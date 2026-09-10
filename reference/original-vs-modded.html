@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/original-vs-modded.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>原版與這台機器差在哪 — toni的MVP模組補習班</title>
+<meta name="description" content="本站的數字大多是從一台裝過台灣模組的機器量的。拿剛安裝好的原版逐項對照：臉皮 504 對 894、大頭照 1,487 對 6,638、語音號碼 1,673 對 4,343。三種資源各有各的原廠上限（臉皮 606、大頭照 5043、語音 5032），編號只能用來排除，不能用來認定。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 原版與這台機器差在哪</p>
+  <h1>原版與這台機器差在哪</h1>
+  <p class="lede">本站絕大多數數字，是從<strong>一台裝過台灣模組的遊戲</strong>量出來的。
+     後來拿到<a href="../tutorials/whats-original/index.html">剛安裝好、從未改動的原版</a>之後
+     逐項對照，才發現差距比想像中大得多 ——
+     <strong>好幾個站上當成「EA 原廠」引用的數字，其實是模組堆上去的。</strong></p>
+  <p>這一頁是那份對照表。<u>站上任何一頁提到這些數字，都以這裡為準。</u></p>
+
+  <div class="card amber">
+    <p class="card-h">編號能證明「不是原廠」，但證明不了「是原廠」</p>
+    <p>三種資源各有各的原廠上限，<strong>不是同一個數字</strong>：
+       臉皮 <code>c001</code>–<code>c606</code>、大頭照 <code>0000</code>–<code>5043</code>、
+       語音號碼 <code>3</code>–<code>5032</code>。</p>
+    <p><strong>超過各自的上限，可以確定是後來加的。</strong>
+       但反過來<u>不成立</u> —— 沒超過上限不代表就是原廠的。這台機器上：</p>
+    <ul>
+      <li>模組加的 395 個臉皮，有 <strong>101 個</strong>（26%）編號落在原廠的 c001–c606 範圍內</li>
+      <li>模組加的 5,428 個大頭照，有 <strong>2,169 個</strong>（40%）編號 ≤ 5043</li>
+      <li>模組加的 2,681 筆語音，有 <strong>997 筆</strong>（37%）編號 ≤ 5032</li>
+    </ul>
+    <p class="small">⚠️ 2026-08-25 訂正：這張卡原本寫「EA 的編號停在五千多，再往上都是後來加的」。
+       那對臉皮根本不成立（原廠上限是 606，不是五千多），
+       而且會讓人以為「五千以下 = 原廠」—— 照那樣去分辨，
+       這台機器上會有三千多個模組檔被認成 EA 的。</p>
+  </div>
+
+  <h2>封裝檔逐項對照</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">封裝檔</th>
+      <th class="num">原版<br>項目</th><th class="num">這台<br>項目</th>
+      <th class="num">原版<br>大小</th><th class="num">這台<br>大小</th><th>怎麼讀</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="封裝檔" class="mono">models.big</td>
+        <td data-label="原版項目" class="num">2,671</td><td data-label="這台項目" class="num"><strong>4,211</strong></td>
+        <td data-label="原版大小" class="num">165.0 MB</td><td data-label="這台大小" class="num"><strong>535.9 MB</strong></td>
+        <td data-label="怎麼讀">臉皮與模型。<strong>3.2 倍大</strong></td></tr>
+      <tr class="hi"><td data-label="封裝檔" class="mono">portrait.big</td>
+        <td data-label="原版項目" class="num">2,393</td><td data-label="這台項目" class="num"><strong>7,544</strong></td>
+        <td data-label="原版大小" class="num">104.2 MB</td><td data-label="這台大小" class="num">253.6 MB</td>
+        <td data-label="怎麼讀">大頭照。<strong>項目多了 3.2 倍</strong></td></tr>
+      <tr><td data-label="封裝檔" class="mono">ingame.big</td>
+        <td data-label="原版項目" class="num">44</td><td data-label="這台項目" class="num">47</td>
+        <td data-label="原版大小" class="num">0.2 MB</td><td data-label="這台大小" class="num">2.5 MB</td>
+        <td data-label="怎麼讀">比賽介面。多出的 3 個檔見 <a href="ingame-files.html">ingame.big 47 個版面檔對照</a></td></tr>
+      <tr><td data-label="封裝檔" class="mono">frontend.big</td>
+        <td data-label="原版項目" class="num">196</td><td data-label="這台項目" class="num">196</td>
+        <td data-label="原版大小" class="num">0.6 MB</td><td data-label="這台大小" class="num">2.1 MB</td>
+        <td data-label="怎麼讀"><strong>項目數一樣</strong>，內容被換過</td></tr>
+      <tr><td data-label="封裝檔" class="mono">anims.big</td>
+        <td data-label="原版項目" class="num">730</td><td data-label="這台項目" class="num">730</td>
+        <td data-label="原版大小" class="num">8.5 MB</td><td data-label="這台大小" class="num">8.5 MB</td>
+        <td data-label="怎麼讀"><strong>完全沒被動過</strong></td></tr>
+      <tr><td data-label="封裝檔" class="mono">logos.big</td>
+        <td data-label="原版項目" class="num">132</td><td data-label="這台項目" class="num">132</td>
+        <td data-label="原版大小" class="num">1.8 MB</td><td data-label="這台大小" class="num">2.3 MB</td>
+        <td data-label="怎麼讀">項目數一樣，換了隊徽</td></tr>
+      <tr><td data-label="封裝檔" class="mono">fonts.big</td>
+        <td data-label="原版項目" class="num">12</td><td data-label="這台項目" class="num">12</td>
+        <td data-label="原版大小" class="num">0.2 MB</td><td data-label="這台大小" class="num">0.4 MB</td>
+        <td data-label="怎麼讀">項目數一樣，換了字型</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">「項目數一樣、大小不同」代表<strong>換內容不換結構</strong> ——
+     模組把既有的格子填上新東西，沒有新增格子。
+     「項目數也變多」代表<u>真的加了新的格子</u>。</p>
+
+  <h2>幾個站上最常引用的數字</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>數字</th><th class="num">原版</th><th class="num">這台</th><th>編號範圍</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="數字">臉皮 <code>cNNN.fsh</code></td>
+        <td data-label="原版" class="num"><strong>504</strong></td><td data-label="這台" class="num">894</td>
+        <td data-label="編號範圍" class="mono">原版 c001–c606<br>這台 c001–c900</td></tr>
+      <tr class="hi"><td data-label="數字">大頭照 <code>NNNN.fsh</code></td>
+        <td data-label="原版" class="num"><strong>1,487</strong></td><td data-label="這台" class="num">6,638</td>
+        <td data-label="編號範圍" class="mono">原版 0000–5043<br>這台 0000–9999</td></tr>
+      <tr class="hi"><td data-label="數字">播報語音的不重複號碼</td>
+        <td data-label="原版" class="num"><strong>1,673</strong></td><td data-label="這台" class="num">4,343</td>
+        <td data-label="編號範圍" class="mono">原版 3–5032<br>這台 1–9999</td></tr>
+      <tr><td data-label="數字">球員名單筆數</td>
+        <td data-label="原版" class="num">2,921</td><td data-label="這台" class="num">3,247</td><td data-label="編號範圍">—</td></tr>
+      <tr><td data-label="數字">投手資料筆數</td>
+        <td data-label="原版" class="num">1,430</td><td data-label="這台" class="num">1,618</td><td data-label="編號範圍">—</td></tr>
+      <tr><td data-label="數字">整套 <code>.big</code> 檔數</td>
+        <td data-label="原版" class="num">224</td><td data-label="這台" class="num">312</td><td data-label="編號範圍">—</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card clay">
+    <p class="card-h">⚠ 這件事訂正了站上一句流傳很廣的話</p>
+    <p><a href="player-voice.html">播報員那頁</a>原本寫著「<u>EA 在 2005 年錄了 4,343 個號碼份的名字</u>」，那句話已經照這一頁訂正掉了。</p>
+    <p><strong>那是這台機器上的數字。EA 實際錄的是 1,673 個。</strong>
+       其餘 2,670 個是<u><strong>淨值</strong></u> ——
+       模組加了 2,681 個號碼，同時也拿掉了 11 個原版有的。
+       至於<a href="../story/community-voices/index.html">台灣模組玩家自己錄的那 23 個人</a>，並不在加進來的那 2,681 個號碼裡：那 23 個號碼有 <strong>16 個</strong>在這台機器的語音庫（<code>data\audio\cd\spch_pbp\pnamedat.big</code>）裡連項目都沒有，剩下 7 個雖然有同名項目、內容卻對不上。那些錄音躺在遊戲讀不到的旁邊資料夾。</p>
+    <p class="small">把單位從「號碼」換成「檔案」，看到的東西更不一樣。
+       原版 4,580 個項目、這台 12,528 個：</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>發生了什麼</th><th class="num">項目數</th></tr></thead>
+      <tbody>
+        <tr><td>新增的</td><td class="num">7,988</td></tr>
+        <tr class="hi"><td><strong>同名、但內容被換掉的</strong></td><td class="num"><strong>848</strong></td></tr>
+        <tr><td>原封不動留著的</td><td class="num">3,692</td></tr>
+        <tr class="hi"><td><strong>被刪掉的</strong></td><td class="num"><strong>40</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>模組不只是「加」。</strong>它換掉了 848 個同名檔案的內容、刪掉了 40 個。
+       只看號碼總數會完全看不到這件事。</p>
+    <p class="small">結論不變：你新增的球員，EA 確實沒錄過他的名字。
+       但「語音庫有 4,343 個號碼」這個數字本身，不能算在 EA 頭上。</p>
+  </div>
+
+  <h2>臉皮那 5 個消失的格子</h2>
+  <p>對照的時候多發現一件事：<strong>原版有、但這台沒有的臉皮編號有 5 個。</strong></p>
+  <p>這 5 個是被<u>覆蓋掉或移除</u>的。
+     <strong>是哪一次改動造成的，本站不知道。</strong><span class="badge wip">未解</span></p>
+  <p class="small">⚠️ 2026-08-25 訂正：這一節原本說「模組通常只會加不會減」，
+     並拿臉皮這 5 個當唯一案例。同一台機器上其實
+     <strong>大頭照少了 277 個原廠編號、語音少了 11 筆</strong> ——
+     臉皮這 5 個是三者裡最小的那一組。「模組只會加不會減」不成立。</p>
+  <p class="small">相對地，這台比原版多出 395 個臉皮編號 —— 加的確實還是比減的多很多。</p>
+
+  <h2>怎麼用這張表</h2>
+  <ul class="tick">
+    <li><strong>看到站上寫某個數字，先問它是哪一欄。</strong>
+        本站已經在各頁把「這台的值」標出來，但如果哪裡漏標了，以這一頁為準。</li>
+    <li><strong>你自己的遊戲會是第三種數字。</strong>
+        裝過什麼就會長什麼樣。用<a href="../tutorials/whats-original/index.html">那一課的腳本</a>先量自己的。</li>
+    <li><strong>編號超過原廠上限的，可以確定是後來加的；沒超過的不能反推。</strong>
+        三種資源的上限不一樣（臉皮 606、大頭照 5043、語音 5032），
+        而且模組加的東西有兩成六到四成就擠在原廠的編號範圍裡。
+        <u>只能用來排除，不能用來認定。</u></li>
+  </ul>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 本站絕大多數數字量自<u>一台裝過台灣模組的遊戲</u>，拿剛安裝好的原版逐項對照之後才發現，<strong>好幾個站上當成「EA 原廠」引用的數字其實是模組堆上去的</strong>，站上任何一頁提到這些數字都以這一頁為準。</li>
+    <li><strong>最常引用的那幾個數字，兩欄差很多</strong> 臉皮 <strong>504 → 894</strong>、大頭照 <strong>1,487 → 6,638</strong>、播報語音的不重複號碼 <strong>1,673 → 4,343</strong>、球員名單 2,921 → 3,247、投手 1,430 → 1,618、整套 <code>.big</code> 檔 224 → 312。</li>
+    <li><strong>訂正一：那句流傳很廣的「EA 錄了 4,343 個名字」是這台機器的數字</strong>。EA 實際錄的是 <strong>1,673 個</strong>，多出來的 2,670 個是<u><strong>淨值</strong></u>：模組加了 2,681 個號碼，同時也拿掉了 11 個原版有的。結論不變（你新增的球員 EA 確實沒錄過），但那個數字不能算在 EA 頭上。</li>
+    <li><strong>訂正二：「EA 的編號停在五千多」對臉皮根本不成立</strong>。三種資源各有各的上限，<u>不是同一個數字</u>：臉皮 <code>c001</code>–<code>c606</code>、大頭照 <code>0000</code>–<code>5043</code>、語音號碼 <code>3</code>–<code>5032</code>。而且模組加進來的東西有兩成六到四成就擠在原廠範圍內（臉皮 101／395 ＝ 26%、大頭照 2,169／5,428 ＝ 40%、語音 997／2,681 ＝ 37%），所以<strong>編號只能用來排除，不能用來認定</strong>。照原本那句去分辨，這台機器上會有三千多個模組檔被認成 EA 的。</li>
+    <li><strong>訂正三：「模組通常只會加不會減」不成立</strong>。同一台機器上大頭照少了 <strong>277</strong> 個原廠編號、語音少了 <strong>11</strong> 筆，臉皮那 5 個反而是三者裡最小的一組。相對地這台比原版多出 395 個臉皮編號，加的確實還是比減的多很多。</li>
+    <li><strong>項目數一樣不代表沒被動過</strong> <code>frontend.big</code> 兩邊都是 196 項，大小卻從 0.6 MB 變 2.1 MB，那是<u>換內容不換結構</u>；<code>anims.big</code> 730 項、8.5 MB，兩邊<strong>完全沒被動過</strong>；<code>models.big</code> 則是 2,671 → 4,211 項、165.0 → 535.9 MB，真的加了新格子。</li>
+    <li><strong>把單位從「號碼」換成「檔案」，看到的東西更不一樣</strong> 原版 4,580 個項目、這台 12,528 個，其中<u>新增 7,988</u>、<strong>同名但內容被換掉 848</strong>、原封不動 3,692、<strong>被刪掉 40</strong>。只看號碼總數會完全看不到後面那兩欄。</li>
+    <li><strong>本站沒驗的</strong> 原版有、這台沒有的那 5 個臉皮編號，<u>是哪一次改動造成的本站不知道</u>。另外整頁只是兩份遊戲的對照，<strong>你自己的遊戲會是第三種數字</strong>，裝過什麼就長什麼樣，要量自己那一份請用「怎麼看出哪些檔還沒被動過」那一課的腳本。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../tutorials/whats-original/index.html">怎麼看出哪些檔還沒被動過</a> —— 量你自己那一份</li>
+    <li><a href="bigf.html">BIGF 封裝格式</a> —— 上面那些項目數是怎麼數出來的</li>
+    <li><a href="official-chinese.html">EA 自己的繁體中文版</a> —— 另一組官方對照</li>
+  </ul>
+
+  <footer>
+    <p>本頁的每一組數字都是把兩份遊戲各自打開數出來的：
+       一份是剛安裝好、從未改動的原版（1,190 個檔，其中 1,189 個的時間落在 2004-2005），
+       一份是本站的測試機（裝過台灣模組）。全程唯讀。
+       標示為「未解」之處本站沒有查出來，不寫成定論。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

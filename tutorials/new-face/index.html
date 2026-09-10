@@ -1,0 +1,2779 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/new-face/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>做一張新的球員臉皮 — toni的MVP模組補習班</title>
+<meta name="description" content="把自己的圖做成遊戲裡的 3D 臉皮貼圖。說明為什麼不能「新增」只能「換掉」，怎麼找到沒人在用的空位，以及臉皮貼圖攤平之後長什麼樣。附零相依腳本，一行指令可還原。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../../index.html">首頁</a>
+  <a class="item" href="../../start.html">新手基本功</a>
+  <a class="item" href="../../do.html">我想做什麼</a>
+  <a class="item" href="../../plan.html">課表</a>
+  <a class="item on" href="../index.html">教學</a>
+  <a class="item" href="../../7min/index.html">七分鐘</a>
+  <a class="item" href="../../reference/index.html">速查</a>
+  <a class="item" href="../../coach/index.html">棒球教練</a>
+  <a class="item" href="../../story/index.html">故事</a>
+  <a class="item" href="../../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="../index.html">教學</a> › 做一張新的球員臉皮</p>
+  <h1>做一張新的球員臉皮</h1>
+  <p class="lede">球場上那張 3D 的臉。這一課會把你的圖壓成遊戲用的格式，放進
+     <code>models.big</code> 這個封裝檔裡。<strong>比換大頭照難一點</strong>，因為臉皮貼圖是攤平的 3D 展開圖，不是正面照。</p>
+
+  <div class="grid">
+    <div class="card"><p class="card-h">難度</p><p>★★★ 要會看展開圖</p></div>
+    <div class="card"><p class="card-h">時間</p><p>約 30 分鐘</p></div>
+    <div class="card"><p class="card-h">可以還原嗎</p><p><strong>可以，一行指令</strong></p></div>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">先講最重要的一件事：不能「新增」，只能「換掉」</p>
+    <p>封裝檔的<strong>目錄放在檔案最前面</strong>，資料緊接在後（<code>models.big</code> 的檔頭加目錄佔前 73,322 個位元組，其中目錄本身是 73,306）。
+       多加一個項目會讓目錄變長，後面<u>所有資料都得往後挪</u> —— 那是「重新打包」，
+       而重新打包會弄丟目錄沒有指到的資料。</p>
+    <p><strong>所以正確做法是：找一個沒有任何球員在用的編號，換掉它。</strong>
+       腳本的 <code>--info</code> 會幫你算出哪些是空位。</p>
+  </div>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <div class="quickfix" id="quick">
+    <p class="card-h">⚡ 只想趕快做完？照這五步</p>
+    <ol>
+      <li>下載 <code>mvp_new_face.py</code>。動手前先確認硬碟<strong>還放得下一份 <code>models.big</code> 的複本</strong>，腳本會先備份它（本站測試機那份是 536 MB，備份時腳本會把大小印給你看）。</li>
+      <li>看哪些編號沒人在用，挑一個空位（空位有幾個要當場算，不能背）<br>
+  <p class="small">Windows:</p>
+  <pre><code>python mvp_new_face.py "&lt;遊戲資料夾&gt;" --info</code></pre>
+  <p class="small">Mac / Linux:</p>
+  <pre><code>python3 mvp_new_face.py "&lt;遊戲資料夾&gt;" --info</code></pre></li>
+      <li>把那個空位現在的貼圖匯出來當範本，<strong>在原圖上改</strong>：尺寸維持 256×512、五官與眼球牙齒的位置都不要挪、存 PNG 保留透明度<br>
+  <p class="small">Windows:</p>
+  <pre><code>python mvp_new_face.py "&lt;遊戲資料夾&gt;" --export 4 %USERPROFILE%\Desktop\c004.png</code></pre>
+  <p class="small">Mac / Linux:</p>
+  <pre><code>python3 mvp_new_face.py "&lt;遊戲資料夾&gt;" --export 4 ~/Desktop/c004.png</code></pre></li>
+      <li>先預覽（會再告訴你一次這個編號有沒有人在用，<u>只是提醒，不會擋你</u>），確定了在同一行最後加 <code>--apply</code>，備份那份封裝檔要等十幾秒<br>
+  <p class="small">Windows:</p>
+  <pre><code>python mvp_new_face.py "&lt;遊戲資料夾&gt;" --import 4 %USERPROFILE%\Desktop\c004.png</code></pre>
+  <pre><code>python mvp_new_face.py "&lt;遊戲資料夾&gt;" --import 4 %USERPROFILE%\Desktop\c004.png --apply</code></pre>
+  <p class="small">Mac / Linux:</p>
+  <pre><code>python3 mvp_new_face.py "&lt;遊戲資料夾&gt;" --import 4 ~/Desktop/c004.png</code></pre>
+  <pre><code>python3 mvp_new_face.py "&lt;遊戲資料夾&gt;" --import 4 ~/Desktop/c004.png --apply</code></pre></li>
+      <li><strong>還沒結束</strong>：貼圖換好了但還沒有人在用它，用另一課的腳本指定某位球員<br>
+  <p class="small">Windows:</p>
+  <pre><code>python mvp_swap_face.py "&lt;遊戲資料夾&gt;" --set &lt;球員&gt; 4 --apply</code></pre>
+  <p class="small">Mac / Linux:</p>
+  <pre><code>python3 mvp_swap_face.py "&lt;遊戲資料夾&gt;" --set &lt;球員&gt; 4 --apply</code></pre></li>
+    </ol>
+    <p class="tail">後悔的話，這一行還原：</p>
+<p class="small">Windows:</p>
+<pre><code>python mvp_new_face.py "〔遊戲資料夾〕" --restore</code></pre>
+<p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_new_face.py "〔遊戲資料夾〕" --restore</code></pre>
+  <p class="tail">⚠️ 第 3 步印出「<code>c004.fsh 是 RGB16_565 格式,這支腳本只處理 DXT1(代號 0x60)的臉皮。</code>」就停住？
+       那代表你那份 <code>models.big</code> 的臉皮還是<strong>剛安裝好的原版格式</strong>，本課動不了它，
+       原因看<a href="#spec">規格那一段</a>。</p>
+  <p class="tail">編號 <code>4</code> 換成第 2 步挑到的空位。不喜歡就跑 <code>--restore</code>，一行還原（一樣可能要等十幾秒）。
+       想知道為什麼，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+  </div>
+
+  <h2>這一課跟另外兩課怎麼接</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>你想做的事</th><th>用哪一課</th></tr></thead>
+    <tbody>
+      <tr><td>讓球員改用<u>已經存在</u>的某張臉</td><td><a href="../swap-face/index.html">幫球員換一張臉</a></td></tr>
+      <tr class="hi"><td><strong>做一張遊戲裡沒有的臉</strong></td><td>本課</td></tr>
+      <tr><td>換名單畫面那張<u>證件照</u></td><td><a href="../swap-portrait/index.html">換球員大頭照</a></td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>完整流程是兩課接起來</strong>：先用本課把貼圖放進某個空編號，
+     再用「幫球員換一張臉」指定某位球員用那個編號。</p>
+
+  <h2>臉皮貼圖攤平之後長什麼樣</h2>
+  <p>不是一張正面照。把 <code>--export</code> 出來的圖打開會看到：</p>
+  <ul class="plain">
+    <li><strong>正中央</strong>：攤開的臉</li>
+    <li><strong>兩側</strong>：耳朵被拉到邊緣</li>
+    <li><strong>上方</strong>：頭髮</li>
+    <li><strong>下面一條</strong>：脖子</li>
+    <li><strong>左下角</strong>：兩顆眼球　<strong>右下角</strong>：牙齒</li>
+  </ul>
+  <p><strong>改圖時位置不要挪動。</strong>五官在展開圖上的位置對應到 3D 模型的表面，
+     挪了就會貼錯地方。最安全的做法是<u>在原圖上面直接改</u>，不要重畫。</p>
+
+  <div class="card grass" id="spec">
+    <p class="card-h">規格看你手上這一份是哪一份，原版跟被換過的剛好相反</p>
+    <p>本站測試機那份 <code>models.big</code> 的 894 張臉皮裡，
+       <strong>890 張都是 256×512、DXT1</strong>（99.6%），只有 4 張是一半大小的例外。
+       <strong>但那不是 EA 出貨時的樣子。</strong></p>
+    <p>拿<u>剛安裝好的原版</u>重量，答案剛好反過來：<strong>504 張 <code>c***.fsh</code>
+       全部是 128×256 的 <code>RGB16_565</code>（代號 <code>0x78</code>），一張 DXT1 都沒有</strong>。
+       本站手上四份剛安裝好的安裝（英文版、中文版、<code>PK</code> 版、套過官方更新檔的那一份）都量過，
+       結果一樣。<span class="small">（那四份的 <code>models.big</code> 只有兩種內容：
+       英文版與 <code>PK</code> 版相同，中文版與官方更新檔那一份相同。）</span></p>
+    <p><span class="badge wip">未解</span> 測試機那 890 張是誰換成 DXT1 的、在哪一次改動裡換的，本站沒有查出來。</p>
+    <p><strong>所以本課這支腳本在剛安裝好的原版上一個編號都動不了。</strong>
+       <code>--info</code> 照樣列得出空位（它不解像素），但每一個編號的
+       <code>--export</code> 與 <code>--import</code> 都會被腳本的格式守門擋下來。
+       要用本課，你那份 <code>models.big</code> 得是<u>臉皮已經被換成 DXT1 的那一種</u>，
+       本站測試機那份就是。兩份的完整對照見<a href="../../reference/models.html">模型與臉皮 models.big</a>。</p>
+  </div>
+
+  <h2>DXT1 跟大頭照的 DXT3 差在哪</h2>
+  <p>兩個都是把 4×4 的方塊壓成一小段位元組，但表達透明度的方式不同：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th></th><th>DXT1（臉皮）</th><th>DXT3（大頭照）</th></tr></thead>
+    <tbody>
+      <tr><td>每個 4×4 方塊</td><td data-label="DXT1（臉皮）">8 個位元組</td><td data-label="DXT3（大頭照）">16 個位元組</td></tr>
+      <tr><td>透明度</td><td data-label="DXT1（臉皮）"><strong>沒有獨立欄位</strong></td><td data-label="DXT3（大頭照）">每像素 4 個位元，獨立存</td></tr>
+      <tr class="hi"><td>那怎麼透明</td>
+          <td data-label="DXT1（臉皮）">靠兩個底色<u>誰大誰小</u>切換模式：小的那種會空出一個索引代表完全透明</td>
+          <td data-label="DXT3（大頭照）">不必，透明度分開存</td></tr>
+      <tr><td>一個方塊最多幾色</td><td data-label="DXT1（臉皮）">4 色（透明模式下 3 色）</td><td data-label="DXT3（大頭照）">4 色</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">本站測試機那份 <code>models.big</code>：890 張 DXT1 臉皮裡讀得出來的 889 張，
+     合計 7,282,688 個 4×4 方塊，四色模式 90.6%、三色加透明 6.3%、整塊同色 3.1%。
+     三種都會遇到，所以腳本三種都要能產生。</p>
+  <p class="small">⚠️ 這組比例只代表這一份檔案。<a href="../../reference/models.html">剛安裝好的原版一張 DXT1 臉皮都沒有</a>，
+     504 張全部是 <code>0x78</code> 的 128×256，英文版與中文版量出來一樣；這台上的 DXT1 臉皮是後來被社群模組換上去的。</p>
+
+  <h2>前置</h2>
+  <ul class="plain">
+    <li>已經照 <a href="../../start.html">新手基本功</a> 找到遊戲資料夾</li>
+    <li>電腦裡有 Python 3</li>
+    <li>一套會存 PNG 並且<strong>保留透明度</strong>的修圖軟體</li>
+    <li><strong>硬碟要放得下一份 <code>models.big</code> 的複本</strong> —— 腳本會先備份它，備份時會把大小印給你看（本站測試機那份是 536 MB）</li>
+    <li><strong>你那份 <code>models.big</code> 裡的臉皮必須是 DXT1</strong>。
+        <u>剛安裝好的原版不是</u>：原版那 504 張全部是 <code>RGB16_565</code>
+        （代號 <code>0x78</code>、128×256），腳本會在第 3 步就停住。
+        怎麼分辨、為什麼會這樣，看<a href="#spec">規格那一段</a></li>
+  </ul>
+
+  <h2>👉 你要做的事</h2>
+
+  <div class="step">
+    <div class="step-n">1</div>
+    <div>
+      <p class="step-t">下載腳本</p>
+      <p><a href="mvp_new_face.py" download>mvp_new_face.py</a>（2,305 行，零相依）</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">2</div>
+    <div>
+      <p class="step-t">看哪些編號沒人在用</p>
+      <p class="step-why">這一步會當場算，因為空位有幾個<strong>完全取決於你裝的是哪一份名冊</strong>，不能背。</p>
+      <p class="small">Windows:</p>
+<pre>python mvp_new_face.py "&lt;遊戲資料夾&gt;" --info</pre>
+      <p class="small">Mac / Linux:</p>
+<pre>python3 mvp_new_face.py "&lt;遊戲資料夾&gt;" --info</pre>
+      <p>畫面會列出空位，也會告訴你有沒有球員指向不存在的貼圖。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">3</div>
+    <div>
+      <p class="step-t">挑一個空位，把它現在的貼圖匯出來</p>
+      <p class="step-why">拿現成的當範本，比從白紙開始容易太多。</p>
+      <p class="small">Windows:</p>
+<pre>python mvp_new_face.py "&lt;遊戲資料夾&gt;" --export 4 %USERPROFILE%\Desktop\c004.png</pre>
+      <p class="small">Mac / Linux:</p>
+<pre>python3 mvp_new_face.py "&lt;遊戲資料夾&gt;" --export 4 ~/Desktop/c004.png</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">4</div>
+    <div>
+      <p class="step-t">在原圖上改</p>
+      <ul class="plain">
+        <li>尺寸維持 <strong>256×512</strong></li>
+        <li><strong>五官位置不要挪</strong>，眼球跟牙齒那兩塊也不要動</li>
+        <li>存成 PNG，保留透明度</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">5</div>
+    <div>
+      <p class="step-t">先預覽</p>
+      <p class="small">Windows:</p>
+<pre>python mvp_new_face.py "&lt;遊戲資料夾&gt;" --import 4 %USERPROFILE%\Desktop\c004.png</pre>
+      <p class="small">Mac / Linux:</p>
+<pre>python3 mvp_new_face.py "&lt;遊戲資料夾&gt;" --import 4 ~/Desktop/c004.png</pre>
+      <p>會印出品質報告，還會再告訴你一次<strong>這個編號有沒有人在用</strong>。
+         <u>那只是提醒，不會擋你</u>：有人在用照樣往下跑，換不換由你自己決定。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">6</div>
+    <div>
+      <p class="step-t">確定了才寫進去</p>
+      <p class="step-why">加 <code>--apply</code>。備份那份幾百 MB 的封裝檔要等十幾秒，是正常的。</p>
+      <p class="small">Windows:</p>
+<pre>python mvp_new_face.py "&lt;遊戲資料夾&gt;" --import 4 %USERPROFILE%\Desktop\c004.png --apply</pre>
+      <p class="small">Mac / Linux:</p>
+<pre>python3 mvp_new_face.py "&lt;遊戲資料夾&gt;" --import 4 ~/Desktop/c004.png --apply</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">7</div>
+    <div>
+      <p class="step-t">指定某位球員用這張臉</p>
+      <p class="step-why">到這裡貼圖換好了，但還沒有人在用它。這一步用另一課的腳本。</p>
+      <p class="small">Windows:</p>
+<pre>python mvp_swap_face.py "&lt;遊戲資料夾&gt;" --set &lt;球員&gt; 4 --apply</pre>
+      <p class="small">Mac / Linux:</p>
+<pre>python3 mvp_swap_face.py "&lt;遊戲資料夾&gt;" --set &lt;球員&gt; 4 --apply</pre>
+      <p>詳見<a href="../swap-face/index.html">幫球員換一張臉</a>。</p>
+    </div>
+  </div>
+
+  <h2>✅ 成功標準</h2>
+  <ul class="plain">
+    <li>預覽時看到「這個編號沒有任何球員在用」。<strong>看到「無法判斷這個編號有沒有人在用」不算通過</strong> —— 那代表名冊 <code>data/database/attrib.dat</code> 讀不到，先把名冊放回去再判斷</li>
+    <li>出現「已備份 → models.big.facetexbak」</li>
+    <li>出現「只改了目錄 8 bytes + 檔頭 4 bytes」</li>
+    <li><strong>複驗的數字大於 90%</strong></li>
+    <li>做完第 7 步之後進遊戲，那位球員的臉變成你做的</li>
+  </ul>
+
+  <h2>❌ 出錯處理</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>看到什麼</th><th>怎麼做</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td><code>是 RGB16_565 格式,這支腳本只處理 DXT1</code></td>
+          <td>你那份 <code>models.big</code> 的臉皮還是<strong>剛安裝好的原版格式</strong>，本課動不了它。
+              原因看<a href="#spec">規格那一段</a></td></tr>
+      <tr><td>尺寸不一樣，不能換</td><td>調成 256×512（或它告訴你的尺寸）</td></tr>
+      <tr><td>這個編號有 N 位球員正在用</td><td>換一個空位，或接受那些人的臉也會變</td></tr>
+      <tr><td>⚠️ 有地方誤差偏大</td><td>圖裡有大面積漸層。可接受，或把漸層改平一點</td></tr>
+      <tr><td><code>QFS 解出來的資料超過檔頭宣稱的 N 位元組</code></td>
+          <td>那一張的壓縮檔頭寫的長度跟實際對不上，腳本不硬拆。<strong>換一個編號</strong>就好
+              （本站測試機那 894 張裡只有 <code>c333</code> 這一張是這樣）</td></tr>
+      <tr><td><code>檔案讀寫失敗 —— …</code></td>
+          <td>硬碟空間不夠（備份需要跟你那份 <code>models.big</code> 一樣大的空間，本站測試機那份是 536 MB）、你指定的輸出資料夾不存在，或對遊戲資料夾沒有寫入權限。<br>如果它是在「<strong>資料已經接到檔尾、目錄還沒改到</strong>」那一刻停下來的，腳本會把剛接上去的那一段<strong>截掉</strong>，你的 <code>models.big</code> 逐位元組回到動手之前，下一次 <code>--apply</code> 照樣進得去（本站在 536 MB 的複本上實測過）。更後面才失敗（提交那 12 個位元組已經開始寫）的話，尾巴會留著，照訊息裡說的跑一次 <code>--restore</code> 就好</td></tr>
+      <tr><td><code>既有的備份 models.big.facetexbak 是壞的(N 個位元組)</code></td>
+          <td>那份備份是半截的，腳本<u>在動遊戲檔之前</u>就停手。把它刪掉再跑一次（腳本會重新做一份），或改用你自己另外留的那一份</td></tr>
+      <tr><td><code>… 已經存在,而且它不是 PNG —— 不覆蓋</code></td>
+          <td><code>--export</code> 的輸出檔名打錯了，換一個名字</td></tr>
+      <tr class="hi"><td><strong>複驗沒過</strong></td><td><strong>腳本已經自己退回了</strong>，你的 <code>models.big</code> 跟執行前一樣，<u>不必再做什麼</u>（它只把這一次改動的那 12 個位元組寫回去，你之前換好的臉不會被一起退掉），<strong>結束代碼 2</strong>。把訊息回報給班主任。<br>只有在它說「<strong>自動退回也沒成功</strong>」的時候，才要自己跑 <code>--restore</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card grass">
+    <p class="card-h">一行就能還原</p>
+<p class="small">Windows:</p>
+<pre>python mvp_new_face.py "&lt;遊戲資料夾&gt;" --restore</pre>
+<p class="small">Mac / Linux:</p>
+<pre>python3 mvp_new_face.py "&lt;遊戲資料夾&gt;" --restore</pre>
+    <p>本站實測：測試機那份 536 MB 的封裝檔還原之後，SHA-256 與動手前<strong>完全相同</strong>。</p>
+    <p class="small">而且<strong>既有的備份如果是半截的，<code>--apply</code> 會在動遊戲檔之前就停下來</strong>，
+       不會讓你落到「改進去了、卻還原不回來」那一步。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">想確認這支腳本本身沒被改壞</p>
+<p class="small">Windows:</p>
+<pre>python mvp_new_face.py --selftest</pre>
+<p class="small">Mac / Linux:</p>
+<pre>python3 mvp_new_face.py --selftest</pre>
+    <p>這一行<strong>不需要遊戲資料夾，也不碰任何遊戲檔</strong>——整組測試都在系統的暫存資料夾裡自己做一個迷你的封裝檔來玩。
+       畫面上會列出 <strong>27 項</strong>，<strong>全部打勾就代表它還是好的</strong>（結束代碼 0；任何一項紅了就是 1）。</p>
+    <p class="small">每一道把關都配一個<strong>餌</strong>（事先擺好的符號連結陷阱、故意讓還原的最後一步失敗、半截的備份…），
+       而且各配一個<strong>陰性對照</strong>——先證明沒有餌的時候那件事真的做得成，
+       免得「整支腳本罷工」被誤讀成「保護有效」。</p>
+  </div>
+
+  <h2>📋 回報範本</h2>
+<pre>做新臉皮 狀態：✅ / ❌
+編號：
+--info 說那個編號有幾人在用：
+我的 PNG 尺寸：
+品質報告的四個數字：
+畫面上的訊息（最後三行）：
+</pre>
+
+  <h2>做這一課時發現的一件事</h2>
+  <p>寫這支腳本時順手比對了<u>剛安裝好的原版</u>與本站測試機的封裝檔，
+     發現測試機這份<strong>少了 5 張 EA 原本就有的臉皮貼圖</strong>
+     （<code>c116</code>、<code>c125</code>、<code>c170</code>、<code>c188</code>、<code>c219</code>）。
+     多半是社群重新打包時掉的。</p>
+  <p>所以腳本的 <code>--info</code> 會分成三種講，不會混為一談：</p>
+  <ul class="plain">
+    <li><strong>901 以上</strong>：遊戲內建的通用臉，封裝檔裡本來就沒有貼圖（原版也沒有）。<u>不是缺檔</u></li>
+    <li><strong>編號 0</strong>：「沒有指定」的意思。<u>不是缺檔</u></li>
+    <li><strong>900 以下卻找不到</strong>：你這份封裝檔真的少了那張圖</li>
+  </ul>
+  <p class="small">這三種在畫面上長得很像，都是「有人指過去但沒有圖」。
+     混在一起講會讓人以為自己的遊戲壞了 —— 其實多數情況完全正常。</p>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 臉皮不能「新增」只能「換掉」，所以流程是找一個沒有任何球員在用的編號，把你的 256×512 圖壓成 DXT1 接回 <code>models.big</code>，再用「幫球員換一張臉」指定誰用它。</li>
+    <li><strong>為什麼不能新增</strong> 封裝檔的目錄放在檔案最前面（<code>models.big</code> 的檔頭加目錄佔前 73,322 個位元組，其中目錄本身是 73,306），多加一個項目會讓目錄變長，後面所有資料都得往後挪，那是「重新打包」，而重新打包會弄丟目錄沒有指到的資料。</li>
+    <li><strong>規格看你手上這一份是哪一份</strong> 本站測試機那份 <code>models.big</code> 894 張臉皮裡，890 張都是 256×512、DXT1（99.6%），只有 4 張是一半大小的例外；<strong>但剛安裝好的原版剛好反過來</strong>：原版 504 張 <code>c***.fsh</code> 全部是 128×256 的 <code>RGB16_565</code>（代號 <code>0x78</code>），一張 DXT1 都沒有，本站手上四份剛安裝好的安裝（英文版、中文版、<code>PK</code> 版、套過官方更新檔的那一份）都量過，結果一樣。<strong>所以這支腳本在剛安裝好的原版上一個編號都動不了</strong>，要用本課，你那份 <code>models.big</code> 得是臉皮已經被換成 DXT1 的那一種。測試機那 890 張是誰換的，本站沒有查出來。</li>
+    <li><strong>貼圖是攤平的 3D 展開圖，不是正面照</strong> 正中央是攤開的臉、兩側是耳朵、上方是頭髮、下面一條是脖子、左下角兩顆眼球、右下角牙齒。位置挪了就會貼錯地方，最安全的做法是在原圖上直接改，不要重畫。</li>
+    <li><strong>DXT1 跟大頭照的 DXT3 差在透明度</strong> DXT1 每個 4×4 方塊只有 8 個位元組，沒有獨立的透明度欄位，靠兩個底色誰大誰小切換模式。本站測試機那份 <code>models.big</code>，890 張 DXT1 臉皮裡讀得出來的 889 張、合計 7,282,688 個方塊：四色 90.6%、三色加透明 6.3%、整塊同色 3.1%，三種都會遇到。<a href="../../reference/models.html">剛安裝好的原版一張 DXT1 臉皮都沒有</a>，504 張全部是 <code>0x78</code> 的 128×256，所以這組比例只代表這一份被社群模組改過的檔案。</li>
+    <li><strong>空位有幾個不能背</strong> 它完全取決於你裝的是哪一份名冊，所以每次都要 <code>--info</code> 當場算。<code>--info</code> 會把三種「有人指過去卻沒有圖」分開講：901 以上是遊戲內建通用臉、編號 0 是「沒有指定」，這兩種都不是缺檔；只有 900 以下卻找不到才是你這份封裝檔真的少了（本站測試機就少了 <code>c116</code>、<code>c125</code>、<code>c170</code>、<code>c188</code>、<code>c219</code> 這 5 張 EA 原本就有的）。</li>
+    <li><strong>安全網</strong> 硬碟先留得下一份 <code>models.big</code> 的複本（本站測試機那份是 536 MB）；不加 <code>--apply</code> 只是預覽，而且預覽會告訴你這個編號有沒有人在用（<u>只是提醒，不會擋你</u>）；備份是 <code>models.big.facetexbak</code>；寫入只改目錄 8 bytes 加檔頭 4 bytes，新資料接在檔尾；<code>--restore</code> 還原後 SHA-256 與動手前完全相同。複驗數字小於 90% <strong>腳本會自動退回</strong>（只把這一次改動的 12 個位元組寫回去，不會動到你之前換好的臉），結束代碼 2。</li>
+    <li><strong>本站沒驗的</strong> 測試機少掉那 5 張貼圖到底是怎麼掉的，頁面只寫「多半是社群重新打包時掉的」，沒有真的查出來；「不影響其他項目」這件事是<strong>抽驗</strong> 299 個其他項目零位元組變動，不是四千多個項目逐一全查。</li>
+  </ul>
+
+  <h2 id="how-it-works">這支腳本在做什麼</h2>
+  <p>整支腳本在做的事，可以看成<strong>把三層外殼一層一層打開，只換掉最裡面那一層，再原樣包回去</strong>。
+     <code>models.big</code> 是封裝檔，裡面的 <code>c004.fsh</code> 用 EA 的 QFS 壓縮過，
+     解開之後是 SHPI 容器，容器裡面才是像素。<strong>這支腳本只認 DXT1 那一種像素</strong>，
+     而剛安裝好的原版那 504 張臉皮是 <code>RGB16_565</code>、128×256，不是 DXT1
+     （見<a href="#spec">規格那一段</a>）。
+     腳本先讀封裝檔最前面的目錄，查出那一項在檔案裡的位移與長度，把它挖出來解壓，
+     再在 SHPI 裡量出像素從第幾個位元組開始、到第幾個結束，
+     然後只把那一段換成你的 PNG 壓出來的位元組。
+     長度完全一樣，所以外面兩層的結構一個數字都不必重算。</p>
+  <p>寫回去的時候<u>不是覆蓋原本的位置</u>，而是把整份新資料<strong>接到檔案最後面</strong>，
+     只改目錄裡那一項的 8 個位元組、加上檔頭的 4 個位元組。
+     舊資料一個位元組都沒有動，這就是 <code>--restore</code> 一定救得回來的原因（而備份如果不完整，腳本會在動手之前就擋下來）。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>哪一段</th><th>做什麼</th><th>為什麼要有它</th></tr></thead>
+    <tbody>
+      <tr><td data-label="哪一段"><code>_atomic_copy()</code><br><code>_restore_from_backup()</code></td>
+          <td data-label="做什麼">備份、還原、匯出 PNG <u>都</u>先寫到目的檔<strong>隔壁</strong>一個<strong>名字搶不走</strong>的暫存檔（<code>tempfile.mkstemp</code>），
+              <code>fsync</code> 落碟、把目的檔原本的權限對回去、整份讀回來比 SHA-256，
+              全過了才用 <code>os.replace</code> 換上；目的檔或備份檔<strong>本身是符號連結就停手</strong>。
+              還原前另外先檢查那份備份有沒有被截斷過</td>
+          <td data-label="為什麼要有它">備份到一半被中斷（磁碟滿、外接碟拔掉、按了 Ctrl-C）會留下半截的檔，
+              而半截的備份會在還原時把好檔蓋掉。
+              暫存檔的名字不自己拼，是因為<u>猜得到的名字會被先做成符號連結劫持</u>——
+              那樣寫出去的東西就跑到別的地方了。
+              <code>os.replace</code> 在同一個資料夾裡是原子的：目的檔要嘛還是舊的那份、
+              要嘛已經是完整的新的那份，沒有「半截」這個選項</td></tr>
+      <tr><td data-label="哪一段"><code>qfs_decompress()</code></td>
+          <td data-label="做什麼">把 <code>.fsh</code> 從 EA 的 QFS 壓縮解開</td>
+          <td data-label="為什麼要有它">封裝檔裡拿到的是壓縮過的位元組，不解開連寬高都讀不到</td></tr>
+      <tr><td data-label="哪一段"><code>qfs_compress_literal()</code></td>
+          <td data-label="做什麼">壓回 QFS，但只用「照抄」這一種指令</td>
+          <td data-label="為什麼要有它">不做字串比對，所以壓出來比 EA 原本的大，
+              但因為是接到檔尾，大一點沒有影響。換來的是快，而且不可能壓錯</td></tr>
+      <tr><td data-label="哪一段"><code>big_entries()</code></td>
+          <td data-label="做什麼">讀封裝檔最前面的目錄，記下每一項的名字、位移、長度，
+              以及<u>那一項的位移欄位本身在檔案的哪個位置</u></td>
+          <td data-label="為什麼要有它">最後一欄是關鍵：記住它，之後改檔就只寫那 8 個位元組，
+              不必重排整份目錄</td></tr>
+      <tr><td data-label="哪一段"><code>append_entry()</code></td>
+          <td data-label="做什麼">把新資料接到檔尾，改目錄 8 個位元組加檔頭 4 個位元組</td>
+          <td data-label="為什麼要有它">重新打包會弄丟目錄沒有指到的資料。接到檔尾是唯一
+              「舊資料一個位元組都不動」的寫法。
+              另外，<strong>資料接到檔尾了、目錄還沒改到就出事</strong>（硬碟滿、外接碟拔掉、按了 <kbd>Ctrl</kbd>+<kbd>C</kbd>）的時候，
+              它會把剛接上去的那一段<strong>截掉</strong>再把錯誤丟出來，
+              檔案逐位元組回到動手之前，連檔頭宣告的長度都對得回去，
+              <u>下一次 <code>--apply</code> 照樣進得去</u>。
+              本站在測試機那份 536 MB 的 <code>models.big</code> 複本上實測過：
+              截掉之後 SHA-256 與動手前完全相同，接著跑一次 <code>--apply</code> 也順利寫進去</td></tr>
+      <tr><td data-label="哪一段"><code>fsh_first_image()</code></td>
+          <td data-label="做什麼">在 SHPI 容器裡量出格式代號、寬、高，以及像素的起點與終點</td>
+          <td data-label="為什麼要有它">不知道像素從哪裡到哪裡，就沒辦法「只換那一段」。
+              認不得的格式代號一律停手，不硬拆</td></tr>
+      <tr><td data-label="哪一段"><code>dxt1_decode()</code></td>
+          <td data-label="做什麼">DXT1 轉成一般的 RGBA 像素</td>
+          <td data-label="為什麼要有它"><code>--export</code> 靠它把遊戲裡的貼圖變成你能用修圖軟體打開的 PNG</td></tr>
+      <tr><td data-label="哪一段"><code>dxt1_encode()</code><br><code>_encode_block()</code></td>
+          <td data-label="做什麼">把你的圖切成 4×4 方塊，每塊試過多組端點，挑誤差最小的那組壓成 8 個位元組</td>
+          <td data-label="為什麼要有它">這是「把圖放回遊戲」真正的那一步。
+              DXT1 沒有獨立的透明度欄位，透明要靠三色模式的索引 3 表達，也在這裡處理</td></tr>
+      <tr><td data-label="哪一段"><code>png_read()</code><br><code>png_write()</code></td>
+          <td data-label="做什麼">自己拆 PNG 的區塊、自己把五種預測濾波加回去、自己寫回 PNG</td>
+          <td data-label="為什麼要有它">這樣整支腳本零相依，不用叫玩家先去安裝影像套件</td></tr>
+      <tr><td data-label="哪一段"><code>resolve_field()</code></td>
+          <td data-label="做什麼">在名冊的表頭當場查出臉皮那一欄是第幾欄</td>
+          <td data-label="為什麼要有它">不同來源的名冊欄位順序不一樣。欄號寫死就會改到別人的資料，
+              所以一律執行時查</td></tr>
+      <tr><td data-label="哪一段"><code>face_usage()</code></td>
+          <td data-label="做什麼">統計每個臉皮編號有幾位球員在用</td>
+          <td data-label="為什麼要有它">「空位」要封裝檔跟名冊兩邊兜起來才算得出來。
+              只看封裝檔，會把別人正在用的編號當成空位</td></tr>
+      <tr><td data-label="哪一段"><code>cmd_import()</code></td>
+          <td data-label="做什麼">把會擋下來的理由先問完（編號在不在、格式對不對、尺寸一不一樣），
+              再壓縮、印品質報告，最後才寫。<u>「有沒有人在用」不會擋你</u>：有人在用只印出提醒，
+              照樣往下跑，換不換由你自己決定，上面「❌ 出錯處理」那張表也是這樣寫的</td>
+          <td data-label="為什麼要有它">沒加 <code>--apply</code> 時就停在印報告那一步。
+              寫完會重新開檔讀回來比對，一致率低於 90% 就當成失敗，
+              而且<strong>當場自己退回</strong>：把這一次動過的 12 個位元組寫回舊值、再把接上去的資料截掉
+              （<u>不是 <code>--restore</code></u>，所以你之前換好的臉不會被一起退掉），
+              退回之後重讀目錄確認那一項真的指回原位才回報</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">安全網集中在三個地方：<strong>預設唯讀</strong>（沒加 <code>--apply</code> 就只印字）、
+     <strong>備份、還原、匯出 PNG 三種寫入都是原子的</strong>、
+     <strong>寫完立刻讀回來複驗，沒過就自動退回</strong>。
+     按 <kbd>Ctrl</kbd>+<kbd>C</kbd> 中斷時它會<u>照實說遊戲檔動到了沒有</u>——
+     「一個檔案都沒有動到」、「改到一半被打斷」、「已經改好了（是完整的）」三種講法各不相同，
+     依據是腳本自己在真正寫入前後留下的記號，不是憑感覺講。
+     做不到的事也一起講清楚：不能新增編號、不能改尺寸、只處理 DXT1（代號 <code>0x60</code>，
+     <u>剛安裝好的原版那 504 張 <code>0x78</code> 臉皮它一張都動不了</u>），
+     讀 PNG 不支援交錯式與每色 16 位元，而且它<u>不會幫你指定哪位球員用這個編號</u>，
+     那是<a href="../swap-face/index.html">幫球員換一張臉</a>那一課的事。</p>
+  <p class="small">還有一個誠實的限制：把 <code>models.big</code> 或那份備份檔<strong>做成符號連結</strong>的人，
+     腳本會直接拒絕、請你把真正的路徑給它——沿著連結寫等於去改別的地方，那不是你以為的位置。
+     <u>這一條本站在 macOS 上驗過</u>；Windows 的目錄捷徑（junction）Python 認不認得出來，<strong>本站還沒實測</strong>。</p>
+
+  <h2 id="source">完整原始碼</h2>
+  <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。</p>
+  <details>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（2305 行）</summary>
+<pre style="margin:10px 0 0">#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+mvp_new_face.py — 幫 MVP Baseball 2005 做一張新的球員臉皮
+
+球場上那張 3D 的臉。這支腳本可以：
+  · 列出哪些臉皮編號**沒有任何球員在用**(那就是你的空位)
+  · 把現有的臉皮貼圖匯出成 PNG(讓你拿去改)
+  · 把你做好的 PNG 換進某個編號
+
+⚠️ **不能「新增」一張臉,只能換掉現有的。**
+   封裝檔的目錄放在檔案最前面,資料緊接在後。多加一個項目會讓目錄變長,
+   後面所有資料都得往後挪 —— 那是「重新打包」,而重新打包會弄丟
+   目錄沒有指到的資料。所以正確做法是:找一個沒人在用的編號,換掉它。
+
+怎麼運作的(三層,由外而內):
+  data/models.big              封裝檔,幾千個項目
+                               (本站測試機那份 4,211 個,剛安裝好的原版 2,671 個)
+    └─ c001.fsh                 一張臉皮貼圖,用 QFS 壓縮過
+        └─ SHPI 容器            解壓後的結構
+            └─ 像素資料          這支腳本只做 DXT1(每 4x4 像素壓成 8 個位元組)
+
+⚠️ **DXT1 不是遊戲出貨時的臉皮格式,所以這支腳本在剛安裝好的原版上動不了。**
+   本站量過手上四份剛安裝好的安裝(英文版、中文版、PK 版、套過官方更新檔的那一份):
+   models.big 裡 504 張 c***.fsh 全部是 RGB16_565(代號 0x78)、128x256,
+   一張 DXT1 都沒有。(那四份的 models.big 只有兩種內容:英文版與 PK 版相同,
+   中文版與官方更新檔那一份相同。)
+   256x512 的 DXT1 是後來被換上去的(本站測試機那份 models.big 894 張裡有 890 張),
+   **是誰換的、在哪一次改動裡換的,本站沒有查出來。**
+   所以在剛安裝好的原版上,--info 照樣列得出空位(它不解像素),
+   但 --export 與 --import 每一個編號都會被下面「只處理 DXT1」那一條擋下來。
+
+換圖時**不動結構**,只換最內層的像素那一段。新圖必須跟原圖同尺寸,
+所以整份檔案的長度不變,外面兩層完全不必重算。
+
+換完之後還要**指定某位球員改用這個編號** —— 那是另一支腳本的事
+(mvp_swap_face.py,只改一個文字檔)。
+
+寫回封裝檔一律用「接到檔尾」的方式:新資料接在檔案最後面,
+只改目錄裡那一項的 8 個位元組 + 檔頭的 4 個位元組。
+原本的資料一個位元組都不動,所以出錯了也還原得回來。
+
+你要準備什麼(輸入):
+  · 遊戲資料夾的路徑(裡面看得到 mvp2005.exe 跟 data 資料夾)
+  · --import 時再多一張 PNG。每色 8 位元、非交錯,尺寸必須跟原圖一模一樣
+  · 名冊 data/database/attrib.dat 有的話會一起讀,用來算哪些編號沒人在用。
+    **只有「名冊不在」才不會停**,那時無法判斷空位 —— --info 與 --import
+    都會明講「無法判斷」,不會假裝那個編號沒人在用。
+    名冊在卻打不開,或內容不像名冊(開頭不是欄位表、切出來不足三行、
+    表頭裡找不到 playerattrib_face 這一欄),腳本會印「停下來了:…」
+    並以結束代碼 2 停住,不會硬做
+
+它會產生什麼(輸出):
+  · --info    只印字,不碰任何檔案
+  · --export  在你指定的位置寫一個 PNG(RGBA 四通道,每一列都不做預測濾波)。
+              那個位置已經有東西、而且它不是 PNG 的話,會停下來不覆蓋
+  · --import  沒加 --apply 就只印壓縮品質報告,一樣不碰檔案。
+              加了 --apply 才寫 data/models.big,並在同一個資料夾
+              留下 models.big.facetexbak 這份備份
+
+安全網:
+  · 預設唯讀。只有 --apply 會寫入
+  · 第一次寫入前先備份。備份、還原、匯出 PNG 三種寫入**都是原子的**:
+    先在目的檔隔壁開一個名字搶不走的暫存檔(每次都不一樣)、寫完 fsync、
+    讀回來比 sha256,最後才換上去。中途被中斷或失敗的話,
+    原本那個位置上的檔一個位元組都不會變
+  · 目的檔或備份檔本身是**符號連結**就停手 —— 沿著連結寫等於去改別的地方
+  · 已經有備份就保留最早那一份,但**寫入之前會先驗那一份**(BIGF 檔頭宣告的
+    長度要等於實際長度)。驗不過就停手,不會在沒有退路的情況下改遊戲檔
+  · 寫入走 append,舊資料一個位元組都不動。資料接到檔尾之後、目錄還沒改到
+    之前出事的話(硬碟滿、外接碟拔掉、按了 Ctrl-C),會把剛接上去的那一段
+    **截掉**再把錯誤丟出來 —— 檔案逐位元組回到動手之前,連檔頭宣告的長度
+    都對得回去。截不掉的話就照實說「改到一半」並叫你去 --restore
+  · 寫完立刻重新開檔讀回來跟你的 PNG 比對,一致率低於 90% 就當成失敗,
+    而且會**自動退回**(只把這一次改過的 12 個位元組寫回去,
+    之前換好的臉不會被一起退掉),結束代碼不是 0。
+    「重新讀回來根本讀不動」(自己寫出去的東西自己讀不回來)也走同一條退回路 ——
+    那時候檔案已經改過了,所以不可以只丟一行錯誤就走人
+  · 按 Ctrl-C 的時候會照實說「動到檔案沒有」,不會含糊帶過。
+    真正決定「換過了沒有」的那幾行(改目錄與檔頭、還原時的換名)跟「記下已經換過」
+    綁成**不可中斷的一段**:那期間按 Ctrl-C 會先記著,離開之後才照常丟出來 ——
+    所以收尾講的狀態一定跟磁碟上的一致,不會發生「已經換過了卻說沒動到」
+  · --restore 一行還原。還原前會先檢查那份備份有沒有被截斷過
+  · --selftest 自我測試,不需要遊戲資料夾,也不碰任何遊戲檔;
+    每一道把關都配一個餌(事先放好的符號連結陷阱、故意讓還原失敗…),
+    確認的是「保護真的擋得下來」,不只是「正常流程跑得完」。
+    **不要加 -O**:-O 會把 assert 全部拿掉,測試有機會假綠,所以加了會直接拒跑
+
+做不到的事:
+  · 不能新增臉皮,只能換掉現有編號(理由見上面那一段)
+  · 只處理 DXT1(代號 0x60)的臉皮。碰到別的格式會停下來,不會硬做。
+    ⚠️ 剛安裝好的原版臉皮是 RGB16_565(代號 0x78),504 張全部是,
+    所以在原版上每一個編號都會被這一條擋下來。理由見檔頭那一段
+  · 不能改尺寸,新圖必須跟原圖一樣大
+  · 不會幫你指定哪位球員用這個編號,那是 mvp_swap_face.py 的事
+  · 讀 PNG 不支援交錯式(interlaced),也不支援每色 16 位元
+  · DXT1 是有損壓縮,壓回去一定有誤差(腳本會把誤差量印給你看)
+  · 不動遊戲的執行檔,也不碰任何保護措施
+
+自包含:整支腳本就是這一個檔,不需要安裝任何套件(連讀寫 PNG 都是自己做的)。
+
+授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
+"""
+#
+# ─────────────────────────────────────────────────────────
+#  法律與免責(每一支本站腳本都帶著這一段)
+#
+#  · 本工具與 Electronic Arts 無任何官方關聯,也未經其授權或背書。
+#    MVP Baseball 2005 為 Electronic Arts 之作品與商標。
+#  · 本工具為原創程式碼,**不含任何 EA 的程式碼或資產**。
+#  · 本工具不提供、不教學、也不包含任何規避技術保護措施的功能。
+#  · 使用者應僅對自己合法取得的遊戲副本使用本工具,並自行承擔風險。
+#    使用前請自行確認你與遊戲發行商之間的使用者授權合約(EULA)。
+#  · 本工具按「現狀」提供,不附任何明示或默示的擔保。
+#  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
+#  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
+#    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
+#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+# ─────────────────────────────────────────────────────────
+
+import os
+import re
+import sys
+import zlib
+import struct
+import shutil
+import signal
+import hashlib
+import argparse
+import tempfile
+
+# ── 備份的原子性(2026-08-29 上線前稽核加)────────────────────────────
+# 原本是直接 shutil.copy2(遊戲檔, .bak)。複製途中被中斷(磁碟滿、外接碟拔掉、
+# Windows 上按 Ctrl-C)會留下一個**半截的 .bak**;下一次執行看到它「存在」
+# 就印「備份已存在,保留最早那一份」繼續改遊戲檔,之後 --restore
+# 會拿那個半截檔覆蓋掉正本。
+#
+# 實測(2026-08-29):把 2,665,562 bytes 的備份截成 300,000 bytes,
+# 本站防護最嚴的那支還原指令三道把關全過、印「✓ 已從備份還原」、exit code 0,
+# 2.66 MB 的遊戲檔當場被 300 KB 蓋掉。magic 只看開頭,看不出後面少了多少。
+#
+# ── 2026-09-05 第二輪安全審查:上面那個修法自己有兩個洞 ────────────────
+# 兩個都不是「寫錯」,是「用了看起來很安全的寫法」。
+#
+#   洞 1:備份寫在 &lt;備份檔&gt;.part 這個**猜得到的名字**上,而且用 shutil.copy2 寫。
+#         只要那個名字先被做成指向資料夾外的符號連結(別的程式、雲端同步、
+#         上一次沒收乾淨的殘骸、或有人刻意放的),copy2 就會沿著連結過去,
+#         把外面那個檔當場截成 0 再蓋掉。
+#         2026-09-05 在複本上實測:資料夾外一個 1,200 bytes 的檔被蓋成
+#         5,004 bytes,而備份流程從頭到尾一句話都沒說。
+#
+#   洞 2:還原是直接 shutil.copy2(備份, 遊戲正本)。copy2 會**先把正本開成 'wb'**
+#         (當場截成 0)再逐段寫回去。寫到一半失敗 —— 磁碟滿、外接碟拔掉、
+#         行程被砍 —— 正本就停在半截,而且沒有任何一道把關看得到。
+#         2026-09-05 在複本上實測(備份與正本放不同磁碟區、用 RLIMIT_FSIZE
+#         讓寫入中途失敗):172,996,899 bytes 的遊戲檔變成 86,496,401 bytes。
+#         備份還是好的,但使用者手上已經沒有一個「現在能玩」的檔案。
+#         ⚠️ 同一個 APFS 磁碟區上 copy2 會走 clonefile(整份瞬間完成、
+#            也打不斷),看起來像沒事 —— 那是 macOS 的特例,不是保護。
+#            讀者的 Windows 硬碟與外接碟走的都是逐段寫那條路。
+#
+# 現在所有寫入一律是同一套:**在目的檔同一個資料夾裡開一個別人搶不走的暫存檔**
+# (tempfile.mkstemp 走 O_CREAT|O_EXCL,名字每次都不一樣)→ 寫完 flush + fsync
+# → 把權限對回去 → 讀回來比 sha256 → 最後才 os.replace 換上。
+# os.replace 是原子的:正本要嘛還是舊的那份、要嘛已經是完整的新的那份,
+# 沒有「半截」這個選項。任何一步失敗就刪掉暫存檔,正本一個位元組都沒動過。
+
+
+def _refuse_symlink(path, what):
+    """這個路徑本身是符號連結的話就停手。
+
+    ⚠️ 不可以用 os.path.exists() 來判斷。exists() 會**跟著連結去看目標**,
+       連結指向的檔案不存在時它回 False —— 等於完全看不見這個連結,
+       而 open(..., 'wb') 照樣會沿著它把目標建出來或蓋掉。
+       要問「這個名字本身是什麼」,只有 os.path.lexists / os.lstat 答得出來。
+    """
+    path = os.fspath(path)
+    if os.path.lexists(path) and os.path.islink(path):
+        raise DataError(
+            '%s是一個符號連結:\n'
+            '    %s\n'
+            '  往連結寫入等於去動連結指到的那個檔,那不是你以為的位置 —— 所以停手。\n'
+            '  請把真正的路徑直接給腳本,或先自己把這個連結移開。' % (what, path))
+
+
+def _temp_beside(dst, tag):
+    """在 dst 隔壁開一個「別人搶不走」的暫存檔,回傳 (fd, 路徑)。
+
+    為什麼一定要在**同一個資料夾**:最後那一步 os.replace 只有在同一個檔案系統
+    上才是原子的。寫到 /tmp 再搬過來會退化成一般複製,等於白做。
+
+    為什麼名字不自己拼:mkstemp 用 O_CREAT|O_EXCL 開檔,而且名字帶隨機碼。
+    「先把那個名字做成符號連結」這一招在這裡用不上 —— 名字被佔住的話
+    mkstemp 會換一個,不會跟著連結走。
+    """
+    dst = os.fspath(dst)
+    d = os.path.dirname(os.path.abspath(dst)) or '.'
+    return tempfile.mkstemp(dir=d, prefix='.' + os.path.basename(dst) + '.' + tag + '-')
+
+
+def _copy_into_fd(src, fd):
+    """把 src 整份寫進已經開好的 fd,回傳 (寫了幾個位元組, sha256)。寫完 fsync。"""
+    h = hashlib.sha256()
+    n = 0
+    # open(fd, 'wb') 會接管這個 fd,離開 with 就一起關掉,不會漏。
+    with open(fd, 'wb') as out:
+        with open(src, 'rb') as f:
+            while True:
+                chunk = f.read(1024 * 1024)
+                if not chunk:
+                    break
+                h.update(chunk)
+                out.write(chunk)
+                n += len(chunk)
+        out.flush()
+        # fsync 是刻意的:幾百 MB 的檔要是只寫進快取就斷電,等於沒寫。
+        os.fsync(out.fileno())
+    return n, h.hexdigest()
+
+
+def _sha256_of(path):
+    """整份讀回來算 sha256。用「讀回來」核對,不是只看複製函式有沒有丟例外。"""
+    h = hashlib.sha256()
+    with open(path, 'rb') as f:
+        while True:
+            chunk = f.read(1024 * 1024)
+            if not chunk:
+                break
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _drop(path):
+    """把暫存檔收掉。收不掉也不能蓋過原本要丟出去的那個錯誤,所以吞掉。"""
+    try:
+        if os.path.lexists(path):
+            os.remove(path)
+    except OSError:
+        pass
+
+
+class _NoInterrupt(object):
+    """把「換名 + 登記」包起來:這段期間收到 Ctrl-C 先記著,離開這段之後再照常丟出。
+
+    為什麼需要它:`os.replace(tmp, target)` 做完、還沒把「已經換過」登記下來之前,
+    Ctrl-C 剛好落在這兩行之間的話,KeyboardInterrupt 的收尾會照**舊的**登記說
+    「什麼都沒有動到」—— 而磁碟上其實已經換過了。那是這支腳本最不能犯的一種錯:
+    讀者照著那句話就不會去還原。
+
+    做法是暫時把 SIGINT 的處理器換成「先記著」,離開這一段再換回去,
+    而且**不吞掉**那個中斷:只要區塊本身沒有出別的錯,離開時照樣丟 KeyboardInterrupt。
+    包進來的一定要是很短的一段(換名、寫 12 個位元組、fsync),不可以拿它包整個複製流程 ——
+    那會變成「按了 Ctrl-C 卻停不下來」,那也是一種說謊。
+
+    ⚠️ 非主執行緒等情況下 signal.signal 會丟例外,那時就退回原本的行為
+       (擋不住,但也不會更糟)。刻意不讓它自己爆掉。
+    """
+
+    def __enter__(self):
+        self._pending = False
+        self._old = None
+        try:
+            self._old = signal.signal(signal.SIGINT, self._remember)
+        except (ValueError, OSError):
+            self._old = None
+        return self
+
+    def _remember(self, signum, frame):
+        self._pending = True
+
+    def __exit__(self, exc_type, exc, tb):
+        if self._old is not None:
+            signal.signal(signal.SIGINT, self._old)
+        # 區塊裡已經在丟別的例外時就不要再蓋掉它 —— 那個例外比較重要。
+        if self._pending and exc_type is None:
+            raise KeyboardInterrupt
+        return False
+
+
+# ── 「到底動到遊戲檔沒有」的旗標 ──────────────────────────────────
+# 被 Ctrl-C 打斷的時候,讀者最需要的一句話是「我的遊戲檔現在是什麼狀態」。
+# 「什麼都沒有動到」這句話不可以憑感覺講 —— 所以真正會改到正本的兩處
+# (append_entry 往檔尾寫、_do_copy 還原時的 os.replace)各自在這裡留一筆。
+#
+# 三態,不是兩態:
+#   target 是 None                「還沒動」
+#   target 有值 + partial 是 True 「正在換 X」—— 收尾要叫人去還原,不可以說沒動到
+#   target 有值 + partial 是 False「已經換完 X」,而且是完整的
+# 中間那一態是保險:真正的把關是下面每一處 os.replace 都被 _NoInterrupt 包著,
+# 中斷落不進「換完了但還沒登記」那個縫。萬一保險絲燒了(非主執行緒之類),
+# 登記至少會停在「正在換」,那句話是安全的一邊。
+_MUTATION = {'target': None, 'partial': False}
+
+
+def _mark_mutating(path):
+    """正本**開始**被改了。從這一刻起,「什麼都沒有動到」就是假話。"""
+    _MUTATION['target'] = os.fspath(path)
+    _MUTATION['partial'] = True
+
+
+def _mark_mutated(path):
+    """正本已經改完,而且是完整的(append 寫完 fsync,或 os.replace 換完)。"""
+    _MUTATION['target'] = os.fspath(path)
+    _MUTATION['partial'] = False
+
+
+def _atomic_copy(src, dst):
+    """備份要嘛完整、要嘛不存在 —— 中間狀態不會留在 dst 這個名字上。
+
+    ⚠️ 本站有些腳本用 pathlib.Path 存路徑,有些用字串。
+       2026-08-29 第一版寫成 dst + '.part',在 Path 上直接 TypeError,
+       等於所有備份都失敗 —— 而且「半截備份被擋下來」那個測試照樣是綠的。
+       是陰性對照(先證明正常流程真的會產生備份)抓到的。
+    ⚠️ 2026-09-05 再改:那個 '.part' 除了型別問題,名字本身**猜得到**,
+       會被符號連結劫持(見本節開頭洞 1)。現在改用 mkstemp。
+    """
+    # 先統一轉成字串。上面那條 ⚠️ 就是這裡沒轉,Path 直接接字串會 TypeError。
+    src, dst = os.fspath(src), os.fspath(dst)
+    _refuse_symlink(src, '要備份的檔案')
+    _refuse_symlink(dst, '備份檔')
+    fd, part = _temp_beside(dst, 'part')
+    try:
+        _n, digest = _copy_into_fd(src, fd)
+        # 權限與時間戳跟著原檔走 —— 這是原本 copy2 幫忙做的事,換掉之後要自己做。
+        shutil.copystat(src, part)
+        if os.path.getsize(part) != os.path.getsize(src) or _sha256_of(part) != digest:
+            raise DataError('備份寫出來之後跟原檔對不上,不敢把它當成備份。\n'
+                            '  多半是硬碟空間不夠或那顆碟有問題。')
+        # 換名包進不可中斷段:落在這一行上的 Ctrl-C 先記著,換完才丟出去。
+        with _NoInterrupt():
+            os.replace(part, dst)      # os.replace 是原子的
+    except BaseException:
+        # 連 KeyboardInterrupt 都要接。只接 Exception 的話,按 Ctrl-C 會留下垃圾。
+        _drop(part)
+        raise
+
+
+def _restore_from_backup(bak, dst):
+    """還原之前先擋掉明顯壞掉的備份。
+
+    ⚠️ 這裡**不能**比對「備份與目標大小相同」—— 本站多數腳本是把資料接到
+    檔尾來改檔(專案鐵律:封裝檔不可重新打包),改完之後正本本來就比備份大,
+    那樣比會擋掉每一次合法的還原。
+
+    ── 2026-08-30 補上三道(上線前資安稽核抓到的真漏洞)────────────────
+    原本只有「不是 0 bytes」+「BIGF 檔頭宣告長度」兩道。**BIGF 以外全破。**
+    實測拿「前 1/8 的半截備份」去還原,六支腳本把正本吃掉而且都印成功:
+        mvp_fix_loc / mvp_menu_text   .LOC        416,753 →  52,094
+        mvp_edit_speed / mvp_ratings
+        / mvp_player                  attrib.dat  840,643 → 105,080
+        mvp_modernize                 mvp2005.exe 5,443,584 → 680,448
+                                      (它還印「複驗:內容與備份相同 ✅」)
+    最後那個會讓遊戲**完全開不起來**,而站上每一課都寫著「隨時可以 --restore」。
+
+    現在檢查五件事:
+      1. 備份不是 0 bytes
+      2. BIGF:檔頭第 4-8 個位元組宣告的總長度要等於實際長度
+         (兩種位元組序都接受;哪些檔是大端、各有幾個,以 reference/bigf.html 量到的為準,這裡不寫會過期的數字)
+      3. LOCH(語系檔):檔頭指到的 LOCL 要在檔內,而且最後一條字串的位移
+         也要在檔內 —— 截斷之後那個位移一定會超出去
+      4. MZ(執行檔):PE 節區表裡 raw offset + raw size 的最大值不得超過檔案長度
+      5. **通用地板**:非 BIGF 的備份不得小於「要被蓋掉的那個檔」的一半。
+         非 BIGF 的工具都是原地改(大小幾乎不變),所以這條很安全;
+         BIGF 走 append 會越改越大,所以刻意**不套**這條,由第 2 道負責。
+    """
+    import struct
+    bak, dst = os.fspath(bak), os.fspath(dst)
+    if not os.path.exists(bak):
+        raise SystemExit('找不到備份:%s' % bak)
+    n = os.path.getsize(bak)
+    if n == 0:
+        raise SystemExit(
+            '備份是 0 bytes(多半是上次備份到一半被中斷),不敢拿它覆蓋 %s。' % dst)
+    with open(bak, 'rb') as _f:
+        head = _f.read(8)
+
+    def _stop(why):
+        """把「哪一道沒過」寫成人看得懂的話再退出。訊息會告訴使用者下一步做什麼。"""
+        raise SystemExit(
+            '這份備份是壞的,不敢拿它覆蓋 %s。\n'
+            '  %s\n'
+            '  多半是備份途中被中斷(磁碟滿、外接碟拔掉、按了 Ctrl-C)。\n'
+            '  請改用你自己另外留的那一份備份。' % (dst, why))
+
+    # 第 2 道:封裝檔自己在檔頭第 4 到 8 個位元組寫著「我應該有多長」。
+    # 這一欄兩種位元組序都遇得到(實測 288 小端、7 大端),所以兩種都算過再比。
+    if len(head) == 8 and head[:4] == b'BIGF':
+        le = struct.unpack('&lt;I', head[4:8])[0]
+        be = struct.unpack('&gt;I', head[4:8])[0]
+        if le != n and be != n:
+            _stop('檔頭說它應該是 %d bytes(或 %d),實際只有 %d bytes。' % (le, be, n))
+        return _do_copy(bak, dst)
+
+    # 第 3 道:語系檔。位移 16 那個 4 位元組(小端)指向字串區 LOCL 的起點;
+    # LOCL 內部再往後 12 個位元組是字串條數,接著才是每條 4 位元組的位移表。
+    # 檔案被截斷時,最後一條字串的位移一定會指到檔案結尾之外。
+    if len(head) &gt;= 4 and head[:4] == b'LOCH':
+        try:
+            d = open(bak, 'rb').read()
+            L = struct.unpack('&lt;I', d[16:20])[0]
+            if L + 16 &gt; n or d[L:L + 4] != b'LOCL':
+                _stop('語系檔的字串區(LOCL)應該在位移 %d,那裡不是 LOCL。' % L)
+            lcnt = struct.unpack('&lt;I', d[L + 12:L + 16])[0]
+            if lcnt &lt;= 0 or L + 16 + lcnt * 4 &gt; n:
+                _stop('語系檔的位移表被截斷了(宣告 %d 條)。' % lcnt)
+            last = struct.unpack('&lt;I', d[L + 16 + (lcnt - 1) * 4:L + 20 + (lcnt - 1) * 4])[0]
+            if L + last &gt;= n:
+                _stop('語系檔最後一條字串在位移 %d,超出檔案結尾(%d bytes)。'
+                      % (L + last, n))
+        except SystemExit:
+            raise
+        except (struct.error, IndexError):
+            _stop('讀不出語系檔的結構,它壞了。')
+
+    # 第 4 道:Windows 執行檔。位移 0x3C 那個 4 位元組(小端)指向 PE 檔頭;
+    # PE 檔頭 +6 是節區數、+20 是選用檔頭長度,節區表就接在選用檔頭後面。
+    # 每個節區 40 個位元組,其中 +16 是實體長度、+20 是實體位移。
+    # 把所有節區的「位移加長度」取最大值,那就是檔案至少要有多長。
+    if len(head) &gt;= 2 and head[:2] == b'MZ':
+        try:
+            d = open(bak, 'rb').read()
+            pe = struct.unpack('&lt;I', d[0x3C:0x40])[0]
+            if pe + 24 &gt; n or d[pe:pe + 4] != b'PE\x00\x00':
+                _stop('執行檔的 PE 檔頭不在它該在的地方,檔案不完整。')
+            nsec = struct.unpack('&lt;H', d[pe + 6:pe + 8])[0]
+            optsz = struct.unpack('&lt;H', d[pe + 20:pe + 22])[0]
+            sec = pe + 24 + optsz
+            end = 0
+            for i in range(nsec):
+                o = sec + i * 40
+                if o + 40 &gt; n:
+                    _stop('執行檔的節區表被截斷了(宣告 %d 個節區)。' % nsec)
+                raw_sz, raw_off = struct.unpack('&lt;II', d[o + 16:o + 24])
+                end = max(end, raw_off + raw_sz)
+            if end &gt; n:
+                _stop('執行檔的節區指到 %d bytes,實際只有 %d bytes。' % (end, n))
+        except SystemExit:
+            raise
+        except (struct.error, IndexError):
+            _stop('讀不出執行檔的結構,它壞了。')
+
+    # 通用地板 —— 非 BIGF 走到這裡
+    if os.path.exists(dst):
+        live = os.path.getsize(dst)
+        if live &gt; 0 and n * 2 &lt; live:
+            _stop('備份只有 %d bytes,而要被蓋掉的那個檔有 %d bytes ——'
+                  '差太多了(不到一半)。' % (n, live))
+    return _do_copy(bak, dst)
+
+
+def _do_copy(bak, dst):
+    """真正把備份蓋回去 —— 但**不是**直接蓋在正本上。
+
+    抽成一支,是為了讓上面每一道把關都只寫一次 return。
+
+    ⚠️ 2026-09-05 改寫。原本這裡是一行 shutil.copy2(bak, dst),
+       而 copy2 會先把 dst 開成 'wb' 截成 0 再逐段寫 —— 寫到一半失敗,
+       讀者的遊戲檔就停在半截,上面那五道把關一道都攔不到(它們驗的是備份,
+       不是還原這個動作本身)。實測數字見本檔上方「洞 2」。
+
+    現在的順序:先在正本隔壁寫一份完整的暫存檔 → fsync → 把正本的權限對過去
+    → 讀回來比 sha256 → 全部過了才 os.replace 換上。中途任何一步失敗,
+    正本都還是原來那一份,連 mtime 都沒變。
+    """
+    bak, dst = os.fspath(bak), os.fspath(dst)
+    _refuse_symlink(bak, '備份檔')
+    _refuse_symlink(dst, '要還原的遊戲檔')
+    fd, tmp = _temp_beside(dst, 'restore')
+    try:
+        _n, digest = _copy_into_fd(bak, fd)
+        # 權限跟著「要被換掉的那個檔」走,不是跟著 mkstemp 給的 0600 走 ——
+        # 不然還原完之後,遊戲可能因為權限變了而讀不到自己的檔。
+        shutil.copymode(dst if os.path.exists(dst) else bak, tmp)
+        if os.path.getsize(tmp) != os.path.getsize(bak) or _sha256_of(tmp) != digest:
+            raise DataError(
+                '還原寫出來的暫存檔跟備份對不上(sha256 不同),所以**沒有**換上去。\n'
+                '  你的遊戲檔還是原來那一份,一個位元組都沒有被動到。\n'
+                '  多半是硬碟空間不夠或那顆碟有問題,清一點空間再試一次。')
+        # 三態的中間那一態:先登記「正在換 dst」再去換。這樣就算下面那一段
+        # 出了 _NoInterrupt 擋不住的意外,收尾看到的也是「正在換」而不是「沒動到」。
+        _was = (_MUTATION['target'], _MUTATION['partial'])
+        _mark_mutating(dst)
+        try:
+            # 換名與登記綁在一起,中間不接受中斷 —— 理由見 _NoInterrupt 的說明。
+            with _NoInterrupt():
+                os.replace(tmp, dst)   # 到這一行才真的換上,而且是原子的
+                _mark_mutated(dst)
+        except OSError:
+            # rename 失敗代表**沒有換成**(它不會換到一半),所以這一筆登記可以撤銷。
+            # ⚠️ 只有這一種情況可以撤銷。其他例外一律讓登記停在「正在換」:
+            #    旗標只有在確定 os.replace 沒做的時候才可以收回去。
+            _MUTATION['target'], _MUTATION['partial'] = _was
+            raise
+    except BaseException:
+        _drop(tmp)
+        raise
+
+
+
+
+# Windows 的主控台預設不是 UTF-8,不先切過去,底下的中文訊息會變亂碼或直接爆掉。
+# 舊版 Python 沒有 reconfigure,所以整段包起來,失敗就照舊,不影響功能。
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
+except Exception:
+    pass
+
+
+class DataError(Exception):
+    """檔案內容跟預期不符。一律當成「停下來問人」,不要猜。"""
+
+
+# 這兩個上限是「防呆」不是規格:壓縮檔頭與封裝檔目錄的數字都是檔案自己寫的,
+# 壞掉的檔可以宣稱自己要解壓 4 GB,照著做就是把記憶體吃光。
+MAX_UNCOMPRESSED = 64 * 1024 * 1024
+MAX_BIG_ENTRIES = 200000
+# 備份檔名 = 原檔名直接加這個尾巴,所以它會跟 models.big 躺在同一個資料夾。
+BACKUP_SUFFIX = '.facetexbak'
+
+
+# ─────────────────────────────────────────────────────────
+#  QFS(EA 的壓縮格式,檔頭是 10 FB)
+# ─────────────────────────────────────────────────────────
+def qfs_decompress(data):
+    """QFS(RefPack)解壓。不是 QFS 就原封不動退回去。
+
+    辨識靠第 2 個位元組固定是 0xFB。檔頭有兩種長度,由第 1 個位元組的最低位元決定:
+      · 最低位元是 1  檔頭 10 個位元組,解壓後大小放在第 6 到 10 個位元組
+      · 最低位元是 0  檔頭 5 個位元組,解壓後大小放在第 2 到 5 個位元組(3 個位元組)
+    兩種都是**大端**,跟後面 SHPI 內部一律小端剛好相反,這裡最容易寫錯。
+    """
+    if len(data) &lt; 2 or data[1] != 0xFB:
+        return data
+    if data[0] &amp; 0x01:
+        if len(data) &lt; 10:
+            raise DataError('QFS 檔頭不完整')
+        size = int.from_bytes(data[6:10], 'big'); pos = 10
+    else:
+        if len(data) &lt; 5:
+            raise DataError('QFS 檔頭不完整')
+        size = int.from_bytes(data[2:5], 'big'); pos = 5
+    if not 0 &lt;= size &lt;= MAX_UNCOMPRESSED:
+        raise DataError('QFS 宣稱解壓尺寸異常:%d' % size)
+
+    out = bytearray()
+    end = len(data)
+
+    def copy_back(offset, length):
+        # 從已經解出來的尾巴往回數 offset 個位元組,抄 length 個過來。
+        # 這一行擋的是「往回的距離」:至少要往回 1 個位元組,而且不能往回到
+        # 還沒解出來的地方。它管的不是輸出總長度,總長度由下面那道擋。
+        if not 0 &lt; offset &lt;= len(out):
+            raise DataError('QFS 反向參照越界 offset=%d' % offset)
+        src = len(out) - offset
+        # 一個位元組一個位元組抄,不能改成切片:length 大於 offset 是合法的,
+        # 那時來源會邊抄邊被自己延長(整段重複填色就是這樣壓出來的)。
+        for _ in range(length):
+            out.append(out[src]); src += 1
+        # ⚠️ 只檢查檔頭宣稱的大小是不夠的:那是「檔案自己說的」。
+        #    一個惡意檔可以宣稱很小(通過上面那道),再用反向參照無限吐資料,
+        #    把記憶體吃光。實際輸出也必須有上限,而且上限就是它自己宣稱的大小。
+        if len(out) &gt; size:
+            raise DataError('QFS 解出來的資料超過檔頭宣稱的 %d 位元組' % size)
+
+    # 指令是一個位元組開頭,靠它落在哪一段決定後面跟幾個位元組。
+    # 每一種都同時帶「先照抄幾個」與「再往回抄多長」兩件事。
+    while pos &lt; end:
+        b0 = data[pos]
+        # 0xFC 到 0xFF:結束。低 2 位元是最後還要照抄幾個位元組(0 到 3)。
+        if b0 &gt;= 0xFC:
+            n = b0 &amp; 0x03; pos += 1
+            out += data[pos:pos + n]; break
+        # 0xE0 到 0xFB:純照抄,一次 4 到 112 個位元組,不往回抄。
+        if b0 &gt;= 0xE0:
+            n = ((b0 &amp; 0x1F) &lt;&lt; 2) + 4; pos += 1
+            out += data[pos:pos + n]; pos += n; continue
+        # 0xC0 到 0xDF:四個位元組的指令,涵蓋最長(5 到 1028)與最遠(1 到 131072)。
+        if b0 &gt;= 0xC0:
+            b1, b2, b3 = data[pos + 1], data[pos + 2], data[pos + 3]; pos += 4
+            n = b0 &amp; 0x03
+            length = ((b0 &amp; 0x0C) &lt;&lt; 6) + b3 + 5
+            offset = ((b0 &amp; 0x10) &lt;&lt; 12) + (b1 &lt;&lt; 8) + b2 + 1
+        # 0x80 到 0xBF:三個位元組的指令,長度 4 到 67、回頭 1 到 16384。
+        elif b0 &gt;= 0x80:
+            b1, b2 = data[pos + 1], data[pos + 2]; pos += 3
+            n = (b1 &gt;&gt; 6) &amp; 0x03
+            length = (b0 &amp; 0x3F) + 4
+            offset = ((b1 &amp; 0x3F) &lt;&lt; 8) + b2 + 1
+        # 0x00 到 0x7F:兩個位元組的指令,長度 3 到 10、回頭 1 到 1024。最常見的一種。
+        else:
+            b1 = data[pos + 1]; pos += 2
+            n = b0 &amp; 0x03
+            length = ((b0 &amp; 0x1C) &gt;&gt; 2) + 3
+            offset = ((b0 &amp; 0x60) &lt;&lt; 3) + b1 + 1
+        out += data[pos:pos + n]; pos += n
+        copy_back(offset, length)
+    return bytes(out[:size])
+
+
+def qfs_compress_literal(data):
+    """純 literal 編碼:不做字串比對,瞬間完成,格式一樣合法。
+
+    壓出來比 EA 原本的大(大約等於原始大小),但因為我們是接到檔尾,
+    大一點沒有影響。換來的是速度快上千倍,而且不可能壓錯。
+    """
+    # 5 個位元組的短檔頭:0x10 0xFB 之後接 3 個位元組的原始長度,大端。
+    n = len(data)
+    out = bytearray([0x10, 0xFB, (n &gt;&gt; 16) &amp; 0xFF, (n &gt;&gt; 8) &amp; 0xFF, n &amp; 0xFF])
+    # 0xE0 那一族一次只能照抄 4 的倍數,所以尾巴不足 4 個的先留給結束指令。
+    tail = n % 4
+    body = n - tail
+    pos = 0
+    while pos &lt; body:
+        # 一段最多 112 個位元組(0xFB 是這一族的頂),再多就要拆成下一段。
+        chunk = min(112, body - pos)
+        out.append(0xE0 | ((chunk - 4) // 4))
+        out += data[pos:pos + chunk]
+        pos += chunk
+    # 0xFC 到 0xFF 是結束指令,低 2 位元順便把剩下的 0 到 3 個位元組帶完。
+    out.append(0xFC | tail)
+    out += data[pos:]
+    return bytes(out)
+
+
+# ─────────────────────────────────────────────────────────
+#  BIGF 封裝檔:讀目錄、接到檔尾
+# ─────────────────────────────────────────────────────────
+def size_field_order(path):
+    """檔頭 +0x04 的「檔案總大小」是 little 還是 big endian。
+
+    ⚠️ 這一欄兩種順序都遇得到,不能寫死,也不能照檔名或檔案大小猜。
+       「哪個檔是哪一種」不是這個格式天生的性質,是看你手上這一份被誰
+       重新打包過。本站用 BIGF 檔頭(不是副檔名)認過五份 data 資料夾:
+
+         · 歷史資料/剛安裝好的全新 MVP2005 英文版   207 個封裝檔,big-endian 0 個
+         · 歷史資料/全新剛安裝好的中文版           205 個,big-endian 0 個
+         · 歷史資料/PK 版                          205 個,big-endian 0 個
+         · 歷史資料/NEW TC_PATCH123 版             205 個,big-endian 0 個
+         · 測試機 MVP2026/data(疊過模組)          384 個,big-endian 10 個
+
+       四份沒疊過模組的通通是 little-endian,連裡面最大的兩個封裝檔
+       models.big(172,992,803 個位元組)與 frontend/portrait.big
+       (109,291,217 個位元組)也是,所以「大檔就是 big-endian」是假的。
+       測試機那 10 個 big-endian 落在 7 個檔名上:models.big、
+       frontend/portrait.big、audio 底下的 pnamedat.big 與 pnamehdr.big,
+       以及球場夜間檔 coornite.big / dodgnite.big / wrignite.big
+       (這三個在 stadium/ 跟旁邊那份原版備份資料夾裡各存了一份,
+       所以是 10 個檔案只有 7 個檔名);同樣這幾個檔名在四份沒疊過模組的
+       資料夾裡全是 little-endian,測試機那顆 models.big 也已經從
+       172,992,803 個位元組變成 561,891,312 個位元組。
+       結論:不要照檔名或檔案大小記,讀出來是哪一種就照哪一種寫回去。
+    """
+    # 判斷方式不是猜,是「哪一種讀法剛好等於實際檔案大小」。
+    # 兩種都對不上就代表這個檔已經被改壞,那時寧可停下來也不要亂寫。
+    n = os.path.getsize(path)
+    with open(path, 'rb') as f:
+        raw = f.read(8)
+    if len(raw) &lt; 8:
+        raise DataError('%s 太小,不像封裝檔' % os.path.basename(path))
+    if struct.unpack('&lt;I', raw[4:8])[0] == n:
+        return '&lt;'
+    if struct.unpack('&gt;I', raw[4:8])[0] == n:
+        return '&gt;'
+    # ⚠️ 這一句讀者最可能在「上一次寫到一半斷電」之後看到,所以救法要跟著講:
+    #    只說「可能已經損毀」會讓人以為得重灌遊戲,其實旁邊那份備份一行就回得去
+    #    (2026-09-11 覆驗抓到:整句話沒有一個字提到 --restore,
+    #     而同一課的 mvp_swap_portrait.py 早就補上了 —— 兩支同型只修了一支)。
+    raise DataError('%s 的檔頭大小欄位跟實際檔案大小對不上 —— 這個檔可能已經損毀。\n'
+                    '  旁邊那份 %s%s 還在的話,跑這一行就回得去:\n'
+                    '    python3 %s "&lt;遊戲資料夾&gt;" --restore'
+                    % (os.path.basename(path), os.path.basename(path), BACKUP_SUFFIX,
+                       os.path.basename(sys.argv[0])))
+
+
+def big_entries(path):
+    """回傳 [(名稱, 目錄欄位位置, 資料 offset, 資料長度)]。
+
+    目錄欄位位置留著,是為了之後只改那 8 個位元組,不必重寫整個目錄。
+    """
+    # 檔頭 16 個位元組:'BIGF' + 檔案總長度(4)+ 項目數(4,大端)+ 資料起點(4)。
+    # 目錄接在檔頭後面,一項是「位移 4 + 長度 4(都是大端)+ 以 0 結尾的名字」。
+    # 名字長度不固定,所以先抓一塊夠大的(平均一項算 80 個位元組再加 8 KB 餘裕),
+    # 一次讀進來慢慢拆,比在幾千個項目上各做一次 seek 快得多。
+    try:
+        with open(path, 'rb') as f:
+            head = f.read(16)
+            if len(head) &lt; 16 or head[:4] != b'BIGF':
+                raise DataError('%s 的開頭不是 BIGF,這不是封裝檔' % os.path.basename(path))
+            count = int.from_bytes(head[8:12], 'big')
+            if not 0 &lt; count &lt; MAX_BIG_ENTRIES:
+                raise DataError('%s 的目錄項目數異常(%d)' % (os.path.basename(path), count))
+            blob = head + f.read(count * 80 + 8192)
+    except OSError as e:
+        raise DataError('讀不到 %s:%s' % (path, e))
+
+    # 從位移 16 開始逐項拆。field 記的是「這一項的位移欄位在檔案裡的哪個位置」,
+    # 之後改檔就只寫那 8 個位元組,不必重排整份目錄。
+    items = []
+    pos = 16
+    for _ in range(count):
+        if pos + 8 &gt; len(blob):
+            break                                   # 目錄比預估長,已讀到的就夠用
+        field = pos
+        off = int.from_bytes(blob[pos:pos + 4], 'big')
+        size = int.from_bytes(blob[pos + 4:pos + 8], 'big')
+        pos += 8
+        end = blob.find(b'\x00', pos)
+        if end &lt; 0:
+            break
+        items.append((blob[pos:end].decode('latin-1', 'replace'), field, off, size))
+        pos = end + 1
+    return items
+
+
+def read_entry(path, off, size):
+    """照目錄講的位移與長度,把那一項的原始位元組挖出來。
+
+    讀不滿就代表目錄跟檔案對不上(多半是檔案被截斷過),寧可停下來。
+    """
+    with open(path, 'rb') as f:
+        f.seek(off)
+        data = f.read(size)
+    if len(data) != size:
+        raise DataError('目錄說這一項有 %d 個位元組,實際只讀到 %d' % (size, len(data)))
+    return data
+
+
+def _rollback_tail(f, old_size, was):
+    """接到檔尾的那一段還沒被目錄指到就出事了 —— 把它截掉,檔案就回到動手之前。
+
+    ── 2026-09-11 第三輪安全審查抓到的真缺口 ────────────────────────────
+    這支腳本的寫法是「資料接到檔尾 → 改目錄與檔頭 12 個位元組」。
+    第二步才是提交(遊戲讀到的東西是被目錄決定的),所以第一步寫下去的那一段,
+    在提交之前就等於**別的腳本那個「還沒換名的暫存檔」**。
+
+    原本第一步出事(硬碟滿、外接碟拔掉、Ctrl-C 落在那次 write 上)是直接往上丟,
+    尾巴就留在檔案裡:遊戲讀到的內容沒變(沒人指到它),但**檔頭宣告的總長度
+    跟實際長度對不上了**。實測(112 個位元組的迷你封裝檔,在資料寫完、還沒提交
+    那一刻丟 OSError 28):檔案 112 → 191 個位元組、sha256 變了,
+    之後再跑一次 --apply 會被 size_field_order() 擋在門外印
+    「這個檔可能已經損毀」,得先 --restore 才能繼續。
+
+    現在改成:提交之前的任何一種失敗,都先把尾巴截回原長度。截得掉的話,
+    正本逐位元組跟開始時相同,「一個位元組都沒有動」那句話才說得出口;
+    截不掉的話,登記就停在「正在換」那一態,收尾會叫人去還原 —— 不會謊稱沒動到。
+
+    ⚠️ 只有「提交還沒開始」才可以走這一條。目錄與檔頭已經改到一半的時候截尾巴,
+       會變成目錄指向檔案結尾之外 —— 那比多一段垃圾嚴重得多。
+       所以呼叫端用一個旗標記「有沒有進到提交那一段」,進去過就不截。
+    """
+    try:
+        # 截尾巴跟「把登記改回沒動到」要一起發生:中間被 Ctrl-C 插進來的話,
+        # 收尾講的狀態會跟磁碟上的對不起來。一次 truncate 加一次 fsync,
+        # 包成不可中斷段不會讓人等。
+        with _NoInterrupt():
+            f.truncate(old_size)
+            f.flush()
+            os.fsync(f.fileno())
+            _MUTATION['target'], _MUTATION['partial'] = was
+    except BaseException:
+        # 連截尾巴都失敗:登記刻意**不動**(停在「正在換」),讓收尾說「請 --restore」。
+        # 這裡不可以把原本要丟出去的那個錯誤蓋掉,所以吞掉自己這一個。
+        return False
+    return True
+
+
+def append_entry(path, field_pos, blob):
+    """把 blob 接到檔尾,只改該項目的目錄 8 bytes 與檔頭的 4 bytes。
+
+    原本的資料一個位元組都不動 —— 所以就算新資料是壞的,舊資料還在檔案裡。
+
+    接到檔尾之後、改目錄之前出事的話,會把接上去的那一段截掉
+    (見 _rollback_tail),正本逐位元組回到動手之前。
+
+    回傳 (新資料的位移, 退回去要用的那張小抄)。小抄裡是**改之前**那 12 個位元組
+    加上原本的檔案長度 —— 複驗沒過的時候照著寫回去,就等於這一次沒發生過。
+    小抄裡另外記著「動手之前的那筆登記」,退回成功時要把它放回去,
+    不然收尾會說「已經改好了」,而磁碟上其實已經退乾淨了。
+    """
+    path = os.fspath(path)
+    # 寫入前先問「這個名字本身是不是符號連結」。是的話 open(..., 'r+b') 會沿著它
+    # 去改別的地方的檔,那不是使用者以為的位置。
+    _refuse_symlink(path, '要寫入的遊戲檔')
+    # 一定要在改檔案之前先量:寫完之後檔案大小就變了,那時再量會兩種都對不上。
+    order = size_field_order(path)          # 一定要在改檔案之前先量
+    # 新資料的位移就是「現在的檔案長度」,因為它要接在最後面。
+    new_off = os.path.getsize(path)
+    # 先把等一下會被覆寫的那 12 個位元組抄下來,不然「退回去」就無從退起。
+    with open(path, 'rb') as f:
+        f.seek(field_pos)
+        old_field = f.read(8)
+        f.seek(4)
+        old_total = f.read(4)
+    if len(old_field) != 8 or len(old_total) != 4:
+        raise DataError('讀不到目錄那一項的原始值(檔案可能已經被截斷),不敢寫。')
+    # 動手之前的那筆登記先留著:提交還沒開始就出事的話,尾巴會被截掉,
+    # 那時候「什麼都沒有動到」是真話,登記要放得回去。
+    was = (_MUTATION['target'], _MUTATION['partial'])
+    with open(path, 'r+b') as f:
+        f.seek(0, os.SEEK_END)
+        # 這一行之後,遊戲檔就不是原來那一份了 —— Ctrl-C 的訊息要照這個講。
+        _mark_mutating(path)
+        # 這個旗標決定出事的時候可不可以截尾巴:進到提交那一段之後就不可以了
+        # (目錄可能已經改到一半,截掉尾巴會讓它指到檔案結尾之外)。
+        committing = False
+        try:
+            f.write(blob)
+            total = f.tell()
+            # 下面這一段就是這支腳本的「換名」:接在檔尾的資料在目錄改到之前
+            # 是沒人指到的垃圾,遊戲讀不到;目錄與檔頭一改,遊戲讀到的就是新資料。
+            # 所以「改目錄與檔頭 + 登記已改完」綁成不可中斷的一段 ——
+            # 中斷落在中間的話,收尾講的狀態會跟磁碟上的對不起來。
+            # 這一段只寫 12 個位元組加一次 fsync,包起來不會讓人等。
+            with _NoInterrupt():
+                committing = True
+                # 只改這一項的目錄欄位 8 個位元組:位移 4 + 長度 4。
+                f.seek(field_pos)
+                f.write(struct.pack('&gt;II', new_off, len(blob)))     # 目錄一律 big-endian
+                # 再改檔頭 +0x04 的總長度 4 個位元組,位元組序沿用原檔量到的那一種。
+                f.seek(4)
+                f.write(struct.pack(order + 'I', total))
+                # fsync 是刻意的:幾百 MB 的檔要是只寫進快取就斷電,目錄跟資料會對不起來。
+                f.flush()
+                os.fsync(f.fileno())
+                _mark_mutated(path)
+        except BaseException:
+            # 連 KeyboardInterrupt 都要接:接到檔尾的那一段是這支腳本的「暫存檔」,
+            # 沒提交就出事的話要清掉它,不然檔頭宣告的長度會跟實際長度對不上。
+            if not committing:
+                _rollback_tail(f, new_off, was)
+            raise
+    return new_off, {'field_pos': field_pos, 'old_field': old_field,
+                     'old_total': old_total, 'old_size': new_off, 'was': was}
+
+
+def undo_append(path, undo):
+    """把 append_entry 剛剛動過的那 12 個位元組寫回去,再把接上去的資料截掉。
+
+    ⚠️ 這**不是** --restore。它只碰自己這一次改過的位置,所以不會把讀者
+       之前成功換過的臉一起退掉 —— 那份備份可能是好幾次改動之前留下來的,
+       拿它整份蓋回去等於把中間的成果全部丟掉。複驗沒過時要的是「當作這次
+       沒發生過」,不是「回到史前時代」。
+
+    順序也是刻意的:**先**把目錄與檔頭寫回舊值(寫回去的那一刻檔案就已經
+    自洽了),**再**去截尾巴。萬一截尾巴那一步失敗,檔尾只是多一段沒人指到的
+    垃圾 —— 封裝檔本來就容得下這種東西,遊戲讀不到它。
+
+    ⚠️ 2026-09-11 補:退回成功之後要把「動手之前的那筆登記」放回去。
+       少了這一步,退乾淨之後 _MUTATION 還停在「已經改好了」,那一刻按 Ctrl-C
+       收尾會叫讀者去跑 --restore —— 而檔案其實已經跟執行前一樣了。
+       照著做只會把**之前**換好的臉一起退掉(那份備份可能是好幾次改動之前留的)。
+       小抄裡的 'was' 就是為了這一步存的;舊版小抄沒有這一格,所以用 .get()。
+    """
+    path = os.fspath(path)
+    # 這裡也是「寫」。跟 append_entry 同一條規矩:目的檔本身是符號連結就停手,
+    # 不跟著連結去改別的地方(路徑中間的資料夾是連結沒關係,只看最後那一個檔)。
+    _refuse_symlink(path, '要退回舊值的遊戲檔')
+    with open(path, 'r+b') as f:
+        _mark_mutating(path)
+        # 退回的兩步(寫回舊值、截掉尾巴)跟登記綁成不可中斷的一段:
+        # 中斷落在中間的話,收尾會說錯現在到底是新的還是舊的。
+        # 一樣只有 12 個位元組加一次 truncate,包起來不會讓人等。
+        with _NoInterrupt():
+            f.seek(undo['field_pos'])
+            f.write(undo['old_field'])
+            f.seek(4)
+            f.write(undo['old_total'])
+            f.flush()
+            os.fsync(f.fileno())
+            f.truncate(undo['old_size'])
+            f.flush()
+            os.fsync(f.fileno())
+            # 退乾淨了 —— 磁碟上就是「動手之前」那一份,登記要照這個講。
+            was = undo.get('was')
+            if was is None:
+                _mark_mutated(path)
+            else:
+                _MUTATION['target'], _MUTATION['partial'] = was
+
+
+# ─────────────────────────────────────────────────────────
+#  FSH(SHPI 容器):找到那張圖、換掉像素
+# ─────────────────────────────────────────────────────────
+# 名字後面那個數字是「一個像素幾個位元組」,全部是本站在剛安裝好的原版上量出來的。
+# 2026-08-28 訂正:原本這張表有四格名字跟量到的位元組數對不上(0x6D 寫成 4 位元組、
+# 0x7B 寫成 2 位元組、0x7D 寫成 3 位元組、RGB24 這個名字掛錯代號),
+# 而且漏了 0x79 與 0x7F 兩個代號 —— 漏掉會讓下面的守門員把真實的圖擋掉。
+# 2026-08-28 再訂正:0x79 原本叫 EMPTY_1x1,那是把「用途」寫成了「格式」。
+FSH_FORMATS = {
+    0x60: 'DXT1',        # 0.5  每 4x4 像素一個 8 位元組區塊
+    0x61: 'DXT3',        # 1.0  每 4x4 像素一個 16 位元組區塊,前 8 個是透明度
+    0x6D: 'ARGB16_4444', # 2.0  models.big 裡 18,287 張
+    0x78: 'RGB16_565',   # 2.0  models.big 裡 10,512 張
+    0x79: 'PAL4',        # 0.5  4 位元索引色,調色盤在緊接的 0x2A 區塊裡
+                         #      2026-08-28 訂正:原本寫 EMPTY_1x1「永遠 1×1」。
+                         #      uniforms.big 的 431 個空槽確實都是 1×1,但那是用途不是格式:
+                         #      中文字型的字圖集就是 0x79,1024x512、正好 0.500 bytes/像素,
+                         #      而 au20b_en.ffn 後面的 0x2A 調色盤正好 16 個項目(2的4次方)。
+    0x7B: 'PAL8',        # 1.0  一個位元組是索引,調色盤在緊接的 0x2A 區塊裡
+    0x7D: 'ARGB32',      # 4.0  剛安裝好的原版 portrait.big 2,391 張圖全部是這個
+    0x7E: 'ARGB16_1555', # 外部文件說的,本站至今找不到樣本,無從實測
+    0x7F: 'RGB24',       # 3.0  models.big 裡 45 張(g001-g045.fsh)
+}
+# 名字對齊 FSHTOOL 1.22(Denis Auroux, 2002)說明書列的格式表;
+# 每像素位元組數是本站在剛安裝好的原版上自己量的,兩邊完全吻合。
+# 那份說明書還有一條本站沒用到的規則:代號 +0x80 代表「這張圖本身是壓縮過的」。
+
+
+def fsh_first_image(data):
+    """回傳 (格式代號, 寬, 高, 像素起點, 像素終點)。只看第一筆記錄。"""
+    # SHPI 檔頭 16 個位元組:'SHPI' + 檔案長度(4)+ 圖片數(4)+ 目錄標記(4),
+    # 全部**小端**,跟外層 QFS 與 BIGF 的大端相反。
+    # 接著是目錄,一項 8 個位元組:標籤(4)+ 該圖起點(4)。
+    if len(data) &lt; 16 or data[:4] != b'SHPI':
+        raise DataError('不是 SHPI 檔(開頭是 %r)' % data[:4])
+    num = struct.unpack_from('&lt;I', data, 8)[0]
+    if num &lt; 1:
+        raise DataError('這個 SHPI 裡一張圖都沒有')
+    off = struct.unpack_from('&lt;I', data, 20)[0]         # 16 + 0*8 + 4
+    if off + 16 &gt; len(data):
+        raise DataError('圖片記錄的檔頭不完整')
+    # 圖片記錄的前 16 個位元組:格式代號(1)+ 到下一塊的位移(3,小端)
+    # + 寬(2)+ 高(2)+ 中心點與位置(8)。像素從第 16 個位元組之後開始。
+    # 認不得的代號一律停手:硬拆下去只會把不是像素的東西當像素改掉。
+    code = data[off]
+    if code not in FSH_FORMATS:
+        raise DataError('沒見過的格式代號 0x%02X' % code)
+    block_size = data[off + 1] | (data[off + 2] &lt;&lt; 8) | (data[off + 3] &lt;&lt; 16)
+    width = struct.unpack_from('&lt;H', data, off + 4)[0]
+    height = struct.unpack_from('&lt;H', data, off + 6)[0]
+    if not (0 &lt; width &lt;= 4096 and 0 &lt; height &lt;= 4096):
+        raise DataError('圖片尺寸異常 %dx%d' % (width, height))
+    # 像素到哪裡結束有三種算法,由可靠到不可靠排:
+    #   1. 記錄自己寫的「到下一塊的位移」(大於 16 才是有效值)
+    #   2. 這個容器還有下一張圖時,用下一張的起點
+    #   3. 都沒有就吃到檔尾
+    start = off + 16
+    if block_size &gt; 16:
+        end = min(off + block_size, len(data))
+    elif num &gt; 1:
+        end = min(struct.unpack_from('&lt;I', data, 16 + 8 + 4)[0], len(data))
+    else:
+        end = len(data)
+    return code, width, height, start, end
+
+
+def fsh_replace_pixels(data, start, end, new_pixels):
+    """把 [start, end) 這一段像素換成新的,前後兩段原封不動。
+
+    長度**必須完全相同**。差一個位元組就代表尺寸或格式對不上,
+    這時硬寫進去會讓後面所有位移全部錯位,所以直接拒絕。
+    """
+    if len(new_pixels) != end - start:
+        raise DataError('新像素有 %d 個位元組,原本是 %d —— 尺寸或格式不一致,拒絕寫入'
+                        % (len(new_pixels), end - start))
+    return data[:start] + new_pixels + data[end:]
+
+
+# ─────────────────────────────────────────────────────────
+#  DXT1:解碼與編碼
+#
+#  這支腳本做的臉皮貼圖是 DXT1。⚠️ 那不是遊戲出貨時的格式:本站在剛安裝好的
+#  原版上量到 504 張 c***.fsh 全部是 RGB16_565、128x256(理由見檔頭那一段)。
+#  DXT1 一張圖切成 4x4 的方塊,每塊只有 8 個位元組:
+#    兩個底色(各 16 位元)+ 16 個 2 位元的索引
+#  兩個底色會再內插出中間色,湊成調色盤,每個像素從裡面挑一個。
+#
+#  ⚠️ DXT1 有兩種模式,靠兩個底色誰大誰小決定:
+#     c0 &gt;  c1  四色模式:底色兩個 + 中間色兩個,全部不透明
+#     c0 &lt;= c1  三色模式:底色兩個 + 中間色一個,第四個索引代表**完全透明**
+#  這是 DXT1 表達透明度的唯一辦法(它沒有獨立的透明度區塊)。
+#  本站測試機那份 data/models.big:890 張 DXT1 臉皮裡讀得出來的 889 張,
+#  合計 7,282,688 個 4x4 方塊,四色 90.6%、三色 6.3%、平坦 3.1%,
+#  三種都會遇到,所以三種都要能產生。
+#  (剩下那張 c333.fsh 的 QFS 檔頭長度對不上,本腳本一律拒讀,沒有列入統計)
+#  ⚠️ 這組比例只代表這一份檔案。剛安裝好的原版一張 DXT1 臉皮都沒有,
+#  504 張全部是 0x78 的 128x256,英文版與中文版量出來一樣;
+#  這台上的 DXT1 臉皮是後來被社群模組換上去的。
+# ─────────────────────────────────────────────────────────
+def _clamp(v):
+    """把外插算出來的色值壓回 0 到 255。外插常常會算出負數或超過 255。"""
+    return 0 if v &lt; 0 else (255 if v &gt; 255 else v)
+
+
+def _dist(p, q):
+    """兩個顏色的距離。刻意不開根號:只拿來比大小,開根號是白算的。"""
+    return (p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2 + (p[2] - q[2]) ** 2
+
+
+def _to565(r, g, b):
+    """0 到 255 的三個色值壓成一個 16 位元的 565:紅 5 位元、綠 6 位元、藍 5 位元。
+
+    綠色多一個位元不是筆誤,是 DXT 的規格:人眼對綠色的階調最敏感。
+    """
+    return (((round(r * 31 / 255) &amp; 0x1F) &lt;&lt; 11) |
+            ((round(g * 63 / 255) &amp; 0x3F) &lt;&lt; 5) |
+            (round(b * 31 / 255) &amp; 0x1F))
+
+
+def _from565(c):
+    """565 拆回 0 到 255 的三個值。乘 255 再除滿刻度,才會讓最大值剛好回到 255。"""
+    return (((c &gt;&gt; 11) &amp; 0x1F) * 255 // 31,
+            ((c &gt;&gt; 5) &amp; 0x3F) * 255 // 63,
+            (c &amp; 0x1F) * 255 // 31)
+
+
+def _palette(c0, c1, four):
+    """兩個底色長出一塊 4x4 方塊能用的調色盤。
+
+    四色模式:兩個底色 + 1/3 與 2/3 的內插色。
+    三色模式:兩個底色 + 中點,第四格填黑但用不到,索引 3 在三色模式代表透明。
+    """
+    r0, g0, b0 = _from565(c0)
+    r1, g1, b1 = _from565(c1)
+    if four:
+        return [(r0, g0, b0), (r1, g1, b1),
+                ((2 * r0 + r1) // 3, (2 * g0 + g1) // 3, (2 * b0 + b1) // 3),
+                ((r0 + 2 * r1) // 3, (g0 + 2 * g1) // 3, (b0 + 2 * b1) // 3)]
+    return [(r0, g0, b0), (r1, g1, b1),
+            ((r0 + r1) // 2, (g0 + g1) // 2, (b0 + b1) // 2), (0, 0, 0)]
+
+
+def dxt1_decode(raw, w, h):
+    """DXT1 → RGBA bytes
+
+    方塊由左到右、由上到下排。每塊 8 個位元組:
+      +0  兩個底色,各 2 個位元組,**小端**的 565
+      +4  16 個 2 位元的索引,湊成一個 4 位元組的小端整數,像素 0 在最低位
+    """
+    out = bytearray(w * h * 4)
+    pos = 0
+    for by in range((h + 3) // 4):
+        for bx in range((w + 3) // 4):
+            if pos + 8 &gt; len(raw):
+                break
+            c0 = raw[pos] | (raw[pos + 1] &lt;&lt; 8)
+            c1 = raw[pos + 2] | (raw[pos + 3] &lt;&lt; 8)
+            lookup = (raw[pos + 4] | (raw[pos + 5] &lt;&lt; 8) |
+                      (raw[pos + 6] &lt;&lt; 16) | (raw[pos + 7] &lt;&lt; 24))
+            pos += 8
+            four = c0 &gt; c1
+            pal = _palette(c0, c1, four)
+            # 圖片寬高不是 4 的倍數時,方塊會有一部分落在圖外,那些像素直接丟掉。
+            for py in range(4):
+                for px in range(4):
+                    x = bx * 4 + px; y = by * 4 + py
+                    if x &gt;= w or y &gt;= h:
+                        continue
+                    i = py * 4 + px
+                    idx = (lookup &gt;&gt; (2 * i)) &amp; 0x03
+                    r, g, b = pal[idx]
+                    a = 0 if (not four and idx == 3) else 255
+                    di = (y * w + x) * 4
+                    out[di] = r; out[di + 1] = g; out[di + 2] = b; out[di + 3] = a
+    return bytes(out)
+
+
+def _endpoint_candidates(cols):
+    """端點候選。
+
+    DXT 解出來的方塊最多只有四種相異色,所以直接試遍所有配對就行(最多十組)。
+    但端點不一定出現在像素裡 —— 方塊可能只用到中間的內插色。那種情況可以
+    解回來:若 a、b 是 1/3 與 2/3 內插點,則 c0 = 2a - b、c1 = 2b - a。
+    這幾個外插候選讓還原率從 95% 升到 99%。
+    """
+    # 相異色多到這個地步,已經不是 DXT 解出來的方塊(多半是使用者自己畫的圖)。
+    # 那時候試遍所有配對太慢,退回兩個夠用的候選:最遠的一對,加上外框的兩個角。
+    if len(cols) &gt; 8:
+        best = -1; pair = (cols[0], cols[0])
+        for i in range(len(cols)):
+            for j in range(i + 1, len(cols)):
+                d = _dist(cols[i], cols[j])
+                if d &gt; best:
+                    best, pair = d, (cols[i], cols[j])
+        return [pair, (tuple(min(c[k] for c in cols) for k in range(3)),
+                       tuple(max(c[k] for c in cols) for k in range(3)))]
+    # 先放所有「兩個端點都出現在像素裡」的配對(含 a 等於 b 的單色情形)。
+    out = [(cols[i], cols[j]) for i in range(len(cols)) for j in range(i, len(cols))]
+    # 再補外插:2a-b、2b-a 是把 1/3 內插點推回端點,3a-2b、3b-2a 對應 2/3 那一種。
+    for a, b in list(out):
+        if a == b:
+            continue
+        for m, n, p, q in ((2, -1, a, b), (2, -1, b, a), (3, -2, b, a), (3, -2, a, b)):
+            cand = tuple(_clamp(m * p[k] + n * q[k]) for k in range(3))
+            out.append((p, cand)); out.append((q, cand))
+    seen = set(); uniq = []
+    for p in out:
+        if p not in seen:
+            seen.add(p); uniq.append(p)
+    return uniq
+
+
+def dxt1_encode(rgba, w, h):
+    """RGBA bytes → DXT1。透明的像素用三色模式的索引 3 表達。
+
+    方塊順序與解碼那一支完全對稱,不然壓回去會整張錯位。
+    """
+    out = bytearray()
+    for by in range((h + 3) // 4):
+        for bx in range((w + 3) // 4):
+            px = []; al = []
+            # 落在圖外的位置用 min() 夾回邊緣像素。方塊一定要湊滿 16 格,
+            # 補 0 會在右邊與下面的邊緣壓出一條黑邊。
+            for py in range(4):
+                for pxi in range(4):
+                    x = min(bx * 4 + pxi, w - 1)
+                    y = min(by * 4 + py, h - 1)
+                    di = (y * w + x) * 4
+                    px.append((rgba[di], rgba[di + 1], rgba[di + 2]))
+                    al.append(rgba[di + 3])
+            out += _encode_block(px, al)
+    return bytes(out)
+
+
+def _encode_block(px, alphas):
+    """16 個像素 → 8 個位元組。
+
+    透明度只有「有」跟「沒有」兩種(DXT1 一個像素只有 1 位元的透明度),
+    所以 128 是門檻:低於它就當成完全透明。
+    """
+    vis = [i for i in range(16) if alphas[i] &gt;= 128]
+    need3 = len(vis) &lt; 16                       # 有透明像素就只能用三色模式
+    if not vis:
+        # 整塊都透明。照樣把顏色編進去,因為遊戲做雙線性過濾會採樣到透明像素的
+        # 顏色,填黑會在邊緣暈出黑邊。
+        vis = list(range(16)); need3 = True
+    cols = sorted({px[i] for i in vis})
+
+    # 每個候選端點都真的壓一次、算一次誤差,挑最小的。誤差歸零就可以提早收工。
+    best_err = None; best = None
+    for a, b in _endpoint_candidates(cols):
+        ca, cb = _to565(*a), _to565(*b)
+        # 兩個端點量化後撞在一起 = 整塊同色,沒有內插色可挑,另外走一條路。
+        if ca == cb:
+            modes = [None]
+        elif need3:
+            modes = [False]
+        else:
+            modes = [True, False]
+        for four in modes:
+            # 整塊同色。索引全填 0 就好,只有需要透明的格子改填 3。
+            if four is None:
+                c0 = c1 = ca
+                lookup = 0
+                if need3:
+                    for k in range(16):
+                        if alphas[k] &lt; 128:
+                            lookup |= 3 &lt;&lt; (2 * k)
+                err = sum(_dist(px[i], _from565(c0)) for i in vis)
+            else:
+                # 模式是靠「c0 跟 c1 誰大」表達的,所以要照想要的模式決定誰放前面:
+                # 四色要 c0 大於 c1,三色要 c0 小於等於 c1。
+                c0, c1 = (max(ca, cb), min(ca, cb)) if four else (min(ca, cb), max(ca, cb))
+                pal = _palette(c0, c1, four)
+                hi = 3 if four else 2            # 三色模式的索引 3 是透明,不能拿來配色
+                lookup = 0; err = 0
+                for k in range(16):
+                    if need3 and alphas[k] &lt; 128:
+                        lookup |= 3 &lt;&lt; (2 * k)
+                        continue
+                    bi = 0; bd = None
+                    for pi in range(hi + 1):
+                        d = _dist(px[k], pal[pi])
+                        if bd is None or d &lt; bd:
+                            bd, bi = d, pi
+                    if alphas[k] &gt;= 128:
+                        err += bd
+                    lookup |= bi &lt;&lt; (2 * k)
+            if best_err is None or err &lt; best_err:
+                best_err, best = err, (c0, c1, lookup)
+                if err == 0:
+                    break
+        if best_err == 0:
+            break
+    c0, c1, lookup = best
+    return bytes((c0 &amp; 0xFF, c0 &gt;&gt; 8, c1 &amp; 0xFF, c1 &gt;&gt; 8,
+                  lookup &amp; 0xFF, (lookup &gt;&gt; 8) &amp; 0xFF,
+                  (lookup &gt;&gt; 16) &amp; 0xFF, (lookup &gt;&gt; 24) &amp; 0xFF))
+
+
+# ─────────────────────────────────────────────────────────
+#  PNG:自己讀、自己寫(只用內建的 zlib,不需要安裝任何套件)
+# ─────────────────────────────────────────────────────────
+PNG_MAGIC = b'\x89PNG\r\n\x1a\n'
+
+
+def png_write(path, rgba, w, h):
+    """寫一張 8 位元 RGBA 的 PNG。只用內建的 zlib,不需要任何影像套件。"""
+    def chunk(tag, payload):
+        # PNG 的區塊格式:長度(4,大端)+ 4 個字母的標籤 + 內容 + CRC32(4,大端)。
+        # CRC 算的是「標籤加內容」,不含長度那 4 個位元組。
+        return (struct.pack('&gt;I', len(payload)) + tag + payload +
+                struct.pack('&gt;I', zlib.crc32(tag + payload) &amp; 0xFFFFFFFF))
+    rows = bytearray()
+    for y in range(h):
+        rows.append(0)                                  # 每一列前面加一個 0 = 不做預測濾波
+        rows += rgba[y * w * 4:(y + 1) * w * 4]
+    # IHDR 那七個數字依序是:寬、高、每色 8 位元、色彩型別 6(RGBA)、
+    # 壓縮法 0、濾波法 0、非交錯 0。PNG 的區塊能少寫一塊是一塊,所以只寫必要的 IHDR、IDAT、IEND 三塊。
+    data = (PNG_MAGIC
+            + chunk(b'IHDR', struct.pack('&gt;IIBBBBB', w, h, 8, 6, 0, 0, 0))
+            + chunk(b'IDAT', zlib.compress(bytes(rows), 9))
+            + chunk(b'IEND', b''))
+    # 輸出也走「隔壁暫存檔 → os.replace」那一套:寫到一半沒電,讀者原本
+    # 那個位置上的檔還是完整的,不會多出一張半截 PNG 讓人以為匯出成功了。
+    # 而且暫存檔是 mkstemp 開的,名字搶不走,不會沿著符號連結寫到別處。
+    _refuse_symlink(path, '要輸出的 PNG')
+    fd, tmp = _temp_beside(path, 'png')
+    try:
+        with open(fd, 'wb') as f:
+            f.write(data)
+            f.flush()
+            os.fsync(f.fileno())
+        # mkstemp 開出來是 0600(只有自己讀得到)。匯出的 PNG 是要拿去修圖的,
+        # 所以權限照系統預設(umask)給,跟一般存檔一樣。
+        um = os.umask(0)
+        os.umask(um)
+        os.chmod(tmp, 0o666 &amp; ~um)
+        with _NoInterrupt():
+            os.replace(tmp, path)
+    except BaseException:
+        _drop(tmp)
+        raise
+
+
+def png_read(path):
+    """回傳 (rgba bytes, w, h)。支援 8 位元的灰階/RGB/索引/灰階+透明/RGBA,不支援交錯。"""
+    with open(path, 'rb') as f:
+        data = f.read()
+    if data[:8] != PNG_MAGIC:
+        raise DataError('%s 不是 PNG 檔' % os.path.basename(path))
+    # 從第 8 個位元組(魔術數字之後)開始逐塊走。認得的收下來,不認得的跳過就好。
+    # IDAT 可以被切成好幾塊,所以要接起來再一起解壓。
+    pos = 8
+    w = h = depth = ctype = None
+    idat = bytearray(); plte = None; trns = None
+    while pos + 8 &lt;= len(data):
+        ln = struct.unpack_from('&gt;I', data, pos)[0]
+        tag = data[pos + 4:pos + 8]
+        body = data[pos + 8:pos + 8 + ln]
+        pos += 12 + ln
+        if tag == b'IHDR':
+            w, h, depth, ctype, comp, filt, inter = struct.unpack('&gt;IIBBBBB', body)
+            if depth != 8:
+                raise DataError('只支援每色 8 位元的 PNG,這張是 %d 位元' % depth)
+            if inter:
+                raise DataError('不支援交錯式(interlaced)PNG,請另存成一般的 PNG')
+        elif tag == b'PLTE':
+            plte = body
+        elif tag == b'tRNS':
+            trns = body
+        elif tag == b'IDAT':
+            idat += body
+        elif tag == b'IEND':
+            break
+    if w is None:
+        raise DataError('這個 PNG 沒有 IHDR')
+    channels = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}.get(ctype)
+    if channels is None:
+        raise DataError('沒見過的 PNG 色彩型別 %d' % ctype)
+
+    # 解開之後每一列的第一個位元組是「這一列用了哪一種預測濾波」,
+    # 後面才是 stride 個位元組的真正資料。要一列一列把預測加回去才是原始像素。
+    raw = zlib.decompress(bytes(idat))
+    stride = w * channels
+    out = bytearray(h * stride)
+    prev = bytearray(stride)
+    p = 0
+    for y in range(h):
+        ft = raw[p]; p += 1
+        line = bytearray(raw[p:p + stride]); p += stride
+        # PNG 的五種預測濾波,每一列自己選一種
+        if ft == 1:
+            for i in range(channels, stride):
+                line[i] = (line[i] + line[i - channels]) &amp; 0xFF
+        elif ft == 2:
+            for i in range(stride):
+                line[i] = (line[i] + prev[i]) &amp; 0xFF
+        elif ft == 3:
+            for i in range(stride):
+                a = line[i - channels] if i &gt;= channels else 0
+                line[i] = (line[i] + ((a + prev[i]) &gt;&gt; 1)) &amp; 0xFF
+        elif ft == 4:
+            for i in range(stride):
+                a = line[i - channels] if i &gt;= channels else 0
+                b = prev[i]
+                c = prev[i - channels] if i &gt;= channels else 0
+                pa = abs(b - c); pb = abs(a - c); pc = abs(a + b - 2 * c)
+                pr = a if (pa &lt;= pb and pa &lt;= pc) else (b if pb &lt;= pc else c)
+                line[i] = (line[i] + pr) &amp; 0xFF
+        elif ft != 0:
+            raise DataError('沒見過的 PNG 濾波型別 %d' % ft)
+        out[y * stride:(y + 1) * stride] = line
+        prev = line
+
+    # 五種來源色彩型別統一攤成 RGBA 四通道,後面壓縮那一段就只要處理一種格式。
+    rgba = bytearray(w * h * 4)
+    for i in range(w * h):
+        s = i * channels; d = i * 4
+        if ctype == 6:
+            rgba[d:d + 4] = out[s:s + 4]
+        elif ctype == 2:
+            rgba[d:d + 3] = out[s:s + 3]; rgba[d + 3] = 255
+        elif ctype == 0:
+            v = out[s]; rgba[d] = rgba[d + 1] = rgba[d + 2] = v; rgba[d + 3] = 255
+        elif ctype == 4:
+            v = out[s]; rgba[d] = rgba[d + 1] = rgba[d + 2] = v; rgba[d + 3] = out[s + 1]
+        else:                                            # 索引色
+            if plte is None:
+                raise DataError('索引色 PNG 卻沒有調色盤')
+            idx = out[s]
+            # 索引超出調色盤時,下面那個切片會取到空的,直接把 rgba 縮短 ——
+            # 那會讓後面整張圖錯位。與其硬做,不如停下來把話講清楚。
+            if idx * 3 + 3 &gt; len(plte):
+                raise DataError(
+                    '這張索引色 PNG 的第 %d 個像素指到調色盤第 %d 格,'
+                    '但它的調色盤只有 %d 格。\n'
+                    '  請用修圖軟體另存成一般的 RGB 或 RGBA PNG 再試一次。'
+                    % (i, idx, len(plte) // 3))
+            rgba[d:d + 3] = plte[idx * 3:idx * 3 + 3]
+            rgba[d + 3] = trns[idx] if (trns and idx &lt; len(trns)) else 255
+    return bytes(rgba), w, h
+
+
+# ─────────────────────────────────────────────────────────
+#  名單:哪些臉皮編號有人在用
+#
+#  ⚠️ 欄位編號**不能寫死**。不同來源的名冊欄位順序不一樣,
+#     一律在執行時從表頭找欄位名。
+#  ⚠️ 空位有幾個也**不能寫死** —— 它完全取決於你裝的是哪一份名冊。
+# ─────────────────────────────────────────────────────────
+FACE_NAME = 'playerattrib_face'
+NAME_FIRST = 0
+NAME_LAST = 1
+
+
+def read_attrib(path):
+    """把名冊整份讀進來並切成行。
+
+    attrib.dat 是純文字的表,**用 CRLF 換行**,第一行是欄位表。
+    開頭不是數字就代表這不是名冊,那時不猜、直接停。
+    """
+    try:
+        raw = open(path, 'rb').read()
+    except OSError as e:
+        raise DataError('讀不到 %s:%s' % (path, e))
+    if not raw[:1].isdigit():
+        raise DataError('%s 的開頭不像欄位表,可能不是 attrib.dat' % os.path.basename(path))
+    lines = raw.split(b'\r\n')
+    if len(lines) &lt; 3:
+        raise DataError('%s 只有 %d 行,內容不完整' % (os.path.basename(path), len(lines)))
+    return raw, lines
+
+
+def resolve_field(lines, wanted):
+    """在表頭找出某個欄位是第幾欄。**執行時查,絕不寫死。**
+
+    表頭每一格長得像「16 playerattrib_audioid」,也就是欄號加空白加欄名。
+    不同來源的名冊欄位順序不一樣,寫死欄號會改到別人的資料。
+    """
+    names = {}
+    for c in lines[0].split(b','):
+        m = re.match(rb'^\s*(\d+) (\w+)', c)
+        if m:
+            names[int(m.group(1))] = m.group(2).decode('latin-1')
+    for num, nm in names.items():
+        if nm == wanted:
+            return num
+    raise DataError('這份名冊的表頭裡找不到 %s 這個欄位(它有 %d 欄)。\n'
+                    '  這支腳本不敢在看不懂的檔案上動手。' % (wanted, len(names)))
+
+
+def cell_value(line_bytes, field):
+    """取出某一列某一欄的值,取不到就回 None。
+
+    資料列的每一格自己也帶著欄號,所以拆完之後還會再核對一次:
+    對不上就代表這一列的格數跟表頭不一樣,那時回 None,不猜。
+    """
+    cells = line_bytes.split(b',')
+    idx = field + 1                                  # 資料列行首多一個識別碼
+    if idx &gt;= len(cells):
+        return None
+    m = re.match(rb'^(\d+) ?(.*)$', cells[idx].strip())
+    if not m or int(m.group(1)) != field:
+        return None
+    return m.group(2).decode('latin-1')
+
+
+def face_usage(gamedir):
+    """回傳 {臉皮編號: 幾位球員在用}。名冊**不在**就回空的。
+
+    只有「名冊不存在」這一種算沒事。名冊在卻打不開、開頭不像欄位表、
+    切出來不足三行、或表頭裡找不到 playerattrib_face,
+    read_attrib 與 resolve_field 會丟 DataError,
+    整支腳本會印「停下來了:…」並以結束代碼 2 停住。
+    """
+    # 名冊不在也不算錯:玩家可能只想看封裝檔。回空字典,呼叫端會少印一段。
+    path = os.path.join(gamedir, 'data', 'database', 'attrib.dat')
+    if not os.path.isfile(path):
+        return {}
+    raw, lines = read_attrib(path)
+    fld = resolve_field(lines, FACE_NAME)
+    used = {}
+    for l in lines[1:]:
+        if not l.strip():
+            continue
+        v = cell_value(l, fld)
+        if v and v.isdigit():
+            n = int(v)
+            used[n] = used.get(n, 0) + 1
+    return used
+
+
+# ─────────────────────────────────────────────────────────
+#  各種動作
+# ─────────────────────────────────────────────────────────
+def human_size(n):
+    """把位元組數寫成人看得懂的大小。
+
+    ⚠️ 刻意不用「無條件捨去到 MB」:561,891,312 個位元組捨去會印 535,
+       跟站上寫的 536 差一格,讀者會以為自己看錯檔案;而幾百個位元組的
+       測試檔捨去會印成「0 MB」。所以四捨五入,不足 1 MB 的改用別的單位。
+    """
+    if n &gt;= 1024 * 1024:
+        return '%d MB' % ((n + 512 * 1024) // (1024 * 1024))
+    if n &gt;= 1024:
+        return '%d KB' % ((n + 512) // 1024)
+    return '%d 個位元組' % n
+
+
+def models_path(gamedir):
+    """由遊戲資料夾算出 models.big 的位置,順便當成「路徑給對了沒」的檢查。"""
+    p = os.path.join(gamedir, 'data', 'models.big')
+    if not os.path.isfile(p):
+        raise DataError('找不到 %s\n'
+                        '  請確認你給的是遊戲資料夾(裡面應該看得到 mvp2005.exe 跟 data 資料夾)' % p)
+    return p
+
+
+def face_entries(items):
+    """回傳 {編號: 目錄項目},只看 c***.fsh"""
+    # 臉皮的檔名規則是 c 加三位數字再加 .fsh。封裝檔裡還有很多別的東西,
+    # 名字不合這個規則的一律不碰。
+    out = {}
+    for it in items:
+        n = it[0]
+        if n.lower().startswith('c') and n.lower().endswith('.fsh') and n[1:-4].isdigit():
+            out[int(n[1:-4])] = it
+    return out
+
+
+def load_image(bigpath, item):
+    """一口氣穿過三層:封裝檔挖出那一項 → QFS 解壓 → 在 SHPI 裡定位到像素。"""
+    blob = read_entry(bigpath, item[2], item[3])
+    plain = qfs_decompress(blob)
+    code, w, h, start, end = fsh_first_image(plain)
+    return plain, code, w, h, start, end
+
+
+def cmd_info(bigpath, gamedir):
+    """把封裝檔有的編號跟名冊用到的編號兜起來,算出哪些是空位。唯讀。"""
+    # 空位 = 「封裝檔裡有這張圖」而且「名冊裡沒有人指過去」。
+    # 兩邊都要看:只看封裝檔會把別人正在用的算成空位。
+    items = big_entries(bigpath)
+    faces = face_entries(items)
+    used = face_usage(gamedir)
+    free = sorted(n for n in faces if used.get(n, 0) == 0)
+    print('  封裝檔 %s(%d 個項目)' % (os.path.basename(bigpath), len(items)))
+    print('  臉皮貼圖 %d 張,編號 c%03d 到 c%03d' % (len(faces), min(faces), max(faces)))
+    if used:
+        print('  你的名冊裡 %d 位球員,用到 %d 種臉皮編號' % (sum(used.values()), len(used)))
+        print('  ✅ **沒有任何球員在用**的編號:%d 個' % len(free))
+        print('     前 20 個:%s' % '  '.join('c%03d' % n for n in free[:20]))
+        # ⚠️ 這裡要分兩種,不能一句話帶過:
+        #    901 以上 = 遊戲內建的通用臉,封裝檔裡本來就沒有貼圖(原版也沒有)
+        #    900 以下 = 你這份封裝檔真的少了那張圖
+        gen = sorted(n for n in used if n not in faces)
+        builtin = [n for n in gen if n &gt;= 901]
+        lost = [n for n in gen if 0 &lt; n &lt; 901]
+        zero = used.get(0, 0)           # 0 是「沒指定臉」的哨兵值,原版也沒有 c000.fsh
+        if builtin:
+            print()
+            print('  有 %d 個編號被 %d 位球員指到,但那是**遊戲內建的通用臉**:'
+                  % (len(builtin), sum(used[n] for n in builtin)))
+            print('     %s%s' % ('  '.join('c%03d' % n for n in builtin[:12]),
+                                 '  …(只列前 12 個)' if len(builtin) &gt; 12 else ''))
+            print('     901 以上的編號封裝檔裡本來就沒有貼圖,剛安裝好的原版也一樣。這不是缺檔。')
+        if zero:
+            print()
+            print('  另外有 %d 位球員的臉皮編號是 0。' % zero)
+            print('     那是「沒有指定」的意思,不是缺檔 —— 原版也沒有 c000.fsh。')
+        if lost:
+            print()
+            print('  ⚠️ 有 %d 個 900 以下的編號被 %d 位球員指到,但封裝檔裡找不到貼圖:'
+                  % (len(lost), sum(used[n] for n in lost)))
+            print('     %s%s' % ('  '.join('c%03d' % n for n in lost[:12]),
+                                 '  …(只列前 12 個)' if len(lost) &gt; 12 else ''))
+            print('     900 以下是 EA 出貨時就有的範圍,所以這幾張是**你這份封裝檔真的少了**')
+            print('     (多半是社群重新打包時掉的)。那些球員會用預設的臉。')
+    else:
+        print('  (讀不到名冊,所以無法判斷哪些編號沒人在用)')
+    print()
+    print('  挑一個空位,把現有貼圖匯出來看看長什麼樣:')
+    if free:
+        print('    python3 %s "&lt;遊戲資料夾&gt;" --export %d ~/Desktop/c%03d.png'
+              % (os.path.basename(sys.argv[0]), free[0], free[0]))
+
+
+def cmd_export(bigpath, number, outpath):
+    """把某個編號的臉皮貼圖解出來存成 PNG。唯讀,不動遊戲檔。
+
+    「唯讀」講的是遊戲檔。輸出的那個路徑是使用者自己打的,所以它有一道把關:
+    那個位置已經有東西、而且不是 PNG 的話就停手,不覆蓋。
+    """
+    # 2026-09-05 在複本上實測:加這道之前,--export 4 ./attrib.dat 會把
+    # 840,643 bytes 的名冊直接變成一張 PNG,連問都不問。遊戲檔(models.big、
+    # attrib.dat、mvp2005.exe)都不是 PNG,所以都會被這一條擋下來;
+    # 而重跑同一行 --export、蓋掉上一次自己匯出的那張 PNG,仍然可以。
+    # ⚠️ 這裡不能用 os.path.exists():它會跟著符號連結去看目標,
+    #    連結指到的檔不存在時回 False —— 那個連結就這樣被看不見地放行了。
+    _refuse_symlink(outpath, '要輸出的 PNG')
+    if os.path.lexists(outpath):
+        with open(outpath, 'rb') as f:
+            if f.read(8) != PNG_MAGIC:
+                raise DataError(
+                    '%s 已經存在,而且它不是 PNG —— 不覆蓋。\n'
+                    '  換一個檔名,或先自己把那個檔移開。' % outpath)
+    items = big_entries(bigpath)
+    faces = face_entries(items)
+    n = int(number)
+    if n not in faces:
+        raise DataError('封裝檔裡沒有 c%03d.fsh。用 --info 看有哪些編號。' % n)
+    plain, code, w, h, start, end = load_image(bigpath, faces[n])
+    if code != 0x60:
+        raise DataError('c%03d.fsh 是 %s 格式,這支腳本只處理 DXT1(代號 0x60)的臉皮。'
+                        % (n, FSH_FORMATS.get(code, '0x%02X' % code)))
+    rgba = dxt1_decode(plain[start:end], w, h)
+    png_write(outpath, rgba, w, h)
+    print('  已匯出 c%03d.fsh → %s' % (n, outpath))
+    print('  尺寸 %dx%d · 格式 DXT1' % (w, h))
+    print()
+    print('  這是一張**攤平的 3D 貼圖**,不是正面照:')
+    print('    正中央是攤開的臉,兩側是耳朵,上方是頭髮,下面一條是脖子,')
+    print('    左下角另外放兩顆眼球,右下角放牙齒。')
+    print('  改圖時位置不要挪動,不然貼到模型上會錯位。')
+
+
+def cmd_import(bigpath, gamedir, number, pngpath, apply_it):
+    """把 PNG 壓成 DXT1 換進某個編號。**沒有 --apply 就只是預覽,不碰檔案。**
+
+    順序是刻意的:先把會擋下來的理由問完(編號在不在、格式對不對、
+    尺寸一不一樣),再壓縮、印品質,最後才寫。
+    「有沒有人在用」也在這一段查,但它**不會擋你**:有人在用只印出提醒
+    (⚠️ 一行,再一行建議你改挑空位),照樣往下跑,換不換自己決定。
+    """
+    items = big_entries(bigpath)
+    faces = face_entries(items)
+    n = int(number)
+    if n not in faces:
+        raise DataError('封裝檔裡沒有 c%03d.fsh。用 --info 看有哪些編號。' % n)
+    item = faces[n]
+    plain, code, w, h, start, end = load_image(bigpath, item)
+    if code != 0x60:
+        raise DataError('c%03d.fsh 是 %s 格式,這支腳本只處理 DXT1(代號 0x60)。'
+                        % (n, FSH_FORMATS.get(code, '0x%02X' % code)))
+
+    used = face_usage(gamedir)
+    cnt = used.get(n, 0)
+    print('  目標 c%03d.fsh   %dx%d  DXT1' % (n, w, h))
+    if cnt:
+        print('  ⚠️ 這個編號**有 %d 位球員正在用**。換掉它,那些人的臉也會跟著變。' % cnt)
+        print('     想避免的話,用 --info 挑一個沒人在用的編號。')
+    elif not used:
+        # face_usage() 在名冊不在的時候回空字典,cnt 必然是 0 —— 那是「沒得查」,
+        # 不是「沒人在用」。--info 在同樣狀況下已經誠實講了,這裡也要講。
+        print('  ⚠️ 名冊 data/database/attrib.dat 讀不出任何一筆臉皮編號'
+              '(多半是它不在),')
+        print('     所以**無法判斷這個編號有沒有人在用** —— 這不等於「沒人在用」。')
+        print('     把名冊放回去再跑一次 --info 才查得到。')
+    else:
+        print('  ✅ 這個編號沒有任何球員在用,換掉它不會影響現有的人。')
+
+    rgba, pw, ph = png_read(pngpath)
+    print('  你要換上去的 PNG  %dx%d' % (pw, ph))
+    if (pw, ph) != (w, h):
+        raise DataError('尺寸不一樣,不能換。請把 PNG 調整成 %dx%d 再試一次。\n'
+                        '  (換圖時不動結構,所以新圖必須跟原圖一樣大。)' % (w, h))
+
+    # 壓完再解回來跟原圖比,是在寫入之前就先讓人看到「會掉多少畫質」。
+    # 完全透明的像素不算進去:它們的顏色看不見,算了只會讓數字難看。
+    newpix = dxt1_encode(rgba, w, h)
+    back = dxt1_decode(newpix, w, h)
+    # ⚠️ 這裡刻意**不報「完全相同的比例」**。
+    #    那個數字只在「原圖本來就是這個格式解出來的」時候有意義(會是 99%)。
+    #    使用者拿自己的圖進來時,8 位元的值幾乎不可能剛好落在量化格點上,
+    #    完全相同的比例會掉到個位數 —— 但最大誤差還是只有十幾,肉眼看不出來。
+    #    報那個數字只會嚇到人,而且跟「看起來對不對」無關。
+    diffs = []
+    for i in range(0, len(rgba), 4):
+        if rgba[i + 3] &lt; 128:
+            continue
+        diffs.append(max(abs(rgba[i + k] - back[i + k]) for k in range(3)))
+    nvis = len(diffs) or 1          # 看得見的像素個數(透明度 128 以上才算),一個都沒有時退成 1 避免除以零
+    ok2 = sum(1 for d in diffs if d &lt;= 2)
+    ok8 = sum(1 for d in diffs if d &lt;= 8)
+    worst = max(diffs) if diffs else 0
+    avg = sum(diffs) / nvis
+    print()
+    print('  壓縮後的品質(把壓完的結果解回來跟你的原圖比,只算看得見的像素):')
+    print('    幾乎看不出差別(誤差 ≤ 2)  %.2f%%' % (100.0 * ok2 / nvis))
+    print('    看不太出來  (誤差 ≤ 8)  %.2f%%' % (100.0 * ok8 / nvis))
+    print('    平均誤差                   %.1f / 255' % avg)
+    print('    單一色階最大誤差           %d / 255' % worst)
+    if worst &lt;= 16:
+        print('  → 這個範圍肉眼看不出來。')
+    elif worst &lt;= 40:
+        print('  → 少數地方看得出一點色塊,通常可以接受。')
+    else:
+        print('  ⚠️ 有地方誤差偏大。多半是圖裡有大面積的漸層或很暗的區域 ——')
+        print('     一個 4x4 的方塊只能有四種顏色,漸層最吃虧。')
+    print('  DXT 是有損壓縮,遊戲本來就用這個格式存,所以有一點誤差是正常的。')
+
+    if not apply_it:
+        print()
+        print('  以上是預覽,還沒有動到任何檔案。')
+        print('  確定要換的話,在剛才那一行最後面加上 --apply')
+        return
+
+    # 走到這裡才真的要動檔案。先換像素、再備份、再壓縮、最後接到檔尾。
+    # 備份只在第一次做:第二次改的時候,最早那一份才是「還沒動過的原始檔」。
+    newfsh = fsh_replace_pixels(plain, start, end, newpix)
+    backup = bigpath + BACKUP_SUFFIX
+    # 備份的名字是「遊戲檔名 + 固定尾巴」,所以它**猜得到** —— 先問它本身
+    # 是不是符號連結。是的話,備份會寫到別的地方去,而 --restore 又會從那裡
+    # 拿東西回來蓋遊戲檔,兩頭都不是使用者以為的位置。
+    _refuse_symlink(backup, '備份檔')
+    if not os.path.exists(backup):
+        print()
+        # 大小是當場量的,不是寫死的。本站測試機那份 models.big 是 536 MB,
+        # 但剛安裝好的原版只有 165 MB —— 寫死就會對第二種讀者說謊。
+        print('  正在備份 %s(%s,可能要等十幾秒)...'
+              % (os.path.basename(bigpath), human_size(os.path.getsize(bigpath))))
+        _atomic_copy(bigpath, backup)
+        print('  已備份 → %s' % os.path.basename(backup))
+    else:
+        # ⚠️ 既有的備份不能只看「存在」。它可能是別的原因留下的半截檔(讀者自己
+        #    複製到一半、外接碟拔掉、雲端同步的佔位檔、跑過舊版非原子備份的腳本)。
+        #    --restore 那邊有把關,但那時遊戲檔已經改過了。
+        #    2026-09-05 在複本上實測:把備份截成 70,236,414 bytes(原本
+        #    561,891,312)之後再跑一次 --apply,它照樣印「保留最早那一份」、
+        #    改完 exit 0,接著 --restore 才拒絕還原 —— 等於在完全沒有退路的
+        #    情況下動了 models.big。所以寫入之前先用跟 --restore 同一道
+        #    BIGF 把關驗它一次。
+        bak_n = os.path.getsize(backup)
+        with open(backup, 'rb') as bf:
+            bak_head = bf.read(8)
+        if (bak_n == 0 or len(bak_head) &lt; 8 or bak_head[:4] != b'BIGF' or
+                (struct.unpack('&lt;I', bak_head[4:8])[0] != bak_n and
+                 struct.unpack('&gt;I', bak_head[4:8])[0] != bak_n)):
+            raise DataError(
+                '既有的備份 %s 是壞的(%d 個位元組),不敢在沒有退路的情況下改遊戲檔。\n'
+                '  把它刪掉再跑一次(腳本會重新做一份),或改用你自己另外留的那一份。'
+                % (os.path.basename(backup), bak_n))
+        print()
+        print('  備份已存在,保留最早那一份(長度與檔頭對得上)→ %s'
+              % os.path.basename(backup))
+    blob = qfs_compress_literal(newfsh)
+    new_off, undo = append_entry(bigpath, item[1], blob)
+    print('  已寫入:新資料接在第 %d 個位元組,只改了目錄 8 bytes + 檔頭 4 bytes' % new_off)
+
+    # 複驗:重新開檔、重新走一次目錄,證明遊戲等一下讀到的真的是你的圖。
+    # 拿記憶體裡的變數比對是不算數的,那只證明程式沒寫錯,不證明檔案寫對了。
+    # ⚠️ 這一段整個包起來。以前它是裸的:重新讀回來的時候丟例外
+    #    (自己剛寫出去的東西自己讀不動)會直接跳出去 —— 而那時目錄**已經**
+    #    指向新資料了,檔案是改過的,訊息卻只說「停下來了:不是 SHPI 檔」,
+    #    一個字都沒提還原。2026-09-10 在複本上實測到這條路:
+    #    把接到檔尾的資料換成壞的,exit 2、檔案 112 → 191 個位元組、沒有退回。
+    #    現在「讀不回來」跟「像素對不上」走同一條收尾:先自動退回,再照實說。
+    try:
+        items2 = big_entries(bigpath)
+        item2 = face_entries(items2)[n]
+        plain2, code2, w2, h2, s2, e2 = load_image(bigpath, item2)
+        back2 = dxt1_decode(plain2[s2:e2], w2, h2)
+        ok = sum(1 for i in range(0, len(rgba), 4)
+                 if rgba[i + 3] &lt; 128
+                 or max(abs(rgba[i + k] - back2[i + k]) for k in range(3)) &lt;= 8)
+    except (DataError, OSError, KeyError, ValueError, IndexError, struct.error) as e:
+        _verify_failed(bigpath, item, undo,
+                       '寫進去之後重新讀回來讀不動了(%s: %s)'
+                       % (type(e).__name__, e))
+    total = len(rgba) // 4
+    print('  複驗:重新讀回來,%.2f%% 的像素跟你給的圖一致' % (100.0 * ok / total))
+    if ok &lt; total * 0.9:
+        # 複驗沒過就**自動退回**,不是只印一行紅字讓讀者自己去想 ——
+        # 上一版寫「用 --restore 還原」然後 return,遊戲檔會就這樣壞在那裡。
+        _verify_failed(bigpath, item, undo, '寫進去的東西跟預期差太多')
+    print('  完成。')
+    print()
+    print('  ⚠️ 還沒結束:現在只是把貼圖換掉了,還沒有人在用這個編號。')
+    print('     要讓某位球員改用它,請用「幫球員換一張臉」那一課的腳本:')
+    print('       python3 mvp_swap_face.py "&lt;遊戲資料夾&gt;" --set &lt;球員&gt; %d --apply' % n)
+
+
+def _verify_failed(bigpath, item, undo, why):
+    """複驗沒過的收尾:先自動退回,再照實說現在檔案是什麼狀態。這一支一定會丟例外。
+
+    抽成一支是因為複驗有**兩種**沒過的方式,而以前只有一種被接住:
+      · 讀得回來但像素對不上  → 本來就走自動退回
+      · **根本讀不回來**(自己寫出去的東西自己讀不動)→ 以前是裸的,
+        例外直接往上跑,而那時目錄已經指向新資料了。訊息只說「不是 SHPI 檔」,
+        一個字都沒提檔案已經改過、也沒說可以還原 —— 那是「換名之後還說沒動到」。
+
+    退回只碰這一次改過的 12 個位元組(見 undo_append 的說明),
+    所以讀者之前換好的臉不會被一起退掉。
+    """
+    try:
+        undo_append(bigpath, undo)
+        again = big_entries(bigpath)
+    except (DataError, OSError, ValueError, IndexError, struct.error):
+        # 連退回本身都出事:這時候唯一還算數的退路是備份,直說。
+        again = None
+    back_off, back_size = None, None
+    for it in (again or []):
+        if it[1] == item[1]:
+            back_off, back_size = it[2], it[3]
+            break
+    if (back_off, back_size) == (item[2], item[3]):
+        raise DataError(
+            '複驗沒過 —— %s。\n'
+            '  **已經自動退回**:目錄那一項指回原本的位置(第 %d 個位元組,'
+            '%d 個位元組長),檔案長度也退回 %d。\n'
+            '  你的 %s 現在跟這次執行之前一樣,不必再做什麼。請回報這個訊息。'
+            % (why, item[2], item[3], undo['old_size'], os.path.basename(bigpath)))
+    raise DataError(
+        '複驗沒過,而且**自動退回也沒成功**。\n'
+        '  請立刻用備份還原:\n'
+        '    python3 %s "&lt;遊戲資料夾&gt;" --restore\n'
+        '  還原完再回報這個訊息。' % os.path.basename(sys.argv[0]))
+
+
+def cmd_restore(bigpath):
+    """用備份蓋回去。備份檔刻意不刪,萬一還原也出事還有得救。"""
+    backup = bigpath + BACKUP_SUFFIX
+    # 先問「這個名字本身是什麼」再問「它在不在」。順序反過來的話,懸空的符號連結
+    # 會被 exists() 說成「不存在」,錯誤訊息就會變成「找不到備份」——
+    # 那句話會讓讀者去找一份其實擺在眼前的東西。真正的擋是在 _do_copy,
+    # 這裡只是把話講在前面,免得先印了「正在還原…」再翻臉。
+    _refuse_symlink(backup, '備份檔')
+    if not os.path.exists(backup):
+        raise DataError('找不到備份 %s —— 沒有東西可以還原。' % os.path.basename(backup))
+    print('  正在還原(%s,可能要等十幾秒)...' % human_size(os.path.getsize(backup)))
+    _restore_from_backup(backup, bigpath)
+    print('  已還原 %s ← %s' % (os.path.basename(bigpath), os.path.basename(backup)))
+    print('  備份檔留著沒刪,你可以自己決定要不要刪掉。')
+
+
+# ─────────────────────────────────────────────────────────
+#  自我測試(--selftest):不需要遊戲檔,全部在暫存資料夾裡做
+#
+#  這一節的重點不是「功能還在不在」,是**每一道安全把關都要有一個餌**:
+#  先擺一個會咬人的東西在那裡,再看腳本有沒有真的擋下來。
+#  沒有餌的測試只能證明「正常路徑會跑完」,證明不了保護有效
+#  (2026-08-29 就吃過這個虧:半截備份的測試是綠的,但備份根本沒產生)。
+#  所以每一項都附一個**陰性對照** —— 先證明沒有餌的時候真的會做完那件事。
+# ─────────────────────────────────────────────────────────
+def _st_mini_big(path):
+    """做一個最小的、真的能被本腳本讀寫的封裝檔:一個 8x8 的 DXT1 c004.fsh。"""
+    # ⚠️ 這張測試圖怎麼畫,決定了下面那道誤差檢查量到的是什麼。
+    #    第一版寫 (x+y)*20 % 256:x+y=13 那一格從 260 繞回 4,同一個 4x4 方塊裡
+    #    出現 256 級的斷崖,誤差量到 79/255 —— 看起來像壓縮壞了,其實是**餌本身
+    #    畫了一張不可能壓好的圖**。第二版三個色階各走各的,方塊裡的 16 個顏色
+    #    散在三維空間,而 DXT1 一個方塊只能取一條直線上的四個顏色,誤差 40/255
+    #    同樣是圖的問題不是程式的問題。
+    #    現在三個色階走同一條斜坡(只差固定的偏移),顏色本來就共線,
+    #    而且斜率壓到一格 4 —— 一個 4x4 方塊裡的 x+y 只會走過 6 格、也就是 24 級,
+    #    DXT1 在方塊裡給四個顏色,理論上的誤差上限大約 24/6 = 4,再加上
+    #    5-6-5 量化的幾級。這時候誤差偏大就真的是編碼器被改壞了,
+    #    那才是這道檢查該抓的東西。
+    rgba = bytearray()
+    for y in range(8):
+        for x in range(8):
+            v = (x + y) * 4
+            rgba += bytes([v, v + 10, v + 20, 255])
+    px = dxt1_encode(bytes(rgba), 8, 8)
+    rec = bytes([0x60]) + (16 + len(px)).to_bytes(3, 'little') \
+        + struct.pack('&lt;HH', 8, 8) + b'\x00' * 8 + px
+    shpi = (b'SHPI' + struct.pack('&lt;I', 24 + len(rec)) + struct.pack('&lt;I', 1)
+            + b'G264' + b'c004' + struct.pack('&lt;I', 24) + rec)
+    qfs = qfs_compress_literal(shpi)
+    name = b'c004.fsh\x00'
+    start = 16 + 8 + len(name)
+    big = (b'BIGF' + struct.pack('&lt;I', start + len(qfs)) + struct.pack('&gt;I', 1)
+           + struct.pack('&gt;I', start) + struct.pack('&gt;II', start, len(qfs)) + name + qfs)
+    with open(path, 'wb') as f:
+        f.write(big)
+    return bytes(rgba)
+
+
+def selftest():
+    """跑完所有把關的餌。全綠回 0,任何一項紅就回 1,在 -O 底下回 2 並拒跑。
+
+    ⚠️ 第一件事是擋掉 `python3 -O`。-O 會把 assert 整個拿掉,
+       在那底下跑自我測試,原本會紅的項目有機會靜靜地變綠 ——
+       **一份假的綠燈比沒有測試更糟**,因為它會讓人以為驗過了。
+       所以寧可不跑,也不要給一個錯的保證。
+       (這一版的每一項用的是 check() 不是 assert,所以今天 -O 不會讓它變綠;
+        這道守門擋的是「以後有人在這裡加一行 assert」那一天。)
+    """
+    if sys.flags.optimize:
+        print('  --selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠。')
+        print('  請拿掉 -O 再跑一次:')
+        print('    python3 %s --selftest' % os.path.basename(sys.argv[0]))
+        return 2
+    import tempfile as _tf
+    fails = []
+
+    def check(name, ok, detail=''):
+        print('  %s %s%s' % ('✅' if ok else '❌', name, ('  —— ' + detail) if detail else ''))
+        if not ok:
+            fails.append(name)
+
+    def outside_file(d):
+        p = os.path.join(d, 'toni的重要檔案.txt')
+        with open(p, 'wb') as f:
+            f.write(b'DO-NOT-TOUCH' * 100)
+        return p
+
+    print('  自我測試(不需要遊戲檔,全部在暫存資料夾裡做)')
+    print()
+
+    # ── 1. 陰性對照:沒有餌的時候,備份真的做得出來 ──────────────
+    with _tf.TemporaryDirectory() as d:
+        src = os.path.join(d, 'models.big')
+        _st_mini_big(src)
+        bak = src + BACKUP_SUFFIX
+        _atomic_copy(src, bak)
+        check('陰性對照:一般情況下備份真的產生了,而且逐位元組相同',
+              os.path.exists(bak) and open(bak, 'rb').read() == open(src, 'rb').read())
+        check('備份做完之後,資料夾裡不會留下暫存檔',
+              sorted(os.listdir(d)) == sorted(['models.big', os.path.basename(bak)]),
+              str(sorted(os.listdir(d))))
+
+    # ── 2. 餌:&lt;備份&gt;.part 事先被做成指向資料夾外的符號連結 ────────
+    with _tf.TemporaryDirectory() as d, _tf.TemporaryDirectory() as out:
+        victim = outside_file(out)
+        before = open(victim, 'rb').read()
+        src = os.path.join(d, 'models.big')
+        _st_mini_big(src)
+        bak = src + BACKUP_SUFFIX
+        os.symlink(victim, bak + '.part')          # 舊版就是寫在這個猜得到的名字上
+        _atomic_copy(src, bak)
+        check('餌:&lt;備份&gt;.part 是指向資料夾外的符號連結 → 外面那個檔沒被動到',
+              open(victim, 'rb').read() == before,
+              '%d bytes → %d bytes' % (len(before), os.path.getsize(victim)))
+        check('  同時備份還是做成功了(不是靠整個罷工來「保護」)',
+              os.path.exists(bak) and os.path.getsize(bak) == os.path.getsize(src))
+
+    # ── 3. 餌:備份檔本身就是符號連結 ────────────────────────
+    with _tf.TemporaryDirectory() as d, _tf.TemporaryDirectory() as out:
+        victim = outside_file(out)
+        before = open(victim, 'rb').read()
+        src = os.path.join(d, 'models.big')
+        _st_mini_big(src)
+        bak = src + BACKUP_SUFFIX
+        os.symlink(victim, bak)
+        blocked = False
+        try:
+            _atomic_copy(src, bak)
+        except DataError:
+            blocked = True
+        check('餌:備份檔本身是符號連結 → 拒絕,而且外面那個檔沒被動到',
+              blocked and open(victim, 'rb').read() == before)
+
+    # ── 4. 餌:懸空的符號連結(exists() 看不見它)──────────────
+    with _tf.TemporaryDirectory() as d:
+        link = os.path.join(d, 'models.big' + BACKUP_SUFFIX)
+        os.symlink(os.path.join(d, '根本不存在的檔'), link)
+        seen_by_exists = os.path.exists(link)
+        blocked = False
+        try:
+            _refuse_symlink(link, '備份檔')
+        except DataError:
+            blocked = True
+        check('餌:懸空符號連結 → os.path.exists() 說「沒這個東西」,但把關擋下來了',
+              blocked and not seen_by_exists,
+              'exists()=%s' % seen_by_exists)
+
+    # ── 5. 陰性對照 + 餌:還原 ─────────────────────────────
+    with _tf.TemporaryDirectory() as d:
+        dst = os.path.join(d, 'models.big')
+        _st_mini_big(dst)
+        bak = dst + BACKUP_SUFFIX
+        _atomic_copy(dst, bak)
+        with open(dst, 'ab') as f:                 # 正本 = 備份再接一段(就是本腳本的改法)
+            f.write(b'\xAA' * 512)
+        os.chmod(dst, 0o644)
+        os.chmod(bak, 0o600)
+        good = open(bak, 'rb').read()
+        _do_copy(bak, dst)
+        check('陰性對照:一般情況下還原真的把正本換回備份的內容',
+              open(dst, 'rb').read() == good)
+        check('  還原之後,正本的權限跟還原前一樣(不是變成暫存檔的 0600)',
+              (os.stat(dst).st_mode &amp; 0o777) == 0o644,
+              '0%o' % (os.stat(dst).st_mode &amp; 0o777))
+        check('  還原做完之後,資料夾裡不會留下暫存檔',
+              sorted(os.listdir(d)) == sorted(['models.big', os.path.basename(bak)]),
+              str(sorted(os.listdir(d))))
+
+    # ── 6. 餌:還原到最後一步才失敗(把 os.replace 換成會丟例外的) ──
+    with _tf.TemporaryDirectory() as d:
+        dst = os.path.join(d, 'models.big')
+        _st_mini_big(dst)
+        bak = dst + BACKUP_SUFFIX
+        _atomic_copy(dst, bak)
+        with open(dst, 'ab') as f:
+            f.write(b'\xAA' * 512)
+        before = open(dst, 'rb').read()
+        before_mtime = os.stat(dst).st_mtime
+        real_replace = os.replace
+
+        def boom(a, b):
+            raise OSError(28, '假裝磁碟滿了')
+        os.replace = boom
+        blew_up = False
+        try:
+            _do_copy(bak, dst)
+        except OSError:
+            blew_up = True
+        finally:
+            os.replace = real_replace
+        check('餌:還原在最後一步失敗 → 正本逐位元組原封不動',
+              blew_up and open(dst, 'rb').read() == before,
+              '%d bytes' % os.path.getsize(dst))
+        check('  連 mtime 都沒被動到', os.stat(dst).st_mtime == before_mtime)
+        check('  失敗之後暫存檔也收乾淨了',
+              sorted(os.listdir(d)) == sorted(['models.big', os.path.basename(bak)]),
+              str(sorted(os.listdir(d))))
+
+    # ── 7. 餌:要還原的「正本」是符號連結 ───────────────────────
+    with _tf.TemporaryDirectory() as d, _tf.TemporaryDirectory() as out:
+        victim = outside_file(out)
+        before = open(victim, 'rb').read()
+        real = os.path.join(d, '真的models.big')
+        _st_mini_big(real)
+        bak = os.path.join(d, 'models.big' + BACKUP_SUFFIX)
+        _atomic_copy(real, bak)
+        dst = os.path.join(d, 'models.big')
+        os.symlink(victim, dst)
+        blocked = False
+        try:
+            _do_copy(bak, dst)
+        except DataError:
+            blocked = True
+        check('餌:要還原的遊戲檔是符號連結 → 拒絕,連結指到的檔沒被動到',
+              blocked and open(victim, 'rb').read() == before)
+
+    # ── 8. 餌:--export 的輸出位置是符號連結 ────────────────────
+    with _tf.TemporaryDirectory() as d, _tf.TemporaryDirectory() as out:
+        victim = outside_file(out)
+        before = open(victim, 'rb').read()
+        good = os.path.join(d, '正常.png')
+        png_write(good, b'\xFF' * (4 * 4 * 4), 4, 4)
+        check('陰性對照:一般情況下 PNG 真的寫得出來,而且讀得回來',
+              png_read(good)[1:] == (4, 4))
+        link = os.path.join(d, '陷阱.png')
+        os.symlink(victim, link)
+        blocked = False
+        try:
+            png_write(link, b'\xFF' * (4 * 4 * 4), 4, 4)
+        except DataError:
+            blocked = True
+        check('餌:輸出的 PNG 位置是符號連結 → 拒絕,連結指到的檔沒被動到',
+              blocked and open(victim, 'rb').read() == before)
+
+    # ── 9. 餌:寫進去之後複驗沒過,自動退回要退得乾淨 ──────────────
+    with _tf.TemporaryDirectory() as d:
+        big = os.path.join(d, 'models.big')
+        _st_mini_big(big)
+        before = open(big, 'rb').read()
+        item = face_entries(big_entries(big))[4]
+        _off, undo = append_entry(big, item[1], qfs_compress_literal('亂寫的東西'.encode('utf-8') * 20))
+        changed = open(big, 'rb').read()
+        undo_append(big, undo)
+        check('餌:寫進去之後退回 → 檔案逐位元組回到動手之前',
+              changed != before and open(big, 'rb').read() == before,
+              '%d → %d → %d bytes' % (len(before), len(changed), os.path.getsize(big)))
+
+    # ── 10. Ctrl-C 要說得出「動到檔案沒有」───────────────────
+    with _tf.TemporaryDirectory() as d:
+        _MUTATION['target'], _MUTATION['partial'] = None, False
+        big = os.path.join(d, 'models.big')
+        _st_mini_big(big)
+        clean = _MUTATION['target'] is None
+        big_entries(big)                                   # 唯讀動作不該留下痕跡
+        still_clean = _MUTATION['target'] is None
+        item = face_entries(big_entries(big))[4]
+        append_entry(big, item[1], qfs_compress_literal(b'x' * 40))
+        marked = (_MUTATION['target'] == big and _MUTATION['partial'] is False)
+        # 三態的中間那一態:「正在換 X」。少了它,收尾只剩「沒動到」跟「已改完」
+        # 兩種講法,改到一半被打斷就只能亂猜一個。
+        _mark_mutating(big)
+        mid = (_MUTATION['target'] == big and _MUTATION['partial'] is True)
+        # 餌:在不可中斷段裡「按下 Ctrl-C」。要同時成立三件事 ——
+        #   (1) 進到段落之後,SIGINT 的處理器真的被換成「先記著」那一個
+        #   (2) 段落裡剩下的那一行照樣跑完(登記才不會跟磁碟狀態脫節)
+        #   (3) 離開段落之後 KeyboardInterrupt 還是照丟(不可以被吃掉,
+        #       不然就變成「按了 Ctrl-C 卻停不下來」)
+        # ⚠️ 刻意**不用** os.kill 送真的訊號:Windows 的 os.kill 收到 SIGINT
+        #    是直接砍掉行程,那會讓讀者在 Windows 上跑 --selftest 當場消失。
+        #    改成直接叫那個裝上去的處理器,效果一樣而且到哪一台都能跑。
+        before_handler = signal.getsignal(signal.SIGINT)
+        wired = False
+        ran_to_end = False
+        raised_after = False
+        try:
+            with _NoInterrupt() as ni:
+                # 綁定方法每次取值都是新物件,所以用 == 不能用 is。
+                wired = signal.getsignal(signal.SIGINT) == ni._remember
+                signal.getsignal(signal.SIGINT)(signal.SIGINT, None)
+                ran_to_end = True              # 中斷被當場丟出來的話,這一行不會執行
+        except KeyboardInterrupt:
+            raised_after = True
+        restored = signal.getsignal(signal.SIGINT) == before_handler
+        check('Ctrl-C:唯讀不變髒 / 三態齊全 / 不可中斷段擋得住又不吞掉中斷',
+              clean and still_clean and marked and mid
+              and wired and ran_to_end and raised_after and restored,
+              '三態=%s 換手=%s 段內跑完=%s 離開後照丟=%s 處理器有換回來=%s'
+              % (mid, wired, ran_to_end, raised_after, restored))
+        _MUTATION['target'], _MUTATION['partial'] = None, False
+
+    # ── 11. 既有守門的回歸:半截備份仍然還原不了 ──────────────────
+    with _tf.TemporaryDirectory() as d:
+        dst = os.path.join(d, 'models.big')
+        _st_mini_big(dst)
+        bak = dst + BACKUP_SUFFIX
+        _atomic_copy(dst, bak)
+        n = os.path.getsize(bak)
+        with open(bak, 'r+b') as f:
+            f.truncate(n // 2)                            # 半截的備份
+        before = open(dst, 'rb').read()
+        blocked = False
+        try:
+            _restore_from_backup(bak, dst)
+        except SystemExit:
+            blocked = True
+        check('回歸:半截的備份還原不了,而且正本沒被動到',
+              blocked and open(dst, 'rb').read() == before)
+
+    # ── 12. 三層格式的來回:改壞了這裡會先紅 ─────────────────────
+    with _tf.TemporaryDirectory() as d:
+        big = os.path.join(d, 'models.big')
+        rgba = _st_mini_big(big)
+        item = face_entries(big_entries(big))[4]
+        plain, code, w, h, st, en = load_image(big, item)
+        check('三層來回:QFS 解得開、SHPI 認得出 8x8 的 DXT1',
+              code == 0x60 and (w, h) == (8, 8) and en - st == 32)
+        back = dxt1_decode(plain[st:en], w, h)
+        worst = max(max(abs(rgba[i + k] - back[i + k]) for k in range(3))
+                    for i in range(0, len(rgba), 4))
+        check('DXT1 壓回來的誤差在合理範圍內', worst &lt;= 8, '最大 %d / 255' % worst)
+        png = os.path.join(d, 'a.png')
+        png_write(png, back, w, h)
+        r2, w2, h2 = png_read(png)
+        check('PNG 自己寫、自己讀,拿回來的位元組一模一樣',
+              (w2, h2) == (w, h) and r2 == back)
+
+    # ── 13. 餌:資料接到檔尾了、目錄還沒改到就出事 ────────────────
+    #
+    # 這支腳本沒有「暫存檔」,接在檔尾那一段就是它的暫存檔:目錄改到之前
+    # 沒人指得到它。所以「暫存檔寫好了、還沒換名」那一刻出事,要把它清掉。
+    # 修之前這裡是紅的 —— 實測 112 → 191 個位元組、sha256 變了,
+    # 而且再跑一次 --apply 會被檔頭長度那道擋在門外印「這個檔可能已經損毀」。
+    with _tf.TemporaryDirectory() as d:
+        big = os.path.join(d, 'models.big')
+        _st_mini_big(big)
+        before = open(big, 'rb').read()
+        item = face_entries(big_entries(big))[4]
+        blob = qfs_compress_literal(b'y' * 60)
+        # 陰性對照:沒有餌的時候,這一次 append 真的把資料寫進去了
+        # (不然下面那一項會因為「根本沒寫」而假綠)。
+        _MUTATION['target'], _MUTATION['partial'] = None, False
+        _off, undo = append_entry(big, item[1], blob)
+        grew = os.path.getsize(big) &gt; len(before)
+        undo_append(big, undo)
+        check('陰性對照:沒有餌的時候 append 真的寫得進去,退回之後也回得來',
+              grew and open(big, 'rb').read() == before,
+              '%d → %d → %d bytes' % (len(before), len(before) + len(blob),
+                                      os.path.getsize(big)))
+        check('  退回成功之後,登記回到「沒動到」(不是停在「已經改好了」)',
+              _MUTATION['target'] is None and _MUTATION['partial'] is False,
+              '登記=%r' % (_MUTATION['target'],))
+        # 餌:把「提交」那一段的入口換掉,讓它在資料已經接到檔尾、
+        #     目錄卻一個位元組都還沒改的那一刻丟 OSError。
+        #     只炸第一次 —— 退回自己也要用同一個不可中斷段,炸第二次就等於
+        #     把要驗的那條路一起拆掉(第一版就是這樣紅的,是儀器的問題不是程式的)。
+        real_enter = _NoInterrupt.__enter__
+        armed = ['yes']
+
+        def boom_enter(self):
+            if armed:
+                armed.pop()
+                raise OSError(28, '假裝磁碟滿了')
+            return real_enter(self)
+
+        _NoInterrupt.__enter__ = boom_enter
+        blew_up = False
+        try:
+            append_entry(big, item[1], blob)
+        except OSError:
+            blew_up = True
+        finally:
+            _NoInterrupt.__enter__ = real_enter
+        check('餌:資料接到檔尾了、目錄還沒改到就出事 → 尾巴截掉,檔案逐位元組回到動手之前',
+              blew_up and open(big, 'rb').read() == before,
+              '%d bytes' % os.path.getsize(big))
+        # 光看「檔案一樣」還不夠:要證明下一次 --apply 進得去。修之前擋住它的
+        # 就是這一道 —— 檔頭宣告的總長度跟實際長度對不上。
+        readable = True
+        try:
+            size_field_order(big)
+        except DataError:
+            readable = False
+        check('  而且登記說得出「沒動到」、檔頭長度也對得回去(下一次 --apply 進得去)',
+              readable and _MUTATION['target'] is None
+              and _MUTATION['partial'] is False)
+        _MUTATION['target'], _MUTATION['partial'] = None, False
+
+    # ── 14. 餌:提交**已經開始**才出事 → 反過來,絕對不可以截尾巴 ──────
+    #
+    # 上面那道守門有一個旗標(committing),決定「還能不能截尾巴」。
+    # 少了它,目錄已經改到一半的時候去截尾巴,目錄就會指到檔案結尾之外 ——
+    # 那比檔尾多一段垃圾嚴重得多。所以這一項是**新守門自己的餌**。
+    with _tf.TemporaryDirectory() as d:
+        big = os.path.join(d, 'models.big')
+        _st_mini_big(big)
+        n0 = os.path.getsize(big)
+        item = face_entries(big_entries(big))[4]
+        blob = qfs_compress_literal(b'z' * 60)
+        _MUTATION['target'], _MUTATION['partial'] = None, False
+        real_fsync = os.fsync
+
+        def boom_fsync(fd):
+            raise OSError(5, '假裝寫到一半那顆碟不見了')
+
+        os.fsync = boom_fsync
+        blew_up = False
+        try:
+            append_entry(big, item[1], blob)
+        except OSError:
+            blew_up = True
+        finally:
+            os.fsync = real_fsync
+        # 12 個位元組已經寫下去了,尾巴留著才是自洽的 —— 讀得回來就是證據。
+        kept = os.path.getsize(big) &gt; n0
+        readable = True
+        try:
+            it2 = face_entries(big_entries(big))[4]
+            read_entry(big, it2[2], it2[3])
+        except (DataError, OSError, KeyError):
+            readable = False
+        check('餌:提交已經開始才出事 → 尾巴**留著**,那一項照樣讀得回來',
+              blew_up and kept and readable,
+              '%d → %d bytes' % (n0, os.path.getsize(big)))
+        check('  而且登記停在「正在換」,收尾會叫人去 --restore(不會謊稱沒動到)',
+              _MUTATION['target'] == big and _MUTATION['partial'] is True)
+        _MUTATION['target'], _MUTATION['partial'] = None, False
+
+    print()
+    if fails:
+        print('  ❌ %d 項沒過:%s' % (len(fails), ' / '.join(fails)))
+        return 1
+    print('  ✅ 全部通過。')
+    return 0
+
+
+def main():
+    """解析參數並分派到四個動作之一。回傳值就是行程的結束碼。
+
+    --selftest 要在 argparse 之前處理:gamedir 是必填的位置參數,
+    而自我測試根本不需要遊戲資料夾。
+    """
+    if '--selftest' in sys.argv:
+        return selftest()
+    ap = argparse.ArgumentParser(
+        description='幫 MVP Baseball 2005 做一張新的球員臉皮',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+例子(照順序做):
+
+  1. 看哪些臉皮編號沒人在用
+     python3 mvp_new_face.py "&lt;遊戲資料夾&gt;" --info
+
+  2. 挑一個空位,把它現在的貼圖匯出來當範本
+     python3 mvp_new_face.py "&lt;遊戲資料夾&gt;" --export 4 ~/Desktop/c004.png
+
+  3. 用修圖軟體改那張 PNG(尺寸不要改,五官位置不要挪)
+
+  4. 先預覽(不會動到遊戲)
+     python3 mvp_new_face.py "&lt;遊戲資料夾&gt;" --import 4 ~/Desktop/c004.png
+
+  5. 確定了才真的寫進去
+     python3 mvp_new_face.py "&lt;遊戲資料夾&gt;" --import 4 ~/Desktop/c004.png --apply
+
+  6. 最後指定某位球員改用這個編號(另一課的腳本)
+     python3 mvp_swap_face.py "&lt;遊戲資料夾&gt;" --set &lt;球員&gt; 4 --apply
+
+  出問題就還原:
+     python3 mvp_new_face.py "&lt;遊戲資料夾&gt;" --restore
+
+  想確認這支腳本本身沒被改壞(不需要遊戲資料夾):
+     python3 mvp_new_face.py --selftest
+     (不要加 -O:那會把 assert 拿掉、測試有機會假綠,所以加了會直接拒跑)
+''')
+    ap.add_argument('gamedir', help='遊戲資料夾(裡面看得到 mvp2005.exe 跟 data)')
+    ap.add_argument('--info', action='store_true', help='看哪些臉皮編號沒人在用')
+    ap.add_argument('--export', nargs=2, metavar=('編號', '輸出.png'), help='把臉皮貼圖匯出成 PNG')
+    ap.add_argument('--import', dest='imp', nargs=2, metavar=('編號', '輸入.png'), help='把 PNG 換進遊戲')
+    ap.add_argument('--apply', action='store_true', help='真的寫入(沒加就只是預覽)')
+    ap.add_argument('--restore', action='store_true', help='從備份還原')
+    ap.add_argument('--selftest', action='store_true',
+                    help='自我測試(不需要遊戲資料夾,也不碰任何遊戲檔;不要加 -O)')
+    args = ap.parse_args()
+
+    # 順序有意義:--restore 排第一,出事的人最先需要它。
+    # 沒指定任何動作就跑 --info,那是唯讀的,誤按不會有後果。
+    try:
+        big = models_path(args.gamedir)
+        if args.restore:
+            cmd_restore(big)
+        elif args.export:
+            cmd_export(big, args.export[0], args.export[1])
+        elif args.imp:
+            cmd_import(big, args.gamedir, args.imp[0], args.imp[1], args.apply)
+        else:
+            cmd_info(big, args.gamedir)
+    except DataError as e:
+        print('\n  停下來了:%s\n' % e)
+        return 2
+    except OSError as e:
+        # 硬碟滿、指定的輸出資料夾不存在、對遊戲資料夾沒有寫入權限 —— 這些不是
+        # 程式的錯,讀者需要的是看得懂的一句話,不是一整頁 traceback。
+        print('\n  停下來了:檔案讀寫失敗 —— %s\n'
+              '  常見原因:硬碟空間不夠、你指定的輸出資料夾不存在、'
+              '對遊戲資料夾沒有寫入權限。\n'
+              '  如果這是在 --apply 途中發生的,備份就在 models.big%s 旁邊,'
+              '可以用 --restore 還原。\n' % (e, BACKUP_SUFFIX))
+        return 2
+    except (ValueError, IndexError, struct.error) as e:
+        # 編號那一格填成非數字,或 PNG 的內容跟它自己的檔頭對不起來(索引色的
+        # 索引超出調色盤、資料少一列)。這一類幾乎都發生在讀參數與讀圖的階段,
+        # 也就是在動檔案之前 —— 但不敢寫成保證,所以順便提醒還有 --restore。
+        print('\n  停下來了:看不懂的輸入 —— %s: %s\n'
+              '  編號那一格要填數字;PNG 請另存成每色 8 位元、非交錯的一般 PNG。\n'
+              '  這一類問題多半出在讀參數與讀圖那一段。如果你剛才下的是 --apply,\n'
+              '  不放心就跑一次 --restore。\n'
+              % (type(e).__name__, e))
+        return 2
+    except KeyboardInterrupt:
+        # 「什麼都沒有動到」這句話不可以憑感覺講。真正會改到遊戲檔的地方
+        # (往檔尾寫、還原時的 os.replace)都會在 _MUTATION 留一筆,這裡照著講。
+        me = os.path.basename(sys.argv[0])
+        if _MUTATION['target'] is None:
+            print('\n  已中斷。到這裡為止一個檔案都沒有動到,遊戲檔還是原來那一份。\n')
+        elif _MUTATION['partial']:
+            print('\n  已中斷 —— 但 %s **是在改到一半的時候被打斷的**,現在可能是壞的。\n'
+                  '  請立刻還原:\n'
+                  '    python3 %s "%s" --restore\n'
+                  % (os.path.basename(_MUTATION['target']), me, args.gamedir))
+        else:
+            print('\n  已中斷 —— 但 %s **已經改好了**(是完整的,不是半截)。\n'
+                  '  想退回改之前的話:\n'
+                  '    python3 %s "%s" --restore\n'
+                  % (os.path.basename(_MUTATION['target']), me, args.gamedir))
+        return 130
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
+
+#
+# ─────────────────────────────────────────────────────────
+#  MIT License
+#
+#  Copyright (c) 2026 toni
+#
+#  Permission is hereby granted, free of charge, to any person obtaining a copy
+#  of this software and associated documentation files (the "Software"), to deal
+#  in the Software without restriction, including without limitation the rights
+#  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#  copies of the Software, and to permit persons to whom the Software is
+#  furnished to do so, subject to the following conditions:
+#
+#  The above copyright notice and this permission notice shall be included in
+#  all copies or substantial portions of the Software.
+#
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#  THE SOFTWARE.
+# ─────────────────────────────────────────────────────────
+</pre>
+  </details>
+
+  <footer>
+    <p>本頁的所有畫面輸出都是實際執行的結果。腳本經過實測：
+       在測試機那份 536 MB 封裝檔的複本上換過貼圖，項目數不變、檔頭大小一致、
+       抽驗 299 個其他項目零位元組變動、還原後 SHA-256 與原檔相同。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../../legal.html">法律與版權說明</a> ·
+       <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

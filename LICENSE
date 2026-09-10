@@ -1,0 +1,81 @@
+toni的MVP模組補習班 — 授權說明
+================================================
+
+本專案採「雙授權」:內容與程式碼分開。
+
+────────────────────────────────────────────────
+一、教學文字、表格、說明、本站自己畫的向量圖表(SVG)
+────────────────────────────────────────────────
+
+    Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+授權條款全文(正式法律文件):
+    https://creativecommons.org/licenses/by/4.0/legalcode
+中文說明:
+    https://creativecommons.org/licenses/by/4.0/deed.zh-hant
+
+你可以自由轉載、修改、再散布,包括商業用途。
+條件是 CC BY 4.0 第 3 條的「署名」:標示出處「toni的MVP模組補習班」與站址
+(https://toniliumvp.github.io/MVPBaseball/)、保留本授權聲明並附上授權連結、
+有修改的話註明改過。第 5 條另有無擔保與責任限制。條文全文見上面的連結。
+站內的點陣圖片不在這一節的範圍(見第三節)。
+
+────────────────────────────────────────────────
+二、本站的腳本(所有 .py 與 .sh 檔)
+────────────────────────────────────────────────
+
+    MIT License
+
+2026-08-26 起,腳本從 CC BY 改為 MIT。
+
+為什麼分開:CC BY 是給「作品」用的;它第 5 條雖然也有無擔保與責任限制,
+但那是為文章、圖片這類作品寫的。這些腳本會真的去改別人電腦裡的檔案 ——
+程式碼圈的慣例是用 MIT 這種軟體授權,條款短、免責寫法是軟體的標準用語。
+
+每一支腳本的檔案開頭都帶著免責與非關聯聲明,檔尾附完整 MIT 條款。
+所以就算有人只拿走腳本、不帶走這個網站,那段聲明也會跟著走。
+
+MIT License
+
+Copyright (c) 2026 toni
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+────────────────────────────────────────────────
+三、不在上述授權範圍內的三類內容
+────────────────────────────────────────────────
+
+上面兩種授權只及於本站的原創內容。下列三類**不在授權範圍內**,
+本站也無權授權它們:
+
+1. EA MVP Baseball 2005 的任何檔案、資產、程式碼與商標
+   —— 本站不提供、不散布任何一個。
+
+2. 社群製作的模組、名冊、臉皮、大頭照、語音
+   —— 著作權屬各自的作者。本站只描述與量測,不提供檔案;
+      唯一的例外是球衣那一課有一張從社群球衣貼圖解碼出來的最小範圍局部對照圖,
+      那是重製、權利仍屬原作者,處理方式寫在法律頁第 6 節。
+
+3. 第三方工具本體
+   —— 本站不提供、不鏡像、不附下載點。
+
+────────────────────────────────────────────────
+
+本站與 Electronic Arts、中華職棒無任何官方關聯。
+下架管道見網站的「法律與版權說明」頁。

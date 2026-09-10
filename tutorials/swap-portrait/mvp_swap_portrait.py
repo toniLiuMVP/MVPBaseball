@@ -1,0 +1,2317 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+mvp_swap_portrait.py — 換掉 MVP Baseball 2005 的球員大頭照
+
+名單畫面上球員照片那一張。這支腳本可以：
+  · 查某位球員的大頭照編號是多少
+  · 把現有的大頭照匯出成 PNG(讓你拿去修圖)
+  · 把你做好的 PNG 換回遊戲裡
+
+怎麼運作的(三層,由外而內):
+  data/frontend/portrait.big   封裝檔,裡面有幾千個項目
+    └─ 0521.fsh                 一張圖,用 QFS 壓縮過
+        └─ SHPI 容器            解壓後的結構
+            └─ 像素資料          格式看那張圖自己寫的代號(對照表在下面的 FSH_FORMATS)
+
+⚠️ 這支腳本只吃 DXT3(代號 0x61,每 4x4 像素壓成 16 個位元組),
+   而**剛安裝好的原版一張 DXT3 都沒有**。本站在三份剛安裝好的原版上各量一次
+   (英文版 / 中文版 / PK 版):portrait.big 都是 104.2 MB、2,393 個項目、
+   2,391 張圖(另外 2 個項目各只有 1 個位元組,不是圖),
+   而那 2,391 張全部是 ARGB32(代號 0x7D)128x128。
+   DXT3 256x256 只出現在被模組換過的封裝檔 —— 本站測試機那一份是 253.6 MB、
+   7,544 個項目,其中 5,250 張 DXT3 256x256、2,292 張 ARGB32 128x128。
+   所以在剛安裝好的原版上跑 --export / --import,每一個編號都會被下面
+   「做不到的事」第一條擋下來(實測訊息:「0521.fsh 是 ARGB32 格式」)。
+   ARGB32 的寫回還沒做。
+
+換圖時**不動結構**,只換最內層的像素那一段。新圖必須跟原圖同尺寸,
+所以整份檔案的長度不變,外面兩層完全不必重算。
+
+寫回封裝檔一律用「接到檔尾」的方式:新資料接在檔案最後面,
+只改目錄裡那一項的 8 個位元組 + 檔頭的 4 個位元組。
+原本的資料一個位元組都不動,所以出錯了也還原得回來。
+
+編號是哪裡來的:大頭照的檔名就是球員的 playerattrib_audioid,
+同一個號碼也決定他的播報語音。所以 --find 查得到編號,靠的是名冊不是圖。
+
+你要準備什麼(輸入):
+  · 遊戲資料夾的路徑(裡面看得到 mvp2005.exe 跟 data 資料夾)
+  · --import 時再多一張 PNG。每色 8 位元、非交錯,尺寸必須跟原圖一模一樣,
+    而且要保留透明度(人像以外那一圈是透明的,存成不透明會變一塊實心色)
+  · --find 會讀 data/database/attrib.dat 這份名冊
+
+它會產生什麼(輸出):
+  · --info / --find  只印字,不碰任何檔案
+  · --export  在你指定的位置寫一個 PNG(RGBA 四通道,每一列都不做預測濾波)
+  · --import  沒加 --apply 就只印壓縮品質報告,一樣不碰檔案。
+              加了 --apply 才寫 data/frontend/portrait.big,並在同一個資料夾
+              留下 portrait.big.portraitbak 這份備份
+
+安全網:
+  · 不加 --apply 就不會動到遊戲檔。--info / --find / --import 全是唯讀,
+    只有 --apply 會寫 portrait.big。(--export 例外:它會在你指定的位置寫一個 PNG)
+  · --export 的輸出路徑先擋五種情形:指到遊戲的 portrait.big 本身、指到一個資料夾、
+    資料夾不存在、**輸出的檔名本身是符號連結**(含指到不存在檔案的懸空連結)、
+    目標已經存在而且不是 PNG。--export 不做備份,這五道就是它全部的防線
+  · 第一次寫入前先備份,而且備份是原子的:先寫一個「名字猜不到」的暫存檔
+    (放在同一個資料夾,tempfile 開的),fsync 之後才改名上位。
+    中途被中斷不會留下半截的備份檔,也不會留下暫存垃圾
+  · **任何要寫的目的檔**是符號連結就拒絕動它 —— 遊戲檔、備份檔、匯出的 PNG、
+    暫存檔都一樣。那種連結會讓寫入落到資料夾外面的檔案上。
+    (路徑中間的**資料夾**是連結不擋 —— 遊戲裝在別顆碟很正常,只看最後那一個檔;
+     讀取也不擋。)判斷「備份在不在」用的是 lexists 不是 exists
+    (exists 會跟著連結去看,指到不存在檔案的連結會被它判成「沒有」)
+  · 匯出的 PNG 也是先寫一個名字猜不到的暫存檔、fsync 之後才改名上位,
+    所以中途被中斷不會把你原本那張圖變成半截的
+  · 寫入走 append,舊資料一個位元組都不動
+  · 寫完立刻重新開檔讀回來跟你的 PNG 比對,一致率低於 90% 就當成失敗:
+    結束碼非 0,並把還原指令整行印出來
+  · 中途按 Ctrl-C:會照「檔案到底動了沒」講不同的話 —— 沒動過才說
+    「什麼都沒有動到」,動過了就叫你 --restore。兩種的結束碼都是 130。
+    「換名」跟「把換過了記下來」是同一段不可中斷的動作:Ctrl-C 落在中間會被
+    壓到那一段結束才丟出來,所以收尾說的跟磁碟上的狀態永遠一致。
+    不是 Ctrl-C 而是出了別的錯(磁碟滿、外接碟拔掉)也走同一條路,一樣會告訴你
+    遊戲檔動了沒 —— 包括被包成「停下來了:…」的那一種(讀不到檔)。
+    那句話本身已經帶著還原指令的時候,就不再另外講一次
+  · --restore 一行還原。還原前會先檢查那份備份有沒有被截斷過;
+    還原本身是「寫進暫存檔 → fsync → 讀回來比 sha256 → 對得上才換掉正本」,
+    所以中途失敗或被中斷時,正本永遠是原來那一份(絕不用 copy2 直接蓋,
+    那會在第一瞬間就把正本截成 0);
+    還原完再把遊戲檔跟備份逐位元組比一次 —— 比對過了才說成功
+  · --selftest 不需要遊戲資料夾,也不碰任何遊戲檔:裡面有 16 個反向餌,
+    先證明「答案錯的時候它真的會叫」。它不接受 python -O(-O 會把 assert
+    全部拿掉,測試會在什麼都沒驗的情況下印「全部通過」)
+
+做不到的事:
+  · 只處理 DXT3(代號 0x61)的大頭照。碰到別的格式會停下來,不會硬做。
+    ⚠️ 剛安裝好的原版 portrait.big 整包都是 ARGB32(代號 0x7D)128x128,
+    等於原版一張都換不了 —— 這支腳本目前只在「已經被模組換成 DXT3」的
+    封裝檔上派得上用場。ARGB32 的寫回還沒做
+  · 不能改尺寸,新圖必須跟原圖一樣大
+  · 不能新增項目,只能換掉封裝檔裡已經有的編號
+  · 不會改球員的名字、能力或任何名冊欄位,只換圖
+  · 讀 PNG 不支援交錯式(interlaced),也不支援每色 16 位元;
+    寬或高超過 4096 的 PNG 一律拒絕(防的是壞檔宣稱自己很大,把記憶體吃光)
+  · DXT3 是有損壓縮,壓回去一定有誤差(腳本會把誤差量印給你看)
+  · 不動遊戲的執行檔,也不碰任何保護措施
+
+自包含:整支腳本就是這一個檔,不需要安裝任何套件(連讀寫 PNG 都是自己做的)。
+
+授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
+"""
+#
+# ─────────────────────────────────────────────────────────
+#  法律與免責(每一支本站腳本都帶著這一段)
+#
+#  · 本工具與 Electronic Arts 無任何官方關聯,也未經其授權或背書。
+#    MVP Baseball 2005 為 Electronic Arts 之作品與商標。
+#  · 本工具為原創程式碼,**不含任何 EA 的程式碼或資產**。
+#  · 本工具不提供、不教學、也不包含任何規避技術保護措施的功能。
+#  · 使用者應僅對自己合法取得的遊戲副本使用本工具,並自行承擔風險。
+#    使用前請自行確認你與遊戲發行商之間的使用者授權合約(EULA)。
+#  · 本工具按「現狀」提供,不附任何明示或默示的擔保。
+#  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
+#  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
+#    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
+#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+# ─────────────────────────────────────────────────────────
+
+import os
+import re
+import sys
+import zlib
+import struct
+import shutil
+import signal
+import hashlib
+import tempfile
+import argparse
+
+# ── 備份的原子性(2026-08-29 上線前稽核加)────────────────────────────
+# 原本是直接 shutil.copy2(遊戲檔, .bak)。複製途中被中斷(磁碟滿、外接碟拔掉、
+# Windows 上按 Ctrl-C)會留下一個**半截的 .bak**;下一次執行看到它「存在」
+# 就印「備份已存在,保留最早那一份」繼續改遊戲檔,之後 --restore
+# 會拿那個半截檔覆蓋掉正本。
+#
+# 實測(2026-08-29):把 2,665,562 bytes 的備份截成 300,000 bytes,
+# 本站防護最嚴的那支還原指令三道把關全過、印「✓ 已從備份還原」、exit code 0,
+# 2.66 MB 的遊戲檔當場被 300 KB 蓋掉。magic 只看開頭,看不出後面少了多少。
+
+# ── 2026-09-05 第二輪資安覆驗再補的三件事 ──────────────────────────
+# (1) **暫存檔名不可以是猜得到的。** 原本寫死 dst + '.part'。只要有人先在同一個
+#     資料夾放一個叫 <備份檔名>.part 的**符號連結**指到別處,shutil.copy2()
+#     會沿著連結,把外面那個檔先截成 0 再往裡面寫 —— 等到後面 os.replace()
+#     只換掉連結本身,外面那個檔早就被蓋掉了。改用 tempfile.mkstemp(dir=同一個
+#     資料夾):名字每次不同,而且是 O_CREAT|O_EXCL 建出來的,不可能是既存的連結。
+# (2) **目的檔本身是符號連結也要擋。** 而且不能用 os.path.exists() 檢查:
+#     它會跟著連結去看,指到不存在的目標時回 False,看起來像「那裡沒東西」,
+#     但 open(..., 'wb') 照樣會沿著它去覆蓋外面那個檔。要用 os.path.islink()。
+# (3) **還原多一道 sha256。** 寫完先讀回來跟備份比,對得上才換。詳見 _do_copy。
+
+def _refuse_symlink(path, what):
+    """路徑是符號連結就停下來,不照著它寫。
+
+    ⚠️ 這裡刻意**不用** os.path.exists():它會跟著連結去看目標,
+       「指到不存在的檔」的連結會回 False —— 看起來就像那裡什麼都沒有,
+       但寫入照樣會沿著它去建立/覆蓋資料夾外面的檔。
+       只有 os.path.islink()(內部走 lstat)看得到連結本身。
+    """
+    if os.path.islink(path):
+        raise SystemExit(
+            '%s 是一個符號連結:%s\n'
+            '  不敢照著它寫 —— 那會動到資料夾外面的檔案。\n'
+            '  請先把那個連結移走(或換一個資料夾),再跑一次。' % (what, path))
+
+
+def _new_temp_beside(dst, tag):
+    """在 dst 隔壁開一個獨佔的暫存檔,回傳 (fd, 路徑)。
+
+    · 放同一個資料夾:最後那一步 os.replace() 才會是同一個檔案系統內的改名
+      (原子的)。跨磁碟改名會直接失敗。
+    · 用 mkstemp:名字帶亂數,而且是 O_CREAT|O_EXCL 開出來的 ——
+      別人沒辦法先佔一個同名的符號連結在那裡等。
+    """
+    folder = os.path.dirname(os.path.abspath(dst)) or '.'
+    return tempfile.mkstemp(dir=folder,
+                            prefix='.%s.%s-' % (os.path.basename(dst), tag))
+
+
+def _sha256_of(path):
+    """整個檔案的 sha256。一塊一塊讀,254 MB 的檔也不會把記憶體吃光。"""
+    h = hashlib.sha256()
+    with open(path, 'rb') as f:
+        while True:
+            chunk = f.read(1 << 20)
+            if not chunk:
+                return h.hexdigest()
+            h.update(chunk)
+
+
+# ── Ctrl-C 落在「換名」與「登記」之間(2026-09-06 第三輪唯讀稽核抓到)──────
+# os.replace() 那一行,跟「把換過了記下來」那一行,是兩個各自獨立的動作。
+# Ctrl-C 剛好落在中間的話,收尾看到的還是舊狀態,於是印「什麼都沒有動到」——
+# 而檔案其實已經被換掉了。窗口很窄,但它是真的;這一輪要問的正是
+# 「中斷的時候它會不會說謊」。
+class _NoInterrupt(object):
+    """把「os.replace + 登記」包成一段不可中斷的動作。
+
+    這段期間收到的 Ctrl-C 先記著,離開這段之後再照常丟出去 ——
+    所以 KeyboardInterrupt 的收尾看到的登記,一定跟磁碟上的狀態一致。
+    裝不上處理器的時候(不在主執行緒等)就退回原本的行為,不會比以前更糟;
+    那種情況還有 _GAME_FILE_INFLIGHT 那一層保險(見下面)。
+    """
+
+    def __enter__(self):
+        self._pending = False
+        self._old = None
+        try:
+            self._old = signal.signal(signal.SIGINT, self._remember)
+        except (ValueError, OSError):       # 不在主執行緒等情況:退回原本行為
+            self._old = None
+        return self
+
+    def _remember(self, signum, frame):
+        self._pending = True
+
+    def __exit__(self, exc_type, exc, tb):
+        if self._old is not None:
+            try:
+                signal.signal(signal.SIGINT, self._old)
+            except (ValueError, OSError):
+                pass
+        if self._pending and exc_type is None:
+            raise KeyboardInterrupt
+        return False
+
+
+def _atomic_copy(src, dst):
+    """備份要嘛完整、要嘛不存在 —— 中間狀態不會留在 dst 這個名字上。
+
+    ⚠️ 本站有些腳本用 pathlib.Path 存路徑,有些用字串。
+       2026-08-29 第一版寫成 dst + '.part',在 Path 上直接 TypeError,
+       等於所有備份都失敗 —— 而且「半截備份被擋下來」那個測試照樣是綠的。
+       是陰性對照(先證明正常流程真的會產生備份)抓到的。
+    """
+    # 先統一轉成字串。上面那條 ⚠️ 就是這裡沒轉,Path 直接接字串會 TypeError。
+    src, dst = os.fspath(src), os.fspath(dst)
+    _refuse_symlink(dst, '備份檔')
+    fd, part = _new_temp_beside(dst, 'part')
+    try:
+        # 整份先複製到一個「猜不到、也搶不到」的名字,成功了才改名上位。
+        # 中途死掉的話,半截的東西留在那個暫存名字上,dst 仍然是舊的那份完整備份。
+        with open(fd, 'wb') as out:
+            fd = None                       # 交給 with 關,底下不要再關第二次
+            with open(src, 'rb') as fin:
+                shutil.copyfileobj(fin, out, 1 << 20)
+            out.flush()
+            os.fsync(out.fileno())          # 只寫進快取就斷電的話,備份是假的
+        shutil.copystat(src, part)          # 跟原本的 copy2 一樣保留時間戳與權限
+        # 換名跟「把 part 這個名字放掉」是同一件事,中間不留給 Ctrl-C 插隊的縫。
+        # (備份不是遊戲檔,所以這裡不登記 _GAME_FILE_CHANGED —— 遊戲檔的登記
+        #  在 _replace_and_mark 那裡,理由見那一段。)
+        with _NoInterrupt():
+            os.replace(part, dst)           # os.replace 是原子的
+            part = None
+    except BaseException:
+        # 連 KeyboardInterrupt 都要接。只接 Exception 的話,按 Ctrl-C 會留下垃圾。
+        if fd is not None:
+            try:
+                os.close(fd)
+            except OSError:
+                pass
+        if part is not None:
+            try:
+                os.remove(part)
+            except OSError:
+                pass
+        raise
+
+
+def _safe_write_bytes(path, data, what):
+    """把一整份資料寫到 path —— 目的檔是符號連結就拒絕,而且是「先寫暫存再改名」。
+
+    ⚠️ **不可以** open(path, 'wb')。兩個理由,兩個都在 2026-09-05 / 09-06 的
+       稽核裡被實際重現過:
+       · path 是符號連結的話,'wb' 會沿著它去截掉、覆蓋**資料夾外面**那個檔。
+         而且不能用 os.path.exists() 判斷:懸空的連結(指到不存在的檔)在它眼裡
+         是「不存在」,看起來像那裡什麼都沒有,'wb' 卻照樣會沿著它生出一個新檔。
+         只有 os.path.islink() 看得見連結本身。
+       · 'wb' 是「先截成 0 再寫」。寫到一半被中斷(磁碟滿、按 Ctrl-C),
+         原本躺在那裡的檔就變成半截的了。
+
+    所以:先擋連結 → 在同一個資料夾用 mkstemp 開一個名字猜不到的暫存檔
+    (O_CREAT|O_EXCL,別人先擺一個同名連結也佔不到)→ 寫完 flush + fsync →
+    os.replace 換名。os.replace **不會**跟著符號連結走,它換掉的是那個名字本身。
+    中途任何一步失敗就把暫存檔收掉,那個名字上不會出現半截的檔。
+    """
+    path = os.fspath(path)
+    _refuse_symlink(path, what)
+    fd, tmp = _new_temp_beside(path, 'out')
+    try:
+        with open(fd, 'wb') as out:
+            fd = None                       # 交給 with 關,底下不要再關第二次
+            out.write(data)
+            out.flush()
+            os.fsync(out.fileno())
+        # mkstemp 一律開成 0600(只有你自己讀得到)。直接改名上位的話,
+        # 匯出來的圖權限會跟以前不一樣 —— 所以先把權限調成一般檔案該有的樣子:
+        # 目的檔本來就在就照它的,不在就照這台機器的 umask。
+        if os.path.exists(path):
+            shutil.copymode(path, tmp)
+        else:
+            um = os.umask(0)                # 讀 umask 的唯一辦法是設一次再設回去
+            os.umask(um)
+            os.chmod(tmp, 0o666 & ~um)
+        # 跟 _atomic_copy 同一個寫法:換名跟「把 tmp 這個名字放掉」中間不留縫。
+        with _NoInterrupt():
+            os.replace(tmp, path)           # os.replace 是原子的
+            tmp = None
+    except BaseException:
+        # 連 KeyboardInterrupt 都要接,不然按 Ctrl-C 會在那個資料夾留下垃圾。
+        if fd is not None:
+            try:
+                os.close(fd)
+            except OSError:
+                pass
+        if tmp is not None:
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
+        raise
+
+
+# ── 中斷的時候要說實話:遊戲檔到底動了沒 ────────────────────────────
+# 按 Ctrl-C 之後只印「已中斷」是不夠的 —— 讀者最需要知道的是
+# 「我的遊戲檔現在是好的還是壞的」。所以每一個真的會動到遊戲檔的地方
+# (接到檔尾的那一次寫入、還原時的 os.replace)都在這裡記一筆,
+# 中斷處理再照著它決定要說哪一句話。
+_GAME_FILE_CHANGED = []
+
+
+def _mark_game_file_changed(path):
+    """記下「這個遊戲檔已經被動過了」。重複呼叫無害。"""
+    p = os.fspath(path)
+    if p not in _GAME_FILE_CHANGED:
+        _GAME_FILE_CHANGED.append(p)
+
+
+# 三態的中間那一態:「正在換 X」。上面的 _NoInterrupt 幾乎讓它不會被用到,
+# 但那一道裝不上處理器的時候(不在主執行緒)就靠這一層 —— 收尾會說
+# 「中斷的時候正在替換 X」,不會說「什麼都沒有動到」。
+_GAME_FILE_INFLIGHT = []
+
+
+def _replace_and_mark(tmp, dst, what):
+    """換名,然後登記 —— 兩件事中間不接受中斷。
+
+    三態:進來之前是「還沒動」,_GAME_FILE_INFLIGHT 有東西是「正在換」,
+    _GAME_FILE_CHANGED 有東西是「已經換過」。收尾訊息就照這三態說話。
+    """
+    dst = os.fspath(dst)
+    _GAME_FILE_INFLIGHT.append((what, dst))
+    try:
+        with _NoInterrupt():
+            os.replace(tmp, dst)            # os.replace 是原子的
+            _mark_game_file_changed(dst)
+    except Exception:
+        # os.replace 自己失敗(磁碟滿、跨裝置、權限)是全有或全無,所以走到這裡
+        # 可以確定沒換成,「正在換」撤掉是安全的。
+        # ⚠️ 這裡刻意只接 Exception 不接 BaseException:KeyboardInterrupt 走到這裡的
+        #    時候,「換成了沒有」是不確定的 —— 那一筆要留著,讓收尾說實話。
+        _GAME_FILE_INFLIGHT.pop()
+        raise
+    _GAME_FILE_INFLIGHT.pop()
+
+
+def _interrupt_note(why='已中斷'):
+    """中斷(或出事)的時候,照三態說「你的遊戲檔現在到底怎麼樣」。
+
+    「已中斷」四個字沒有用 —— 讀者要知道的是「要不要還原」。
+    why 換一個詞就能給「不是 Ctrl-C 而是出了別的錯」那條路共用同一段判斷:
+    兩條路要說的是同一件事,分開寫遲早會有一邊漏掉。
+    """
+    if _GAME_FILE_CHANGED:
+        print()
+        print('  %s —— 但遊戲檔已經被改過了(%s)。'
+              % (why, ', '.join(os.path.basename(p) for p in _GAME_FILE_CHANGED)))
+        print('  要回到原本的樣子,跑:')
+        print('    python3 %s "<遊戲資料夾>" --restore'
+              % os.path.basename(sys.argv[0]))
+        print()
+    elif _GAME_FILE_INFLIGHT:
+        # 走到這裡代表 _NoInterrupt 那一道沒發揮作用(裝不上處理器)。
+        # 「換成了沒有」不確定的時候,只能照最壞的講。
+        print()
+        print('  %s —— 停下來的時候正在替換 %s,它現在是新的還是舊的沒辦法確定。'
+              % (why, ', '.join(os.path.basename(q) for _, q in _GAME_FILE_INFLIGHT)))
+        print('  請還原,或自己拿備份逐位元組比一次:')
+        print('    python3 %s "<遊戲資料夾>" --restore'
+              % os.path.basename(sys.argv[0]))
+        print()
+    else:
+        print('\n  %s,什麼都沒有動到。\n' % why)
+
+
+def _data_error_note(e):
+    """「停下來了:…」這條路也要照三態說一次「遊戲檔動了沒」。
+
+    DataError 是本檔所有「檔案內容跟預期不符」的出口 —— 包含 big_entries 把
+    OSError 包起來的那一種(外接碟被拔掉、權限沒了)。它以前直接 return 2,
+    於是「已經接到檔尾、接著讀不回來」的人只看到一行錯誤,不知道旁邊那份
+    備份救得回來(2026-09-06 第三輪覆驗實際重現)。
+
+    ⚠️ 訊息自己已經帶著還原指令的時候就不要再印一次 —— 複驗沒過那一句
+       本來就把 --restore 整行印給讀者複製,重複兩次只會讓人以為要跑兩遍。
+    """
+    if '--restore' in str(e):
+        return
+    _interrupt_note('停下來了')
+
+
+def _restore_from_backup(bak, dst):
+    """還原之前先擋掉明顯壞掉的備份。
+
+    ⚠️ 這裡**不能**比對「備份與目標大小相同」—— 本站多數腳本是把資料接到
+    檔尾來改檔(專案鐵律:封裝檔不可重新打包),改完之後正本本來就比備份大,
+    那樣比會擋掉每一次合法的還原。
+
+    ── 2026-08-30 補上三道(上線前資安稽核抓到的真漏洞)────────────────
+    原本只有「不是 0 bytes」+「BIGF 檔頭宣告長度」兩道。**BIGF 以外全破。**
+    實測拿「前 1/8 的半截備份」去還原,六支腳本把正本吃掉而且都印成功:
+        mvp_fix_loc / mvp_menu_text   .LOC        416,753 →  52,094
+        mvp_edit_speed / mvp_ratings
+        / mvp_player                  attrib.dat  840,643 → 105,080
+        mvp_modernize                 mvp2005.exe 5,443,584 → 680,448
+                                      (它還印「複驗:內容與備份相同 ✅」)
+    最後那個會讓遊戲**完全開不起來**,而站上每一課都寫著「隨時可以 --restore」。
+
+    現在檢查五件事:
+      1. 備份不是 0 bytes
+      2. BIGF:檔頭第 4-8 個位元組宣告的總長度要等於實際長度
+         (兩種位元組序都接受;哪些檔是大端、各有幾個,以 reference/bigf.html 量到的為準,這裡不寫會過期的數字)
+      3. LOCH(語系檔):檔頭指到的 LOCL 要在檔內,而且最後一條字串的位移
+         也要在檔內 —— 截斷之後那個位移一定會超出去
+      4. MZ(執行檔):PE 節區表裡 raw offset + raw size 的最大值不得超過檔案長度
+      5. **通用地板**:非 BIGF 的備份不得小於「要被蓋掉的那個檔」的一半。
+         非 BIGF 的工具都是原地改(大小幾乎不變),所以這條很安全;
+         BIGF 走 append 會越改越大,所以刻意**不套**這條,由第 2 道負責。
+    """
+    import struct
+    bak, dst = os.fspath(bak), os.fspath(dst)
+    if not os.path.exists(bak):
+        raise SystemExit('找不到備份:%s' % bak)
+    n = os.path.getsize(bak)
+    if n == 0:
+        raise SystemExit(
+            '備份是 0 bytes(多半是上次備份到一半被中斷),不敢拿它覆蓋 %s。' % dst)
+    with open(bak, 'rb') as _f:
+        head = _f.read(8)
+
+    def _stop(why):
+        """把「哪一道沒過」寫成人看得懂的話再退出。訊息會告訴使用者下一步做什麼。"""
+        raise SystemExit(
+            '這份備份是壞的,不敢拿它覆蓋 %s。\n'
+            '  %s\n'
+            '  多半是備份途中被中斷(磁碟滿、外接碟拔掉、按了 Ctrl-C)。\n'
+            '  請改用你自己另外留的那一份備份。' % (dst, why))
+
+    # 第 2 道:封裝檔自己在檔頭第 4 到 8 個位元組寫著「我應該有多長」。
+    # 這一欄兩種位元組序都遇得到(實測 288 小端、7 大端),所以兩種都算過再比。
+    if len(head) == 8 and head[:4] == b'BIGF':
+        le = struct.unpack('<I', head[4:8])[0]
+        be = struct.unpack('>I', head[4:8])[0]
+        if le != n and be != n:
+            _stop('檔頭說它應該是 %d bytes(或 %d),實際只有 %d bytes。' % (le, be, n))
+        return _do_copy(bak, dst)
+
+    # 第 3 道:語系檔。位移 16 那個 4 位元組(小端)指向字串區 LOCL 的起點;
+    # LOCL 內部再往後 12 個位元組是字串條數,接著才是每條 4 位元組的位移表。
+    # 檔案被截斷時,最後一條字串的位移一定會指到檔案結尾之外。
+    if len(head) >= 4 and head[:4] == b'LOCH':
+        try:
+            d = open(bak, 'rb').read()
+            L = struct.unpack('<I', d[16:20])[0]
+            if L + 16 > n or d[L:L + 4] != b'LOCL':
+                _stop('語系檔的字串區(LOCL)應該在位移 %d,那裡不是 LOCL。' % L)
+            lcnt = struct.unpack('<I', d[L + 12:L + 16])[0]
+            if lcnt <= 0 or L + 16 + lcnt * 4 > n:
+                _stop('語系檔的位移表被截斷了(宣告 %d 條)。' % lcnt)
+            last = struct.unpack('<I', d[L + 16 + (lcnt - 1) * 4:L + 20 + (lcnt - 1) * 4])[0]
+            if L + last >= n:
+                _stop('語系檔最後一條字串在位移 %d,超出檔案結尾(%d bytes)。'
+                      % (L + last, n))
+        except SystemExit:
+            raise
+        except (struct.error, IndexError):
+            _stop('讀不出語系檔的結構,它壞了。')
+
+    # 第 4 道:Windows 執行檔。位移 0x3C 那個 4 位元組(小端)指向 PE 檔頭;
+    # PE 檔頭 +6 是節區數、+20 是選用檔頭長度,節區表就接在選用檔頭後面。
+    # 每個節區 40 個位元組,其中 +16 是實體長度、+20 是實體位移。
+    # 把所有節區的「位移加長度」取最大值,那就是檔案至少要有多長。
+    if len(head) >= 2 and head[:2] == b'MZ':
+        try:
+            d = open(bak, 'rb').read()
+            pe = struct.unpack('<I', d[0x3C:0x40])[0]
+            if pe + 24 > n or d[pe:pe + 4] != b'PE\x00\x00':
+                _stop('執行檔的 PE 檔頭不在它該在的地方,檔案不完整。')
+            nsec = struct.unpack('<H', d[pe + 6:pe + 8])[0]
+            optsz = struct.unpack('<H', d[pe + 20:pe + 22])[0]
+            sec = pe + 24 + optsz
+            end = 0
+            for i in range(nsec):
+                o = sec + i * 40
+                if o + 40 > n:
+                    _stop('執行檔的節區表被截斷了(宣告 %d 個節區)。' % nsec)
+                raw_sz, raw_off = struct.unpack('<II', d[o + 16:o + 24])
+                end = max(end, raw_off + raw_sz)
+            if end > n:
+                _stop('執行檔的節區指到 %d bytes,實際只有 %d bytes。' % (end, n))
+        except SystemExit:
+            raise
+        except (struct.error, IndexError):
+            _stop('讀不出執行檔的結構,它壞了。')
+
+    # 通用地板 —— 非 BIGF 走到這裡
+    if os.path.exists(dst):
+        live = os.path.getsize(dst)
+        if live > 0 and n * 2 < live:
+            _stop('備份只有 %d bytes,而要被蓋掉的那個檔有 %d bytes ——'
+                  '差太多了(不到一半)。' % (n, live))
+    return _do_copy(bak, dst)
+
+
+def _do_copy(bak, dst):
+    """真正把備份蓋回去 —— 而且是「驗過了才換」。
+
+    ⚠️ 這裡**絕對不可以**直接 shutil.copy2(bak, dst):copy2 會先把 dst 開成
+       'wb',那一瞬間正本就被截成 0 個位元組。254 MB 蓋到一半被中斷
+       (按 Ctrl-C、外接碟拔掉、磁碟滿),留下的就是一個半截的遊戲檔,
+       而備份那時還沒複製完。
+
+    現在的順序是(2026-09-05 第二輪覆驗定的):
+      1. 備份檔與正本先各擋一次符號連結
+      2. 在正本隔壁開一個獨佔的暫存檔(mkstemp,名字猜不到也搶不到)
+      3. 把備份完整寫進去,flush + fsync
+      4. copymode(正本 → 暫存檔),讓權限跟原本的正本一樣
+      5. **把暫存檔讀回來算 sha256,跟備份比** —— 對不上就丟掉它,正本原封不動
+      6. 全部過了才 os.replace(暫存檔, 正本)
+    中間任何一步失敗,正本都還是原來那一份,備份也還在,再跑一次就好。
+    """
+    bak, dst = os.fspath(bak), os.fspath(dst)
+    _refuse_symlink(bak, '備份檔')
+    _refuse_symlink(dst, '要被還原的遊戲檔')
+    fd, tmp = _new_temp_beside(dst, 'restore')
+    try:
+        want = hashlib.sha256()
+        with open(fd, 'wb') as out:
+            fd = None                       # 交給 with 關
+            with open(bak, 'rb') as fin:
+                while True:
+                    chunk = fin.read(1 << 20)
+                    if not chunk:
+                        break
+                    want.update(chunk)      # 邊寫邊算,不必為了算再讀一次備份
+                    out.write(chunk)
+            out.flush()
+            os.fsync(out.fileno())
+        if os.path.exists(dst):
+            shutil.copymode(dst, tmp)       # 權限照正本原本的來
+        if _sha256_of(tmp) != want.hexdigest():
+            # 讀回來跟備份對不上 —— 多半是磁碟滿了或外接碟出問題。
+            # 這時候最重要的是「不要動正本」。
+            raise SystemExit(
+                '寫出來的還原檔跟備份對不起來(sha256 不同),不敢拿它換掉 %s。\n'
+                '  正本一個位元組都沒有動,備份也還在。\n'
+                '  請確認磁碟空間與外接碟連線之後,再跑一次 --restore。' % dst)
+        # ⚠️ 換名與登記中間不可以留縫。原本是 os.replace 一行、_mark_game_file_changed
+        #    另一行,Ctrl-C 落在兩行中間的話,收尾會照舊狀態印「什麼都沒有動到」,
+        #    而正本已經被換掉了。現在兩件事包在同一段不可中斷的動作裡。
+        _replace_and_mark(tmp, dst, '還原')
+        tmp = None
+    except BaseException:
+        if fd is not None:
+            try:
+                os.close(fd)
+            except OSError:
+                pass
+        if tmp is not None:
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
+        raise
+
+
+def _same_bytes(a, b):
+    """兩個檔逐位元組比到底,回傳「完全相同」與否。
+
+    ⚠️ 刻意**不用** zip():zip 會在短的那一邊結束時停下來,
+       兩個檔長度不同反而比不出差別 —— 而「短了一截」正是要抓的那種壞法。
+       所以先比長度,再一塊一塊比完整份。
+    """
+    if os.path.getsize(a) != os.path.getsize(b):
+        return False
+    with open(a, 'rb') as fa, open(b, 'rb') as fb:
+        while True:
+            ca = fa.read(1 << 20)
+            cb = fb.read(1 << 20)
+            if ca != cb:
+                return False
+            if not ca:
+                return True
+
+
+
+
+# Windows 的主控台預設不是 UTF-8,不先切過去,底下的中文訊息會變亂碼或直接爆掉。
+# 舊版 Python 沒有 reconfigure,所以整段包起來,失敗就照舊,不影響功能。
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
+except Exception:
+    pass
+
+
+class DataError(Exception):
+    """檔案內容跟預期不符。一律當成「停下來問人」,不要猜。"""
+
+
+# 這兩個上限是「防呆」不是規格:壓縮檔頭與封裝檔目錄的數字都是檔案自己寫的,
+# 壞掉的檔可以宣稱自己要解壓 4 GB,照著做就是把記憶體吃光。
+MAX_UNCOMPRESSED = 64 * 1024 * 1024
+MAX_BIG_ENTRIES = 200000
+# 備份檔名 = 原檔名直接加這個尾巴,所以它會跟 portrait.big 躺在同一個資料夾。
+BACKUP_SUFFIX = '.portraitbak'
+
+
+# ─────────────────────────────────────────────────────────
+#  QFS(EA 的壓縮格式,檔頭是 10 FB)
+# ─────────────────────────────────────────────────────────
+def qfs_decompress(data):
+    """QFS(RefPack)解壓。不是 QFS 就原封不動退回去。
+
+    辨識靠第 2 個位元組固定是 0xFB。檔頭有兩種長度,由第 1 個位元組的最低位元決定:
+      · 最低位元是 1  檔頭 10 個位元組,解壓後大小放在第 6 到 10 個位元組
+      · 最低位元是 0  檔頭 5 個位元組,解壓後大小放在第 2 到 5 個位元組(3 個位元組)
+    兩種都是**大端**,跟後面 SHPI 內部一律小端剛好相反,這裡最容易寫錯。
+    """
+    if len(data) < 2 or data[1] != 0xFB:
+        return data
+    if data[0] & 0x01:
+        if len(data) < 10:
+            raise DataError('QFS 檔頭不完整')
+        size = int.from_bytes(data[6:10], 'big'); pos = 10
+    else:
+        if len(data) < 5:
+            raise DataError('QFS 檔頭不完整')
+        size = int.from_bytes(data[2:5], 'big'); pos = 5
+    if not 0 <= size <= MAX_UNCOMPRESSED:
+        raise DataError('QFS 宣稱解壓尺寸異常:%d' % size)
+
+    out = bytearray()
+    end = len(data)
+
+    def copy_back(offset, length):
+        # 從已經解出來的尾巴往回數 offset 個位元組,抄 length 個過來。
+        # 這一行擋的是「往回的距離」:至少要往回 1 個位元組,而且不能往回到
+        # 還沒解出來的地方。它管的不是輸出總長度,總長度由下面那道擋。
+        if not 0 < offset <= len(out):
+            raise DataError('QFS 反向參照越界 offset=%d' % offset)
+        src = len(out) - offset
+        # 一個位元組一個位元組抄,不能改成切片:length 大於 offset 是合法的,
+        # 那時來源會邊抄邊被自己延長(整段重複填色就是這樣壓出來的)。
+        for _ in range(length):
+            out.append(out[src]); src += 1
+        # ⚠️ 只檢查檔頭宣稱的大小是不夠的:那是「檔案自己說的」。
+        #    一個惡意檔可以宣稱很小(通過上面那道),再用反向參照無限吐資料,
+        #    把記憶體吃光。實際輸出也必須有上限,而且上限就是它自己宣稱的大小。
+        if len(out) > size:
+            raise DataError('QFS 解出來的資料超過檔頭宣稱的 %d 位元組' % size)
+
+    # 指令是一個位元組開頭,靠它落在哪一段決定後面跟幾個位元組。
+    # 每一種都同時帶「先照抄幾個」與「再往回抄多長」兩件事。
+    while pos < end:
+        b0 = data[pos]
+        # 0xFC 到 0xFF:結束。低 2 位元是最後還要照抄幾個位元組(0 到 3)。
+        if b0 >= 0xFC:
+            n = b0 & 0x03; pos += 1
+            out += data[pos:pos + n]; break
+        # 0xE0 到 0xFB:純照抄,一次 4 到 112 個位元組,不往回抄。
+        if b0 >= 0xE0:
+            n = ((b0 & 0x1F) << 2) + 4; pos += 1
+            out += data[pos:pos + n]; pos += n; continue
+        # 0xC0 到 0xDF:四個位元組的指令,涵蓋最長(5 到 1028)與最遠(1 到 131072)。
+        if b0 >= 0xC0:
+            b1, b2, b3 = data[pos + 1], data[pos + 2], data[pos + 3]; pos += 4
+            n = b0 & 0x03
+            length = ((b0 & 0x0C) << 6) + b3 + 5
+            offset = ((b0 & 0x10) << 12) + (b1 << 8) + b2 + 1
+        # 0x80 到 0xBF:三個位元組的指令,長度 4 到 67、回頭 1 到 16384。
+        elif b0 >= 0x80:
+            b1, b2 = data[pos + 1], data[pos + 2]; pos += 3
+            n = (b1 >> 6) & 0x03
+            length = (b0 & 0x3F) + 4
+            offset = ((b1 & 0x3F) << 8) + b2 + 1
+        # 0x00 到 0x7F:兩個位元組的指令,長度 3 到 10、回頭 1 到 1024。最常見的一種。
+        else:
+            b1 = data[pos + 1]; pos += 2
+            n = b0 & 0x03
+            length = ((b0 & 0x1C) >> 2) + 3
+            offset = ((b0 & 0x60) << 3) + b1 + 1
+        out += data[pos:pos + n]; pos += n
+        copy_back(offset, length)
+    return bytes(out[:size])
+
+
+def qfs_compress_literal(data):
+    """純 literal 編碼:不做字串比對,瞬間完成,格式一樣合法。
+
+    壓出來比 EA 原本的大(大約等於原始大小),但因為我們是接到檔尾,
+    大一點沒有影響。換來的是速度快上千倍,而且不可能壓錯。
+    """
+    # 5 個位元組的短檔頭:0x10 0xFB 之後接 3 個位元組的原始長度,大端。
+    n = len(data)
+    out = bytearray([0x10, 0xFB, (n >> 16) & 0xFF, (n >> 8) & 0xFF, n & 0xFF])
+    # 0xE0 那一族一次只能照抄 4 的倍數,所以尾巴不足 4 個的先留給結束指令。
+    tail = n % 4
+    body = n - tail
+    pos = 0
+    while pos < body:
+        # 一段最多 112 個位元組(0xFB 是這一族的頂),再多就要拆成下一段。
+        chunk = min(112, body - pos)
+        out.append(0xE0 | ((chunk - 4) // 4))
+        out += data[pos:pos + chunk]
+        pos += chunk
+    # 0xFC 到 0xFF 是結束指令,低 2 位元順便把剩下的 0 到 3 個位元組帶完。
+    out.append(0xFC | tail)
+    out += data[pos:]
+    return bytes(out)
+
+
+# ─────────────────────────────────────────────────────────
+#  BIGF 封裝檔:讀目錄、接到檔尾
+# ─────────────────────────────────────────────────────────
+def size_field_order(path):
+    """檔頭 +0x04 的「檔案總大小」是 little 還是 big endian。
+
+    ⚠️ 這一欄兩種順序都遇得到,不能寫死,也不能照檔名或檔案大小猜。
+       「哪個檔是哪一種」不是這個格式天生的性質,是看你手上這一份被誰重新打包過。
+       本站以 BIGF 檔頭(不是副檔名)認,三份剛安裝好的原版各掃一次整個 data 資料夾:
+       英文版 207 個封裝檔、繁體中文版 205 個、PK 版 205 個,三份**全部**是 little-endian,
+       連裡面最大的 models.big(172,992,803 個位元組)與這一課的主角
+       frontend/portrait.big(109,291,217 個位元組)也是。
+       big-endian 只出現在本站測試機那份疊過模組的 data 資料夾:384 個封裝檔裡有 10 個,
+       落在 7 個檔名上(models.big、frontend/portrait.big、
+       audio/cd/spch_pbp/pnamedat.big、audio/spch_pbp/pnamehdr.big,
+       以及球場夜間檔 coornite.big、dodgnite.big、wrignite.big;
+       最後這三個各有兩份複本,所以檔數是 10 個而檔名是 7 個),
+       而這 7 個檔名在三份原版裡量到的都是 little-endian。
+       所以不要照檔名或檔案大小記,讀出來是哪一種就照哪一種寫回去。
+    """
+    # 判斷方式不是猜,是「哪一種讀法剛好等於實際檔案大小」。
+    # 兩種都對不上就代表這個檔已經被改壞,那時寧可停下來也不要亂寫。
+    n = os.path.getsize(path)
+    with open(path, 'rb') as f:
+        raw = f.read(8)
+    if len(raw) < 8:
+        raise DataError('%s 太小,不像封裝檔' % os.path.basename(path))
+    if struct.unpack('<I', raw[4:8])[0] == n:
+        return '<'
+    if struct.unpack('>I', raw[4:8])[0] == n:
+        return '>'
+    # ⚠️ 這一句讀者最可能在「上一次寫到一半斷電」之後看到,所以救法要跟著講:
+    #    只說「可能已經損毀」會讓人以為得重灌遊戲,其實旁邊那份備份一行就回得去
+    #    (2026-09-06 第三輪覆驗抓到:整句話沒有一個字提到 --restore)。
+    raise DataError('%s 的檔頭大小欄位跟實際檔案大小對不上 —— 這個檔可能已經損毀。\n'
+                    '  旁邊那份 %s%s 還在的話,跑這一行就回得去:\n'
+                    '    python3 %s "<遊戲資料夾>" --restore'
+                    % (os.path.basename(path), os.path.basename(path), BACKUP_SUFFIX,
+                       os.path.basename(sys.argv[0])))
+
+
+def big_entries(path):
+    """回傳 [(名稱, 目錄欄位位置, 資料 offset, 資料長度)]。
+
+    目錄欄位位置留著,是為了之後只改那 8 個位元組,不必重寫整個目錄。
+    """
+    # 檔頭 16 個位元組:'BIGF' + 檔案總長度(4)+ 項目數(4,大端)+ 資料起點(4)。
+    # 目錄接在檔頭後面,一項是「位移 4 + 長度 4(都是大端)+ 以 0 結尾的名字」。
+    # 名字長度不固定,所以先抓一塊夠大的(平均一項算 80 個位元組再加 8 KB 餘裕),
+    # 一次讀進來慢慢拆,比在幾千個項目上各做一次 seek 快得多。
+    try:
+        with open(path, 'rb') as f:
+            head = f.read(16)
+            if len(head) < 16 or head[:4] != b'BIGF':
+                raise DataError('%s 的開頭不是 BIGF,這不是封裝檔' % os.path.basename(path))
+            count = int.from_bytes(head[8:12], 'big')
+            if not 0 < count < MAX_BIG_ENTRIES:
+                raise DataError('%s 的目錄項目數異常(%d)' % (os.path.basename(path), count))
+            blob = head + f.read(count * 80 + 8192)
+    except OSError as e:
+        raise DataError('讀不到 %s:%s' % (path, e))
+
+    # 從位移 16 開始逐項拆。field 記的是「這一項的位移欄位在檔案裡的哪個位置」,
+    # 之後改檔就只寫那 8 個位元組,不必重排整份目錄。
+    items = []
+    pos = 16
+    for _ in range(count):
+        if pos + 8 > len(blob):
+            break                                   # 目錄比預估長,已讀到的就夠用
+        field = pos
+        off = int.from_bytes(blob[pos:pos + 4], 'big')
+        size = int.from_bytes(blob[pos + 4:pos + 8], 'big')
+        pos += 8
+        end = blob.find(b'\x00', pos)
+        if end < 0:
+            break
+        items.append((blob[pos:end].decode('latin-1', 'replace'), field, off, size))
+        pos = end + 1
+    return items
+
+
+def read_entry(path, off, size):
+    """照目錄講的位移與長度,把那一項的原始位元組挖出來。
+
+    讀不滿就代表目錄跟檔案對不上(多半是檔案被截斷過),寧可停下來。
+    """
+    with open(path, 'rb') as f:
+        f.seek(off)
+        data = f.read(size)
+    if len(data) != size:
+        raise DataError('目錄說這一項有 %d 個位元組,實際只讀到 %d' % (size, len(data)))
+    return data
+
+
+def append_entry(path, field_pos, blob):
+    """把 blob 接到檔尾,只改該項目的目錄 8 bytes 與檔頭的 4 bytes。
+
+    原本的資料一個位元組都不動 —— 所以就算新資料是壞的,舊資料還在檔案裡。
+
+    ── 兩件事的順序是刻意的(2026-09-06 第三輪稽核定的)────────────────
+    1. **先把新資料落到磁碟(fsync),再去改目錄。** 順序反過來的話,斷電時
+       目錄可能已經指到一段還沒落盤的資料 —— 那才是真的壞檔。照這個順序,
+       中途死掉的最壞結果是「檔尾多出一段沒有人指到的資料」:目錄還指著舊那一段,
+       遊戲照樣讀得到,而且 --restore 一行就回得去。
+    2. **目錄 8 bytes 與檔頭 4 bytes 是同一件事,中間不接受 Ctrl-C。**
+       只改了一半的話,目錄說的位置跟檔頭說的總長度會互相矛盾。
+    另外:「動過了」這一筆是在寫下第一個位元組**之前**就登記的,所以這條路上
+    不會出現「已經改了卻說沒動到」——(換名那條路的同一個問題,見 _replace_and_mark。)
+    """
+    # 一定要在改檔案之前先量:寫完之後檔案大小就變了,那時再量會兩種都對不上。
+    order = size_field_order(path)          # 一定要在改檔案之前先量
+    # 封裝檔本身是符號連結的話就停下來 —— 不然接到檔尾這一寫,
+    # 動到的是資料夾外面那個檔,而備份跟還原都以為自己在管這個名字。
+    _refuse_symlink(path, '遊戲的封裝檔')
+    # 新資料的位移就是「現在的檔案長度」,因為它要接在最後面。
+    new_off = os.path.getsize(path)
+    with open(path, 'r+b') as f:
+        f.seek(0, os.SEEK_END)
+        # 從下一行開始,遊戲檔就真的被動過了。中斷處理要照著這一筆說實話,
+        # 不可以再印「什麼都沒有動到」。
+        _mark_game_file_changed(path)
+        f.write(blob)
+        total = f.tell()
+        # fsync 是刻意的,而且一定要在改目錄**之前**:254 MB 的檔要是只寫進快取
+        # 就斷電,目錄會指到一段根本還不在磁碟上的資料。
+        f.flush()
+        os.fsync(f.fileno())
+        # 目錄與檔頭這 12 個位元組是同一件事,中間不接受 Ctrl-C(理由見上面的說明)。
+        with _NoInterrupt():
+            # 只改這一項的目錄欄位 8 個位元組:位移 4 + 長度 4。
+            f.seek(field_pos)
+            f.write(struct.pack('>II', new_off, len(blob)))     # 目錄一律 big-endian
+            # 再改檔頭 +0x04 的總長度 4 個位元組,位元組序沿用原檔量到的那一種。
+            f.seek(4)
+            f.write(struct.pack(order + 'I', total))
+            f.flush()
+            os.fsync(f.fileno())
+    return new_off
+
+
+# ─────────────────────────────────────────────────────────
+#  FSH(SHPI 容器):找到那張圖、換掉像素
+# ─────────────────────────────────────────────────────────
+# 名字後面那個數字是「一個像素幾個位元組」,全部是本站在剛安裝好的原版上量出來的。
+# 2026-08-28 訂正:原本這張表有四格名字跟量到的位元組數對不上(0x6D 寫成 4 位元組、
+# 0x7B 寫成 2 位元組、0x7D 寫成 3 位元組、RGB24 這個名字掛錯代號),
+# 而且漏了 0x79 與 0x7F 兩個代號 —— 漏掉會讓下面的守門員把真實的圖擋掉。
+# 2026-08-28 再訂正:0x79 原本叫 EMPTY_1x1,那是把「用途」寫成了「格式」。
+FSH_FORMATS = {
+    0x60: 'DXT1',        # 0.5  每 4x4 像素一個 8 位元組區塊
+    0x61: 'DXT3',        # 1.0  每 4x4 像素一個 16 位元組區塊,前 8 個是透明度
+    0x6D: 'ARGB16_4444', # 2.0  models.big 裡 18,287 張
+    0x78: 'RGB16_565',   # 2.0  models.big 裡 10,512 張
+    0x79: 'PAL4',        # 0.5  4 位元索引色,調色盤在緊接的 0x2A 區塊裡
+                         #      2026-08-28 訂正:原本寫 EMPTY_1x1「永遠 1×1」。
+                         #      uniforms.big 的 431 個空槽確實都是 1×1,但那是用途不是格式:
+                         #      中文字型的字圖集就是 0x79,1024x512、正好 0.500 bytes/像素,
+                         #      而 au20b_en.ffn 後面的 0x2A 調色盤正好 16 個項目(2的4次方)。
+    0x7B: 'PAL8',        # 1.0  一個位元組是索引,調色盤在緊接的 0x2A 區塊裡
+    0x7D: 'ARGB32',      # 4.0  剛安裝好的原版 portrait.big 2,391 張圖全部是這個
+    0x7E: 'ARGB16_1555', # 外部文件說的,本站至今找不到樣本,無從實測
+    0x7F: 'RGB24',       # 3.0  models.big 裡 45 張(g001-g045.fsh)
+}
+# 名字對齊 FSHTOOL 1.22(Denis Auroux, 2002)說明書列的格式表;
+# 每像素位元組數是本站在剛安裝好的原版上自己量的,兩邊完全吻合。
+# 那份說明書還有一條本站沒用到的規則:代號 +0x80 代表「這張圖本身是壓縮過的」。
+
+
+def fsh_first_image(data):
+    """回傳 (格式代號, 寬, 高, 像素起點, 像素終點)。只看第一筆記錄。"""
+    # SHPI 檔頭 16 個位元組:'SHPI' + 檔案長度(4)+ 圖片數(4)+ 目錄標記(4),
+    # 全部**小端**,跟外層 QFS 與 BIGF 的大端相反。
+    # 接著是目錄,一項 8 個位元組:標籤(4)+ 該圖起點(4)。
+    if len(data) < 16 or data[:4] != b'SHPI':
+        raise DataError('不是 SHPI 檔(開頭是 %r)' % data[:4])
+    num = struct.unpack_from('<I', data, 8)[0]
+    if num < 1:
+        raise DataError('這個 SHPI 裡一張圖都沒有')
+    off = struct.unpack_from('<I', data, 20)[0]         # 16 + 0*8 + 4
+    if off + 16 > len(data):
+        raise DataError('圖片記錄的檔頭不完整')
+    # 圖片記錄的前 16 個位元組:格式代號(1)+ 到下一塊的位移(3,小端)
+    # + 寬(2)+ 高(2)+ 中心點與位置(8)。像素從第 16 個位元組之後開始。
+    # 認不得的代號一律停手:硬拆下去只會把不是像素的東西當像素改掉。
+    code = data[off]
+    if code not in FSH_FORMATS:
+        raise DataError('沒見過的格式代號 0x%02X' % code)
+    block_size = data[off + 1] | (data[off + 2] << 8) | (data[off + 3] << 16)
+    width = struct.unpack_from('<H', data, off + 4)[0]
+    height = struct.unpack_from('<H', data, off + 6)[0]
+    if not (0 < width <= 4096 and 0 < height <= 4096):
+        raise DataError('圖片尺寸異常 %dx%d' % (width, height))
+    # 像素到哪裡結束有三種算法,由可靠到不可靠排:
+    #   1. 記錄自己寫的「到下一塊的位移」(大於 16 才是有效值)
+    #   2. 這個容器還有下一張圖時,用下一張的起點
+    #   3. 都沒有就吃到檔尾
+    start = off + 16
+    if block_size > 16:
+        end = min(off + block_size, len(data))
+    elif num > 1:
+        end = min(struct.unpack_from('<I', data, 16 + 8 + 4)[0], len(data))
+    else:
+        end = len(data)
+    return code, width, height, start, end
+
+
+def fsh_replace_pixels(data, start, end, new_pixels):
+    """把 [start, end) 這一段像素換成新的,前後兩段原封不動。
+
+    長度**必須完全相同**。差一個位元組就代表尺寸或格式對不上,
+    這時硬寫進去會讓後面所有位移全部錯位,所以直接拒絕。
+    """
+    if len(new_pixels) != end - start:
+        raise DataError('新像素有 %d 個位元組,原本是 %d —— 尺寸或格式不一致,拒絕寫入'
+                        % (len(new_pixels), end - start))
+    return data[:start] + new_pixels + data[end:]
+
+
+# ─────────────────────────────────────────────────────────
+#  DXT3:解碼與編碼
+#
+#  一張圖切成 4x4 的方塊,每塊 16 個位元組:
+#    前 8 個  每個像素 4 個位元的透明度(16 個像素 = 8 個位元組)
+#    後 8 個  兩個底色(各 16 位元)+ 16 個 2 位元的索引
+#  兩個底色會再內插出兩個中間色,湊成四色的調色盤,每個像素從裡面挑一個。
+#  所以一個 4x4 方塊只能有四種顏色 —— 這就是為什麼它壓得這麼小。
+# ─────────────────────────────────────────────────────────
+def _clamp(v):
+    """把外插算出來的色值壓回 0 到 255。外插常常會算出負數或超過 255。"""
+    return 0 if v < 0 else (255 if v > 255 else v)
+
+
+def _dist(p, q):
+    """兩個顏色的距離。刻意不開根號:只拿來比大小,開根號是白算的。"""
+    return (p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2 + (p[2] - q[2]) ** 2
+
+
+def _to565(r, g, b):
+    """0 到 255 的三個色值壓成一個 16 位元的 565:紅 5 位元、綠 6 位元、藍 5 位元。
+
+    綠色多一個位元不是筆誤,是 DXT 的規格:人眼對綠色的階調最敏感。
+    """
+    return (((round(r * 31 / 255) & 0x1F) << 11) |
+            ((round(g * 63 / 255) & 0x3F) << 5) |
+            (round(b * 31 / 255) & 0x1F))
+
+
+def _from565(c):
+    """565 拆回 0 到 255 的三個值。乘 255 再除滿刻度,才會讓最大值剛好回到 255。"""
+    return (((c >> 11) & 0x1F) * 255 // 31,
+            ((c >> 5) & 0x3F) * 255 // 63,
+            (c & 0x1F) * 255 // 31)
+
+
+def _palette4(c0, c1):
+    """兩個底色長出四色調色盤:兩個底色 + 1/3 與 2/3 的內插色。
+
+    DXT3 的透明度自己有一塊,所以顏色這半邊**永遠是四色**,
+    不像 DXT1 還要靠 c0 與 c1 誰大誰小去切換模式。
+    """
+    r0, g0, b0 = _from565(c0)
+    r1, g1, b1 = _from565(c1)
+    return [(r0, g0, b0), (r1, g1, b1),
+            ((2 * r0 + r1) // 3, (2 * g0 + g1) // 3, (2 * b0 + b1) // 3),
+            ((r0 + 2 * r1) // 3, (g0 + 2 * g1) // 3, (b0 + 2 * b1) // 3)]
+
+
+def dxt3_decode(raw, w, h):
+    """DXT3 → RGBA bytes
+
+    方塊由左到右、由上到下排。每塊 16 個位元組:
+      +0  16 個像素各 4 位元的透明度。像素 0 在第 1 個位元組的**低**半位元組
+      +8  兩個底色,各 2 個位元組,小端的 565
+      +12 16 個 2 位元的索引,湊成一個 4 位元組的小端整數,像素 0 在最低位
+    """
+    out = bytearray(w * h * 4)
+    pos = 0
+    for by in range((h + 3) // 4):
+        for bx in range((w + 3) // 4):
+            if pos + 16 > len(raw):
+                break
+            alpha = raw[pos:pos + 8]; pos += 8
+            c0 = raw[pos] | (raw[pos + 1] << 8)
+            c1 = raw[pos + 2] | (raw[pos + 3] << 8)
+            lookup = (raw[pos + 4] | (raw[pos + 5] << 8) |
+                      (raw[pos + 6] << 16) | (raw[pos + 7] << 24))
+            pos += 8
+            pal = _palette4(c0, c1)              # DXT3 永遠是四色,不看 c0/c1 大小
+            # 圖片寬高不是 4 的倍數時,方塊會有一部分落在圖外,那些像素直接丟掉。
+            # 透明度乘 17 是把 0 到 15 攤回 0 到 255(15 乘 17 剛好 255,不會差一階)。
+            for py in range(4):
+                for px in range(4):
+                    x = bx * 4 + px; y = by * 4 + py
+                    if x >= w or y >= h:
+                        continue
+                    i = py * 4 + px
+                    r, g, b = pal[(lookup >> (2 * i)) & 0x03]
+                    a = (alpha[i // 2] & 0x0F) if i % 2 == 0 else ((alpha[i // 2] >> 4) & 0x0F)
+                    di = (y * w + x) * 4
+                    out[di] = r; out[di + 1] = g; out[di + 2] = b; out[di + 3] = a * 17
+    return bytes(out)
+
+
+def _endpoint_candidates(cols):
+    """端點候選。
+
+    DXT 解出來的方塊最多只有四種相異色,所以直接試遍所有配對就行(最多十組)。
+    但端點不一定出現在像素裡 —— 方塊可能只用到中間兩個內插色。那種情況可以
+    解回來:若 a、b 是 1/3 與 2/3 內插點,則 c0 = 2a - b、c1 = 2b - a。
+    這幾個外插候選讓還原率從 95% 升到 99%。
+    """
+    # 相異色多到這個地步,已經不是 DXT 解出來的方塊(多半是使用者自己的照片)。
+    # 那時候試遍所有配對太慢,退回兩個夠用的候選:最遠的一對,加上外框的兩個角。
+    if len(cols) > 8:                       # 真實照片才會這麼多色,退回最遠對 + 外框
+        best = -1; pair = (cols[0], cols[0])
+        for i in range(len(cols)):
+            for j in range(i + 1, len(cols)):
+                d = _dist(cols[i], cols[j])
+                if d > best:
+                    best, pair = d, (cols[i], cols[j])
+        return [pair, (tuple(min(c[k] for c in cols) for k in range(3)),
+                       tuple(max(c[k] for c in cols) for k in range(3)))]
+    # 先放所有「兩個端點都出現在像素裡」的配對(含 a 等於 b 的單色情形)。
+    out = [(cols[i], cols[j]) for i in range(len(cols)) for j in range(i, len(cols))]
+    # 再補外插:2a-b、2b-a 是把 1/3 內插點推回端點,3a-2b、3b-2a 對應 2/3 那一種。
+    for a, b in list(out):
+        if a == b:
+            continue
+        for m, n, p, q in ((2, -1, a, b), (2, -1, b, a), (3, -2, b, a), (3, -2, a, b)):
+            cand = tuple(_clamp(m * p[k] + n * q[k]) for k in range(3))
+            out.append((p, cand)); out.append((q, cand))
+    seen = set(); uniq = []
+    for p in out:
+        if p not in seen:
+            seen.add(p); uniq.append(p)
+    return uniq
+
+
+def _encode_colour_block(px, alphas):
+    """16 個 (r,g,b) → 8 個位元組。
+
+    透明度低於 128 的像素不參與端點擬合 —— 它們看不見,卻會把端點拉偏、害到看得見的像素。
+    但整塊都透明時例外:那時照樣把顏色編進去,因為遊戲做雙線性過濾會採樣到
+    透明像素的顏色,填黑會在邊緣暈出黑邊。
+    """
+    vis = [i for i in range(16) if alphas[i] >= 128]
+    if not vis:
+        vis = list(range(16))
+    cols = sorted({px[i] for i in vis})
+
+    # 每個候選端點都真的壓一次、算一次誤差,挑最小的。誤差歸零就可以提早收工。
+    best_err = None; best = None
+    for a, b in _endpoint_candidates(cols):
+        ca, cb = _to565(*a), _to565(*b)
+        # 大的放前面只是慣例。DXT3 不靠這個順序表達模式,所以怎麼排都是四色。
+        c0, c1 = (max(ca, cb), min(ca, cb))
+        pal = _palette4(c0, c1)
+        # 16 格各自挑調色盤裡最近的一色。全部都要挑(包含透明的,
+        # 遊戲做雙線性過濾會採樣到透明像素的顏色),但誤差只算看得見的那些。
+        lookup = 0; err = 0
+        for k in range(16):
+            bi = 0; bd = None
+            for pi in range(4):
+                d = _dist(px[k], pal[pi])
+                if bd is None or d < bd:
+                    bd, bi = d, pi
+            if alphas[k] >= 128:
+                err += bd
+            lookup |= bi << (2 * k)
+        if best_err is None or err < best_err:
+            best_err, best = err, (c0, c1, lookup)
+            if err == 0:
+                break                       # 完美解,不必再試(實測九成以上的方塊都會走到)
+    c0, c1, lookup = best
+    return bytes((c0 & 0xFF, c0 >> 8, c1 & 0xFF, c1 >> 8,
+                  lookup & 0xFF, (lookup >> 8) & 0xFF,
+                  (lookup >> 16) & 0xFF, (lookup >> 24) & 0xFF))
+
+
+def dxt3_encode(rgba, w, h):
+    """RGBA bytes → DXT3
+
+    方塊順序與解碼那一支完全對稱,不然壓回去會整張錯位。
+    每塊先寫 8 個位元組的透明度,再寫 8 個位元組的顏色。
+    """
+    out = bytearray()
+    for by in range((h + 3) // 4):
+        for bx in range((w + 3) // 4):
+            px = []; al = []
+            # 落在圖外的位置用 min() 夾回邊緣像素。方塊一定要湊滿 16 格,
+            # 補 0 會在右邊與下面的邊緣壓出一條黑邊。
+            for py in range(4):
+                for pxi in range(4):
+                    x = min(bx * 4 + pxi, w - 1)
+                    y = min(by * 4 + py, h - 1)
+                    di = (y * w + x) * 4
+                    px.append((rgba[di], rgba[di + 1], rgba[di + 2]))
+                    al.append(rgba[di + 3])
+            # 透明度降到 4 位元:除以 17 剛好把 0 到 255 對回 0 到 15。
+            # 偶數格放低半位元組、奇數格放高半位元組,順序要跟解碼那邊一致。
+            ab = bytearray(8)
+            for i, a in enumerate(al):
+                q = max(0, min(15, round(a / 17)))
+                if i % 2 == 0:
+                    ab[i // 2] |= q
+                else:
+                    ab[i // 2] |= q << 4
+            out += bytes(ab)
+            out += _encode_colour_block(px, al)
+    return bytes(out)
+
+
+# ─────────────────────────────────────────────────────────
+#  PNG:自己讀、自己寫(只用內建的 zlib,不需要安裝任何套件)
+# ─────────────────────────────────────────────────────────
+PNG_MAGIC = b'\x89PNG\r\n\x1a\n'
+
+
+def png_write(path, rgba, w, h):
+    """寫一張 8 位元 RGBA 的 PNG。只用內建的 zlib,不需要任何影像套件。"""
+    def chunk(tag, payload):
+        # PNG 的區塊格式:長度(4,大端)+ 4 個字母的標籤 + 內容 + CRC32(4,大端)。
+        # CRC 算的是「標籤加內容」,不含長度那 4 個位元組。
+        return (struct.pack('>I', len(payload)) + tag + payload +
+                struct.pack('>I', zlib.crc32(tag + payload) & 0xFFFFFFFF))
+    rows = bytearray()
+    for y in range(h):
+        rows.append(0)                                  # 每一列前面加一個 0 = 不做預測濾波
+        rows += rgba[y * w * 4:(y + 1) * w * 4]
+    # IHDR 那七個數字依序是:寬、高、每色 8 位元、色彩型別 6(RGBA)、
+    # 壓縮法 0、濾波法 0、非交錯 0。PNG 的區塊能少寫一塊是一塊,所以只寫必要的 IHDR、IDAT、IEND 三塊。
+    data = (PNG_MAGIC
+            + chunk(b'IHDR', struct.pack('>IIBBBBB', w, h, 8, 6, 0, 0, 0))
+            + chunk(b'IDAT', zlib.compress(bytes(rows), 9))
+            + chunk(b'IEND', b''))
+    # 不是 open(path, 'wb') —— 匯出的目的檔也是「寫入」,一樣要擋符號連結、
+    # 一樣要先寫暫存再改名。理由整段寫在 _safe_write_bytes 裡。
+    _safe_write_bytes(path, data, '匯出的 PNG')
+
+
+def png_read(path):
+    """回傳 (rgba bytes, w, h)。支援 8 位元的灰階/RGB/索引/灰階+透明/RGBA,不支援交錯。"""
+    with open(path, 'rb') as f:
+        data = f.read()
+    if data[:8] != PNG_MAGIC:
+        raise DataError('%s 不是 PNG 檔' % os.path.basename(path))
+    # 從第 8 個位元組(魔術數字之後)開始逐塊走。認得的收下來,不認得的跳過就好。
+    # IDAT 可以被切成好幾塊,所以要接起來再一起解壓。
+    pos = 8
+    w = h = depth = ctype = None
+    idat = bytearray(); plte = None; trns = None
+    while pos + 8 <= len(data):
+        ln = struct.unpack_from('>I', data, pos)[0]
+        tag = data[pos + 4:pos + 8]
+        body = data[pos + 8:pos + 8 + ln]
+        pos += 12 + ln
+        if tag == b'IHDR':
+            w, h, depth, ctype, comp, filt, inter = struct.unpack('>IIBBBBB', body)
+            # 尺寸是「檔案自己寫的」,跟 QFS 那邊的道理一樣:一張 69 個位元組的壞檔
+            # 可以宣稱自己是 6000x6000,照著配置就是 144 MB(實測 peak 158 MB)。
+            # 這一課的圖最大也才 256x256,4096 是留給其他封裝檔的餘裕。
+            if not (0 < w <= 4096 and 0 < h <= 4096):
+                raise DataError('這張 PNG 宣稱自己是 %dx%d —— 超出這支腳本處理的範圍'
+                                '(寬高都要在 1 到 4096 之間)' % (w, h))
+            if depth != 8:
+                raise DataError('只支援每色 8 位元的 PNG,這張是 %d 位元' % depth)
+            if inter:
+                raise DataError('不支援交錯式(interlaced)PNG,請另存成一般的 PNG')
+        elif tag == b'PLTE':
+            plte = body
+        elif tag == b'tRNS':
+            trns = body
+        elif tag == b'IDAT':
+            idat += body
+        elif tag == b'IEND':
+            break
+    if w is None:
+        raise DataError('這個 PNG 沒有 IHDR')
+    channels = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}.get(ctype)
+    if channels is None:
+        raise DataError('沒見過的 PNG 色彩型別 %d' % ctype)
+
+    # 解開之後每一列的第一個位元組是「這一列用了哪一種預測濾波」,
+    # 後面才是 stride 個位元組的真正資料。要一列一列把預測加回去才是原始像素。
+    if not idat:
+        raise DataError('這個 PNG 沒有影像資料(IDAT),檔案不完整')
+    try:
+        raw = zlib.decompress(bytes(idat))
+    except zlib.error:
+        raise DataError('這個 PNG 的影像資料解不開,檔案多半沒存完或壞了')
+    stride = w * channels
+    # 少一個位元組都不行:下面是一列一列往前走,資料短了會直接 IndexError,
+    # 那對照著做的人來說就是一段看不懂的 traceback。先在這裡講清楚。
+    need = h * (stride + 1)
+    if len(raw) < need:
+        raise DataError('這個 PNG 說自己是 %dx%d,需要 %d 個位元組的影像資料,'
+                        '實際只有 %d —— 檔案不完整' % (w, h, need, len(raw)))
+    out = bytearray(h * stride)
+    prev = bytearray(stride)
+    p = 0
+    for y in range(h):
+        ft = raw[p]; p += 1
+        line = bytearray(raw[p:p + stride]); p += stride
+        # PNG 的五種預測濾波,每一列自己選一種
+        if ft == 1:
+            for i in range(channels, stride):
+                line[i] = (line[i] + line[i - channels]) & 0xFF
+        elif ft == 2:
+            for i in range(stride):
+                line[i] = (line[i] + prev[i]) & 0xFF
+        elif ft == 3:
+            for i in range(stride):
+                a = line[i - channels] if i >= channels else 0
+                line[i] = (line[i] + ((a + prev[i]) >> 1)) & 0xFF
+        elif ft == 4:
+            for i in range(stride):
+                a = line[i - channels] if i >= channels else 0
+                b = prev[i]
+                c = prev[i - channels] if i >= channels else 0
+                pa = abs(b - c); pb = abs(a - c); pc = abs(a + b - 2 * c)
+                pr = a if (pa <= pb and pa <= pc) else (b if pb <= pc else c)
+                line[i] = (line[i] + pr) & 0xFF
+        elif ft != 0:
+            raise DataError('沒見過的 PNG 濾波型別 %d' % ft)
+        out[y * stride:(y + 1) * stride] = line
+        prev = line
+
+    # 五種來源色彩型別統一攤成 RGBA 四通道,後面壓縮那一段就只要處理一種格式。
+    rgba = bytearray(w * h * 4)
+    for i in range(w * h):
+        s = i * channels; d = i * 4
+        if ctype == 6:
+            rgba[d:d + 4] = out[s:s + 4]
+        elif ctype == 2:
+            rgba[d:d + 3] = out[s:s + 3]; rgba[d + 3] = 255
+        elif ctype == 0:
+            v = out[s]; rgba[d] = rgba[d + 1] = rgba[d + 2] = v; rgba[d + 3] = 255
+        elif ctype == 4:
+            v = out[s]; rgba[d] = rgba[d + 1] = rgba[d + 2] = v; rgba[d + 3] = out[s + 1]
+        else:                                            # 索引色
+            if plte is None:
+                raise DataError('索引色 PNG 卻沒有調色盤')
+            idx = out[s]
+            rgba[d:d + 3] = plte[idx * 3:idx * 3 + 3]
+            rgba[d + 3] = trns[idx] if (trns and idx < len(trns)) else 255
+    return bytes(rgba), w, h
+
+
+# ─────────────────────────────────────────────────────────
+#  名單:從球員名字查出他的大頭照編號
+#
+#  ⚠️ 欄位編號**不能寫死**。不同來源的名冊欄位順序不一樣(本站測試機跟
+#     剛安裝好的原版就差了 27 欄),所以一律在執行時從表頭找欄位名。
+# ─────────────────────────────────────────────────────────
+AUDIOID_NAME = 'playerattrib_audioid'
+NAME_FIRST = 0
+NAME_LAST = 1
+
+
+def read_attrib(path):
+    """把名冊整份讀進來並切成行。
+
+    attrib.dat 是純文字的表,**用 CRLF 換行**,第一行是欄位表。
+    開頭不是數字就代表這不是名冊,那時不猜、直接停。
+    """
+    try:
+        raw = open(path, 'rb').read()
+    except OSError as e:
+        raise DataError('讀不到 %s:%s' % (path, e))
+    if not raw[:1].isdigit():
+        raise DataError('%s 的開頭不像欄位表,可能不是 attrib.dat' % os.path.basename(path))
+    lines = raw.split(b'\r\n')
+    if len(lines) < 3:
+        raise DataError('%s 只有 %d 行,內容不完整' % (os.path.basename(path), len(lines)))
+    return raw, lines
+
+
+def resolve_field(lines, wanted):
+    """在表頭找出某個欄位是第幾欄。**執行時查,絕不寫死。**
+
+    表頭每一格長得像「16 playerattrib_audioid」,也就是欄號加空白加欄名。
+    本站測試機那份跟剛安裝好的原版就差了 27 欄,寫死欄號會讀到別人的資料。
+    """
+    names = {}
+    for c in lines[0].split(b','):
+        m = re.match(rb'^\s*(\d+) (\w+)', c)
+        if m:
+            names[int(m.group(1))] = m.group(2).decode('latin-1')
+    for num, nm in names.items():
+        if nm == wanted:
+            return num
+    raise DataError('這份名冊的表頭裡找不到 %s 這個欄位(它有 %d 欄)。\n'
+                    '  這支腳本不敢在看不懂的檔案上動手。' % (wanted, len(names)))
+
+
+def cell_value(line_bytes, field):
+    """取出某一列某一欄的值,取不到就回 None。
+
+    資料列的每一格自己也帶著欄號,所以拆完之後還會再核對一次:
+    對不上就代表這一列的格數跟表頭不一樣,那時回 None,不猜。
+    """
+    cells = line_bytes.split(b',')
+    idx = field + 1                                  # 資料列行首多一個識別碼
+    if idx >= len(cells):
+        return None
+    m = re.match(rb'^(\d+) ?(.*)$', cells[idx].strip())
+    if not m or int(m.group(1)) != field:
+        return None                                  # 欄位編號對不上就不猜
+    return m.group(2).decode('latin-1')
+
+
+def find_players(gamedir, keyword):
+    """用名字的一部分找球員,回傳 (名, 姓, 大頭照編號) 與那一欄的欄號。
+
+    名冊裡是英文拼法,所以比對前兩邊都轉小寫,而且是「包含」不是「等於」。
+    第 0 欄是名、第 1 欄是姓,回傳的順序就照著名冊的欄序,所以是先名後姓;
+    --find 印出來的「Chin-Feng Chen」就是這個順序,Chen 才是姓。
+    本站這台機器上內容相異的 9 份 attrib.dat(從剛安裝好的原版英文版,到
+    台灣之光、亞洲球員、旅美球員、最新中職這些社群名冊),表頭前兩欄都寫著
+    「0 first_name」與「1 last_name」,一份例外都沒有。
+    """
+    path = os.path.join(gamedir, 'data', 'database', 'attrib.dat')
+    raw, lines = read_attrib(path)
+    aid = resolve_field(lines, AUDIOID_NAME)
+    key = keyword.lower()
+    hits = []
+    for l in lines[1:]:
+        if not l.strip():
+            continue
+        first = cell_value(l, NAME_FIRST)
+        last = cell_value(l, NAME_LAST)
+        if first is None or last is None:
+            continue
+        if key in ('%s %s' % (first, last)).lower():
+            hits.append((first, last, cell_value(l, aid)))
+    return hits, aid
+
+
+# ─────────────────────────────────────────────────────────
+#  各種動作
+# ─────────────────────────────────────────────────────────
+def portrait_path(gamedir):
+    """由遊戲資料夾算出 portrait.big 的位置,順便當成「路徑給對了沒」的檢查。"""
+    p = os.path.join(gamedir, 'data', 'frontend', 'portrait.big')
+    if not os.path.isfile(p):
+        raise DataError('找不到 %s\n'
+                        '  請確認你給的是遊戲資料夾(裡面應該看得到 mvp2005.exe 跟 data 資料夾)' % p)
+    return p
+
+
+def entry_for(items, number):
+    """從目錄裡找出「編號.fsh」那一項。
+
+    比對前統一轉小寫:封裝檔裡的名字大小寫不保證一致,而且 Windows 與 Mac
+    對大小寫的看法不同,轉過再比才不會在某一台上找不到。
+    """
+    want = ('%s.fsh' % number).lower()
+    for it in items:
+        if it[0].lower() == want:
+            return it
+    raise DataError('封裝檔裡沒有 %s。\n'
+                    '  用 --info 看有哪些編號,或用 --find <球員名字> 查他的編號。' % want)
+
+
+def load_image(bigpath, item):
+    """一口氣穿過三層:封裝檔挖出那一項 → QFS 解壓 → 在 SHPI 裡定位到像素。"""
+    name, field, off, size = item
+    blob = read_entry(bigpath, off, size)
+    plain = qfs_decompress(blob)
+    code, w, h, start, end = fsh_first_image(plain)
+    return plain, code, w, h, start, end
+
+
+def cmd_info(bigpath):
+    """報告封裝檔裡有什麼。純唯讀,不動任何檔案,拿來確認路徑給對了。"""
+    items = big_entries(bigpath)
+    fsh = [i for i in items if i[0].lower().endswith('.fsh')]
+    print('  封裝檔 %s' % os.path.basename(bigpath))
+    print('  項目數 %d(其中 .fsh 有 %d 個)' % (len(items), len(fsh)))
+    print('  檔案大小 %d 位元組' % os.path.getsize(bigpath))
+    print()
+    # 小到裝不下 QFS/SHPI 檔頭的項目不是圖:本站測試機那份封裝檔裡有兩個
+    # a2653.fsh,各只有 1 個位元組,拿去 --export 只會得到「不是 SHPI 檔」。
+    # 這一段是端給人照著複製的,所以先濾掉。
+    pics = [i for i in fsh if i[3] >= 16]
+    skipped = len(fsh) - len(pics)
+    print('  前 12 個看起來是圖的 .fsh 編號:')
+    print('    %s' % '  '.join(i[0].rsplit('.', 1)[0] for i in pics[:12]))
+    if skipped:
+        print('    (另外 %d 個項目小到不可能是圖,沒有列出來)' % skipped)
+    print()
+    print('  想知道某位球員是哪一號:')
+    print('    python3 %s "<遊戲資料夾>" --find Chin-Feng' % os.path.basename(sys.argv[0]))
+    print('    (名冊是英文拼法。Chin-Feng Chen 就是陳金鋒,他在原版遊戲裡)')
+
+
+def cmd_find(gamedir, keyword):
+    """查球員的大頭照編號。只讀名冊,不碰封裝檔。
+
+    會把「在第幾欄找到的」一起印出來,是為了讓人看見那個欄號是當場查的,
+    不是寫死在腳本裡的。
+    """
+    hits, field = find_players(gamedir, keyword)
+    print('  在名單的第 %d 欄找到 %s(欄號是執行時從表頭查的,不是寫死的)'
+          % (field, AUDIOID_NAME))
+    if not hits:
+        print('  找不到名字含「%s」的球員。' % keyword)
+        return
+    print('  命中 %d 位:' % len(hits))
+    for first, last, aid in hits[:30]:
+        print('    %-28s 大頭照編號 %s' % ('%s %s' % (first, last), aid or '(空白)'))
+    if len(hits) > 30:
+        print('    ...(還有 %d 位,把關鍵字打長一點)' % (len(hits) - 30))
+    print()
+    print('  匯出他的大頭照:')
+    if hits and hits[0][2]:
+        print('    python3 %s "<遊戲資料夾>" --export %s ~/Desktop/%s.png'
+              % (os.path.basename(sys.argv[0]), hits[0][2], hits[0][2]))
+
+
+def cmd_export(bigpath, number, outpath):
+    """把某個編號的大頭照解出來存成 PNG。不動遊戲檔,只寫出你指定的那一張 PNG。
+
+    那一張 PNG 也是「寫入」:目的檔是符號連結一律拒絕,寫的時候先寫一個
+    名字猜不到的暫存檔再改名上位(見 _safe_write_bytes)。
+    """
+    items = big_entries(bigpath)
+    item = entry_for(items, number)
+    plain, code, w, h, start, end = load_image(bigpath, item)
+    if code != 0x61:
+        raise DataError('%s.fsh 是 %s 格式,這支腳本目前只處理 DXT3(代號 0x61)的大頭照。'
+                        % (number, FSH_FORMATS.get(code, '0x%02X' % code)))
+    # 輸出路徑先擋五種「會把好檔蓋掉而且救不回來」的情形。--export 不做備份,
+    # 這裡不擋的話,一個打錯的路徑就能把 254 MB 的封裝檔換成一張 50 KB 的圖
+    # (2026-09-05 實測:265,883,417 → 52,517 個位元組,畫面還是印「已匯出」、
+    #  結束碼 0,而 --restore 因為沒有備份救不回來)。
+    # 比路徑用 realpath,是為了連「指過去的捷徑」也一起擋掉。
+    if os.path.realpath(outpath) == os.path.realpath(bigpath):
+        raise DataError('輸出路徑指到遊戲的 portrait.big 本身,拒絕覆蓋。\n'
+                        '  請給一個 .png 的路徑,例如 ~/Desktop/%s.png' % number)
+    if os.path.isdir(outpath):
+        raise DataError('%s 是一個資料夾,不是檔名。\n'
+                        '  請把檔名也一起給上,例如 %s.png' % (outpath, number))
+    outdir = os.path.dirname(os.path.abspath(outpath))
+    if not os.path.isdir(outdir):
+        raise DataError('資料夾不存在:%s\n  請先建好那個資料夾,或換一個路徑。' % outdir)
+    # 第五道:輸出的檔名本身是符號連結就停手。這一道要排在下面那一道之前 ——
+    # 下面那一道問的是「已經存在的那個檔是不是 PNG」,而它會**跟著連結**去看:
+    # 連結指到資料夾外面一張真的 PNG 的話,它會說「是 PNG,可以蓋」,
+    # 於是外面那張圖被覆蓋掉(2026-09-06 實測重現過)。懸空的連結更糟:
+    # exists() 說「不存在」,一路暢通,然後在連結指到的位置生出一個新檔。
+    # (png_write 那邊還有第二層同樣的守門,兩道都在。)
+    _refuse_symlink(outpath, '輸出的 PNG')
+    if os.path.exists(outpath):
+        # 已經存在的話,只允許蓋掉「本來就是 PNG」的檔 —— 這樣「改完再匯出一次確認」
+        # 那個流程照舊,但指到遊戲檔、備份檔或任何非圖檔時都會停下來。
+        with open(outpath, 'rb') as _f:
+            if _f.read(8) != PNG_MAGIC:
+                raise DataError('%s 已經存在,而且不是 PNG 檔 —— 不敢覆蓋它。\n'
+                                '  請換一個檔名。' % outpath)
+    # 匯出的就是遊戲實際會讀到的那張圖,所以改完再匯出一次就能當成驗收。
+    rgba = dxt3_decode(plain[start:end], w, h)
+    png_write(outpath, rgba, w, h)
+    print('  已匯出 %s.fsh → %s' % (number, outpath))
+    print('  尺寸 %dx%d · 格式 DXT3' % (w, h))
+    print()
+    print('  接下來:用任何修圖軟體改這張 PNG,尺寸維持 %dx%d,存檔時保留透明度,' % (w, h))
+    print('  然後用 --import 換回去。')
+
+
+def cmd_import(bigpath, number, pngpath, apply_it):
+    """把 PNG 壓成 DXT3 換進某個編號。**沒有 --apply 就只是預覽,不碰檔案。**
+
+    順序是刻意的:先把所有會擋下來的理由問完(編號在不在、格式對不對、
+    尺寸一不一樣),再壓縮、印品質,最後才寫。
+    """
+    items = big_entries(bigpath)
+    item = entry_for(items, number)
+    plain, code, w, h, start, end = load_image(bigpath, item)
+    if code != 0x61:
+        raise DataError('%s.fsh 是 %s 格式,這支腳本目前只處理 DXT3(代號 0x61)。'
+                        % (number, FSH_FORMATS.get(code, '0x%02X' % code)))
+    rgba, pw, ph = png_read(pngpath)
+    print('  遊戲裡的 %s.fsh   %dx%d  DXT3' % (number, w, h))
+    print('  你要換上去的 PNG  %dx%d' % (pw, ph))
+    if (pw, ph) != (w, h):
+        raise DataError('尺寸不一樣,不能換。請把 PNG 調整成 %dx%d 再試一次。\n'
+                        '  (換圖時不動結構,所以新圖必須跟原圖一樣大。)' % (w, h))
+
+    newpix = dxt3_encode(rgba, w, h)
+    # 自我檢查:編碼完再解碼回來,看看跟你給的圖差多少
+    # 透明度低於 128 的像素不算進去(跟上面擬合用同一條線):它們幾乎看不見,算了只會讓數字難看。
+    back = dxt3_decode(newpix, w, h)
+    # ⚠️ 這裡刻意**不報「完全相同的比例」**。
+    #    那個數字只在「原圖本來就是這個格式解出來的」時候有意義(會是 99%)。
+    #    使用者拿自己的圖進來時,8 位元的值幾乎不可能剛好落在量化格點上,
+    #    完全相同的比例會掉到個位數 —— 但最大誤差還是只有十幾,肉眼看不出來。
+    #    報那個數字只會嚇到人,而且跟「看起來對不對」無關。
+    diffs = []
+    for i in range(0, len(rgba), 4):
+        if rgba[i + 3] < 128:
+            continue
+        diffs.append(max(abs(rgba[i + k] - back[i + k]) for k in range(3)))
+    nvis = len(diffs) or 1          # 看得見的像素個數(透明度 128 以上才算),一個都沒有時退成 1 避免除以零
+    ok2 = sum(1 for d in diffs if d <= 2)
+    ok8 = sum(1 for d in diffs if d <= 8)
+    worst = max(diffs) if diffs else 0
+    avg = sum(diffs) / nvis
+    print()
+    print('  壓縮後的品質(把壓完的結果解回來跟你的原圖比,只算看得見的像素):')
+    print('    幾乎看不出差別(誤差 ≤ 2)  %.2f%%' % (100.0 * ok2 / nvis))
+    print('    看不太出來  (誤差 ≤ 8)  %.2f%%' % (100.0 * ok8 / nvis))
+    print('    平均誤差                   %.1f / 255' % avg)
+    print('    單一色階最大誤差           %d / 255' % worst)
+    if worst <= 16:
+        print('  → 這個範圍肉眼看不出來。')
+    elif worst <= 40:
+        print('  → 少數地方看得出一點色塊,通常可以接受。')
+    else:
+        print('  ⚠️ 有地方誤差偏大。多半是圖裡有大面積的漸層或很暗的區域 ——')
+        print('     一個 4x4 的方塊只能有四種顏色,漸層最吃虧。')
+    print('  DXT 是有損壓縮,遊戲本來就用這個格式存,所以有一點誤差是正常的。')
+
+    if not apply_it:
+        print()
+        print('  以上是預覽,還沒有動到任何檔案。')
+        print('  確定要換的話,在剛才那一行最後面加上 --apply')
+        return
+
+    # 走到這裡才真的要動檔案。先換像素、再備份、再壓縮、最後接到檔尾。
+    # 備份只在第一次做:第二次改的時候,最早那一份才是「還沒動過的原始檔」。
+    newfsh = fsh_replace_pixels(plain, start, end, newpix)
+    # 封裝檔本身是符號連結的話,現在就停 —— 不要等到 append_entry 才擋。
+    # 那時候備份已經做出來了,擋下來只會在遊戲資料夾裡留一個沒有用處的備份檔。
+    # (append_entry 自己那一道留著當第二層,兩道都在。)
+    _refuse_symlink(bigpath, '遊戲的封裝檔')
+    backup = bigpath + BACKUP_SUFFIX
+    # ⚠️ 兩件事都要做,而且順序不能反:
+    #   · 備份的名字是符號連結 → 直接拒絕(不然備份會寫到資料夾外面去,
+    #     之後 --restore 讀回來的也是外面那個檔)
+    #   · 判斷「備份在不在」要用 lexists 不是 exists。exists 會跟著連結去看,
+    #     一個指到不存在檔案的連結會被它判成「不存在」。
+    _refuse_symlink(backup, '備份檔')
+    if not os.path.lexists(backup):
+        _atomic_copy(bigpath, backup)
+        print()
+        print('  已備份 → %s' % os.path.basename(backup))
+    else:
+        print()
+        print('  備份已存在,保留最早那一份 → %s' % os.path.basename(backup))
+    blob = qfs_compress_literal(newfsh)
+    new_off = append_entry(bigpath, item[1], blob)
+    print('  已寫入:新資料接在第 %d 個位元組,只改了目錄 8 bytes + 檔頭 4 bytes' % new_off)
+
+    # 複驗:重新開檔讀回來,確認真的換成功了
+    # 拿記憶體裡的變數比對是不算數的,那只證明程式沒寫錯,不證明檔案寫對了。
+    items2 = big_entries(bigpath)
+    item2 = entry_for(items2, number)
+    plain2, code2, w2, h2, s2, e2 = load_image(bigpath, item2)
+    back2 = dxt3_decode(plain2[s2:e2], w2, h2)
+    ok = sum(1 for i in range(0, len(rgba), 4)
+             if rgba[i + 3] < 128 or max(abs(rgba[i + k] - back2[i + k]) for k in range(3)) <= 8)
+    total = len(rgba) // 4
+    print('  複驗:重新讀回來,%.2f%% 的像素跟你給的圖一致' % (100.0 * ok / total))
+    if ok < total * 0.9:
+        # 走到這裡代表檔案已經寫進去了,而且寫出來的東西跟預期對不上。
+        # 這種情形不可以只印一個 ❌ 就當沒事:結束碼要是非 0(DataError → 2),
+        # 而且要把還原指令整行印出來,讀者複製就能跑。
+        raise DataError('複驗沒過 —— 寫進去的東西跟預期差太多。\n'
+                        '  遊戲檔已經被改過了,請馬上還原:\n'
+                        '    python3 %s "<遊戲資料夾>" --restore\n'
+                        '  然後回報這個訊息。' % os.path.basename(sys.argv[0]))
+    print('  完成。進遊戲看看名單畫面。')
+
+
+def cmd_restore(bigpath):
+    """用備份蓋回去。備份檔刻意不刪,萬一還原也出事還有得救。"""
+    backup = bigpath + BACKUP_SUFFIX
+    # 先擋連結再問「在不在」:一個指到別處的備份連結,exists() 看起來是好的,
+    # 但照著它還原等於拿資料夾外面的檔覆蓋遊戲檔。
+    _refuse_symlink(backup, '備份檔')
+    if not os.path.exists(backup):
+        raise DataError('找不到備份 %s —— 沒有東西可以還原。' % os.path.basename(backup))
+    _restore_from_backup(backup, bigpath)
+    # 複驗:把還原完的遊戲檔跟備份從頭比到尾。不比就印成功,等於只證明
+    # 「複製指令沒有丟例外」,不證明檔案真的一樣。
+    if not _same_bytes(backup, bigpath):
+        raise DataError('還原完之後,%s 跟備份的內容對不起來 —— 沒有還原成功。\n'
+                        '  備份檔還在(%s),請確認磁碟空間夠不夠,再跑一次 --restore。'
+                        % (os.path.basename(bigpath), os.path.basename(backup)))
+    print('  已還原 %s ← %s(逐位元組比對過,兩邊完全相同)'
+          % (os.path.basename(bigpath), os.path.basename(backup)))
+    print('  備份檔留著沒刪,你可以自己決定要不要刪掉。')
+
+
+def main():
+    """解析參數並分派到五個動作之一。回傳值就是行程的結束碼。"""
+    ap = argparse.ArgumentParser(
+        description='換掉 MVP Baseball 2005 的球員大頭照',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+例子(照順序做):
+
+  1. 查 Chin-Feng 的大頭照編號(下面的 5826 就是這一步查出來的)
+     python3 mvp_swap_portrait.py "C:\\Program Files (x86)\\EA SPORTS\\MVP Baseball 2005" --find Chin-Feng
+
+  2. 把那張照片匯出成 PNG
+     python3 mvp_swap_portrait.py "<遊戲資料夾>" --export 5826 ~/Desktop/5826.png
+
+  3. 用修圖軟體改那張 PNG(尺寸不要改)
+
+  4. 先預覽會變成怎樣(不會動到遊戲)
+     python3 mvp_swap_portrait.py "<遊戲資料夾>" --import 5826 ~/Desktop/5826.png
+
+  5. 確定了才真的寫進去
+     python3 mvp_swap_portrait.py "<遊戲資料夾>" --import 5826 ~/Desktop/5826.png --apply
+
+  出問題就還原:
+     python3 mvp_swap_portrait.py "<遊戲資料夾>" --restore
+
+  只想確認這支腳本本身沒壞(不需要遊戲資料夾,也不碰任何遊戲檔):
+     python3 mvp_swap_portrait.py --selftest
+''')
+    # gamedir 改成可省略,是為了讓 --selftest 在「還沒有遊戲」的機器上也跑得起來。
+    # 原本的每一行指令寫法完全不變。
+    ap.add_argument('gamedir', nargs='?', help='遊戲資料夾(裡面看得到 mvp2005.exe 跟 data)')
+    ap.add_argument('--info', action='store_true', help='看封裝檔裡有什麼')
+    ap.add_argument('--find', metavar='名字', help='查某位球員的大頭照編號')
+    ap.add_argument('--export', nargs=2, metavar=('編號', '輸出.png'), help='把大頭照匯出成 PNG')
+    ap.add_argument('--import', dest='imp', nargs=2, metavar=('編號', '輸入.png'), help='把 PNG 換進遊戲')
+    ap.add_argument('--apply', action='store_true', help='真的寫入(沒加就只是預覽)')
+    ap.add_argument('--restore', action='store_true', help='從備份還原')
+    ap.add_argument('--selftest', action='store_true', help='自我測試,不碰任何遊戲檔')
+    args = ap.parse_args()
+
+    # --selftest 排最前面:它不需要遊戲資料夾,手上還沒有遊戲的人也該能先驗腳本自己。
+    if args.selftest:
+        return selftest()
+    if not args.gamedir:
+        ap.print_help()
+        return 1
+
+    # 順序有意義:--restore 排第一,出事的人最先需要它。
+    # 沒指定任何動作就跑 --info,那是唯讀的,誤按不會有後果。
+    try:
+        big = portrait_path(args.gamedir)
+        if args.restore:
+            cmd_restore(big)
+        elif args.find:
+            cmd_find(args.gamedir, args.find)
+        elif args.export:
+            cmd_export(big, args.export[0], args.export[1])
+        elif args.imp:
+            cmd_import(big, args.imp[0], args.imp[1], args.apply)
+        else:
+            cmd_info(big)
+    except DataError as e:
+        print('\n  停下來了:%s\n' % e)
+        # 停下來的原因印完了,還缺讀者最想知道的那一句:「我的遊戲檔現在好不好」。
+        # 跟 KeyboardInterrupt 與其他例外走**同一段**判斷(_interrupt_note),
+        # 分開寫遲早會有一邊漏掉 —— 這條路以前漏的就是它。
+        _data_error_note(e)
+        return 2
+    except KeyboardInterrupt:
+        # 中斷的時候,「已中斷」四個字沒用 —— 讀者要知道的是遊戲檔現在好不好。
+        # 所以照三態的紀錄講(_interrupt_note):真的動過就叫他還原,
+        # 沒動過才敢說「什麼都沒有動到」。兩種都是 130,不可以回 0。
+        _interrupt_note()
+        return 130
+    except Exception:
+        # 沒預料到的錯(磁碟滿、權限、外接碟拔掉…)要走**同一條**誠實路徑:
+        # 只接 KeyboardInterrupt 的話,這條路上的讀者會看到一串 traceback,
+        # 卻不知道自己的遊戲檔動了沒。說完再把原本的例外丟回去 ——
+        # traceback 照樣印出來(回報的時候用得上),結束碼一樣非 0。
+        _interrupt_note('出錯停下來了')
+        raise
+    return 0
+
+
+# ─────────────────────────────────────────────────────────
+#  自我測試(不碰任何遊戲檔)
+# ─────────────────────────────────────────────────────────
+def _fake_big(path, name=b'0001.fsh', payload=b'HELLO'):
+    """做一個最小的 BIGF 封裝檔,只有一個項目。專門給自我測試用。
+
+    版面:檔頭 16(BIGF + 總長度 4 + 項目數 4 大端 + 資料起點 4)
+          + 目錄一項(位移 4 + 長度 4,都是大端,接一個以 0 結尾的名字)
+          + 資料。回傳那一項的目錄欄位位置(固定是 16)。
+    """
+    dir_len = 8 + len(name) + 1
+    off = 16 + dir_len
+    total = off + len(payload)
+    blob = (b'BIGF' + struct.pack('<I', total) + struct.pack('>I', 1)
+            + struct.pack('<I', off)
+            + struct.pack('>II', off, len(payload)) + name + b'\x00'
+            + payload)
+    with open(path, 'wb') as f:
+        f.write(blob)
+    return 16
+
+
+def _fake_fsh(w=8, h=8, seed=0):
+    """做一張最小的 DXT3 圖(SHPI 容器 + 一筆圖片記錄)。專門給自我測試用。
+
+    版面:SHPI 檔頭 16(SHPI + 檔案長度 4 + 圖片數 4 + 目錄標記 4,全部小端)
+          + 目錄一項 8(標籤 4 + 該圖起點 4)
+          + 圖片記錄 16(格式代號 1 + 到下一塊的位移 3 + 寬 2 + 高 2 + 中心點與位置 8)
+          + 像素。回傳整份位元組。
+    """
+    rgba = bytearray()
+    for y in range(h):
+        for x in range(w):
+            rgba += bytes(((x * 32 + seed) % 256, (y * 32 + seed) % 256,
+                           (x + y) * 16 % 256, 255))
+    pix = dxt3_encode(bytes(rgba), w, h)
+    off = 24                                    # 檔頭 16 + 目錄一項 8
+    rec = (bytes((0x61,)) + bytes(((16 + len(pix)) & 0xFF,
+                                   ((16 + len(pix)) >> 8) & 0xFF,
+                                   ((16 + len(pix)) >> 16) & 0xFF))
+           + struct.pack('<HH', w, h) + b'\x00' * 8)
+    total = off + len(rec) + len(pix)
+    return (b'SHPI' + struct.pack('<I', total) + struct.pack('<I', 1) + b'GIMX'
+            + b'0521' + struct.pack('<I', off) + rec + pix)
+
+
+def _no_leftovers(folder, dst):
+    """那個資料夾裡不可以留下我們自己開的暫存檔。
+
+    mkstemp 開出來的名字一律是「.<目的檔名>.<用途>-亂數」,
+    所以只要看有沒有這種開頭的檔就知道有沒有留垃圾。
+    """
+    head = '.' + os.path.basename(dst) + '.'
+    return [n for n in os.listdir(folder) if n.startswith(head)]
+
+
+def selftest():
+    """不碰任何遊戲檔的自我測試,全部在系統暫存資料夾裡做(跑完不刪,方便你自己去看)。
+
+    重點不是「有沒有通過」,是**裡面有 16 個反向餌**:先證明「答案錯的時候
+    它真的會叫」。只驗正向的測試會一路綠燈,卻在功能整個壞掉時照樣綠燈,
+    那種測試比沒有更危險(本站 2026-08-29 就被這種測試騙過)。
+
+    (這一整套不接受 python -O:-O 會把下面每一個 assert 拿掉,
+     整份測試會在什麼都沒驗的情況下印「全部通過」。進來第一行就擋掉。)
+
+    16 個反向餌:
+      1. 事先放一個「猜得到的名字」的符號連結指到資料夾外面 → 備份不可以動到外面那個檔
+      2. 備份檔本身就是符號連結 → 要拒絕,而且外面那個檔不可以被動到
+      3. 指到不存在檔案的連結,exists() 會說「沒有」→ 證明為什麼要用 islink / lexists
+      4. 還原到一半 os.replace 失敗 → 正本要原封不動,而且不留暫存垃圾
+      5. 還原寫出來的東西跟備份的 sha256 對不上 → 不可以換,正本原封不動
+      6. 半截的檔不可以被 _same_bytes 判成「相同」(那是 zip() 的陷阱)
+      7. 被截斷過的 BIGF 備份不可以拿來還原
+      8. 封裝檔本身是符號連結 → append_entry 要拒絕,外面那個檔不可以被動到
+      9. DXT3 來回一趟之後不可以整片同色(那代表編碼器根本沒作用)
+     10. 什麼都還沒寫之前,「遊戲檔動過了」這筆紀錄必須是空的
+     11. --export 的目的檔是指向資料夾外面**一張真的 PNG** 的連結 → 要拒絕,
+         外面那張圖一個位元組都不可以變
+     12. --export 的目的檔是指到不存在檔案的懸空連結 → 一樣要拒絕,
+         而且不可以在連結指到的位置生出一個新檔
+     13. _NoInterrupt 真的把 Ctrl-C 壓到區塊結束才丟(而且處理器有還回去)
+     14. 換名剛做完就中斷 → 登記一定已經在了,收尾不可以說「什麼都沒有動到」;
+         連 (a) 那道失效時由「正在替換」接手的那一句也一起驗
+     15. 接到檔尾之後讀不回來(外接碟被拔掉那一種)→「停下來了:…」這條路
+         也要說遊戲檔動過了並印還原指令;而訊息自己已經帶著還原指令時只印一次
+     16. 檔頭大小欄位跟實際檔案大小對不上 → 那句話要把「旁邊那份備份救得回來」講出來
+    其餘是正向檢查,沒有算進來。
+    """
+    # ⚠️ 這一道要排在最前面。python -O 會把 assert 整個拿掉,底下每一個守門
+    #    一句都不會執行,而畫面照樣印「全部通過」—— 那是最糟的一種綠燈。
+    if sys.flags.optimize:
+        print('--selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠')
+        return 2
+
+    import io as _io
+    import contextlib as _contextlib
+
+    def _raise_sigint():
+        """對自己發一次 SIGINT(等於使用者按了 Ctrl-C)。"""
+        if hasattr(signal, 'raise_signal'):     # 3.8 以後才有
+            signal.raise_signal(signal.SIGINT)
+        else:
+            os.kill(os.getpid(), signal.SIGINT)
+
+    baits = 0
+    skipped = []
+
+    # 反向餌 10:還沒寫任何東西之前,不可以有「動過了」這筆紀錄。
+    # 這一條先跑,因為底下的正向測試會真的去動測試用的假檔,把它填起來。
+    assert not _GAME_FILE_CHANGED, '什麼都還沒做,卻已經說遊戲檔被動過了'
+    baits += 1
+
+    d = tempfile.mkdtemp(prefix='mvp_swap_portrait_selftest_')
+    outside_dir = tempfile.mkdtemp(prefix='mvp_swap_portrait_outside_')
+    OUTSIDE = os.path.join(outside_dir, '別人的重要檔案.txt')
+    KEEP = '這個檔在資料夾外面,誰都不准動它'.encode('utf-8')
+
+    def _can_symlink(link, target):
+        """Windows 沒開開發者模式就不能建符號連結。建不起來就跳過那個餌,誠實報告。"""
+        try:
+            os.symlink(target, link)
+            return True
+        except (OSError, NotImplementedError, AttributeError):
+            return False
+
+    # ── 正向:備份是完整的、不留垃圾 ────────────────────────
+    src = os.path.join(d, 'portrait.big')
+    _fake_big(src, payload=b'A' * 500)
+    bak = src + BACKUP_SUFFIX
+    _atomic_copy(src, bak)
+    assert _same_bytes(src, bak), '備份出來的內容跟原檔不一樣'
+    assert not _no_leftovers(d, bak), '備份完之後留下暫存垃圾:%r' % _no_leftovers(d, bak)
+
+    # ── 反向餌 1:先佔一個「猜得到的名字」的連結,指到資料夾外面 ──
+    with open(OUTSIDE, 'wb') as f:
+        f.write(KEEP)
+    d1 = tempfile.mkdtemp(prefix='mvp_swap_portrait_bait1_')
+    src1 = os.path.join(d1, 'portrait.big')
+    _fake_big(src1, payload=b'B' * 300)
+    bak1 = src1 + BACKUP_SUFFIX
+    if _can_symlink(bak1 + '.part', OUTSIDE):       # 舊版寫死的就是這個名字
+        _atomic_copy(src1, bak1)
+        with open(OUTSIDE, 'rb') as f:
+            assert f.read() == KEEP, '備份沿著猜得到的 .part 連結,把資料夾外面的檔蓋掉了'
+        assert _same_bytes(src1, bak1), '備份內容不對'
+        baits += 1
+    else:
+        skipped.append('餌 1(這台機器不能建符號連結)')
+
+    # ── 反向餌 2:備份檔本身就是符號連結 ────────────────────
+    d2 = tempfile.mkdtemp(prefix='mvp_swap_portrait_bait2_')
+    src2 = os.path.join(d2, 'portrait.big')
+    _fake_big(src2, payload=b'C' * 300)
+    bak2 = src2 + BACKUP_SUFFIX
+    if _can_symlink(bak2, OUTSIDE):
+        try:
+            _atomic_copy(src2, bak2)
+        except SystemExit:
+            pass
+        else:
+            raise AssertionError('備份檔是符號連結,竟然照樣寫下去了')
+        with open(OUTSIDE, 'rb') as f:
+            assert f.read() == KEEP, '被擋下來了,資料夾外面那個檔卻還是被動到'
+        baits += 1
+    else:
+        skipped.append('餌 2(這台機器不能建符號連結)')
+
+    # ── 反向餌 3:指到不存在檔案的連結,exists() 看不見 ──────
+    dangling = os.path.join(d, 'dangling.bak')
+    if _can_symlink(dangling, os.path.join(outside_dir, '根本不存在的檔')):
+        assert os.path.exists(dangling) is False, \
+            'exists() 竟然看得到指到不存在檔案的連結 —— 這條說明要改'
+        assert os.path.islink(dangling) is True, 'islink() 應該看得到連結本身'
+        assert os.path.lexists(dangling) is True, 'lexists() 應該看得到連結本身'
+        try:
+            _atomic_copy(src, dangling)
+        except SystemExit:
+            pass
+        else:
+            raise AssertionError('指到不存在檔案的連結,竟然可以拿來當備份檔')
+        baits += 1
+    else:
+        skipped.append('餌 3(這台機器不能建符號連結)')
+
+    # ── 正向:還原走一趟,逐位元組相同 ──────────────────────
+    d3 = tempfile.mkdtemp(prefix='mvp_swap_portrait_restore_')
+    live = os.path.join(d3, 'portrait.big')
+    _fake_big(live, payload=b'D' * 400)
+    good = live + BACKUP_SUFFIX
+    _atomic_copy(live, good)
+    with open(live, 'ab') as f:                      # 假裝改過了(append,跟真的一樣)
+        f.write(b'X' * 64)
+    assert not _same_bytes(live, good), '改過之後應該要不一樣'
+    _do_copy(good, live)
+    assert _same_bytes(live, good), '還原完之後跟備份對不起來'
+    assert not _no_leftovers(d3, live), '還原完留下暫存垃圾:%r' % _no_leftovers(d3, live)
+
+    # ── 反向餌 4:還原到一半 os.replace 失敗 → 正本原封不動 ──
+    d4 = tempfile.mkdtemp(prefix='mvp_swap_portrait_bait4_')
+    live4 = os.path.join(d4, 'portrait.big')
+    _fake_big(live4, payload=b'E' * 400)
+    bak4 = live4 + BACKUP_SUFFIX
+    _atomic_copy(live4, bak4)
+    with open(live4, 'ab') as f:
+        f.write(b'Y' * 64)
+    before = open(live4, 'rb').read()
+    real_replace = os.replace
+    os.replace = lambda a, b: (_ for _ in ()).throw(OSError('餌:假裝改名失敗'))
+    try:
+        try:
+            _do_copy(bak4, live4)
+        except OSError:
+            pass
+        else:
+            raise AssertionError('os.replace 都失敗了,還原竟然說自己成功')
+    finally:
+        os.replace = real_replace
+    assert open(live4, 'rb').read() == before, '還原失敗了,正本卻被動到'
+    assert not _no_leftovers(d4, live4), '還原失敗後留下暫存垃圾:%r' % _no_leftovers(d4, live4)
+    baits += 1
+
+    # ── 反向餌 5:寫出來的東西 sha256 對不上 → 不可以換 ──────
+    d5 = tempfile.mkdtemp(prefix='mvp_swap_portrait_bait5_')
+    live5 = os.path.join(d5, 'portrait.big')
+    _fake_big(live5, payload=b'F' * 400)
+    bak5 = live5 + BACKUP_SUFFIX
+    _atomic_copy(live5, bak5)
+    with open(live5, 'ab') as f:
+        f.write(b'Z' * 64)
+    before5 = open(live5, 'rb').read()
+    g = globals()
+    real_sha = g['_sha256_of']
+    g['_sha256_of'] = lambda p: 'deadbeef'          # 假裝讀回來的內容不對
+    try:
+        try:
+            _do_copy(bak5, live5)
+        except SystemExit:
+            pass
+        else:
+            raise AssertionError('讀回來的內容對不上,竟然還是把正本換掉了')
+    finally:
+        g['_sha256_of'] = real_sha
+    assert open(live5, 'rb').read() == before5, 'sha256 對不上,正本卻被動到'
+    assert not _no_leftovers(d5, live5), '擋下來之後留下暫存垃圾:%r' % _no_leftovers(d5, live5)
+    baits += 1
+
+    # ── 反向餌 6:半截的檔不可以被判成「相同」 ────────────────
+    whole = os.path.join(d, 'whole.bin')
+    half = os.path.join(d, 'half.bin')
+    with open(whole, 'wb') as f:
+        f.write(b'A' * 2000)
+    with open(half, 'wb') as f:
+        f.write(b'A' * 1000)
+    assert _same_bytes(whole, whole), '同一個檔應該相同'
+    assert not _same_bytes(whole, half), '半截的檔竟然被判成跟完整的相同'
+    baits += 1
+
+    # ── 反向餌 7:被截斷過的 BIGF 備份不可以拿來還原 ──────────
+    d7 = tempfile.mkdtemp(prefix='mvp_swap_portrait_bait7_')
+    live7 = os.path.join(d7, 'portrait.big')
+    _fake_big(live7, payload=b'G' * 4000)
+    bak7 = live7 + BACKUP_SUFFIX
+    _atomic_copy(live7, bak7)
+    with open(bak7, 'r+b') as f:                     # 截成一半,檔頭還是宣稱原本的長度
+        f.truncate(os.path.getsize(bak7) // 2)
+    before7 = open(live7, 'rb').read()
+    try:
+        _restore_from_backup(bak7, live7)
+    except SystemExit:
+        pass
+    else:
+        raise AssertionError('半截的備份竟然可以拿來覆蓋正本')
+    assert open(live7, 'rb').read() == before7, '擋下來了,正本卻還是被動到'
+    baits += 1
+
+    # ── 反向餌 8:封裝檔本身是符號連結 → 不可以往裡面接資料 ──
+    # ⚠️ 這個餌的第一版是啞的:連結指到一個文字檔,少了守門也會因為
+    #    「開頭不是 BIGF」被擋下來,拆掉守門照樣是綠的(2026-09-05 陰性對照抓到)。
+    #    所以連結要指到一個**完全合法的**封裝檔 —— 這樣擋住它的就只剩守門本身。
+    d8 = tempfile.mkdtemp(prefix='mvp_swap_portrait_bait8_')
+    outside_big = os.path.join(outside_dir, '別人的封裝檔.big')
+    _fake_big(outside_big, payload=b'H' * 200)
+    outside_bytes = open(outside_big, 'rb').read()
+    link8 = os.path.join(d8, 'portrait.big')
+    if _can_symlink(link8, outside_big):
+        try:
+            append_entry(link8, 16, b'NEW')
+        except SystemExit:
+            pass
+        else:
+            raise AssertionError('封裝檔是符號連結,竟然照樣往裡面寫')
+        assert open(outside_big, 'rb').read() == outside_bytes, \
+            '沿著連結把資料夾外面那個封裝檔改掉了'
+        baits += 1
+    else:
+        skipped.append('餌 8(這台機器不能建符號連結)')
+
+    # ── 正向:接到檔尾這一段真的會動到檔案,而且會被記下來 ────
+    d9 = tempfile.mkdtemp(prefix='mvp_swap_portrait_append_')
+    big9 = os.path.join(d9, 'portrait.big')
+    field = _fake_big(big9, payload=b'HELLO')
+    assert size_field_order(big9) == '<', '總長度欄位的位元組序讀錯'
+    items = big_entries(big9)
+    assert items and items[0][0] == '0001.fsh', '目錄讀錯:%r' % (items,)
+    assert read_entry(big9, items[0][2], items[0][3]) == b'HELLO', '讀出來的內容不對'
+    del _GAME_FILE_CHANGED[:]                        # 前面的還原測試會填它,先清空再驗
+    append_entry(big9, field, b'WORLD!')
+    assert _GAME_FILE_CHANGED, '真的寫進去了,卻沒有記下「遊戲檔被動過」'
+    items2 = big_entries(big9)
+    assert read_entry(big9, items2[0][2], items2[0][3]) == b'WORLD!', '接到檔尾之後讀不到新資料'
+    assert size_field_order(big9) == '<', '接完之後檔頭的總長度沒有跟著改'
+
+    # 大端的檔頭也要認得(本站測試機那份疊過模組的 portrait.big 就是大端)
+    dbe = tempfile.mkdtemp(prefix='mvp_swap_portrait_be_')
+    bebig = os.path.join(dbe, 'portrait.big')
+    _fake_big(bebig, payload=b'HI')
+    raw = bytearray(open(bebig, 'rb').read())
+    raw[4:8] = struct.pack('>I', len(raw))
+    open(bebig, 'wb').write(bytes(raw))
+    assert size_field_order(bebig) == '>', '大端的總長度欄位沒認出來'
+
+    # 找不到的編號要停下來,不可以亂猜一個
+    try:
+        entry_for(items2, '9999')
+    except DataError:
+        pass
+    else:
+        raise AssertionError('封裝檔裡沒有的編號,竟然找得到')
+
+    # ── 正向:QFS 壓縮走一趟 ────────────────────────────────
+    raw = bytes(range(256)) * 7
+    assert qfs_decompress(qfs_compress_literal(raw)) == raw, 'QFS 來回之後內容變了'
+
+    # ── 正向 + 反向餌 9:DXT3 來回 ──────────────────────────
+    w = h = 8
+    rgba = bytearray()
+    for y in range(h):
+        for x in range(w):
+            rgba += bytes((x * 32 % 256, y * 32 % 256, (x + y) * 16 % 256, 255))
+    enc = dxt3_encode(bytes(rgba), w, h)
+    assert len(enc) == (w // 4) * (h // 4) * 16, 'DXT3 編碼長度不對'
+    dec = dxt3_decode(enc, w, h)
+    assert len(dec) == w * h * 4, 'DXT3 解碼長度不對'
+    assert len({bytes(dec[i:i + 3]) for i in range(0, len(dec), 4)}) > 1, \
+        'DXT3 來回之後整張圖同色 —— 編碼器沒作用'
+    baits += 1
+
+    # ── 正向:PNG 自己寫、自己讀 ────────────────────────────
+    png = os.path.join(d, 'test.png')
+    png_write(png, bytes(rgba), w, h)
+    back, bw, bh = png_read(png)
+    assert (bw, bh) == (w, h) and back == bytes(rgba), 'PNG 寫出去再讀回來就變了'
+
+    # ── 正向 + 反向餌 11 / 12:--export 寫出去的那一張 PNG ──────────
+    # 做一個「裡面真的有一張 DXT3 圖」的最小封裝檔,cmd_export 才走得完整條路
+    # (只驗 png_write 的話,驗不到 cmd_export 自己那一道)。
+    d11 = tempfile.mkdtemp(prefix='mvp_swap_portrait_export_')
+    big11 = os.path.join(d11, 'portrait.big')
+    _fake_big(big11, name=b'0521.fsh', payload=qfs_compress_literal(_fake_fsh(8, 8)))
+    good_png = os.path.join(d11, 'good.png')
+    _quiet = _io.StringIO()
+    with _contextlib.redirect_stdout(_quiet):       # 匯出會印字,別混進測試輸出
+        cmd_export(big11, '0521', good_png)
+    _got, gw, gh = png_read(good_png)
+    assert (gw, gh) == (8, 8), '匯出的 PNG 尺寸不對(%dx%d)' % (gw, gh)
+    assert not _no_leftovers(d11, good_png), \
+        '匯出完之後留下暫存垃圾:%r' % _no_leftovers(d11, good_png)
+    # 權限不可以是 mkstemp 的 0600 —— 那樣匯出來的圖只有你自己讀得到,
+    # 跟以前 open(path, 'wb') 的行為不一樣(這是改寫入方式時最容易漏掉的迴歸)。
+    _um = os.umask(0)
+    os.umask(_um)
+    _mode = os.stat(good_png).st_mode & 0o777
+    assert _mode == (0o666 & ~_um), \
+        '匯出的 PNG 權限變成 %o(應該是 %o)' % (_mode, 0o666 & ~_um)
+
+    # 反向餌 11:輸出的檔名是一個指向資料夾外面**一張真的 PNG** 的連結。
+    # ⚠️ 連結指到「不是 PNG 的檔」是啞餌:少了守門也會被「已經存在而且不是 PNG」
+    #    那一道擋下來 —— 2026-09-06 陰性對照實測過,舊版正是被那一道擋住的,
+    #    看起來像有守門其實沒有。所以外面那個檔必須是一張合法的 PNG。
+    outside_png = os.path.join(outside_dir, '別人的圖.png')
+    png_write(outside_png, bytes((9, 9, 9, 255)) * 4, 2, 2)     # 一張 2x2 的深灰小圖
+    keep_png = open(outside_png, 'rb').read()
+    link11 = os.path.join(d11, 'link.png')
+    if _can_symlink(link11, outside_png):
+        try:
+            with _contextlib.redirect_stdout(_io.StringIO()):
+                cmd_export(big11, '0521', link11)
+        except SystemExit:
+            pass
+        else:
+            raise AssertionError('輸出的檔名是符號連結,竟然照樣寫下去了')
+        assert open(outside_png, 'rb').read() == keep_png, \
+            '沿著連結把資料夾外面那張 PNG 蓋掉了'
+        baits += 1
+    else:
+        skipped.append('餌 11(這台機器不能建符號連結)')
+
+    # 反向餌 12:懸空連結 —— exists() 看不見它,舊寫法會一路暢通,
+    # 然後在連結指到的位置(資料夾外面)生出一個新檔。
+    ghost = os.path.join(outside_dir, '本來不存在的圖.png')
+    link12 = os.path.join(d11, 'ghost.png')
+    if _can_symlink(link12, ghost):
+        assert os.path.exists(link12) is False, \
+            'exists() 竟然看得到懸空連結 —— 這條說明要改'
+        try:
+            with _contextlib.redirect_stdout(_io.StringIO()):
+                cmd_export(big11, '0521', link12)
+        except SystemExit:
+            pass
+        else:
+            raise AssertionError('輸出的檔名是懸空連結,竟然照樣寫下去了')
+        assert not os.path.exists(ghost), \
+            '順著懸空連結,在資料夾外面生出了一個新檔'
+        baits += 1
+    else:
+        skipped.append('餌 12(這台機器不能建符號連結)')
+
+    # ── 反向餌 13:_NoInterrupt 真的把 Ctrl-C 壓到區塊結束才丟 ────────
+    # 這是「換名 + 登記」不可中斷的地基。它壞掉的話,餌 14 那個情境會退回舊行為:
+    # 收尾照舊狀態說「什麼都沒有動到」,而檔案其實已經換掉了。
+    _sig_ok = True
+    try:
+        seq = []
+        old_h = signal.getsignal(signal.SIGINT)
+        try:
+            with _NoInterrupt():
+                assert signal.getsignal(signal.SIGINT) is not old_h, \
+                    '餌 13:_NoInterrupt 根本沒把處理器裝上去'
+                _raise_sigint()             # 這一下要被壓住
+                seq.append('inside')        # 壓住了才跑得到這一行
+        except KeyboardInterrupt:
+            seq.append('after')
+        assert seq == ['inside', 'after'], \
+            '餌 13:Ctrl-C 沒有被壓到區塊結束才丟(%r)' % seq
+        assert signal.getsignal(signal.SIGINT) is old_h, \
+            '餌 13:離開之後沒有把原本的處理器還回去'
+        baits += 1
+    except (OSError, ValueError, AttributeError, NotImplementedError):
+        # 這台機器發不了 SIGINT(某些 Windows / 非主執行緒的組合)。
+        # 跳過的餌等於沒驗到,誠實記下來,不混進「全部通過」。
+        _sig_ok = False
+        skipped.append('餌 13(這台機器發不了 SIGINT)')
+
+    # ── 反向餌 14:換名剛做完就中斷 —— 登記一定要已經在了 ─────────────
+    # 咬的正是這一輪要關掉的那個窗口:os.replace 成功、登記還沒寫,Ctrl-C 落在中間。
+    if _sig_ok:
+        d14 = tempfile.mkdtemp(prefix='mvp_swap_portrait_bait14_')
+        src14 = os.path.join(d14, 'src.bin')
+        dst14 = os.path.join(d14, 'portrait.big')
+        with open(src14, 'wb') as f:
+            f.write(b'NEW')
+        mark = len(_GAME_FILE_CHANGED)
+        real_replace14 = os.replace
+
+        def _replace_then_sigint(a, b):
+            real_replace14(a, b)
+            _raise_sigint()                 # 換名剛做完,這時候中斷
+        os.replace = _replace_then_sigint
+        try:
+            try:
+                _replace_and_mark(src14, dst14, '還原')
+            except KeyboardInterrupt:
+                pass
+            else:
+                raise AssertionError('餌 14:被壓住的 Ctrl-C 應該在區塊結束時丟出來')
+        finally:
+            os.replace = real_replace14
+        assert os.path.exists(dst14), '餌 14 的前提不成立(換名應該已經做完了)'
+        assert dst14 in _GAME_FILE_CHANGED[mark:], \
+            '餌 14:換名做完了卻沒登記 —— Ctrl-C 的收尾會說「什麼都沒有動到」'
+        # 三態的中間那一態:(a) 那道失效的時候(裝不上處理器)由「正在替換」接手,
+        # 收尾一樣不可以說「沒動到」。
+        saved_c = list(_GAME_FILE_CHANGED)
+        saved_i = list(_GAME_FILE_INFLIGHT)
+        _GAME_FILE_CHANGED[:] = []
+        _GAME_FILE_INFLIGHT[:] = [('還原', dst14)]
+        buf14 = _io.StringIO()
+        with _contextlib.redirect_stdout(buf14):
+            _interrupt_note()
+        _GAME_FILE_CHANGED[:] = saved_c
+        _GAME_FILE_INFLIGHT[:] = saved_i
+        assert '什麼都沒有動到' not in buf14.getvalue(), \
+            '餌 14:「正在替換」的狀態被收尾報成「沒動到」'
+        assert '正在替換' in buf14.getvalue(), \
+            '餌 14:「正在替換」的狀態沒有被說出來(%r)' % buf14.getvalue()
+        # 餌 14 刻意讓那一筆「正在換」留著(KeyboardInterrupt 走到那裡時,
+        # 「換成了沒有」是不確定的)—— 驗完了才清掉,不要污染後面。
+        del _GAME_FILE_INFLIGHT[:]
+        baits += 1
+    else:
+        skipped.append('餌 14(這台機器發不了 SIGINT)')
+
+    # ── 反向餌 15:「停下來了」這條路也要說遊戲檔動了沒 ─────────────────
+    # 咬的是 2026-09-06 覆驗重現的那一種:資料已經接到檔尾(遊戲檔真的變了),
+    # 下一步讀回來卻失敗(外接碟被拔掉、權限沒了)—— big_entries 把 OSError
+    # 包成 DataError,以前畫面只印一行錯誤,一個字都沒提旁邊的備份救得回來。
+    d15 = tempfile.mkdtemp(prefix='mvp_swap_portrait_bait15_')
+    game15 = os.path.join(d15, 'game')
+    os.makedirs(os.path.join(game15, 'data', 'frontend'))
+    big15 = os.path.join(game15, 'data', 'frontend', 'portrait.big')
+    field15 = _fake_big(big15, payload=b'P' * 64)
+    del _GAME_FILE_CHANGED[:]
+    append_entry(big15, field15, b'NEWDATA')         # 真的動過了(它自己會登記)
+    assert _GAME_FILE_CHANGED, '餌 15 的前提不成立:接到檔尾了卻沒登記'
+
+    def _read_back_fails(path):
+        """模擬「寫完之後讀不回來」:big_entries 就是這樣把 OSError 包成 DataError 的。"""
+        raise DataError('讀不到 %s:[Errno 13] Permission denied' % path)
+
+    def _verify_failed(path):
+        """複驗沒過那一種:訊息自己已經帶著還原指令了。"""
+        raise DataError('複驗沒過 —— 寫進去的東西跟預期差太多。\n'
+                        '  遊戲檔已經被改過了,請馬上還原:\n'
+                        '    python3 %s "<遊戲資料夾>" --restore'
+                        % os.path.basename(sys.argv[0]))
+
+    def _run_main_with(fake_entries):
+        """換掉 big_entries,跑一次**真正的** main()(沒加動作 = --info 那條路)。
+
+        直接呼叫 _data_error_note 是驗不到東西的:要證明的是 main() 的
+        `except DataError` 分支真的接上去了,所以這裡走完整的 main()。
+        (換的是本模組的全域名字,cmd_info 是呼叫時才查,所以換得掉;
+         跟餌 14 換掉 os.replace 同一個手法。)
+        """
+        real = globals()['big_entries']
+        argv_save = sys.argv[:]
+        buf = _io.StringIO()
+        globals()['big_entries'] = fake_entries
+        sys.argv = ['mvp_swap_portrait.py', game15]
+        try:
+            with _contextlib.redirect_stdout(buf):
+                rc = main()
+        finally:
+            globals()['big_entries'] = real
+            sys.argv = argv_save
+        return rc, buf.getvalue()
+
+    rc15, out15 = _run_main_with(_read_back_fails)
+    assert rc15 == 2, '餌 15:讀不回來應該以 2 結束(得到 %r)' % rc15
+    assert '已經被改過了' in out15, \
+        '餌 15:遊戲檔已經動過了,「停下來了」這條路卻沒說出來(%r)' % out15
+    assert '--restore' in out15, '餌 15:沒有把還原指令印給讀者(%r)' % out15
+    # 另一半:訊息自己已經帶著還原指令的時候,不可以再印第二次。
+    rc15b, out15b = _run_main_with(_verify_failed)
+    assert rc15b == 2, '餌 15:複驗沒過應該以 2 結束(得到 %r)' % rc15b
+    assert out15b.count('--restore') == 1, \
+        '餌 15:還原指令印了 %d 次,讀者會以為要跑兩遍' % out15b.count('--restore')
+    del _GAME_FILE_CHANGED[:]                        # 驗完了,不要污染後面
+    baits += 1
+
+    # ── 反向餌 16:檔頭大小欄位對不上的那句話,要把救法一起講 ────────────
+    # 「資料已經接到檔尾、目錄或檔頭只改到一半」的檔,下一次跑就是在這裡被擋下來。
+    # 那一句以前只說「這個檔可能已經損毀」,讀者會以為得重灌遊戲。
+    d16 = tempfile.mkdtemp(prefix='mvp_swap_portrait_bait16_')
+    big16 = os.path.join(d16, 'portrait.big')
+    _fake_big(big16, payload=b'Q' * 100)
+    with open(big16, 'r+b') as f:
+        f.seek(4)
+        f.write(struct.pack('<I', 123456))           # 檔頭宣稱的總長度改成假的
+    try:
+        size_field_order(big16)
+    except DataError as e16:
+        msg16 = str(e16)
+    else:
+        raise AssertionError('餌 16:檔頭大小欄位對不上,竟然沒停下來')
+    assert BACKUP_SUFFIX in msg16 and '--restore' in msg16, \
+        '餌 16:擋下來了,卻沒告訴讀者旁邊那份備份救得回來(%r)' % msg16
+    baits += 1
+
+    print('自我測試:全部通過(含 %d 個反向餌)' % baits)
+    if skipped:
+        # 誠實報告:跳過的餌等於沒驗到,不可以混在「全部通過」裡面裝作驗過了。
+        print('  跳過:%s' % '、'.join(skipped))
+    print('  測試檔留在 %s(跑完不刪,你可以自己去看)' % d)
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
+
+#
+# ─────────────────────────────────────────────────────────
+#  MIT License
+#
+#  Copyright (c) 2026 toni
+#
+#  Permission is hereby granted, free of charge, to any person obtaining a copy
+#  of this software and associated documentation files (the "Software"), to deal
+#  in the Software without restriction, including without limitation the rights
+#  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#  copies of the Software, and to permit persons to whom the Software is
+#  furnished to do so, subject to the following conditions:
+#
+#  The above copyright notice and this permission notice shall be included in
+#  all copies or substantial portions of the Software.
+#
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#  THE SOFTWARE.
+# ─────────────────────────────────────────────────────────

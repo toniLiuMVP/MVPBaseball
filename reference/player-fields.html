@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/player-fields.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>球員資料檔全欄位清單 — toni的MVP模組補習班</title>
+<meta name="description" content="attrib.dat 46 欄、pitcher.dat 29 欄逐欄列出,含實測值域。順便解開身高與生日這兩個編碼很怪的欄位。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 球員資料檔全欄位清單</p>
+  <h1>球員資料檔全欄位清單</h1>
+  <p class="lede"><a href="player-data.html">球員資料檔那頁</a>講的是「這個檔怎麼讀」，
+     <a href="player-codes.html">代號對照表</a>講的是「那些數字代表什麼」。
+     這頁是<strong>完整清單</strong> —— 兩個檔案的每一欄，加上實測值域。</p>
+
+    <div class="card blue" style="margin-top:14px">
+    <p class="card-h">先說清楚這頁的數字是從哪一份遊戲量的</p>
+    <p>本頁的項目數、檔案數、覆蓋率，量的是<strong>一台裝過台灣模組的遊戲</strong>。
+       <u>剛安裝好的原版數字小很多</u> —— 例如臉皮 504 對 894、大頭照 1,487 對 6,638、
+       語音號碼 1,673 對 4,343。</p>
+    <p><strong>格式與結構的部分兩邊一樣</strong>，那是遊戲程式決定的；
+       會變的是「有幾個」。完整對照見
+       <a href="original-vs-modded.html">原版與這台機器差在哪</a>。</p>
+  </div>
+<div class="card amber">
+    <p class="card-h">⚠️ 這頁的數字量自本站測試機，你的會不一樣</p>
+    <p>本站測試機的 <code>attrib.dat</code> 與 <code>pitcher.dat</code>
+       <u>都被模組換過</u>、跟剛安裝好的原版不同，裝的是一份混了大聯盟與台灣球員的名單。</p>
+    <p class="small">（這裡本來寫「<code>attrib.dat</code> 檔案日期是 2026 年 4 月」。
+       <strong>檔案日期不要拿來當佐證</strong> —— 它會被後來的操作蓋掉，現在量到的是 2026-08-29。
+       <u>內容沒有變過</u>：本站 2026-04-14 那份快照裡的 <code>attrib.dat</code>
+       與現役這一份 sha256 相同。<code>pitcher.dat</code> 的日期還停在 2023 年 5 月。）</p>
+    <p>所以像「3,247 位球員」「某某球員的識別碼是多少」這種<strong>跟名單內容有關的數字，
+       你自己跑會得到別的結果</strong>。</p>
+    <p>不會變的是<strong>格式</strong>：欄位有幾個、每一格怎麼寫、資料怎麼分隔 ——
+       那是遊戲程式決定的，換名單也不會變。<br>
+       ⚠️ <strong>但「哪一欄是什麼」會變。</strong>本站實測 46 個欄位裡有 <strong>27 個</strong>
+       在剛安裝好的原版與社群名冊之間位置不同（<code>skin_tone</code> 從第 12 欄搬到第 38 欄，
+       中間的欄位各前移一格；<code>audioid</code> 原版第 17、社群名冊第 16）。
+       兩份剛安裝好的原版（英文與中文）彼此完全相同，所以分界是<u>原版 vs 社群名冊</u>，不是語言。
+       <strong>永遠不要記欄號，要在執行時從表頭找欄位名</strong> —— 本站的腳本都是這樣做的。
+       這頁講的規則對你成立，數字與欄號不一定。</p>
+    <p class="small">⚠️ <u>本頁有幾節量的是<strong>剛安裝好的原版</strong>而不是測試機</u>
+       （薪水、身高體重、兩條自動檢查那幾節），那幾節都在段落裡標出來了 ——
+       同一個欄位在兩份名單給出不同的數字是正常的。</p>
+    <p class="small">同樣的道理本站在<a href="fonts.html">字型</a>、
+       <a href="audio.html">音訊</a>、<a href="anims.html">動畫</a>那幾頁也標過。</p>
+  </div>
+
+  <h2>先看規模</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">檔案</th><th class="num">欄位</th><th class="num">資料列</th><th>裝什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="檔案" class="mono">attrib.dat</td><td data-label="欄位" class="num">46</td><td data-label="資料列" class="num">3,247</td>
+          <td data-label="裝什麼">每一位球員都有一列</td></tr>
+      <tr><td data-label="檔案" class="mono">pitcher.dat</td><td data-label="欄位" class="num">29</td><td data-label="資料列" class="num">1,618</td>
+          <td data-label="裝什麼"><strong>只有投手</strong>才有一列</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">兩個檔各有 <strong>25 列姓名兩欄都空白</strong> —— 那是沒用到的名單空位，不是球員。
+     算比例的時候要記得扣掉。</p>
+
+  <h2 id="height">先解兩個編碼很怪的欄位</h2>
+  <p>大部分欄位一看就懂。但有兩欄的數字完全不像它該有的樣子。</p>
+
+  <div class="card grass">
+    <p class="card-h">身高：欄位值 + 48 = 英吋</p>
+    <p>身高那一欄的值只有 <strong>18 到 35</strong>，看起來完全不像身高。
+       拿五位身高公開已知的球員對一次：</p>
+    <div class="tablewrap" style="margin:8px 0"><table class="stack">
+      <thead><tr><th>球員</th><th class="num">欄位值</th><th class="num">真實身高</th><th class="num">差</th></tr></thead>
+      <tbody>
+        <tr><td data-label="球員">José Altuve</td><td data-label="欄位值" class="num">18</td><td data-label="真實身高" class="num">66 吋</td><td data-label="差" class="num">48</td></tr>
+        <tr><td data-label="球員">Mike Trout</td><td data-label="欄位值" class="num">26</td><td data-label="真實身高" class="num">74 吋</td><td data-label="差" class="num">48</td></tr>
+        <tr><td data-label="球員">Bryce Harper</td><td data-label="欄位值" class="num">27</td><td data-label="真實身高" class="num">75 吋</td><td data-label="差" class="num">48</td></tr>
+        <tr><td data-label="球員">Shohei Ohtani</td><td data-label="欄位值" class="num">28</td><td data-label="真實身高" class="num">76 吋</td><td data-label="差" class="num">48</td></tr>
+        <tr class="hi"><td data-label="球員">Aaron Judge</td><td data-label="欄位值" class="num">31</td><td data-label="真實身高" class="num">79 吋</td><td data-label="差" class="num"><strong>48</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>五個人，差都是 48，一次都沒有誤差。</strong>
+       48 英吋是四英尺 —— 也就是這一欄存的是「超過四英尺幾吋」。</p>
+    <p>換算回來：值域 18–35 = <strong>5 呎 6 吋 到 6 呎 11 吋</strong>（66 到 83 英吋），
+       這正好就是職業棒球選手的身高範圍。</p>
+    <p class="small">再加一道旁證：把身高分組去算平均體重，
+       <strong>從 19 到 31 完全單調遞增</strong>（76.6 一路爬到 132.9）。矮的輕、高的重。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">生日：從 1947 年最後一天起算的天數</p>
+    <p>生日那一欄是四到五位數（<code>9196</code> 到 <code>20543</code>），
+       看起來像天數。問題是「從哪一天開始算」。</p>
+    <p>同樣拿已知生日的球員反推：</p>
+    <div class="tablewrap" style="margin:8px 0"><table class="stack">
+      <thead><tr><th>球員</th><th class="num">欄位值</th><th>真實生日</th><th>反推的起點</th></tr></thead>
+      <tbody>
+        <tr><td data-label="球員">José Altuve</td><td data-label="欄位值" class="num">15,467</td><td data-label="真實生日">1990-05-06</td><td data-label="反推的起點" class="mono">1947-12-31</td></tr>
+        <tr><td data-label="球員">Aaron Judge</td><td data-label="欄位值" class="num">16,188</td><td data-label="真實生日">1992-04-26</td><td data-label="反推的起點" class="mono">1947-12-31</td></tr>
+        <tr><td data-label="球員">Bryce Harper</td><td data-label="欄位值" class="num">16,361</td><td data-label="真實生日">1992-10-16</td><td data-label="反推的起點" class="mono">1947-12-31</td></tr>
+        <tr class="hi"><td data-label="球員">Shohei Ohtani</td><td data-label="欄位值" class="num">16,988</td><td data-label="真實生日">1994-07-05</td><td data-label="反推的起點" class="mono"><strong>1947-12-31</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>四個人反推出同一天。</strong>所以規則是
+       <code>生日 = 1947-12-31 加上這個欄位的天數</code>。</p>
+    <p>套回整份名單：值域 9,196–20,543 換算成
+       <strong>1973 年 3 月到 2004 年 3 月</strong>出生 —— 完全合理。</p>
+    <div class="card clay" style="margin-top:10px">
+      <p class="card-h">第五個人對不上，這件事要講</p>
+      <p>本站也對了 Mike Trout，反推出來是 <code>1948-01-31</code>，<strong>差了一個月。</strong></p>
+      <p>四比一，所以本站採 <code>1947-12-31</code>。
+         但這代表<u>那一列的生日跟現實不一樣</u> ——
+         可能是模組填錯，也可能是本站查到的資料有誤。
+         <span class="badge wip">未解</span> 本站沒有再往下追。</p>
+      <p class="small"><strong>五個樣本裡有一個不合，就要寫出來。</strong>
+         只報「四個都對」是報喜不報憂。</p>
+    </div>
+  </div>
+
+  <h2 id="salary">第三個編碼很怪的欄位：薪水</h2>
+  <p>上面兩欄本站解開了。<strong>這一欄沒有。</strong>但量得出來的部分已經夠用了。</p>
+  <p class="small">⚠️ <strong>這一節的數字量自剛安裝好的原版</strong>（2,921 列），
+     不是本頁其他地方用的那台測試機。測試機那一份的薪水值域是 <strong>0–255</strong>、
+     出現過 149 種值、最常見的是 0 —— 跟下面這張表對不上是正常的，那是兩份不同的名單。
+     下面 46 欄表第 40 列寫的 0–255／149 種就是測試機的值。</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>量到的（剛安裝好的原版）</th><th class="num">結果</th></tr></thead>
+    <tbody>
+      <tr><td>值域</td><td class="num">0 – 251</td></tr>
+      <tr><td>出現過幾種不同的值</td><td class="num">133</td></tr>
+      <tr class="hi"><td>最常見的值</td><td class="num"><strong>2</strong>（1,274 人）</td></tr>
+      <tr><td>次常見</td><td class="num">3（545 人）· 4（532 人）</td></tr>
+    </tbody>
+  </table></div>
+  <p>2,921 人裡有 <strong>2,351 人</strong>擠在 2、3、4 這三個值上。
+     換句話說：<u>絕大多數球員領的是同一個底薪級距</u>，
+     真正有差別的是剩下那幾百人。</p>
+
+  <div class="card grass">
+    <p class="card-h">兩道旁證，說明這一欄真的是薪水</p>
+    <p><strong>一、跟星等單調相關。</strong>把球員按 <code>starpower</code>（0–4）分組算薪水中位數
+       （<u>同一份剛安裝好的原版</u>）：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th class="num">starpower</th><th class="num">人數</th><th class="num">薪水中位數</th></tr></thead>
+      <tbody>
+        <tr><td data-label="starpower" class="num">0</td><td data-label="人數" class="num">992</td><td data-label="薪水中位數" class="num">2</td></tr>
+        <tr><td data-label="starpower" class="num">1</td><td data-label="人數" class="num">730</td><td data-label="薪水中位數" class="num">3</td></tr>
+        <tr><td data-label="starpower" class="num">2</td><td data-label="人數" class="num">651</td><td data-label="薪水中位數" class="num">3</td></tr>
+        <tr><td data-label="starpower" class="num">3</td><td data-label="人數" class="num">359</td><td data-label="薪水中位數" class="num">4</td></tr>
+        <tr class="hi"><td data-label="starpower" class="num"><strong>4</strong></td><td data-label="人數" class="num">189</td><td data-label="薪水中位數" class="num"><strong>15</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>二、排在最前面的就是那年最貴的那幾個人。</strong>
+       薪水欄由高排到低，前幾名分別是 251、199、188、179、170、169 ——
+       名字對得上當時公認最高薪的球星。
+       <span class="small">（第四名那個對不上，那是另一個故事：
+       <a href="../story/stance-choices/index.html#anomaly">名單裡有一個對不上任何東西的異常值</a>）</span></p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">⭐ 2026-08-28：身高與體重的換算，拿到外部佐證了</p>
+    <p>同一份 <code>MVPedit</code> 說明書還寫了兩句話：</p>
+<pre><code>Height is stored in inches.  Players range from 5'6" to 7'0".
+Weight ranges from 150 to 300 pounds.</code></pre>
+    <p>拿剛安裝好的原版對一次（原版<u>沒有那 25 個空殼列</u> ——
+       2,921 列全部是真的球員；那 25 列是本站測試機那份名冊才有的東西，理由見下）：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th></th><th class="num">真實球員的值域</th><th>加上位移</th><th>說明書說的</th></tr></thead>
+      <tbody>
+        <tr><td>身高</td><td data-label="真實球員的值域" class="num">18 – 35</td><td data-label="加上位移"><strong>+48</strong> → 66–83 英吋 = 5'6"–6'11"</td><td data-label="說明書說的">5'6" 到 7'0" ✅ <u>下限完全吻合</u></td></tr>
+        <tr><td>體重</td><td data-label="真實球員的值域" class="num">50 – 190</td><td data-label="加上位移"><strong>+100</strong> → 150–290 磅</td><td data-label="說明書說的">150 到 300 磅 ✅ <u>下限完全吻合</u></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>位移量是被唯一釘死的</strong>：換成 +110，體重下限會變成 160 磅，
+       對不上說明書寫的 150。而且<u>低於下限的值是 0 人</u>，
+       高於說明書上限的也是 0 人 —— 資料正好占滿說明書宣告的範圍。</p>
+    <p class="small">說明書的上限（7'0" / 300 磅）是<u>編輯器允許你填到哪</u>，
+       不是名單裡真的有人那麼高那麼重。原版最高 6'11"、最重 290 磅。</p>
+    <div class="card">
+      <p class="card-h">那「值域從 0 開始」是怎麼回事：25 個空殼列</p>
+      <p>本頁下面那張欄位表寫身高 <code>0–35</code>、體重 <code>0–190</code>，
+         那是<u>本站測試機</u>量的（3,247 列）。把 0 那一群挑出來看：</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>條件</th><th class="num">列數</th></tr></thead>
+        <tbody>
+          <tr><td>體重 = 0</td><td class="num">25</td></tr>
+          <tr><td>身高 = 0</td><td class="num">25</td></tr>
+          <tr><td>骨架 = 0</td><td class="num">25</td></tr>
+          <tr><td>姓與名兩欄都空白</td><td class="num">25</td></tr>
+          <tr class="hi"><td><strong>四組是不是同一批</strong></td><td class="num"><strong>完全相同</strong></td></tr>
+        </tbody>
+      </table></div>
+      <p>隨便挑一列來看，<strong>除了 <code>hidden</code> = 1 之外每一欄都是 0</strong>。
+         那是遊戲留給「創造球員」的空位，不是球員。
+         <u>算值域的時候要先把它們拿掉</u>，不然身高會變成 4'0"、體重會變成 100 磅。</p>
+    </div>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">⭐ 2026-08-28：點數怎麼算解開了，答案在一支 2006 年編輯器的說明書裡</p>
+    <p>本站原本寫「沒解開」，理由是<u>從遊戲自己的文字檔找不到乘數</u>。
+       那個判斷沒有錯，但<strong>找錯地方了</strong> ——
+       答案不在遊戲裡，在<u>當年那批編輯器的說明書</u>裡。
+       <code>MVPedit</code> 的說明檔直接寫著：</p>
+<pre><code>Salary is based on points.  Starting at 100, points occur in
+intervals of 33 - 133, 166, 199, 232, etc. ...
+The maximum salary is 8515.</code></pre>
+    <p>也就是 <strong>點數 = 100 + 33 × 這一欄的值</strong>。三件事互相對得上：</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>檢查</th><th>結果</th></tr></thead>
+      <tbody>
+        <tr><td>說明書說上限是 8515</td><td><code>100 + 255×33 = 8515</code> ✅ 一個位元組剛好用滿</td></tr>
+        <tr><td>說明書舉例「166 點」</td><td>對應欄位值 2 ——<u>而本站量到最多人用的就是 2</u>（1,274 人）✅</td></tr>
+        <tr><td>本站實測值域</td><td>0–251，落在 0–255 之內 ✅</td></tr>
+      </tbody>
+    </table></div>
+    <p>所以要改薪水，<strong>直接改這一欄的值</strong>，每 +1 就是 +33 點。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">但「一點等於多少錢」只有一句話撐著 <span class="badge wip">推論</span></p>
+    <p>同一份說明書只舉了一個例子：<u>「想讓某人兩年拿 $1,000,000，那就是每年 166 點」</u>。
+       照這句反推，<strong>一點大約 $3,000</strong>（100 點 = $300,000，
+       正好是那個年代大聯盟的最低年薪）。</p>
+    <p>本站採這個讀法，理由是<strong>另一種讀法會推出不可能的數字</strong>：
+       如果「$1,000,000」是指每年而不是兩年合計，一點就變成 $6,024，
+       上限 8515 點會變成 <u>年薪 $5,100 萬</u> —— 那個年代沒有這種合約。</p>
+    <p>拿剛安裝好的原版名單套進去（1 點 = $3,000）：</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>球員</th><th class="num">欄位值</th><th class="num">點數</th><th class="num">推算年薪</th></tr></thead>
+      <tbody>
+        <tr><td>Alex Rodriguez</td><td class="num">251</td><td class="num">8,383</td><td class="num">$25,149,000</td></tr>
+        <tr><td>Manny Ramirez</td><td class="num">199</td><td class="num">6,667</td><td class="num">$20,001,000</td></tr>
+        <tr><td>Derek Jeter</td><td class="num">188</td><td class="num">6,304</td><td class="num">$18,912,000</td></tr>
+        <tr class="hi"><td><a href="../story/stance-choices/index.html#anomaly">Jon Dowd</a></td><td class="num">179</td><td class="num">6,007</td><td class="num">$18,021,000</td></tr>
+        <tr><td>Randy Johnson</td><td class="num">159</td><td class="num">5,347</td><td class="num">$16,041,000</td></tr>
+        <tr><td colspan="4" class="small">最多人用的欄位值 2（1,274 人）換算是 $498,000。
+            表中第五列的 Randy Johnson（159）在這份名單裡是<u>並列第 9</u>、不是第 5 ——
+            中間還有 170（一人）與 169（三人並列）。</td></tr>
+      </tbody>
+    </table></div>
+    <p>名次與量級都對得上那個年代。第四名那位是本站另外寫過的
+       <a href="../story/stance-choices/index.html#anomaly">一個對不上任何東西的異常值</a> ——
+       <u>本站沒有主張他是誰的替身</u>，那一頁把證據攤開讓你自己判斷。</p>
+    <p>不管怎樣，幣值這一段仍然是<strong>推論</strong>：
+       直接證據只有說明書那一句話，本站沒有第二個獨立來源。
+       要改薪水的話，<u>改欄位值就好，不必先決定一點等於多少錢</u>。</p>
+    <p class="small">⚠️ 本站試過做一個不依賴外部資料的檢定
+       （「算出來的錢應該貼著整數合約金額」），<strong>結果證明那個檢定沒有用</strong>：
+       薪水欄的間隔固定是 33 點，換算後永遠等距，
+       離整數格線的距離不管乘數是多少都差不多 ——
+       $3,000 得 0.261，隨機亂數的中位數是 0.254。
+       <u>一個在答案為真時也不會亮的指標，測出來的 0 是它自己的性質，不是資料的性質。</u>
+       這條教訓本站今天記了三次。</p>
+    <p class="small">順帶一個量到的小東西：球團資料檔 <code>org.dat</code> 的
+       <code>org_budget</code> 欄，<strong>34 個球團裡有 30 個是同一個值、剩下 4 個是 0</strong>。
+       那個「同一個值」在剛安裝好的原版是 <strong>100000</strong>，
+       <u>本站測試機那一份是 65535</u>（兩份都是 30 ＋ 4 的分布）。
+       看起來是統一的起始值，遊戲進行中才會變。
+       <span class="badge wip">未實機驗證</span></p>
+  </div>
+
+  <h2><code>attrib.dat</code> —— 46 欄</h2>
+  <p>「種類」欄的判準：值域小、選項少的算<strong>選單型</strong>（存的是代號），
+     其餘算<strong>數值型</strong>。代號的意思見<a href="player-codes.html">代號對照表</a>。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">#</th><th class="mono">欄位名</th><th>是什麼</th>
+      <th class="num">實測值域</th><th class="num">幾種值</th></tr></thead>
+    <tbody>
+      <tr><td data-label="#" class="num">0</td><td data-label="欄位名" class="mono">first_name</td><td data-label="是什麼">名</td><td data-label="實測值域">文字</td><td data-label="幾種值" class="num">1,094</td></tr>
+      <tr><td data-label="#" class="num">1</td><td data-label="欄位名" class="mono">last_name</td><td data-label="是什麼">姓</td><td data-label="實測值域">文字</td><td data-label="幾種值" class="num">2,249</td></tr>
+      <tr><td data-label="#" class="num">2</td><td data-label="欄位名" class="mono">jerseynum</td><td data-label="是什麼">背號</td><td data-label="實測值域" class="num">0–99</td><td data-label="幾種值" class="num">99</td></tr>
+      <tr><td data-label="#" class="num">3</td><td data-label="欄位名" class="mono">bats</td><td data-label="是什麼">打擊左右</td><td data-label="實測值域" class="num">0–2</td><td data-label="幾種值" class="num">3</td></tr>
+      <tr><td data-label="#" class="num">4</td><td data-label="欄位名" class="mono">throws</td><td data-label="是什麼">投球左右</td><td data-label="實測值域" class="num">0–1</td><td data-label="幾種值" class="num">2</td></tr>
+      <tr class="hi"><td data-label="#" class="num">5</td><td data-label="欄位名" class="mono">primary_position</td><td data-label="是什麼">主守位</td><td data-label="實測值域" class="num">0–10</td><td data-label="幾種值" class="num">10</td></tr>
+      <tr><td data-label="#" class="num">6</td><td data-label="欄位名" class="mono">secondary_position</td><td data-label="是什麼">副守位</td><td data-label="實測值域" class="num">0–13</td><td data-label="幾種值" class="num">14</td></tr>
+      <tr class="hi"><td data-label="#" class="num">7</td><td data-label="欄位名" class="mono">height</td><td data-label="是什麼"><strong>身高</strong>（+48 = 英吋）</td><td data-label="實測值域" class="num">0–35</td><td data-label="幾種值" class="num">18</td></tr>
+      <tr><td data-label="#" class="num">8</td><td data-label="欄位名" class="mono">weight</td><td data-label="是什麼">體重</td><td data-label="實測值域" class="num">0–190</td><td data-label="幾種值" class="num">117</td></tr>
+      <tr><td data-label="#" class="num">9</td><td data-label="欄位名" class="mono">boneprofile</td><td data-label="是什麼">骨架</td><td data-label="實測值域" class="num">0–36</td><td data-label="幾種值" class="num">13</td></tr>
+      <tr class="hi"><td data-label="#" class="num">10</td><td data-label="欄位名" class="mono">face</td><td data-label="是什麼"><a href="player-numbers.html">臉皮號碼</a></td><td data-label="實測值域" class="num">0–915</td><td data-label="幾種值" class="num">715</td></tr>
+      <tr><td data-label="#" class="num">11</td><td data-label="欄位名" class="mono">face2004style</td><td data-label="是什麼">用 2004 年的臉</td><td data-label="實測值域" class="num">0–1</td><td data-label="幾種值" class="num">2</td></tr>
+      <tr><td data-label="#" class="num">12</td><td data-label="欄位名" class="mono">hairstyle</td><td data-label="是什麼">髮型</td><td data-label="實測值域" class="num">0–9</td><td data-label="幾種值" class="num">10</td></tr>
+      <tr><td data-label="#" class="num">13</td><td data-label="欄位名" class="mono">haircolour</td><td data-label="是什麼">髮色</td><td data-label="實測值域" class="num">0–5</td><td data-label="幾種值" class="num">6</td></tr>
+      <tr><td data-label="#" class="num">14</td><td data-label="欄位名" class="mono">facialhair</td><td data-label="是什麼">鬍子</td><td data-label="實測值域" class="num">0–7</td><td data-label="幾種值" class="num">8</td></tr>
+      <tr><td data-label="#" class="num">15</td><td data-label="欄位名" class="mono">bodytype</td><td data-label="是什麼">體型</td><td data-label="實測值域" class="num">0–2</td><td data-label="幾種值" class="num">3</td></tr>
+      <tr class="hi"><td data-label="#" class="num">16</td><td data-label="欄位名" class="mono">audioid</td><td data-label="是什麼"><a href="player-voice.html">本人號碼</a>（大頭照＋語音）</td>
+          <td data-label="實測值域" class="num">0–25028</td><td data-label="幾種值" class="num">1,836</td></tr>
+      <tr><td data-label="#" class="num">17</td><td data-label="欄位名" class="mono">photo</td><td data-label="是什麼">開關，<strong>不是編號</strong></td><td data-label="實測值域" class="num">0–2</td><td data-label="幾種值" class="num">3</td></tr>
+      <tr><td data-label="#" class="num">18</td><td data-label="欄位名" class="mono">platediscipline</td><td data-label="是什麼">選球</td><td data-label="實測值域" class="num">0–13</td><td data-label="幾種值" class="num">14</td></tr>
+      <tr><td data-label="#" class="num">19</td><td data-label="欄位名" class="mono">bunting</td><td data-label="是什麼">短打</td><td data-label="實測值域" class="num">0–15</td><td data-label="幾種值" class="num">16</td></tr>
+      <tr><td data-label="#" class="num">20</td><td data-label="欄位名" class="mono">stealing_aggressive</td><td data-label="是什麼">盜壘積極度</td><td data-label="實測值域" class="num">0–15</td><td data-label="幾種值" class="num">16</td></tr>
+      <tr><td data-label="#" class="num">21</td><td data-label="欄位名" class="mono">baserunning</td><td data-label="是什麼">跑壘</td><td data-label="實測值域" class="num">0–13</td><td data-label="幾種值" class="num">14</td></tr>
+      <tr class="hi"><td data-label="#" class="num">22</td><td data-label="欄位名" class="mono">speed</td><td data-label="是什麼"><strong>速度</strong>（<a href="../tutorials/edit-speed/index.html">有教學</a>）</td>
+          <td data-label="實測值域" class="num">0–97</td><td data-label="幾種值" class="num">88</td></tr>
+      <tr><td data-label="#" class="num">23</td><td data-label="欄位名" class="mono">fielding</td><td data-label="是什麼">守備</td><td data-label="實測值域" class="num">0–50</td><td data-label="幾種值" class="num">17</td></tr>
+      <tr><td data-label="#" class="num">24</td><td data-label="欄位名" class="mono">range</td><td data-label="是什麼">守備範圍</td><td data-label="實測值域" class="num">0–13</td><td data-label="幾種值" class="num">14</td></tr>
+      <tr><td data-label="#" class="num">25</td><td data-label="欄位名" class="mono">throwstrength</td><td data-label="是什麼">臂力</td><td data-label="實測值域" class="num">0–15</td><td data-label="幾種值" class="num">15</td></tr>
+      <tr><td data-label="#" class="num">26</td><td data-label="欄位名" class="mono">throwaccuracy</td><td data-label="是什麼">傳球準度</td><td data-label="實測值域" class="num">0–14</td><td data-label="幾種值" class="num">13</td></tr>
+      <tr><td data-label="#" class="num">27</td><td data-label="欄位名" class="mono">durability</td><td data-label="是什麼">耐用度</td><td data-label="實測值域" class="num">0–15</td><td data-label="幾種值" class="num">14</td></tr>
+      <tr><td data-label="#" class="num">28</td><td data-label="欄位名" class="mono">battingstance</td><td data-label="是什麼">打擊姿勢</td><td data-label="實測值域" class="num">0–65</td><td data-label="幾種值" class="num">62</td></tr>
+      <tr><td data-label="#" class="num">29</td><td data-label="欄位名" class="mono">swingtype</td><td data-label="是什麼">揮棒類型</td><td data-label="實測值域" class="num">0–1</td><td data-label="幾種值" class="num">2</td></tr>
+      <tr><td data-label="#" class="num">30</td><td data-label="欄位名" class="mono">batcolour</td><td data-label="是什麼">球棒顏色</td><td data-label="實測值域" class="num">0–7</td><td data-label="幾種值" class="num">8</td></tr>
+      <tr><td data-label="#" class="num">31</td><td data-label="欄位名" class="mono">batglove</td><td data-label="是什麼">打擊手套</td><td data-label="實測值域" class="num">0–1</td><td data-label="幾種值" class="num">2</td></tr>
+      <tr><td data-label="#" class="num">32</td><td data-label="欄位名" class="mono">wristband</td><td data-label="是什麼">護腕</td><td data-label="實測值域" class="num">0–6</td><td data-label="幾種值" class="num">7</td></tr>
+      <tr><td data-label="#" class="num">33</td><td data-label="欄位名" class="mono">elbowguard</td><td data-label="是什麼">護肘</td><td data-label="實測值域" class="num">0–3</td><td data-label="幾種值" class="num">4</td></tr>
+      <tr><td data-label="#" class="num">34</td><td data-label="欄位名" class="mono">shinguard</td><td data-label="是什麼">護脛</td><td data-label="實測值域" class="num">0–2</td><td data-label="幾種值" class="num">3</td></tr>
+      <tr><td data-label="#" class="num">35</td><td data-label="欄位名" class="mono">socks</td><td data-label="是什麼">襪子</td><td data-label="實測值域" class="num">0–2</td><td data-label="幾種值" class="num">3</td></tr>
+      <tr><td data-label="#" class="num">36</td><td data-label="欄位名" class="mono">catchermask</td><td data-label="是什麼">捕手面罩</td><td data-label="實測值域" class="num">0–1</td><td data-label="幾種值" class="num">2</td></tr>
+      <tr><td data-label="#" class="num">37</td><td data-label="欄位名" class="mono">fieldglovecolour</td><td data-label="是什麼">手套顏色</td><td data-label="實測值域" class="num">0–6</td><td data-label="幾種值" class="num">7</td></tr>
+      <tr><td data-label="#" class="num">38</td><td data-label="欄位名" class="mono">skin_tone</td><td data-label="是什麼">膚色</td><td data-label="實測值域" class="num">0–15</td><td data-label="幾種值" class="num">16</td></tr>
+      <tr><td data-label="#" class="num">39</td><td data-label="欄位名" class="mono">ditty</td><td data-label="是什麼"><a href="player-codes.html#ditty">出場音樂曲風</a></td><td data-label="實測值域" class="num">0–6</td><td data-label="幾種值" class="num">7</td></tr>
+      <tr><td data-label="#" class="num">40</td><td data-label="欄位名" class="mono">salary</td><td data-label="是什麼">薪資</td><td data-label="實測值域" class="num">0–255</td><td data-label="幾種值" class="num">149</td></tr>
+      <tr><td data-label="#" class="num">41</td><td data-label="欄位名" class="mono">contract_length</td><td data-label="是什麼">合約年限</td><td data-label="實測值域" class="num">0–7</td><td data-label="幾種值" class="num">8</td></tr>
+      <tr><td data-label="#" class="num">42</td><td data-label="欄位名" class="mono">starpower</td><td data-label="是什麼">明星等級</td><td data-label="實測值域" class="num">0–4</td><td data-label="幾種值" class="num">5</td></tr>
+      <tr><td data-label="#" class="num">43</td><td data-label="欄位名" class="mono">topprospect</td><td data-label="是什麼">潛力新秀</td><td data-label="實測值域" class="num">0–1</td><td data-label="幾種值" class="num">2</td></tr>
+      <tr><td data-label="#" class="num">44</td><td data-label="欄位名" class="mono">hidden</td><td data-label="是什麼">隱藏</td><td data-label="實測值域" class="num">0–1</td><td data-label="幾種值" class="num">2</td></tr>
+      <tr class="hi"><td data-label="#" class="num">45</td><td data-label="欄位名" class="mono">birthday</td><td data-label="是什麼"><strong>生日</strong>（1947-12-31 起算的天數）</td>
+          <td data-label="實測值域" class="num">0–20543</td><td data-label="幾種值" class="num">2,285</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">欄位名在檔案裡都帶 <code>playerattrib_</code> 前綴，上表為了好讀省略了。
+     ⚠️ <strong>上表的欄號與值域量自本站測試機那份名冊</strong>，剛安裝好的原版兩者都不一樣 ——
+     欄號見下面<a href="#shift">欄號會整個位移</a>那一節，膚色值域見
+     <a href="player-codes.html">代號對照表</a>（原版只有 0–10）。</p>
+
+  <h2><code>pitcher.dat</code> —— 29 欄</h2>
+  <p>這個檔的結構<strong>自己會驗算</strong>：</p>
+<pre><code>2(姓名) + 1(續航力) + 1(牽制) + 4(快速球) + 20(第 2~5 球各 5 欄) + 1(投球姿勢) = 29</code></pre>
+  <div class="card blue">
+    <p class="card-h">快速球只有 4 欄，其他球種都是 5 欄</p>
+    <p><strong>「變化軌跡」那一欄的 8 個值是<u>方向</u>，這一半本站量到了</strong> ——
+       它存的是球往哪個方向跑，而且<u>左投右投互為鏡像</u>
+       （右投的滑球填 6、左投填 2，填錯邊球會朝反方向跑）。
+       至於<u>這八個值各自叫什麼名字、對到鐘面第幾點</u>，那一半是社群檔案說的，本站佐證不了。
+       完整推導、窮舉對照組與強度分界見<a href="player-codes.html#trajectory">代號對照表</a>。</p>
+    <p>第 2 到第 5 球每一球都有<u>球種、尾勁、變化軌跡、控球、球速</u>五欄。
+       快速球<strong>少了「球種」那一欄</strong> —— 因為<u>第一球就是快速球，不需要再記型別</u>。</p>
+    <p>這就是為什麼總數是 29 不是 30。</p>
+  </div>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">#</th><th class="mono">欄位名</th><th>是什麼</th><th class="num">實測值域</th><th class="num">沒有這一球的</th></tr></thead>
+    <tbody>
+      <tr><td data-label="#" class="num">0–1</td><td data-label="欄位名" class="mono">first_name / last_name</td><td data-label="是什麼">姓名</td><td data-label="實測值域">文字</td><td data-label="沒有這一球的" class="num">—</td></tr>
+      <tr class="hi"><td data-label="#" class="num">2</td><td data-label="欄位名" class="mono">stamina</td><td data-label="是什麼"><strong>續航力</strong></td><td data-label="實測值域" class="num">0–92</td><td data-label="沒有這一球的" class="num">—</td></tr>
+      <tr><td data-label="#" class="num">3</td><td data-label="欄位名" class="mono">pickoff</td><td data-label="是什麼">牽制</td><td data-label="實測值域" class="num">0–36</td><td data-label="沒有這一球的" class="num">—</td></tr>
+      <tr><td data-label="#" class="num">4–7</td><td data-label="欄位名" class="mono">fastball_*</td><td data-label="是什麼"><strong>快速球</strong>（尾勁／變化軌跡／控球／球速）</td>
+          <td data-label="實測值域" class="num">0–100</td><td data-label="沒有這一球的" class="num"><strong>0</strong></td></tr>
+      <tr><td data-label="#" class="num">8–12</td><td data-label="欄位名" class="mono">pitch2_*</td><td data-label="是什麼">第二球（含球種）</td><td data-label="實測值域" class="num">0–100</td><td data-label="沒有這一球的" class="num">19</td></tr>
+      <tr><td data-label="#" class="num">13–17</td><td data-label="欄位名" class="mono">pitch3_*</td><td data-label="是什麼">第三球</td><td data-label="實測值域" class="num">0–100</td><td data-label="沒有這一球的" class="num">101</td></tr>
+      <tr><td data-label="#" class="num">18–22</td><td data-label="欄位名" class="mono">pitch4_*</td><td data-label="是什麼">第四球</td><td data-label="實測值域" class="num">0–100</td><td data-label="沒有這一球的" class="num">674</td></tr>
+      <tr class="hi"><td data-label="#" class="num">23–27</td><td data-label="欄位名" class="mono">pitch5_*</td><td data-label="是什麼">第五球</td><td data-label="實測值域" class="num">1–98</td><td data-label="沒有這一球的" class="num"><strong>1,348</strong></td></tr>
+      <tr><td data-label="#" class="num">28</td><td data-label="欄位名" class="mono">pitcher_delivery</td><td data-label="是什麼">投球姿勢</td><td data-label="實測值域" class="num">0–58</td><td data-label="沒有這一球的" class="num">—</td></tr>
+    </tbody>
+  </table></div>
+  <p>「沒有這一球」那一欄，檔案裡填的是 <code>-</code> 這個符號。
+     <strong>快速球那四欄一次都沒有出現過 <code>-</code></strong> ——
+     每個投手至少有一種球路。</p>
+  <p class="small">上表的人數<u>已經扣掉那 25 列空白名單空位</u>
+     （它們四個球種群組全部是 <code>-</code>）。不扣的話數字會多出 25 到 44。</p>
+
+  <h2 id="shift">⚠️ 最重要的一節：欄號在不同名冊之間會整個位移</h2>
+  <p>上面那張 46 欄的表，是<u>本站測試機</u>的順序 —— 也就是<strong>社群名冊</strong>那一種
+     （<code>skin_tone</code> 在第 38 欄）。
+     <strong>剛安裝好的原版順序不一樣。</strong></p>
+  <p>本站拿一份 2009 年的社群名冊跟原版逐欄比對，兩邊<u>都是 46 欄、欄位名一個不多一個不少</u>，
+     可是：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>比對結果</th><th class="num">欄數</th></tr></thead>
+    <tbody>
+      <tr><td>同編號、同意義</td><td class="num">19</td></tr>
+      <tr class="hi"><td><strong>同編號、不同意義</strong></td><td class="num"><strong>27</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>46 欄裡有 27 欄對不上。</strong>原因只有一個：
+     <code>skin_tone</code> 這一欄<u>從第 12 位搬到了第 38 位</u>，
+     中間所有欄位跟著往前移一格。</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">編號</th><th class="mono">原版</th><th class="mono">2009 年那份名冊</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="編號" class="num">12</td><td data-label="原版" class="mono">skin_tone</td><td data-label="2009 年那份名冊" class="mono">hairstyle</td></tr>
+      <tr><td data-label="編號" class="num">13</td><td data-label="原版" class="mono">hairstyle</td><td data-label="2009 年那份名冊" class="mono">haircolour</td></tr>
+      <tr><td data-label="編號" class="num">14</td><td data-label="原版" class="mono">haircolour</td><td data-label="2009 年那份名冊" class="mono">facialhair</td></tr>
+      <tr><td data-label="編號" class="num">15</td><td data-label="原版" class="mono">facialhair</td><td data-label="2009 年那份名冊" class="mono">bodytype</td></tr>
+      <tr><td data-label="編號" class="num">16</td><td data-label="原版" class="mono">bodytype</td><td data-label="2009 年那份名冊" class="mono">audioid</td></tr>
+      <tr><td data-label="編號" class="num">17</td><td data-label="原版" class="mono">audioid</td><td data-label="2009 年那份名冊" class="mono">photo</td></tr>
+      <tr><td data-label="編號" class="num">18</td><td data-label="原版" class="mono">photo</td><td data-label="2009 年那份名冊" class="mono">platediscipline</td></tr>
+      <tr><td data-label="編號" class="num">19</td><td data-label="原版" class="mono">platediscipline</td><td data-label="2009 年那份名冊" class="mono">bunting</td></tr>
+      <tr><td data-label="編號" class="num">20</td><td data-label="原版" class="mono">bunting</td><td data-label="2009 年那份名冊" class="mono">stealing_aggressive</td></tr>
+      <tr><td data-label="編號" class="num">21</td><td data-label="原版" class="mono">stealing_aggressive</td><td data-label="2009 年那份名冊" class="mono">baserunning</td></tr>
+      <tr><td data-label="編號" class="num">22</td><td data-label="原版" class="mono">baserunning</td><td data-label="2009 年那份名冊" class="mono">speed</td></tr>
+      <tr><td data-label="編號" class="num">23</td><td data-label="原版" class="mono">speed</td><td data-label="2009 年那份名冊" class="mono">fielding</td></tr>
+      <tr><td data-label="編號" class="num">24</td><td data-label="原版" class="mono">fielding</td><td data-label="2009 年那份名冊" class="mono">range</td></tr>
+      <tr><td data-label="編號" class="num">25</td><td data-label="原版" class="mono">range</td><td data-label="2009 年那份名冊" class="mono">throwstrength</td></tr>
+      <tr><td data-label="編號" class="num">26</td><td data-label="原版" class="mono">throwstrength</td><td data-label="2009 年那份名冊" class="mono">throwaccuracy</td></tr>
+      <tr><td data-label="編號" class="num">27</td><td data-label="原版" class="mono">throwaccuracy</td><td data-label="2009 年那份名冊" class="mono">durability</td></tr>
+      <tr><td data-label="編號" class="num">28</td><td data-label="原版" class="mono">durability</td><td data-label="2009 年那份名冊" class="mono">battingstance</td></tr>
+      <tr class="hi"><td data-label="編號" class="num">29</td><td data-label="原版" class="mono">battingstance</td><td data-label="2009 年那份名冊" class="mono">swingtype</td></tr>
+      <tr class="hi"><td data-label="編號" class="num">30</td><td data-label="原版" class="mono">swingtype</td><td data-label="2009 年那份名冊" class="mono">batcolour</td></tr>
+      <tr><td data-label="編號" class="num">31</td><td data-label="原版" class="mono">batcolour</td><td data-label="2009 年那份名冊" class="mono">batglove</td></tr>
+      <tr><td data-label="編號" class="num">32</td><td data-label="原版" class="mono">batglove</td><td data-label="2009 年那份名冊" class="mono">wristband</td></tr>
+      <tr><td data-label="編號" class="num">33</td><td data-label="原版" class="mono">wristband</td><td data-label="2009 年那份名冊" class="mono">elbowguard</td></tr>
+      <tr><td data-label="編號" class="num">34</td><td data-label="原版" class="mono">elbowguard</td><td data-label="2009 年那份名冊" class="mono">shinguard</td></tr>
+      <tr><td data-label="編號" class="num">35</td><td data-label="原版" class="mono">shinguard</td><td data-label="2009 年那份名冊" class="mono">socks</td></tr>
+      <tr><td data-label="編號" class="num">36</td><td data-label="原版" class="mono">socks</td><td data-label="2009 年那份名冊" class="mono">catchermask</td></tr>
+      <tr><td data-label="編號" class="num">37</td><td data-label="原版" class="mono">catchermask</td><td data-label="2009 年那份名冊" class="mono">fieldglovecolour</td></tr>
+      <tr><td data-label="編號" class="num">38</td><td data-label="原版" class="mono">fieldglovecolour</td><td data-label="2009 年那份名冊" class="mono">skin_tone</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">前綴 <code>playerattrib_</code> 已省略。編號 0–11 與 39–45 兩邊一樣。</p>
+
+  <div class="card clay">
+    <p class="card-h">這會怎麼咬你</p>
+    <p>看那三個標色的：<strong>原版的第 29 欄是打擊姿勢，
+       2009 那份名冊的第 29 欄是揮棒型態。</strong></p>
+    <p>如果你照著本站這張表去改「第 29 欄」，而你的遊戲裝的是模組名冊，
+       你改到的是<u>另一個欄位</u>。
+       <strong>不會報錯、不會壞檔</strong> —— 只是那個球員的揮棒型態變成一個
+       打擊姿勢的編號，而打擊姿勢完全沒動。</p>
+    <p><strong>正確做法只有一個：讀那個檔自己的第一行。</strong>
+       每一個 <code>.dat</code> 的第一行就是它自己的欄位名清單，
+       <u>那才是你手上這一份的真相</u>。</p>
+<pre><code>python -c "print(open(r'你的遊戲資料夾\data\database\attrib.dat').readline())"</code></pre>
+    <p class="small">本站的<a href="../tutorials/edit-stance/index.html">換姿勢腳本</a>
+       就是這樣做的 —— 它<u>不記欄號</u>，每次都從表頭找欄位名。
+       本站在寫這一節的時候自己踩過一次：拿原版的欄號去讀模組名冊，
+       得到一整排 0，差點以為站上寫錯了。</p>
+  </div>
+
+  <h2>改之前要知道的事</h2>
+  <div class="card clay">
+    <p class="card-h">本站教改的欄位就那幾個，這是有理由的</p>
+    <p><a href="../tutorials/edit-speed/index.html">改球員速度</a>那一課只教
+       <code>speed</code> 這一欄 —— 它<strong>看得出範圍、改了效果直接，
+       而且是本站唯一實際改過、進遊戲確認過的能力欄位</strong>。
+       投手的 <code>fastball_control</code> 與其他幾個 <code>control</code>
+       在統計上是同一個形狀、<u>很可能也可以改，但本站未實機驗證</u>，
+       所以那一課的腳本連寫都不讓你寫。</p>
+    <p>另外<a href="../tutorials/stats-to-ratings/index.html">成績換算成能力值</a>那一課
+       會寫 <code>rhattrib.dat</code>／<code>lhattrib.dat</code> 的
+       <code>lrattrib_power</code> 與 <code>pitcher.dat</code> 的
+       <code>pitchattrib_stamina</code>（寫完自己讀回來逐項比對，
+       但<u>那一課也沒有實機確認改完在遊戲裡的手感</u>）。
+       除了這幾欄，其他欄位本站<u>沒有一欄一欄實測過改動的後果</u>。</p>
+    <p><span class="badge wip">未驗</span>
+       特別是 <code>face</code>、<code>audioid</code> 這種<strong>指向別的檔案</strong>的欄位 ——
+       改壞了不會當場報錯，是進遊戲才發現不對。</p>
+  </div>
+
+  <h2>怎麼自己產一份</h2>
+  <p>這張表不需要本站的工具。用記事本打開 <code>data\database\attrib.dat</code>，
+     <strong>第一行就是完整欄位表</strong>：</p>
+<pre><code>0 first_name,1 last_name,2 playerattrib_jerseynum,3 playerattrib_bats,...</code></pre>
+  <p>每一格資料也都帶著自己的欄位編號當前綴，所以<u>欄位順序可以打亂，遊戲照樣讀得懂</u> ——
+     <strong>在同一個檔裡</strong>，算數的是格子上寫的那個編號，不是它排第幾格。
+     但編號本身沒有固定的意義：<u>哪個編號是哪個欄位，由第一行的表頭決定</u>，
+     所以跨名冊要看的是<strong>名字</strong>
+     （見<a href="team-limit.html">球隊數量上限</a>那頁「遊戲是照名字認欄位的」，
+     以及本頁<a href="#shift">欄號會整個位移</a>那一節）。
+     詳見<a href="player-data.html">球員資料檔的真相</a>。</p>
+
+  <div class="card amber" id="col-shift">
+    <p class="card-h">⚠️ 欄位「編號」會因名冊而異，不要照抄別人寫的欄號</p>
+    <p>既然順序可以打亂，那不同名冊就真的會不一樣。實測本站測試機與剛安裝好的原版：
+       <strong>46 個欄位裡有 27 個編號不同。</strong></p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>欄位名</th><th class="num">本站測試機</th><th class="num">剛安裝好的原版</th></tr></thead>
+      <tbody>
+        <tr><td data-label="欄位名" class="mono">playerattrib_speed</td><td data-label="本站測試機" class="num">22</td><td data-label="剛安裝好的原版" class="num">23</td></tr>
+        <tr><td data-label="欄位名" class="mono">playerattrib_audioid</td><td data-label="本站測試機" class="num">16</td><td data-label="剛安裝好的原版" class="num">17</td></tr>
+        <tr><td data-label="欄位名" class="mono">playerattrib_photo</td><td data-label="本站測試機" class="num">17</td><td data-label="剛安裝好的原版" class="num">18</td></tr>
+        <tr><td data-label="欄位名" class="mono">playerattrib_battingstance</td><td data-label="本站測試機" class="num">28</td><td data-label="剛安裝好的原版" class="num">29</td></tr>
+        <tr class="hi"><td data-label="欄位名" class="mono">playerattrib_skin_tone</td><td data-label="本站測試機" class="num">38</td><td data-label="剛安裝好的原版" class="num">12</td></tr>
+      </tbody>
+    </table></div>
+    <p>根源就是最後那一列：原版把 <code>skin_tone</code> 排在第 12 欄，
+       這台的名冊把它移到第 38 欄，<strong>12 之後的每一欄都往前挪了一格</strong>。</p>
+    <p><strong>所以：認名字，不要認編號。</strong>
+       站上多數頁面寫的欄號是本站測試機的值，但速查頁的
+       <a href="database.html#allfields">全部 18 個檔的完整欄位表</a>那一份
+       <code>attrib.dat</code> 列的是<u>剛安裝好的原版</u>順序（兩者有 27 格不同）——
+       所以連站上的欄號都不要照抄，你打開自己的 <code>attrib.dat</code> 第一行，自己數一次才準。
+       本站的腳本從 2026-08-25 起全部改成執行時從表頭解析，不再寫死編號。</p>
+  </div>
+
+  <h2 id="invariants">兩條可以拿來自動檢查的規則</h2>
+  <p>改球員能力的時候，有兩條規則值得寫進腳本 —— 它們在剛安裝好的原版裡<strong>零例外</strong>。</p>
+
+  <div class="card grass">
+    <p class="card-h">1 · 兩組百分比各自加起來一定是 100</p>
+    <p><code>lhattrib.dat</code> 與 <code>rhattrib.dat</code>（面對左投／右投的打擊資料）
+       各有兩組百分比欄位：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>那一組</th><th>欄位</th><th>意思</th></tr></thead>
+      <tbody>
+        <tr><td data-label="那一組">擊球落點</td><td data-label="欄位" class="mono">lf_pct + cf_pct + rf_pct</td><td data-label="意思">左外野／中外野／右外野的比例</td></tr>
+        <tr><td data-label="那一組">擊球型態</td><td data-label="欄位" class="mono">hr_pct + fb_pct + ld_pct + gb_pct</td><td data-label="意思">全壘打／高飛／平飛／滾地的比例</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>剛安裝好的原版：兩個檔各 2,921 列，兩組總和全部剛好 100，一個例外都沒有。</strong></p>
+    <p><strong>所以改一格就要把同組其他格補回來</strong> ——
+       把某人的右外野比例調高，左外野或中外野就得降下來。</p>
+
+    <p class="card-h" style="margin-top:12px">但遊戲不會擋你</p>
+    <p>拿社群名冊量同一件事，結果差很多：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>名冊</th><th class="num">列數</th><th class="num">落點三欄 = 100</th><th class="num">擊球四欄 = 100</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="名冊">剛安裝好的原版</td><td data-label="列數" class="num">2,921</td><td data-label="落點三欄 = 100" class="num"><strong>100.0%</strong></td><td data-label="擊球四欄 = 100" class="num"><strong>100.0%</strong></td></tr>
+        <tr><td data-label="名冊">一份亞洲球員名冊</td><td data-label="列數" class="num">3,224</td><td data-label="落點三欄 = 100" class="num">100.0%</td><td data-label="擊球四欄 = 100" class="num">97.1%</td></tr>
+        <tr><td data-label="名冊">一份台灣名冊</td><td data-label="列數" class="num">3,208</td><td data-label="落點三欄 = 100" class="num"><strong>89.0%</strong></td><td data-label="擊球四欄 = 100" class="num">96.6%</td></tr>
+        <tr><td data-label="名冊">本站測試機</td><td data-label="列數" class="num">3,247</td><td data-label="落點三欄 = 100" class="num">99.2%</td><td data-label="擊球四欄 = 100" class="num">94.3%</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>那些名冊照樣進得去遊戲。</strong>所以這是
+       <u>EA 自己的資料紀律，不是遊戲強制的規則</u>。
+       總和不是 100 會怎麼樣（比例被重新正規化？還是照數字用？），
+       <span class="badge wip">未解</span> 本站沒有驗過。</p>
+    <p class="small">但這條規則<strong>很適合當自動檢查</strong>：
+       你改完之後跑一次，總和不是 100 的那幾列，多半是打錯字或算錯。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">2 · <code>photo = 2</code> 的人，臉皮一定是通用臉</p>
+    <p>這是一條<strong>單向</strong>的規則：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>名冊</th><th class="num"><code>photo=2</code> 的人</th><th class="num">臉皮落在 901–915</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="名冊">剛安裝好的原版</td><td data-label="photo=2 的人" class="num">1,620</td><td data-label="臉皮落在 901–915" class="num"><strong>1,620（100%）</strong></td></tr>
+        <tr class="hi"><td data-label="名冊">本站測試機</td><td data-label="photo=2 的人" class="num">141</td><td data-label="臉皮落在 901–915" class="num"><strong>141（100%）</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>反過來不成立</strong>：原版 <code>photo=1</code> 的 1,301 人裡，
+       也有 <u>836 人（64.3%）</u>用 901–915 的通用臉。
+       所以「用通用臉」不代表 <code>photo</code> 是 2。</p>
+    <p><strong>做了專屬臉皮的人要注意</strong>：如果那位球員的 <code>photo</code> 是 2，
+       就算你把 <code>face</code> 改成自己的編號，也要一併確認 <code>photo</code>
+       ——見<a href="../tutorials/swap-face/index.html">換臉那一課</a>。</p>
+    <p class="small">兩份台灣名冊有意思的地方：它們<u>把所有人的 <code>photo</code> 都設成 1</u>，
+       整份名冊一個 2 都沒有。</p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> <code>attrib.dat</code> 46 欄、<code>pitcher.dat</code> 29 欄，<strong>格式不會變但欄號會變</strong>，所以永遠認欄位名，不要認欄號。</li>
+    <li><strong>最重要的一節</strong> 46 個欄位裡有 <strong>27 個</strong>在剛安裝好的原版與社群名冊之間位置不同，根源是 <code>skin_tone</code> 從第 12 欄搬到第 38 欄，中間每一欄跟著往前移一格。原版第 29 欄是打擊姿勢、2009 那份名冊第 29 欄是揮棒型態，照錯的欄號去改<strong>不會報錯也不會壞檔</strong>，只是你改到了另一個欄位。正解只有一個：讀那個檔自己的第一行。本站寫這一節時自己也踩過一次，拿原版欄號去讀模組名冊，得到一整排 0。</li>
+    <li><strong>兩個編碼很怪的欄位解開了</strong> 身高 ＝ 欄位值 <strong>＋ 48</strong> 英吋（五位球員差都是 48，值域 18–35 換算成 5 呎 6 吋到 6 呎 11 吋，再加一道旁證：分組平均體重從 19 到 31 完全單調遞增）；生日 ＝ <strong>1947-12-31 起算的天數</strong>（四位球員反推出同一天，值域 9,196–20,543 換算成 1973 年 3 月到 2004 年 3 月出生）。</li>
+    <li><strong>訂正了一個自己寫的「沒解開」</strong> 薪水點數的公式本站原本寫沒解開，理由是從遊戲自己的文字檔找不到乘數。那個判斷沒有錯，只是<strong>找錯了地方</strong>：答案在當年那批編輯器的說明書裡，<code>MVPedit</code> 直接寫著<strong>點數 ＝ 100 ＋ 33 × 這一欄的值</strong>。三件事互相對得上：上限 <code>100 + 255×33 = 8515</code> 剛好把一個位元組用滿、說明書舉例的 166 點對應欄位值 2、而 2 正是本站在剛安裝好的原版裡量到最多人用的值（1,274 人）。要改薪水就直接改這一欄，每 ＋1 就是 ＋33 點。</li>
+    <li><strong>算值域之前先扣掉 25 個空殼列</strong> 本站測試機的兩個資料檔各有 25 列姓名兩欄空白，除了 <code>hidden</code> ＝ 1 之外每一欄都是 0，那是留給「創造球員」的空位不是球員。不扣掉的話身高會變成 4 呎 0 吋、體重會變成 100 磅（<u>剛安裝好的原版沒有這種空殼列，不必扣</u>）。扣掉之後，身高 18–35（＋48）與體重 50–190（＋100）全部落在說明書宣告的 5'6"–7'0" 與 150–300 磅之內，<u>下限完全吻合，低於下限 0 人、高於上限 0 人</u>；上限那一端是編輯器允許你填到哪，原版實際上最高 6 呎 11 吋、最重 290 磅。</li>
+    <li><strong>兩條可以寫進腳本的自動檢查</strong> 擊球落點三欄與擊球型態四欄各自加起來要是 100，剛安裝好的原版 <code>lhattrib.dat</code> 與 <code>rhattrib.dat</code> 各 2,921 列 <strong>100% 成立</strong>；<code>photo</code> ＝ 2 的人臉皮一定落在 901–915（原版 1,620/1,620、測試機 141/141），但<u>反過來不成立</u>，原版 <code>photo</code> ＝ 1 的人也有 64.3% 在用通用臉。社群名冊不守第一條照樣進得去遊戲，所以那是 EA 自己的資料紀律，不是遊戲強制的規則。</li>
+    <li><strong><code>pitcher.dat</code> 自己會驗算</strong> 2（姓名）＋ 1（續航力）＋ 1（牽制）＋ 4（快速球）＋ 20（第 2 到第 5 球各 5 欄）＋ 1（投球姿勢）＝ 29。快速球少「球種」那一欄，因為第一球本來就是快速球；而且那四欄一次都沒出現過代表「沒有這一球」的 <code>-</code>，每個投手至少有一種球路。</li>
+    <li><strong>本站沒驗的</strong> 生日第五個樣本 Mike Trout 反推出 1948-01-31，差了一個月，四比一之下本站採 1947-12-31 但沒有再往下追；「一點等於多少錢」只有說明書那一句話撐著，是<u>推論</u>不是量測；<code>org.dat</code> 的 <code>org_budget</code> 34 個球團裡 30 個是同一個值、4 個是 0（原版那個值是 100000、本站測試機是 65535），未實機驗證；百分比總和不是 100 遊戲會怎麼處理沒有驗；本站<u>實際改過並進遊戲確認過</u>的能力欄位只有 <code>speed</code> 一欄（投手的 <code>control</code> 只是統計形狀相同，<u>沒有實機驗證</u>，<a href="../tutorials/edit-speed/index.html">改球員速度</a>那一課的腳本也不讓你寫）；<a href="../tutorials/stats-to-ratings/index.html">成績換算成能力值</a>那一課另外寫過 <code>lrattrib_power</code>（左右兩個檔）與 <code>pitchattrib_stamina</code>，寫完讀回來逐項比對，但同樣沒有實機確認手感。其他欄位<u>沒有一欄一欄實測過改動的後果</u>。另外附一條教訓：本站試過一個不依賴外部資料的幣值檢定，結果證明<strong>那個檢定沒有用</strong>，$3,000 得 0.261、隨機亂數中位數 0.254，<u>一個在答案為真時也不會亮的指標，測出來的 0 是它自己的性質</u>。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="player-data.html">球員資料檔的真相</a> —— 這個檔怎麼讀、改之前的紀律</li>
+    <li><a href="player-codes.html">球員代號對照表</a> —— 選單型欄位的數字是什麼意思</li>
+    <li><a href="player-numbers.html">兩套球員編號</a> —— <code>playerattrib_face</code> 與 <code>playerattrib_audioid</code></li>
+    <li><a href="../tutorials/edit-speed/index.html">實戰：改球員速度</a> —— 動手改 <code>playerattrib_speed</code></li>
+  </ul>
+
+  <footer>
+    <p>本頁的欄位數、值域、種類數、人數皆為現場打開 <code>data\database\attrib.dat</code> 與
+       <code>pitcher.dat</code> 量測所得。身高與生日的換算規則由公開已知資料的球員反推驗證，
+       文中已載明樣本與不合的那一筆。標示為「未解」「未驗」之處本站尚未確認。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/stadium.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>球場檔 stadium — toni的MVP模組補習班</title>
+<meta name="description" content="MVP Baseball 2005 的 87 個球場封裝檔：剛安裝好的英文原版是每個檔 88 項的固定編制、日夜版本的真實差異、以及動手前該知道的風險。所有數字現場量測。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 球場檔 stadium</p>
+  <h1>球場檔 stadium</h1>
+  <p class="lede">遊戲裡每一座球場都是一個獨立的 <code>.big</code> 封裝檔。
+     這一區是全遊戲<strong>結構最整齊的地方</strong> —— 整齊到 87 個檔案的內容編制
+     一模一樣，連順序都不差。看懂一個，就等於看懂全部。</p>
+
+  <h2>先看規模</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>項目</th><th class="num">數字</th><th>備註</th></tr></thead>
+    <tbody>
+      <tr><td data-label="項目">球場封裝檔</td><td data-label="數字" class="num">87 個</td><td data-label="備註">全在 <code>data/stadium/</code></td></tr>
+      <tr><td data-label="項目">合計大小</td><td data-label="數字" class="num">283.1 MB</td><td data-label="備註">單檔 2.6 MB ～ 4.0 MB</td></tr>
+      <tr class="hi"><td data-label="項目">每個檔的項目數</td><td data-label="數字" class="num">88 項</td><td data-label="備註"><strong>剛安裝好的英文原版 87 個檔全部都是 88</strong>；裝過球場模組的機器會有例外，見下</td></tr>
+      <tr><td data-label="項目">不重複的場地</td><td data-label="數字" class="num">58 座</td>
+          <td data-label="備註">54 座分日夜（共 83 檔）＋ 4 座巨蛋（各 1 檔）</td></tr>
+      <tr><td data-label="項目">已壓縮的項目</td><td data-label="數字" class="num">7,464 個</td><td data-label="備註">佔全部 7,656 項的 97.5%，都是 QFS</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">上面每個數字都是把<strong>剛安裝好的英文原版</strong>那一包 <code>data/stadium/</code>
+     底下的檔案現場打開數出來的，不是引用他人資料（那一包在<a href="how-we-measured.html">本站怎麼量的</a>
+     裡列的是 88 個檔、296,846,196 位元組 —— 88 是這 87 個 <code>.big</code> 再加上下面會講的 <code>lighting.csv</code>）。
+     <u>裝過球場模組的機器會是另一組數字</u>：本站測試機那一包（2023 年那份台灣模組）合計 647.6 MB、
+     單檔最大 15.14 MB、全部是 <strong>7,658 項</strong>而不是 7,656 ——
+     <code>propday.big</code> 與 <code>propnite.big</code> <strong>兩個</strong>檔是 89 項不是 88，
+     各多一個 <code>removable.o</code>；已壓縮的是 7,658 項裡的 7,390 項（96.5%），
+     見<a href="../tutorials/shrink-big/index.html">球場超過 10MB 就當機</a>那一課。
+     <strong>你照本頁的方法在自己那份台灣模組上數，數到 89 是正常的，不是你把檔案弄壞了。</strong></p>
+
+  <h2>檔名怎麼讀</h2>
+  <p>檔名是「<strong>四碼場地代號</strong>」加上「<strong><code>day</code> 或 <code>nite</code></strong>」：</p>
+<pre><code>anahday.big     <span class="cm">anah 這座球場的白天版</span>
+anahnite.big    <span class="cm">同一座球場的夜間版</span>
+astrdome.big    <span class="cm">沒有 day/nite ← 這是巨蛋</span></code></pre>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>類型</th><th class="num">檔數</th><th>說明</th></tr></thead>
+    <tbody>
+      <tr><td data-label="類型">白天版（<code>day</code>）</td><td data-label="檔數" class="num">44</td><td data-label="說明"></td></tr>
+      <tr><td data-label="類型">夜間版（<code>nite</code>）</td><td data-label="檔數" class="num">39</td><td data-label="說明"></td></tr>
+      <tr class="hi"><td data-label="類型">沒有日夜之分</td><td data-label="檔數" class="num">4</td>
+          <td data-label="說明"><code>astrdome</code>、<code>metrdome</code>、<code>olymdome</code>、<code>tropdome</code>
+              —— <strong>四個檔名裡都有 <code>dome</code></strong>（巨蛋）。
+              有屋頂的球場不分白天晚上，是合理的解釋，
+              但本站只確認了「這四個檔沒有日夜版本」這件事</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card amber">
+    <p class="card-h">不是每座球場都有兩個版本</p>
+    <p>54 個場地代號裡，<strong>只有 29 個同時有日、夜兩檔</strong>。
+       另外 15 個只有白天版、10 個只有夜間版。</p>
+    <p>只有夜間版的代號包含 <code>aa01</code>–<code>aa03</code>、<code>aaa1</code>–<code>aaa3</code>；
+       只有白天版的包含 <code>polo</code>、<code>forb</code>、<code>cros</code>、
+       <code>shib</code>、<code>grif</code>、<code>vete</code>。
+       <span class="badge wip">未確認</span> 這些四碼代號對應到哪一座真實球場，本站沒有查證。</p>
+    <p><strong>對你的意義</strong>：想在某座球場打夜間比賽卻發現沒得選，多半不是設定問題，
+       而是那座球場根本沒做夜間版的檔案。</p>
+  </div>
+
+  <h2>88 項，一項不多一項不少</h2>
+  <p>這是這一區最值得記住的事。我們把 87 個檔的目錄全部列出來，
+     再把「項目名稱的排列順序」拿去比對 ——</p>
+  <div class="card grass">
+    <p class="card-h">87 個檔，只產生 1 種目錄簽章</p>
+    <p>也就是說，<strong>87 個球場的 88 個項目，名稱一樣、順序也一樣</strong>。
+       EA 是照同一份模板把每座球場填進去的。</p>
+  </div>
+  <p>88 項的組成固定如下：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">副檔名</th><th class="num">每檔幾個</th><th>裝什麼</th><th>證據</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="副檔名" class="mono">.ord</td><td data-label="每檔幾個" class="num">31</td><td data-label="裝什麼">幾何模型資料</td>
+          <td data-label="證據"><span class="badge wip">部分實測</span> 與 <code>.orl</code> 同名成對，本站尚未逐欄解讀</td></tr>
+      <tr class="hi"><td data-label="副檔名" class="mono">.orl</td><td data-label="每檔幾個" class="num">31</td><td data-label="裝什麼"><code>.ord</code> 的配套資料</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 31 個名稱與 <code>.ord</code> 完全一一對應；<strong>合計</strong>只有 <code>.ord</code> 的一成（87 個檔加起來 5,553,379 對 57,784,675 位元組），但<u>逐項比不是每一對都比較小</u> —— 2,697 對裡有 1,383 對的 <code>.orl</code> 反而較大</td></tr>
+      <tr><td data-label="副檔名" class="mono">.fsh</td><td data-label="每檔幾個" class="num">16</td><td data-label="裝什麼">貼圖（草皮、紅土、看板、隊徽）</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 名稱直白：<code>clay</code>／<code>dert</code>／<code>brik</code>／<code>logo0-2</code></td></tr>
+      <tr><td data-label="副檔名" class="mono">.dat</td><td data-label="每檔幾個" class="num">4</td><td data-label="裝什麼"><code>wall</code>／<code>shadow</code>／<code>coll</code>／<code>crowd</code></td>
+          <td data-label="證據"><span class="badge ok">實測</span> 四個名稱固定，見下方陰影一節</td></tr>
+      <tr><td data-label="副檔名" class="mono">.ifo</td><td data-label="每檔幾個" class="num">3</td><td data-label="裝什麼"><code>stadium</code>／<code>remap</code>／<code>render</code></td>
+          <td data-label="證據"><span class="badge wip">未確認</span> 名稱看得出用途，內容未解讀</td></tr>
+      <tr><td data-label="副檔名" class="mono">.csv</td><td data-label="每檔幾個" class="num">3</td><td data-label="裝什麼"><code>tanim</code>／<code>ganim</code>／<code>flags</code></td>
+          <td data-label="證據"><span class="badge ok">實測</span> <strong>是純文字</strong>，<code>ganim.csv</code> 首行就是欄位名</td></tr>
+    </tbody>
+  </table></div>
+  <p>31 + 31 + 16 + 4 + 3 + 3 = <strong>88</strong>。</p>
+
+  <div class="card blue">
+    <p class="card-h">整齊有整齊的好處</p>
+    <p>因為編制固定，你可以拿任何一座球場當範本去理解另一座。
+       也代表<strong>寫工具時可以直接假設這 88 個名稱都存在</strong> ——
+       但還是建議檢查，因為那是「原廠 87 個檔如此」，不是格式規定如此。
+       別人改過的球場包不保證照規矩來。</p>
+  </div>
+
+  <h2>白天跟晚上，差的不只是燈</h2>
+  <p>直覺上「夜間版」聽起來像是同一座球場換個光源。實際比對 29 組日夜配對後
+     <strong>不是這樣</strong>：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>比對結果</th><th class="num">數字</th></tr></thead>
+    <tbody>
+      <tr><td>每組 88 項中，內容不同的項目數</td><td class="num">41 ～ 65 項</td></tr>
+      <tr><td>平均</td><td class="num">47.2 項</td></tr>
+      <tr class="hi"><td>29 組<strong>全部</strong>都完全相同的項目</td>
+          <td class="num">原版 <strong>9</strong> 項<br><span class="small">本站測試機 8 項（見下）</span></td></tr>
+      <tr class="hi"><td>29 組<strong>全部</strong>都不同的項目</td><td class="num">33 項</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>那些「日夜完全一樣」的項目很有意思，全部都是貼近地面、本身不帶光影的材質：</p>
+<pre><code>brik.fsh    clay.fsh    dert.fsh          <span class="cm">磚牆、紅土、泥土</span>
+logo0.fsh   logo1.fsh   logo2.fsh          <span class="cm">場地上的隊徽</span>
+useraligned.ord   useraligned.orl          <span class="cm">一組幾何資料</span>
+3dcrowd.ord                                <span class="cm">看台觀眾的幾何 ← 只有原版算得進來</span></code></pre>
+
+  <div class="card amber">
+    <p class="card-h">第 9 項那件事：一個位元組改掉了本站發布過的數字</p>
+    <p>這一格原本寫「只有 8 項」。<strong>那是本站測試機量出來的。
+       剛安裝好的英文原版是 9 項</strong>，多的那個是 <code>3dcrowd.ord</code>（看台觀眾的幾何）。</p>
+    <p>差在哪？<code>orionite.big</code>（金鶯球場夜間版）裡的
+       <code>3dcrowd.ord</code> 長 188,930 個位元組，兩份只差 <strong>1 個</strong>：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>檔案裡的位置</th><th>英文原版</th><th>本站測試機</th><th class="num">對 32 取餘</th></tr></thead>
+      <tbody>
+        <tr><td data-label="檔案裡的位置" class="mono">0x8A500</td><td data-label="英文原版" class="mono">F6</td><td data-label="本站測試機" class="mono">FE</td><td data-label="對 32 取餘" class="num">0</td></tr>
+      </tbody>
+    </table></div>
+    <p>那正是<a href="official-chinese.html">另一頁講的那 45 個損壞位元組</a>之一 ——
+       同樣是第 3 個位元被設起來、同樣落在 32 的倍數上。</p>
+    <p>因果鏈是這樣的：</p>
+    <ul>
+      <li>英文原版的 <code>3dcrowd.ord</code> 在白天版與夜間版<u>逐位元組相同</u> → 算進「29 組全部相同」</li>
+      <li>本站測試機那份夜間版被那一個位元組打到 → 兩邊不再相同 → <u>被踢出那份名單</u></li>
+      <li><strong>於是本站量到 8，寫上了 8。</strong></li>
+    </ul>
+    <p class="small">本站測試機的球場資料夾跟那份繁中版備份<u>逐位元組完全相同</u>，
+       所以兩邊量出來都是 8。三份裡有兩份同源，那不算三個獨立的證據
+       —— 這也是為什麼要留著第三份英文安裝。</p>
+  </div>
+  <p>而 33 個「永遠不同」的項目，涵蓋了天空、球場地面、看台觀眾、球場主體、
+     護網、以及 <code>render.ifo</code> 這個看名字就是算繪設定的檔。</p>
+
+  <div id="shadow" class="card amber">
+    <p class="card-h">一個很直白的證據：晚上沒有影子</p>
+    <p>每個球場檔裡都有一個 <code>shadow.dat</code>。實測 29 組配對：</p>
+    <p style="margin-top:8px">
+       白天版：<strong>中位數 1,183 bytes</strong>（最大 3,411）<br>
+       夜間版：<strong>29 座球場全部都剛好 2 bytes</strong>，一個例外都沒有</p>
+    <p>換句話說，夜間版的陰影資料是空的。
+       <strong>這是量出來的事實。</strong></p>
+    <p class="small">附帶一提：這 29 組配對的白天版裡也有 5 座的 <code>shadow.dat</code> 小於 100 bytes，
+       本站沒有進一步查是哪幾座、為什麼。</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">這裡要誠實</p>
+    <p>上面這些差異<strong>看起來</strong>像是「EA 把光影先算好燒進模型與貼圖」，
+       所以日夜其實是兩座分開做的球場，只共用不含光影的材質。
+       這個解釋跟量到的數字一致，但本站<strong>沒有驗證過遊戲引擎實際怎麼處理</strong>，
+       所以不寫成定論。</p>
+    <p>能確定的只有：29 組配對裡，88 項有 41 到 65 項的內容不同，
+       其中 33 項每一組都不同，<strong>原版 9 項</strong>（本站測試機 8 項，
+       原因見上面〈第 9 項那件事〉）每一組都相同。</p>
+  </div>
+
+  <h2>動手之前</h2>
+  <div class="card clay">
+    <p class="card-h">球場是高風險區，備份紀律要加倍</p>
+    <p>單檔 2.6–4.0 MB，而且 97.5% 的項目是壓縮過的二進位。
+       這裡<strong>沒有像賽程那樣的純文字可以安全編輯</strong>，
+       改壞了不會有錯誤訊息，只會在載入球場時當掉或畫面破圖。</p>
+    <p>存回 <code>.big</code> 的鐵律跟別處一樣：
+       <strong>接到檔尾、只改目錄</strong>，絕不整包重新打包。
+       詳見 <a href="bigf.html">BIGF 封裝格式</a>。</p>
+  </div>
+
+  <div class="tablewrap"><table>
+    <thead><tr><th>你可能想做的事</th><th>現況</th></tr></thead>
+    <tbody>
+      <tr><td>換掉草皮、紅土、牆面貼圖</td>
+          <td><span class="badge lv">可以替換</span> <code>.fsh</code> 圖片，用社群既有的圖片工具轉檔</td></tr>
+      <tr><td>換掉場上的隊徽</td>
+          <td><span class="badge lv">可以替換</span> <code>logo0-2.fsh</code>，且日夜共用同一份，改一次兩邊都生效</td></tr>
+      <tr><td>改球場尺寸、全壘打牆距離</td>
+          <td><span class="badge wip">未解</span> 幾何資料在 <code>.ord</code>／<code>.orl</code>，本站尚未解讀</td></tr>
+      <tr><td>幫只有白天版的球場加上夜間版</td>
+          <td><span class="badge wip">未解</span> 需要重算光影，不是複製改名就能了事</td></tr>
+      <tr><td>新增一座全新球場</td>
+          <td><span class="badge wip">未解</span> 除了檔案本身，遊戲還要認得這個場地代號</td></tr>
+    </tbody>
+  </table></div>
+  <p>完整的可改／不可改分級見 <a href="what-can-be-modded.html">什麼改得動、什麼還不行</a>。</p>
+
+  <h2 id="lighting">那個資料夾裡還有一個不是球場的檔</h2>
+  <p><code>data\stadium\</code> 裡有 87 個 <code>.big</code>，還有<strong>一個純文字檔</strong>：
+     <code>lighting.csv</code>，只有 1,470 個位元組。</p>
+  <p>它長這樣，沒有表頭，每行兩欄：</p>
+<pre><code>arliday,04day
+bankday,03day
+bushday,05day
+comeday,05day
+   ...</code></pre>
+  <p><strong>左邊是球場的檔名，右邊是它用哪一組光源設定。</strong></p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>量到的</th><th class="num">結果</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td>行數</td><td class="num"><strong>87</strong> —— 跟球場檔數一樣</td></tr>
+      <tr class="hi"><td>每一行都對得到球場檔</td><td class="num"><strong>87 / 87</strong></td></tr>
+      <tr><td>有球場檔但不在表裡的</td><td class="num">0 個</td></tr>
+      <tr><td>左邊有重複的</td><td class="num">0 個</td></tr>
+      <tr><td>相異的光源組</td><td class="num">16 種</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>一座球場一行，一個不多一個不少。</strong></p>
+  <p class="small">那 16 組光源<u>本身長什麼樣</u>，寫在另一個檔裡 ——
+     見<a href="datafile.html#lighting">總設定檔的燈光那一節</a>。
+     那裡有一件意外的事：<strong>PC 版的遊戲檔裡，
+     連 Xbox、PS2、GameCube 三台主機的燈光設定也一起裝著。</strong></p>
+
+  <div class="card grass">
+    <p class="card-h">夜間場的光源幾乎全部一樣</p>
+    <div class="tablewrap" style="margin:8px 0"><table class="stack">
+      <thead><tr><th></th><th class="num">幾座</th><th>用了幾種光源組</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td>夜間版</td><td data-label="幾座" class="num">39</td>
+            <td data-label="用了幾種光源組"><strong>2 種</strong> —— 其中 <u>38 座用同一組</u></td></tr>
+        <tr><td>白天版</td><td data-label="幾座" class="num">44</td><td data-label="用了幾種光源組">15 種</td></tr>
+        <tr><td>巨蛋（不分日夜）</td><td data-label="幾座" class="num">4</td><td data-label="用了幾種光源組">—</td></tr>
+      </tbody>
+    </table></div>
+    <p>白天要處理太陽角度、雲、看台陰影，所以每座球場都不一樣。
+       <strong>晚上開燈就是開燈，三十八座夜間版球場共用一組設定。</strong></p>
+  <div class="card blue">
+    <p class="card-h">這個數字的邊界在哪</p>
+    <p>這頁上線時寫的是「四十座」，那個數字量不出來。實測那份設定檔（87 行）：
+       掛同一組光源（<code>07night</code>）的一共 <strong>44 座</strong>，
+       組成是<strong>夜間版 38 座 + 巨蛋 4 座 + 兩座只有白天版的</strong>
+       （<code>clevday</code>、<code>min1day</code>，這兩座沒有夜間版檔案卻掛夜間光源組）。</p>
+    <p>句子講的是「晚上」，所以本站取<strong>夜間版那 38 座</strong>，
+       跟上面表格的「其中 38 座用同一組」對得起來。</p>
+    <p class="small">另外 <code>metpnite</code> 是唯一不用 <code>07night</code> 的夜間版（它用 <code>07nite_c</code>）。<strong>為什麼有這三個例外，本站不知道。</strong></p>
+  </div>
+    <p>這跟本站上面量到的另一件事對得起來：
+       <a href="#shadow">夜間版的 <code>shadow.dat</code> 全部剛好 2 個位元組</a>。</p>
+    <p><strong>兩個完全獨立的檔案，都在說同一句話：晚上的場景是簡化過的。</strong></p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">它比遊戲本體還早</p>
+    <p><code>lighting.csv</code> 的檔案日期是<strong>世界標準時間 2004 年 12 月 3 日</strong> ——
+       比<a href="../story/build-2004/index.html">動畫封包那批平安夜的時間戳</a>還早二十一天。</p>
+    <p class="small">（2026-09-05 訂正：本頁原本寫「12 月 4 日 …… 還早二十天」。
+       那是官方繁中版那一份的時間戳用<u>台北時間</u>讀出來的樣子。
+       改用跟那一頁同一套<u>世界標準時間</u>讀，剛安裝好的英文原版是 12 月 3 日 04:29、
+       繁中版那一份是同一天 21:29，兩份都落在 12 月 3 日，距離 12 月 24 日是二十一天。）</p>
+    <p class="small">檔案日期只能說明「這個檔那時候被寫入」，不能說明別的。
+       這是本站一貫的界線。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">✅ 找到了：定義在 <code>data\datafile\</code></p>
+    <p class="small">這張卡片原本寫「本站沒有找到定義它們的地方」，掛了「未解」。
+       2026-08-25 找到了 —— 而且就在旁邊的資料夾。</p>
+    <p><code>lighting.csv</code> 右欄那 <strong>16 種代號，每一種在
+       <code>data\datafile\</code> 裡都有一個同名的檔</strong>：
+       <code>04day</code> 對 <code>04day.txt</code>、<code>07night</code> 對 <code>07night.txt</code>，16／16 全中。</p>
+    <p>打開來是一長串<u>具名的光源參數</u>，每個參數一個編號。
+       下面這一段是<strong>名稱表</strong>（編號＋參數名），
+       <u>數值放在同一個檔的第二筆記錄</u>（<code>0x3cb4818e … pclighting</code>）裡，用同一組編號對回來 ——
+       例如編號 295 的 <code>DugoutR_Light2_RGB</code>，值是 <code>0 0 0</code>：</p>
+<pre><code><span class="cm">04day.txt（節錄）</span>
+0xaba1daef 357 1
+295 DugoutR_Light2_RGB
+290 DugoutR_Light1_Pitch
+259 DugoutL_Light8_Pitch
+214 DugoutL_IR_Stadium
+184 Bullpen_Light6_Heading
+167 Bullpen_Light2_RGB
+154 Bullpen_IR_Ground_Weight</code></pre>
+    <p>16 個檔各 12 KB 上下，共 <strong>381 種參數名</strong>，
+       其中 <strong>357 種是 16 個檔全部都有的</strong> —— 也就是同一組欄位、不同的值。</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>參數名前綴</th><th class="num">幾種</th><th>大概在講什麼</th></tr></thead>
+      <tbody>
+        <tr><td data-label="參數名前綴" class="mono">DugoutR_ / DugoutL_</td><td data-label="幾種" class="num">78 + 78</td><td data-label="大概在講什麼">左右兩個休息區各自的燈</td></tr>
+        <tr><td data-label="參數名前綴" class="mono">Bullpen_</td><td data-label="幾種" class="num">78</td><td data-label="大概在講什麼">牛棚的燈</td></tr>
+        <tr><td data-label="參數名前綴" class="mono">IR_ / IRCoeff / IRLeftCoeff</td><td data-label="幾種" class="num">28 + 10 + 10</td><td data-label="大概在講什麼">間接光（每個區域各一組）</td></tr>
+        <tr><td data-label="參數名前綴" class="mono">Light1_ … Light8_</td><td data-label="幾種" class="num">—</td><td data-label="大概在講什麼">八盞主燈，各有 <code>RGB</code>／<code>Pitch</code>／<code>Heading</code></td></tr>
+        <tr><td data-label="參數名前綴" class="mono">DOF_</td><td data-label="幾種" class="num">6</td><td data-label="大概在講什麼">景深</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>所以「那一組是什麼」現在答得出來了</strong>：
+       是一份 357 到 381 欄的光源設定表（16 個檔共同的核心是那 357 欄），描述八盞主燈的顏色與角度、
+       左右休息區與牛棚各自的照明、間接光係數、以及景深。</p>
+    <p class="small">⚠️ 本站<u>沒有</u>去改這些數值看遊戲會怎樣，也<u>沒有</u>解讀每個數值的單位。
+       知道的是「這 16 個檔就是那 16 個代號的定義」以及「欄位叫什麼名字」。
+       <span class="badge wip">未驗</span></p>
+    <p class="small">怎麼找到的：EA 官方繁體中文版<a href="official-chinese.html">把 <code>datafile.big</code> 拆開出貨</a>，
+       466 個散檔攤在資料夾裡，其中就有這 16 個。英文版是打包起來的，要先解開才看得到 ——
+       <u>同一份資料，換一個發行版就從「找不到」變成「一眼看到」</u>。</p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> <code>data/stadium/</code> 底下 87 個球場封裝檔，<u>剛安裝好的英文原版</u>每一個都剛好 <strong>88 項、名稱一樣、順序也一樣</strong>，87 個檔只產生 1 種目錄簽章，看懂一個等於看懂全部；裝過球場模組的機器會有例外（本站測試機那一包有兩個檔是 89 項）。</li>
+    <li><strong>88 項怎麼組成</strong> 31 個 <code>.ord</code> ＋ 31 個 <code>.orl</code> ＋ 16 個 <code>.fsh</code> ＋ 4 個 <code>.dat</code> ＋ 3 個 <code>.ifo</code> ＋ 3 個 <code>.csv</code>。全區合計 283.1 MB、單檔 2.6 到 4.0 MB，7,656 項裡有 <strong>7,464 項（97.5%）是壓縮過的</strong>（這一組數字量的是<u>剛安裝好的英文原版</u>那一包；裝過球場模組的機器不一樣，見上面規模表底下那段），改壞了不會有錯誤訊息，只會當掉或破圖。</li>
+    <li><strong>白天跟晚上差的不只是燈</strong> 29 組日夜配對裡，88 項有 <strong>41 到 65 項內容不同</strong>（平均 47.2），其中 33 項每一組都不同。最直白的證據是 <code>shadow.dat</code>：白天版中位數 1,183 位元組，<strong>夜間版 29 座全部剛好 2 個位元組</strong>，一個例外都沒有。</li>
+    <li><strong>本站訂正了兩個發布過的數字</strong> 一、「29 組全部相同的項目」原本寫 8 項，那是<u>測試機</u>量的，剛安裝好的英文原版是 <strong>9 項</strong>，多的是 <code>3dcrowd.ord</code>；差別只有 <strong>1 個位元組</strong>（<code>orionite.big</code> 裡那個 188,930 位元組的項目，差的那一個落在<u>檔案位置</u> <code>0x8A500</code>，<code>F6</code> 對 <code>FE</code>），那正是<a href="official-chinese.html">另一頁講的那 45 個損壞位元組</a>之一。二、光源那段上線時寫「四十座」，那個數字量不出來：掛同一組 <code>07night</code> 的其實是 <strong>44 座</strong>（夜間版 38 ＋ 巨蛋 4 ＋ <code>clevday</code>、<code>min1day</code> 兩座只有白天版的），句子講的是「晚上」，所以取夜間版那 <strong>38 座</strong>。</li>
+    <li><strong>不是每座球場都有兩個版本</strong> 54 個場地代號裡<strong>只有 29 個同時有日、夜兩檔</strong>，15 個只有白天版、10 個只有夜間版。想在某座球場打夜間比賽卻沒得選，多半不是設定問題，而是那座球場根本沒做夜間版的檔案。</li>
+    <li><strong><code>lighting.csv</code> 一座一行，一個不多一個不少</strong> 只有 1,470 個位元組、<strong>87 行對 87 個球場檔，87／87 全對得上</strong>，沒有多餘、沒有重複，相異光源組 16 種。夜間版 39 座只用 2 種（其中 38 座同一組），白天版 44 座用了 15 種。這跟 <code>shadow.dat</code> 是兩個完全獨立的檔，都在說同一句話：晚上的場景是簡化過的。</li>
+    <li><strong>從「未解」變成「一眼看到」</strong> 那 16 個光源代號的定義就在旁邊的 <code>data\datafile\</code>，16 個同名 <code>.txt</code> <strong>16／16 全中</strong>，共 381 種參數名、其中 357 種是 16 個檔全部都有的（左右休息區、牛棚、八盞主燈的顏色與角度、間接光、景深）。找得到的原因是 EA 官方繁中版<u>把 <code>datafile.big</code> 拆開出貨</u>，英文版是打包起來的。</li>
+    <li><strong>本站沒驗的</strong> 幾何資料在 <code>.ord</code>／<code>.orl</code>，<u>本站尚未解讀</u>，所以改球場尺寸、幫白天版加夜間版、新增球場都還做不到；四碼場地代號對應哪一座真實球場沒有查證；「EA 把光影先算好燒進模型與貼圖」的解釋跟數字一致但<strong>沒驗過遊戲引擎實際怎麼處理</strong>，不寫成定論；那 16 組光源的數值本站沒有改過也沒解讀單位。另外 <code>metpnite</code> 是唯一不用 <code>07night</code> 的夜間版、29 組配對裡的白天版也有 5 座 <code>shadow.dat</code> 小於 100 位元組（44 個白天版全算則是 12 座），原因都不知道。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="file-map.html">遊戲檔案地圖</a> —— 球場只是 224 個封裝檔的其中一區</li>
+    <li><a href="bigf.html">BIGF 封裝格式</a> —— 怎麼安全地把東西放回 <code>.big</code></li>
+    <li><a href="../tutorials/read-file-headers/index.html">五秒看穿一個檔案</a> —— 自己動手確認上面這些數字</li>
+  </ul>
+
+  <footer>
+    <p>本頁所有數字皆為現場打開<strong>剛安裝好的英文原版</strong>那一包 <code>data/stadium/</code>
+       全 87 個檔量測所得（標明「本站測試機」的那幾個數字量的是 2023 年那份台灣模組）；
+       標示為「部分實測」「未確認」之處未經證實，本站不寫成定論。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

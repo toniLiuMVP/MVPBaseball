@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/models.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>模型與臉皮 models.big — toni的MVP模組補習班</title>
+<meta name="description" content="MVP Baseball 2005 最大的封裝檔：4,211 個項目、894 張球員臉皮的統一規格，以及怎麼判斷你手上這份是不是原版。所有數字現場量測。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 模型與臉皮 models.big</p>
+  <h1>模型與臉皮 models.big</h1>
+  <p class="lede">全遊戲<strong>最大的單一封裝檔</strong>，535.9 MB，裝著球員的臉、身體與裝備。
+     這一頁除了講結構，還會講一件更重要的事：
+     <strong>怎麼判斷你手上這份是不是原版。</strong></p>
+
+    <div class="card blue" style="margin-top:14px">
+    <p class="card-h">先說清楚這頁的數字是從哪一份遊戲量的</p>
+    <p>本頁的項目數、檔案數、覆蓋率，量的是<strong>一台裝過台灣模組的遊戲</strong>。
+       <u>剛安裝好的原版數字小很多</u> —— 例如臉皮 504 對 894、大頭照 1,487 對 6,638、
+       語音號碼 1,673 對 4,343。</p>
+    <p><strong>格式與結構的部分兩邊一樣</strong>，那是遊戲程式決定的；
+       會變的是「有幾個」。完整對照見
+       <a href="original-vs-modded.html">原版與這台機器差在哪</a>。</p>
+  </div>
+<h2>先看規模</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>項目</th><th class="num">數字</th><th>備註</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="項目">檔案大小</td><td data-label="數字" class="num">535.9 MB</td><td data-label="備註">全遊戲最大的 <code>.big</code></td></tr>
+      <tr><td data-label="項目">項目數</td><td data-label="數字" class="num">4,211 個</td><td data-label="備註"></td></tr>
+      <tr class="hi"><td data-label="項目">壓縮比例</td><td data-label="數字" class="num">4,211 / 4,211</td><td data-label="備註"><strong>全部都是 QFS，零例外</strong></td></tr>
+      <tr class="hi"><td data-label="項目">目錄涵蓋率</td><td data-label="數字" class="num">100.0%</td>
+          <td data-label="備註">孤兒 <strong>0 bytes</strong></td></tr>
+      <tr><td data-label="項目">球員臉皮</td><td data-label="數字" class="num">894 張</td><td data-label="備註">命名 <code>c001</code>–<code>c900</code>（缺 6 號），每張三個檔</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">⚠️ 2026-08-28 訂正：孤兒那一格原本寫「只有 0.1 MB」。
+     那 73,322 bytes <u>就是檔頭 16 加上目錄 73,306</u> —— <strong>目錄本身不是孤兒</strong>。
+     照<a href="bigf.html#orphan-def">本站統一的定義</a>算，
+     <code>models.big</code> 的孤兒是 <strong>0 bytes，一個位元組都沒有</strong>。
+     這比原本寫的更強，而且是真的。</p>
+  <p class="small">上面每個數字都是把 <code>models.big</code> 現場解開數出來的，不是引用他人資料。</p>
+
+  <h2>裡面裝什麼</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">副檔名</th><th class="num">數量</th><th>是什麼</th><th>證據</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="副檔名" class="mono">.fsh</td><td data-label="數量" class="num">2,332</td><td data-label="是什麼">貼圖（臉、皮膚、裝備表面）</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 解壓後開頭是 <code>SHPI</code>，格式見<a href="portrait.html">大頭照那頁</a></td></tr>
+      <tr><td data-label="副檔名" class="mono">.ord</td><td data-label="數量" class="num">939</td><td data-label="是什麼">幾何模型資料</td>
+          <td data-label="證據"><span class="badge wip">未確認</span> 本站未逐欄解讀</td></tr>
+      <tr><td data-label="副檔名" class="mono">.orl</td><td data-label="數量" class="num">939</td><td data-label="是什麼"><code>.ord</code> 的配套資料</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 939 個名稱與 <code>.ord</code> 一一對應，體積小得多</td></tr>
+      <tr><td data-label="副檔名" class="mono">.txt</td><td data-label="數量" class="num">1</td><td data-label="是什麼">一份純文字清單。<strong>原版一個 <code>.txt</code> 都沒有</strong>（副檔名只有 <code>.fsh</code> 1,573、<code>.ord</code> 549、<code>.orl</code> 549）—— 這個是重打包時塞進來的</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 見下方「這份檔案的來歷」</td></tr>
+    </tbody>
+  </table></div>
+  <p><code>.ord</code> 與 <code>.orl</code> 成對出現，跟<a href="stadium.html">球場檔</a>是同一套做法。</p>
+
+  <h2>894 張臉皮，890 張規格完全一樣</h2>
+  <div class="card blue">
+    <p class="card-h">我們改過這一段：EA 出貨的規格是那 4 張「例外」</p>
+    <p>下面這一節量的是<a href="original-vs-modded.html">本站測試機那份 <code>models.big</code></a>。
+       拿<u>剛安裝好的原版</u>重量：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th></th><th class="num">臉皮張數</th><th>格式與尺寸</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td><strong>剛安裝好的原版</strong></td><td data-label="臉皮張數" class="num">504</td>
+            <td data-label="格式與尺寸"><strong><code>0x78</code> 128×256，504 張全部一樣，零例外</strong></td></tr>
+        <tr><td>本站測試機</td><td data-label="臉皮張數" class="num">894</td>
+            <td data-label="格式與尺寸"><code>0x60</code> 256×512 有 890 張、<code>0x78</code> 128×256 有 4 張</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>方向剛好反過來。</strong>本頁原本把 890 張 <code>0x60</code> 當成「規格」、
+       4 張 <code>0x78</code> 當成「例外」；但 <u><code>0x78</code> 128×256 才是 EA 出貨時用的</u>，
+       原版 504 張全部是它。</p>
+    <p class="small">這台上那 890 張用的是 <u>EA 沒有用在臉皮上</u>的格式與尺寸。
+       <strong>是誰、在哪一次改動裡換掉的，本站不知道。</strong><span class="badge wip">未解</span></p>
+    <p class="small">⚠️ 2026-08-25 訂正：這裡原本寫「EA 沒有用過的格式」「原版沒有這個格式」，
+       <strong>兩句都是假的全稱句</strong>。<code>0x60</code> 與 <code>0x61</code> 是 EA 自己大量在用的正規格式，
+       只是沒用在臉皮和大頭照上：<code>frontend\logos.big</code> 裡有 920 張 <code>0x61</code>、
+       <code>frontend\bkgnds.big</code> 裡有 105 張 <code>0x60</code>；
+       連「<code>0x60</code> 的 256×512」這個一模一樣的組合，
+       球場檔 <code>stadium\crosday.big</code> 裡就有一張。
+       同一件事<a href="portrait.html">大頭照那頁</a>寫對了 ——
+       它寫的是「EA <u>在這個倉庫裡</u>沒有用過」。差別只在那個限定詞。</p>
+  </div>
+  <p>臉皮的命名是 <code>c</code> 加三位數字，每一張佔三個項目
+     （<code>.fsh</code> 貼圖 ＋ <code>.ord</code>／<code>.orl</code> 幾何）。
+     2,682 ÷ 3 = <strong>894 張臉</strong>。</p>
+  <p id="missing"><strong>本站測試機</strong>的編號從 <code>c001</code> 排到 <code>c900</code>，但<strong>中間缺 6 個號碼</strong>
+     （<code>c116</code>、<code>c125</code>、<code>c170</code>、<code>c177</code>、<code>c188</code>、<code>c219</code>），
+     900 − 6 = 894。<span class="badge wip">未確認</span> 為什麼缺這幾號，本站沒有查出來。</p>
+  <p class="small">⚠️ 2026-08-25 補：<strong>剛安裝好的原版完全不是這樣</strong>。
+     原版只有 <strong>504 張、編號 <code>c001</code>–<code>c606</code>、中間缺 102 個</strong>
+     （2、37、58、80、106…）。「c001–c900、缺 6 個」是<u>社群重新打包之後的樣子</u> ——
+     模組把號碼填到 900，順手補掉了原版那 102 個空號的大部分，自己又缺了 6 個。
+     所以「缺號」這件事在兩份檔案裡是完全不同的兩回事。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">張數</th><th class="num">貼圖尺寸</th><th class="mono">格式代號</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="張數" class="num">890</td><td data-label="貼圖尺寸" class="num">256 × 512</td><td data-label="格式代號" class="mono">0x60</td></tr>
+      <tr><td data-label="張數" class="num">4</td><td data-label="貼圖尺寸" class="num">128 × 256</td><td data-label="格式代號" class="mono">0x78</td></tr>
+    </tbody>
+  </table></div>
+  <div class="card grass">
+    <p class="card-h">99.6% 用同一個規格</p>
+    <p>894 張臉裡有 <strong>890 張</strong>是同一個尺寸、同一種格式代號。
+       這代表<strong>做臉皮模組時規格是固定的</strong>，不必每張各自研究。</p>
+    <p>只有 4 張是例外，尺寸剛好是一半（128×256）。</p>
+  </div>
+
+  <h2>哪一張臉是哪一位球員</h2>
+  <p>這個問題有答案，而且答案就在球員資料檔裡。
+     <a href="database.html"><code>attrib.dat</code></a> 裡的
+     <strong><code>playerattrib_face</code> 這一欄</strong>存的就是臉皮編號：</p>
+<pre><code>attrib.dat 裡 Shohei Ohtani 那一列
+  playerattrib_face = 665
+                       └→ models.big 裡的 c665.fsh / c665.ord / c665.orl</code></pre>
+  <p class="small"><strong>認欄位名字，不要認欄號。</strong>本站 2026-09-03 把手邊九份內容不重複的
+     名冊逐份查過表頭，<code>playerattrib_face</code> 九份都排在第 10 欄，但那是運氣不是規定：
+     同一批名冊裡 <code>playerattrib_audioid</code> 有 16 與 17 兩種、
+     <code>playerattrib_skin_tone</code> 有 12 與 38 兩種。打開你自己那份的第一行照名字找才準，見
+     <a href="player-fields.html#col-shift">欄號會因名冊而異</a>。</p>
+
+  <div class="card grass">
+    <p class="card-h">實測對得起來</p>
+    <p>把 3,247 位球員的 <code>face</code> 值全部拿去比對 <code>models.big</code> 的臉皮編號：</p>
+    <p style="margin-top:8px"><strong>699 個不同編號裡，698 個對得到，命中率 99.9%。</strong></p>
+    <p>唯一對不到的是 <code>219</code> —— 而 <code>c219</code> 正好就是
+       <a href="#missing">前面提到那 6 個缺號</a>之一。
+       也就是說：<strong>有球員指向一張不存在的臉。</strong></p>
+  </div>
+
+  <h2>只有兩成球員有自己的臉</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">face 欄位的值</th><th class="num">球員數</th><th class="num">佔比</th><th>意思</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="face 欄位的值" class="mono">1 ～ 900</td><td data-label="球員數" class="num">712</td><td data-label="佔比" class="num">21.9%</td>
+          <td data-label="意思"><strong>有專屬臉皮</strong>，對應 <code>models.big</code> 的 <code>c001</code>–<code>c900</code></td></tr>
+      <tr class="hi"><td data-label="face 欄位的值" class="mono">901 ～ 915</td><td data-label="球員數" class="num">2,510</td><td data-label="佔比" class="num">77.3%<br><span class="small">分母是全部 3,247 列；只算有名字的 3,222 列是 77.9%</span></td>
+          <td data-label="意思"><strong>用通用臉</strong>。只有 15 個編號，兩千多人共用</td></tr>
+      <tr><td data-label="face 欄位的值" class="mono">0</td><td data-label="球員數" class="num">25</td><td data-label="佔比" class="num">0.8%</td><td data-label="意思">沒有指定。<strong>這 25 列不是球員</strong> —— 姓名兩欄空白、<code>hidden</code> 寫 1 的預留列</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">這張表的「球員數」是<strong>名冊的列數</strong>：3,247 列裡有名字的是 3,222 列，
+     其餘 25 列是空白預留列（<a href="player-numbers.html#wall">兩套球員編號</a>那頁同一格也是這樣記的）。
+     上面的佔比分母是全部 3,247 列。</p>
+  <p>15 個通用臉的使用人次相當集中：編號 <code>903</code> 一個就有 <strong>613 位球員</strong>在用，
+     其次是 <code>902</code>（388 位）與 <code>905</code>（315 位）。</p>
+
+  <div class="card blue">
+    <p class="card-h">這解釋了一件玩起來會注意到的事</p>
+    <p>知名球員長得像本人，板凳球員看起來都差不多 ——
+       不是你的錯覺，<strong>是大部分球員真的共用那 15 張臉</strong>（本站測試機 2,510/3,247 = 77.3%，<u>剛安裝好的原版還更高：2,456/2,921 = 84.1%</u>）。</p>
+    <p>反過來說，如果你想幫某位球員做專屬臉皮，
+       除了做出 <code>c###</code> 那三個檔，還得<strong>把他 <code>attrib.dat</code>
+       裡 <code>playerattrib_face</code> 那一格的值改成那個編號</strong>，否則遊戲不會用它。</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">順帶澄清一個容易搞混的欄位</p>
+    <p><code>attrib.dat</code> 還有一個欄位叫 <code>playerattrib_photo</code>（本站測試機第 17 欄，剛安裝好的原版第 18 欄 —— <a href="player-fields.html#col-shift">欄號會因名冊而異</a>），
+       名字看起來像大頭照編號，<strong>但它不是</strong>。</p>
+    <p><strong>本站測試機</strong>實測它<u>只有 0、1、2 三種值</u>（分別是 198、2,908、141 位球員），
+       是某種旗標。<span class="badge wip">未確認</span> 實際用途本站沒有解出。</p>
+    <p class="small">⚠️ 2026-08-25 補：<strong>原版只有 1 與 2 兩種值,沒有 0</strong>
+       (1 有 1,301 人、2 有 1,620 人)。而且它幾乎是「這位球員有沒有語音編號」的鏡像：
+       <code>photo=2</code> 且 <code>audioid=0</code> 有 1,620 人、
+       <code>photo=1</code> 且 <code>audioid≠0</code> 有 1,300 人 ——
+       2,921 位裡只有 1 個例外(<code>Default Default</code>,名冊的第一列空位)。
+       <strong>99.97% 的一致度 —— 這一欄在原版基本上就是「這位球員有沒有語音」的旗標。</strong>
+       而那個 <code>0</code> 是社群名冊才有的。</p>
+    <p><a href="portrait.html">大頭照</a>那邊的編號對應<u>已經解開了</u>：檔名的四位數就是同一張表裡的
+       <code>playerattrib_audioid</code>，不是這一欄（拿剛安裝好的原版對，1,300 個非 0 的
+       <code>audioid</code> 有 1,232 個在 <code>portrait.big</code> 裡找得到圖，命中 94.8%）。
+       詳見<a href="player-numbers.html">兩套球員編號</a>。</p>
+    <p class="small">⚠️ 2026-09-05 訂正：這裡原本寫「大頭照那邊的編號對應，目前仍未解」。
+       那是本頁上線時的說法，<a href="portrait.html">大頭照那頁</a>後來已經解開並自我訂正，
+       本頁沒有跟著改。<strong>未解的只有 <code>photo</code> 這一欄的實際用途。</strong></p>
+  </div>
+
+  <h2>編號有三個區間，而且中間那個是雷區</h2>
+  <p>臉皮編號看起來只是 <code>c001</code> 到 <code>c900</code> 一路排下去，
+     但拿<u>剛安裝好的原版</u>去比就會發現它其實分三段：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">編號</th><th>是什麼</th><th class="num">原版用到幾號</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="編號" class="mono">c001 – c606</td>
+          <td data-label="是什麼"><strong>EA 自己用掉的</strong>。兩份剛安裝好的原版（英文版與繁體中文版）都是 465 位球員有專屬臉，全部落在這一段</td>
+          <td data-label="原版用到幾號" class="num">上限 606</td></tr>
+      <tr><td data-label="編號" class="mono">c607 – c900</td>
+          <td data-label="是什麼"><strong>剛安裝好的原版沒有球員指過來的號段</strong>。在原版上把新臉放這一段不會動到任何人；
+              但剛安裝好的原版<u>這一段一張臉也沒有</u>，要 <code>models.big</code> 裡真的有那個編號才用得上。
+              <u>裝過模組的名冊會用到這一段</u>（本站測試機有 234 位球員指過來）</td>
+          <td data-label="原版用到幾號" class="num">原版 0 個</td></tr>
+      <tr><td data-label="編號" class="mono">901 – 915</td>
+          <td data-label="是什麼">通用臉。不對應 <code>models.big</code> 的 <code>c###</code>（見上一節）</td>
+          <td data-label="原版用到幾號" class="num">15 個</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card amber">
+    <p class="card-h">為什麼中間那段是雷區：一個實際的例子</p>
+    <p>本站手上有一份 2009 年的社群模組，它附了 <strong>26 張臉皮</strong>，
+       每個資料夾的名字都寫著球員、編號、和做的人。把那 26 個編號拿去對：</p>
+    <ul>
+      <li><strong>26 個全部真的有人在用</strong>（名冊裡都找得到指向它的球員），一個沒空放</li>
+      <li>其中 <u>15 個落在 EA 的 c001–c606</u>，<strong>有 14 個撞到 EA 已經指派過的球員</strong></li>
+      <li>另外 11 個落在 c607–c900，<u>一個都沒撞</u></li>
+    </ul>
+    <p>撞號的意思是：那張臉本來是別人的。例如 <code>c131</code> 在原版是
+       Jason Isringhausen 的臉，模組把它換成了一位台灣球員的臉。</p>
+  </div>
+
+  <h3>那撞到的人怎麼辦</h3>
+  <p>這是這份模組最值得看的地方 —— <strong>它有處理</strong>，不是覆蓋了就算：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>原版是誰的臉</th><th class="mono">原版</th><th class="mono">模組裡變成</th><th>怎麼處理的</th></tr></thead>
+    <tbody>
+      <tr><td>Keith Foulke</td><td class="mono">c190</td><td class="mono">c902</td><td rowspan="5">改用通用臉<br><span class="small">（5 位）</span></td></tr>
+      <tr><td>Antonio Alfonseca</td><td class="mono">c192</td><td class="mono">c911</td></tr>
+      <tr><td>Armando Benitez</td><td class="mono">c114</td><td class="mono">c909</td></tr>
+      <tr><td>Jason Isringhausen</td><td class="mono">c131</td><td class="mono">c902</td></tr>
+      <tr><td>Eric Milton</td><td class="mono">c520</td><td class="mono">c903</td></tr>
+      <tr><td>Barry Larkin、Mark Mulder、Tony Womack 等</td><td class="mono">c119 等</td>
+          <td class="mono">—</td><td><strong>不在這份名冊裡</strong><br><span class="small">（7 位，2009 年都已退休或不在大聯盟）</span></td></tr>
+      <tr class="hi"><td><strong>Rod Carew、Lou Gehrig</strong></td><td class="mono">c442 / c423</td>
+          <td class="mono">c442 / c423</td><td><strong>沒有處理</strong><br><span class="small">（見下）</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>14 個撞號裡，<strong>12 個是處理過的</strong>：還在打球的挪到通用臉，2009 年已經退休或不在大聯盟的就不放進名冊。
+     那是有人一個一個決定的，不是工具自動做的。</p>
+  <div class="card amber">
+    <p class="card-h">但有兩個沒處理 —— 而那正好是最好的示範</p>
+    <p><code>c442</code> 與 <code>c423</code> 在那份模組裡各有一張新臉皮，
+       但名冊裡 <strong>Rod Carew 與 Lou Gehrig 還留在那兩個編號上</strong>。</p>
+    <p>意思是：裝了那個臉皮包之後，<u>這兩位名人堂球員會頂著別人的臉</u>。</p>
+    <p class="small">本站沒有實機確認遊戲裡看起來如何，也不知道這是疏漏還是刻意。
+       <span class="badge wip">未驗</span>
+       但它把「用 EA 範圍內的編號要付什麼代價」講得比任何說明都清楚。</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">所以你要加臉的時候</p>
+    <p><strong>用 c607 以上的空號。</strong>那一段 EA 沒有用，在<u>剛安裝好的原版名冊</u>上
+       加下去不會動到任何人。<strong>但裝過模組的名冊不一樣</strong> ——
+       本站測試機那份名冊就有 <strong>234 位</strong>球員指向 c607–c900（231 個不同編號），
+       所以挑號之前要先查那個編號有沒有人在用（本站的換臉工具會替你查，見本卡最後一段）。</p>
+    <p class="small">但要先讓 <code>models.big</code> 裡<u>真的有那個編號</u>才算數：剛安裝好的原版
+       c607–c900 一個項目都沒有（504 張臉全落在 <code>c001</code>–<code>c606</code>），
+       而封裝檔不能新增項目、只能換掉現有的（見〈<a href="../tutorials/new-face/index.html">做一張新的球員臉皮</a>〉）。
+       所以在剛安裝好的原版上，可以直接挑的是「封裝檔裡有、名冊裡卻沒人用」的編號，
+       英文版與中文版兩份量到的都是 <strong>39 個</strong>；
+       本站測試機那份裝過模組的 <code>models.big</code> 有 894 張臉，c607–c900 就占了 294 張。</p>
+    <p>要用 c606 以下的號碼也不是不行 —— 2009 年那份模組就用了 15 個 ——
+       但你得知道你正在拿走誰的臉，而且要決定那個人之後長什麼樣。</p>
+    <p class="small">本站的<a href="../tutorials/swap-face/index.html">換臉工具</a>
+       從 2026-08-25 起會提醒你這件事：指定一個已經有別人在用的專屬臉編號時，
+       它會列出那些人，並建議改挑一個「<code>models.big</code> 裡有、名冊裡卻沒人用」的編號。
+       （通用臉 901–915 本來就是共用的，不會提醒。）</p>
+  </div>
+
+
+  <h2>整包共用同一種貼圖格式</h2>
+  <p>不論哪一種尺寸、哪一種格式，每個 <code>.fsh</code> 的影像資料後面
+     都跟著一段目錄沒登記的文字記錄，跟<a href="portrait.html">大頭照</a>完全一樣：</p>
+<pre><code>EAGL64 metal bin attachment for runtime texture management</code></pre>
+  <p><strong>2,332 / 2,332，一個例外都沒有。</strong>
+     加上 <code>portrait.big</code> 的 <a href="portrait.html">7,539 / 7,542</a>，
+     將近一萬個圖片檔帶著同一句話 —— <u>只有三個例外</u>。</p>
+  <div class="card amber">
+    <p class="card-h">先講一個很容易數錯的地方</p>
+    <p>與大頭照不同，這裡<strong>一個 <code>.fsh</code> 檔可以裝很多張圖</strong>
+       （實測有裝 36 張、28 張、10 張的）。所以「有幾個檔」跟「有幾張圖」是兩回事：</p>
+    <p style="margin-top:8px"><code>.fsh</code> 檔案數 <strong>2,332</strong>　·　
+       裡面的影像總數 <strong>41,343</strong></p>
+    <p>只數每個檔的第一張圖，會得到完全不同的分佈。下表是<strong>走過全部 41,343 張</strong>統計的。</p>
+  </div>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">代號</th><th class="num">影像數</th><th class="num">佔比</th><th>尺寸分佈</th></tr></thead>
+    <tbody>
+      <tr><td data-label="代號" class="mono">0x6D</td><td data-label="影像數" class="num">25,958</td><td data-label="佔比" class="num">62.8%</td>
+          <td data-label="尺寸分佈">以 16×32（16,852）與 32×64（6,340）為主，小圖示類</td></tr>
+      <tr><td data-label="代號" class="mono">0x78</td><td data-label="影像數" class="num">13,738</td><td data-label="佔比" class="num">33.2%</td>
+          <td data-label="尺寸分佈">混合：256×256（3,472）、256×128（2,958）、256×512（2,359）</td></tr>
+      <tr class="hi"><td data-label="代號" class="mono">0x60</td><td data-label="影像數" class="num">890</td><td data-label="佔比" class="num">2.2%</td>
+          <td data-label="尺寸分佈"><strong>全部都是 256×512 ← 這 890 張就是球員臉皮</strong></td></tr>
+      <tr><td data-label="代號" class="mono">0x61</td><td data-label="影像數" class="num">591</td><td data-label="佔比" class="num">1.4%</td>
+          <td data-label="尺寸分佈">256×256（375）與 128×128（216）</td></tr>
+      <tr><td data-label="代號" class="mono">0x7D</td><td data-label="影像數" class="num">121</td><td data-label="佔比" class="num">0.3%</td><td data-label="尺寸分佈">全部 128×128</td></tr>
+      <tr><td data-label="代號" class="mono">0x7F</td><td data-label="影像數" class="num">45</td><td data-label="佔比" class="num">0.1%</td><td data-label="尺寸分佈">全部 128×128</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">代號 <code>0x60</code> 那 890 張的數字，跟前面「894 張臉皮，890 張規格完全一樣」那一節<strong>完全對得起來</strong> ——
+     它們就是同一批東西，從兩個方向數到同一個數。</p>
+
+  <h2>這份檔案的來歷</h2>
+  <p>掃描時發現 <code>models.big</code> 裡有一個 <code>faces.txt</code>。
+     解開來看，<strong>它是某人在自己的 Windows 電腦上跑目錄列表指令的輸出</strong>，
+     被原封不動打包了進去：</p>
+<pre><code> Volume in drive C has no label.
+ Directory of C:\Users\<span class="hl">〔本站已移除〕</span>\Desktop\〔已移除〕\faces
+
+Nov-26-13  08:48 AM      65,680 c001.fsh
+Nov-26-13  08:48 AM      44,224 c001.ord
+Nov-26-13  08:48 AM       5,040 c001.orl
+              …共 2,710 行</code></pre>
+
+  <div class="card clay">
+    <p class="card-h">兩件事同時成立</p>
+    <p><strong>一、這份 <code>models.big</code> 不是 EA 原版。</strong>
+         日期是 <strong>2013 年 11 月</strong>，遊戲是 2005 年出的。它被社群重新打包過。</p>
+    <p><strong>二、打包的人把自己的使用者名稱一起送了出去。</strong>
+         本站已移除，<u>也不寫出那份檔案的其他辨識資訊</u>
+         —— 把名字遮掉、卻附上「去哪裡找」，等於沒遮。</p>
+      <p class="small">要講的重點不是那個人是誰，是<strong>這件事會發生</strong>。
+         那份檔案在網路上流傳了十幾年，每一份拷貝都帶著它。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">如果你要做模組包，這是給你的提醒</p>
+    <p>打包前檢查一下：<strong>有沒有把目錄列表、批次檔、記事本草稿一起裝進去</strong>。
+       這些檔案常常帶著你的使用者名稱、桌面路徑、甚至專案代號。</p>
+    <p>檢查方法很簡單：把封裝檔的項目清單列出來，看看有沒有
+       <code>.txt</code>、<code>.bat</code>、<code>.log</code> 這種不該出現在遊戲資源裡的東西。</p>
+  </div>
+
+  <h2>怎麼知道自己手上的是不是原版</h2>
+  <p>不用開檔案，看<strong>檔案日期</strong>就有八成把握。原版檔案會停在 2005 年：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">檔案</th><th class="num">日期</th><th>判讀</th></tr></thead>
+    <tbody>
+      <tr><td data-label="檔案" class="mono">anims\anims.big</td><td data-label="日期" class="num">2005-01</td><td data-label="判讀"><span class="badge ok">原版</span></td></tr>
+      <tr><td data-label="檔案" class="mono">stadium\crosday.big</td><td data-label="日期" class="num">2005-02</td><td data-label="判讀"><span class="badge ok">原版</span></td></tr>
+      <tr class="hi"><td data-label="檔案" class="mono">models.big</td><td data-label="日期" class="num">2023-05</td><td data-label="判讀"><span class="badge wip">動過</span></td></tr>
+      <tr><td data-label="檔案" class="mono">frontend\ingame.big</td><td data-label="日期" class="num">2023-02</td><td data-label="判讀"><span class="badge wip">動過</span></td></tr>
+      <tr><td data-label="檔案" class="mono">fonts\fonts.big</td><td data-label="日期" class="num">2022-11</td><td data-label="判讀"><span class="badge wip">動過</span></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">上表是本站測試機的實際狀況，<strong>你的電腦會不一樣</strong>。重點是方法不是數字。</p>
+
+  <div class="card blue">
+    <p class="card-h">為什麼這件事值得先確認</p>
+    <p>網路上很多「MVP 2005 的檔案格式是這樣」的說法，
+       是從<strong>已經被改過的檔案</strong>量出來的，卻寫成 EA 的設計。</p>
+    <p>本站也一樣受限：測試機的 <code>models.big</code> 是社群版本，
+       所以這一頁講的是<strong>「這個檔案現在長什麼樣」</strong>，
+       <strong>不宣稱那是 EA 當年的做法</strong>。要談 EA 的原始設計，
+       得先拿到沒被動過的原版才行。</p>
+  </div>
+
+  <h2>想動它之前</h2>
+  <div class="card clay">
+    <p class="card-h">535.9 MB，全遊戲風險最高的一個檔</p>
+    <p>它同時裝著幾何模型與貼圖，改壞了通常是<strong>進到球場就當掉</strong>，
+       而且因為檔案大，備份與還原都慢。</p>
+    <p>存回去一樣是那條鐵律：<strong>接到檔尾、只改目錄</strong>，
+       絕不整包重新打包。詳見 <a href="bigf.html">BIGF 封裝格式</a>。</p>
+  </div>
+
+  <div class="tablewrap"><table>
+    <thead><tr><th>你可能想做的事</th><th>現況</th></tr></thead>
+    <tbody>
+      <tr><td>換一張球員臉皮</td>
+          <td><span class="badge lv">可以替換</span> 規格固定，但要看你手上是哪一份：
+              <u>本站測試機這一份</u>是 256×512、代號 <code>0x60</code>，
+              <strong>剛安裝好的原版是 128×256、代號 <code>0x78</code></strong>
+              （見本頁前面那張原版與測試機的對照表）。
+              社群有現成臉皮包</td></tr>
+      <tr><td>自己做一張新臉皮</td>
+          <td><span class="badge wip">半解</span> <code>.fsh</code><code>0x60</code> 的像素編碼<strong>已經解開</strong> —— 每 4×4 像素一個 8 位元組的區塊，見<a href="pixel-formats.html">圖片的像素怎麼排</a>；把新圖<u>壓縮回去</u>那一半後來也做了（見<a href="../tutorials/new-face/index.html">做一張新的球員臉皮</a>）</td></tr>
+      <tr><td>改球員體型、裝備幾何</td>
+          <td><span class="badge wip">半解</span> 只解開容器：<code>.ord</code>＋<code>.orl</code> 接起來是一個完整的
+              MIPS 目標檔，但裡面的幾何欄位本站<strong>未逐欄解讀</strong>，也沒有做出可以改它的工具，
+              見<a href="#orl">下方</a></td></tr>
+    </tbody>
+  </table></div>
+  <p>完整的可改／不可改分級見 <a href="what-can-be-modded.html">什麼改得動、什麼還不行</a>。</p>
+
+  <h2 id="orl">那些 <code>.ord</code> 與 <code>.orl</code> 是什麼</h2>
+  <p><code>models.big</code> 裡除了臉皮貼圖，還有 <strong>939 個 <code>.ord</code></strong> 與
+     <strong>939 個 <code>.orl</code></strong>，<u>成對出現，一個不缺</u>。</p>
+  <p>把一對解開來看：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">檔案</th><th class="num">解壓後</th><th class="mono">開頭四個位元組</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="檔案" class="mono">c001.ord</td><td data-label="解壓後" class="num">44,304</td>
+          <td data-label="開頭四個位元組" class="mono">7F 45 4C 46 = <strong><code>.ELF</code></strong></td></tr>
+      <tr><td data-label="檔案" class="mono">c001.orl</td><td data-label="解壓後" class="num">5,040</td>
+          <td data-label="開頭四個位元組" class="mono">00 2E 64 61 = <code>.da…</code></td></tr>
+    </tbody>
+  </table></div>
+  <p><code>ELF</code> 是一種<strong>標準的目標檔格式</strong>（編譯器產生、還沒連結的中間產物）。
+     所以 <code>.ord</code> 不是 EA 自己發明的格式。</p>
+
+  <div class="card grass">
+    <p class="card-h">最漂亮的一條：檔案自己說它不完整</p>
+    <p>ELF 的檔頭裡有一格寫著「段落表在第幾個位元組」。<code>c001.ord</code> 那一格寫的是
+       <strong>49,104</strong> —— 但這個檔<u>只有 44,304 個位元組</u>。</p>
+    <p>指到檔案外面去了。而 <code>.orl</code> 剛好 5,040 個位元組，
+       44,304 + 5,040 = <strong>49,344</strong>，49,104 就落在裡面。</p>
+    <p><strong>兩個檔接起來，才是一個完整的目標檔。</strong>
+       這不是猜的 —— <u>是那個檔頭自己指過去的</u>。</p>
+  </div>
+
+  <p>本站把<strong>全部 939 對</strong>都跑了一遍：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>檢查</th><th class="num">結果</th></tr></thead>
+    <tbody>
+      <tr><td>解壓成功</td><td class="num">939 / 939</td></tr>
+      <tr class="hi"><td><code>.ord</code> 開頭是 <code>ELF</code></td><td class="num"><strong>939 / 939</strong></td></tr>
+      <tr class="hi"><td>檔頭指向的位置落在 <code>.orl</code> 範圍內</td>
+          <td class="num"><strong>939 / 939</strong><br><span class="small">零例外</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>檔頭還說了更多：<strong>32 位元、小端序、可重定位的目標檔、目標是 MIPS 處理器。</strong></p>
+  <div class="card blue">
+    <p class="card-h">MIPS 是主機的處理器</p>
+    <p>PlayStation 2 用的就是 MIPS。這些檔案是<u>主機版留下來的</u>，
+       跟<a href="../story/hidden-website/index.html">遊戲裡那個網站</a>、
+       <a href="../tutorials/controller-config/index.html">虛擬 PlayStation 手把</a>一樣，
+       都是移植的痕跡。</p>
+    <p class="small"><a href="anims.html">動畫封包那頁</a>的 <code>.ord</code>／<code>.orl</code>
+       是同一回事，兩邊各自量到同樣的結構。</p>
+  </div>
+  <div class="card grass">
+    <p class="card-h">但有 14 個沒有被切成兩半</p>
+    <p>本站把整個 <code>data\</code> 底下每一個封裝檔都掃過一遍找 ELF：</p>
+    <div class="tablewrap" style="margin:8px 0"><table>
+      <thead><tr><th>量到的</th><th class="num">個數</th></tr></thead>
+      <tbody>
+        <tr><td>開頭是 <code>ELF</code> 的項目</td><td class="num">3,895</td></tr>
+        <tr><td>需要拼接另一半的</td><td class="num">3,879</td></tr>
+        <tr class="hi"><td><strong>本身就完整的</strong></td><td class="num"><strong>16</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p class="small">⚠️ 這張表量的是<u>本站測試機</u>那一份 <code>data\</code>。
+       剛安裝好的原版是 <strong>3,503 個</strong>（207 個封裝檔、29,816 個項目），
+       見<a href="anims.html#wholegame">動畫封包那頁</a>。
+       差的 392 個裡有 390 個就是 <code>models.big</code> 兩邊 <code>.ord</code> 的差
+       —— 測試機 939 個、原版 549 個；剩下那 2 個在下面說。</p>
+    <p class="small">⚠️ 2026-09-05 訂正：這三個數字原本寫 3,893／3,879／14。重量之後是
+       <strong>3,895／3,879／16</strong>，而「差的 390 個剛好等於 <code>.ord</code> 的差」也不成立，
+       實際差 392。多出來的兩個見下一段。</p>
+    <p>那 16 個裡有 14 個在同一個地方：<code>data\misc\miscmod.big</code>。
+       而且<strong>那個封裝檔裡就只有這 14 個東西，別的什麼都沒有</strong>。</p>
+    <p class="small">另外 2 個是測試機才有的：<code>stadium\propday.big</code> 與
+       <code>stadium\propnite.big</code> 裡各一個 <code>removable.o</code>，
+       而且它們<u>沒有壓縮</u>，是直接放進去的 ELF。剛安裝好的原版那兩個封裝檔是 88 個項目、
+       沒有這一項；測試機是 89 個。所以剛安裝好的原版那邊仍然是 <strong>14 個</strong>。</p>
+    <p>它們用的是標準副檔名 <code>.o</code>（目標檔的慣例寫法），
+       而 <code>models.big</code> 裡那些被切兩半的用的是 <code>.ord</code>／<code>.orl</code>。
+       <u>連副檔名都在說「這個是完整的、那個是半個」。</u></p>
+    <p>檔名很有畫面：</p>
+<pre style="margin:8px 0 0"><code>lawn.o   moon.o   roof.o   tran.o
+obj1.o   obj2.o   obj3.o   obj4.o
+pla1.o   pla2.o   bli1.o   bli2.o
+aple.o   bern.o</code></pre>
+    <p style="margin-top:8px"><span class="badge wip">推測</span>
+       草皮、月亮、屋頂 —— 看起來像<u>球場周邊的景物</u>。
+       <strong>但本站沒有解出裡面的內容，這只是從檔名猜的。</strong></p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">解開了容器，沒解開內容</p>
+    <p>知道「這是一個 MIPS 目標檔、兩半怎麼接」——
+       但<strong>裡面那些機器碼與資料段實際在做什麼，本站沒有解讀</strong>，
+       也沒有做出可以改它的工具。<span class="badge wip">未解</span></p>
+    <p>本站不會往「改執行碼」的方向走。</p>
+  </div>
+
+  <h2 id="skeleton">所有的臉共用同一副骨架（2026-08-28 量的）</h2>
+  <p>本頁前面講過 <code>.ord</code> 與 <code>.orl</code> 接起來是一個標準目標檔。
+     <strong>那把它打開來看裡面有什麼？</strong></p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>剛安裝好的原版 <code>models.big</code></th><th class="num">結果</th></tr></thead>
+    <tbody>
+      <tr><td><code>.orl</code> 的數量</td><td class="num">549 個<br><span class="small">504 個臉皮 <code>c###</code> ＋ 45 個 <code>g###</code></span></td></tr>
+      <tr class="hi"><td>每個檔裡有幾根骨頭</td><td class="num"><strong>66 根，549/549 零例外</strong></td></tr>
+      <tr class="hi"><td>骨頭名稱的集合</td><td class="num"><strong>只有 1 種 —— 全部共用同一副</strong></td></tr>
+      <tr><td>英文版與中文版</td><td class="num">兩邊逐項完全相同</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>這回答了一個實用的問題：為什麼不同人做的臉可以互換。</strong>
+     因為它們掛的是同一副骨架 ——
+     <a href="../tutorials/swap-face/index.html">換臉</a>與
+     <a href="../tutorials/new-face/index.html">做新臉皮</a>那兩課能成立，
+     根本原因就在這裡。</p>
+
+  <div class="card grass">
+    <p class="card-h">那 66 根骨頭</p>
+    <p>骨頭的名字全部以 <code>FBXdummyNode.</code> 開頭 ——
+       <u>FBX 是 Autodesk 的模型交換格式</u>，所以 EA 的製作管線是經由它匯出的。
+       去掉前綴之後：</p>
+<pre><code>Hips  LowerSpine  MiddleSpine  UpperSpine  Neck  Head     ← 身體中軸
+LArm  LArmTwist  LForearm  LForearmTwist  LHand           ← 手臂（左右各一組）
+LIndex LIndexB  LMiddle LMiddleB  LRing LRingB  LThumb LThumbB   ← 手指
+LLeg  LShin  LFoot  LToe                                  ← 腿
+<span class="hl">EyeLids  Jaw  LEye  LBrow  LCornerMouth  LLoCheek  LUpCheek
+UpLip  LoLip</span>                                              ← 臉部表情
+Bat  Hat  Trajectory  hatPosition  leftEyePosition  rightEyePosition  ← 掛載點
+LCollerBone  RCollerBone  LConstraint  RConstraint  FBXdummyNode
+<span class="hl">dudeWheresMyHead</span></code></pre>
+    <p>臉部有 <strong>九種表情骨頭</strong>（眼皮、下巴、眼睛、眉毛、嘴角、上下臉頰、上下唇），
+       左右各一份 —— 這是那些
+       <a href="../story/build-2004/index.html">平安夜那天打包的 48 個表情動畫</a>在動的東西。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">兩個 EA 忘了拿掉的東西，出貨了 549 次</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>骨頭名</th><th>問題</th><th class="num">出現在幾個檔</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="骨頭名" class="mono">dudeWheresMyHead</td><td data-label="問題"><strong>一個開發者玩笑</strong>（「老兄，我的頭咧」）</td>
+            <td data-label="出現在幾個檔" class="num"><strong>549 / 549</strong></td></tr>
+        <tr class="hi"><td data-label="骨頭名" class="mono">LCollerBone · RCollerBone</td><td data-label="問題"><strong>拼字錯誤</strong> —— 鎖骨是 <code>Collar</code> 不是 <code>Coller</code></td>
+            <td data-label="出現在幾個檔" class="num"><strong>549 / 549</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p>兩個都在<u>英文版與中文版的每一個 <code>.orl</code> 裡</u>，一個例外都沒有。
+       骨架是同一份範本複製 549 次的，所以範本裡的東西全部跟著走。</p>
+    <p class="small">這也順帶說明了為什麼「共用同一副骨架」這件事可以量得這麼硬：
+       <strong>連錯字都一模一樣。</strong></p>
+    <p class="small">每個檔裡還有一個工具鏈版本標記 <code>EAGL_TOOLLIB_VERSION-4</code>，
+       549 個全部是 4 —— 整批是同一版工具匯出的。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">⭐ 社群做的臉皮也是同一副骨架 —— 跨十八年，零例外</p>
+    <p>上面量的是 EA 出貨的 549 個 <code>.orl</code>。本站另外把手上七批社群臉皮包全部解開
+       （年份從 2005 到 2023），把裡面每一個 <code>.orl</code> 的骨頭名單抓出來：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th></th><th class="num"><code>.orl</code> 個數</th><th class="num">每個幾根骨頭</th><th class="num">骨架與 EA 逐字相同</th></tr></thead>
+      <tbody>
+        <tr><td>EA 出貨的</td><td data-label=".orl 個數" class="num">549</td><td data-label="每個幾根骨頭" class="num">66</td><td data-label="骨架與 EA 逐字相同" class="num">—（基準）</td></tr>
+        <tr class="hi"><td><strong>社群做的（七批）</strong></td><td data-label=".orl 個數" class="num"><strong>555</strong></td><td data-label="每個幾根骨頭" class="num"><strong>66</strong></td>
+            <td data-label="骨架與 EA 逐字相同" class="num"><strong>555 / 555（100%）</strong></td></tr>
+        <tr><td>合計</td><td data-label=".orl 個數" class="num"><strong>1,104</strong></td><td data-label="每個幾根骨頭" class="num">66</td><td data-label="骨架與 EA 逐字相同" class="num">零例外</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>一千一百多個模型，一副骨架，十八年沒有變過。</strong>
+       這就是為什麼任何人做的臉都可以裝進任何一份名冊 ——
+       <u>大家都是從 EA 的同一個範本改出來的</u>。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">⚠️ 但那些臉皮包會蓋掉 EA 自己的球員</p>
+    <p>同一批包裡的臉皮編號合計 <strong>321 個</strong>，
+       而剛安裝好的原版有 504 個臉皮（編號 <code>c001</code>–<code>c606</code>）。兩邊比對：</p>
+    <div class="tablewrap"><table>
+      <tbody>
+        <tr class="hi"><td>跟原版<strong>撞號</strong>的</td><td class="num"><strong>204 個（64%）</strong></td>
+            <td>裝下去會把 EA 原本那位球員的臉換掉</td></tr>
+        <tr><td>原版沒有的編號</td><td class="num">117 個（36%）</td>
+            <td>需要先有一份把範圍撐大的名冊模組</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>兩件事同時發生</strong>：一部分是「加」，一部分是「換」。
+       這也是為什麼<u>同時裝兩個臉皮包，後裝的會蓋掉先裝的</u> ——
+       它們共用同一個編號空間。</p>
+    <p class="small">本站在<a href="../story/people-2009/index.html">2009 年那份名冊</a>
+       講過同一個現象的一個具體例子。這裡是把它量成整體的樣子。</p>
+  </div>
+
+  <h2 id="uniform-spec">原廠出貨的球衣長什麼樣（2026-08-28 補）</h2>
+  <p>本頁其他段落量的是<u>這台裝過台灣模組的機器</u>。球衣這一塊後來拿到剛安裝好的原版，
+     可以給出 EA 原始出貨的基準：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>剛安裝好的官方英文版 <code>models.big</code></th><th class="num">結果</th></tr></thead>
+    <tbody>
+      <tr><td>球衣本體 <code>u###x.fsh</code> 的數量</td><td class="num">433 個</td></tr>
+      <tr class="hi"><td>每個檔裡有幾張貼圖</td><td class="num"><strong>28 張，433/433 零例外</strong></td></tr>
+      <tr class="hi"><td>解壓後的大小</td><td class="num"><strong>732,592 bytes，433/433 完全相同</strong></td></tr>
+      <tr class="hi"><td>「貼圖名稱＋像素格式＋尺寸」的組合</td><td class="num"><strong>只有 1 種</strong></td></tr>
+      <tr><td>子圖的排列順序</td><td class="num">8 種（其中一種佔 425 個）</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>每一件原廠球衣的規格完全一樣</strong>，連解壓後的位元組數都分毫不差。
+     變的只有<u>子圖在檔案裡排第幾</u> —— 這跟<a href="../tutorials/uniforms/index.html">隊徽</a>
+     那邊觀察到的現象一樣：<strong>名字是固定的，順序不是。</strong>
+     寫自動化腳本的人要照名字找，不能照位置找。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>那 28 張貼圖</th><th>像素格式</th><th class="num">尺寸</th></tr></thead>
+    <tbody>
+      <tr><td data-label="那 28 張貼圖" class="mono">jerf · jerk · jers · jert</td><td data-label="像素格式">16 位元</td><td data-label="尺寸" class="num">128 × 128</td></tr>
+      <tr><td data-label="那 28 張貼圖" class="mono">lega · legb · legc · legd</td><td data-label="像素格式">16 位元</td><td data-label="尺寸" class="num">128 × 256</td></tr>
+      <tr><td data-label="那 28 張貼圖" class="mono">chst · merf · shn1</td><td data-label="像素格式">16 位元</td><td data-label="尺寸" class="num">128 × 128</td></tr>
+      <tr><td data-label="那 28 張貼圖" class="mono">hat · hlm1 · shoe · slvl · slvr</td><td data-label="像素格式">16 位元</td><td data-label="尺寸" class="num">128 × 64</td></tr>
+      <tr><td data-label="那 28 張貼圖" class="mono">mslv</td><td data-label="像素格式">16 位元</td><td data-label="尺寸" class="num">64 × 128</td></tr>
+      <tr><td data-label="那 28 張貼圖" class="mono">aslv · bglb · bglt · merk</td><td data-label="像素格式">16 位元</td><td data-label="尺寸" class="num">64 × 64</td></tr>
+      <tr><td data-label="那 28 張貼圖" class="mono">wrbn</td><td data-label="像素格式">16 位元</td><td data-label="尺寸" class="num">32 × 32</td></tr>
+      <tr><td data-label="那 28 張貼圖" class="mono">msk2</td><td data-label="像素格式">16 位元</td><td data-label="尺寸" class="num">8 × 8</td></tr>
+      <tr class="hi"><td data-label="那 28 張貼圖" class="mono">hhlm · llod · msk1</td><td data-label="像素格式"><strong>16 位元 4444</strong>（有透明度）</td><td data-label="尺寸" class="num">128 × 128</td></tr>
+      <tr class="hi"><td data-label="那 28 張貼圖" class="mono">msk3</td><td data-label="像素格式"><strong>16 位元 4444</strong></td><td data-label="尺寸" class="num">64 × 32</td></tr>
+      <tr class="hi"><td data-label="那 28 張貼圖" class="mono">lace</td><td data-label="像素格式"><strong>16 位元 4444</strong></td><td data-label="尺寸" class="num">32 × 32</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>28 張裡一張 DXT 都沒有</strong> —— 全部是 16 位元，
+     其中 5 張用帶透明度的 4444 格式（頭盔遮罩、鞋帶、幾張遮罩圖）。
+     像素格式的意義見<a href="pixel-formats.html">圖片像素編碼</a>。</p>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 535.9 MB 的 <code>models.big</code> 是全遊戲最大的封裝檔，4,211 個項目<strong>全部是 QFS 壓縮</strong>、目錄涵蓋率 100.0%、孤兒 0 bytes，裡面是球員的臉、身體與球衣。</li>
+    <li><strong>本頁最大的一次訂正：方向剛好反過來</strong>。本頁原本把測試機那 890 張 <code>0x60</code> 256×512 當成「規格」、4 張 <code>0x78</code> 128×256 當成「例外」；拿剛安裝好的原版重量，<strong>EA 出貨的 504 張臉皮全部是 <code>0x78</code> 128×256，零例外</strong>。同一段還訂正過一次假的全稱句：原本寫「<code>0x60</code> 是 EA 沒有用過的格式」，實際上 <code>logos.big</code> 有 920 張 <code>0x61</code>、<code>bkgnds.big</code> 有 105 張 <code>0x60</code>，正確講法要加限定詞「<u>在這個倉庫裡</u>沒有用過」。孤兒那一格也訂正過：原本寫「只有 0.1 MB」，那 73,322 bytes 其實是檔頭加目錄，<strong>真正的孤兒是 0 bytes</strong>。</li>
+    <li><strong>原廠球衣的規格硬得驚人</strong> 433 個 <code>u###x.fsh</code>，每個都是 28 張貼圖、解壓後都是 732,592 bytes，433/433 分毫不差，「名稱＋像素格式＋尺寸」的組合只有 1 種；會變的只有子圖排第幾（8 種順序）。所以<strong>寫腳本要照名字找，不能照位置找</strong>。順帶一個很容易數錯的地方：一個 <code>.fsh</code> 可以裝很多張圖，2,332 個檔裡總共有 41,343 張。</li>
+    <li><strong>哪一張臉是哪一位球員</strong> <code>attrib.dat</code> 的 <code>face</code> 欄存的就是臉皮編號。3,247 位球員的 699 個不同編號有 <strong>698 個對得到（99.9%）</strong>，唯一對不到的 <code>219</code> 正好是缺號之一，也就是<u>有球員指向一張不存在的臉</u>。編號分三段：<code>c001</code>–<code>c606</code> 是 EA 用掉的、<code>c607</code>–<code>c900</code> 在剛安裝好的原版<u>沒有任何球員指過來、也一張臉都沒有</u>（要封裝檔裡真的有才用得上；裝過模組的名冊會用到這一段，本站測試機有 234 位球員指過來）、901–915 是通用臉。</li>
+    <li><strong>只有兩成球員有自己的臉</strong> 測試機 712 人（21.9%）有專屬臉、2,510 人（77.3%）共用那 15 張通用臉，剛安裝好的原版還更高，84.1%。光是編號 <code>903</code> 一個就有 613 位球員在用。所以要幫某人做專屬臉，除了做出 <code>c###</code> 那三個檔，還得把他 <code>attrib.dat</code> 的 <code>face</code> 改成那個編號。</li>
+    <li><strong>一副骨架撐了十八年</strong> 原版 <code>models.big</code> 裡 549 個 <code>.orl</code>（504 個臉皮 <code>c###</code> ＋ 45 個 <code>g###</code>）每個都是 <strong>66 根骨頭</strong>、骨名集合只有 1 種，連 <code>dudeWheresMyHead</code> 這個開發者玩笑和 <code>LCollerBone</code> 這個拼錯都 549/549 跟著出貨。七批社群臉皮包（2005 到 2023）的 555 個模型也是 <strong>555/555 跟 EA 逐字相同</strong>。這就是不同人做的臉可以互換的根本原因。</li>
+    <li><strong>這份檔案不是原版，而且洩漏了打包的人</strong> 裡面有一個 <code>faces.txt</code>，是某人 <strong>2013 年 11 月</strong>在自己 Windows 電腦上跑目錄列表的輸出，連使用者名稱一起被打包（本站已移除）。判斷手上這份是不是原版，最快的方法是看<strong>檔案日期</strong>，原版會停在 2005 年。</li>
+    <li><strong>本站沒驗的</strong> <code>.ord</code> 的幾何欄位沒有逐欄解讀，接起來知道是一個 MIPS 目標檔，但裡面的機器碼與資料段在做什麼沒有解；為什麼測試機缺那 6 個號碼、那 890 張是誰換成 <code>0x60</code> 的、<code>photo</code> 欄實際用途，都還是未解（2026-09-05 訂正：本頁原本還在這裡列了「把新圖壓縮回去那一半」與「大頭照的編號怎麼對應」，<u>這兩件都已經解開了</u> —— 見<a href="../tutorials/new-face/index.html">做一張新的球員臉皮</a>與<a href="player-numbers.html">兩套球員編號</a>）；2009 年那份模組沒處理的兩個撞號（Rod Carew <code>c442</code>、Lou Gehrig <code>c423</code>）本站沒有實機看過遊戲裡長什麼樣。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="portrait.html">大頭照 portrait.big</a> —— 同一套 FSH 格式，結構更單純，建議先看那頁</li>
+    <li><a href="../tutorials/read-file-headers/index.html">五秒看穿一個檔案</a> —— 自己動手確認你的檔案有沒有被動過</li>
+    <li><a href="bigf.html">BIGF 封裝格式</a> —— 怎麼安全地寫回去</li>
+  </ul>
+
+  <footer>
+    <p>本頁所有數字皆為現場解開 <code>models.big</code> 全 4,211 個項目量測所得；
+       標示為「未確認」「半解」之處未經證實，本站不寫成定論。
+       本頁描述的是測試機上這份（社群重新打包過的）檔案，非 EA 原始出貨內容。
+       <strong>球衣貼圖那一項 2026-08-28 補了原廠基準</strong>，見上面「原廠出貨的球衣長什麼樣」。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

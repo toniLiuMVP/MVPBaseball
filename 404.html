@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-WaWtC+Gd03shQ4Ibe5PIt0orblDZnsDHMJIPXg+bfwY='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<meta name="description" content="找不到這一頁。toni的MVP模組補習班 —— MVP Baseball 2005 的檔案格式與模組教學。">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<title>404 — toni的MVP模組補習班</title>
+<style>
+  body { background:#F4F6F1; color:#16241E; text-align:center; padding:80px 20px;
+         font-family:"IBM Plex Sans","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif; }
+  h1 { font-size:3rem; margin:0; }
+  a { color:#8A5608; }
+  footer { margin-top:34px; padding-top:14px; border-top:1px solid #C8D2C8;
+           font-size:.86rem; color:#44534C; }
+  /* 深色規則必須放在最後,否則會被上面同權重的 a 規則覆蓋 */
+  @media (prefers-color-scheme:dark){
+    body { background:#0E1A16; color:#E8EDE7; }
+    a { color:#E0A346; }
+    footer { border-top-color:#2C4038; color:#AEBBB3; }
+  }
+</style>
+</head>
+<body>
+  <h1>⚾ 404</h1>
+  <p>找不到這個頁面 —— 可能是界外球。</p>
+  <p><a id="home" href="/MVPBaseball/">回首頁</a> · <a id="tut" href="/MVPBaseball/tutorials/">看教學列表</a></p>
+  <footer>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a id="lgl" href="/MVPBaseball/legal.html">法律與版權說明</a></p>
+  </footer>
+<script>
+// GitHub Pages 的 project site 會把 404 頁用在任何深度的網址上,
+// 相對路徑與絕對路徑都會有一種情況失效。這裡在執行時算出正確的站根。
+// HTML 裡寫死的 /MVPBaseball/ 是「JS 被關掉」時的退路 —— 對實際部署的
+// project site 正確;JS 有開的話下面會依實際網址重算,涵蓋倉庫改名或自訂網域
+// (不涵蓋改成 user site,見下面那條註解)。
+(function () {
+  var seg = location.pathname.split('/').filter(Boolean);
+  // 這裡把所有 *.github.io 都當成 project site,第一段就是倉庫名稱;
+  // 自訂網域走 '/'。唯一算錯的是 user site(倉庫名叫「帳號.github.io」、
+  // 站根就是 /),純前端分辨不出來,真要改成那樣這段也要一起改。
+  var base = (location.hostname.endsWith('github.io') && seg.length > 0)
+             ? '/' + seg[0] + '/'
+             : '/';
+  document.getElementById('home').href = base;
+  document.getElementById('tut').href = base + 'tutorials/';
+  document.getElementById('lgl').href = base + 'legal.html';
+})();
+</script>
+</body>
+</html>

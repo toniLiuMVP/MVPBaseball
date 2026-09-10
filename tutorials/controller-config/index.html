@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/controller-config/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>暖身課：打開一個遊戲的檔案 — toni的MVP模組補習班</title>
+<meta name="description" content="不用工具、不用命令列、不用解壓縮。用記事本打開遊戲根目錄那個純文字設定檔,看懂它,而且改壞了一定回得來。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../../index.html">首頁</a>
+  <a class="item" href="../../start.html">新手基本功</a>
+  <a class="item" href="../../do.html">我想做什麼</a>
+  <a class="item" href="../../plan.html">課表</a>
+  <a class="item on" href="../index.html">教學</a>
+  <a class="item" href="../../7min/index.html">七分鐘</a>
+  <a class="item" href="../../reference/index.html">速查</a>
+  <a class="item" href="../../coach/index.html">棒球教練</a>
+  <a class="item" href="../../story/index.html">故事</a>
+  <a class="item" href="../../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="../index.html">教學</a> › 暖身課：打開一個遊戲的檔案</p>
+  <h1>暖身課：打開一個遊戲的檔案</h1>
+  <p class="lede">本站的<a href="../../start.html">第 0 課</a>要你先學會開命令提示字元，之後每一課還要裝 Python、解壓縮。<strong>這一課排在第 0 課<u>前面</u></strong> —— 
+     什麼都不用。遊戲資料夾裡有一個純文字檔，
+     用記事本就打得開、看得懂、改得動，而且<u>改壞了一定回得來</u>。</p>
+
+  <div class="card grass">
+    <p class="card-h">這一課要你學會的不是「改鍵位」</p>
+    <p>改鍵位在遊戲的設定畫面裡就能做，不需要碰檔案。</p>
+    <p><strong>這一課真正在教的是三件事</strong>，而這三件事後面每一課都會用到：</p>
+    <p style="margin-top:6px">
+       一、遊戲的檔案<u>不是天書</u>，有些是純文字。<br>
+       二、<u>先找到還原的方法，再動手</u>。<br>
+       三、看到一個沒看過的檔案，<u>怎麼從它自己身上找出規律</u>。</p>
+  </div>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <div class="quickfix" id="quick">
+    <p class="card-h">⚡ 只想趕快做完？照這五步</p>
+    <ol>
+      <li>打開遊戲資料夾（裡面有 <code>mvp2005.exe</code> 的那一層），找到 <code>controller.cfg</code>，對著它按右鍵複製貼上，<strong>把複製檔拖到桌面</strong>。</li>
+      <li>用記事本打開<strong>原本那個</strong> <code>controller.cfg</code>，先看形狀：每一行都是「名字＝ 值」，一行例外都沒有（本站那份 315 行全部符合）。</li>
+      <li>從頭往下數 <code>profile=</code> 出現幾次，那就是幾個輸入裝置；代入算式，記事本右下角顯示的行數要等於算出來的數字、或比它多 1（<strong>差 0 或差 1 都正常</strong>，看檔尾有沒有多一個換行）。
+  <pre><code>2 + 段數 × 63 + (段數 − 1) = 總行數</code></pre></li>
+      <li>按 <code>Ctrl+F</code> 搜 <code>CROSS</code>，找得到就完成最後一項成功標準，然後<strong>直接關掉，不要存檔</strong>。</li>
+      <li>不小心存壞了：先把桌面那份複製回去覆蓋；還是不對，再進遊戲 → 設定 → 手把設定 → 選「還原預設」。</li>
+    </ol>
+    <p class="tail">這一課不用任何工具，所以<strong>沒有指令可以還原</strong> —— <u>上面第 1 步那份手動備份就是你的安全網</u>。</p>
+  <p class="tail">記事本要先把「自動換行」關掉、把「狀態列」勾起來，右下角才會出現行數。
+       Mac 的「文字編輯」沒有行號，第三步改驗「隨便挑一段，從它的 <code>profile=</code> 數到下一個 <code>profile=</code> 之前剛好 63 行」。
+       想知道這個檔為什麼長這樣，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+  </div>
+
+  <h2>為什麼從這個檔開始</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>條件</th><th>這個檔</th></tr></thead>
+    <tbody>
+      <tr><td>要不要解壓縮</td><td><strong>不用</strong>，它就攤在遊戲資料夾最外層</td></tr>
+      <tr><td>要不要工具</td><td><strong>不用</strong>，記事本就行</td></tr>
+      <tr><td>是不是純文字</td><td><strong>是</strong>，整份都讀得出來：以英數字、底線、等號為主，另外會有 <code>+</code> <code>-</code> <code>.</code> 與括號（來自裝置名稱與搖桿軸向）</td></tr>
+      <tr class="hi"><td>改壞了怎麼辦</td><td><strong>遊戲設定畫面裡有一個「還原預設」按鈕</strong></td></tr>
+      <tr><td>會不會弄壞存檔</td><td><strong>不會</strong>，它跟球員名單、賽季進度完全無關</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>前置</h2>
+  <ul class="tick">
+    <li>你已經安裝好 EA MVP Baseball 2005，而且<a href="../../start.html#findfolder">找得到它的資料夾</a></li>
+    <li class="hi"><strong>你至少進過遊戲一次</strong> ——
+        <code>controller.cfg</code> 是玩過之後才會出現的（<u>本站沒有實測它確切是在哪一步被寫出來</u>），
+        <u>剛安裝好、還沒玩過的話，那個檔根本不存在</u>。
+        （本站拿三份剛安裝好的原版實測，三份都沒有這個檔。）</li>
+    <li>你知道記事本在哪（Windows 內建；Mac 用「文字編輯」——
+        <span class="small">Mac 版沒有行號，這一課有一項成功標準要換一個方式驗，下面會說</span>）</li>
+    <li><strong>沒有其他前置了</strong> —— 不用裝任何東西</li>
+  </ul>
+
+  <h2>👉 你要做的事</h2>
+
+  <p><strong>步驟 1</strong>：先做一份備份。這是本站所有教學的第一步，永遠不會變。</p>
+  <ul class="plain">
+    <li>(1a) 打開遊戲的資料夾（裡面有 <code>mvp2005.exe</code> 的那一層）</li>
+    <li>(1b) 找到 <code>controller.cfg</code></li>
+    <li>(1c) 對著它按右鍵 → 複製 → 貼上。你會多出一個「controller - 複製.cfg」</li>
+    <li>(1d) <strong>把那份複製檔拖到桌面</strong>，不要留在遊戲資料夾裡</li>
+  </ul>
+  <div class="card amber">
+    <p class="card-h">為什麼要拖到桌面</p>
+    <p>留在原地的備份，很容易在下次整理資料夾時被自己刪掉，或被遊戲一起覆蓋。
+       <strong>備份要放在「不會被你正在做的事情碰到」的地方。</strong></p>
+  </div>
+
+  <p><strong>步驟 2</strong>：用記事本打開<u>原本那個</u> <code>controller.cfg</code>。</p>
+  <ul class="plain">
+    <li>(2a) 對 <code>controller.cfg</code> 按右鍵 → 開啟檔案 → 記事本</li>
+    <li>(2b) 如果沒有「記事本」選項，選「選擇其他應用程式」再找記事本</li>
+  </ul>
+  <div class="seen"><b>你會看到</b>
+<pre style="margin:8px 0 0"><code>profile= Keyboard_Profile_1
+device= Keyboard_Profile_1
+player= 2
+number_of_buttons= 0
+number_of_povs= 0
+number_of_axis= 0
+VPAD_VIRTUAL_BUTTON_START= key sc_esc
+VPAD_VIRTUAL_BUTTON_SELECT= key sc_divide
+VPAD_VIRTUAL_BUTTON_CROSS= key sc_down
+VPAD_VIRTUAL_BUTTON_CIRCLE= key sc_right
+VPAD_VIRTUAL_BUTTON_SQUARE= key sc_left
+VPAD_VIRTUAL_BUTTON_TRIANGLE= key sc_up
+...</code></pre>
+  </div>
+  <p>看不懂沒關係，<strong>先看形狀</strong>：每一行都是
+     <code>名字＝ 值</code>，等號前面沒有空格、等號後面剛好一個空格。
+     <u>全檔 315 行都是這個形狀，一行例外都沒有。</u></p>
+
+  <p><strong>步驟 3</strong>：數一數這個檔有幾段。</p>
+  <ul class="plain">
+    <li>(3a) 按 <kbd>Ctrl</kbd>+<kbd>Home</kbd> 回到最上面</li>
+    <li>(3b) 從上往下捲，找 <code>profile=</code> 開頭的行，數它出現幾次</li>
+  </ul>
+  <div class="seen"><b>你會看到</b>
+    <p style="margin:8px 0 0">每一次 <code>profile=</code> 就是<strong>一個輸入裝置</strong>。
+       本站測試機上有五段：兩支 USB 手把、兩組鍵盤配置、一支 Xbox 手把。
+       <u>你的電腦上通常會比較少</u>，因為它記的是「這台電腦接過什麼」。</p>
+  </div>
+  <div class="card blue">
+    <p class="card-h">每一段的長度是固定的：63 行</p>
+    <p>6 行裝置資訊 ＋ 24 行按鈕對照 ＋ 33 行動作設定 ＝ 63。所以整個檔案的行數是算得出來的：</p>
+<pre style="margin:8px 0 0"><code>開頭 2 行空白 + 5 段 × 63 行 + 段與段之間 4 行空白 = 321 行</code></pre>
+    <p style="margin-top:8px">本站測試機那份剛好 <strong>321 行</strong>。
+       <strong>你可以拿自己的檔案驗這條算式</strong>：
+       <code>2 + 段數 × 63 + (段數 − 1) = 總行數</code>。</p>
+
+  <div class="card amber">
+    <p class="card-h">記事本要先做兩件事才看得到行數</p>
+    <p>很多人到這一步會卡住，因為<strong>記事本預設不顯示行號</strong>：</p>
+    <ul class="plain">
+      <li><strong>(a)</strong> 上方選單 <u>格式</u> → 把「<u>自動換行</u>」<strong>關掉</strong>。
+          <span class="small">開著的時候，狀態列會被停用 —— 這是最常見的原因。</span></li>
+      <li><strong>(b)</strong> 上方選單 <u>檢視</u> → 勾「<u>狀態列</u>」。
+          右下角就會出現「第 X 列，第 Y 行」。</li>
+      <li><strong>(c)</strong> 按 <code>Ctrl + End</code> 跳到檔案最後面，
+          看右下角那個「第 X 列」。</li>
+    </ul>
+    <div class="card blue" style="margin:10px 0 0">
+      <p class="card-h">⚠️ 這裡會差 1，那是正常的</p>
+      <p><strong>有些機器上，這個檔最後一行結尾還有一個換行</strong>，最底下就會多一個空行，
+         記事本會把那個空行也算進去。</p>
+      <p><strong>那種情況下，算式算出來的數字會比記事本顯示的少 1。</strong>
+         本站量了三份檔案，兩份是這樣；<u>另外一份最後一行沒有換行</u>，
+         記事本顯示的數字就剛好等於算式。<strong>差 0 或差 1 都算過關。</strong></p>
+      <p class="small">（2026-09-05 訂正：本站原本寫成「兩台不同機器上的檔案都是這樣」、
+         把「減 1」寫成必然。再量第三份才發現不是每一份檔尾都有那個換行。）</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th></th><th class="num">五段的情況</th></tr></thead>
+        <tbody>
+          <tr><td>算式 <code>2 + 5×63 + 4</code></td><td class="num">321</td></tr>
+          <tr class="hi"><td><strong>記事本 Ctrl+End 顯示</strong></td><td class="num"><strong>321 或 322</strong></td></tr>
+          <tr><td>真正有內容的行</td><td class="num">315</td></tr>
+        </tbody>
+      </table></div>
+      <p><strong>所以：記事本顯示的數字，等於算式算出來的數字、或比它多 1，兩種都算對。</strong></p>
+      <p class="small">本站原本沒寫這一段，成功標準寫成「兩個數字一致」——
+         <u>檔尾有那個換行的機器上</u>，照著做的人會看到差 1，然後以為自己數錯了。
+         這是<u>拿第二個樣本重驗才發現的</u>。</p>
+    </div>
+    <p class="small">🍎 <strong>Mac 的「文字編輯」沒有行號</strong>，這個算式在 Mac 上驗不了。
+       Mac 讀者跳過這一項就好，下面的成功標準也有寫。
+       （這款遊戲本來就是 Windows 遊戲，Mac 上多半是透過相容層在跑。）</p>
+  </div>
+  </div>
+
+  <p><strong>步驟 4</strong>：找出這個遊戲的一個小祕密。</p>
+  <ul class="plain">
+    <li>(4a) 按 <kbd>Ctrl</kbd>+<kbd>F</kbd> 打開搜尋</li>
+    <li>(4b) 搜 <code>CROSS</code></li>
+  </ul>
+  <div class="card grass">
+    <p class="card-h">PC 版遊戲，內部是一支 PlayStation 手把</p>
+    <p>24 個按鈕名字全部是 PlayStation 的講法：
+       <code>CROSS</code>（×）、<code>CIRCLE</code>（○）、<code>SQUARE</code>（□）、<code>TRIANGLE</code>（△）、
+       <code>L1</code>、<code>R1</code>、<code>L2</code>、<code>R2</code>、<code>START</code>、<code>SELECT</code>。</p>
+    <p><strong>沒有任何一顆叫 A／B／X／Y。</strong>
+       連 Xbox 手把那一段也是 —— 一支根本沒有「×」鍵的手把，
+       在這個檔裡被記成 <code>CROSS = button 1</code>。
+       鍵盤也一樣：<code>CROSS = key sc_down</code>，方向鍵下被登記成「×鍵」。</p>
+    <p>換句話說，遊戲把手把、鍵盤、Xbox 手把<u>全部先翻譯成同一支虛擬的 PlayStation 手把</u>，
+       這 24 行就是那張翻譯表。</p>
+    <p class="small">這是移植遊戲留下的痕跡。想看更多這種痕跡，見
+       <a href="../../story/build-2004/index.html">平安夜凌晨的兩次建置</a>。</p>
+  </div>
+
+  <h2>⚠️ 一件必須先知道的事</h2>
+  <div class="card clay">
+    <p class="card-h">這個檔不是「給你填的」，是「遊戲自己寫出來的」</p>
+    <p>本站在遊戲主程式裡找到<strong>整整 17 種輸出模板</strong>，
+       形狀就是這個檔每一行的樣子。拿那 17 種模板去比對整個檔案：
+       <u>315 行全部命中，沒有任何一行落單，而且 17 種模板每一種都真的用到了</u>。</p>
+    <p>意思是：<strong>你在遊戲的設定畫面按下確定的時候，遊戲會把整個檔案重印一次。</strong>
+       你手動改的內容，可能會在那個時候被蓋掉。</p>
+    <p><span class="badge lv">所以</span>
+       這一課的目的是<u>看懂</u>它。真的要改鍵位，<strong>在遊戲的設定畫面改比較保險</strong>。</p>
+  </div>
+
+  <h2>附帶：按鍵名稱表也在主程式裡</h2>
+  <p>檔案裡的鍵盤按鍵寫成 <code>key sc_down</code>、<code>key sc_numpad6</code> 這樣。
+     那些 <code>sc_</code> 名字不是隨便取的 —— <strong>完整的清單就在遊戲主程式裡</strong>，
+     只是全部大寫：</p>
+<pre><code>SC_ESC  SC_1  SC_2  …  SC_NUMPAD0  …  SC_LWIN  SC_RWIN  SC_KANJI …</code></pre>
+  <p>實測 <strong>122 個不重複的名字</strong>，而你的 <code>controller.cfg</code> 只用到其中一小部分。
+     裡面甚至有 <code>SC_KANJI</code>（日文鍵）、<code>SC_SLEEP</code>（睡眠鍵）這種
+     <u>這個遊戲根本用不到</u>的按鍵。</p>
+  <div class="card blue">
+    <p class="card-h">這代表什麼</p>
+    <p>那是一張<strong>通用的鍵盤按鍵對照表</strong>，不是為這個遊戲寫的。
+       遊戲把整張表帶著走，用到哪個算哪個。</p>
+    <p class="small">跟前面「PC 版內部是一支 PlayStation 手把」是同一件事的兩面：
+       <u>輸入這一層是通用的，遊戲只是接上去。</u></p>
+  </div>
+
+  <h2>✅ 成功標準</h2>
+  <p>以下全部做到就算過關：</p>
+  <ul class="tick">
+    <li>桌面上有一份 <code>controller.cfg</code> 的備份</li>
+    <li>你用記事本打開了原檔，而且沒有存檔</li>
+    <li>你數得出自己的檔案裡有幾個 <code>profile=</code></li>
+    <li><strong>Windows：</strong>記事本右下角顯示的行數，
+        等於你用 <code>2 + 段數 × 63 + (段數 − 1)</code> 算出來的數字，<u>或比它多 1</u>
+        <span class="small">（為什麼會多 1，看上面那張「這裡會差 1」；
+        看不到行號的話看「記事本要先做兩件事」）</span></li>
+    <li><strong>Mac 或看不到行號的人：</strong>改驗這一項 ——
+        隨便挑<u>一段</u>，從它的 <code>profile=</code> 那行數到下一個 <code>profile=</code> 之前，
+        中間<strong>剛好 63 行</strong></li>
+    <li>你找得到 <code>CROSS</code> 這個字</li>
+  </ul>
+
+  <h2>❌ 出錯處理</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>狀況</th><th>怎麼辦</th></tr></thead>
+    <tbody>
+      <tr><td>找不到 <code>controller.cfg</code></td>
+          <td>你可能開在錯的資料夾。<strong>先確認同一層有 <code>mvp2005.exe</code></strong>。
+              如果從來沒有玩過這款遊戲，這個檔可能還沒被建立出來 ——
+              先進遊戲玩一次再回來</td></tr>
+      <tr><td>打開是一堆亂碼</td>
+          <td>你開錯檔了。這個檔<strong>整份都是看得懂的英數字</strong>，
+              最「特別」的字元也只有 <code>=</code>、底線，以及裝置名稱與搖桿軸向會用到的
+              <code>+</code> <code>-</code> <code>.</code> <code>(</code> <code>)</code></td></tr>
+      <tr><td>行數算式對不上</td>
+          <td>先確認你數的是 <code>profile=</code> 而不是 <code>device=</code>（兩者長得很像、值也一樣）。
+              如果還是對不上，<strong>那是有意義的發現</strong> —— 照下面的範本回報</td></tr>
+      <tr class="hi"><td>不小心存檔了，遊戲怪怪的</td>
+          <td>三個辦法，<strong>從上往下試</strong>：<br>
+              一、把桌面那份備份複製回去覆蓋<br>
+              二、進遊戲 → 設定 → 手把設定 → 選「還原預設」<br>
+              三、看下面「原廠預設值放在哪」</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>原廠預設值放在哪</h2>
+  <p>可以拿來對照的預設值有<strong>兩份</strong>，兩份還不一樣（<u>第二份不是遊戲安裝時就有的</u>，是玩過之後才出現）：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>哪一份</th><th class="mono">位置</th><th>內容</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="哪一份"><strong>原廠裝置表</strong></td><td data-label="位置" class="mono">data\profiles.big</td>
+          <td data-label="內容"><strong>28 種裝置</strong>的完整預設綁定。它是純文字 CSV、<u>沒有壓縮</u>，
+              用記事本打開 <code>.big</code> 就看得到內容</td></tr>
+      <tr><td data-label="哪一份">遊戲自己留下的一份</td><td data-label="位置" class="mono">Support\MVP Baseball 2005\controller.cfg</td>
+          <td data-label="內容">只有兩組鍵盤配置，126 行（跟上面 315 行同一種數法：有內容的行；記事本會顯示 130）</td></tr>
+    </tbody>
+  </table></div>
+  <div class="card amber">
+    <p class="card-h">⚠️ 那份「備份」反而不是原廠值</p>
+    <p>直覺會以為 <code>Support\</code> 那份是最乾淨的原廠檔。<strong>反過來。</strong></p>
+    <p>把它跟 <code>profiles.big</code> 的原廠表逐欄比對，<strong>有 8 欄不同</strong>，
+       全部集中在同一個地方：兩組鍵盤配置的<u>右類比搖桿四個方向</u>。
+       原廠表寫「未綁定」，那份備份卻綁了小鍵盤與 WASD。</p>
+    <p>而遊戲根目錄那份<u>反而跟原廠表一致</u>。
+       <strong>所以要還原，用遊戲裡的「還原預設」最保險。</strong></p>
+  </div>
+  <div class="card blue">
+    <p class="card-h">一個你可以自己做的驗算</p>
+    <p>把原廠表裡兩組鍵盤配置那兩列，照下面的換算規則翻成 <code>controller.cfg</code> 的寫法：</p>
+<pre style="margin:8px 0 0"><code>na       →  not_assigned -1
+sc_xxx   →  key sc_xxx
+p0       →  pov0 1
+a-3      →  axis- 3
+7        →  button 7</code></pre>
+    <p style="margin-top:8px">再跟你電腦上的 <code>controller.cfg</code> 逐欄比對。
+       本站測試機的結果是 <strong>34 / 34 完全相同</strong>，兩組鍵盤配置都是。</p>
+    <p class="small">如果你的也是 34/34，代表<u>你的鍵盤設定從來沒被改過</u>。</p>
+  </div>
+
+  <h2 id="wine">在 Wine 底下按鈕會對不上，而那不是你設錯</h2>
+  <div class="card clay">
+    <p class="card-h">本站原本沒有講這件事</p>
+    <p>MVP 2005 用的是 <strong>2005 年的 DirectInput 按鈕編號</strong>。
+       那些編號跟現代手把上印的標籤<u>不保證對得上</u> ——
+       透過 USB 轉接器接老手把時更亂。</p>
+    <p><strong>在 Wine 底下最麻煩</strong>：Linux、Wine、遊戲三邊
+       <u>可能各自用不同的編號在描述同一顆按鈕</u>。</p>
+    <p>症狀很好認：<strong>手把只有一半能用</strong> ——
+       左類比可以瞄投球，但選球種、傳球、跑壘或右類比的動作跑到別顆按鈕上。
+       <u>那不是你設錯，是編號對不上。</u></p>
+  </div>
+
+  <h3>有人做了一支工具解決它</h3>
+  <p>2026 年 7 月出現的 <code>mvp2005padcfg</code>（MIT 授權，原始碼公開）。
+     本站沒有使用它，但它的做法有兩點值得學：</p>
+  <ul>
+    <li><strong>它不猜編號，它問你。</strong>
+        依序要你按每一顆按鈕、每一個方向，
+        <u>記下「MVP 實際收到的是幾號」</u>，再照那個產生設定檔。
+        這樣三邊怎麼描述都不重要 —— 只看遊戲收到什麼</li>
+    <li><strong>它另存新檔，不覆蓋你的 <code>controller.cfg</code>。</strong>
+        <u>這一點比本站這一課教的做法安全</u>：本站教的是直接改那個檔，
+        雖然有教備份，但「產生一份新的、原檔不動」本來就更好</li>
+    <li>它明說可以在 Wine 底下跑，<u>但必須跟遊戲在同一個 Wine prefix 裡</u> ——
+        不然它問到的是另一套環境的編號，等於白做</li>
+  </ul>
+  <p class="small">⚠️ 本站<u>沒有實際跑過</u>那支工具，上面是讀它的說明與原始碼得到的。
+     這一課的做法（自己讀懂 <code>controller.cfg</code> 再手改）仍然成立，
+     而且你會知道每一格是什麼 —— 那是工具給不了的。</p>
+
+
+  <div class="grid">
+    <div class="card"><p class="card-h">難度</p><p>★☆☆ 什麼工具都不用</p></div>
+    <div class="card"><p class="card-h">時間</p><p>約 10 分鐘</p></div>
+    <div class="card"><p class="card-h">要會什麼</p><p>會用記事本</p></div>
+  </div>
+
+  <h2>本站沒有測的一件事</h2>
+  <div class="card clay">
+    <p class="card-h">直接刪掉 <code>controller.cfg</code> 會怎樣？</p>
+    <p><span class="badge wip">未解</span> <strong>本站沒有測。</strong></p>
+    <p>從「遊戲會自己重印這個檔」這件事<u>推測</u>它會重新產生一份，
+       但本站的紀律是<strong>全程唯讀、不動使用者的檔案</strong>，所以沒有實際刪掉來驗。</p>
+    <p><strong>不要拿這件事當還原方法。</strong>用備份或遊戲裡的「還原預設」。</p>
+    <p class="small">如果你有完整備份、願意實測，歡迎照下面的範本回報，本站會把結果補上並註明來源。</p>
+  </div>
+
+  <h2>📋 回報範本</h2>
+  <p>卡住或有發現，複製下面這段填一填：</p>
+<pre><code>暖身課 status: ✅ / ❌
+我的 profile= 有幾段: ___
+記事本顯示的總行數: ___    (看不到行號就填「沒有行號」)
+算式 2 + 段數×63 + (段數-1) 算出來: ___
+記事本那個數字跟算式差多少: 0 / 1 / 其他 ___ / 沒驗
+一段是不是剛好 63 行: 是 / 否    (上面那項沒驗的人填這個)
+找得到 CROSS 嗎: 是 / 否
+卡在哪一步: ___
+其他發現: ___</code></pre>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 這一課教的不是改鍵位，是「打開、看懂、還原」這三件後面每一課都要用的事，練習對象是一個記事本就打得開的純文字檔。</li>
+    <li><strong>前置</strong> <code>controller.cfg</code> 是玩過之後才會出現的（本站沒有實測它確切是在哪一步被寫出來），本站拿三份剛安裝好的原版實測，三份都沒有這個檔，所以你至少要先進過遊戲一次。</li>
+    <li><strong>關鍵數字</strong> 每一段固定 63 行（6 行裝置資訊 ＋ 24 行按鈕對照 ＋ 33 行動作設定）；本站測試機五段，算式得 321、記事本顯示 321 或 322（看檔尾有沒有多一個換行）、真正有內容 315 行。</li>
+    <li><strong>最容易踩的雷</strong> 記事本那個數字可能<strong>比算式多 1</strong>，因為有些機器上最後一行結尾還有一個換行（本站量的三份裡有兩份），差 0 或差 1 都正常；還有要數的是 <code>profile=</code>，不是長得很像、值也一樣的 <code>device=</code>。</li>
+    <li><strong>看得到的祕密</strong> PC 版內部是一支虛擬 PlayStation 手把，24 個按鈕名字全是 PlayStation 的講法（<code>CROSS</code>、<code>CIRCLE</code>、<code>SQUARE</code>、<code>TRIANGLE</code>、<code>L1</code>、<code>R1</code>、<code>L2</code>、<code>R2</code>、<code>START</code>、<code>SELECT</code>），沒有任何一顆叫 A／B／X／Y，連 Xbox 手把那一段也是；鍵盤按鍵表則是通用的，主程式裡實測 122 個不重複的大寫 <code>SC_</code> 名字，含這遊戲根本用不到的 <code>SC_KANJI</code>。</li>
+    <li><strong>它會被整份重印</strong> 主程式裡 17 種輸出模板打中全部 315 行、每一種都真的用到，代表你在設定畫面按確定時整個檔案會被重寫一次，所以真要改鍵位，在遊戲的設定畫面改比較保險。</li>
+    <li><strong>安全網</strong> 動手前先複製一份拖到桌面；改壞了依序試「複製回去覆蓋」「遊戲裡的還原預設」「查原廠值」。原廠裝置表在 <code>data\profiles.big</code>（28 種裝置、純文字 CSV 沒有壓縮），注意 <code>Support\</code> 底下那份<strong>反而不是原廠值</strong>，跟原廠表有 8 欄不同。</li>
+    <li><strong>本站沒驗的</strong> 直接刪掉 <code>controller.cfg</code> 會怎樣<strong>沒有測</strong>，只從「遊戲會自己重印」推測它會重新產生，不要拿這件事當還原方法；那支 <code>mvp2005padcfg</code> 本站也沒有實際跑過，寫的是讀它的說明與原始碼得到的。</li>
+  </ul>
+
+  <h2>接下來去第 0 課</h2>
+  <p>學會「打開、看懂、還原」之後，可以往兩個方向走：</p>
+  <ul class="plain">
+    <li><a href="../../start.html">新手基本功</a> —— 學會開命令提示字元，本站大部分教學都需要</li>
+    <li><a href="../change-schedule-year/index.html">把整季賽程搬到任何年份</a> —— 三分鐘，隨時可以還原</li>
+    <li><a href="../../reference/file-map.html">遊戲檔案地圖</a> —— 其他東西都放在哪裡</li>
+    <li><a href="../../reference/loc-strings.html">文字表 .LOC</a> —— 遊戲本體介面的文字存在哪</li>
+  </ul>
+
+  <footer>
+    <p>本頁的行數、段落結構、欄位比對結果皆為現場打開 <code>controller.cfg</code>、
+       <code>data\profiles.big</code> 與 <code>Support\</code> 底下的備份量測所得；全程唯讀。
+       標示為「未解」之處本站尚未實測。你的電腦上的段數與內容會與本站不同，
+       因為這個檔記錄的是<u>你這台電腦接過哪些裝置</u>。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../../legal.html">法律與版權說明</a> ·
+       <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/7min/chant.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>七分鐘學會製作應援曲並匯入遊戲 — toni的MVP模組補習班</title>
+<meta name="description" content="七分鐘把遊戲裡現有的應援曲指給你想要的球員。含格子大小的限制說明。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item on" href="index.html">七分鐘</a>
+  <a class="item" href="../reference/index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">七分鐘</a> › 應援曲</p>
+  <h1>七分鐘學會製作應援曲並匯入遊戲</h1>
+  <p class="lede">讓某位球員上場時放你要的應援曲。七分鐘做得完的是<strong>把遊戲裡現成的某一首，指給另一位球員</strong> ——不需要任何音訊工具。</p>
+  <div class="card">
+    <p class="card-h">⏱ 七分鐘怎麼分配</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>做什麼</th><th class="num">分鐘</th></tr></thead>
+      <tbody>
+        <tr><td>列出現有的應援曲</td><td class="num">2</td></tr>
+        <tr><td>挑一首</td><td class="num">1</td></tr>
+        <tr><td>指給你的球員</td><td class="num">2</td></tr>
+        <tr><td>進遊戲確認</td><td class="num">2</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <h2>前置</h2>
+  <ul>
+    <li>已安裝的 MVP Baseball 2005</li>
+    <li>Python 3</li>
+    <li>下載 <a href="../tutorials/swap-chant/mvp_swap_chant.py" download>mvp_swap_chant.py</a></li>
+  </ul>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法看<a href="../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <h2>👉 你要做的事</h2>
+
+  <div class="step">
+    <div class="step-n">1</div>
+    <div>
+      <p><strong>先看遊戲裡有哪些球員專屬應援曲。</strong></p>
+      <p class="small">⚠️ <strong>名冊裡是英文拼法</strong>，打中文查不到。這裡用<strong>陳金鋒</strong>當例子 —— 他在原版遊戲裡就叫 <code>Chin-Feng Chen</code>，2005 年他真的在道奇隊（不過<u>遊戲的原版名冊把他放在小聯盟的 <code>Las Vegas 51s</code></u>，不在道奇的大聯盟名單裡）。EA 給了他一張專屬大頭照 —— 原版 <code>portrait.big</code> 裡的 <code>1598.fsh</code>。曹錦輝是 <code>Chin-Hui Tsao</code>，他也有一張（<code>2463.fsh</code>）。（2026-09-05 訂正：這裡原本寫「EA 還給了他一張專屬臉」，那是錯的 —— 原版名冊裡他的臉皮欄位是 906，而本站的分級是 901 以上都算通用臉；專屬的是大頭照，不是臉皮。）<br>（王建民 2005 年才上大聯盟，<u>沒趕上這款遊戲</u>，所以查不到他。）</p>
+<p class="small">Windows:</p>
+<pre><code>python mvp_swap_chant.py &quot;〔你的遊戲資料夾〕&quot; --list</code></pre>
+      <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_swap_chant.py &quot;〔你的遊戲資料夾〕&quot; --list</code></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">2</div>
+    <div>
+      <p><strong>挑一首，把它指給你要的球員。</strong></p>
+      <p class="small">Windows:</p>
+<pre><code>python mvp_swap_chant.py &quot;〔你的遊戲資料夾〕&quot; --give Chin-Feng 0004</code></pre>
+      <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_swap_chant.py &quot;〔你的遊戲資料夾〕&quot; --give Chin-Feng 0004</code></pre>
+      <p>先看預覽，確認之後加 <code>--apply</code>。</p>
+    </div>
+  </div>
+
+  <h2>✅ 怎麼知道成功了</h2>
+  <ul>
+    <li><code>--list</code> 印得出應援曲清單</li>
+    <li>預覽顯示的「哪位球員 ← 哪一首」是對的</li>
+    <li>進遊戲讓那位球員上場打擊</li>
+  </ul>
+
+  <h2>❌ 出錯處理</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>症狀</th><th>怎麼辦</th></tr></thead>
+    <tbody>
+      <tr><td>清單是空的</td><td>原版本來就有 57 組（三份安裝量到的號碼集合完全相同），所以不是「沒裝模組」；比較可能是索引檔 <code>spch_cht.txt</code> 缺了或被別的工具改過，先照〈備份與還原 SOP〉那一課把它從你的整包備份拿回來</td></tr>
+      <tr><td>指定的編號不存在</td><td>照 <code>--list</code> 印出來的編號填</td></tr>
+      <tr><td>遊戲裡沒聲音</td><td>確認遊戲設定裡的音效沒被關掉</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card red">
+    <p class="card-h">⚠️ 這一課到哪裡為止</p>
+    <p>要放<strong>你自己的音樂</strong>，得先把它轉成 EA 的音訊格式。<strong>這一格本站後來解開了一半</strong>：實測應援曲那個檔走的是<u>編碼器 2</u>（<code>--info</code> 報「2 聲道 · 24000 Hz · 103 段」），正是<a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>那支腳本認得的三種之一。但本站在測試機上逐段跑過那 103 段，<strong>只有 40 段寫得回去</strong>；其餘 63 段有區塊切不出相位，腳本會<u>明說拒絕寫入</u>，不會硬塞一段對不齊的聲音進去。所以七分鐘這條路線仍然只做「把現成的指給別人」，要換成自己的歌請走那一課，並先確認你要蓋的那一段沒有被拒絕。</p><p>還有一件事值得記：<strong>每首應援曲的格子大小是固定的</strong>，你的錄音比較短會被補靜音、比較長會被切掉（腳本會先把這件事印出來）。<span class="small">（2026-09-05 訂正：這裡原本還寫著「遊戲裡會爆音」，以及「當年的建議是做成 6 到 8 秒並加淡入淡出」。那兩句本站找不到出處、也沒有實測過，已經拿掉。）</span></p><p class="small">⚠️ 這一頁原本寫的是「本站的腳本做不到（理由同語音那一堂）」。<strong>那句話已經失效</strong>——語音那一堂的編碼器後來寫出來了，這裡把轉指改成本頁自己量到的結果。</p>
+  </div>
+
+
+  <h2>想弄懂為什麼</h2>
+  <ul class="plain">
+    <li><a href="../tutorials/swap-chant/index.html">把應援曲指給別的球員</a> —— 完整版</li>
+    <li><a href="../reference/audio.html">播報與音訊系統</a> —— 13 個音訊分區</li>
+    <li><a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a> —— 本站自己寫的編碼器</li>
+    <li><a href="../reference/tools-archive.html">二十年工具清冊</a></li>
+  </ul>
+
+  <footer>
+    <p>本頁是「下課七分鐘」系列，只講一件事怎麼做完。
+       原理、量測過程與本站驗到哪裡為止，寫在上面連過去的完整課程裡。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/coach/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>棒球教練：看懂遊戲裡的棒球話 — toni的MVP模組補習班</title>
+<meta name="description" content="站上好幾課都在叫你改 playerattrib_platediscipline 這種欄位。這一頁把遊戲裡所有棒球術語列成三欄：遊戲裡的英文、EA 官方繁體中文、台灣棒球圈的講法，每一條都附詳細說明。官方譯法有十一個會誤導，單獨列一節。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item" href="../reference/index.html">速查</a>
+  <a class="item on" href="index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px">棒球教練</p>
+  <h1>棒球教練</h1>
+  <p class="lede">補習班的分工是這樣的：<strong>班主任教你改遊戲，教練教你看懂遊戲裡的棒球話。</strong>
+     站上好幾課都在叫你改 <code>playerattrib_platediscipline</code> 這種欄位 ——
+     不知道那是什麼的人，改了也不知道自己改了什麼。這一頁把它們一次講完。</p>
+
+  <div class="card blue">
+    <p class="card-h">📋 這一頁的三欄各是什麼，證據強度不一樣</p>
+    <div class="tablewrap" style="margin:8px 0"><table class="stack">
+      <thead><tr><th>欄</th><th>哪裡來的</th><th>強度</th></tr></thead>
+      <tbody>
+        <tr><td data-label="欄"><strong>遊戲裡的英文</strong></td>
+            <td data-label="哪裡來的">名冊檔的欄位名（<code>attrib.dat</code> 46 欄、<code>pitcher.dat</code> 29 欄）
+                與 <code>config.txt</code> 裡 EA 自己的代號表（守位／左右打／球種／投球動作）</td>
+            <td data-label="強度">一手，量出來的</td></tr>
+        <tr><td data-label="欄"><strong>EA 官方繁中</strong></td>
+            <td data-label="哪裡來的">拿<u>剛安裝好的英文版</u>與<u>剛安裝好的官方繁體中文版</u>兩份字串表，
+                <strong>同一個字串編號</strong>兩邊各讀一次配出來的</td>
+            <td data-label="強度">一手，量出來的</td></tr>
+        <tr class="lo"><td data-label="欄"><strong>台灣棒球圈的講法</strong></td>
+            <td data-label="哪裡來的">台灣球迷與轉播實際在用的說法</td>
+            <td data-label="強度"><span class="badge wip">慣用語，不是量出來的</span></td></tr>
+      </tbody>
+    </table></div>
+    <p class="small">第三欄本站不宣稱它是「標準」——
+       它是<u>讓你聽得懂、講得出口</u>的講法。有出入以你熟悉的為準。</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">⚠️ 先講一件事：官方的中文有十一個會誤導</p>
+    <p>EA 當年的繁體中文版，有幾個術語譯得不準 ——
+       照著它理解會改錯東西。最要緊的是
+       <strong><code>Earned Run Average</code> 譯成「得分率」</strong>，
+       那其實是<strong>防禦率</strong>，而且<u>數字越小越好</u>。
+       完整清單在<a href="#misleading">最下面那一節</a>。</p>
+  </div>
+
+  <h2 id="batter">打者的能力值</h2>
+
+  <p>這些是 <code>attrib.dat</code> 裡跟球技有關的欄位。站上<a href="../tutorials/make-a-player/index.html">改一位球員</a>與<a href="../tutorials/stats-to-ratings/index.html">成績換算能力值</a>兩課，寫得回這張表的只有 <code>playerattrib_speed</code> 一欄（前者另外改的是名字與背號；後者另外還會寫 <code>lrattrib_power</code> 與 <code>pitchattrib_stamina</code>，那兩欄不在 <code>attrib.dat</code> 裡）。</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>遊戲裡的欄位</th><th>英文</th><th>EA 官方繁中</th><th>台灣講法</th><th>這是什麼</th></tr></thead>
+    <tbody>
+      <tr><td data-label="遊戲裡的欄位" class="mono">playerattrib_platediscipline</td><td data-label="英文"><strong>Plate Discipline</strong></td><td data-label="EA 官方繁中"><code>本壘板紀律</code></td><td data-label="台灣講法"><strong>選球能力</strong></td><td data-label="這是什麼">打者不揮壞球的本事。數字高的人會等到好球才出棒，保送多、被三振少。這一欄跟「打得到球」是兩回事 —— 選球好的人上壘率高，不一定安打多。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">playerattrib_bunting</td><td data-label="英文"><strong>Bunting</strong></td><td data-label="EA 官方繁中"><code>觸擊</code></td><td data-label="台灣講法"><strong>短打</strong></td><td data-label="這是什麼">把球輕輕點出去、不揮大棒。用在推進壘上跑者(犧牲觸擊)或搶一壘安打(觸擊安打)。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">playerattrib_stealing_aggressive</td><td data-label="英文"><strong>Stealing Aggressiveness</strong></td><td data-label="EA 官方繁中"><code>盜壘積極度</code></td><td data-label="台灣講法"><strong>盜壘積極度</strong></td><td data-label="這是什麼">不是「跑得多快」，是「多敢跑」。電腦控球隊時，這個數字決定他要不要起跑。速度快但這一欄低的人，站在壘上不太動。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">playerattrib_baserunning</td><td data-label="英文"><strong>Baserunning</strong></td><td data-label="EA 官方繁中"><code>跑壘</code></td><td data-label="台灣講法"><strong>跑壘判斷</strong></td><td data-label="這是什麼">跑壘的腦子：要不要多搶一個壘、球被接殺時回不回得來。跟純速度分開算。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">playerattrib_speed</td><td data-label="英文"><strong>Speed</strong></td><td data-label="EA 官方繁中"><code>速度</code></td><td data-label="台灣講法"><strong>腳程</strong></td><td data-label="這是什麼">純粹的跑步速度。內野安打、盜壘成功率、外野守備追球都吃這一欄。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">playerattrib_fielding</td><td data-label="英文"><strong>Fielding</strong></td><td data-label="EA 官方繁中"><code>守備</code></td><td data-label="台灣講法"><strong>守備穩定度</strong></td><td data-label="這是什麼">接得穩不穩、會不會失誤。跟「接得到」是兩件事 —— 那是下面那一欄。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">playerattrib_range</td><td data-label="英文"><strong>Range</strong></td><td data-label="EA 官方繁中"><code>距離</code></td><td data-label="台灣講法"><strong>守備範圍</strong></td><td data-label="這是什麼">⚠️ 官方譯成「距離」很容易誤會。它指的是<strong>這個守備員能顧到多大一塊地</strong>，也就是他往左右追得到多遠的球。中外野手最吃這一欄。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">playerattrib_throwstrength</td><td data-label="英文"><strong>Arm Strength</strong></td><td data-label="EA 官方繁中"><code>手臂力量</code></td><td data-label="台灣講法"><strong>臂力</strong></td><td data-label="這是什麼">傳球的力道。外野手回傳本壘、游擊手從深遠處傳一壘，都看這裡。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">playerattrib_throwaccuracy</td><td data-label="英文"><strong>Arm Accuracy</strong><span class="small">（能力畫面寫 <code>Throwing Accuracy</code>）</span></td><td data-label="EA 官方繁中"><code>投球準確度</code></td><td data-label="台灣講法"><strong>傳球準度</strong></td><td data-label="這是什麼">傳得準不準。臂力強但準度差的人，會把球傳到看台上。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">playerattrib_durability</td><td data-label="英文"><strong>Durability</strong></td><td data-label="EA 官方繁中"><code>耐力</code></td><td data-label="台灣講法"><strong>耐用度</strong></td><td data-label="這是什麼">⚠️ 別跟投手的 Stamina(體力)搞混。這一欄是<strong>不容易受傷、可以連續出賽</strong>，不是「一場撐多久」。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">playerattrib_starpower</td><td data-label="英文"><strong>Star Power</strong></td><td data-label="EA 官方繁中"><span class="small">（遊戲裡沒有這個字串）</span></td><td data-label="台灣講法"><strong>明星光環</strong></td><td data-label="這是什麼">球星價值。影響球迷人氣、球團收入與合約談判，不影響他的球技。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">playerattrib_topprospect</td><td data-label="英文"><strong>Prospect</strong></td><td data-label="EA 官方繁中"><code>人選</code></td><td data-label="台灣講法"><strong>潛力新秀</strong></td><td data-label="這是什麼">⚠️ 官方譯成「人選」讀不出意思。它指的是<strong>還沒上大聯盟、但被看好的年輕球員</strong>。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">playerattrib_salary</td><td data-label="英文"><strong>Salary</strong></td><td data-label="EA 官方繁中"><code>薪資</code></td><td data-label="台灣講法"><strong>年薪</strong></td><td data-label="這是什麼">這位球員一年拿多少錢。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">playerattrib_contract_length</td><td data-label="英文"><strong>Contract</strong></td><td data-label="EA 官方繁中"><code>合約</code></td><td data-label="台灣講法"><strong>合約年限</strong></td><td data-label="這是什麼">合約還剩幾年。到期就要重新談，談不攏他會變成自由球員。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">playerattrib_bats</td><td data-label="英文"><strong>Bats</strong></td><td data-label="EA 官方繁中"><code>打擊</code></td><td data-label="台灣講法"><strong>左打／右打</strong></td><td data-label="這是什麼">⚠️ 官方譯成「打擊」會誤會成打擊能力。這一欄只有三種值：右打、左打、左右開弓(switch hitter)。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">playerattrib_throws</td><td data-label="英文"><strong>Throws</strong></td><td data-label="EA 官方繁中"><code>丟球</code></td><td data-label="台灣講法"><strong>慣用手</strong></td><td data-label="這是什麼">⚠️ 官方譯成「丟球」。它是<strong>投球／傳球用哪隻手</strong>，只有右投與左投兩種。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">playerattrib_primary_position</td><td data-label="英文"><strong>Position</strong></td><td data-label="EA 官方繁中"><code>位置</code></td><td data-label="台灣講法"><strong>守備位置</strong></td><td data-label="這是什麼">他主要守哪裡。代號見下面那張守位表。</td></tr>
+    </tbody>
+  </table></div>
+
+  <p class="small">⚠️ 打者最要緊的<strong>擊球能力</strong>與<strong>長打力</strong>不在 <code>attrib.dat</code> 裡：
+     它們是 <code>lhattrib.dat</code>／<code>rhattrib.dat</code> 的
+     <code>lrattrib_contact</code> 與 <code>lrattrib_power</code>，<u>對左投與對右投各存一份</u>。
+     逐欄清單見<a href="../reference/database.html">資料檔總覽</a>。</p>
+
+  <h2 id="pitcher">投手的能力值</h2>
+
+  <p><code>pitcher.dat</code> 的欄位。每位投手有五個球種，每一種各有自己的<u>球速、控球、尾勁、進壘角度</u>四個數字（第二到第五球再多一欄「球種」，所以整個檔是 29 欄不是 30 欄）。</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>遊戲裡的欄位</th><th>英文</th><th>EA 官方繁中</th><th>台灣講法</th><th>這是什麼</th></tr></thead>
+    <tbody>
+      <tr><td data-label="遊戲裡的欄位" class="mono">pitchattrib_stamina</td><td data-label="英文"><strong>Stamina</strong></td><td data-label="EA 官方繁中"><code>體力</code></td><td data-label="台灣講法"><strong>續航力</strong></td><td data-label="這是什麼">一場能投多久。先發投手最吃這一欄 —— 體力見底之後控球與球速會一起掉。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">pitchattrib_pickoff</td><td data-label="英文"><strong>Pickoff</strong></td><td data-label="EA 官方繁中"><code>牽制</code></td><td data-label="台灣講法"><strong>牽制能力</strong></td><td data-label="這是什麼">把球傳向壘包、逼跑者回壘的本事。這一欄高的投手，跑者不太敢盜壘。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">pitchattrib_fastball_velocity</td><td data-label="英文"><strong>Velocity</strong></td><td data-label="EA 官方繁中"><code>速度</code></td><td data-label="台灣講法"><strong>球速</strong></td><td data-label="這是什麼">這一球有多快。遊戲裡直接用英里／小時(mph)存。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">pitchattrib_fastball_control</td><td data-label="英文"><strong>Control</strong></td><td data-label="EA 官方繁中"><code>控制</code></td><td data-label="台灣講法"><strong>控球</strong></td><td data-label="這是什麼">投得準不準 —— 能不能把球放到想要的位置。控球差的投手保送多。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">pitchattrib_fastball_movement</td><td data-label="英文"><strong>Movement</strong></td><td data-label="EA 官方繁中"><code>動作</code></td><td data-label="台灣講法"><strong>尾勁／變化幅度</strong></td><td data-label="這是什麼">⚠️ 官方譯成「動作」很容易誤會成投球姿勢。它指的是<strong>球在飛行途中跑掉多少</strong>，也就是打者以為會進來、結果球溜掉的那個量。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">pitchattrib_pitch2_type</td><td data-label="英文"><strong>Pitch Type</strong></td><td data-label="EA 官方繁中"><code>球路</code><span class="small">（字串表寫 <code>Pitch Types</code>）</span></td><td data-label="台灣講法"><strong>球種</strong></td><td data-label="這是什麼">第二到第五球種是什麼。代號見下面那張球種表。</td></tr>
+      <tr><td data-label="遊戲裡的欄位" class="mono">pitchattrib_pitcher_delivery</td><td data-label="英文"><strong>Pitch Delivery</strong></td><td data-label="EA 官方繁中"><code>投手</code><span class="small">（字串表寫 <code>Pitcher Delivery</code>）</span></td><td data-label="台灣講法"><strong>投球動作</strong></td><td data-label="這是什麼">他的投球姿勢。<code>config.txt</code> 的 <code>Pitch Delivery</code> 一共 59 項：12 項是通用動作（3/4 四種、正上方三種、側投、低肩側投、典型 1 到 3），其餘 47 項以真實球員命名。</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="position">守備位置</h2>
+
+  <p>代號直接來自 <code>config.txt</code> 裡 EA 自己的表。注意<strong>主守位不會出現 9</strong>（<code>9</code> 只出現在副守位 <code>playerattrib_secondary_position</code>，代表指定打擊 DH），而 <code>10</code> 是中繼投手 ——棒球慣例的「9 = 右外野、10 = 指定打擊」在這個遊戲裡不成立。</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>代號</th><th>縮寫</th><th>英文</th><th>中文</th><th>這個位置在做什麼</th></tr></thead>
+    <tbody>
+      <tr><td data-label="代號" class="num mono">0</td><td data-label="縮寫" class="mono">P</td><td data-label="英文">Pitcher</td><td data-label="中文"><strong>投手</strong></td><td data-label="這個位置在做什麼">投球的人。</td></tr>
+      <tr><td data-label="代號" class="num mono">1</td><td data-label="縮寫" class="mono">C</td><td data-label="英文">Catcher</td><td data-label="中文"><strong>捕手</strong></td><td data-label="這個位置在做什麼">蹲在本壘後面接球、配球、擋本壘。</td></tr>
+      <tr><td data-label="代號" class="num mono">2</td><td data-label="縮寫" class="mono">1B</td><td data-label="英文">First Base</td><td data-label="中文"><strong>一壘手</strong></td><td data-label="這個位置在做什麼">守一壘，主要工作是接內野手的傳球。</td></tr>
+      <tr><td data-label="代號" class="num mono">3</td><td data-label="縮寫" class="mono">2B</td><td data-label="英文">Second Base</td><td data-label="中文"><strong>二壘手</strong></td><td data-label="這個位置在做什麼">守一二壘之間，雙殺的軸心之一。</td></tr>
+      <tr><td data-label="代號" class="num mono">4</td><td data-label="縮寫" class="mono">3B</td><td data-label="英文">Third Base</td><td data-label="中文"><strong>三壘手</strong></td><td data-label="這個位置在做什麼">守三壘，位置近打者、球又強又快，俗稱「熱角」。</td></tr>
+      <tr><td data-label="代號" class="num mono">5</td><td data-label="縮寫" class="mono">SS</td><td data-label="英文">Shortstop</td><td data-label="中文"><strong>游擊手</strong></td><td data-label="這個位置在做什麼">守二三壘之間，內野守備範圍最大、要求最高的位置。</td></tr>
+      <tr><td data-label="代號" class="num mono">6</td><td data-label="縮寫" class="mono">LF</td><td data-label="英文">Left Field</td><td data-label="中文"><strong>左外野手</strong></td><td data-label="這個位置在做什麼">守左外野。</td></tr>
+      <tr><td data-label="代號" class="num mono">7</td><td data-label="縮寫" class="mono">CF</td><td data-label="英文">Center Field</td><td data-label="中文"><strong>中外野手</strong></td><td data-label="這個位置在做什麼">守中外野，外野裡守備範圍最大的位置。</td></tr>
+      <tr><td data-label="代號" class="num mono">8</td><td data-label="縮寫" class="mono">RF</td><td data-label="英文">Right Field</td><td data-label="中文"><strong>右外野手</strong></td><td data-label="這個位置在做什麼">守右外野，回傳三壘的距離最遠，最吃臂力。</td></tr>
+      <tr><td data-label="代號" class="num mono">10</td><td data-label="縮寫" class="mono">RP</td><td data-label="英文">Relief Pitcher</td><td data-label="中文"><strong>中繼／後援投手</strong></td><td data-label="這個位置在做什麼">不是先發，從中途上場的投手。</td></tr>
+    </tbody>
+  </table></div>
+
+  <p class="small">另外兩個只有兩三種值的欄位：<code>playerattrib_bats</code>（<code>0</code> 右打 · <code>1</code> 左打 · <code>2</code> 左右開弓）、<code>playerattrib_throws</code>（<code>0</code> 右投 · <code>1</code> 左投）。</p>
+
+  <h2 id="pitchtype">球種</h2>
+
+  <p>十五種，代號同樣來自 <code>config.txt</code>。一位投手最多帶五種（<code>fastball</code> 加 <code>pitch2</code> 到 <code>pitch5</code>）。</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>代號</th><th>英文</th><th>EA 官方繁中</th><th>台灣講法</th><th>這球長什麼樣</th></tr></thead>
+    <tbody>
+      <tr><td data-label="代號" class="num mono">0</td><td data-label="英文"><strong>Fastball</strong></td><td data-label="EA 官方繁中"><code>快速球</code></td><td data-label="台灣講法"><strong>直球</strong></td><td data-label="這球長什麼樣">最基本的一球，比快不比變化。</td></tr>
+      <tr><td data-label="代號" class="num mono">1</td><td data-label="英文"><strong>Changeup</strong></td><td data-label="EA 官方繁中"><code>變速球</code></td><td data-label="台灣講法"><strong>變速球</strong></td><td data-label="這球長什麼樣">握法讓球慢下來，但手臂動作跟直球一樣 —— 騙的是打者的節奏。</td></tr>
+      <tr><td data-label="代號" class="num mono">2</td><td data-label="英文"><strong>Curveball</strong></td><td data-label="EA 官方繁中"><code>曲球</code></td><td data-label="台灣講法"><strong>曲球</strong></td><td data-label="這球長什麼樣">大幅度往下墜、常帶橫向。速度明顯比直球慢。</td></tr>
+      <tr><td data-label="代號" class="num mono">3</td><td data-label="英文"><strong>Knuckleball</strong></td><td data-label="EA 官方繁中"><code>蝴蝶球</code></td><td data-label="台灣講法"><strong>蝴蝶球</strong></td><td data-label="這球長什麼樣">幾乎不轉，靠空氣亂飄。連捕手都不知道會往哪跑。</td></tr>
+      <tr><td data-label="代號" class="num mono">4</td><td data-label="英文"><strong>Screwball</strong></td><td data-label="EA 官方繁中"><code>螺旋球</code></td><td data-label="台灣講法"><strong>螺旋球</strong></td><td data-label="這球長什麼樣">往跟曲球相反的方向轉，很少人投得出來。</td></tr>
+      <tr><td data-label="代號" class="num mono">5</td><td data-label="英文"><strong>Sinker</strong></td><td data-label="EA 官方繁中"><code>伸卡球</code></td><td data-label="台灣講法"><strong>伸卡球</strong></td><td data-label="這球長什麼樣">進壘前往下沉，專門讓打者打成滾地球。</td></tr>
+      <tr><td data-label="代號" class="num mono">6</td><td data-label="英文"><strong>Slider</strong></td><td data-label="EA 官方繁中"><code>滑球</code></td><td data-label="台灣講法"><strong>滑球</strong></td><td data-label="這球長什麼樣">速度接近直球，進壘前橫向滑開。</td></tr>
+      <tr><td data-label="代號" class="num mono">7</td><td data-label="英文"><strong>Splitter</strong></td><td data-label="EA 官方繁中"><code>叉指球</code></td><td data-label="台灣講法"><strong>指叉球</strong></td><td data-label="這球長什麼樣">兩指張開夾球，進壘瞬間往下掉。</td></tr>
+      <tr><td data-label="代號" class="num mono">8</td><td data-label="英文"><strong>2-Seam FB</strong></td><td data-label="EA 官方繁中"><code>二縫線球</code></td><td data-label="台灣講法"><strong>二縫線快速球</strong></td><td data-label="這球長什麼樣">握縫線的方式不同，比四縫線稍慢但會跑。</td></tr>
+      <tr><td data-label="代號" class="num mono">9</td><td data-label="英文"><strong>Cutter</strong></td><td data-label="EA 官方繁中"><code>切球</code></td><td data-label="台灣講法"><strong>卡特球</strong></td><td data-label="這球長什麼樣">接近直球，最後一刻小幅切向一邊，專打斷球棒。</td></tr>
+      <tr><td data-label="代號" class="num mono">10</td><td data-label="英文"><strong>Circle Change</strong></td><td data-label="EA 官方繁中"><code>圈指變速球</code></td><td data-label="台灣講法"><strong>圈指變速球</strong></td><td data-label="這球長什麼樣">拇指與食指圈起來的變速球握法。</td></tr>
+      <tr><td data-label="代號" class="num mono">11</td><td data-label="英文"><strong>Forkball</strong></td><td data-label="EA 官方繁中"><code>指叉球</code></td><td data-label="台灣講法"><strong>叉指球</strong></td><td data-label="這球長什麼樣">⚠️ 官方把它跟 Splitter 的中文譯名對調了，見下面那一節。</td></tr>
+      <tr><td data-label="代號" class="num mono">12</td><td data-label="英文"><strong>Knuckle Curve</strong></td><td data-label="EA 官方繁中"><code>彈指曲球</code><span class="small">（字串表寫 <code>Knucklecurve</code>）</span></td><td data-label="台灣講法"><strong>彈指曲球</strong></td><td data-label="這球長什麼樣">用蝴蝶球的握法投出曲球的軌跡。</td></tr>
+      <tr><td data-label="代號" class="num mono">13</td><td data-label="英文"><strong>Palmball</strong></td><td data-label="EA 官方繁中"><code>掌心球</code></td><td data-label="台灣講法"><strong>掌心球</strong></td><td data-label="這球長什麼樣">球壓在掌心，是一種更慢的變速球。</td></tr>
+      <tr><td data-label="代號" class="num mono">14</td><td data-label="英文"><strong>Slurve</strong></td><td data-label="EA 官方繁中"><code>滑曲球</code></td><td data-label="台灣講法"><strong>滑曲球</strong></td><td data-label="這球長什麼樣">介於滑球與曲球之間。</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="stats">成績欄位</h2>
+
+  <p>看轉播與看名冊都會遇到的縮寫。本站<a href="../reference/database.html">解開歷史成績檔</a>時，打擊與投球各量到八欄；下面這張表挑的是其中最常見的幾個，另外還收了防禦率、上壘率這種<u>看轉播會遇到、但檔案裡並沒有存</u>的衍生值。</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>縮寫</th><th>英文</th><th>EA 官方繁中</th><th>台灣講法</th><th>這是什麼</th></tr></thead>
+    <tbody>
+      <tr><td data-label="縮寫" class="mono"><strong>AB</strong></td><td data-label="英文">At Bats</td><td data-label="EA 官方繁中"><span class="small">（沒有這個字串）</span></td><td data-label="台灣講法"><strong>打數</strong></td><td data-label="這是什麼">正式的打擊機會。保送、犧牲打不算。</td></tr>
+      <tr><td data-label="縮寫" class="mono"><strong>H</strong></td><td data-label="英文">Hits</td><td data-label="EA 官方繁中"><code>擊中</code></td><td data-label="台灣講法"><strong>安打</strong></td><td data-label="這是什麼">打出去而且安全上壘。</td></tr>
+      <tr><td data-label="縮寫" class="mono"><strong>HR</strong></td><td data-label="英文">Home Run</td><td data-label="EA 官方繁中"><code>全壘打</code></td><td data-label="台灣講法"><strong>全壘打</strong></td><td data-label="這是什麼">一棒打出全壘打牆，或跑完一圈。</td></tr>
+      <tr><td data-label="縮寫" class="mono"><strong>RBI</strong></td><td data-label="英文">Runs Batted In</td><td data-label="EA 官方繁中"><code>打點</code></td><td data-label="台灣講法"><strong>打點</strong></td><td data-label="這是什麼">因為你這一打席而回來得分的人數。</td></tr>
+      <tr><td data-label="縮寫" class="mono"><strong>R</strong></td><td data-label="英文">Runs</td><td data-label="EA 官方繁中"><code>得分</code></td><td data-label="台灣講法"><strong>得分</strong></td><td data-label="這是什麼">你自己跑回本壘的次數。</td></tr>
+      <tr><td data-label="縮寫" class="mono"><strong>SB</strong></td><td data-label="英文">Stolen Base</td><td data-label="EA 官方繁中"><code>盜壘</code></td><td data-label="台灣講法"><strong>盜壘成功</strong></td><td data-label="這是什麼">投手投球時起跑並安全上到下一個壘。</td></tr>
+      <tr><td data-label="縮寫" class="mono"><strong>BB</strong></td><td data-label="英文">Walk</td><td data-label="EA 官方繁中"><code>保送</code></td><td data-label="台灣講法"><strong>四壞球保送</strong></td><td data-label="這是什麼">四個壞球，打者不用打就上一壘。</td></tr>
+      <tr><td data-label="縮寫" class="mono"><strong>K/SO</strong></td><td data-label="英文">Strikeout</td><td data-label="EA 官方繁中"><code>三振出局</code></td><td data-label="台灣講法"><strong>三振</strong></td><td data-label="這是什麼">三個好球，打者出局。</td></tr>
+      <tr><td data-label="縮寫" class="mono"><strong>ERA</strong></td><td data-label="英文">Earned Run Average</td><td data-label="EA 官方繁中"><code>得分率</code></td><td data-label="台灣講法"><strong>防禦率</strong></td><td data-label="這是什麼">⚠️ <strong>官方譯成「得分率」是錯的。</strong>它是「每九局平均失掉幾分自責分」，數字越小越好 —— 台灣棒球圈叫防禦率。</td></tr>
+      <tr><td data-label="縮寫" class="mono"><strong>W-L</strong></td><td data-label="英文">Win-Loss Record</td><td data-label="EA 官方繁中"><code>勝-敗記錄</code></td><td data-label="台灣講法"><strong>勝／敗</strong></td><td data-label="這是什麼">這場勝投或敗投記在誰頭上。</td></tr>
+      <tr><td data-label="縮寫" class="mono"><strong>SV</strong></td><td data-label="英文">Saves</td><td data-label="EA 官方繁中"><code>救援成功</code></td><td data-label="台灣講法"><strong>救援成功</strong></td><td data-label="這是什麼">在領先的情況下關門成功。</td></tr>
+      <tr><td data-label="縮寫" class="mono"><strong>IP</strong></td><td data-label="英文">Innings Pitched</td><td data-label="EA 官方繁中"><code>投球局數</code></td><td data-label="台灣講法"><strong>投球局數</strong></td><td data-label="這是什麼">總共投了幾局。</td></tr>
+      <tr><td data-label="縮寫" class="mono"><strong>OBP</strong></td><td data-label="英文">On Base Percentage</td><td data-label="EA 官方繁中"><span class="small">（沒有這個字串）</span></td><td data-label="台灣講法"><strong>上壘率</strong></td><td data-label="這是什麼">⚠️ 遊戲裡 On Base 官方譯「壘包上」，那是描述跑者位置;成績欄位的 OBP 是<strong>上壘率</strong>(安打 + 保送 + 觸身球 佔全部打席的比例)。</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="mode">模式與其他名詞</h2>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>英文</th><th>EA 官方繁中</th><th>台灣講法</th><th>這是什麼</th></tr></thead>
+    <tbody>
+      <tr><td data-label="英文"><strong>Dynasty</strong></td><td data-label="EA 官方繁中"><code>王朝</code></td><td data-label="台灣講法"><strong>王朝模式</strong></td><td data-label="這是什麼">接手一支球隊經營很多年：選秀、交易、育成、算薪水。遊戲的主菜。</td></tr>
+      <tr><td data-label="英文"><strong>Franchise</strong></td><td data-label="EA 官方繁中"><span class="small">（沒有這個字串）</span></td><td data-label="台灣講法"><strong>球團模式</strong></td><td data-label="這是什麼">跟王朝模式類似的長期經營。</td></tr>
+      <tr><td data-label="英文"><strong>Owner</strong></td><td data-label="EA 官方繁中"><code>老闆</code></td><td data-label="台灣講法"><strong>老闆模式</strong></td><td data-label="這是什麼">連票價、球場設施、周邊商品都要管的模式 —— 你是老闆不只是總教練。</td></tr>
+      <tr><td data-label="英文"><strong>Roster</strong></td><td data-label="EA 官方繁中"><code>球員名冊</code></td><td data-label="台灣講法"><strong>名單</strong></td><td data-label="這是什麼">所有球員與他們能力值的那份資料。站上大部分課改的就是它。</td></tr>
+      <tr><td data-label="英文"><strong>Lineup</strong></td><td data-label="EA 官方繁中"><code>球員名單</code></td><td data-label="台灣講法"><strong>打線</strong></td><td data-label="這是什麼">這一場誰先打、誰第幾棒。跟「名冊」不是同一件事。</td></tr>
+      <tr><td data-label="英文"><strong>Rotation</strong></td><td data-label="EA 官方繁中"><code>輪替名單</code></td><td data-label="台灣講法"><strong>先發輪值</strong></td><td data-label="這是什麼">先發投手的出場順序，通常五個人輪。</td></tr>
+      <tr><td data-label="英文"><strong>Bullpen</strong></td><td data-label="EA 官方繁中"><code>練投區</code></td><td data-label="台灣講法"><strong>牛棚</strong></td><td data-label="這是什麼">⚠️ 官方譯成「練投區」。在棒球裡它同時指那塊地方，也指<strong>全隊的後援投手群</strong>。</td></tr>
+      <tr><td data-label="英文"><strong>Bench</strong></td><td data-label="EA 官方繁中"><code>板凳球員</code></td><td data-label="台灣講法"><strong>板凳</strong></td><td data-label="這是什麼">這一場沒有先發、坐在休息區等待上場的人。</td></tr>
+      <tr><td data-label="英文"><strong>Spring Training</strong></td><td data-label="EA 官方繁中"><code>春季訓練</code></td><td data-label="台灣講法"><strong>春訓</strong></td><td data-label="這是什麼">球季開打前的熱身與調整期。</td></tr>
+      <tr><td data-label="英文"><strong>Playoff</strong></td><td data-label="EA 官方繁中"><code>季後賽</code></td><td data-label="台灣講法"><strong>季後賽</strong></td><td data-label="這是什麼">例行賽打完，前幾名進入的淘汰賽。</td></tr>
+      <tr><td data-label="英文"><strong>World Series</strong></td><td data-label="EA 官方繁中"><code>世界大賽</code></td><td data-label="台灣講法"><strong>世界大賽</strong></td><td data-label="這是什麼">美國職棒的總冠軍賽。</td></tr>
+      <tr><td data-label="英文"><strong>Draft</strong></td><td data-label="EA 官方繁中"><code>選秀</code></td><td data-label="台灣講法"><strong>選秀</strong></td><td data-label="這是什麼">各隊按順序挑新人。</td></tr>
+      <tr><td data-label="英文"><strong>Trade</strong></td><td data-label="EA 官方繁中"><code>交易</code></td><td data-label="台灣講法"><strong>交易</strong></td><td data-label="這是什麼">兩隊互換球員。</td></tr>
+      <tr><td data-label="英文"><strong>Injury</strong></td><td data-label="EA 官方繁中"><code>受傷</code></td><td data-label="台灣講法"><strong>傷兵</strong></td><td data-label="這是什麼">受傷的球員會進傷兵名單，一段時間不能上場。</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="misleading">⚠️ 官方中文譯得不準的十一個</h2>
+  <p>這一節不是在挑 EA 的毛病 —— 是因為<strong>你照著官方中文理解，就會改錯欄位</strong>。
+     每一條的英文都是從遊戲檔案裡量到的，中文是官方繁中版同一個字串編號的內容。</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>遊戲裡的英文</th><th>EA 官方繁中</th><th>應該是</th><th>為什麼會誤導</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="遊戲裡的英文"><strong>Range</strong></td><td data-label="EA 官方繁中"><code>距離</code></td><td data-label="應該是"><strong>守備範圍</strong></td><td data-label="為什麼會誤導">「距離」讀起來像傳球距離，實際是守備員顧得到多大一塊地。</td></tr>
+      <tr class="hi"><td data-label="遊戲裡的英文"><strong>Movement</strong></td><td data-label="EA 官方繁中"><code>動作</code></td><td data-label="應該是"><strong>尾勁／變化幅度</strong></td><td data-label="為什麼會誤導">「動作」讀起來像投球姿勢，實際是球在飛行中跑掉多少。</td></tr>
+      <tr class="hi"><td data-label="遊戲裡的英文"><strong>Power</strong></td><td data-label="EA 官方繁中"><code>爆發力</code></td><td data-label="應該是"><strong>長打力</strong></td><td data-label="為什麼會誤導">「爆發力」偏向瞬間力量;棒球講的是把球打遠的能力。</td></tr>
+      <tr class="hi"><td data-label="遊戲裡的英文"><strong>Contact</strong></td><td data-label="EA 官方繁中"><code>擊球率</code></td><td data-label="應該是"><strong>球棒控制／擊球能力</strong></td><td data-label="為什麼會誤導">它不是一個「率」，是能不能碰到球的能力值。</td></tr>
+      <tr class="hi"><td data-label="遊戲裡的英文"><strong>Earned Run Average</strong></td><td data-label="EA 官方繁中"><code>得分率</code></td><td data-label="應該是"><strong>防禦率</strong></td><td data-label="為什麼會誤導"><strong>這個最要緊</strong>:它算的是自責分，不是得分;而且數字越小越好。</td></tr>
+      <tr class="hi"><td data-label="遊戲裡的英文"><strong>Prospect</strong></td><td data-label="EA 官方繁中"><code>人選</code></td><td data-label="應該是"><strong>潛力新秀</strong></td><td data-label="為什麼會誤導">「人選」讀不出是什麼;它指還沒上大聯盟但被看好的年輕人。</td></tr>
+      <tr class="hi"><td data-label="遊戲裡的英文"><strong>Bats</strong></td><td data-label="EA 官方繁中"><code>打擊</code></td><td data-label="應該是"><strong>左打／右打</strong></td><td data-label="為什麼會誤導">這一欄只有右打／左打／左右開弓三種值，不是打擊能力。</td></tr>
+      <tr class="hi"><td data-label="遊戲裡的英文"><strong>Throws</strong></td><td data-label="EA 官方繁中"><code>丟球</code></td><td data-label="應該是"><strong>投球慣用手</strong></td><td data-label="為什麼會誤導">只有右投與左投兩種。</td></tr>
+      <tr class="hi"><td data-label="遊戲裡的英文"><strong>Bullpen</strong></td><td data-label="EA 官方繁中"><code>練投區</code></td><td data-label="應該是"><strong>牛棚</strong></td><td data-label="為什麼會誤導">它也指全隊的後援投手群，不只是那塊地。</td></tr>
+      <tr class="hi"><td data-label="遊戲裡的英文"><strong>Durability</strong></td><td data-label="EA 官方繁中"><code>耐力</code></td><td data-label="應該是"><strong>耐用度</strong></td><td data-label="為什麼會誤導">容易跟投手的 Stamina(體力)混。這一欄是不容易受傷。</td></tr>
+      <tr class="hi"><td data-label="遊戲裡的英文"><strong>Splitter / Forkball</strong></td><td data-label="EA 官方繁中"><code>叉指球 / 指叉球</code></td><td data-label="應該是"><strong>指叉球 / 叉指球</strong></td><td data-label="為什麼會誤導">這兩個的中文譯名在官方版裡跟台灣慣用剛好對調。看到中文先確認英文是哪一個。</td></tr>
+    </tbody>
+  </table></div>
+
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 這一頁把遊戲裡的棒球術語列成三欄 ——
+        <u>遊戲裡的英文</u>（名冊欄位名與 EA 代號表，量出來的）、
+        <u>EA 官方繁中</u>（兩份原版字串表同一個編號配出來的，也是量出來的）、
+        <u>台灣棒球圈的講法</u>（慣用語，本站不宣稱它是標準）。</li>
+    <li><strong>最要緊的一條</strong> <code>Earned Run Average</code>
+        官方譯成「得分率」是錯的 —— 它是<strong>防禦率</strong>
+        （每九局平均失掉幾分自責分），而且<u>數字越小越好</u>。</li>
+    <li><strong>三組最容易改錯的欄位</strong> <code>Range</code> 是<u>守備範圍</u>不是傳球距離；
+        <code>Movement</code> 是<u>球的尾勁</u>不是投球姿勢；
+        <code>Bats</code>／<code>Throws</code> 是<u>左右手</u>不是能力值。</li>
+    <li><strong>守位代號跟棒球慣例不一樣</strong> 這個遊戲裡
+        <u>主守位不會出現 <code>9</code></u>（<code>9</code> 只在副守位出現，代表指定打擊 DH），
+        <code>10</code> 是中繼投手 ——
+        棒球記分慣用的「9 = 右外野」在這裡不成立，直接照 EA 的表看。</li>
+    <li><strong>投手的每一個球種各有四個數字</strong> 球速、控球、尾勁、進壘角度。
+        五個球種就是二十個數字，改一個球種不會動到別的。</li>
+    <li><strong>本站沒驗的</strong> 第三欄的「台灣講法」是<u>慣用語不是量測</u>，
+        不同世代、不同轉播用詞會有出入；
+        而且本站<u>沒有在遊戲裡逐欄改過看效果</u> ——
+        這一頁講的是「這個欄位叫什麼、是什麼意思」，
+        不是「改了之後遊戲裡會怎樣」。</li>
+  </ul>
+
+  <footer>
+    <p>本頁的英文欄位名取自 <code>attrib.dat</code>（46 欄）與 <code>pitcher.dat</code>（29 欄）的表頭，
+       代號表取自 <code>config.txt</code>（守位 10 項、球種 15 項、投球動作 59 項）；
+       官方中文取自剛安裝好的官方繁體中文版字串表，與英文版<u>同一個字串編號</u>逐條配對。
+       量法見<a href="../reference/how-we-measured.html">本站怎麼量的</a>。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/hud-map.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>介面座標圖 — toni的MVP模組補習班</title>
+<meta name="description" content="版面檔每一行都寫著座標。把它們畫出來就是一張「哪個東西在畫面哪裡」的地圖,不需要截圖。附座標是絕對值的實測證據。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 介面座標圖</p>
+  <h1>介面座標圖</h1>
+  <p class="lede"><a href="fel.html">版面檔</a>的每一行都寫著這個元素在畫面上的位置。
+     把整個檔案的座標畫出來，就得到一張<strong>「哪個東西在畫面哪裡」的地圖</strong> ——
+     全程沒有開遊戲，也沒有用到任何截圖。</p>
+
+  <h2>先講一個發現：座標是絕對的</h2>
+  <p>版面檔用縮排把元素排成一層一層的群組。直覺會以為<strong>子元素的座標是相對於上層群組</strong>
+     （很多介面系統都這樣）。實際上不是。</p>
+  <p>驗證方法：把 <code>ingame.big</code> 裡<strong>全部 18,649 個帶座標的元素</strong>各用兩種解讀算一次，
+     看哪一種算出來的位置比較合理：</p>
+  <div class="card blue">
+    <p class="card-h">我們改過這一段</p>
+    <p>這頁上線時，第一列寫的是「<strong>99.3%</strong> 對 41.4%」，
+       但<u>沒有寫「落在畫面內」是怎麼判定的</u>。</p>
+    <p>重新量的時候<strong>用五種合理的判定條件都湊不出那兩個數字</strong>。
+       原本那一對怎麼算出來的，本站已經無法重現，所以整列換成下面這張表 ——
+       每一種判定都把條件寫清楚，讀者可以自己挑一種重跑。</p>
+  </div>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>「落在畫面內」怎麼判定</th><th class="num">絕對座標</th><th class="num">相對座標</th><th class="num">差幾倍</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="「落在畫面內」怎麼判定">整個框都在 640×480 之內</td><td data-label="絕對座標" class="num"><strong>96.4%</strong></td><td data-label="相對座標" class="num">18.9%</td><td data-label="差幾倍" class="num">5.1×</td></tr>
+      <tr><td data-label="「落在畫面內」怎麼判定">左上角在 640×480 之內</td><td data-label="絕對座標" class="num"><strong>98.5%</strong></td><td data-label="相對座標" class="num">25.2%</td><td data-label="差幾倍" class="num">3.9×</td></tr>
+      <tr><td data-label="「落在畫面內」怎麼判定">框與畫面有任何重疊</td><td data-label="絕對座標" class="num"><strong>99.4%</strong></td><td data-label="相對座標" class="num">25.7%</td><td data-label="差幾倍" class="num">3.9×</td></tr>
+      <tr><td data-label="「落在畫面內」怎麼判定">中心點在 640×480 之內</td><td data-label="絕對座標" class="num"><strong>99.0%</strong></td><td data-label="相對座標" class="num">23.6%</td><td data-label="差幾倍" class="num">4.2×</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>結論不受影響，而且比原本更強：</strong>四種判定條件下，
+     絕對解讀都是相對解讀的<strong>三點九到五點一倍</strong>。<u>不管你怎麼定義「在畫面內」，絕對解讀都贏</u>。</p>
+    <div class="card amber">
+      <p class="card-h">⚠️ 2026-08-29 訂正：這四對數字本站算錯過一次</p>
+      <p>上面那張表原本寫 49.1 / 19.5、91.0 / 42.7、88.5 / 40.2、83.2 / 33.6。
+         那組數字是<strong>整欄左移一格</strong>算出來的 —— 讀成了
+         （保留欄, X, Y, 寬），而不是本頁自己宣告的第 4 到第 7 欄（X, Y, 寬, 高）。</p>
+      <p><strong>怎麼確定是欄位錯了：</strong>每個版面檔開頭都有一行畫面定義，例如
+         <code>SC:DEFENSIVEPOS,1,0,0,0,640,480,…</code>。畫面就是 640×480 ——
+         用第 4-7 欄讀出來是 <code>(0, 0, 640, 480)</code>，正是畫面本身；
+         用第 3-6 欄讀出來是 <code>(0, 0, 0, 640)</code>，寬度變成 0。
+         <u>只有一種讀法成立</u>，而且這一行的身分獨立可知，不是靠數量湊出來的。</p>
+      <p>錯誤的形狀也說得出來：左移一格之後，X 被釘在一個
+         <strong>99.5% 的行都是 0</strong> 的保留欄，所以「左上角在內」被灌水到 91.0%；
+         同時被當成「高」的其實是「寬」，所以「整框在內」塌到 49.1%。
+         <u>一高一低正是位移一格的特徵</u>。</p>
+      <p class="tail">底下那張「子元素落在群組框裡 52.7%」是用<strong>正確欄位</strong>算的，沒有受影響。
+         同一頁兩張表用了不同口徑 —— 這就是為什麼沒有任何一支檢查器抓到它。</p>
+    </div>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>另一個檢驗項目</th><th class="num">絕對座標</th><th class="num">相對座標</th></tr></thead>
+    <tbody>
+      <tr><td data-label="另一個檢驗項目">子元素完全落在上層群組的框裡</td><td data-label="絕對座標" class="num"><strong>52.7%</strong></td><td data-label="相對座標" class="num">2.6%</td></tr>
+    </tbody>
+  </table></div>
+  <div class="card clay">
+    <p class="card-h">⚠️ 本站訂正了自己的訂正（2026-08-29）</p>
+    <p>這裡原本寫「<u>相對解讀會讓一大半的元素跑到畫面外，
+       這在一款正式出貨的遊戲裡不可能發生</u>」。</p>
+    <p>後來本站把這個理由<strong>撤回</strong>，說它會把自己也否掉，
+         因為「絕對解讀也只有 49.1% 整框在畫面內」。
+         <strong>那次撤回是錯的</strong> —— 49.1% 本身就是用錯欄位算的（見上面那張卡）。
+         用正確欄位，絕對解讀是 <strong>96.4%</strong>。</p>
+      <p>所以<u>原本那個理由其實站得住</u>：相對解讀只有 18.9% 的元素整框在畫面內，
+         那確實不像一款出貨遊戲的樣子。
+         <strong>本站撤回了一個對的理由，而撤回的依據是一個錯的數字。</strong>
+         底下這個觀察本身仍然成立，也仍然是更好的論據：</p>
+    <p>真正的原因是：<strong>版面檔裡本來就塞著大量隱藏、備用、同畫面多版本的元素</strong>。
+       同一個元素在一個檔裡宣告六次是常態
+       （見 <a href="fel.html">FEL 版面語法</a>）。
+       畫面外的座標不代表出錯，代表那一份宣告當下沒有被用到。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">改用一個看得見的元素當證據</p>
+    <p>與其比百分比，不如找<strong>一個確定會出現在畫面上的元素</strong>，
+       看兩種解讀各自把它算到哪裡。</p>
+    <p><code>TX:RATING</code> 就是那個元素 ——
+       它是<a href="../tutorials/hide-runner-speed/index.html">本站招牌那一課</a>要關掉的東西，
+       <u>整整一課存在的理由就是「它看得見、而且很多人想關掉它」</u>。</p>
+    <p>拿 <code>fes_ingameendofgamemenu.fel</code> 裡的那一行來算
+       （<span class="small">這一行的數值是<u>剛安裝好的 EA 原版</u>那一份；
+       這台機器上那一份被模組改過，同一行的 Y 是 409、逐層累加是 1,495，
+       一樣遠在畫面外，結論不受影響</span>）：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>層</th><th class="num">X</th><th class="num">Y</th></tr></thead>
+      <tbody>
+        <tr><td data-label="層" class="mono">TX:RATING（自己）</td><td data-label="X" class="num">572</td><td data-label="Y" class="num">398</td></tr>
+        <tr><td data-label="層" class="mono">GR:HOMEPLATE</td><td data-label="X" class="num">349</td><td data-label="Y" class="num">396</td></tr>
+        <tr><td data-label="層" class="mono">GR:BASES</td><td data-label="X" class="num">234</td><td data-label="Y" class="num">312</td></tr>
+        <tr><td data-label="層" class="mono">GR:DIAMOND</td><td data-label="X" class="num">315</td><td data-label="Y" class="num">314</td></tr>
+        <tr><td data-label="層" class="mono">GR:BASEBALLCENTER</td><td data-label="X" class="num">187</td><td data-label="Y" class="num">64</td></tr>
+        <tr class="hi"><td data-label="層"><strong>相對解讀（逐層累加）</strong></td>
+            <td data-label="X" class="num"><strong>1,657</strong></td><td data-label="Y" class="num"><strong>1,484</strong></td></tr>
+        <tr class="hi"><td data-label="層"><strong>絕對解讀</strong></td>
+            <td data-label="X" class="num"><strong>572</strong></td><td data-label="Y" class="num"><strong>398</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p>畫面是 <strong>640 × 480</strong>。
+       相對解讀把它算到 (1657, 1484) —— <u>螢幕的兩倍半以外</u>。
+       絕對解讀算到 (572, 398)，在畫面右下角。</p>
+    <p><strong>一個看得見的元素，不可能座標在畫面外。</strong>
+       這一個案例比上面四種百分比都硬 ——
+       百分比要解釋「為什麼有些元素在畫面外」，
+       而這個只要問「這個東西你在遊戲裡看得到嗎」。</p>
+    <p class="small">⚠️ 「這個元素在畫面上看得到」的依據是<u>網友的實機截圖</u>，
+       不是本站自己開遊戲拍的。<span class="badge wip">非本站實機驗證</span></p>
+  </div>
+  <p><strong>結論不變：座標是相對於整個畫面的絕對值，群組只是邏輯上的分組，不是座標的原點。</strong>
+     變的是<u>撐住這個結論的理由</u> —— 從一個會反噬自己的百分比論證，換成一個看得見的元素。</p>
+  <p class="small">計法補充：母體是<strong>這台機器上一份 2023 年整理的</strong> <code>ingame.big</code>
+     那 47 個版面檔裡第 4 到 7 欄可解析成數字的行，
+     扣掉 <code>KA:</code>（57 行，那四欄是影格與時間不是座標），共 <strong>18,649</strong> 個。
+     <u>剛安裝好的原版只有 44 個版面檔</u>（見<a href="ingame-files.html">比賽中版面檔一覽</a>），
+     拿原版重跑母體會少一批。<br>
+     「相對座標」的算法是把<u>上層每一層的 X、Y 逐層累加</u>下去 ——
+     不只 <code>GR</code>／<code>GG</code>／<code>SG</code> 這三種群組指令，
+     也包含 <code>FR</code>／<code>FC</code>／<code>BU</code>／<code>SL</code>／<code>TL</code>／<code>SC</code>
+     這些同樣會有下一層子元素的行（47 個檔裡有子元素的行 6,722 個，只有 3,480 個是那三種群組）。
+     如果只累加那三種群組，相對欄會變成 19.7% / 30.3% / 30.8% / 26.2%，差 3.2 到 4.9 倍，
+     絕對解讀一樣四種判定全贏。</p>
+  <div class="card blue">
+    <p class="card-h">群組的框也不是裁切範圍</p>
+    <p>上面第二張表只有 52.7%，代表<strong>有將近一半的元素畫在自己所屬群組的框外面</strong>。
+       群組的寬高欄位存在，但不會把超出去的子元素切掉。</p>
+    <p>這解釋了一件本站原本覺得奇怪的事：跑壘者速度那幾個數字寫在
+       <code>GR:HOMEPLATE</code>（349,396，寬 250）裡面，但它自己的 X 是 618，
+       已經超出群組右邊界 599。<strong>照樣顯示。</strong></p>
+  </div>
+
+  <h2>圖：比賽中的記分板版面</h2>
+  <p>下面這張圖是 <code>fes_ingameinfobar.fel</code> 裡
+     <strong>36 個顯示開關為 1 的可見元素</strong>，照它們自己寫的座標畫出來的
+     （<span class="small">「可見元素」＝文字 <code>TX</code>、貼圖 <code>SH</code>、色塊 <code>RT</code> 這三種，而且寬高都大於 0；
+     這個檔顯示開關為 1 的行其實有 97 行，其餘是群組與不佔畫面的指令</span>）。
+     橘色是下方圖例列出的七組，其餘是同一個檔案裡的其他元素。
+     <span class="small">（滑鼠移到框上會顯示行號與座標）</span></p>
+
+  <figure class="figbox">
+  <div class="figscroll">
+<svg class="hudmap" viewBox="-6 -6 652 492" role="img" aria-label="fes_ingameinfobar.fel 版面座標圖:640×480 畫面上 36 個顯示中的元素,標號 1 到 7 對應下方圖例">
+<rect x="0" y="0" width="640" height="480" class="scr"/>
+<line x1="320.0" y1="0" x2="320.0" y2="480" class="gd"/><line x1="0" y1="240.0" x2="640" y2="240.0" class="gd"/>
+<rect x="0" y="458" width="645" height="22" class="el"><title>SH:GREYTHIN1 · 第 36 行 · (0,458) 645×22</title></rect>
+<rect x="283" y="413" width="135" height="18" class="el"><title>SH:F5 · 第 428 行 · (283,413) 135×18</title></rect>
+<rect x="5" y="5" width="272" height="60" class="el"><title>SH:BLACKCORNER · 第 627 行 · (5,5) 272×60</title></rect>
+<rect x="576" y="317" width="64" height="128" class="el"><title>SH:BLACKTRANBOT · 第 753 行 · (576,317) 64×128</title></rect>
+<rect x="618" y="391" width="20" height="12" class="el hit"><title>TX:RATING · 第 758 行 · (618,391) 20×12 · 文字 99</title></rect>
+<rect x="618" y="348" width="20" height="12" class="el hit"><title>TX:RATING · 第 769 行 · (618,348) 20×12 · 文字 99</title></rect>
+<rect x="618" y="362" width="20" height="12" class="el hit"><title>TX:RATING · 第 779 行 · (618,362) 20×12 · 文字 99</title></rect>
+<rect x="618" y="377" width="20" height="12" class="el hit"><title>TX:RATING · 第 788 行 · (618,377) 20×12 · 文字 99</title></rect>
+<rect x="618" y="377" width="20" height="12" class="el hit"><title>TX:RATING · 第 797 行 · (618,377) 20×12 · 文字 99</title></rect>
+<rect x="550" y="461" width="20" height="12" class="el hit"><title>TX:RATING · 第 805 行 · (550,461) 20×12 · 文字 99</title></rect>
+<rect x="103" y="21" width="16" height="20" class="el"><title>SH:BP · 第 809 行 · (103,21) 16×20</title></rect>
+<rect x="93" y="10" width="16" height="20" class="el"><title>SH:BP · 第 811 行 · (93,10) 16×20</title></rect>
+<rect x="83" y="21" width="16" height="20" class="el"><title>SH:BP · 第 813 行 · (83,21) 16×20</title></rect>
+<rect x="63" y="23" width="24" height="14" class="el hit"><title>TX:SCORE1 · 第 835 行 · (63,23) 24×14 · 文字 99</title></rect>
+<rect x="63" y="42" width="24" height="14" class="el hit"><title>TX:SCORE2 · 第 842 行 · (63,42) 24×14 · 文字 99</title></rect>
+<rect x="590" y="20" width="50" height="50" class="el"><title>SH:EASPORTS · 第 865 行 · (590,20) 50×50</title></rect>
+<rect x="437" y="92" width="36" height="12" class="el hit"><title>TX:OUTS · 第 868 行 · (437,92) 36×12 · 文字 Out</title></rect>
+<rect x="424" y="92" width="17" height="12" class="el hit"><title>TX:NUMBER · 第 869 行 · (424,92) 17×12 · 文字 3</title></rect>
+<rect x="48" y="52" width="17" height="25" class="el hit"><title>TX:BALLS · 第 871 行 · (48,52) 17×25 · 文字 3</title></rect>
+<rect x="67" y="52" width="17" height="11" class="el hit"><title>TX:STRIKES · 第 872 行 · (67,52) 17×11 · 文字 2</title></rect>
+<rect x="58" y="52" width="15" height="11" class="el hit"><title>TX:DASH · 第 873 行 · (58,52) 15×11 · 文字 -</title></rect>
+<rect x="295" y="19" width="26" height="12" class="el hit"><title>TX:INNING · 第 881 行 · (295,19) 26×12 · 文字 9</title></rect>
+<rect x="77" y="448" width="66" height="16" class="el"><title>SH:BARBACK · 第 891 行 · (77,448) 66×16</title></rect>
+<rect x="79" y="450" width="62" height="6" class="el"><title>SH:POWERBAR · 第 892 行 · (79,450) 62×6</title></rect>
+<rect x="113" y="42" width="35" height="12" class="el hit"><title>TX:TX1 · 第 896 行 · (113,42) 35×12 · 文字 999</title></rect>
+<rect x="79" y="450" width="62" height="6" class="el"><title>SH:POWERBAR · 第 901 行 · (79,450) 62×6</title></rect>
+<rect x="577" y="473" width="26" height="12" class="el tx"><title>TX:TX1 · 第 905 行 · (577,473) 26×12 · 文字 WWW</title></rect>
+<rect x="220" y="473" width="35" height="12" class="el tx"><title>TX:TX1 · 第 909 行 · (220,473) 35×12 · 文字 WWW</title></rect>
+<rect x="415" y="473" width="118" height="11" class="el hit"><title>TX:TX1 · 第 913 行 · (415,473) 118×11 · 文字 WWWWWWW</title></rect>
+<rect x="75" y="473" width="131" height="11" class="el hit"><title>TX:TX1 · 第 917 行 · (75,473) 131×11 · 文字 WWWWWWW</title></rect>
+<rect x="562" y="460" width="66" height="16" class="el"><title>SH:BARBACK · 第 923 行 · (562,460) 66×16</title></rect>
+<rect x="565" y="462" width="62" height="6" class="el"><title>SH:POWERBAR · 第 924 行 · (565,462) 62×6</title></rect>
+<rect x="562" y="460" width="66" height="16" class="el"><title>SH:BARBACK · 第 930 行 · (562,460) 66×16</title></rect>
+<rect x="565" y="462" width="62" height="6" class="el"><title>SH:POWERBAR · 第 931 行 · (565,462) 62×6</title></rect>
+<rect x="562" y="460" width="66" height="16" class="el"><title>SH:BARBACK · 第 937 行 · (562,460) 66×16</title></rect>
+<rect x="565" y="462" width="62" height="6" class="el"><title>SH:POWERBAR · 第 938 行 · (565,462) 62×6</title></rect>
+<circle cx="625" cy="397" r="12" class="cal"/><text x="625" y="401.6" class="caln">1</text>
+<circle cx="75" cy="30" r="12" class="cal"/><text x="75" y="34.6" class="caln">2</text>
+<circle cx="455" cy="98" r="12" class="cal"/><text x="455" y="102.6" class="caln">4</text>
+<circle cx="56.5" cy="64.5" r="12" class="cal"/><text x="56.5" y="69.1" class="caln">3</text>
+<circle cx="308" cy="25" r="12" class="cal"/><text x="308" y="29.6" class="caln">5</text>
+<circle cx="130.5" cy="48" r="12" class="cal"/><text x="130.5" y="52.6" class="caln">6</text>
+<circle cx="474" cy="465" r="12" class="cal"/><text x="474" y="469.6" class="caln">7</text>
+</svg>
+  </div>
+  <figcaption><b>資料來源</b>：<code>data\frontend\ingame.big</code> → <code>fes_ingameinfobar.fel</code>。
+     每個方框的 X、Y、寬、高都直接取自版面檔的第 4 到第 7 個欄位，沒有任何位置是估的。
+     虛線是畫面的水平與垂直中線，只是輔助線。<br>
+     <b>版本說明</b>：這張圖量的是<a href="original-vs-modded.html">這台機器</a>上一份 2023 年整理的
+     <code>ingame.big</code>（47 個版面檔）。<u>剛安裝好的 EA 原版只有 44 個版面檔，而且不含
+     <code>fes_ingameinfobar.fel</code></u> —— 全新安裝的話，你在自己的檔案裡找不到這個版面檔是正常的，
+     有它的是裝過台灣名冊那類社群模組之後的版本。</figcaption>
+  </figure>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">標號</th><th>是什麼</th><th class="mono">元素</th>
+      <th class="num">行號</th><th class="num">座標</th><th class="mono">顯示的字</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="標號" class="num">1</td><td data-label="是什麼"><strong>跑壘者速度</strong></td><td data-label="元素" class="mono">TX:RATING</td>
+        <td data-label="行號" class="num">758 · 769 · 779<br>788 · 797 · 805</td><td data-label="座標" class="num">618,391 等六處</td><td data-label="顯示的字" class="mono">99</td></tr>
+      <tr><td data-label="標號" class="num">2</td><td data-label="是什麼">兩隊分數</td><td data-label="元素" class="mono">TX:SCORE1<br>TX:SCORE2</td>
+        <td data-label="行號" class="num">835 · 842</td><td data-label="座標" class="num">63,23<br>63,42</td><td data-label="顯示的字" class="mono">99</td></tr>
+      <tr><td data-label="標號" class="num">3</td><td data-label="是什麼">好壞球數</td><td data-label="元素" class="mono">TX:BALLS<br>TX:STRIKES<br>TX:DASH</td>
+        <td data-label="行號" class="num">871–873</td><td data-label="座標" class="num">48,52<br>67,52<br>58,52</td><td data-label="顯示的字" class="mono">3<br>2<br>-</td></tr>
+      <tr><td data-label="標號" class="num">4</td><td data-label="是什麼">出局數</td><td data-label="元素" class="mono">TX:OUTS<br>TX:NUMBER</td>
+        <td data-label="行號" class="num">868 · 869</td><td data-label="座標" class="num">437,92<br>424,92</td><td data-label="顯示的字" class="mono">Out<br>3</td></tr>
+      <tr><td data-label="標號" class="num">5</td><td data-label="是什麼">局數</td><td data-label="元素" class="mono">TX:INNING</td>
+        <td data-label="行號" class="num">881</td><td data-label="座標" class="num">295,19</td><td data-label="顯示的字" class="mono">9</td></tr>
+      <tr><td data-label="標號" class="num">6</td><td data-label="是什麼">投打數據格的<br>數字欄</td><td data-label="元素" class="mono">TX:TX1</td>
+        <td data-label="行號" class="num">896</td><td data-label="座標" class="num">113,42</td><td data-label="顯示的字" class="mono">999</td></tr>
+      <tr><td data-label="標號" class="num">7</td><td data-label="是什麼">投打數據列的<br>文字欄</td><td data-label="元素" class="mono">TX:TX1</td>
+        <td data-label="行號" class="num">913 · 917</td><td data-label="座標" class="num">415,473<br>75,473</td><td data-label="顯示的字" class="mono">WWWWWWW</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">第 6、7 兩組所屬的群組叫 <code>STATSBOX/PITCHERBATTER</code>，
+     顯示的字是<a href="loc-strings.html">佔位字串</a>（三位數、七個字寬），
+     所以本站只寫得出「這格能放幾個字」，<strong>不寫它實際放的是哪一項數據</strong>。
+     <code>WWWWWWW</code> 為什麼是 W，見<a href="loc-strings.html">文字表那頁</a>。</p>
+
+  <h2>自己畫一張</h2>
+  <p><a href="../tutorials/fel-toolkit/index.html">介面萬用工具</a>加了一個
+     <code>--where</code>，把上圖用到的座標直接印出來：</p>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --where fes_ingameinfobar.fel</code></pre>
+  <p class="small">⚠️ 你的遊戲如果是<u>剛安裝好的原版</u>，這一行會說封裝檔裡沒有這個檔 ——
+     那不是錯誤，原版的 <code>ingame.big</code> 只有 44 個版面檔、本來就沒有它。
+     先用 <code>--list</code> 看你這一份有哪些，再挑一個換上去。</p>
+  <div class="seen"><b>你會看到</b>
+<pre style="margin:8px 0 0"><code>fes_ingameinfobar.fel 裡顯示中的元素(畫面是 640x480)
+
+   行號    X    Y   寬 x 高  指令:名稱                文字 / 所屬群組
+  ----------------------------------------------------------------------------
+    758  618  391    20x12   TX:RATING              「99」  &lt; .../BASES/HOMEPLATE
+    769  618  348    20x12   TX:RATING              「99」  &lt; .../BASES/THIRDBASE
+    835   63   23    24x14   TX:SCORE1              「99」  &lt; .../TEAMSCOREFLASH/X0Y0
+    ...
+  共 36 個。全程唯讀。</code></pre>
+  </div>
+  <p class="small">換成別的檔名就換一個畫面。<code>fes_hudleft.fel</code> 有 186 個，
+     <code>fes_ingameoverlay.fel</code> 有 67 個。</p>
+
+  <h2>這張圖不能告訴你什麼</h2>
+  <div class="card clay">
+    <p class="card-h">三件事本站沒有驗證</p>
+    <p style="margin-top:6px">
+       一、<strong>沒有跟實機畫面比對過。</strong>圖上畫的是<u>檔案裡宣告的座標</u>，
+       不是<u>遊戲跑起來的樣子</u>。<br>
+       二、<strong>遊戲程式可以在執行時搬動元素。</strong>
+       <a href="fel.html">版面檔那頁</a>已經證實群組的顯示開關會被程式覆寫，位置同理。<br>
+       三、<strong>640×480 是版面座標系，不是你的螢幕解析度。</strong>
+       遊戲怎麼把它縮放到實際視窗，本站未解讀。</p>
+    <p><span class="badge wip">未驗證</span> 要當成「找元素的地圖」用，不要當成「畫面預覽圖」用。</p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 版面檔的每一行都寫著這個元素在畫面上的位置，把整個檔的座標畫出來就得到一張「哪個東西在畫面哪裡」的地圖，<u>全程沒有開遊戲，也沒有用到任何截圖</u>。</li>
+    <li><strong>座標是絕對值，不是相對於上層群組</strong> 拿 <code>ingame.big</code> 裡全部 <strong>18,649</strong> 個帶座標的元素，各用兩種解讀算一次。四種「落在畫面內」的判定條件下，絕對解讀都是相對解讀的三點九到五點一倍：整框在內 96.4% 對 18.9%、左上角在內 98.5% 對 25.2%、有重疊 99.4% 對 25.7%、中心點在內 99.0% 對 23.6%。不管你怎麼定義「在畫面內」，絕對解讀都贏。</li>
+    <li><strong>本站改過的數字</strong> 這頁上線時第一列寫的是「99.3% 對 41.4%」，卻沒有寫「落在畫面內」是怎麼判定的。重新量的時候<u>用五種合理的判定條件都湊不出那兩個數字，本站已經無法重現</u>，所以整列換成上面那張四行的表，每一種判定都把條件寫清楚，讀者可以自己挑一種重跑。</li>
+    <li><strong>本站訂正了自己的訂正</strong> 原本用「相對解讀會讓一大半元素跑到畫面外，正式出貨的遊戲不可能這樣」當論據，後來撤回它，理由是「絕對解讀也只有 49.1% 整框在畫面內」。<strong>那次撤回錯了</strong> —— 49.1% 是整欄左移一格算出來的，正確值 96.4%，所以原本那個理由其實站得住。真正的原因是版面檔本來就塞著大量隱藏、備用、同畫面多版本的宣告，畫面外不代表出錯。所以改用一個看得見的元素當證據：<code>TX:RATING</code> 用相對逐層累加算到 (1657, 1484)，用絕對解讀算到 (572, 398)，而畫面是 <strong>640 × 480</strong>（這一行的數值是剛安裝好的 EA 原版那一份；這台機器上那一份被模組改過，同一行累加起來是 (1657, 1495)，一樣在畫面外）。結論不變，變的是撐住結論的理由。</li>
+    <li><strong>群組的框不是裁切範圍</strong> 子元素完全落在上層群組框裡的只有 52.7%，代表將近一半的元素畫在自己群組的框外面，照樣顯示。跑壘者速度那幾個數字就是例子：它掛在 <code>GR:HOMEPLATE</code>（349,396，寬 250）底下，自己的 X 卻是 618，早就超出群組右邊界 599。</li>
+    <li><strong>圖上畫的到底是什麼</strong> <code>fes_ingameinfobar.fel</code> 裡 <strong>36 個顯示開關為 1 的可見元素</strong>（只算文字 <code>TX</code>、貼圖 <code>SH</code>、色塊 <code>RT</code>，而且寬高都大於 0；這個檔顯示開關為 1 的行其實有 97 行），每個方框的 X、Y、寬、高都直接取自版面檔第 4 到第 7 欄，沒有任何位置是估的。跑壘者速度是六處 <code>TX:RATING</code>；換個檔名就換一個畫面，<code>fes_hudleft.fel</code> 有 186 個、<code>fes_ingameoverlay.fel</code> 有 67 個。母體的計法也寫明了：<u>這台機器上一份 2023 年整理的</u> <code>ingame.big</code> 那 47 個版面檔裡第 4 到 7 欄可解析成數字的行，扣掉 <code>KA:</code> 那 57 行（那四欄是影格與時間不是座標）—— <u>剛安裝好的原版只有 44 個版面檔，而且不含 <code>fes_ingameinfobar.fel</code></u>。</li>
+    <li><strong>本站沒驗的</strong> 三件事本站沒有驗證。一、<u>沒有跟實機畫面比對過</u>，圖上畫的是檔案裡宣告的座標，不是遊戲跑起來的樣子。二、遊戲程式可以在執行時搬動元素，版面檔那頁已經證實群組的顯示開關會被程式覆寫，位置同理。三、640 × 480 是版面座標系，不是你的螢幕解析度，遊戲怎麼縮放本站未解讀。另外「<code>TX:RATING</code> 在畫面上看得到」的依據是<u>網友的實機截圖</u>，不是本站自己開遊戲拍的；圖例第 6、7 兩組顯示的是佔位字串，所以本站只寫得出這格能放幾個字，不寫它實際放的是哪一項數據。這張圖要當「找元素的地圖」用，不要當「畫面預覽圖」用。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../tutorials/fel-recipes/index.html">介面實例集</a> —— 圖上這幾個，怎麼一行指令關掉</li>
+    <li><a href="fel.html">FEL 版面語法</a> —— 座標是第幾欄，其他欄位是什麼</li>
+    <li><a href="loc-strings.html">文字表 .LOC</a> —— 圖例最後一欄的字是怎麼查出來的</li>
+    <li><a href="ingame-files.html">比賽中版面檔一覽</a> —— 另外 46 個檔案</li>
+  </ul>
+
+  <footer>
+    <p>本頁的座標、元素數量、百分比皆為現場解開 <code>ingame.big</code> 量測所得。
+       標示為「未驗證」之處本站尚未驗證。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

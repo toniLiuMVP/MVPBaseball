@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/file-map.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>遊戲檔案地圖 — toni的MVP模組補習班</title>
+<meta name="description" content="MVP Baseball 2005 的 224 個封裝檔在哪、裝什麼、可以改什麼。想改遊戲的任何東西，先從這張地圖找到對的檔案。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 檔案地圖</p>
+  <h1>遊戲檔案地圖</h1>
+  <p class="lede">想改遊戲裡的東西，第一個問題永遠是「它在哪個檔案」。
+     這頁把 <code>data\</code> 底下的 <strong>224 個封裝檔</strong>依用途分類，
+     從你想改的東西反查到檔案。</p>
+  <p class="small">⚠️ 說清楚一下這個 224：那是 <code>data\</code> 底下<u>副檔名叫 <code>.big</code> 的檔案數</u>。其中<strong>真正是 BIGF 封裝格式的只有 207 個</strong> —— 另外 8 個開頭是 <code>SCHl</code>(音訊容器)、1 個是 <code>SHPI</code>(圖片)、8 個沒有可辨識的開頭。站上其他地方講「224 個封裝檔」是沿用習慣講法，需要精確數字的時候以這裡為準。<br>另外要說的是：<strong>本頁的檔案大小與項目數量自本站測試機那台裝過模組的遊戲</strong>。224 這個檔數剛安裝好的原版也一樣（本站測試機是扣掉個人備份檔之後的數字），但容量差很多 —— 原版的 <code>portrait.big</code> 是 104.2 MB、<code>models.big</code> 是 165.0 MB，對照見<a href="original-vs-modded.html">原版與這台機器差在哪</a>。</p>
+
+  <div class="card amber">
+    <p class="card-h">先看懂資料夾結構</p>
+<pre><code>data\
+├── frontend\    98 個  介面、載入畫面、大頭照、球衣
+├── stadium\     87 個  球場,依日夜分檔(4 個巨蛋不分)<b>(＋ 1 個 lighting.csv,不是封裝檔)</b>
+├── audio\       28 個  音樂、音效、播報(13 個子資料夾)
+├── database\     3 個  球員資料、賽程<b>(＋ 24 個非封裝檔,其中 18 個是純文字 .dat)</b>
+├── anims\        1 個  全部動畫
+├── fonts\        1 個  字型
+├── misc\         1 個  <b>(這個資料夾其實有 33 個檔)</b>
+├── datafile\     1 個  <b>← 本站原本漏列</b>
+├── easo\         0 個  <b>← 本站原本漏列,519 個檔</b>
+├── igshapes\     0 個  <b>← 本站原本漏列,6 個檔</b>
+└── (根目錄)      4 個  models.big / profiles.big 等</code></pre>
+  <div class="card clay">
+    <p class="card-h">⚠️ 本站改過這張樹狀圖</p>
+    <p>上線時這張圖<strong>少了三個資料夾</strong>：<code>datafile\</code>、
+       <code>easo\</code>、<code>igshapes\</code>。</p>
+    <p><strong>原因是這張表數的是「封裝檔」，不是「檔案」。</strong>
+       完全沒有封裝檔的資料夾，在製表的時候就整個消失了。
+       不過這只解釋得了 <code>easo\</code> 與 <code>igshapes\</code>：<code>datafile\</code>
+       自己就有一個封裝檔（<code>datafile.big</code>），那一個是單純漏抄 ——
+       而 <code>easo\</code> 裡面有 <u>519 個檔</u>，是全遊戲檔案數<u>最多</u>的資料夾，
+       第二名的 <code>frontend\</code> 只有一百出頭。</p>
+    <p>那 519 個檔<a href="../story/hidden-website/index.html">是一整套 2005 年的社群網站</a>，
+       現在站上有一整篇在講它。</p>
+    <p class="small">教訓：<strong>用某個條件產生的清單，會把不符合那個條件的東西變成看不見。</strong>
+       表格上寫「N 個」的時候，要說清楚數的是什麼。</p>
+  </div>
+
+  </div>
+
+    <h2>遊戲資料夾在哪</h2>
+  <p>上面那張樹狀圖的 <code>data\</code> 就在遊戲安裝資料夾底下。舉例來說，比賽中介面那個檔的完整路徑長這樣：</p>
+<pre><code>&lt;遊戲安裝資料夾&gt;\data\frontend\ingame.big</code></pre>
+  <p>路徑結尾的 <code>data\frontend\</code> 就是上面樹狀圖裡的 <code>frontend\</code>，
+     把 <code>frontend\</code> 去掉就是 <code>data\</code> 本身。
+     遊戲安裝資料夾常見的位置有下面這幾種：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th style="width:22%">系統</th><th>路徑</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td>Windows</td><td class="mono">C:\Program Files (x86)\EA SPORTS\MVP Baseball 2005\data\frontend\</td></tr>
+      <tr><td>Windows</td><td class="mono">C:\Program Files (x86)\EA Games\MVP Baseball 2005\data\frontend\</td></tr>
+      <tr><td>綠色版 / 免安裝</td><td class="mono">&lt;你自己解壓的資料夾&gt;\data\frontend\</td></tr>
+      <tr><td>Mac（Wine / CrossOver）</td><td class="mono">~/…/drive_c/Program Files (x86)/EA SPORTS/MVP Baseball 2005/data/frontend/</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">裝在別的磁碟或自訂資料夾也很常見，上表只是最常遇到的幾種。
+     真正的判準是：那個資料夾底下要有一個 <code>data\</code>。</p>
+  <div class="card clay">
+    <p class="card-h">這幾個檔名長得很像，別拿錯</p>
+    <p><code>frontend\</code> 底下有一批名字很接近的 <code>.big</code>。
+       本站<a href="../tutorials/hide-runner-speed/index.html">比賽中介面的教學</a>要改的是
+       <strong><code>ingame.big</code></strong> —— 不是 <code>igonly.big</code>、不是
+       <code>frontend.big</code>、也不是 <code>feonly.big</code>。這四個都是真實存在的檔案，
+       所以挑錯一個不會跳出「找不到檔案」，只會改到別的地方去。</p>
+  </div>
+<h2>從「我想改什麼」反查</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th style="width:30%">你想改的</th><th>檔案</th><th>難度</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="你想改的">比賽賽程年份</td><td data-label="檔案" class="mono">database\schedule.big</td><td data-label="難度"><a href="../tutorials/change-schedule-year/index.html">★☆☆ 有教學</a></td></tr>
+      <tr class="hi"><td data-label="你想改的">比賽中的介面 / HUD</td><td data-label="檔案" class="mono">frontend\ingame.big</td><td data-label="難度"><a href="../tutorials/hide-runner-speed/index.html">★☆☆ 有教學</a></td></tr>
+      <tr><td data-label="你想改的">選單介面</td><td data-label="檔案" class="mono">frontend\frontend.big</td><td data-label="難度">★★☆ 同 FEL 格式</td></tr>
+      <tr><td data-label="你想改的">球員能力值</td><td data-label="檔案" class="mono">database\attrib.dat · pitcher.dat</td><td data-label="難度"><a href="player-data.html">★★☆ 先讀避雷頁</a></td></tr>
+      <tr><td data-label="你想改的">球員大頭照</td><td data-label="檔案" class="mono">frontend\portrait.big</td><td data-label="難度">★★☆ 需處理圖片格式</td></tr>
+      <tr><td data-label="你想改的">球衣</td><td data-label="檔案" class="mono">frontend\uniforms.big</td><td data-label="難度">★★☆</td></tr>
+      <tr><td data-label="你想改的">球員臉皮 / 3D 模型</td><td data-label="檔案" class="mono">models.big（根目錄）</td><td data-label="難度">★★★ 535.9 MB，風險高</td></tr>
+      <tr><td data-label="你想改的">球場</td><td data-label="檔案" class="mono">stadium\&lt;球場名&gt;day.big / nite.big</td><td data-label="難度">★★★ 改壞會整個掛掉</td></tr>
+      <tr><td data-label="你想改的">載入畫面圖</td><td data-label="檔案" class="mono">frontend\load0.big ~ load58.big ＋ load99.big</td><td data-label="難度">★★☆ 換圖即可</td></tr>
+      <tr><td data-label="你想改的">選單音樂</td><td data-label="檔案" class="mono">audio\cd\</td><td data-label="難度">★★☆ <a href="audio.html#asf">副檔名是騙人的</a></td></tr>
+      <tr><td data-label="你想改的">播報語音</td><td data-label="檔案" class="mono">audio\spch_pbp\ · speechdb\</td><td data-label="難度">★★★ <a href="audio.html#voice-swap">做得到，工作量極大</a></td></tr>
+      <tr><td data-label="你想改的">動畫</td><td data-label="檔案" class="mono">anims\anims.big</td><td data-label="難度">★★★ 需 3D 知識</td></tr>
+      <tr><td data-label="你想改的">字型</td><td data-label="檔案" class="mono">fonts\fonts.big</td><td data-label="難度">★★★ 字模層未解</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>frontend\ —— 98 個，介面與視覺資源</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>類別</th><th class="num">數量</th><th class="num">大小</th><th>說明</th></tr></thead>
+    <tbody>
+      <tr><td data-label="類別"><strong>載入畫面</strong> <span class="mono">load*.big</span></td><td data-label="數量" class="num">60</td><td data-label="大小" class="num">24.9 MB</td><td data-label="說明">每個載入畫面一個檔</td></tr>
+      <tr class="hi"><td data-label="類別"><strong>視覺資源</strong></td><td data-label="數量" class="num">6</td><td data-label="大小" class="num">385.6 MB</td><td data-label="說明">大頭照、背景、球場縮圖、球衣、隊徽、球場貼圖</td></tr>
+      <tr class="hi"><td data-label="類別"><strong>球場經營</strong> <span class="mono">bp*.big</span></td><td data-label="數量" class="num">7</td><td data-label="大小" class="num">24.1 MB</td><td data-label="說明"><strong>老闆模式的球場資源</strong>（<code>bp</code> ＝ ballpark）—— <code>bpattrac</code> 遊樂設施、<code>bpticket</code> 門票、<code>bpvendor</code> 小販、<code>bppromos</code> 促銷、<code>bpupgrad</code> 升級</td></tr>
+      <tr class="hi"><td data-label="類別"><strong>Cooperstown</strong> <span class="mono">coop*.big</span></td><td data-label="數量" class="num">6</td><td data-label="大小" class="num">9.3 MB</td><td data-label="說明"><strong>經典（名人堂）解鎖內容</strong>，不是雙人合作</td></tr>
+      <tr><td data-label="類別"><strong>選單介面</strong> <span class="mono">fe*.big</span></td><td data-label="數量" class="num">3</td><td data-label="大小" class="num">10.8 MB</td><td data-label="說明">選單版面與資源</td></tr>
+      <tr class="hi"><td data-label="類別"><strong>比賽中介面</strong> <span class="mono">ingame · igonly</span></td><td data-label="數量" class="num">2</td><td data-label="大小" class="num">7.7 MB</td><td data-label="說明">版面檔全部在 <code>ingame.big</code> 裡（<a href="ingame-files.html">本站測試機 47 個、剛安裝好的原版 44 個</a>）；<code>igonly.big</code> 裝的是 4 張 <code>.fsh</code> 圖，沒有版面檔</td></tr>
+      <tr><td data-label="類別">其他</td><td data-label="數量" class="num">14</td><td data-label="大小" class="num">—</td><td data-label="說明">頒獎、球探報告、網路檢查等</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">視覺資源那 6 個檔案就佔了 frontend 資料夾八成的容量，其中
+     <code>portrait.big</code>（球員大頭照）一個檔就 253.6 MB。
+     （這一段量的是本站測試機；剛安裝好的原版 <code>portrait.big</code> 104.2 MB、
+     六個視覺資源合計 165.9 MB，見<a href="original-vs-modded.html">原版與這台機器差在哪</a>。）</p>
+
+  <h2>audio\ —— 13 個子資料夾</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>資料夾</th><th class="num">大小</th><th>裝什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="資料夾" class="mono">cd</td><td data-label="大小" class="num">729.0 MB</td>
+          <td data-label="裝什麼"><strong>所有分區的聲音本體都在這裡</strong>，不只是音樂。佔全部音訊 98.9%</td></tr>
+      <tr><td data-label="資料夾" class="mono">aems</td><td data-label="大小" class="num">4.3 MB</td><td data-label="裝什麼">音效引擎資源（資料在 <code>cd\aems\</code>，121.8 MB）</td></tr>
+      <tr><td data-label="資料夾" class="mono">spch_pbp</td><td data-label="大小" class="num">2.8 MB</td>
+          <td data-label="裝什麼">播報語音的<strong>索引</strong>（資料在 <code>cd\spch_pbp\</code>，330.2 MB）</td></tr>
+      <tr><td data-label="資料夾" class="mono">spch_pa</td><td data-label="大小" class="num">0.4 MB</td>
+          <td data-label="裝什麼">球場廣播的<strong>索引</strong>（資料在 <code>cd\spch_pa\</code>，99.3 MB）</td></tr>
+      <tr><td data-label="資料夾" class="mono">orca</td><td data-label="大小" class="num">0.2 MB</td><td data-label="裝什麼">前端與暫停選單音效（兩個檔開頭都是 <code>BNKl</code>）</td></tr>
+      <tr><td data-label="資料夾" class="mono">crowddb / chants / rally</td><td data-label="大小" class="num">各 &lt; 0.1 MB</td>
+          <td data-label="裝什麼">觀眾聲、應援、加油音樂的索引</td></tr>
+      <tr><td data-label="資料夾" class="mono">plyr_cht / hmrn_sfx / stadium / bdcst_mx / speechdb</td><td data-label="大小" class="num">各 &lt; 0.1 MB</td>
+          <td data-label="裝什麼">球員專屬、全壘打音效、球場環境、轉播混音、語音資料庫</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card amber">
+    <p class="card-h">索引跟聲音是分開放的</p>
+    <p>上表大部分資料夾看起來都很小，那是因為<strong>它們只放索引，真正的聲音全部在 <code>cd\</code> 底下</strong>。
+       想知道某一區實際多大，要看 <code>cd\</code> 裡的同名資料夾。</p>
+    <div class="tablewrap" style="margin-top:10px"><table class="stack">
+      <thead><tr><th class="mono">cd\ 底下</th><th class="num">大小</th><th class="num">佔 cd\</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="cd\ 底下" class="mono">spch_pbp</td><td data-label="大小" class="num">330.2 MB</td><td data-label="佔 cd\" class="num">45.3%</td></tr>
+        <tr><td data-label="cd\ 底下" class="mono">aems</td><td data-label="大小" class="num">121.8 MB</td><td data-label="佔 cd\" class="num">16.7%</td></tr>
+        <tr><td data-label="cd\ 底下" class="mono">spch_pa</td><td data-label="大小" class="num">99.3 MB</td><td data-label="佔 cd\" class="num">13.6%</td></tr>
+        <tr><td data-label="cd\ 底下" class="mono">music</td><td data-label="大小" class="num">84.2 MB</td><td data-label="佔 cd\" class="num">11.6%</td></tr>
+        <tr><td data-label="cd\ 底下" class="mono">chants</td><td data-label="大小" class="num">53.9 MB</td><td data-label="佔 cd\" class="num">7.4%</td></tr>
+        <tr><td data-label="cd\ 底下" class="mono">rally / plyr_cht / hmrn_sfx / stadium / bdcst_mx</td><td data-label="大小" class="num">39.6 MB</td><td data-label="佔 cd\" class="num">5.4%</td></tr>
+      </tbody>
+    </table></div>
+    <p style="margin-top:10px">詳細結構見 <a href="audio.html">播報與音訊系統</a>。</p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">我們改過這張表</p>
+    <p>這頁上線時，表上寫「<code>cd</code> 是<strong>選單音樂</strong>，佔音訊 99%，
+       而遊戲中的播報、觀眾、應援加起來不到 1%」，還附了一段「音樂用串流、音效要常駐記憶體」的解釋。</p>
+    <p><strong>重新量測後發現寫反了。</strong>選單音樂只有 84.2 MB，
+       佔音訊總量 <strong>11.4%</strong>；語音與音效是 644.8 MB，佔 <strong>87.5%</strong>。
+       光是主播語音一區就有 330.2 MB。那段記憶體的解釋是推測，沒有依據，已一併移除。</p>
+    <p>寫錯了就改，並且說明改了什麼。</p>
+  </div>
+
+  <h2>其他資料夾</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>位置</th><th class="num">檔數</th><th>內容</th></tr></thead>
+    <tbody>
+      <tr><td data-label="位置" class="mono">stadium\</td><td data-label="檔數" class="num">87</td><td data-label="內容">檔名是四碼場地代號加 <code>day</code> 或 <code>nite</code>：87 個檔裡 44 個白天版、39 個夜間版，另外 4 個巨蛋（<code>astrdome</code>、<code>metrdome</code>、<code>olymdome</code>、<code>tropdome</code>）沒有日夜之分；54 個場地代號裡只有 29 個同時有兩檔。<a href="stadium.html">結構速查</a></td></tr>
+      <tr><td data-label="位置" class="mono">database\</td><td data-label="檔數" class="num">3</td><td data-label="內容"><code>schedule.big</code> 賽程、<code>progress.big</code>、<code>rookie.big</code>。<br>球員資料 <code>attrib.dat</code> 等也在這個資料夾，但不是封裝檔</td></tr>
+      <tr><td data-label="位置" class="mono">anims\</td><td data-label="檔數" class="num">1</td><td data-label="內容"><code>anims.big</code>，全部動畫（730 個子檔）</td></tr>
+      <tr><td data-label="位置" class="mono">fonts\</td><td data-label="檔數" class="num">1</td><td data-label="內容"><code>fonts.big</code>，12 個字型檔</td></tr>
+      <tr><td data-label="位置" class="mono">根目錄</td><td data-label="檔數" class="num">4</td><td data-label="內容"><code>models.big</code>（球員 3D 模型與臉皮）、<code>profiles.big</code> 等</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="unsolved">目前還改不了的東西</h2>
+  <p>誠實說明：不是所有東西都已經解開。以下是目前已知的邊界。</p>
+  <p class="small">第一列本站在 2026-08-28 <strong>自己推翻了</strong>。
+     它留在表上是因為<u>那次判斷錯在哪比結論本身更值得記住</u> —— 詳見那一列。</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>想改的</th><th>卡在哪</th></tr></thead>
+    <tbody>
+      <tr><td>播報語音內容<br><span class="small">（<strong>2026-08-28 訂正：這一格改得動</strong>）</span></td>
+          <td><strong>換掉主播唸的名字做得到</strong>，社群二十年前就做了 —— 本站原本把它列在這裡是<u>把「未解」貼錯了層次</u>：
+              要換語音需要的是「產生一個遊戲吃得下去的檔」，不是「把 EA 錄的解碼出來」。
+              詳見<a href="audio.html#voice-swap">播報與音訊系統的訂正</a>與<a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>。
+       還沒釐清的是音檔索引跨三個檔案的編號系統彼此對不上。
+       （<u>2026-08-29 訂正</u>：這裡原本還列著「15 個位元組怎麼還原成 28 個取樣」，那一格<strong>已經解開</strong>，對照 ffmpeg 驗過 21,678,328 個取樣 0 個不同 ——見<a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>。）</td></tr>
+      <tr><td>字型字模</td><td>容器層已解開，但每個字的點陣圖與間距資料還沒</td></tr>
+      <tr><td>動畫動作本身</td><td>動畫資料是編譯過的 3D 骨架關鍵影格，改它接近重寫一套 3D 軟體</td></tr>
+      <tr><td>球場 3D 結構</td><td>可以換貼圖、改光源，但重建球場幾何需要完整的 3D 管線</td></tr>
+    </tbody>
+  </table></div>
+  <p>務實的結論：<strong>檔案層級的替換（換圖、換音檔、換數值）已經能滿足絕大多數需求</strong>。
+     真正需要重建 3D 結構的情況很少。</p>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 想改遊戲裡的任何東西，第一個問題永遠是「它在哪個檔案」，這一頁把 <code>data\</code> 底下的封裝檔依用途分類，讓你從想改的東西反查到檔案。</li>
+    <li><strong>那個 224 要看清楚</strong> 224 是<u>副檔名叫 <code>.big</code> 的檔案數</u>，真正是 BIGF 封裝格式的只有 <strong>207 個</strong>（8 個開頭是 <code>SCHl</code>、1 個是 <code>SHPI</code>、8 個沒有可辨識的開頭）。站上其他地方講「224 個封裝檔」是沿用習慣講法，需要精確數字時以這一頁為準。</li>
+    <li><strong>容量集中在少數幾個檔</strong> <code>frontend\</code> 98 個裡，6 個視覺資源就佔了這個資料夾八成容量，光 <code>portrait.big</code> 一個檔 253.6 MB；根目錄的 <code>models.big</code> 535.9 MB，是表上風險標最高的一個（容量量自本站測試機，剛安裝好的原版分別是 104.2 MB 與 165.0 MB）。<code>stadium\</code> 87 個、<code>audio\</code> 28 個。</li>
+    <li><strong>本站訂正一：樹狀圖少了三個資料夾</strong> 上線時漏了 <code>datafile\</code>、<code>easo\</code>、<code>igshapes\</code>。原因是那張表數的是「封裝檔」不是「檔案」，完全沒有封裝檔的資料夾在製表時整個消失 —— 這解釋得了 <code>easo\</code> 與 <code>igshapes\</code>，但解釋不了 <code>datafile\</code>：它自己就有一個封裝檔（<code>datafile.big</code>），那一個是單純漏抄。而 <code>easo\</code> 裡有 <strong>519 個檔</strong>，是全遊戲檔案數最多的資料夾。教訓：<u>用某個條件產生的清單，會把不符合那個條件的東西變成看不見</u>。</li>
+    <li><strong>本站訂正二：音訊那張表寫反了</strong> 原本寫「<code>cd</code> 是選單音樂，佔音訊 99%，遊戲中的播報與觀眾加起來不到 1%」。重新量測後是相反的：選單音樂只有 84.2 MB（11.4%），語音與音效 644.8 MB（87.5%），光主播語音一區就 330.2 MB。當時附的「音樂用串流、音效要常駐記憶體」是沒有依據的推測，已一併移除。</li>
+    <li><strong>索引跟聲音是分開放的</strong> <code>audio\</code> 底下大部分資料夾看起來都很小，因為它們只放索引，真正的聲音全部在 <code>cd\</code> 底下（佔音訊 98.9%）。想知道某一區實際多大，要看 <code>cd\</code> 裡的同名資料夾。</li>
+    <li><strong>最容易拿錯的檔</strong> <code>frontend\</code> 底下有 <code>ingame.big</code>、<code>igonly.big</code>、<code>frontend.big</code>、<code>feonly.big</code> 四個名字很像的<u>真實存在</u>的檔案。挑錯一個不會跳出「找不到檔案」，只會改到別的地方去。</li>
+    <li><strong>本站沒驗的</strong> 字型的容器層解開了，每個字的點陣圖與間距沒有；動畫是編譯過的 3D 骨架關鍵影格；球場可以換貼圖改光源，但重建幾何需要完整的 3D 管線。<strong>這三格目前都改不動。</strong>播報語音原本也列在這裡，2026-08-28 訂正為<u>做得到</u>（見<a href="audio.html#voice-swap">音訊那頁的訂正</a>）；那裡剩下的未解是音檔索引跨三個檔案的編號系統彼此對不上，不是「換不了」；「15 個位元組怎麼還原成 28 個取樣」那一格已經在 <u>2026-08-29 解開</u>（見上面「目前還改不了的東西」那一列的訂正與<a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>）。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="bigf.html">BIGF 封裝格式</a> —— 怎麼打開這些 <code>.big</code></li>
+    <li><a href="qfs.html">QFS 壓縮</a> —— 打開之後裡面常常還包一層</li>
+    <li><a href="../tutorials/change-schedule-year/index.html">從最簡單的開始</a> —— 換賽程年份，3 分鐘</li>
+  </ul>
+
+  <footer>
+    <p>檔案數量與容量皆為實際掃描結果（不含個人備份檔）。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

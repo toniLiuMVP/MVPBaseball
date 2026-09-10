@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/fel-recipes/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>介面實例集 — toni的MVP模組補習班</title>
+<meta name="description" content="十則現成的介面修改配方:關掉打者之眼、球速數字、打者姓名,或把這台機器上被模組關掉的元素打開來看。每一則的行數與文字都實測過。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../../index.html">首頁</a>
+  <a class="item" href="../../start.html">新手基本功</a>
+  <a class="item" href="../../do.html">我想做什麼</a>
+  <a class="item" href="../../plan.html">課表</a>
+  <a class="item on" href="../index.html">教學</a>
+  <a class="item" href="../../7min/index.html">七分鐘</a>
+  <a class="item" href="../../reference/index.html">速查</a>
+  <a class="item" href="../../coach/index.html">棒球教練</a>
+  <a class="item" href="../../story/index.html">故事</a>
+  <a class="item" href="../../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="../index.html">教學</a> › 介面實例集</p>
+  <h1>介面實例集</h1>
+  <p class="lede">十則現成的配方，複製指令就能用。
+     每一則的<strong>會改幾行、那個元素實際顯示什麼字</strong>，都是先查過才寫上來的。
+     全部用同一支<a href="../fel-toolkit/index.html">萬用工具</a>。</p>
+
+  <div class="grid">
+    <div class="card"><p class="card-h">難度</p><p>★☆☆ 複製指令</p></div>
+    <div class="card"><p class="card-h">時間</p><p>每則約 2 分鐘</p></div>
+    <div class="card"><p class="card-h">可以還原嗎</p><p><strong>可以，一行指令</strong></p></div>
+  </div>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <div class="quickfix" id="quick">
+    <p class="card-h">⚡ 只想趕快改掉一則？照這四步</p>
+    <ol>
+      <li>先照<a href="../fel-toolkit/index.html">萬用工具</a>那一課把 <code>mvp_fel_toolkit.py</code> 準備好，並確認自己的遊戲資料夾在哪。</li>
+      <li>挑一則配方，把指令裡的 <code>你的遊戲資料夾</code> 換成你自己的路徑，<strong>先不加 <code>--apply</code></strong> 跑一次看預覽（這裡以 A3 球速數字為例）<br>
+  <pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --toggle fes_ingameoverlay.fel PITCHSPEED1 off</code></pre></li>
+      <li>預覽列出來的就是你想改的元素，同一行加 <code>--apply</code> 真的改，要看到「✅ 複驗通過」與「目標元素 0 個未套用」<br>
+  <pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --toggle fes_ingameoverlay.fel PITCHSPEED1 off --apply</code></pre></li>
+      <li>不論改了幾則、改了幾次，這一行都回到你第一次動手之前<br>
+  <pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --restore</code></pre></li>
+    </ol>
+    <p class="tail">A1、A2 這種左右 HUD 各一行的，<code>fes_hudleft.fel</code> 與 <code>fes_hudright.fel</code> 要各下一次。
+       想知道每一則在改什麼，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+  </div>
+
+  <h2>前置：先把工具準備好</h2>
+  <ul class="tick">
+    <li>下載<a href="../fel-toolkit/index.html">萬用工具</a>並照那一課做過一次</li>
+    <li>知道自己的遊戲資料夾在哪</li>
+  </ul>
+  <p>下面所有指令裡的 <code>你的遊戲資料夾</code> 都要換成你自己的路徑。
+     <strong>先不加 <code>--apply</code> 跑一次看預覽</strong>，確定行數對得上再真的改。</p>
+
+  <div class="card clay">
+    <p class="card-h">三件事先講</p>
+    <p><strong>一、行數是本站在<u>測試機</u>的檔案上量的，不是 EA 原版。</strong>你手上那份若裝過其他模組，數字可能不同。
+       只要預覽列出來的是你想改的東西，就可以繼續。</p>
+    <p><strong>二、本站沒有實機跑過每一則的畫面結果。</strong>
+       能保證的是「檔案確實被正確修改、可以完整還原」，
+       不能保證「遊戲一定會照你想的顯示」。</p>
+    <p><strong>三、隨時可以全部還原</strong>：<code>--restore</code> 一行，位元組完全一致。</p>
+  </div>
+
+  <h2>A 組：關掉比賽畫面上的東西</h2>
+
+  <h3>A1 · 打者之眼</h3>
+  <p>畫面上那個 <code>Hitter's Eye</code> 標籤。左置與右置 HUD <strong>各一行</strong>，兩邊都要改。</p>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --toggle fes_hudleft.fel HITTERSEYE off --apply</code></pre>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --toggle fes_hudright.fel HITTERSEYE off --apply</code></pre>
+  <div class="seen"><b>預覽會說</b><p>每個檔<strong>找到 1 行 · 會改動 1 行</strong>。</p></div>
+
+  <h3>A2 · 打者姓名</h3>
+  <p>HUD 上顯示打者名字的那一格。同樣左右各一行。</p>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --toggle fes_hudleft.fel BATTERNAME off --apply</code></pre>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --toggle fes_hudright.fel BATTERNAME off --apply</code></pre>
+  <p class="small">用 <code>--strings</code> 查這個元素，會看到它的預設文字是一個球員名字 ——
+     那是 EA 拿來當版面範例用的。</p>
+
+  <h3>A3 · 球速數字</h3>
+  <p>投完球之後跳出來的那個速度數字。<strong>1 行。</strong></p>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --toggle fes_ingameoverlay.fel PITCHSPEED1 off --apply</code></pre>
+  <div class="card blue">
+    <p class="card-h">怎麼確定是這一個</p>
+    <p>先查它的文字：</p>
+<pre style="margin:8px 0 0"><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --strings fes_ingameoverlay.fel</code></pre>
+    <p style="margin-top:8px">會看到 <code>PITCHSPEED1</code> 的文字是 <code>999</code> ——
+       <strong>三位數的佔位字串</strong>，正好對得上球速。</p>
+  </div>
+
+  <h3>A4 · 出局／安打之類的結果字樣</h3>
+  <p><code>fes_ingameoverlay.fel</code> 裡的 <code>MESSAGE</code>，<strong>3 行</strong>，
+     文字是 <code>Out</code>。</p>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --toggle fes_ingameoverlay.fel MESSAGE off --apply</code></pre>
+  <div class="ifnot"><b>提醒</b>
+    <p>同一個封裝檔裡的 <code>fes_ingamechat.fel</code> 也有一個 <code>MESSAGE</code>，那是聊天訊息，
+       跟這個無關。<strong>指令有指定檔名，所以不會改到它。</strong></p>
+  </div>
+
+  <h3>A5 · 跑壘者速度數值</h3>
+  <p>壘包鑽石圖上每個壘包旁邊那個兩位數，都在同一個檔。<strong>本站測試機那一份是 6 行</strong>，你手上那份可能不同。</p>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --toggle fes_ingameinfobar.fel RATING off --apply</code></pre>
+  <p class="small">這一則有<a href="../hide-runner-speed/index.html">專屬教學</a>，
+     裡面解釋了為什麼本站測試機那一份是 6 行而不是 4 行。</p>
+
+  <h2>B 組：把這台機器上關掉的東西打開</h2>
+
+  <div class="card amber">
+    <p class="card-h">B 組要先說清楚</p>
+    <p>下面這些元素在<strong>本站測試機的檔案裡</strong>開關是 0。本站把它們的文字查出來了，
+       所以知道它們原本要顯示什麼。</p>
+    <p class="small">⚠️ 2026-08-25 訂正：這一組原本叫「把 EA 自己關掉的東西打開」，方向講反了。拿剛安裝好的原版一比就知道 —— 見下面 B1。</p>
+    <p><strong>但本站沒有驗證遊戲是否真的會用到它們。</strong>
+       <a href="../../reference/fel.html">FEL 速查</a>記載過：群組的開關會被遊戲程式在執行時覆寫。
+       所以把開關打開，<strong>很可能什麼都不會發生</strong>。</p>
+    <p>這一組的價值是「看看檔案裡有什麼」，不是「解鎖隱藏功能」。
+       <span class="badge wip">未驗證</span></p>
+  </div>
+
+  <h3>B1 · 揮棒時機回饋</h3>
+  <p><code>fes_ingameoverlay.fel</code> 裡有六個關掉的貼圖元素，
+     分成左右兩組，各是 <code>EARLY</code> / <code>LATE</code> / <code>PERFECT</code>。
+     這六個名字在本站測試機這一份裡<strong>各出現 5 行</strong>（同一個名字散在好幾個畫面），
+     所以預覽會說「找到 5 行」：</p>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --toggle fes_ingameoverlay.fel PERFECTR on</code></pre>
+  <p>另外五個是 <code>EARLYR</code>、<code>LATER</code>、<code>PERFECTL</code>、<code>EARLYL</code>、<code>LATEL</code>。
+     它們的父群組 <code>FEEDBACKR</code> 與 <code>FEEDBACKL</code> 本身是<strong>開著的</strong>，
+     只有裡面這六個圖是關的。</p>
+
+  <div class="card grass">
+    <p class="card-h">這一項不是「EA 關掉的」，是這台機器上被關掉的</p>
+    <p>同一個檔在剛安裝好的原版裡也存在，兩份都是 290 行。
+       把裡面所有 <code>EARLY</code> / <code>LATE</code> / <code>PERFECT</code> 的行撈出來比：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th></th><th class="num">總行數</th><th class="num">開著</th><th class="num">關著</th></tr></thead>
+      <tbody>
+        <tr><td>剛安裝好的原版</td><td data-label="總行數" class="num">36</td><td data-label="開著" class="num"><strong>24</strong></td><td data-label="關著" class="num">12</td></tr>
+        <tr class="hi"><td>本站測試機</td><td data-label="總行數" class="num">36</td><td data-label="開著" class="num"><strong>0</strong></td><td data-label="關著" class="num">36</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>原版有 24 行是開著的。</strong>所以打開這些開關，
+       不是「解鎖 EA 藏起來的東西」，是<u>還原模組關掉的東西</u> ——
+       這台機器上跑的名冊模組把它們全關了。</p>
+    <p class="small">為什麼模組要關掉揮棒時機回饋，本站不知道
+       （最省事的猜測是「玩起來比較難」，但那是猜的，沒有證據）。
+       <span class="badge wip">未解</span></p>
+  </div>
+
+  <h3>B2 · 兩組帶文字的介面</h3>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">元素</th><th>查出來的文字</th><th>裡面有什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="元素" class="mono">GR:ARGUMENTMETER</td><td data-label="查出來的文字" class="mono">Argument Intensity</td>
+          <td data-label="裡面有什麼">黑底 + 進度條 + 文字 + 按鈕圖示</td></tr>
+      <tr class="hi"><td data-label="元素" class="mono">GR:CHARGEMOUND</td><td data-label="查出來的文字" class="mono">To Charge Mound Press</td>
+          <td data-label="裡面有什麼">黑底 + 文字 + 按鈕圖示</td></tr>
+      <tr><td data-label="元素" class="mono">SH:NEXTFIELDER</td><td data-label="查出來的文字">（沒有文字）</td><td data-label="裡面有什麼">一張貼圖</td></tr>
+    </tbody>
+  </table></div>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --toggle fes_ingameoverlay.fel ARGUMENTMETER on</code></pre>
+  <p class="small">文字表裡還有 <code>Argue Call</code>、<code>Charge Mound</code>、
+     <code>Charge Mound Available</code> 這幾條。詳見<a href="../../reference/loc-strings.html">文字表那頁</a>。</p>
+
+  <h2>C 組：先看再決定</h2>
+
+  <h3>C1 · 列出某個畫面現在有哪些東西是關的</h3>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --show fes_ingameoverlay.fel --screen INGAMEOVERLAY</code></pre>
+  <p>輸出裡開頭有 <code>✕</code> 的那幾行就是關掉的。</p>
+
+  <h3>C2 · 查某個元素到底顯示什麼字</h3>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --strings fes_hudleft.fel</code></pre>
+  <p>這是決定要不要改之前<strong>最有用的一步</strong> —— 名字看不出來的元素，
+     看它的文字通常就懂了。</p>
+
+  <h3>C3 · 找出遊戲裡所有跟某件事有關的元素</h3>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --find SCORE</code></pre>
+  <p>會掃封裝檔裡的每一個版面檔，列出檔名、行號、目前是開還是關（<code>ingame.big</code> 在本站測試機是 47 個，<a href="../../reference/original-vs-modded.html">剛安裝好的原版是 44 個</a>）。</p>
+
+  <h2>✅ 每一則的成功標準</h2>
+  <ul class="tick">
+    <li>預覽列出的行數<strong>跟本頁寫的一致</strong>（裝過模組的話可能不同，看是不是你要的元素就好）</li>
+    <li>加 <code>--apply</code> 後印出「<strong>✅ 複驗通過</strong>」與「目標元素 <strong>0 個未套用</strong>」</li>
+    <li>再跑一次 <code>--find</code>，那些元素的「顯示」欄變成你要的狀態</li>
+  </ul>
+
+  <h2>❌ 全部還原</h2>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --restore</code></pre>
+  <p>不論你改了幾則、改了幾次，這一行都會回到第一次修改之前的狀態，位元組完全一致。</p>
+  <div class="card blue">
+    <p class="card-h">備份檔叫什麼名字</p>
+    <p>第一次加 <code>--apply</code> 的時候，工具會在 <code>ingame.big</code> 旁邊建一個
+       <code><strong>ingame.big.feltoolbak</strong></code>。</p>
+    <p><strong>之後再改幾次都不會覆蓋它</strong> —— 所以 <code>--restore</code> 永遠是回到
+       「你第一次動手之前」，不是「上一次修改之前」。</p>
+    <p class="small">⚠️ 本站每支工具用的副檔名都不一樣（<code>.bak</code>／<code>.speedbak</code>／
+       <code>.facebak</code>／<code>.feltoolbak</code>），這樣同時用兩支工具時備份不會互相蓋掉。
+       <a href="../crash-diagnosis/index.html">診斷腳本</a>四種都會找。</p>
+  </div>
+  
+  <div class="ifnot"><b>如果說找不到備份</b>
+    <p>代表你還沒 <code>--apply</code> 過任何東西 —— 本來就不需要還原。</p>
+  </div>
+
+  <div class="report">
+    <p class="card-h">📋 卡住的話，照這個格式回報</p>
+<pre style="margin:0"><code>作業系統：Windows 11 / Windows 10 / macOS ___
+卡在哪一則：A1 / A2 / … / C3
+我打的指令：(整行複製貼上)
+畫面印出什麼：(整段複製貼上)
+預覽說找到幾行：___（本頁寫的是 ___）</code></pre>
+  </div>
+
+  <h2>📋 回報範本</h2>
+
+  <p>卡住或做成了，複製下面這段填一填：</p>
+<pre><code>某一則食譜 status: ✅ / ❌
+我做的是哪一則(A/B/C 第幾條): ___
+改的版面檔與元素: ___
+預覽印出來會改幾行: ___
+加了 --apply 之後有沒有印「✅ 複驗通過」: 有 / 沒有
+進遊戲看到的差別: ___
+還原有沒有成功: 有 / 沒試 / 失敗</code></pre>
+
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 十則現成配方，把指令裡的路徑換掉就能用，全部靠同一支萬用工具，改錯了一行 <code>--restore</code> 就退回去。</li>
+    <li><strong>三組怎麼分</strong> A 組關掉比賽畫面上的東西（打者之眼、打者姓名、球速數字、出局安打字樣、跑壘者速度），B 組把這台機器上被關掉的元素打開，C 組是決定之前先看的三個指令（<code>--show</code>／<code>--strings</code>／<code>--find</code>）。</li>
+    <li><strong>關鍵行數</strong> A1 打者之眼與 A2 打者姓名是左右各 1 行、A3 球速 1 行、A4 <code>MESSAGE</code> 3 行、A5 跑壘者速度 6 行。行數對不上不一定是錯，因為這些是在本站測試機的檔案上量的，不是 EA 原版，裝過模組數字就可能不同，只要預覽列的是你想改的元素就可以繼續。</li>
+    <li><strong>先查文字再決定要不要改</strong> <code>--strings</code> 是最有用的一步，名字看不出來的元素，看它的文字通常就懂了（<code>PITCHSPEED1</code> 的文字是三位數佔位字串 <code>999</code>，正好對得上球速）。</li>
+    <li><strong>最容易踩的雷</strong> <code>fes_ingamechat.fel</code> 裡也有一個 <code>MESSAGE</code>，那是聊天訊息，因為指令有指定檔名所以不會改到；B 組的元素打開之後<strong>很可能什麼都不會發生</strong>，FEL 速查記載過群組的開關會被遊戲程式在執行時覆寫。</li>
+    <li><strong>B 組的方向曾經講反</strong> 這一組原本叫「把 EA 自己關掉的東西打開」。拿剛安裝好的原版一比，那 36 行 <code>EARLY</code>／<code>LATE</code>／<code>PERFECT</code> 在原版有 24 行是開著的，本站測試機是 0 行。所以打開它是<strong>還原模組關掉的東西</strong>，不是解鎖 EA 藏起來的功能。</li>
+    <li><strong>安全網</strong> 第一次 <code>--apply</code> 會建 <code>ingame.big.feltoolbak</code>，之後再改幾次都不覆蓋，<code>--restore</code> 永遠回到「你第一次動手之前」而不是「上一次修改之前」，位元組完全一致。說找不到備份，代表你根本還沒 <code>--apply</code> 過。</li>
+    <li><strong>本站沒驗的</strong> 本站沒有實機跑過每一則的畫面結果。能保證的是檔案確實被正確修改、可以完整還原，不能保證遊戲一定會照你想的顯示；B 組更是連遊戲會不會用到那些元素都沒驗證，模組當初為什麼要關掉揮棒時機回饋，本站也不知道。</li>
+  </ul>
+
+  <h2>想更進一步</h2>
+  <ul class="plain">
+    <li><a href="../fel-toolkit/index.html">介面萬用工具</a> —— 這些指令的完整說明</li>
+    <li><a href="../../reference/ingame-files.html">47 個版面檔對照表</a> —— 想改的東西在哪個檔（可搜尋）</li>
+    <li><a href="../../reference/hud-map.html">介面座標圖</a> —— 這些元素在畫面上的哪個位置</li>
+    <li><a href="../../reference/loc-strings.html">文字表 .LOC</a> —— 為什麼查得到每個元素寫什麼字</li>
+    <li><a href="../../reference/fel.html">FEL 版面語法</a> —— 三條會壞檔的鐵律</li>
+  </ul>
+
+  <footer>
+    <p>本頁每一則配方的行數與文字都是實際查過的；
+       寫入與還原流程在複本上完整測試過。
+       B 組標示為「未驗證」之處，本站沒有實機確認遊戲行為。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../../legal.html">法律與版權說明</a> ·
+       <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

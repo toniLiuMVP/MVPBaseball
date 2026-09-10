@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/start.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>第 0 課 新手基本功 — toni的MVP模組補習班</title>
+<meta name="description" content="改遊戲之前先學會六個基本操作：找到遊戲資料夾、開命令提示字元、取得檔案路徑、顯示副檔名、備份觀念、安裝 Python。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="index.html">首頁</a>
+  <a class="item on" href="start.html">新手基本功</a>
+  <a class="item" href="do.html">我想做什麼</a>
+  <a class="item" href="plan.html">課表</a>
+  <a class="item" href="tutorials/index.html">教學</a>
+  <a class="item" href="7min/index.html">七分鐘</a>
+  <a class="item" href="reference/index.html">速查</a>
+  <a class="item" href="coach/index.html">棒球教練</a>
+  <a class="item" href="story/index.html">故事</a>
+  <a class="item" href="about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="eyebrow" style="margin-top:36px">第 0 課</p>
+  <h1>新手基本功：先學會六個基本操作</h1>
+  <p class="lede">後面每一課都會用到這六件事。本來就會的人可以直接去
+     <a href="tutorials/index.html">教學列表</a>；不熟的請在這裡練一次，
+     <strong>這一課不會動到任何遊戲檔案，練壞也沒關係</strong>。</p>
+
+  <div class="card grass">
+    <p class="card-h">其實還有一課比這裡更早</p>
+    <p>如果你完全沒有改過遊戲檔案，
+       <a href="tutorials/controller-config/index.html"><strong>暖身課：打開一個遊戲的檔案</strong></a>
+       <u>什麼工具都不用</u> —— 記事本打開遊戲資料夾裡一個純文字檔，看懂它，改壞了一定回得來。</p>
+    <p>先做那一課建立信心，再回來這裡學命令提示字元，會輕鬆很多。</p>
+  </div>
+
+  <div class="card amber" id="words">
+    <p class="card-h">👀 先看這裡：下面會出現 11 個電腦詞</p>
+    <p>底下那個橘色框是<strong>給已經懂這些字的人</strong>看的。
+       如果你看到「網址列」「副檔名」會愣一下,<u>那不是你的問題</u> ——
+       這張表把它們一次講完,每個一句話。看完再往下,就都看得懂了。</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>這個字</th><th>就是這個意思</th></tr></thead>
+      <tbody>
+        <tr><td><strong>資料夾</strong></td>
+            <td>裝東西的箱子。點兩下會打開,裡面還可以有別的箱子。</td></tr>
+        <tr><td><strong>檔案總管</strong></td>
+            <td>Windows 上用來翻箱子的那個視窗。Mac 上叫「<strong>Finder</strong>」,
+                就是最左邊那個藍色笑臉。</td></tr>
+        <tr class="hi"><td><strong>網址列</strong></td>
+            <td>你以為它只在 Chrome 裡?<u>檔案總管上面那條也是</u> ——
+                它顯示你現在在哪個箱子裡。<strong>那條可以打字。</strong></td></tr>
+        <tr><td><strong>路徑</strong></td>
+            <td>箱子的地址。像 <code>C:\遊戲\MVP</code> —— 從最外面一層一層寫到裡面。</td></tr>
+        <tr><td><strong>捷徑</strong></td>
+            <td>桌面上那個有小箭頭的圖示。它不是遊戲本體,是<u>指向遊戲的路標</u>。</td></tr>
+        <tr><td><strong>副檔名</strong></td>
+            <td>檔名最後那一小截,例如 <code>.txt</code>、<code>.big</code>。
+                它告訴電腦這是什麼種類的檔。</td></tr>
+        <tr><td><code>.exe</code></td>
+            <td>一種副檔名,意思是「這個檔案<strong>是一個程式</strong>,點兩下會執行」。
+                遊戲本體就是 <code>mvp2005.exe</code>。</td></tr>
+        <tr class="hi"><td><strong>命令提示字元</strong></td>
+            <td>一個<u>只能打字的黑色視窗</u>。不用滑鼠,你打一行字、按 Enter,電腦就做一件事。
+                Mac 上叫「<strong>終端機</strong>」。</td></tr>
+        <tr><td><code>cmd</code></td>
+            <td>命令提示字元的名字。在檔案總管的網址列打這三個字母按 Enter,它就會開在那個資料夾。</td></tr>
+        <tr><td><strong>Enter</strong></td>
+            <td>鍵盤右邊那顆大按鍵(有時候印著 ⏎)。在黑視窗裡代表「我打完了,做吧」。</td></tr>
+        <tr><td><strong>Python</strong></td>
+            <td>一個免費的程式,本站的工具需要它才能跑。<u>裝一次就好,以後都不用再管</u>。
+                <a href="7min/computer.html">七分鐘電腦課</a>裡有手把手的裝法。</td></tr>
+      </tbody>
+    </table></div>
+    <p class="tail">⚠️ 這一課<strong>不會動到任何遊戲檔案</strong>,練壞也沒關係。
+       真的還是卡住的話,先去做<a href="tutorials/controller-config/index.html">暖身課</a> ——
+       那一課連黑視窗都不用開。</p>
+  </div>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站<u>會動到遊戲檔</u>的工具都會自己備份它要動的那一個檔
+       （純檢查用的那幾支不寫檔，沒有備份，也不需要還原），
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法看<a href="tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <div class="quickfix" id="quick">
+    <p class="card-h">⚡ 只想趕快做完？照這五步（用到<a href="#words">上面那張表</a>的字）</p>
+    <ol>
+      <li>找到遊戲資料夾：對桌面上的遊戲捷徑<strong>按右鍵</strong> →「<strong>開啟檔案位置</strong>」。
+          同一層同時看得到 <code>mvp2005.exe</code> 跟一個叫 <code>data</code> 的資料夾，兩個都有才是對的。
+          沒有捷徑就把這一行貼進檔案總管的網址列：
+  <pre><code>C:\Program Files (x86)\EA SPORTS</code></pre></li>
+      <li>在那個資料夾的<strong>網址列</strong>把字刪掉、改打 <code>cmd</code> 按 <span class="key">Enter</span>，
+          開出來的命令提示字元已經停在那個資料夾。
+          Mac 是按 <span class="key">⌘ Cmd</span> + <span class="key">空白鍵</span>，輸入「終端機」。</li>
+      <li>把副檔名打開：隨便開一個資料夾視窗 →「<strong>檢視</strong>」→「<strong>顯示</strong>」→ 勾「<strong>副檔名</strong>」。
+          <u>不開這個，記事本會把腳本存成 <code>xxx.py.txt</code>。</u></li>
+      <li>要填路徑時<strong>不要用打的</strong>：指令打到需要路徑的位置、空一格、游標停著不要按 Enter，
+          再把檔案<strong>拖進視窗</strong>放開。</li>
+      <li>確認電腦有沒有 Python（Windows 用第一行、Mac 用第二行）。印出來<strong>開頭是 3、第二個數字 7 以上</strong>就完課（印出 <code>2.7.x</code> 不算，往下看操作五）。
+  <pre><code>python --version</code></pre>
+  <pre><code>python3 --version</code></pre></li>
+    </ol>
+    <p class="tail">第六件事沒有指令：<strong>改任何檔案之前先複製一份放旁邊，檔名加 <code>.bak</code></strong>。
+       這一課本身不會動到任何遊戲檔案，練壞也沒關係。
+       想知道每一步為什麼這樣做，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+  </div>
+
+  <h2>先認識幾個名詞</h2>
+  <div class="tablewrap"><table class="gloss">
+    <tr><td>命令提示字元</td><td>一個只有文字的視窗：你打字給電腦，電腦回你文字。Mac 上叫「終端機」。本站的指令都打在這裡。</td></tr>
+    <tr><td>路徑</td><td>檔案在電腦裡的完整位置，像門牌號碼。例如 <code>C:\Games\MVP\data\frontend\ingame.big</code>。</td></tr>
+    <tr><td>副檔名</td><td>檔名最後那一小段，例如 <code>.big</code>、<code>.py</code>。Windows 預設把它藏起來，這會害你存錯檔。</td></tr>
+    <tr><td>指令</td><td>你打進命令提示字元的那一行字。本站所有指令都可以整行複製貼上；只有帶 <code>〔…〕</code> 的那幾行要先把括號連同裡面的字換成你自己的路徑。</td></tr>
+    <tr><td>備份</td><td>動手前先複製一份原始檔留著，做錯了就把它換回去。本站會動到遊戲檔的工具都會自動幫你做這件事。</td></tr>
+  </table></div>
+
+  <h2 id="findfolder">操作零：找到你的遊戲資料夾</h2>
+  <div class="card amber">
+    <p class="card-h">這是所有教學的第一步，而本站以前沒教</p>
+    <p>每一課的第一個動作都是「打開遊戲資料夾」。
+       但遊戲不一定裝在你以為的地方 —— 而且<u>路徑打錯是新手最常卡住的第一關</u>。
+       這一節 2026-08-26 補上。</p>
+  </div>
+  <p><strong>為什麼要學</strong>：後面每一課都要用到它。找一次，記起來。</p>
+  <p><strong>怎麼找（Windows，三種方法擇一）</strong></p>
+  <ol class="plain">
+    <li><strong>從桌面捷徑找（最快）</strong>：
+        對桌面上的遊戲捷徑<u>按右鍵</u> → 選「<strong>開啟檔案位置</strong>」。
+        檔案總管會直接跳到遊戲資料夾。
+        <span class="small">（如果跳到的還是捷徑，再按一次右鍵→開啟檔案位置。）</span></li>
+    <li><strong>從開始功能表找</strong>：按 ⊞ Win 打「MVP」，
+        在搜尋結果上<u>按右鍵</u> → 「開啟檔案位置」。</li>
+    <li><strong>直接去常見的安裝位置</strong>：檔案總管網址列貼上這一行按 Enter：
+<pre><code>C:\Program Files (x86)\EA SPORTS</code></pre>
+        <span class="small">舊機器或 32 位元系統可能是
+        <code>C:\Program Files\EA SPORTS</code>；
+        自己改過安裝位置的話這一招沒用，請用前兩種。</span></li>
+  </ol>
+  <p><strong>怎麼確認找對了</strong>：那個資料夾裡<u>同一層</u>要看得到
+     <code>mvp2005.exe</code> 跟一個叫 <code>data</code> 的資料夾。
+     <strong>兩個都有才是對的。</strong></p>
+  <div class="card grass">
+    <p class="card-h">找到之後，把路徑複製起來</p>
+    <p>在檔案總管的<u>網址列</u>點一下（整條會反白），按 <kbd>Ctrl</kbd>+<kbd>C</kbd>。
+       後面每一課要你「貼上遊戲資料夾路徑」時就是貼這個。</p>
+    <p class="small">Mac：在 Finder 裡對資料夾按右鍵，按住 <kbd>⌥ Option</kbd>，
+       選單會變成「拷貝……為路徑名稱」。</p>
+  </div>
+  <p class="small">⚠️ 一個常見的誤會：<strong>Steam / Origin / EA app 的遊戲不在這裡</strong>。
+     MVP Baseball 2005 是 2005 年的光碟遊戲，沒有在那些平台上。
+     如果你找不到，先確認你是用光碟安裝的。</p>
+
+  <h2>操作一：打開命令提示字元</h2>
+  <p class="step-why"><strong>為什麼要學：</strong>每一課的指令都在這裡打。</p>
+
+  <div class="step">
+    <div class="step-n">W</div>
+    <div>
+      <div class="step-t">Windows：三種方法，會一種就好</div>
+      <div class="substep">
+        <p><span class="sk">1</span><strong>鍵盤法（最快）</strong>：按住 <span class="key">⊞ Win</span> 不放，再按一下
+           <span class="key">R</span>，左下角跳出小視窗，輸入 <code>cmd</code> 三個字母，按 <span class="key">Enter</span>。</p>
+        <p><span class="sk">2</span><strong>搜尋法</strong>：按 <span class="key">⊞ Win</span> 直接打字，
+           輸入「命令提示字元」，在搜尋結果上點一下。</p>
+        <p><span class="sk">3</span><strong>資料夾法（最省事）</strong>：用檔案總管打開你要工作的資料夾，
+           點一下最上面的<strong>網址列</strong>（整條會反白），把裡面的字刪掉改打 <code>cmd</code>，按 <span class="key">Enter</span>。
+           開出來的視窗<strong>已經停在那個資料夾</strong>，可以少打一個指令。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">M</div>
+    <div>
+      <div class="step-t">Mac：打開「終端機」</div>
+      <div class="substep">
+        <p><span class="sk">1</span>按 <span class="key">⌘ Cmd</span> + <span class="key">空白鍵</span>，畫面中央跳出搜尋框。</p>
+        <p><span class="sk">2</span>輸入「終端機」（或 <code>Terminal</code>），按 <span class="key">Enter</span>。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="seen"><b>你會看到</b>
+    <p>一個黑色或白色的文字視窗，最後一行結尾有個閃爍的方塊或底線 —— 那是游標，代表它在等你打字。</p>
+  </div>
+  <div class="ifnot"><b>如果沒看到</b>
+    <ul>
+      <li>Windows 找不到「命令提示字元」→ 改搜尋 <code>cmd</code> 或「終端機」（Win 11 換過名字）。</li>
+      <li>視窗一閃就消失 → 那不是命令提示字元，你點到了別的檔案，重來一次。</li>
+    </ul>
+  </div>
+
+  <div class="card amber" id="powershell">
+    <p class="card-h">Windows 還有另一個黑視窗：PowerShell</p>
+    <p>本站大多數的課用「命令提示字元」就夠了，但<u>有幾課的指令只有 PowerShell 有</u> ——
+       例如<a href="tutorials/read-file-headers/index.html">看檔案開頭那幾個位元組</a>要用的
+       <code>Format-Hex</code>，命令提示字元裡根本沒有這個東西。
+       <strong>它們是兩個不同的視窗，不是同一個。</strong></p>
+    <p><strong>怎麼開</strong>（兩種會一種就好）：</p>
+    <ul class="plain">
+      <li>按住 <span class="key">⊞ Win</span> 不放，再按一下 <span class="key">R</span>，
+          輸入 <code>powershell</code>，按 <span class="key">Enter</span>。</li>
+      <li>按 <span class="key">⊞ Win</span> 直接打字，輸入「PowerShell」，在搜尋結果上點一下。</li>
+    </ul>
+    <p><strong>還有版本要分</strong>：Windows 10／11 內建的那個叫「<strong>Windows PowerShell</strong>」，
+       版本是 <strong>5.1</strong>；自己另外裝的叫 <strong>PowerShell 7</strong>，指令名字是 <code>pwsh</code>。
+       兩種的參數寫法有出入，各課會分開寫。要知道自己開的是哪一種，就打這一行：</p>
+<pre><code>$PSVersionTable.PSVersion</code></pre>
+    <p class="small">印出來的 <code>Major</code> 是 5 就是內建的那個 5.1，是 7 就是自己裝的那一版。
+       Mac 沒有這個分別，終端機就是終端機。
+       ⚠️ 這一段的版本差異依據的是微軟官方文件，<u>還沒在 Windows 上實測</u>。</p>
+  </div>
+
+  <h2>操作二：取得檔案的完整路徑（不用手打）</h2>
+  <p class="step-why"><strong>為什麼要學：</strong>指令需要檔案路徑。路徑很長又容易打錯，用拖曳最保險。</p>
+  <div class="substep">
+    <p><span class="sk">a</span>先在命令提示字元把指令打到<strong>需要路徑的位置</strong>，打一個空格，游標停著<strong>不要按 Enter</strong>。</p>
+    <p><span class="sk">b</span>用檔案總管（Mac 用 Finder）找到那個檔案。</p>
+    <p><span class="sk">c</span>用滑鼠<strong>按住檔案不放，拖到命令提示字元視窗上放開</strong>。</p>
+    <p><span class="sk">d</span>路徑會自動填進去（通常還會自動加引號），這時再按 <span class="key">Enter</span>。</p>
+  </div>
+  <div class="seen"><b>你會看到</b>
+    <p>指令後面自動出現一長串路徑，例如 <code>"C:\Program Files (x86)\EA SPORTS\MVP Baseball 2005\data\frontend\ingame.big"</code>。</p>
+  </div>
+  <div class="ifnot"><b>如果拖曳沒反應</b>
+    <p>手動打也可以，但<strong>路徑前後一定要各加一個半形雙引號</strong>。
+       路徑裡有空格（例如 <code>Program Files</code>）時，沒有引號電腦會以為你在講好幾個檔案。</p>
+  </div>
+
+  <h2>操作三：讓 Windows 顯示副檔名</h2>
+  <p class="step-why"><strong>為什麼要學：</strong>Windows 預設把副檔名藏起來。你用記事本存腳本時會存成
+     <code>xxx.py.txt</code> 而畫面上看起來一模一樣，然後指令就跑不動。<strong>這是新手最常卡住的地方。</strong></p>
+  <div class="substep">
+    <p><span class="sk">a</span>隨便打開一個資料夾視窗。</p>
+    <p><span class="sk">b</span>Windows 11：點上方「<strong>檢視</strong>」→「<strong>顯示</strong>」→ 勾選「<strong>副檔名</strong>」。</p>
+    <p><span class="sk">c</span>Windows 10：點上方「<strong>檢視</strong>」頁籤 → 在右邊勾選「<strong>副檔名</strong>」。</p>
+  </div>
+  <div class="seen"><b>你會看到</b>
+    <p>資料夾裡的檔名後面開始出現 <code>.big</code>、<code>.txt</code>、<code>.exe</code> 這些尾巴。</p>
+  </div>
+  <p class="small">Mac 沒這個問題；若 Finder 也藏了副檔名，到「Finder → 設定 → 進階」勾「顯示所有檔案副檔名」。</p>
+
+  <h2>操作四：備份與還原的觀念</h2>
+  <p class="step-why"><strong>為什麼要學：</strong>改遊戲檔案唯一真正的保險就是備份。</p>
+  <ul class="tick">
+    <li><strong>改任何檔案之前，先複製一份放旁邊</strong>，檔名加 <code>.bak</code>（例如 <code>ingame.big.bak</code>）。</li>
+    <li>本站<u>會動到遊戲檔</u>的工具會<strong>自動</strong>做這件事，還提供一行指令還原（<code>--restore</code>）——
+        純檢查用的那幾支不寫檔，也就沒有備份與還原。</li>
+    <li>手動還原也很簡單：刪掉改壞的檔，把備份檔改名回原檔名。<u>本站工具留下的備份多半不叫 <code>.bak</code></u>，
+        而是那一課自己的尾巴（例如 <code>.hudcolorbak</code>、<code>.speedbak</code>）——
+        完整對照表在<a href="tutorials/backup/index.html">備份與還原 SOP</a>。</li>
+    <li><strong>備份只有一份時，第二次修改前先把上一次的成果另存</strong>，不然還原會退回更早的版本。</li>
+  </ul>
+
+  <h2>操作五：安裝 Python（跑教學腳本用）</h2>
+  <p class="step-why"><strong>為什麼要學：</strong>本站的自動化工具都是 Python 小程式，零相依、附完整原始碼。</p>
+  <p>先確認電腦有沒有：打開命令提示字元，複製貼上（Windows 用第一行，Mac 用第二行），按 <span class="key">Enter</span>。</p>
+<pre><code>python --version</code></pre>
+<pre><code>python3 --version</code></pre>
+  <div class="seen"><b>你會看到</b>
+    <p>類似 <code>Python 3.11.4</code> 的一行字。<strong>開頭是 3、第二個數字 7 以上就可以用</strong>（3.7、3.9、3.12 都行；<code>2.7.x</code> 不算）。有了就完課！</p>
+  </div>
+  <div class="ifnot"><b>如果沒有</b>
+    <div class="substep" style="border:none;padding-left:0">
+      <p><span class="sk">a</span>瀏覽器開 <strong>python.org</strong> → 點 <strong>Downloads</strong> → 按黃色大按鈕下載。</p>
+      <p><span class="sk">b</span>執行安裝檔。<strong>最重要的一步</strong>：安裝畫面最下面的勾選框
+         「<strong>Add python.exe to PATH</strong>」<strong>一定要先打勾</strong>，再按 Install Now。</p>
+      <p><span class="sk">c</span>裝完<strong>把命令提示字元關掉重開</strong>（不重開抓不到），再跑一次上面的指令確認。</p>
+      <p><span class="sk">d</span>Mac：執行 <code>xcode-select --install</code>，跳出視窗按「安裝」即可。</p>
+      <p><span class="sk">e</span>Windows 跳出 Microsoft Store 頁面 → 那是假的，關掉，照 a 步驟裝真的。</p>
+      <p><span class="sk">f</span>印出的是 <code>Python 2.7.x</code> → 版本太舊（本站腳本要 3.7 以上）。
+         這有可能是兩個版本都裝了，只是 <code>python</code> 這個名字指到舊的那個 ——
+         <strong>Windows</strong> 先打 <code>py -3 --version</code> 試試（<code>py</code> 只有 Windows 有）；
+         <strong>Mac</strong> 則是打上面第二行的 <code>python3 --version</code>。
+         哪一個印出 3.x，就把本站指令開頭的 <code>python</code> 換成它
+         （例如 <code>py -3 mvp_hide_runner_speed.py</code>）；兩個都沒有才照 a 步驟另外裝一份。</p>
+    </div>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">六個基本功練熟了，後面就是照著打字而已</p>
+    <p>下一步：<a href="tutorials/hide-runner-speed/index.html"><strong>本站招牌教學 —— 關掉跑壘者速度數值</strong></a>，
+       全程約 5 分鐘，隨時可以還原。</p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 第 0 課先把後面每一課都會用到的六個基本操作練一次，<u>這一課不會動到任何遊戲檔案，練壞也沒關係</u>。</li>
+    <li><strong>其實還有一課更早</strong> 完全沒改過遊戲檔案的人，先去做暖身課「打開一個遊戲的檔案」，什麼工具都不用，記事本開一個純文字檔看懂它，改壞了一定回得來，建立信心之後再回來學命令提示字元會輕鬆很多。</li>
+    <li><strong>操作零是 2026-08-26 才補上的</strong> 每一課的第一個動作都是「打開遊戲資料夾」，而<u>本站以前沒教</u>。找法是對桌面捷徑按右鍵選「開啟檔案位置」，或到 <code>C:\Program Files (x86)\EA SPORTS</code>。<strong>確認找對了的條件是同一層同時看得到 <code>mvp2005.exe</code> 跟一個叫 <code>data</code> 的資料夾，兩個都有才算。</strong>另外 MVP Baseball 2005 是 2005 年的光碟遊戲，Steam、Origin、EA app 上都沒有。</li>
+    <li><strong>新手最常卡住的兩關</strong> 一是路徑打錯，二是 Windows 預設把副檔名藏起來，用記事本存腳本會存成 <code>xxx.py.txt</code> 而畫面上看起來一模一樣，然後指令就跑不動。所以先到「檢視」把副檔名打開。</li>
+    <li><strong>路徑用拖的不要用打的</strong> 指令打到需要路徑的位置後空一格、游標停著不要按 Enter，把檔案拖進視窗放開，路徑會自動填進去（通常還會自動加引號）。真要手打的話，路徑前後一定要各加一個半形雙引號，不然遇到 <code>Program Files</code> 這種含空格的路徑，電腦會以為你在講好幾個檔案。</li>
+    <li><strong>備份的觀念，還有一個容易漏的陷阱</strong> 改任何檔案之前先複製一份加 <code>.bak</code>，本站會動到遊戲檔的工具會自動做並提供 <code>--restore</code> 一行還原（<u>它們留的備份多半不叫 <code>.bak</code></u>，而是那一課自己的尾巴）。<u>但備份只有一份時，第二次修改前要先把上一次的成果另存</u>，不然還原會退回更早的版本。</li>
+    <li><strong>Python 要開頭是 3、第二個數字 7 以上</strong> <code>python --version</code>（Mac 用 <code>python3</code>）印出來開頭是 3、第二個數字 7 以上才能用（<code>2.7.x</code> 不算）。要裝的話，安裝畫面最下面那個「Add python.exe to PATH」<strong>一定要先打勾</strong>，裝完要把命令提示字元關掉重開才抓得到；跳出 Microsoft Store 那頁是假的，關掉去 python.org 裝；印出 2.7 就改用 <code>py -3</code>（只有 Windows 有）或 <code>python3</code>。</li>
+    <li><strong>本站沒驗的</strong> 這一課本身沒有量測任何數字，頁面自己標了保留的有三處。一是常見安裝位置那條路徑，<u>舊機器或 32 位元系統可能是 <code>C:\Program Files\EA SPORTS</code>，自己改過安裝位置的話這一招完全沒用</u>，要改用前兩種找法；二是 <code>python</code> 印出 2.7 時，頁面寫的是「有可能是兩個版本都裝了，只是這個名字指到舊的那個」，那也是可能性，要靠 <code>py -3</code> 或 <code>python3</code> 實際試出來；三是操作一補的 PowerShell 那一段（內建 5.1 與自己裝的 7 之差、<code>$PSVersionTable.PSVersion</code> 這行看版本的指令）依據的是微軟官方文件，<u>還沒在 Windows 上實測</u>。</li>
+  </ul>
+
+  <footer>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯。</p>
+    <p><a href="legal.html">法律與版權說明</a> ·
+       <a href="changelog.html">更新紀錄</a> · <a href="index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

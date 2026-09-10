@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/player-codes.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>球員代號對照表 — toni的MVP模組補習班</title>
+<meta name="description" content="守位、慣用手、球種那些數字各代表什麼。本站只寫能用遊戲自己的檔案佐證的部分,佐證不了的照實說佐證不了。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 球員代號對照表</p>
+  <h1>球員代號對照表</h1>
+  <p class="lede"><a href="player-data.html">球員資料檔</a>裡有一大群欄位存的<strong>不是數值，是代號</strong> ——
+     守位、慣用手、球種、髮型那些。看到 <code>5 8</code> 你不會知道那是右外野手。
+     這頁把<u>能佐證的</u>代號寫出來，<u>佐證不了的</u>照實說佐證不了。</p>
+
+    <div class="card blue" style="margin-top:14px">
+    <p class="card-h">先說清楚這頁的數字是從哪一份遊戲量的</p>
+    <p>本頁的項目數、檔案數、覆蓋率，量的是<strong>一台裝過台灣模組的遊戲</strong>。
+       <u>剛安裝好的原版數字小很多</u> —— 例如臉皮 504 對 894、大頭照 1,487 對 6,638、
+       語音號碼 1,673 對 4,343。</p>
+    <p><strong>格式與結構的部分兩邊一樣</strong>，那是遊戲程式決定的；
+       會變的是「有幾個」。完整對照見
+       <a href="original-vs-modded.html">原版與這台機器差在哪</a>。</p>
+  </div>
+<div class="card amber">
+    <p class="card-h">這頁本來是被本站自己擋下來的</p>
+    <p><a href="index.html">速查首頁</a>原本掛著一行：
+       「位置、球路這些數字代號各自代表什麼 —— <strong>目前缺原廠出處，暫緩</strong>。」</p>
+    <p>解法不是去找原廠文件，是換一個問題：
+       <strong>能不能用遊戲自己的檔案佐證？</strong>能的話，站上寫的就不是轉載別人的表，
+       而是讀者可以自己重現的量測結果。</p>
+    <p>結果是<u>一部分可以，一部分不行</u>。這頁的一半價值在那張「不行」的清單。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">⚠️ 這頁的數字量自本站測試機，你的會不一樣</p>
+    <p>本站測試機的 <code>attrib.dat</code> 與 <code>pitcher.dat</code>
+       <u>都被模組換過</u>，裝的是一份混了大聯盟與台灣球員的名單。</p>
+    <p class="small">（2026-09-05 訂正：這裡原本拿檔案日期當佐證，寫「<code>attrib.dat</code> 是 2026 年 4 月、
+       <code>pitcher.dat</code> 是 2023 年 5 月」。<strong>檔案日期不能當證據</strong> ——
+       複製與同步都會動到它。現在量到的 <code>attrib.dat</code> 是 2026-08-29，
+       而它跟 2023 年那份備份<u>逐位元組相同</u>（同一個 MD5），
+       代表被搬動的只有日期、內容一個位元組都沒改。
+       「被模組換過」本身照舊成立，那是從名冊內容看出來的，不是從日期。）</p>
+    <p>所以像「3,247 位球員」「某某球員的識別碼是多少」這種<strong>跟名單內容有關的數字，
+       你自己跑會得到別的結果</strong>。</p>
+    <p>不會變的是<strong>格式</strong>：欄位有幾個、每一格怎麼寫、資料怎麼分隔 ——
+       那是遊戲程式決定的，換名單也不會變。<br>
+       ⚠️ <strong>但「哪一欄是什麼」會變。</strong>本站實測 46 個欄位裡有 <strong>27 個</strong>
+       在剛安裝好的原版與社群名冊之間位置不同（<code>skin_tone</code> 從第 12 欄搬到第 38 欄，
+       中間的欄位各前移一格；<code>audioid</code> 原版第 17、社群名冊第 16）。
+       兩份剛安裝好的原版（英文與中文）彼此完全相同，所以分界是<u>原版 vs 社群名冊</u>，不是語言。
+       <strong>永遠不要記欄號，要在執行時從表頭找欄位名</strong> —— 本站的腳本都是這樣做的。
+       這頁講的規則對你成立，數字與欄號不一定。</p>
+    <p class="small">同樣的道理本站在<a href="fonts.html">字型</a>、
+       <a href="audio.html">音訊</a>、<a href="anims.html">動畫</a>那幾頁也標過。</p>
+  </div>
+
+  <h2 id="proof">招牌自證：守位不用相信任何人給的表</h2>
+  <p>先做一個完全不靠外部資料的測試。</p>
+  <p>球員資料分成兩個檔：<code>attrib.dat</code>（所有球員）與 <code>pitcher.dat</code>（<u>只有投手才有投球能力值</u>）。
+     所以「投手是誰」這件事，檔案自己就回答了。</p>
+  <div class="seen"><b>做法</b>
+    <p style="margin:8px 0 0">把 <code>pitcher.dat</code> 裡每一列的識別碼抓出來，
+       拿去 <code>attrib.dat</code> 查這些人的<strong>主守位</strong>那一欄，看是什麼值。</p>
+  </div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>有投球能力值的人，主守位是</th><th class="num">人數</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td class="mono">10</td><td class="num">839</td></tr>
+      <tr class="hi"><td class="mono">0</td><td class="num">777</td></tr>
+      <tr><td>其他值</td><td class="num">2</td></tr>
+      <tr><td><strong>合計</strong></td><td class="num"><strong>1,618</strong>（= <code>pitcher.dat</code> 的列數）</td></tr>
+    </tbody>
+  </table></div>
+  <p>反過來也成立：<strong>不在 <code>pitcher.dat</code> 裡的人，主守位<u>從來不是</u> 0 或 10</strong>，
+     只出現 1 到 8。</p>
+  <div class="card grass">
+    <p class="card-h">所以 0 與 10 就是投手，不必相信任何對照表</p>
+    <p>1,616 / 1,618 = <strong>99.88%</strong>。而且這是可證偽的 ——
+       如果 0 不是投手，這個測試會當場垮掉。</p>
+  </div>
+  <p><strong>剩下那 2 筆要分開講，不能混為一談：</strong></p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>那一列</th><th>主守位</th><th>是什麼</th></tr></thead>
+    <tbody>
+      <tr><td data-label="那一列" class="mono">姓名兩欄都是 Default</td><td data-label="主守位" class="num">2</td>
+          <td data-label="是什麼"><strong>範本列，不是球員</strong>。整份名冊的第一列，用來當欄位格式的樣板</td></tr>
+      <tr><td data-label="那一列" class="mono">一位真實球員</td><td data-label="主守位" class="num">6</td>
+          <td data-label="是什麼">主守位是左外野，<u>副守位是 10</u> —— 真的兼任兩種角色的例子</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">本站原本把這兩筆都寫成「兩位二刀流」，重驗時才發現有一筆是範本列。
+     <strong>例外要逐個看，不能只數個數。</strong></p>
+
+  
+  <div class="card grass">
+    <p class="card-h">⭐ 那個結構有一個實務後果：改主守位會刪掉東西</p>
+    <p>上面證明了 <code>pitcher.dat</code> 只有投手才有列。
+       <strong>所以把一個人的主守位從投手改成野手，他在那個檔裡的那一列就沒有存在的理由了。</strong>
+       2006 年那支編輯器的說明書把後果寫得很直白：</p>
+<pre><code>There are no pitching ratings stored for fielders.
+If you change a pitcher to a fielder, you will <span class="hl">delete</span> that
+player's pitching ratings.  If you change a fielder to a pitcher,
+he will be given the <span class="hl">default</span> pitching ratings.</code></pre>
+    <p>換句話說：<u>投手改野手 = 那個人的球種、球速、控球全部消失；
+       野手改投手 = 他會拿到一組預設值</u>。這一步<strong>不可逆</strong> ——
+       改回去不會把原本的數值找回來。要動這一欄之前先備份。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">⭐ 另外兩條限制，而且都可以拿原版資料自己驗</p>
+    <p><strong>一、一位投手不能有兩種相同的球種。</strong>
+       這條不是本站推的 —— 另一支 2008 年的編輯器，它的介面上就有一個按鈕叫
+       <code>Remove Duplicate Pitch</code>（移除重複球種）。
+       <u>兩支獨立的工具講同一件事</u>。拿剛安裝好的原版驗：</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>量測</th><th class="num">結果</th></tr></thead>
+      <tbody>
+        <tr><td>投手（排除範本列）</td><td class="num">1,429</td></tr>
+        <tr class="hi"><td>有兩種相同球種的</td><td class="num"><strong>0 位，零例外</strong></td></tr>
+        <tr><td>每位登記幾種變化球</td><td class="num">1 種 2 位 · 2 種 758 · 3 種 471 · 4 種 198</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>二、副守位填「指定打擊」的人不能被當成投手。</strong>
+       這條的出處是<u>另一支工具</u>：前面那支 2006 年的編輯器（上一張卡片引說明書的那一支），
+       它 2004-04-12 的更新紀錄寫著
+       <code>Don't turn a player into a pitcher if DH is selected for secondary position</code> ——
+       那是他們<u>修過的一個 bug</u>。拿原版驗：<strong>1,430 位投手裡，副守位是 9（指定打擊）的有 0 位。</strong></p>
+    <p class="small">（9 = 指定打擊這件事來自本頁上面那張<a href="#pos">守備位置表</a>，
+       不是來自那份說明書 —— 說明書從頭到尾只寫 <code>DH</code> 這兩個字母。）</p>
+  </div>
+<h2>本站怎麼決定哪些代號可以寫出來</h2>
+  <p>遊戲自己有兩張<a href="loc-strings.html">文字表</a>（<code>FEENG.LOC</code> 與 <code>IGENG.LOC</code>），
+     裡面裝著遊戲本體介面會出現的文字。
+     做法是：<strong>把候選的代號名稱拿去遊戲自己的文字表裡搜，看找不找得到、順序對不對。</strong></p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>判定</th><th>標準</th><th>本站怎麼寫</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="判定"><span class="badge ok">可照登</span></td>
+          <td data-label="標準">整組標籤在遊戲檔案裡<strong>連續、同順序</strong>出現，順序能對上代號</td>
+          <td data-label="本站怎麼寫">直接列成對照表</td></tr>
+      <tr><td data-label="判定"><span class="badge lv">部分</span></td>
+          <td data-label="標準">標籤存在、順序也對，但中間有斷點或少數幾個找不到</td>
+          <td data-label="本站怎麼寫">列出來，並標明哪幾格沒得驗</td></tr>
+      <tr><td data-label="判定"><span class="badge wip">不可照登</span></td>
+          <td data-label="標準">只有零星通用英文字命中（<code>None</code>、<code>Red</code> 這種），不構成綁定證據</td>
+          <td data-label="本站怎麼寫"><strong>不列表</strong>，只說明「這一欄有幾個選項」</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">兩張文字表一共 7,936 條字串（<code>FEENG</code> 6,352 條、<code>IGENG</code> 1,584 條）。
+     抽法見<a href="loc-strings.html">文字表那頁</a>。</p>
+
+  <h2><span class="badge wip">推論</span> 出場音樂曲風 —— 7 / 7</h2>
+  <p>這一欄是<u>本站標「推論」的項目裡證據最完整的一條</u>。遊戲文字表裡有一條字串是
+     <code>Batter Ditty Type</code>（欄位標題），
+     <strong>緊接著正好七條連續字串</strong>，再下一條就跳到完全無關的內容：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th class="num">代號</th><th class="mono">遊戲檔案裡的字串</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0</td><td class="mono">Country</td></tr>
+      <tr><td class="num">1</td><td class="mono">Dance</td></tr>
+      <tr><td class="num">2</td><td class="mono">Hip Hop</td></tr>
+      <tr><td class="num">3</td><td class="mono">Pop</td></tr>
+      <tr><td class="num">4</td><td class="mono">Rock</td></tr>
+      <tr><td class="num">5</td><td class="mono">Heavy Rock</td></tr>
+      <tr><td class="num">6</td><td class="mono">Latin</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>三方同時吻合</strong>：遊戲文字表七條連續、順序一致；
+     球員資料檔那一欄實測<u>剛好用滿 0–6 七個代號</u>，一個不多一個不少；
+     2008 年那支社群編輯器附的設定檔（跟下面解開<a href="#swingtype">揮棒型態</a>的是同一份），
+     這一欄列的也是同樣七個曲風、同樣的順序
+     （它把 <code>Heavy Rock</code> 寫成縮寫 <code>Hv. Rock</code>）。</p>
+  <p class="small">⚠️ <strong>那為什麼不算「可照登」</strong>：本站<u>沒有進遊戲聽過</u>，
+     也沒在音訊資料裡找到七組對應的音樂。形式上它符合上面那張表的「可照登」條件，
+     但本站選擇標低一級。完整的支持與不足見下面
+     <a href="#ditty">出場音樂曲風：完整證據</a>。</p>
+
+  <h2><span class="badge ok">可照登</span> 球種 —— 15 / 15</h2>
+  <p>遊戲自己有完整的 15 個球種名，而且<strong>把同一份清單重複了四遍</strong>
+     （全名、兩字母縮寫、三字母縮寫、四字母縮寫），<u>四次的順序完全一樣</u>。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">代號</th><th class="mono">球種</th><th class="num">代號</th><th class="mono">球種</th></tr></thead>
+    <tbody>
+      <tr><td data-label="代號" class="num">0</td><td data-label="球種" class="mono">4-Seam Fastball<br><span class="small">直球</span></td>
+          <td data-label="代號" class="num">8</td><td data-label="球種" class="mono">2-Seam Fastball</td></tr>
+      <tr><td data-label="代號" class="num">1</td><td data-label="球種" class="mono">Changeup<br><span class="small">變速球</span></td>
+          <td data-label="代號" class="num">9</td><td data-label="球種" class="mono">Cutter</td></tr>
+      <tr><td data-label="代號" class="num">2</td><td data-label="球種" class="mono">Curveball<br><span class="small">曲球</span></td>
+          <td data-label="代號" class="num">10</td><td data-label="球種" class="mono">Circle Change</td></tr>
+      <tr><td data-label="代號" class="num">3</td><td data-label="球種" class="mono">Knuckleball<br><span class="small">蝴蝶球</span></td>
+          <td data-label="代號" class="num">11</td><td data-label="球種" class="mono">Forkball<br><span class="small">叉指球</span></td></tr>
+      <tr><td data-label="代號" class="num">4</td><td data-label="球種" class="mono">Screwball</td>
+          <td data-label="代號" class="num">12</td><td data-label="球種" class="mono">Knucklecurve</td></tr>
+      <tr><td data-label="代號" class="num">5</td><td data-label="球種" class="mono">Sinker<br><span class="small">伸卡球</span></td>
+          <td data-label="代號" class="num">13</td><td data-label="球種" class="mono">Palmball</td></tr>
+      <tr><td data-label="代號" class="num">6</td><td data-label="球種" class="mono">Slider<br><span class="small">滑球</span></td>
+          <td data-label="代號" class="num">14</td><td data-label="球種" class="mono">Slurve</td></tr>
+      <tr><td data-label="代號" class="num">7</td><td data-label="球種" class="mono">Splitter<br><span class="small">指叉球</span></td>
+          <td data-label="代號"></td><td data-label="球種"></td></tr>
+    </tbody>
+  </table></div>
+  <div class="card blue">
+    <p class="card-h">代號 0 那一格是推測</p>
+    <p>15 個球種概念一個不缺，順序也對得上。但<strong>「代號 0 = 直球」是推理不是量到的</strong>：
+       理由是第二到第五球種那四個欄位<u>從來沒有出現過 0</u>，
+       看起來 0 是保留給「第一球種一定是直球」用的。</p>
+    <p><span class="badge wip">推測</span> 本站沒有實際改一格進遊戲確認。</p>
+  </div>
+  <p class="small">實測還有兩件事：第二到第五球種<strong>從來沒人用 13（Palmball 那一格）</strong>；
+     而且這些欄位允許填 <code>-</code> 代表「沒有這一球」。</p>
+
+  <h2 id="pos"><span class="badge ok">可照登</span> 守備位置 —— 主守位 10 / 10</h2>
+  <p>遊戲的兩張文字表裡各有<strong>一整段連續 21 條</strong>守位縮寫，順序完全一樣：</p>
+<pre><code>P  C  1B  2B  3B  SS  LF  CF  RF  DH  RP  CP  SP  OF  SRP  LRP  MRP  SU  IF  Util  PH
+└─────────── 前 11 條就是代號 0 到 10 ───────────┘</code></pre>
+  <div class="tablewrap"><table>
+    <thead><tr><th class="num">代號</th><th class="mono">縮寫</th><th>中文</th><th>可以當主守位嗎</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td class="num">0</td><td class="mono">P</td><td>投手</td><td>可以（777 人）</td></tr>
+      <tr><td class="num">1</td><td class="mono">C</td><td>捕手</td><td>可以（279 人）</td></tr>
+      <tr><td class="num">2</td><td class="mono">1B</td><td>一壘手</td><td>可以（182 人）</td></tr>
+      <tr><td class="num">3</td><td class="mono">2B</td><td>二壘手</td><td>可以（223 人）</td></tr>
+      <tr><td class="num">4</td><td class="mono">3B</td><td>三壘手</td><td>可以（201 人）</td></tr>
+      <tr><td class="num">5</td><td class="mono">SS</td><td>游擊手</td><td>可以（205 人）</td></tr>
+      <tr><td class="num">6</td><td class="mono">LF</td><td>左外野手</td><td>可以（152 人）</td></tr>
+      <tr><td class="num">7</td><td class="mono">CF</td><td>中外野手</td><td>可以（233 人）</td></tr>
+      <tr><td class="num">8</td><td class="mono">RF</td><td>右外野手</td><td>可以（156 人）</td></tr>
+      <tr class="hi"><td class="num">9</td><td class="mono">DH</td><td>指定打擊</td>
+          <td><strong>不行</strong> —— 主守位 0 人、副守位 55 人</td></tr>
+      <tr class="hi"><td class="num">10</td><td class="mono">RP</td><td>後援投手</td><td>可以（839 人）</td></tr>
+      <tr><td class="num">11</td><td class="mono">OF</td><td>外野手</td><td rowspan="3"><strong>不行</strong>，只出現在副守位</td></tr>
+      <tr><td class="num">12</td><td class="mono">IF</td><td>內野手</td></tr>
+      <tr><td class="num">13</td><td class="mono">Util</td><td>工具人</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">（2026-09-05 訂正：這一節原本掛「10 / 10 與 14 / 14」。
+     副守位那三格 <code>OF</code>／<code>IF</code>／<code>Util</code>
+     <u>不是</u>照本頁自己訂的「整組標籤連續、同順序」標準取得的 ——
+     遊戲那段連續 21 條裡 <code>OF</code> 排第 14、<code>IF</code> 第 19、<code>Util</code> 第 20，
+     位置對不上代號 11、12、13，所以上面那段方框也只敢寫「前 11 條就是代號 0 到 10」。
+     這三格的名字來自一支社群工具附的設定檔（<code>Secondary Position</code> 那一段寫著
+     <code>11,OF</code>／<code>12,IF</code>／<code>13,UTIL</code>），
+     照本頁的分級表那屬於<strong>外部來源</strong>，不是「可照登」。
+     「只出現在副守位」那一句則是本站從名冊自己數出來的。）</p>
+  <div class="card grass">
+    <p class="card-h">代號 9 是 DH，這解釋了一件原本很奇怪的事</p>
+    <p>主守位<u>從來沒有出現過 9</u>，副守位卻有 55 人是 9。
+       因為<strong>指定打擊本來就不是一個「守」的位置</strong> ——
+       他只打擊不上場守備，所以那是「額外身分」不是「主要守位」。</p>
+  </div>
+
+  <h2 id="lefty">⭐ 最硬的一條：用左投右投反證守位</h2>
+  <p>上面靠文字表對出來的表，還可以<strong>用棒球常識再驗一次</strong>，
+     而且完全不需要任何外部資料。</p>
+  <p>棒球場上有四個位置<u>幾乎不可能由左投手擔任</u> ——
+     捕手、二壘手、三壘手、游擊手。原因是傳球方向：左手傳球的人在這四個位置上，
+     每一次轉身傳一壘都要多轉半圈。</p>
+  <p>把整份名單的<strong>慣用投球手</strong>那一欄，按主守位分組數一次（下表量的是本站測試機那份名冊，原版的數字見表後）：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">代號</th><th class="mono">縮寫</th><th class="num">人數</th>
+      <th class="num">左投人數</th><th class="num">左投比例</th></tr></thead>
+    <tbody>
+      <tr><td data-label="代號" class="num">0</td><td data-label="縮寫" class="mono">P</td><td data-label="人數" class="num">777</td><td data-label="左投人數" class="num">200</td><td data-label="左投比例" class="num">25.7%</td></tr>
+      <tr class="hi"><td data-label="代號" class="num">1</td><td data-label="縮寫" class="mono">C</td><td data-label="人數" class="num">279</td><td data-label="左投人數" class="num"><strong>0</strong></td><td data-label="左投比例" class="num"><strong>0.0%</strong></td></tr>
+      <tr><td data-label="代號" class="num">2</td><td data-label="縮寫" class="mono">1B</td><td data-label="人數" class="num">182</td><td data-label="左投人數" class="num">39</td><td data-label="左投比例" class="num">21.4%</td></tr>
+      <tr class="hi"><td data-label="代號" class="num">3</td><td data-label="縮寫" class="mono">2B</td><td data-label="人數" class="num">223</td><td data-label="左投人數" class="num"><strong>0</strong></td><td data-label="左投比例" class="num"><strong>0.0%</strong></td></tr>
+      <tr class="hi"><td data-label="代號" class="num">4</td><td data-label="縮寫" class="mono">3B</td><td data-label="人數" class="num">201</td><td data-label="左投人數" class="num"><strong>0</strong></td><td data-label="左投比例" class="num"><strong>0.0%</strong></td></tr>
+      <tr class="hi"><td data-label="代號" class="num">5</td><td data-label="縮寫" class="mono">SS</td><td data-label="人數" class="num">205</td><td data-label="左投人數" class="num"><strong>0</strong></td><td data-label="左投比例" class="num"><strong>0.0%</strong></td></tr>
+      <tr><td data-label="代號" class="num">6</td><td data-label="縮寫" class="mono">LF</td><td data-label="人數" class="num">152</td><td data-label="左投人數" class="num">39</td><td data-label="左投比例" class="num">25.7%</td></tr>
+      <tr><td data-label="代號" class="num">7</td><td data-label="縮寫" class="mono">CF</td><td data-label="人數" class="num">233</td><td data-label="左投人數" class="num">68</td><td data-label="左投比例" class="num">29.2%</td></tr>
+      <tr><td data-label="代號" class="num">8</td><td data-label="縮寫" class="mono">RF</td><td data-label="人數" class="num">156</td><td data-label="左投人數" class="num">40</td><td data-label="左投比例" class="num">25.6%</td></tr>
+      <tr><td data-label="代號" class="num">10</td><td data-label="縮寫" class="mono">RP</td><td data-label="人數" class="num">839</td><td data-label="左投人數" class="num">210</td><td data-label="左投比例" class="num">25.0%</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>那四個位置合計 908 人，左投 0 人，零例外。</strong>
+     其餘六個位置全部落在 21% 到 29%。</p>
+
+  <div class="card blue">
+    <p class="card-h">我們改過這一段：原版有一個例外</p>
+    <p>上面那張表量的是<a href="original-vs-modded.html">本站測試機那份名冊</a>。
+       後來拿<u>剛安裝好的原版</u>重跑同一套統計：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th></th><th class="num">四個位置合計</th><th class="num">左投</th></tr></thead>
+      <tbody>
+        <tr><td>本站測試機（台灣名冊）</td><td data-label="四個位置合計" class="num">908</td><td data-label="左投" class="num"><strong>0</strong></td></tr>
+        <tr class="hi"><td><strong>剛安裝好的原版</strong></td><td data-label="四個位置合計" class="num">785</td><td data-label="左投" class="num"><strong>1</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p>那一位是 <strong>Randall Simon</strong>，原版名冊裡登記為三壘手、左投左打。
+       其餘三個位置（捕手 0/247、二壘 0/151、游擊 0/217）在原版一樣是零。</p>
+    <p><strong>這不但沒有推翻上面的推論，還讓它更像真的。</strong>
+       785 個人裡有 1 個例外是 <u>0.13%</u>，跟其他六個位置的 21% 到 29% 差了兩個數量級。
+       真實資料本來就會有一兩個特例；<u>剛好是零反而比較像人為整理過的名單</u>。</p>
+    <p class="small">所以這條反證的講法要收一下：不是「零例外」，是
+       <strong>「那四個位置的左投比例低到跟其他位置差兩個數量級」</strong>。
+       結論（代號 1 = 捕手、3 = 二壘、4 = 三壘、5 = 游擊）不受影響。</p>
+  </div>
+  <div class="card grass">
+    <p class="card-h">這條為什麼比查表更有說服力</p>
+    <p>文字表告訴你「第二個字串是 C」。<u>左投分布告訴你那真的是捕手</u> ——
+       因為現實棒球就是這樣，而遊戲的資料照著現實走。</p>
+    <p><strong>兩個完全獨立的來源指向同一個答案。</strong>
+       而且這一條只用一個檔案就做得到，連文字表都不用開。</p>
+  </div>
+  <div class="card blue">
+    <p class="card-h">附帶：0 與 10 也被「續航力」分得乾乾淨淨</p>
+    <div class="tablewrap" style="margin:8px 0"><table class="stack">
+      <thead><tr><th>主守位</th><th class="num">人數</th><th class="num">續航力中位數</th></tr></thead>
+      <tbody>
+        <tr><td data-label="主守位" class="mono">0（P）</td><td data-label="人數" class="num">777</td><td data-label="續航力中位數" class="num"><strong>65</strong></td></tr>
+        <tr><td data-label="主守位" class="mono">10（RP）</td><td data-label="人數" class="num">839</td><td data-label="續航力中位數" class="num"><strong>26</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p>先發投手要投得久、後援投手不用。<strong>兩個代號的續航力差了兩倍半。</strong></p>
+  </div>
+
+  <h2><span class="badge ok">可照登</span> 慣用手 —— 2 / 2 與 3 / 3</h2>
+  <p>兩張文字表裡各有一段<strong>六條連續</strong>字串：</p>
+<pre><code>Left  Right  Switch  L  R  S</code></pre>
+  <div class="tablewrap"><table>
+    <thead><tr><th>欄位</th><th class="num">代號</th><th class="mono">縮寫</th><th>中文</th><th class="num">人數</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="3">打擊</td><td class="num">0</td><td class="mono">R</td><td>右打</td><td class="num">2,123</td></tr>
+      <tr><td class="num">1</td><td class="mono">L</td><td>左打</td><td class="num">928</td></tr>
+      <tr><td class="num">2</td><td class="mono">S</td><td>左右開弓</td><td class="num">196</td></tr>
+      <tr><td rowspan="2">投球</td><td class="num">0</td><td class="mono">R</td><td>右投</td><td class="num">2,651</td></tr>
+      <tr><td class="num">1</td><td class="mono">L</td><td>左投</td><td class="num">596</td></tr>
+    </tbody>
+  </table></div>
+  <p>投球只有兩個值 —— <strong>沒有「左右開弓投球」</strong>，符合現實。
+     打擊三個值的人數分布（右打最多、左打次之、左右開弓最少）也符合現實。</p>
+  <div class="card clay">
+    <p class="card-h">⚠️ 這一節本站原本寫錯</p>
+    <p>上線時這兩欄被列在「佐證不了」，理由寫「連投左投右都 0 命中」。</p>
+    <p><strong>錯在本站的搜尋方法</strong> —— 抽字串的程式把<u>長度小於兩個字元的字串丟掉了</u>，
+       所以 <code>P</code>、<code>C</code>、<code>L</code>、<code>R</code>、<code>S</code>
+       這些單字母標籤在那個方法裡<u>永遠不可能命中</u>。</p>
+    <p>同一個錯誤也讓守備位置被低估成「8 / 10」，實際是
+       <a href="#pos"><strong>10 / 10</strong></a>。</p>
+    <p class="small">教訓跟本站其他頁一樣：<strong>「我找過了，沒有」要先證明「我找得到已知存在的東西」。</strong>
+       一個會丟掉單字母的搜尋器，報「找不到單字母」是必然的，不是發現。</p>
+  </div>
+
+  <h2><span class="badge wip">不可照登</span> 這些欄位本站佐證不了</h2>
+  <p>下面這些欄位確實有第三方的對照表存在，但<strong>拿去遊戲自己的文字表搜，證據不足</strong> ——
+     命中的都是 <code>None</code>、<code>Red</code>、<code>Average</code> 這種通用英文字，散落在無關的位置。</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>欄位</th><th class="num">嚴格命中</th><th>備註</th></tr></thead>
+    <tbody>
+      <tr><td>投球姿勢</td><td class="num">3 / 59</td>
+          <td><code>sidearm</code>／<code>submarine</code>／<code>overhand</code> <strong>全部 0 命中</strong></td></tr>
+      <tr><td>髮型</td><td class="num">2 / 10</td>
+          <td>文字表有標題 <code>Hair Style</code>，但<u>下一條就跳到 <code>Facial Hair</code></u> ——
+              代表這個選單不是用文字呈現的</td></tr>
+      <tr><td>打擊姿勢</td><td class="num">7 / 66</td>
+          <td>只有前七個「通用姿勢」對得上，見下方說明</td></tr>
+      <tr><td>鬍子</td><td class="num">1 / 8</td><td rowspan="8">命中的都是通用字，不構成綁定</td></tr>
+      <tr><td>髮色</td><td class="num">4 / 7</td></tr>
+      <tr><td>骨架</td><td class="num">2 / 12</td></tr>
+      <tr><td>膚色</td><td class="num">2 / 16</td></tr>
+      <tr><td>球棒顏色</td><td class="num">2 / 8</td></tr>
+      <tr><td>明星等級</td><td class="num">2 / 5</td></tr>
+      <tr><td>揮棒類型</td><td class="num">0 / 5</td></tr>
+    </tbody>
+  </table></div>
+  <div class="card clay">
+    <p class="card-h">⚠️ 上表膚色那個分母「16」，來源跟你以為的不一樣</p>
+    <p>（2026-09-05 訂正：這張卡原本寫「16 是<u>這台裝過台灣模組的機器</u>上出現過的值有幾種」，那是錯的。）
+       分母 16 跟同表其他每一列一樣，是<strong>第三方對照表列了幾條</strong> ——
+       那份設定檔 <code>Skin Tone</code> 那一段剛好 16 行。
+       同表「揮棒類型 0 / 5」就是反證：這台機器那一欄實測只用到 <strong>2</strong> 個值，
+       分母 5 不可能是量這台機器來的。
+       而這台機器的膚色<u>剛好也是 16 種</u> —— 兩個 16 意思不同
+       （一個是對照表有幾條，一個是名冊裡出現過幾種值），別把它們當成同一件事。
+       膚色這一欄拿剛安裝好的原版重量：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>哪一份名冊</th><th class="num">膚色值域</th><th class="num">幾種</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="哪一份名冊">剛安裝好的官方英文版</td><td data-label="膚色值域" class="num">0 – 10</td><td data-label="幾種" class="num"><strong>11</strong></td></tr>
+        <tr class="hi"><td data-label="哪一份名冊">剛安裝好的官方繁體中文版</td><td data-label="膚色值域" class="num">0 – 10</td><td data-label="幾種" class="num"><strong>11</strong></td></tr>
+        <tr><td data-label="哪一份名冊">2009 年的台灣名冊</td><td data-label="膚色值域" class="num">0 – 11</td><td data-label="幾種" class="num">12</td></tr>
+        <tr><td data-label="哪一份名冊">這台機器</td><td data-label="膚色值域" class="num">0 – 15</td><td data-label="幾種" class="num">16</td></tr>
+      </tbody>
+    </table></div>
+    <p>兩份原版<strong>逐格人數完全相同</strong>（0 有 236 人、1 有 796 人、2 有 621 人…），
+       所以 11 這個值是後來才出現的。</p>
+    <p><strong>而 11 以上根本不是膚色。</strong>一支社群修改工具附的設定檔把它們標成：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th class="num">值</th><th>0 – 10</th><th class="num">11</th><th class="num">12</th><th class="num">13</th><th class="num">14</th><th class="num">15</th></tr></thead>
+      <tbody>
+        <tr><td data-label="值">意思</td><td data-label="0 – 10">膚色 1 – 11</td><td data-label="11">短袖／黑</td><td data-label="12">短袖／藍</td><td data-label="13">短袖／紅</td><td data-label="14">長袖／黑</td><td data-label="15">長袖／紅</td></tr>
+      </tbody>
+    </table></div>
+    <p>也就是說，社群<u>把「膚色」這一欄借去放袖子</u>。
+       本站手上那批舊資料裡正好有一個資料夾叫「sleeves」，跟這個說法對得上。</p>
+    <p class="small">⭐ 這個錯的形狀值得記：<strong>把改過的機器上出現過的值當成「遊戲有幾個選項」在報。</strong>
+       同樣的陷阱在<a href="player-fields.html">球員欄位</a>那頁講過一次
+       （欄位編號會因名冊而異），這裡是它的另一種變形 ——
+       <u>值域也會因名冊而異，而且社群還會把欄位挪作他用</u>。
+       本站沒有驗過遊戲拿到 11–15 會畫出什麼，所以只寫到這裡。</p>
+  </div>
+
+  <p class="small">上表的「嚴格命中」是指<u>整組標籤連續同序出現</u>。
+     零星命中通用英文字不算 —— 那種證據拿來對照表會出錯。</p>
+  <div class="card clay">
+    <p class="card-h">那這些欄位你還是可以自己動手</p>
+    <p>佐證不了「代號叫什麼名字」，不代表你不能改。你可以自己數出<strong>這一欄有幾個選項</strong>，
+       然後一格一格試：</p>
+<pre style="margin:8px 0 0"><code>把名冊那一欄所有出現過的值列出來,就是這個選單的全部選項</code></pre>
+    <p style="margin-top:8px">實測結果：慣用手 3 個選項、投球手 2 個、體型 3 個、骨架 13 個、
+       髮型 10 個、鬍子 8 個、打擊姿勢 62 個 —— 這七欄都在
+       <code>attrib.dat</code>（打擊姿勢那一欄叫 <code>playerattrib_battingstance</code>）。
+       <u>投球姿勢 45 個要去 <code>pitcher.dat</code> 數</u>，欄位叫
+       <code>pitchattrib_pitcher_delivery</code>，<strong><code>attrib.dat</code> 裡沒有這一欄</strong>。
+       <span class="small">（2026-09-06 訂正：這一句原本八個欄位一起寫成「把 <code>attrib.dat</code>
+       那一欄列出來」，照著做會在 <code>attrib.dat</code> 裡找不到投球姿勢。
+       兩邊都重數過：<code>attrib.dat</code> 的打擊姿勢 62 個、<code>pitcher.dat</code>
+       的投球姿勢 45 個，數字本身是對的，錯的是檔名。）</span>
+       <strong>改之前先備份</strong>，見<a href="player-data.html">球員資料檔那頁</a>的紀律。</p>
+  </div>
+
+  <h2>打擊姿勢：對得上前七個，第八個以後就崩了</h2>
+  <p>打擊姿勢有 66 個代號，前七個是通用姿勢，文字表<strong>連續七條逐一對上</strong>：</p>
+<pre><code>0 Generic   1 Bent   2 Crouched   3 Upright   4 Open   5 High   6 Closed</code></pre>
+  <p>其餘 59 個是<strong>球員名字</strong>（模仿某位大聯盟球員的站姿）。
+     遊戲檔案裡確實另有一份 65 條的姓名清單，但兩份比對之後：</p>
+  <ul class="plain">
+    <li>遊戲那份有 <strong>13 個名字</strong>是第三方對照表沒有的</li>
+    <li>第三方對照表有 <strong>8 個名字</strong>不在遊戲那個區塊裡</li>
+    <li>中段有連續 12 格剛好吻合，但<strong>下一格就對不上了</strong>，前面四格也全錯</li>
+  </ul>
+  <p><strong>兩份不是同一份表。</strong>12 格吻合撐不起 66 格，
+     所以<u>光靠遊戲檔案裡那份姓名清單</u>只寫得出前七個。</p>
+  <div class="card grass">
+    <p class="card-h">⚠️ 這一節在 2026-08-28 之後只描述「用遊戲內部字串表」這條路的結果</p>
+    <p>後來本站在兩批舊資料裡各找到<strong>一份互相獨立的完整名稱表</strong>，
+       拿遊戲自己的資料去考它們（打擊 54/54、錨點 39/39），
+       <strong>66 個編號現在全部有名字了</strong>。
+       完整推導與表格在本頁下方
+       <a href="#stance">打擊姿勢與投球姿勢 —— 它們每一個都有名字</a>。</p>
+    <p class="small">留著這一節不刪，是因為它記錄了<u>另一條路走不通</u> ——
+       遊戲內部那份 65 條姓名清單跟姿勢編號<strong>不是同一份表</strong>，
+       這件事本身要知道，否則會有人重蹈本站當初「猜位移」的錯。</p>
+  </div>
+
+  <h2>遊戲自己跟第三方對照表打架的兩處</h2>
+  <div class="card amber">
+    <p class="card-h">體型：遊戲說五種，資料只用三種</p>
+    <p>遊戲文字表裡 <code>Body Type</code> 這個標題後面<strong>接著五條</strong>：
+       <code>Normal</code>、<code>Athletic</code>、<code>Skinny</code>、<code>Heavy</code>、<code>Muscular</code>。</p>
+    <p>但第三方對照表只有 <strong>3</strong> 個代號，而球員資料檔那一欄實測也<strong>只用到 3 個值</strong>。</p>
+    <p><span class="badge wip">未解</span> 五對三，對不起來。本站不猜是哪三個。</p>
+  </div>
+  <div class="card amber">
+    <p class="card-h">襪子：個數一樣，名稱不同</p>
+    <p>遊戲文字表是 <code>Low</code>／<code>Medium</code>／<code>High</code>，
+       第三方對照表是另一組寫法。<strong>都是三個，但集合不同。</strong></p>
+    <p><span class="badge wip">未解</span></p>
+  </div>
+
+  <h2>界外值：資料裡有對照表沒宣告的號碼</h2>
+  <p>把每一欄「實際用到的值」跟「對照表宣告的值」相減，
+     <strong>35 個對照組裡只有 2 組出現界外值</strong>。最有料的是骨架那一欄：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>骨架代號</th><th class="num">筆數</th><th>查出來是什麼</th></tr></thead>
+    <tbody>
+      <tr><td data-label="骨架代號" class="mono">0</td><td data-label="筆數" class="num">25</td>
+          <td data-label="查出來是什麼"><strong>全部是空殼列</strong> —— 姓名兩欄都空白。不是球員，是沒用到的名單空位</td></tr>
+      <tr class="hi"><td data-label="骨架代號" class="mono">25</td><td data-label="筆數" class="num">141</td>
+          <td data-label="查出來是什麼">有名字的真球員，但對照表上<strong>沒有這個號碼</strong></td></tr>
+      <tr><td data-label="骨架代號" class="mono">37</td><td data-label="筆數" class="num">0</td><td data-label="查出來是什麼">對照表宣告了，<strong>但沒有任何人在用</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>那 141 個人往下追，量到一組非常乾淨的巧合：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>量測</th><th>結果</th></tr></thead>
+    <tbody>
+      <tr><td>骨架 = 25 的人數</td><td class="num">141</td></tr>
+      <tr><td><code>photo</code> = 2 的人數</td><td class="num">141</td></tr>
+      <tr class="hi"><td>這兩群是不是同一批人</td><td><strong>完全相同，一個不差</strong></td></tr>
+      <tr><td>這 141 人的體型／新秀／隱藏三個欄位</td><td>100% 都是 0</td></tr>
+      <tr><td>這 141 人用到的臉</td><td>只有 14 種，全都是 900 以上的<a href="player-numbers.html#wall">罐頭臉</a></td></tr>
+      <tr><td>這 141 人的識別碼號段</td>
+          <td>不屬於主名單那個號段<br>
+              <span class="small">（不屬於主號段的一共 171 列 = 這 141 人 + 25 個空殼列 + 範本列 + 4 位真球員）</span></td></tr>
+    </tbody>
+  </table></div>
+  <p><span class="badge wip">推測</span>
+     這 141 人像是同一批「填充用的非真實球員」—— 共用少數幾張臉、旗標全部一樣、識別碼自成一段。</p>
+
+  <div class="card grass">
+    <p class="card-h">⭐ 2026-08-28：代號 25 有答案了（但要照它原本的強度寫）</p>
+    <p>本站原本寫「代號 25 到底是什麼骨架，未解」。
+       一支 2008 年的社群編輯器，它的說明書在「Some notes」那一段的第一條（檔案第 48 行）寫著：</p>
+<pre><code>The players that the game creates automatically <span class="hl">seem to</span> have
+a bone profile of 25.  <span class="hl">I have named this</span> Athletic(Created).</code></pre>
+    <p>同一支工具的語言檔也對得上 —— 它的骨架下拉選單<u>沒有名字的格子直接顯示成數字</u>，
+       而<strong>第 25 格顯示的就是 <code>Athletic(Created)</code></strong>：</p>
+<pre><code>… 22   23   24   <span class="hl">Athletic(Created)</span>   Slim   Slim Big Chest   Athletic …
+                       ↑ 第 25 格        ↑ 26      ↑ 27           ↑ 28</code></pre>
+    <p>26 到 37 那一段跟設定檔逐字相同，所以<u>位置關係是硬的</u>，不是靠數量湊的。
+       繁體中文語言檔把它譯成「運動型(自創球員)」。</p>
+    <p><strong>但要注意這句話的強度。</strong>原文是 <code>seem to</code>（工具作者自己的推測）、
+       <code>I have named this</code>（名字是他取的，不是 EA 的）。
+       所以正確的說法是：<u>一位 2008 年的工具作者推測 25 是遊戲自動生成的球員，並自己給了它一個名字</u>。
+       <span class="badge wip">推測</span></p>
+    <p>本站能加上的是<strong>資料這一邊的佐證</strong>：</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>量測</th><th>結果</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td>剛安裝好的<strong>官方英文版</strong>有幾人用骨架 25</td><td class="num"><strong>0</strong></td></tr>
+        <tr class="hi"><td>剛安裝好的<strong>官方繁體中文版</strong></td><td class="num"><strong>0</strong></td></tr>
+        <tr><td>這台裝過台灣模組的機器</td><td class="num">141</td></tr>
+        <tr><td>骨架 <code>0</code> 那 25 個空殼列，兩份原版各有幾個</td><td class="num"><strong>也是 0</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>兩個界外值在 EA 出貨的名冊裡都不存在。</strong>
+       這跟「它們是遊戲執行時才產生的東西」是一致的 ——
+       也解釋了為什麼那份設定檔的骨架清單從 26 開始：
+       <u>26 到 37 是編輯器讓你選的，25 是遊戲自己寫進去的</u>。</p>
+    <p class="small">⚠️ 誠實邊界：本站沒有實機驗證過「玩久了會不會生出骨架 25 的球員」。
+       上面是兩件量得到的事實（原版 0 人、改機 141 人）加上一位工具作者的推測，
+       兩者方向一致，但都不是實機證據。</p>
+  </div>
+  <div class="card blue">
+    <p class="card-h">一個被資料否掉的直覺</p>
+    <p>直覺會想「是不是整張骨架表往前挪了一格，25 才是最瘦的」。
+       拿體重去測就不成立：代號 <strong>26 到 34 的平均體重單調遞增</strong>
+       （85.0 一路爬到 158.7，連續九個代號，很符合瘦到壯的排法），
+       而 <strong>25 的平均體重卡在 27 和 28 中間，不是最輕的</strong>。</p>
+    <p class="small">誠實補一句：35 與 36 反而比 34 輕（155.0 / 156.2 對 158.7），
+       遞增在那裡斷掉。但那兩格分別只有 2 人與 5 人，<u>樣本太小不足以判斷趨勢</u>，
+       所以本站說「26 到 34 遞增」，不說「26 到 36 遞增」。</p>
+    <p class="small">誠實補一句：這 141 人本來就是同一批填充名單，體重分布可能只是那批人的特性。
+       所以這個反證只能說「挪一格的說法沒有證據」，不能說「25 一定不是最瘦」。</p>
+  </div>
+
+  <h2 id="trajectory">⭐ 球路的「變化軌跡」——  8 個方向，而且左右投是鏡像</h2>
+  <p>投手資料檔每一種球路都有四欄：<u>尾勁、變化軌跡、控球、球速</u>。
+     其中「變化軌跡」（<code>pitchattrib_*_description</code>）這一欄，
+     本站原本連提都沒提過 —— 兩張代號表都漏了它。</p>
+  <p>它存的是<strong>球往鐘面的哪個方向跑</strong>。剛安裝好的原版 1,430 位投手，
+     這一欄<u>剛好用滿 0 到 7 八個值</u>，一個不多一個不少；
+     而<strong>直球那一欄 1,430 人全部是 0</strong>，直接印證 0 = 沒有變化。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">代號</th><th>名字</th><th>鐘面方向</th><th class="num">原版用了幾次</th></tr></thead>
+    <tbody>
+      <tr><td data-label="代號" class="num">0</td><td data-label="名字">None　無</td><td data-label="鐘面方向">不變化（直球固定是這個）</td><td data-label="原版用了幾次" class="num">1,437</td></tr>
+      <tr class="hi"><td data-label="代號" class="num">1</td><td data-label="名字">Left Extreme　左橫移</td><td data-label="鐘面方向">3 → 9</td><td data-label="原版用了幾次" class="num">45</td></tr>
+      <tr><td data-label="代號" class="num">2</td><td data-label="名字">Left Diag　左斜移</td><td data-label="鐘面方向">2 → 8</td><td data-label="原版用了幾次" class="num">404</td></tr>
+      <tr><td data-label="代號" class="num">3</td><td data-label="名字">Left Slight　微左斜</td><td data-label="鐘面方向">1 → 7</td><td data-label="原版用了幾次" class="num">694</td></tr>
+      <tr><td data-label="代號" class="num">4</td><td data-label="名字">Drop　垂直落下</td><td data-label="鐘面方向">12 → 6</td><td data-label="原版用了幾次" class="num">1,295</td></tr>
+      <tr><td data-label="代號" class="num">5</td><td data-label="名字">Right Slight　微右斜</td><td data-label="鐘面方向">11 → 5</td><td data-label="原版用了幾次" class="num">485</td></tr>
+      <tr><td data-label="代號" class="num">6</td><td data-label="名字">Right Diag　右斜移</td><td data-label="鐘面方向">10 → 4</td><td data-label="原版用了幾次" class="num">701</td></tr>
+      <tr class="hi"><td data-label="代號" class="num">7</td><td data-label="名字">Right Extreme　右橫移</td><td data-label="鐘面方向">9 → 3</td><td data-label="原版用了幾次" class="num">95</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card grass">
+    <p class="card-h">⭐ 兩份外部來源在這裡打架，而遊戲自己的資料可以裁決</p>
+    <p>名字來自兩份社群工具的檔案，<u>它們對右邊三格寫的一樣，左邊三格卻不同</u>：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th class="num">代號</th><th>設定檔寫的</th><th>語言檔寫的</th></tr></thead>
+      <tbody>
+        <tr><td data-label="代號" class="num">1</td><td data-label="設定檔寫的">Left Extreme (3-9)</td><td data-label="語言檔寫的">Left Extreme (3-9)　<span class="small">一樣</span></td></tr>
+        <tr class="hi"><td data-label="代號" class="num">2</td><td data-label="設定檔寫的">Left Diag <strong>(4-10)</strong></td><td data-label="語言檔寫的">Left Diag <strong>(2-8)</strong></td></tr>
+        <tr class="hi"><td data-label="代號" class="num">3</td><td data-label="設定檔寫的">Left Slight <strong>(5-11)</strong></td><td data-label="語言檔寫的">Left Slight <strong>(1-7)</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>裁決方法：如果這八個值真的是方向，左投跟右投的分布就應該互為鏡像。</strong>
+       把原版 1,430 位投手的「球種 × 慣用手 × 軌跡」交叉表做出來
+       （投手資料檔與名冊靠姓名對接，<u>1,430 筆 0 筆對不到</u>）：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>球種</th><th class="num">右投最常用</th><th class="num">左投最常用</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="球種">卡特球</td><td data-label="右投最常用" class="num"><strong>7</strong>　76 / 77（99%）</td><td data-label="左投最常用" class="num"><strong>1</strong>　42 / 42（<strong>100%</strong>）</td></tr>
+        <tr><td data-label="球種">滑球</td><td data-label="右投最常用" class="num"><strong>6</strong>　429 / 508（84%）</td><td data-label="左投最常用" class="num"><strong>2</strong>　128 / 137（93%）</td></tr>
+        <tr><td data-label="球種">二縫線速球</td><td data-label="右投最常用" class="num"><strong>3</strong>　518 / 691（75%）</td><td data-label="左投最常用" class="num"><strong>5</strong>　92 / 136（68%）</td></tr>
+        <tr><td data-label="球種">指叉球</td><td data-label="右投最常用" class="num">4　209 / 237（88%）</td><td data-label="左投最常用" class="num">4　44 / 45（98%）</td></tr>
+      </tbody>
+    </table></div>
+    <p>配對是 <strong>1↔7、2↔6、3↔5，而 4（垂直落下）自己對自己</strong> —— 完全符合鏡像。</p>
+    <p><strong>而且做了窮舉對照組。</strong>把「哪一格對哪一格」所有可能的配對方式
+       （自己是自己的反函數那種，共 <strong>764 種</strong>）全部試一遍，
+       算左右兩邊分布的差距：</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>配對方式</th><th class="num">左右分布的差距</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td><code>1↔7　2↔6　3↔5</code></td><td class="num"><strong>0.099</strong>　← 764 種裡最好</td></tr>
+        <tr><td>第二名（上面那組去掉 1↔7）</td><td class="num">0.127</td></tr>
+        <tr><td>最差的一組</td><td class="num">0.998</td></tr>
+        <tr><td><u>完全不做鏡像、直接比</u></td><td class="num">0.681</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small">0 = 兩邊分布一模一樣，1 = 完全不重疊。
+       卡特球、二縫線、滑球這三種，<u>直接比是 1.000 / 1.000 / 0.993（幾乎不重疊）</u>，
+       鏡像之後掉到 0.013 / 0.073 / 0.090。</p>
+    <p><strong>所以語言檔那份是對的，設定檔左邊三格寫錯了。</strong>
+       理由不是「同一條軸」（1 = (3-9) 跟 7 = (9-3) 也是同一條軸，而兩份都接受這一組），
+       而是：<u>設定檔把 2 寫成 (4-10)、把 6 寫成 (10-4)，那會讓 2 和 6 變成同一個方向</u>。
+       如果它們是同一件事，名冊沒有理由讓右投一律填 6、左投一律填 2。
+       語言檔的 (2-8) 與 (10-4) 才是真正互為鏡像的兩個方向。</p>
+    <p class="small">⚠️ 強度要分開講：<u>「這八個值是方向、而且左右互為鏡像」是本站量到的</u>；
+       <u>「它們各自叫什麼名字、對到鐘面第幾點」是那兩份社群檔案說的</u>。
+       這八個名字掃遍剛安裝好的原版<strong>一個都找不到</strong>，
+       所以名字這一半跟打擊姿勢、投球姿勢同級 —— 佐證不了，只能標明出處。</p>
+    <p><strong>實務上怎麼用</strong>：改投手的時候，
+       <u>右投的滑球填 6、左投的滑球填 2</u>；填錯邊，球會朝反方向跑。
+       想確認的話不必相信任何人給的表 —— 照上面的方法自己把交叉表做一次就好。</p>
+  </div>
+
+  <h2 id="stance">打擊姿勢與投球姿勢 —— 它們每一個都有名字</h2>
+  <p><a href="../tutorials/edit-stance/index.html">換姿勢那一課</a>教你填一個數字。
+     那個數字有名字，而名字是<strong>真實球員的姓</strong>。</p>
+
+  <div class="card clay">
+    <p class="card-h">⚠️ 這一節本站發表過一個錯的版本，先講怎麼錯的</p>
+    <p>名字放在遊戲的文字檔 <code>FEENG.LOC</code> 裡。
+       本站第一版<u>假設「第 N 號的名字就是第 10000+N 條字串」</u> ——
+       因為那一段剛好連號、剛好都是球員的姓、數量也剛好。</p>
+    <p><strong>那個假設是錯的，而且錯得很難察覺</strong>：
+       它讓本站得出「幾乎沒有球員用以自己命名的姿勢」這種<u>聽起來很有故事性</u>的結論，
+       甚至寫進了故事頁。</p>
+    <p><strong>正確的做法不是猜位移，是找錨點</strong>：
+       挑出「整份名冊只有一兩個人在用」的編號，看那一兩個人是誰，
+       再去字串表裡找有沒有同姓的名字。
+       這種對應如果成立，就不可能是巧合。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">用錨點法重做的結果</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th></th><th class="num">編號總數</th><th class="num">只有 1–2 人用的</th>
+                 <th class="num">名字對得上使用者的</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td>打擊姿勢</td><td data-label="編號總數" class="num">66</td><td data-label="只有 1–2 人用的" class="num">43</td>
+            <td data-label="名字對得上使用者的" class="num"><strong>39</strong></td></tr>
+        <tr class="hi"><td>投球姿勢</td><td data-label="編號總數" class="num">59</td><td data-label="只有 1–2 人用的" class="num">46</td>
+            <td data-label="名字對得上使用者的" class="num"><strong>41</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p class="small">⚠️ <strong>本站 2026-08-28 訂正了一個數字</strong>：投球那一列的
+       「只有 1–2 人用的」原本寫 43，跟打擊那一列一樣 —— <u>那是把上面一列抄下來了</u>。
+       重數剛安裝好的原版 <code>pitcher.dat</code>（1,430 位投手、59 個代號）：
+       <strong>只有 1 人用的 36 個 + 只有 2 人用的 10 個 = 46 個</strong>。
+       打擊那一列的 43 是對的（29 + 14）。
+       兩個數字長得一樣的時候，要特別確認它們是分別數出來的。</p>
+    <p><strong>事實跟本站原本寫的完全相反：
+       只要那個姿勢是專屬的，用它的人就是它命名的那個人。</strong></p>
+    <p>例如：Randy Johnson 用 <code>R. Johnson</code>、Nomo 用 <code>Nomo</code>、
+       Mussina 用 <code>Mussina</code>、Rivera 用 <code>Rivera</code>、
+       Schilling 用 <code>Schilling</code>、Glavine 用 <code>Glavine</code>、
+       Nolan Ryan 用 <code>N. Ryan</code>、Satchel Paige 用 <code>S. Paige</code>；
+       打擊那邊 Ichiro 用 <code>Ichiro</code>、Jeter 用 <code>Jeter</code>、
+       Sheffield 用 <code>Sheffield</code>、Garciaparra 用 <code>Garciaparra</code>。</p>
+    <p class="small">會被騙的原因是：<u>用得最多的那幾個編號是通用姿勢</u>
+       （最多的一個有 764 人用），
+       而通用姿勢也有名字。拿全體去算「有沒有用自己那號」，
+       會被那幾百人稀釋成看起來像零。<strong>要把通用的濾掉才看得到真相。</strong></p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">⭐ 2026-08-28：下面兩張表的「未知」幾乎全部填掉了</p>
+    <p>本站原本只填得出<u>錨得住的</u>那些（該編號只有 1–2 人用、而其中一人與名字同姓）。
+       用得多的編號沒辦法從資料本身反推名字，只能標「未知」。</p>
+    <p>後來在兩批舊資料裡各找到<strong>一份完整的名稱表</strong>，
+       而且是<u>互相獨立的兩份</u>：一份是 2006 年一個台灣模組網站上的欄位說明頁，
+       另一份是一支社群修改工具附的設定檔。兩份都沒有標出處，
+       所以本站沒有直接照抄，而是<strong>拿遊戲自己的資料去考它們</strong>：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th></th><th class="num">具名編號</th><th class="num">使用者裡真有同姓的</th>
+                 <th class="num">其中只有 1–2 人用的錨點</th><th class="num">錨點命中</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td>打擊姿勢</td><td data-label="具名編號" class="num">54</td><td data-label="使用者裡真有同姓的" class="num"><strong>54（100%）</strong></td>
+            <td data-label="其中只有 1–2 人用的錨點" class="num">39</td><td data-label="錨點命中" class="num"><strong>39（100%）</strong></td></tr>
+        <tr class="hi"><td>投球姿勢</td><td data-label="具名編號" class="num">45</td><td data-label="使用者裡真有同姓的" class="num"><strong>45（100%）</strong></td>
+            <td data-label="其中只有 1–2 人用的錨點" class="num">42</td><td data-label="錨點命中" class="num"><strong>42（100%）</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>對照組</strong>：把每個球員的姿勢編號隨機打散重排 500 次，
+       同一套比對平均只命中 <strong>0.25</strong>（打擊）與 <strong>0.14</strong>（投球），
+       最高都只有 2。<u>真實值是 54 與 45</u> —— 這不是巧合能產生的距離。</p>
+    <p>還有一個獨立的巧合太難的細節：<strong>整份原版名冊唯一沒有人使用的打擊姿勢編號是 23</strong>，
+       而那份 2006 年的表<u>也剛好在 23 這一格跳過</u>。</p>
+
+    <p class="card-h" style="margin-top:14px">三份資料互相打架的地方，由遊戲自己的資料裁決</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>編號</th><th>2006 網站</th><th>工具設定檔</th><th>誰在用</th><th>判定</th></tr></thead>
+      <tbody>
+        <tr><td data-label="編號">打擊 27</td><td data-label="2006 網站"><strong>通用 2</strong></td><td data-label="工具設定檔">Martinez, Edgar</td>
+            <td data-label="誰在用">只有 1 人，而那人姓 Cabrera</td><td data-label="判定">2006 網站對</td></tr>
+        <tr><td data-label="編號">投球 23</td><td data-label="2006 網站">Wakefield</td><td data-label="工具設定檔">Niekro, Phil</td>
+            <td data-label="誰在用">2 人，剛好就是 Wakefield 與 Niekro，兩份各命中一個</td><td data-label="判定"><strong>裁決不了，本站不選</strong></td></tr>
+        <tr><td data-label="編號">投球 4</td><td data-label="2006 網站">歸進通用範圍</td><td data-label="工具設定檔"><strong>Sparks, Steve</strong></td>
+            <td data-label="誰在用">只有 1 人，就是 Steve Sparks</td><td data-label="判定">工具設定檔對</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>沒有任何一份外部名單自己是全對的。</strong>
+       一個 2004 年就退休、<u>剛安裝好的原版名冊裡根本查不到</u>的打者（Edgar Martinez）
+       被安在一個通用姿勢上，而那一格唯一的使用者姓 Cabrera；
+       另一邊那份則把只有 Steve Sparks 一個人在用的投球 4 號歸進通用範圍。
+       這些都是憑印象填表會犯的錯。<u>只有遊戲自己的資料能裁決。</u></p>
+    <p class="small">（2026-09-05 訂正：這一段原本還把「兩個蝴蝶球投手（Wakefield 與 Niekro）被寫成同一格」
+       也算成填表的錯。<strong>不是</strong> —— 遊戲自己的名冊裡投球 23 號的使用者
+       剛好就是這兩個人，他們本來就共用同一格，兩份表各寫一個都不算填錯。
+       上表那一列的判定也一併從「2006 網站對」改成「裁決不了」。）</p>
+    <p class="small">本站不轉貼那兩份名單的原文，也不提供下載。
+       表格裡標 <strong>†</strong> 的格子，意思是
+       「名字來自外部名單、已用上面的方法驗過」；沒有標的是本站原本就從遊戲資料錨定出來的。</p>
+  </div>
+
+  <h3>打擊姿勢 —— 66 個編號</h3>
+  <p class="small">標 <strong>†</strong> 的名字來自外部名單並經上述驗證；沒標的是本站從遊戲資料直接錨定的。
+     第三欄是剛安裝好的原版有幾個球員在用。
+     <u>編號 23 維持「未知」</u> —— 整份名冊<strong>沒有任何人在用它</strong>。
+     那份 2006 年的表在這一格跳過；工具設定檔雖然填了一個姓，
+     但沒有人在用就沒得驗，所以本站不採用。
+     <span class="small">（2026-09-05 訂正：原本寫「那兩份外部名單也都沒有它」，
+     只有 2006 年那份是這樣，工具設定檔那一格是有名字的。）</span></p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr>
+      <th class="num">編號</th><th>名字</th><th class="num">幾人用</th>
+      <th class="num">編號</th><th>名字</th><th class="num">幾人用</th>
+      <th class="num">編號</th><th>名字</th><th class="num">幾人用</th>
+    </tr></thead>
+    <tbody>
+      <tr><td data-label="編號" class="num">0</td><td data-label="名字">通用 1 <span class="small">†</span></td><td data-label="幾人用" class="num">582</td><td data-label="編號" class="num">1</td><td data-label="名字">屈膝 <span class="small">†</span></td><td data-label="幾人用" class="num">422</td><td data-label="編號" class="num">2</td><td data-label="名字">彎腰 <span class="small">†</span></td><td data-label="幾人用" class="num">352</td></tr>
+      <tr><td data-label="編號" class="num">3</td><td data-label="名字">挺直 <span class="small">†</span></td><td data-label="幾人用" class="num">764</td><td data-label="編號" class="num">4</td><td data-label="名字">開放式 <span class="small">†</span></td><td data-label="幾人用" class="num">348</td><td data-label="編號" class="num">5</td><td data-label="名字">高 <span class="small">†</span></td><td data-label="幾人用" class="num">314</td></tr>
+      <tr><td data-label="編號" class="num">6</td><td data-label="名字">封閉式 <span class="small">†</span></td><td data-label="幾人用" class="num">17</td><td data-label="編號" class="num">7</td><td data-label="名字">A. Jones</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">8</td><td data-label="名字">M. Ramirez</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">9</td><td data-label="名字">Sosa <span class="small">†</span></td><td data-label="幾人用" class="num">3</td><td data-label="編號" class="num">10</td><td data-label="名字">M. Ordonez <span class="small">†</span></td><td data-label="幾人用" class="num">3</td><td data-label="編號" class="num">11</td><td data-label="名字">Thome <span class="small">†</span></td><td data-label="幾人用" class="num">3</td></tr>
+      <tr><td data-label="編號" class="num">12</td><td data-label="名字">V. Guerrero</td><td data-label="幾人用" class="num">2</td><td data-label="編號" class="num">13</td><td data-label="名字">Piazza <span class="small">†</span></td><td data-label="幾人用" class="num">7</td><td data-label="編號" class="num">14</td><td data-label="名字">Ichiro</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">15</td><td data-label="名字">Giambi</td><td data-label="幾人用" class="num">2</td><td data-label="編號" class="num">16</td><td data-label="名字">Garciaparra</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">17</td><td data-label="名字">Griffey Jr.</td><td data-label="幾人用" class="num">2</td></tr>
+      <tr><td data-label="編號" class="num">18</td><td data-label="名字">L. Gonzalez</td><td data-label="幾人用" class="num">2</td><td data-label="編號" class="num">19</td><td data-label="名字">Sheffield</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">20</td><td data-label="名字">Bagwell</td><td data-label="幾人用" class="num">2</td></tr>
+      <tr><td data-label="編號" class="num">21</td><td data-label="名字">A. Rodriguez <span class="small">†</span></td><td data-label="幾人用" class="num">8</td><td data-label="編號" class="num">22</td><td data-label="名字">Jeter</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">23</td><td data-label="名字"><span class="small">未知</span></td><td data-label="幾人用" class="num">0</td></tr>
+      <tr><td data-label="編號" class="num">24</td><td data-label="名字">Beltre</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">25</td><td data-label="名字">Everett</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">26</td><td data-label="名字">D. Ortiz</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">27</td><td data-label="名字">通用 2 <span class="small">†</span></td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">28</td><td data-label="名字">B. Williams</td><td data-label="幾人用" class="num">2</td><td data-label="編號" class="num">29</td><td data-label="名字">Durham <span class="small">†</span></td><td data-label="幾人用" class="num">5</td></tr>
+      <tr><td data-label="編號" class="num">30</td><td data-label="名字">Fullmer</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">31</td><td data-label="名字">Walker</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">32</td><td data-label="名字">Counsell</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">33</td><td data-label="名字">J. Franco</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">34</td><td data-label="名字">Vina</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">35</td><td data-label="名字">Renteria</td><td data-label="幾人用" class="num">2</td></tr>
+      <tr><td data-label="編號" class="num">36</td><td data-label="名字">B. Boone <span class="small">†</span></td><td data-label="幾人用" class="num">3</td><td data-label="編號" class="num">37</td><td data-label="名字">Klesko <span class="small">†</span></td><td data-label="幾人用" class="num">6</td><td data-label="編號" class="num">38</td><td data-label="名字">Delgado <span class="small">†</span></td><td data-label="幾人用" class="num">5</td></tr>
+      <tr><td data-label="編號" class="num">39</td><td data-label="名字">Alou</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">40</td><td data-label="名字">Lofton <span class="small">†</span></td><td data-label="幾人用" class="num">6</td><td data-label="編號" class="num">41</td><td data-label="名字">Sierra</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">42</td><td data-label="名字">Burnitz</td><td data-label="幾人用" class="num">2</td><td data-label="編號" class="num">43</td><td data-label="名字">C. Jones</td><td data-label="幾人用" class="num">2</td><td data-label="編號" class="num">44</td><td data-label="名字">Thomas</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">45</td><td data-label="名字">Green <span class="small">†</span></td><td data-label="幾人用" class="num">3</td><td data-label="編號" class="num">46</td><td data-label="名字">J. Gonzalez</td><td data-label="幾人用" class="num">2</td><td data-label="編號" class="num">47</td><td data-label="名字">Floyd <span class="small">†</span></td><td data-label="幾人用" class="num">4</td></tr>
+      <tr><td data-label="編號" class="num">48</td><td data-label="名字">H. Matsui <span class="small">†</span></td><td data-label="幾人用" class="num">3</td><td data-label="編號" class="num">49</td><td data-label="名字">Helton <span class="small">†</span></td><td data-label="幾人用" class="num">3</td><td data-label="編號" class="num">50</td><td data-label="名字">Giles <span class="small">†</span></td><td data-label="幾人用" class="num">3</td></tr>
+      <tr><td data-label="編號" class="num">51</td><td data-label="名字">Glaus</td><td data-label="幾人用" class="num">2</td><td data-label="編號" class="num">52</td><td data-label="名字">A. Pujols</td><td data-label="幾人用" class="num">2</td><td data-label="編號" class="num">53</td><td data-label="名字">B. Ruth</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">54</td><td data-label="名字">L. Gehrig</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">55</td><td data-label="名字">R. Jackson</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">56</td><td data-label="名字">J. Morgan</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">57</td><td data-label="名字">R. Carew</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">58</td><td data-label="名字">T. Cobb</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">59</td><td data-label="名字">Y. Berra</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">60</td><td data-label="名字">H. Wagner</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">61</td><td data-label="名字">典型 1 <span class="small">†</span></td><td data-label="幾人用" class="num">2</td><td data-label="編號" class="num">62</td><td data-label="名字">典型 2 <span class="small">†</span></td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">63</td><td data-label="名字">典型 3 <span class="small">†</span></td><td data-label="幾人用" class="num">2</td><td data-label="編號" class="num">64</td><td data-label="名字">K. Matsui</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">65</td><td data-label="名字">E. Chavez</td><td data-label="幾人用" class="num">1</td></tr>
+    </tbody>
+  </table></div>
+
+  <p class="small">⭐ 上表最後那一段連號值得單獨看：<strong>編號 53 到 60 這八格</strong>
+     （B. Ruth、L. Gehrig、R. Jackson、J. Morgan、R. Carew、T. Cobb、Y. Berra、H. Wagner）
+     <u>每一格都只有一個人在用，而用的就是同名的那位傳奇球員</u>。
+     這八個人在剛安裝好的原版名冊裡<strong>全部都是第 44 欄標 1 的那 61 人</strong>（8 / 8）——
+     <a href="../story/hidden-legends/index.html">名單裡藏著 61 個名人堂球員</a>
+     那頁引用的「有專屬打擊姿勢的 8 位」就是這八格。</p>
+
+  <h3>投球姿勢 —— 59 個編號</h3>
+  <p class="small">這 59 格裡有 <strong>12 格是通用姿勢</strong>
+     （3/4 四種、正上方三種、側投、低肩側投、典型 1–3）、<strong>47 格是球員的姓</strong>。
+     ⚠️ 這個 <strong>47</strong> 跟上面考題表的「投球 具名編號 <strong>45</strong>」
+     <u>不是同一個口徑</u>：考題表數的是<strong>外部名單</strong>那邊有幾格填了球員的姓，
+     這張表是<strong>本站最後採用的名字</strong>，兩份名單打架的第 4 與第 23 號這裡照樣列出來。
+     <u>少的那兩格是哪兩格，本站沒有逐格寫出來。</u>
+     下面 <code>Style 1</code> 那一段量到「遊戲自己的選單也是 45 個具名選項」，
+     但那個 45 跟考題表的 45 是不是同一組，本站還沒逐格核對過 ——
+     <strong>兩個數字長得一樣的時候，要特別確認它們是分別數出來的。</strong></p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr>
+      <th class="num">編號</th><th>名字</th><th class="num">幾人用</th>
+      <th class="num">編號</th><th>名字</th><th class="num">幾人用</th>
+      <th class="num">編號</th><th>名字</th><th class="num">幾人用</th>
+    </tr></thead>
+    <tbody>
+      <tr><td data-label="編號" class="num">0</td><td data-label="名字">3/4（先發／後援） <span class="small">†</span></td><td data-label="幾人用" class="num">55</td><td data-label="編號" class="num">1</td><td data-label="名字">3/4 高抬腿 <span class="small">†</span></td><td data-label="幾人用" class="num">220</td><td data-label="編號" class="num">2</td><td data-label="名字">3/4 低抬腿 <span class="small">†</span></td><td data-label="幾人用" class="num">337</td></tr>
+      <tr><td data-label="編號" class="num">3</td><td data-label="名字">3/4 背向 <span class="small">†</span></td><td data-label="幾人用" class="num">8</td><td data-label="編號" class="num">4</td><td data-label="名字">Sparks <span class="small">†</span></td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">5</td><td data-label="名字">正上方（先發／後援） <span class="small">†</span></td><td data-label="幾人用" class="num">232</td></tr>
+      <tr><td data-label="編號" class="num">6</td><td data-label="名字">正上方 高抬腿 <span class="small">†</span></td><td data-label="幾人用" class="num">91</td><td data-label="編號" class="num">7</td><td data-label="名字">正上方 低抬腿 <span class="small">†</span></td><td data-label="幾人用" class="num">239</td><td data-label="編號" class="num">8</td><td data-label="名字">側投 <span class="small">†</span></td><td data-label="幾人用" class="num">94</td></tr>
+      <tr><td data-label="編號" class="num">9</td><td data-label="名字">低肩側投 <span class="small">†</span></td><td data-label="幾人用" class="num">85</td><td data-label="編號" class="num">10</td><td data-label="名字">R. Johnson</td><td data-label="幾人用" class="num">2</td><td data-label="編號" class="num">11</td><td data-label="名字">Nomo</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">12</td><td data-label="名字">Ishii</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">13</td><td data-label="名字">Maddux <span class="small">†</span></td><td data-label="幾人用" class="num">3</td><td data-label="編號" class="num">14</td><td data-label="名字">K. Brown</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">15</td><td data-label="名字">P. Martinez <span class="small">†</span></td><td data-label="幾人用" class="num">3</td><td data-label="編號" class="num">16</td><td data-label="名字">Kim</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">17</td><td data-label="名字">Schmidt</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">18</td><td data-label="名字">Nelson</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">19</td><td data-label="名字">Hasegawa <span class="small">†</span></td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">20</td><td data-label="名字">O. Hernandez</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">21</td><td data-label="名字">Park</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">22</td><td data-label="名字">Mussina</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">23</td><td data-label="名字">Wakefield / Niekro <span class="small">未定</span></td><td data-label="幾人用" class="num">2</td></tr>
+      <tr><td data-label="編號" class="num">24</td><td data-label="名字">Nen</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">25</td><td data-label="名字">Lowe <span class="small">†</span></td><td data-label="幾人用" class="num">4</td><td data-label="編號" class="num">26</td><td data-label="名字">Weber</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">27</td><td data-label="名字">Ohka</td><td data-label="幾人用" class="num">2</td><td data-label="編號" class="num">28</td><td data-label="名字">Smoltz <span class="small">†</span></td><td data-label="幾人用" class="num">2</td><td data-label="編號" class="num">29</td><td data-label="名字">Pettitte</td><td data-label="幾人用" class="num">2</td></tr>
+      <tr><td data-label="編號" class="num">30</td><td data-label="名字">Rivera</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">31</td><td data-label="名字">D. Wells</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">32</td><td data-label="名字">Schilling</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">33</td><td data-label="名字">Glavine</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">34</td><td data-label="名字">D. Willis</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">35</td><td data-label="名字">E. Gagne</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">36</td><td data-label="名字">R. Halladay</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">37</td><td data-label="名字">J. Seo</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">38</td><td data-label="名字">B. Zito</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">39</td><td data-label="名字">M. Mulder</td><td data-label="幾人用" class="num">2</td><td data-label="編號" class="num">40</td><td data-label="名字">M. Morris</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">41</td><td data-label="名字">Moyer</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">42</td><td data-label="名字">Hoffman</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">43</td><td data-label="名字">M. Redman</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">44</td><td data-label="名字">Ol. Perez</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">45</td><td data-label="名字">M. Prior</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">46</td><td data-label="名字">W. Johnson</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">47</td><td data-label="名字">J. Marichal</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">48</td><td data-label="名字">N. Ryan</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">49</td><td data-label="名字">S. Paige</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">50</td><td data-label="名字">B. Gibson</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">51</td><td data-label="名字">C. Hunter</td><td data-label="幾人用" class="num">2</td><td data-label="編號" class="num">52</td><td data-label="名字">T. Seaver</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">53</td><td data-label="名字">典型 1 <span class="small">†</span></td><td data-label="幾人用" class="num">2</td></tr>
+      <tr><td data-label="編號" class="num">54</td><td data-label="名字">典型 2 <span class="small">†</span></td><td data-label="幾人用" class="num">3</td><td data-label="編號" class="num">55</td><td data-label="名字">典型 3 <span class="small">†</span></td><td data-label="幾人用" class="num">2</td><td data-label="編號" class="num">56</td><td data-label="名字">T. Hudson</td><td data-label="幾人用" class="num">1</td></tr>
+      <tr><td data-label="編號" class="num">57</td><td data-label="名字">Foulke</td><td data-label="幾人用" class="num">1</td><td data-label="編號" class="num">58</td><td data-label="名字">Oswalt</td><td data-label="幾人用" class="num">2</td><td data-label="編號" class="num">—</td><td data-label="名字"></td><td data-label="幾人用" class="num">—</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">有三個編號<u>光靠遊戲自己的資料錨不出唯一答案</u>：第 28 號同時被
+     Roger Clemens 與 John Smoltz 使用，兩人的姓都在字串表裡；
+     第 19 號的候選是同一個姓出現兩次的重複字串；
+     第 23 號的兩位使用者剛好就是兩份外部名單各自寫的那個姓（Wakefield 與 Niekro）。
+     28 與 19 表上那兩個名字是<strong>外部名單給的、已用上面的方法驗過</strong>（所以標 †）；
+     第 23 號兩份名單彼此打架、遊戲資料也裁決不了，本站<u>不硬選</u>，留「未定」。
+     <span class="badge wip">未定</span></p>
+
+  <div class="card blue">
+    <p class="card-h">名字是從哪裡讀出來的</p>
+    <p>不是猜的，也不是社群整理的，是<u>遊戲自己的文字檔</u> <code>data\FEENG.LOC</code>。
+       同一批字串也被<strong>「創造球員」畫面</strong>拿去當下拉選單的選項 ——
+       那個畫面的 <code>TL:BATSTANCETL</code> 有 66 個選項、
+       <code>TL:PITCHDELIVERYTL</code> 有 59 個，<u>剛好等於這兩欄的值數</u>。</p>
+    <p class="small">但那個選單是<strong>照姓氏字母排的</strong>，不是照編號排，
+       所以它能告訴你「總共有哪些」，<u>不能告訴你「第幾號是哪一個」</u>。
+       本站一度想用它來對編號，這條路是死的。</p>
+  </div>
+
+  <h2 id="swingtype">揮棒型態 —— 只有五種，而且第 2、3 號根本不存在</h2>
+  <p><code>playerattrib_swingtype</code> 的值域是 <strong>0 到 6</strong>。
+     本站原本把七個值全部標「未解」——
+     <strong>2026-08-28 解開了，答案在一支社群編輯器附的設定檔裡</strong>，
+     而且它跟本站量到的分布互相印證。</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th class="num">值</th><th>設定檔寫的</th><th>遊戲裡顯示成</th><th>握法</th><th class="num">原版有幾人用</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td class="num">0</td><td class="mono">1 Two Hands</td><td>1</td><td>雙手</td><td class="num"><strong>2,485</strong></td></tr>
+      <tr class="hi"><td class="num">1</td><td class="mono">2 One Hand</td><td>2</td><td>單手</td><td class="num"><strong>433</strong></td></tr>
+      <tr class="lo"><td class="num">2</td><td colspan="3"><strong>設定檔裡沒有這一格</strong></td><td class="num">0</td></tr>
+      <tr class="lo"><td class="num">3</td><td colspan="3"><strong>設定檔裡沒有這一格</strong></td><td class="num">0</td></tr>
+      <tr><td class="num">4</td><td class="mono">3 One Hand</td><td>3</td><td>單手</td><td class="num">1</td></tr>
+      <tr><td class="num">5</td><td class="mono">4 One Hand</td><td>4</td><td>單手</td><td class="num">1</td></tr>
+      <tr><td class="num">6</td><td class="mono">5 Two Hands</td><td>5</td><td>雙手</td><td class="num">1</td></tr>
+    </tbody>
+  </table></div>
+  <div class="card grass">
+    <p class="card-h">⭐ 為什麼這次可以寫成「解開了」而不是「推論」</p>
+    <p><strong>不是因為數量對上。</strong>是因為<u>缺的那兩格，兩邊缺在同一個位置</u> ——
+       設定檔跳過 2 和 3，而 2,921 位球員裡用 2 或 3 的<strong>剛好也是零人</strong>。</p>
+    <p>那份設定檔<u>幾乎不跳號</u>：本站把它 33 個區段全部檢查過，
+       <strong>31 個是完整連號</strong>，只有兩個跳號 —— 而<u>兩個都跳得有道理</u>：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>區段</th><th>跳過</th><th>原版資料裡那一格有幾人</th></tr></thead>
+      <tbody>
+        <tr><td data-label="區段">主守位</td><td data-label="跳過" class="num">9</td><td data-label="原版資料裡那一格有幾人" class="num"><strong>0 人</strong>（9 = 指定打擊，見上面）</td></tr>
+        <tr><td data-label="區段">揮棒型態</td><td data-label="跳過" class="num">2、3</td><td data-label="原版資料裡那一格有幾人" class="num"><strong>0 人、0 人</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p>而且方向也對得起來：同一份設定檔的<strong>副</strong>守位清單<u>有</u> 9，
+       而資料裡副守位是 9 的有 <strong>54 人</strong>。
+       <u>該有的地方有、該沒有的地方沒有，兩個欄位、兩個方向，全部一致。</u></p>
+    <p class="small">剩下三個值各只有一個人在用（<code>4</code> Jesus Ludwick、
+       <code>5</code> Danny Everett、<code>6</code> Dick Smallenberg），
+       那三個都是遊戲用來填滿小聯盟的虛構球員
+       （<a href="../story/stance-choices/index.html#anomaly">沒有播報語音的那一群</a>）。
+       所以實際會遇到的只有前兩種。</p>
+  </div>
+  <div class="card clay">
+    <p class="card-h">⚠️ 本站原本把那七個字串當成這一欄的名稱，那是錯的</p>
+    <p>本站一度寫「字串 14900–14906 就是這七個值的名字」，理由是數量剛好對上。
+       <strong>那個推論錯了，而且錯得很典型：只憑數量吻合就下結論。</strong></p>
+    <p>正確答案是去<u>看那些字串被誰使用</u>。
+       本站把介面版面檔全部掃一遍，找哪一個畫面引用了 14900–14906：</p>
+<pre><code><span class="cm">frontend.big / fes_createaplayer.fel 第 1849 行</span>
+TL:<span class="hl">BATSTANCETL</span>,1,0,424,181,120,14,…,14900,…
+ TE:14900   ← Generic
+ TE:14901   ← Bent
+ TE:14906   ← Closed
+ TE:14902   ← Crouched   …</code></pre>
+    <p><code>TL</code> 是下拉選單，<code>TE</code> 是它的選項。
+       那七個字串是<strong>「創造球員」畫面裡<u>打擊姿勢</u>選單的選項</strong>，
+       跟揮棒型態這一欄無關。</p>
+    <p><strong>而且那個畫面根本沒有揮棒型態的選單。</strong>
+       本站數過，<code>fes_createaplayer.fel</code> 有 <strong>85 個</strong>下拉選單，
+       身高、體重、生日、五種球路、各種能力值都有，
+       <u>就是沒有 swingtype</u>。</p>
+    <p>所以<strong>被推翻的是「那七個字串是這一欄的名字」這一條路</strong>，
+       <span class="badge wip">已撤回</span>
+       <u>不是上面那張表</u> —— 那張表來自社群編輯器附的設定檔，是完全另一條來源。
+       兩件事在 2026-08-28 同一天處理：<strong>一邊撤回、一邊補上。</strong></p>
+    <p class="small">還沒補上的是「遊戲裡顯示成 1 到 5」那五種<u>各自長什麼樣</u> ——
+       設定檔只寫了幾隻手，沒寫姿勢本身，本站也沒有實機改一格進遊戲看過。
+       不受這次撤回影響的是那個分布：2,921 人裡 2,918 人只用前兩種 ——
+       那是直接從名冊數出來的。</p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">順便解掉了 <code>Style 1</code> 到 <code>Style 24</code></p>
+    <p>本站原本把它列成未解。同一次掃描裡它也出現了：</p>
+<pre><code>TL:<span class="hl">PITCHDELIVERYTL</span>,…,14914,…
+ TE:14914   ← Style 1
+ TE:14915   ← Style 2   …</code></pre>
+    <p>那是<strong>「創造球員」畫面裡<u>投球姿勢</u>選單的選項</strong>。
+       整個選單有 <strong>59 個</strong>選項 —— 剛好等於名冊那一欄的 59 個值。
+       其中 <strong>11 個</strong>是 <code>Style N</code>、<strong>3 個</strong>是
+       <code>Classic N</code> 這種不具名的，其餘 <strong>45 個</strong>是球員的姓。
+       <span class="small">（2026-09-05 訂正：原本寫「13 個是 <code>Style N</code>」。
+       字串表裡 <code>Style</code> 一路排到 24，但這個選單只用到前 11 條；
+       剛安裝好的原版與本站測試機兩份量到的都是 11 ／ 3 ／ 45。）</span></p>
+    <p class="small">這也解釋了一件事:2009 年那份台灣名冊的更新紀錄裡寫著
+       「倪福德 — Style9」「郭泓志 — Style2」——
+       <u>那不是隨便編的代號,是創造球員畫面上真的看得到的選項名稱。</u></p>
+  </div>
+
+  <h2 id="ditty">出場音樂曲風：完整證據</h2>
+  <p><code>playerattrib_ditty</code> 的值域是 <strong>0 到 6</strong>，七個值。
+     遊戲的文字表裡，字串 <strong>16690</strong> 是
+     <code>Batter Ditty Type</code>（打者出場曲類型），
+     <u>緊接著的七條</u>是：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">字串編號</th><th>文字</th><th class="num">用的人數</th></tr></thead>
+    <tbody>
+      <tr><td data-label="字串編號" class="num">16691</td><td data-label="文字" class="mono">Country</td><td data-label="用的人數" class="num">368</td></tr>
+      <tr><td data-label="字串編號" class="num">16692</td><td data-label="文字" class="mono">Dance</td><td data-label="用的人數" class="num">370</td></tr>
+      <tr><td data-label="字串編號" class="num">16693</td><td data-label="文字" class="mono">Hip Hop</td><td data-label="用的人數" class="num">406</td></tr>
+      <tr><td data-label="字串編號" class="num">16694</td><td data-label="文字" class="mono">Pop</td><td data-label="用的人數" class="num">203</td></tr>
+      <tr class="hi"><td data-label="字串編號" class="num">16695</td><td data-label="文字" class="mono">Rock</td><td data-label="用的人數" class="num">604</td></tr>
+      <tr><td data-label="字串編號" class="num">16696</td><td data-label="文字" class="mono">Heavy Rock</td><td data-label="用的人數" class="num">492</td></tr>
+      <tr><td data-label="字串編號" class="num">16697</td><td data-label="文字" class="mono">Latin</td><td data-label="用的人數" class="num">478</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">右欄是原版名冊裡各個值有幾個球員在用（依序對應 0 到 6）。</p>
+
+  <div class="card blue">
+    <p class="card-h">這條的證據強度：比「數量剛好」好，比「量到的」弱</p>
+    <p><strong>支持</strong>：那七條字串<u>緊接在一條寫著欄位名字的標籤後面</u>
+       （<code>Batter Ditty Type</code>），而且剛好七條、剛好七個值。
+       同一份混音表裡也有一條 <code>BatDittyVol%</code>
+       （見<a href="datafile.html#audio">總設定檔</a>）。
+       另外<u>還有一路獨立的旁證</u>：2008 年那支社群編輯器附的設定檔，
+       這一欄列的也是同樣七個曲風、同樣的順序，而且<strong>代號跟名字是直接綁在一起寫的</strong>
+       （<code>0,Country</code> 一路到 <code>6,Latin</code>），不必靠「誰接在誰後面」去推。
+       那份設定檔就是上面解開<a href="#swingtype">揮棒型態</a>用的同一份。</p>
+    <p><strong>不足</strong>：本站<u>沒有進遊戲聽過</u>，
+       也<u>沒有在音訊資料裡找到七組對應的音樂</u> ——
+       <code>audio\aems\batdit.abk</code> 打開只有音量與開關的控制字串，
+       不是七組曲子。</p>
+    <p><strong>所以標推論。</strong><span class="badge wip">推論</span>
+       要確認很簡單：把一位球員這一欄從 0 改成 6，進遊戲聽他上場時放什麼。
+       <u>本站沒做這件事，因為那需要實機驗證。</u></p>
+    <p class="small">為什麼要把證據強度講到這麼細：本站在
+       <a href="#stance">姿勢那一節</a>吃過虧 ——
+       只憑「數量剛好對得上」就發表,結果整段結論反過來。
+       這一條比那次強(多了一個直接寫著欄位名的標籤),但還沒強到可以寫成定論。</p>
+  </div>
+
+  <h2 id="socks">襪子高度</h2>
+  <p>同一種讀法：字串 <strong>9706</strong> 是 <code>Socks</code>，後面三條是
+     <code>Low</code>、<code>Medium</code>、<code>High</code>。
+     而 <code>playerattrib_socks</code> 剛好有三個值（0–2）。</p>
+  <p class="small">一樣標<span class="badge wip">推論</span>。
+     這一欄改起來風險極低（只影響外觀），想確認的人自己改一個看看最快。</p>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 球員資料檔裡一大群欄位存的是代號不是數值，這頁只寫<u>能用遊戲自己的檔案佐證的</u>那些，佐證不了的照實說佐證不了，而它一半的價值就在那張「不行」的清單。</li>
+    <li><strong>兩條不必相信任何人給的表的自證</strong> 只有投手才會出現在 <code>pitcher.dat</code>，這 1,618 列的人主守位是 0 或 10 的有 1,616 位，99.88%；捕手、二壘、三壘、游擊四個位置的左投比例低到跟其他位置差兩個數量級。順帶一個實務後果：把主守位從投手改成野手，那個人的球種、球速、控球會整組消失，而且改回去救不回來。</li>
+    <li><strong>能照登的只有三欄</strong> 球種、守備位置、慣用手。標準是整組標籤在遊戲自己的文字表裡連續、同順序出現。<u>出場音樂曲風形式上也符合這個標準，但本站沒進遊戲聽過，所以標低一級當「推論」</u>。髮型、骨架、投球姿勢那些只有零星通用英文字命中，本站不列表，只說明那一欄有幾個選項。</li>
+    <li><strong>球路的變化軌跡是 8 個方向，左右投互為鏡像</strong> 把所有可能的配對窮舉 764 種，<code>1↔7</code>、<code>2↔6</code>、<code>3↔5</code>（4 自己對自己）是最好的一組，差距 0.099，第二名 0.127，完全不做鏡像是 0.681。實務上右投的滑球填 6、左投的滑球填 2，填錯邊球會朝反方向跑。</li>
+    <li><strong>最容易誤讀的地方：欄號與值域都會因名冊而異</strong>。46 個欄位裡有 27 個在原版與社群名冊之間位置不同（<code>skin_tone</code> 從第 12 欄搬到第 38 欄），所以<u>永遠不要記欄號，要在執行時從表頭找欄位名</u>。膚色更誇張：原版只有 0 到 10 共 11 種，這台機器 16 種，而 11 以上根本不是膚色，是社群把那一欄借去放袖子。</li>
+    <li><strong>本站訂正了自己一次搜尋方法</strong> 慣用手與守備位置原本被列在「佐證不了」，理由寫「連投左投右都 0 命中」。錯的是本站的抽字串程式把長度小於兩個字元的字串丟掉了，<code>P</code>、<code>C</code>、<code>L</code>、<code>R</code>、<code>S</code> 這些單字母永遠不可能命中。同一個錯讓守備位置被低估成 8 / 10，實際是 10 / 10。</li>
+    <li><strong>本站訂正了整段結論反過來的一次</strong> 姿勢名稱原本用「第 N 號就是第 10000+N 條字串」這個假設去對，錯了，還推出「幾乎沒有球員用以自己命名的姿勢」寫進故事頁。改用錨點法（挑只有 1 到 2 人在用的編號，看那人是誰）重做，事實完全相反。後來用兩份互相獨立的外部名單交叉考核，打擊 54/54、投球 45/45 全中，而隨機打散重排 500 次平均只命中 0.25 與 0.14。另外投球那一列「只有 1 到 2 人用的」原本寫 43 是把上一列抄下來了，重數是 46。</li>
+    <li><strong>本站沒驗的</strong> 揮棒型態五種各自長什麼樣 —— 代號對名字有社群編輯器的設定檔可查（只有五種，2 和 3 號不存在），但本站沒有實機改一格確認過，2026-08-28 撤回的是另一條路（原本以為字串 14900–14906 是這一欄的名字，其實那是打擊姿勢選單的選項）；姿勢的名字掃遍剛安裝好的原版一個都找不到，只能標明出處；出場音樂曲風與襪子高度都只到「推論」，本站沒有進遊戲聽過也沒找到七組對應的音樂；骨架 25 是一位 2008 年工具作者自己的推測、本站沒有實機驗證；體型「遊戲說五種資料只用三種」與襪子名稱兩份不同都未解；打擊姿勢編號 23 整份名冊沒有人在用，維持未知。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="player-data.html">球員資料檔的真相</a> —— 這些欄位所在的檔案怎麼讀、改之前的紀律</li>
+    <li><a href="player-numbers.html">兩套球員編號</a> —— 臉皮與大頭照那兩欄</li>
+    <li><a href="loc-strings.html">文字表 .LOC</a> —— 本頁的佐證方法從哪裡來</li>
+    <li><a href="../tutorials/edit-speed/index.html">實戰：改球員速度</a> —— 動手改一個<u>數值型</u>欄位</li>
+  </ul>
+
+  <footer>
+    <p>本頁的值域、筆數、命中數皆為現場打開 <code>data\database\attrib.dat</code>、
+       <code>pitcher.dat</code>、<code>data\FEENG.LOC</code>、<code>data\IGENG.LOC</code> 量測所得。
+       標示為「推測」之處未經證實，標示為「未解」「未驗」之處本站尚未解讀。
+       文中提到之第三方對照表僅描述其與遊戲資料的比對結果，本站不轉載其內容、不提供該工具。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

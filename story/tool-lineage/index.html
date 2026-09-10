@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/story/tool-lineage/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>這些工具不是為棒球寫的 — toni的MVP模組補習班</title>
+<meta name="description" content="294 MB 的模組工具箱，最底層那幾支原本是給賽車、籃球、足球、冰球遊戲用的。從執行檔裡的版權行、md5、和遊戲資料夾裡一個八位元組的檔頭，把這條血緣關係一條一條量出來。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../../index.html">首頁</a>
+  <a class="item" href="../../start.html">新手基本功</a>
+  <a class="item" href="../../do.html">我想做什麼</a>
+  <a class="item" href="../../plan.html">課表</a>
+  <a class="item" href="../../tutorials/index.html">教學</a>
+  <a class="item" href="../../7min/index.html">七分鐘</a>
+  <a class="item" href="../../reference/index.html">速查</a>
+  <a class="item" href="../../coach/index.html">棒球教練</a>
+  <a class="item on" href="../index.html">故事</a>
+  <a class="item" href="../../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="../index.html">故事</a> › 這些工具不是為棒球寫的</p>
+  <h1>這些工具不是為棒球寫的</h1>
+  <p class="lede">這台電腦上有一個 294 MB 的資料夾，裝著社群做過的 MVP 模組工具。
+     一個一個打開來看，發現一件本來沒想到的事：
+     <strong>裡面最底層的幾支工具，原本都不是為棒球遊戲寫的。</strong>
+     它們來自賽車、籃球、足球、冰球的模組社群，被搬過來，換個名字，就一路用了下去。</p>
+
+  <div class="card blue">
+    <p class="card-h">這一頁在講什麼</p>
+    <p>不是教學，是一次盤點。內容全部來自<strong>打開檔案本身</strong>：
+       執行檔裡的版權字串、說明書的第一行、檔案與壓縮包的時間戳、以及 md5 比對。</p>
+    <p style="margin-top:8px">凡是查不到出處的，這一頁會直接寫「未確認」，不用推測補上。
+       量到數字但解釋不了的，只寫數字，不補故事。</p>
+  </div>
+
+  <h2>這個資料夾裡有什麼</h2>
+  <p>工具箱位於遊戲資料夾底下的 <code>MVPtools</code>，最上層 102 個項目（98 個檔案加 4 個資料夾），
+     合計 294 MB。其中 60 個是壓縮包、19 個是可以直接跑的 <code>.exe</code>。</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>檔案上的年份</th><th class="num">項目數</th><th>這些是什麼</th></tr></thead>
+    <tbody>
+      <tr><td data-label="檔案上的年份" class="mono">1997 – 2003</td><td data-label="項目數" class="num">13</td><td data-label="這些是什麼">7 個是 Windows 執行期元件（<code>.dll</code> / <code>.ocx</code>），6 個是工具本身</td></tr>
+      <tr><td data-label="檔案上的年份" class="mono">2004 – 2008</td><td data-label="項目數" class="num">71</td><td data-label="這些是什麼">社群做工具最密集的五年</td></tr>
+      <tr class="hi"><td data-label="檔案上的年份" class="mono">2019-01-10</td><td data-label="項目數" class="num">62</td><td data-label="這些是什麼"><strong>同一天下載</strong>的，不是同一天做的</td></tr>
+      <tr><td data-label="檔案上的年份" class="mono">2023</td><td data-label="項目數" class="num">9</td><td data-label="這些是什麼">DirectX 執行期與光碟模擬器的安裝檔、編輯器的反安裝檔、兩份 2023-05-23 的名冊相關檔，以及兩個沒歸到上面任何一類的雜項</td></tr>
+      <tr><td data-label="檔案上的年份" class="mono">2026</td><td data-label="項目數" class="num">6</td><td data-label="這些是什麼">4 個資料夾本身、加 2 個安裝腳本被動過的日期。<strong>這 6 個日期的來由本站沒有查證</strong></td></tr>
+    </tbody>
+  </table></div>
+
+  <p class="small">這張表數的是<strong>最上層的 98 個檔案、4 個資料夾，再加上那 4 個資料夾第一層的內容</strong>，
+     合計 171 個項目，沒有再往更深的層數數。表上沒列到的是 2011、2013、2015、2016 各一到四個項目，
+     以及 2019 年另外三個日期（01-07、01-14、01-20）各一個。</p>
+
+  <div class="card amber">
+    <p class="card-h">修改日期有兩種，不能混著讀</p>
+    <p>散裝檔案的日期常常是<strong>下載日期</strong>。這個資料夾裡有 62 個檔案的日期都是
+       2019 年 1 月 10 日，那顯然是一次抓下來的，不是那天做的。</p>
+    <p style="margin-top:8px">相對地，<strong>壓縮包內部的檔案時間戳通常會保留原始年代</strong>，
+       因為解壓縮不會改寫它。所以這一頁凡是講年代，都優先採用壓縮包內部的時間戳，
+       其次才是散裝檔的日期，並且會註明是哪一種。</p>
+    <p style="margin-top:8px">但這條也有例外：壓縮包裡的<strong>資料夾項目</strong>記的常常是
+       重新打包那天，不是工具的年代。下面年表裡真的踩到一次，該處已標明。</p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">順手訂正一個以為</p>
+    <p>不少檔名前面掛著一組數字，原本以為那是下載編號。攤開來看不是：
+       同一組數字底下有 <strong>11 個完全不同的工具</strong>，而這 11 包的說明書
+       <strong>全部署名同一個代號</strong>；另一組數字底下的兩個工具，一個是 2006 年的轉播畫面切換器、
+       一個是 2008 年的球場替換器，<strong>說明書也署名同一個人</strong>。</p>
+    <p style="margin-top:8px">所以那組數字比較像是<strong>上傳者的編號</strong>，不是單一檔案的編號。
+       這一點只在這個資料夾的樣本內成立，原站怎麼編的本站沒有查證，不寫成定論。</p>
+  </div>
+
+  <h2>先看一個八個位元組的檔案</h2>
+  <p>在遊戲的 <code>data\igshapes\</code> 底下，有一個被拆開來改過的圖檔資料夾，
+     裡面躺著一個 1,878 位元組的 <code>index.fsh</code>。
+     它的副檔名是 <code>.fsh</code>，但前四個位元組既不是 <code>SHPI</code>、也不是壓縮檔的 <code>10 FB</code>。
+     原因很單純：它是純文字。</p>
+
+<pre><code>4e 46 53 48 54 6f 6f 6c    <span class="cm">← 前八個位元組</span>
+ N  F  S  H  T  o  o  l</code></pre>
+
+  <p>整個 <code>data</code> 資料夾裡的散裝 <code>.fsh</code> 檔共 22 個，
+     其中 21 個的開頭都是 <code>SHPI</code>（EA 的圖檔標記）。
+     唯一的例外就是這一個，而它的第一行就是工具自己的名字：</p>
+
+<pre><code>NFSHTool generated file ...          <span class="cm">← 第 1 行</span>
+<span class="hl">（某人桌面上的完整路徑）</span>          <span class="cm">← 第 2 行,含 Windows 帳號,本站不轉載</span>
+FSH                                  <span class="cm">← 第 3 行</span>
+SHPI 1 objects, tag G357             <span class="cm">← 第 4 行</span></code></pre>
+
+  <p class="small">第 3、4 行的意思不用猜，寫這支工具的說明書自己列了格式：第三行寫 <code>QFS</code>
+     代表這包是壓縮過的、寫 <code>FSH</code> 代表沒壓縮；第四行是 FSH 裡的物件數量，
+     說明書還特別註明「加新圖的時候要改這個數字」。</p>
+
+  <div class="card grass">
+    <p class="card-h">NFSH 的 NFS，就是 Need for Speed</p>
+    <p>這個檔案是某支工具拆解圖檔時留下的索引檔，而它會自報家門。
+       寫下這行字的程式，在這台電腦上找得到：
+       把整個遊戲資料夾底下的每一個檔案掃過一遍，含有這串文字的<strong>程式只有兩支</strong>：
+       <code>kraw\nfshtool.exe</code> 與 <code>kraw\nfsdll.dll</code>，
+       各有兩份副本、內容位元組完全相同。其餘掃到的，就是這種索引檔本身。</p>
+    <p style="margin-top:8px">而這個索引檔的日期是 <strong>2022 年 12 月 28 日</strong>。
+       一支從賽車遊戲社群流出來的工具，在二十年後還在被拿來改棒球遊戲的畫面元件。</p>
+  </div>
+
+  <h2>四個社群的簽名</h2>
+  <p>順著這條線往回查，底層那幾支工具都自己留了版權行。下面每一條都是從檔案裡讀出來的，不是從網路上聽來的。</p>
+
+  <h3>賽車：FSHTOOL</h3>
+  <p>隨附的說明書開宗明義寫著它是「FSH/QFS 解壓縮與轉 BMP 的工具」，
+     版權年份 1998 到 2002，授權是 <strong>GNU 通用公共授權（GPL）</strong>，
+     並且明文寫著散布這套軟體而不附原始碼是違法的。</p>
+  <p>全文提到 NFS3 兩次、NFS5 三次、NFS6 三次，提到 FIFA 一次，
+     其中 1.22 版的更新內容只有一條：<strong>為了相容足球遊戲的多尺度貼圖</strong>。
+     <strong>棒球出現零次。</strong></p>
+  <p>工具箱裡那份 <code>fshtool.txt</code> 最上面多了兩行，署名 <strong>tywiggins</strong>，
+     說他拿原始碼「拿掉了一些東西，好讓它比較容易寫進批次檔裡跑」。
+     同名的那支 2006 年執行檔內部留著 Visual Studio 2005 的編譯路徑，
+     所以它確實是後來重新編過的。授權原文要求散布時附上原始碼；那份修改註記自己也寫「原始碼隨這個版本附上」，不過<strong>這個資料夾裡現在沒有原始碼</strong>。本站只記錄看到什麼，不下法律判斷。</p>
+
+  <h3>籃球：nFSHTOOL、FSHLINE、EAZIP</h3>
+  <p>籃球社群把上面那支工具接手改成了自己的版本。證據在同一個 DLL 裡，兩行版權並排：</p>
+
+<pre><code>FSHTOOL  version 1.22  - (c) <span class="cm">Denis Auroux 2002</span>
+NFSHTOOL version 2.20  - (c) <span class="cm">(一個 NBA Live 網域)</span> for NBA Live 2005,2004,2003</code></pre>
+
+  <p>再往下三行接著寫「Original Version available at:」，把原始出處保留在檔案裡。
+     這是很典型的 GPL 衍生做法：改了、掛上自己的名字、但不抹掉上一手。
+     同一包裡的 <code>nfshtool.exe</code> 自報的是比較早的 <code>nFSHTOOL 1.22</code>，
+     版本行寫著「for NBA Live 2003 formats」。</p>
+  <p>同一批人還做了 <code>EAZIP</code>。它的說明書講得很白：
+     這是給 EA 運動遊戲的 <code>.viv</code> 與 <code>.big</code> 用的封裝檔工具，
+     版本紀錄從 NBA Live 2003、2000、2001 一路排到 2005，一句棒球都沒有。
+     連作者署名用的都是一個帶 NBA 字樣的代號。</p>
+
+  <h3>足球：fifaFS、bigGUI</h3>
+  <p><code>fifaFS</code> 附了六份說明書，其中一份的標題直接寫「怎麼加新球員臉、新球衣」，
+     指令範例是把檔案塞進 <code>zdata_15.big</code>，
+     腳本手冊裡列的七個預定義變數，全是各代足球遊戲的安裝資料夾。
+     這些變數在棒球遊戲裡一個都用不到，但這支工具處理封裝檔的那半邊功能通用，
+     所以照樣被搬過來。</p>
+  <p>它的授權條件不是 GPL，而是一句白話規定：
+     <strong>可以放進你的模組與程式裡散布，但你要註明有用到它，而且要把全部文件跟著附上。</strong>
+     這個資料夾裡確實躺著一整包足球遊戲的文件 —— 但只在 8 個出現位置裡的 1 個，所以<u>不能說是授權條款造成的</u>。</p>
+  <p>另一支 <code>bigGUI</code> 更直接，執行檔裡的產品名稱字串第一個字就是 Fifa。</p>
+
+  <h3>冰球：gfxpak</h3>
+  <p>這支工具的版權行寫得最完整：它是「BMP/GIF/JPG/PCX/PNG 與 EA-SHPI 互轉」的程式，
+     作者留的聯絡位址與網址都掛在同一個以 NHL 為名的網域底下，程式裡還留著
+     「新增 NHL 98/99 臉部檔案」的功能說明，以及四個 <code>FACES</code> 封裝檔的檔名。
+     這支工具在這個資料夾裡有<strong>兩個版本</strong>：
+     397,312 位元組那份日期是 <strong>1999 年 4 月 1 日</strong>，
+     339,968 位元組那份是 2002 年 10 月 12 日。</p>
+
+  <div class="card clay">
+    <p class="card-h">這一頁不散布這些工具</p>
+    <p>上面提到的每一支都是別人的作品，著作權歸原作者。本站<strong>只寫名字與用途，
+       不放檔案、不放下載連結、不放安裝包</strong>。想找的人請自己循原社群的正式管道。</p>
+  </div>
+
+  <h2>一個 md5，三個位置，兩個檔名</h2>
+  <p>把工具箱裡所有同名檔案抓出來對雜湊值，對出一個很說明問題的結果。
+     下面三個檔案<strong>位元組完全相同</strong>：</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>所在的工具包</th><th class="mono">檔名</th><th class="num">大小</th><th class="mono">md5 前 8 碼</th></tr></thead>
+    <tbody>
+      <tr><td data-label="所在的工具包">名冊編輯器 MVPedit</td><td data-label="檔名" class="mono">fshtool.exe</td><td data-label="大小" class="num">78,217</td><td data-label="md5 前 8 碼" class="mono">98fd730a</td></tr>
+      <tr><td data-label="所在的工具包">球衣編輯器 MVP Studio 2006</td><td data-label="檔名" class="mono">nfshtool.exe</td><td data-label="大小" class="num">78,217</td><td data-label="md5 前 8 碼" class="mono">98fd730a</td></tr>
+      <tr><td data-label="所在的工具包">同一組聯絡帳號的隊徽工具包</td><td data-label="檔名" class="mono">nfshtool.exe</td><td data-label="大小" class="num">78,217</td><td data-label="md5 前 8 碼" class="mono">98fd730a</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>同一個執行檔，出現在<strong>三個各自發布的工具包</strong>裡，用了兩個不同的檔名，
+     日期都是 2004 年 3 月 23 日。後兩包的說明書留的是同一組聯絡帳號，第一包是另一位作者。
+     而打開它看字串，它自報的身分是<strong>賽車社群那支 FSHTOOL 1.22</strong>，
+     而不是檔名上的 <code>nfshtool</code>。</p>
+  <p>換句話說，棒球社群這三份各自發布的東西，底層是同一顆從賽車社群拿來的引擎，
+     只是有人給它改了名字。</p>
+
+  <h2>它們不是擺著好看的</h2>
+  <p>這些外來工具不只是被複製進來，是真的在跑。棒球工具自己的批次檔一行一行點名：</p>
+
+<pre><code>eazip -s -d %1 %2.fsh              <span class="cm">← delete.bat,呼叫籃球社群的 eazip</span>
+ImpBIG.exe /e %1 %2.fsh %2.fsh     <span class="cm">← unpack.bat,呼叫另一位作者的 ImpBIG</span>
+fshtool %1 face                    <span class="cm">← makebmf.bat,呼叫賽車社群的 fshtool</span></code></pre>
+
+  <p>整個資料夾也是這樣長出來的：最上層那八個散裝檔（兩支外來工具、兩份說明書、三個批次檔、一個主程式）
+     跟壓縮包裡的 MVP2005 Editor v0.30 逐一比對，<strong>八個 md5 全部相同</strong>；
+     遊戲根目錄下 <code>kraw</code> 資料夾裡出自 TiT 的那 17 個檔案，跟 TiT 2.0.5 安裝檔裡的 <code>kraw</code>，
+     <strong>17 個 md5 也全部相同</strong>。</p>
+
+  <div class="card grass">
+    <p class="card-h">2026-08-29 補：TiT 的原始碼還在，而且在 GitHub 上</p>
+    <p>本頁對 TiT 的描述是<u>從二進位檔量出來的</u>（17 個 md5 逐一比對）。
+       後來查到它的<strong>完整原始碼是公開的</strong>：
+       <code>go2tom42/Total-Installer-Thingy</code>，
+       主程式 <code>TiT.au3</code> <strong>141 KB 的 AutoIt</strong>，
+       repo 裡連 <code>kraw/</code> 那 17 個檔都在。</p>
+    <p>本站去比對了<u>班主任遊戲根目錄下那個 <code>kraw/</code></u> 與 repo 裡的那份：
+       <strong>17 個檔名全部相同，17 個大小也全部相同。</strong>
+       這替本頁原本的 md5 比對加了一個獨立的第二來源。</p>
+    <p><strong>意義不只是多一個佐證。</strong>本頁講的是「工具是怎麼互相借出來的」，
+       而<u>要講一個工具做了什麼，讀它的原始碼永遠好過拆它的執行檔</u> ——
+       後者是本站不做的事。這一份剛好不必拆。</p>
+    <p class="small">⚠️ 這跟本頁下面那個 GPL 的觀察<u>不是同一件事</u>：
+       那一格講的是<strong>賽車社群那支工具</strong>的原始碼不在這個資料夾裡，
+       跟 TiT 自己的原始碼在不在無關。那一格維持原樣。</p>
+  </div>
+
+  <h2>為什麼借得動</h2>
+  <p>會這樣借，不是因為誰偷懶，而是因為<strong>這些遊戲的檔案格式本來就是同一套</strong>。
+     這件事可以直接量。</p>
+
+  <p>拿遊戲自己的檔案來看：<code>ingame.big</code>、<code>portrait.big</code>、
+     <code>schedule.big</code> 的前四個位元組都是 <code>42 49 47 46</code>，也就是
+     <a href="../../reference/bigf.html">BIGF</a>；
+     散裝圖檔的前四個位元組是 <code>53 48 50 49</code>，也就是 <code>SHPI</code>。</p>
+
+  <p>再看那些外來工具的執行檔裡，寫著什麼字串：</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>執行檔</th><th>出身社群</th><th class="num">BIGF</th><th class="num">SHPI</th><th>備註</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="執行檔" class="mono">gfxpak.exe</td><td data-label="出身社群">冰球 NHL</td><td data-label="BIGF" class="num">7</td><td data-label="SHPI" class="num">20</td><td data-label="備註">另有 2 次 <code>C0FB</code>，程式自己把它跟 <code>BIGF</code> 並列成另一種封裝檔</td></tr>
+      <tr><td data-label="執行檔" class="mono">fifaFS.exe</td><td data-label="出身社群">足球 FIFA</td><td data-label="BIGF" class="num">2</td><td data-label="SHPI" class="num">2</td><td data-label="備註">另有 1 次 <code>BIG4</code></td></tr>
+      <tr><td data-label="執行檔" class="mono">fshtool.exe</td><td data-label="出身社群">賽車 NFS</td><td data-label="BIGF" class="num">0</td><td data-label="SHPI" class="num">4</td><td data-label="備註">只處理圖檔，不碰封裝檔</td></tr>
+      <tr><td data-label="執行檔" class="mono">fshline.exe</td><td data-label="出身社群">籃球 NBA Live</td><td data-label="BIGF" class="num">0</td><td data-label="SHPI" class="num">3</td><td data-label="備註"></td></tr>
+      <tr><td data-label="執行檔" class="mono">eazip.exe</td><td data-label="出身社群">籃球 NBA Live</td><td data-label="BIGF" class="num">0</td><td data-label="SHPI" class="num">0</td><td data-label="備註"><strong>這一格量不到，不是「不支援」</strong></td></tr>
+    </tbody>
+  </table></div>
+
+  <p class="small">同一支工具在這個資料夾裡常常有好幾份，數字會不一樣。這張表逐一指定量了哪一份：
+     <code>gfxpak.exe</code> 是 MVPedit 資料夾內那份（2002-10-12）、
+     <code>fifaFS.exe</code> 與 <code>fshline.exe</code> 是 <code>kraw\</code> 底下那份、
+     <code>fshtool.exe</code> 與 <code>eazip.exe</code> 是工具箱最上層那份。
+     換一份數字就會變：MVPedit 裡那支 <code>fshtool.exe</code> 的 <code>SHPI</code> 是 5 不是 4。</p>
+
+  <div class="card amber">
+    <p class="card-h">最後那個 0 只能解讀成「量不到」</p>
+    <p>最上層那份 <code>eazip.exe</code>，<code>file</code> 指令說它是 UPX 壓過的執行檔。
+       但把 <code>kraw\</code> 底下那份<strong>沒有被 UPX 壓過</strong>的 <code>eazip.exe</code> 拿來掃，
+       <code>BIGF</code> 一樣是 0（那份倒是掃到 2 次 <code>BIG4</code>）。</p>
+    <p style="margin-top:8px">它會不會處理 <code>BIGF</code>？會，它的說明書整篇都在講這件事。
+       <strong>掃不到跟沒有是兩回事</strong>，這一格只能寫「量不到」。
+       至於為什麼掃不到，本站沒有查證，也不歸因給 UPX。</p>
+  </div>
+
+  <p>還有第三個四字母。把遊戲那 21 個 <code>SHPI</code> 圖檔全部掃過一遍，
+     <strong>21 個裡面有 21 個</strong>都含有同一句英文，說明這塊資料是給
+     「EAGL 執行期貼圖管理」用的附加資料。</p>
+  <p>EAGL 這個代號本站只在<strong>這一款遊戲</strong>的檔案裡量到，
+     它在 EA 其他遊戲裡是不是同一套，本站沒有查證，不寫成定論。
+     但可以確定的是：一支冰球社群寫的工具，認得棒球遊戲的 <code>SHPI</code>；
+     一支足球社群寫的工具，認得棒球遊戲的 <code>BIGF</code>。
+     <strong>工具會流動，是因為格式本來就相通。</strong></p>
+
+  <h2>年表</h2>
+
+  <figure class="figbox">
+  <div class="figscroll">
+<svg class="barchart" viewBox="-4 -4 760 506" role="img" aria-label="十三項工具的年代長條圖：最早是說明書自署 1998 年、出自賽車遊戲社群的 FSHTOOL；棒球社群自己做工具最密集的是 2004 到 2008 年；最後一條是這個資料夾本身留下的 2019 到 2022 年">
+<line x1="160.0" y1="4" x2="160.0" y2="474.0" class="ax"/>
+<line x1="195.7" y1="4" x2="195.7" y2="474.0" class="ax"/>
+<line x1="278.4" y1="4" x2="278.4" y2="474.0" class="ax"/>
+<line x1="361.2" y1="4" x2="361.2" y2="474.0" class="ax"/>
+<line x1="443.9" y1="4" x2="443.9" y2="474.0" class="ax"/>
+<line x1="526.7" y1="4" x2="526.7" y2="474.0" class="ax"/>
+<line x1="609.5" y1="4" x2="609.5" y2="474.0" class="ax"/>
+
+<text x="152" y="25.68" class="bl">FSHTOOL</text>
+<rect x="162.6" y="8" width="144.8" height="26" class="bar"><title>FSHTOOL：說明書自署版權 1998-2002 · 這個資料夾裡最新的一份 fshtool.exe 檔案日期 2006-10-03，內部留有 Visual Studio 2005 的編譯路徑</title></rect>
+<text x="314.4" y="25.68" class="bv">NFS 賽車 · 1998-2006</text>
+
+<text x="152" y="61.68" class="bl">gfxpak</text>
+<rect x="183.3" y="44" width="57.9" height="26" class="bar"><title>gfxpak：圖片與 EA-SHPI 互轉 · 版權行的聯絡位址掛在以 NHL 為名的網域 · 兩個版本，397,312 位元組那份 1999-04-01、339,968 位元組那份 2002-10-12</title></rect>
+<text x="248.2" y="61.68" class="bv">NHL 冰球 · 1999-2002</text>
+
+<text x="152" y="97.68" class="bl">fifaFS</text>
+<rect x="212.2" y="80" width="118.6" height="26" class="bar"><title>fifaFS：說明書自署 v.4.9，版權 2001-2006 · 這個資料夾裡兩個版本，98,816 位元組那份壓縮包內時間戳 2006-10-15、292,864 位元組那份 2008-03-25</title></rect>
+<text x="337.9" y="97.68" class="bv">FIFA 足球 · 2001-2008</text>
+
+<text x="152" y="133.68" class="bl">bigGUI</text>
+<rect x="246.7" y="116" width="16.6" height="26" class="bar"><title>bigGUI：執行檔內產品名字串以 Fifa 開頭 · 檔案日期 2003-02-09 · 只查到這一個日期</title></rect>
+<text x="270.3" y="133.68" class="bv">FIFA 足球 · 2003</text>
+
+<text x="152" y="169.68" class="bl">nFSHTOOL</text>
+<rect x="245.3" y="152" width="38.6" height="26" class="bar"><title>nFSHTOOL：nfshtool.exe 自報 nFSHTOOL 1.22 for NBA Live 2003 formats，安裝檔內時間戳 2003-01-16 · nfsdll.dll 自報 NFSHTOOL 2.20 for NBA Live 2005,2004,2003，時間戳 2005-05-26</title></rect>
+<text x="291.0" y="169.68" class="bv">NBA Live 籃球 · 2003-2005</text>
+
+<text x="152" y="205.68" class="bl">EAZIP 4.02</text>
+<rect x="284.0" y="188" width="16.6" height="26" class="bar"><title>EAZIP 4.02：說明書與執行檔同為 2005-05-17，另一份 163,840 位元組的版本是 2005-05-18 · 註：另一個壓縮包裡有一支更舊的同名 eazip.exe（2002-11-29），版本無法確認，未併入本條</title></rect>
+<text x="307.6" y="205.68" class="bv">NBA Live 籃球 · 2005</text>
+
+<text x="152" y="241.68" class="bl">FSHLINE</text>
+<rect x="284.0" y="224" width="16.6" height="26" class="bar"><title>fshline.exe：與 nfsdll.dll 同為 2005-05-26（取自 TiT 安裝檔內部時間戳）· 只查到這一個日期</title></rect>
+<text x="307.6" y="241.68" class="bv">NBA Live 籃球 · 2005</text>
+
+<text x="152" y="277.68" class="bl">MVPedit</text>
+<rect x="263.3" y="260" width="31.7" height="26" class="bar"><title>MVPedit：隨附 readme.html 的開發紀錄共 43 個日期、19 個 build 編號，第一筆 2004-02-22、最後一筆 2006-01-11</title></rect>
+<text x="302.0" y="277.68" class="bv">MVP 棒球 · 2004-2006</text>
+
+<text x="152" y="313.68" class="bl">MVP Studio 06</text>
+<rect x="306.0" y="296" width="16.6" height="26" class="bar"><title>MVP Studio 2006：說明書第一行自署 September 14th, 2006 · 只查到這一個日期</title></rect>
+<text x="329.6" y="313.68" class="bv">MVP 棒球 · 2006</text>
+
+<text x="152" y="349.68" class="bl">compmaniac 11 包</text>
+<rect x="311.6" y="332" width="16.6" height="26" class="bar"><title>同一組檔名前綴的 11 個壓縮包,10 份說明書署名 compmaniac,1 份寫明工具作者是 tywiggins · 包內 2007 年的時間戳落在 2007-01-11 到 2007-04-06</title></rect>
+<text x="335.2" y="349.68" class="bv">MVP 棒球 · 2007</text>
+
+<text x="152" y="385.68" class="bl">MVP2005 Editor</text>
+<rect x="328.1" y="368" width="16.6" height="26" class="bar"><title>MVP2005 Editor v0.30：說明書第一、二行自署 by tywiggins、Released January 14, 2008 · 只查到這一個日期</title></rect>
+<text x="351.7" y="385.68" class="bv">MVP 棒球 · 2008</text>
+
+<text x="152" y="421.68" class="bl">TiT 2.0.5</text>
+<rect x="337.8" y="404" width="16.6" height="26" class="bar"><title>TiT 2.0.5：安裝檔 2008-08-25、說明書 2008-08-25、設定檔 2008-07-07（壓縮包內時間戳）· 註：另一個壓縮包裡的資料夾項目寫 2012-04-26，那是重新打包的日期，不採計</title></rect>
+<text x="361.4" y="421.68" class="bv">MVP 棒球 · 2008</text>
+
+<text x="152" y="457.68" class="bl">這份工具箱</text>
+<rect x="510.1" y="440" width="64.8" height="26" class="bar"><title>2019-01-10：62 個散裝檔同一天的日期 · 2022-12-28：遊戲的 data 資料夾裡留下 NFSHTool 索引檔 · 資料夾本身另有 2026 年的日期，來由本站沒有查證，不採計</title></rect>
+<text x="582.0" y="457.68" class="bv">2019-2022</text>
+
+<text x="182.7" y="492" class="bn">2000</text>
+<text x="265.4" y="492" class="bn">2005</text>
+<text x="348.2" y="492" class="bn">2010</text>
+<text x="430.9" y="492" class="bn">2015</text>
+<text x="513.7" y="492" class="bn">2020</text>
+<text x="596.5" y="492" class="bn">2025</text>
+</svg>
+  </div>
+  <figcaption><b>資料來源</b>：每一條長條的兩端，是<strong>在這台電腦上、針對長條上那個名字能查到的最早與最晚證據</strong>，
+     取自壓縮包內部時間戳、散裝檔案日期、以及說明書自己寫的版權年份。
+     它<strong>不代表</strong>該工具真正的開發起訖，只代表證據落在哪一段。
+     短到只剩一格的長條，表示證據全落在同一年之內。
+     滑鼠移到長條上會顯示該條的逐項依據，包含刻意不採計的日期。</figcaption>
+  </figure>
+
+  <h2>棒球社群自己長出來的工具</h2>
+  <p>借來的是底層，上面那層是這個社群自己蓋的。這些工具處理的是別的遊戲沒有的東西：
+     打擊率、輪值、球員能力值、王朝模式。</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th style="width:24%">工具</th><th>做什麼</th><th>作者代號</th><th class="mono">日期</th></tr></thead>
+    <tbody>
+      <tr><td data-label="工具">MVPedit</td><td data-label="做什麼">名冊編輯器。說明書指定的八個 <code>.dat</code> 資料檔要一次匯入，改完再匯出</td><td data-label="作者代號">rglass4</td><td data-label="日期" class="mono">2004-2006</td></tr>
+      <tr><td data-label="工具">MVP2005 Editor</td><td data-label="做什麼">要先開著遊戲才能用。說明書寫：遊戲沒開會跳訊息，找記憶體位址要花幾秒鐘，改完存檔就直接進遊戲</td><td data-label="作者代號">tywiggins</td><td data-label="日期" class="mono">2008-01-14</td></tr>
+      <tr><td data-label="工具">MVP Studio 2006</td><td data-label="做什麼">球衣與隊徽的加裝介面</td><td data-label="作者代號">fuzZOne</td><td data-label="日期" class="mono">2006-09-14</td></tr>
+      <tr class="hi"><td data-label="工具">TiT 2.0.5</td><td data-label="做什麼">一鍵安裝別人做好的模組。<strong>它裝進去的那個資料夾，就是本頁那堆外來工具</strong></td><td data-label="作者代號">未署名<br><span class="small">隨附 DLL 內有 krawhitham</span></td><td data-label="日期" class="mono">2008-08-25</td></tr>
+      <tr><td data-label="工具">11 個壓縮包</td><td data-label="做什麼">賽程產生、安裝檔製作、開場畫面、球場檔批次匯出入。<strong>11 份說明書裡有 10 份署名 compmaniac</strong>；另一份（改解析度那支）寫明工具是 tywiggins 做的，compmaniac 只組裝安裝檔</td><td data-label="作者代號">compmaniac（10）／tywiggins（1）</td><td data-label="日期" class="mono">2007</td></tr>
+      <tr><td data-label="工具">MVPSavReader</td><td data-label="做什麼">讀<a href="../../reference/dynasty-save.html">王朝存檔</a>，輸出成一整套網頁。這裡有三個版本包，包內時間戳分別是 2005-07-22、2007-04-01、2007-05-19</td><td data-label="作者代號">未確認</td><td data-label="日期" class="mono">2005-2007</td></tr>
+      <tr><td data-label="工具">六支計算機</td><td data-label="做什麼">檔名寫的是打擊、守備、投球、投手續航力的能力值計算，另外兩支叫 MLECalc 與 SplitEstimator</td><td data-label="作者代號">未確認</td><td data-label="日期" class="mono">四支 2008-2011<br><span class="small">另兩支只剩下載日</span></td></tr>
+      <tr><td data-label="工具">走場音樂工具兩支</td><td data-label="做什麼">換場中音樂與打者上場音樂</td><td data-label="作者代號">iansimcox</td><td data-label="日期" class="mono">2005-05-18 / 05-23</td></tr>
+      <tr><td data-label="工具">Portrait Maker</td><td data-label="做什麼">把主圖與 alpha 圖加上球員編號，打包成<a href="../../reference/portrait.html">大頭照</a>圖檔</td><td data-label="作者代號">未確認</td><td data-label="日期" class="mono">2006-10-30</td></tr>
+      <tr><td data-label="工具">轉播與球場切換器</td><td data-label="做什麼">主體是批次檔，靠複製檔案換轉播主播與球場；包內另附一支 2000 年的小程式做按鍵選單</td><td data-label="作者代號">Sharpshooter</td><td data-label="日期" class="mono">2006-04-28 / 2008-05-21</td></tr>
+    </tbody>
+  </table></div>
+
+  <p class="small">日期一律取自壓縮包內部時間戳或說明書自署行；只寫年份的，代表該包內時間戳落在那一段。
+     六支計算機裡有兩支是散裝安裝檔，只剩 2019-01-10 這個下載日期，沒有年代可寫。</p>
+
+  <h2>借東西這件事，他們自己講得很清楚</h2>
+  <p>很容易在這裡編出一套「因為授權這樣寫，所以資料夾才長這樣」的故事。
+       本站試著驗，<strong>三條都驗不過</strong>，所以不寫：</p>
+    <ul class="plain">
+      <li>足球那支要求散布時附上全部文件。但它在這個資料夾出現 <strong>8 次</strong>，
+          真的附了那六份說明書的<strong>只有 1 次</strong>。</li>
+      <li>籃球那支的授權寫的是「散布時要附上全部文件」，<u>同一句還明文要求「不得修改、變更或省略散布內容」</u>。
+          而它在這裡有<strong>三種不同的二進位</strong>（75,264／163,840／80,896 個位元組），
+          不是原封不動的同一份；是同一個作者先後發布的不同版本，還是有人改過，<u>本站沒有查證，不下判斷</u>。</li>
+      <li>賽車那支是 GPL，授權原文寫「不附原始碼散布是違法的」，
+          而<strong>這個資料夾裡找不到它的原始碼</strong>。這件事本站<u>不下判斷</u>。</li>
+    </ul>
+    <p>能講的只有一句沒有因果的觀察：<strong>這些工具的授權條款都寫得很清楚，
+       而後來的人確實照著改、照著搬。</strong></p>
+
+  <p>社群內部借來借去也一樣坦白。名冊編輯器 2006 年 1 月那次更新，
+     改用另一位作者的封裝工具處理圖片，更新紀錄裡逐條標了「感謝某某」；
+     同一條更新紀錄裡還有一句寫著
+     <strong>「Stole config file from SwinginSoriano, hope he doesn't mind」</strong>
+     （出自 MVPedit 2006.1 更新紀錄）。用偷這個字，後面接一個笑臉。</p>
+
+  <div class="card grass">
+    <p class="card-h">這才是這個資料夾真正的內容</p>
+    <p>294 MB 裡面裝的不只是程式。是四個遊戲社群、二十幾年、幾十位素不相識的人，
+       各自解開一小塊格式，然後把成果丟出去讓別人接著用。</p>
+    <p style="margin-top:8px">本站做的事情跟他們一樣：量到什麼寫什麼，寫完公開。
+       這一頁就是那條鏈子往下接的一節。</p>
+  </div>
+
+  <h2>名字這一欄的處理原則</h2>
+  <p>這些說明書與執行檔裡有作者的真實姓名、電子信箱、贊助帳號、個人網站，本次至少讀到三位作者的本名；
+     那個索引檔裡甚至留著某人 Windows 帳號的完整桌面路徑。
+     這些本站<strong>一律不抄出來</strong>，只保留當年公開發表時的圈內代號、工具名稱、日期與功能。</p>
+  <p><strong>唯一的例外是 FSHTOOL 的著作權人 Denis Auroux。</strong>
+     那支工具是 GPL 自由軟體，<u>保留著作權聲明是授權條款本身的要求</u>，
+     而他當年就是以本名公開發表的。這跟「把一個網友的真實身分挖出來」是兩件事。
+     即使如此，他留在檔案裡的電子信箱與個人網址，本站一樣不放。</p>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 這個 294 MB 工具箱裡最底層那幾支工具，原本都不是為棒球寫的，它們來自賽車、籃球、足球、冰球社群，而它們借得動的原因是這些遊戲的檔案格式本來就是同一套。</li>
+    <li><strong>八個位元組就破了案</strong> 遊戲 <code>data\igshapes\</code> 底下有個 <code>index.fsh</code>，開頭既不是 <code>SHPI</code> 也不是壓縮標記，而是純文字 <code>NFSHTool</code>。整個 <code>data</code> 底下 22 個散裝 <code>.fsh</code> 只有它是例外，而 <strong>NFSH 的 NFS 就是 Need for Speed</strong>。掃過整個遊戲資料夾，含這串文字的程式只有兩支，都在 <code>kraw\</code> 底下；那個索引檔的日期是 2022 年 12 月 28 日，一支從賽車社群流出來的工具，二十年後還在改棒球遊戲的畫面元件。</li>
+    <li><strong>一個 md5、三個位置、兩個檔名</strong> 78,217 位元組、md5 前八碼 <code>98fd730a</code> 的同一個執行檔，出現在名冊編輯器、球衣編輯器與隊徽工具包<u>三個各自發布的工具包</u>裡，用了 <code>fshtool.exe</code> 與 <code>nfshtool.exe</code> 兩個檔名，日期都是 2004-03-23。打開看字串，它自報的身分是賽車社群那支 <strong>FSHTOOL 1.22</strong>，不是檔名上的 <code>nfshtool</code>。</li>
+    <li><strong>借得動是因為格式相通</strong> 賽車那支的說明書一路點名 NFS3、NFS5、NFS6，提到 FIFA 一次，<strong>棒球零次</strong>，卻照樣認得棒球的 <code>SHPI</code>；冰球的 <code>gfxpak.exe</code> 裡 <code>BIGF</code> 出現 7 次、<code>SHPI</code> 20 次。而遊戲這邊 21 個散裝 <code>SHPI</code> 圖檔，<strong>21 個</strong>都含有同一句 EAGL 貼圖管理的字串。這些工具也不是擺著好看，棒球工具自己的批次檔一行一行點名在呼叫它們。</li>
+    <li><strong>最容易誤讀的：修改日期有兩種</strong> 散裝檔案的日期常常是<u>下載日期</u>，這個資料夾裡有 62 個檔的日期都是 2019 年 1 月 10 日，那顯然是一次抓下來的。所以這頁講年代一律優先採用壓縮包內部的時間戳。<strong>但這條也有例外</strong>：壓縮包裡的<u>資料夾項目</u>記的常是重新打包那天，年表裡真的踩到一次，該處已標明不採計。</li>
+    <li><strong>本站訂正與新增</strong> 檔名前面那組數字原本以為是下載編號，攤開來看不是，同一組數字底下有 11 個完全不同的工具、說明書全部署名同一個代號，比較像<strong>上傳者的編號</strong>。2026-08-29 又補了一條：TiT 的完整原始碼是公開的（<code>go2tom42/Total-Installer-Thingy</code>，主程式是 141 KB 的 AutoIt），班主任遊戲根目錄那個 <code>kraw/</code> 的 17 個檔名與大小跟 repo 全部相同，替原本的 md5 比對加了獨立的第二來源。<u>要講一個工具做了什麼，讀原始碼永遠好過拆執行檔。</u></li>
+    <li><strong>很想編、但三條都驗不過的故事</strong> 「因為授權這樣寫，資料夾才長這樣」很好聽，可是足球那支要求散布時附上全部文件，它在這裡出現 8 次真的附了只有 1 次；籃球那支的授權明文寫著「不得修改、變更或省略散布內容」，而它在這裡有三種不同的二進位（版本先後還是有人改過，本站沒有查證）；賽車那支是 GPL、原文寫不附原始碼散布是違法的，而這個資料夾裡找不到它的原始碼（這件事本站<u>不下判斷</u>）。能講的只有一句沒有因果的觀察：授權都寫得很清楚，後來的人確實照著改、照著搬。社群內部借來借去也一樣坦白，名冊編輯器的更新紀錄裡直接寫著向某人「偷」了設定檔，後面接一個笑臉。</li>
+    <li><strong>本站沒驗的</strong> <code>eazip.exe</code> 掃不到 <code>BIGF</code> 那一格只能寫「<strong>量不到</strong>」而不是「不支援」，它的說明書整篇都在講這件事；為什麼掃不到本站沒查證，也不歸因給 UPX。EAGL 這個代號在 EA 其他遊戲裡是不是同一套沒查證；資料夾那 6 個 2026 年的日期來由沒查證；檔名數字前綴在原站怎麼編的也沒查證。名字一律只留當年公開發表的圈內代號，唯一例外是 GPL 條款本身要求保留著作權聲明的 Denis Auroux，即使如此他的信箱與個人網址一樣不放。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../../reference/bigf.html">BIGF 封裝格式</a>：上面所有工具搶著處理的那層外殼，規格全在這一頁</li>
+    <li><a href="../../reference/qfs.html">QFS / RefPack 壓縮</a>：賽車社群 1998 年的說明書就在講的那層壓縮，今天照樣適用</li>
+    <li><a href="../toni-2009/index.html">當年那兩份說明書，一句一句拿今天的檔案對過</a>：同一批工具在台灣這邊做出了什麼</li>
+    <li><a href="../../reference/what-can-be-modded.html">什麼改得動、什麼還不行</a>：二十年後的今天，還剩哪些沒解開</li>
+  </ul>
+
+  <footer>
+    <p>本頁所有數字皆為現場打開檔案量測所得：檔案數與大小取自 <code>MVPtools</code>
+       最上層加上四個子資料夾的第一層（共 171 個項目），年代取自壓縮包內部時間戳與說明書自署，
+       相同執行檔的判定以 md5 比對，字串次數以逐檔掃描計得並註明量的是哪一份副本。
+       同名檔的份數只數到「散裝檔案與最上層壓縮包」這一層。
+       <code>SHPI</code> 與 EAGL 的 21 / 21 只在 <code>data</code> 底下的散裝圖檔成立，不含封裝檔內部。
+       標示為「未確認」「本站沒有查證」之處未經證實，本站不寫成定論。
+       本站不公開任何真實姓名、聯絡方式或個人網站，不轉載任何第三方工具或檔案。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../../legal.html">法律與版權說明</a> ·
+       <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

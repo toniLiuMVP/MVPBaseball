@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/patches.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>官方更新檔動了哪些檔 — toni的MVP模組補習班</title>
+<meta name="description" content="EA 為 MVP Baseball 2005 英文版出過的四個官方更新檔,逐一量出它們會覆蓋哪些檔案。結論對裝模組的人很重要:更新檔從來沒碰過球場、球衣、模型、大頭照、動作與音訊,但每一版都會覆蓋名冊資料庫。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 官方更新檔動了哪些檔</p>
+  <h1>官方更新檔動了哪些檔</h1>
+  <p class="lede">EA 為<strong>英文版</strong>出過四個官方更新檔（官方繁體中文版另有三個
+     <code>_TC</code> 更新檔，見<a href="patches-tc.html">官方繁體中文版的三個更新檔，到底改了什麼</a>；
+     本頁只講英文版那四個）。裝模組的人最常問的是
+     「<u>我先裝更新檔還是先裝模組</u>」——
+     這一頁把答案量出來：<strong>四個更新檔加起來只碰 19 個檔案</strong>，
+     而球場、球衣、模型、大頭照、動作、音訊、介面版面
+     <strong>一個都沒碰過</strong>。</p>
+
+  <h2>手上有哪幾個</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>檔名</th><th class="num">大小</th><th class="num">會覆蓋幾個檔</th></tr></thead>
+    <tbody>
+      <tr><td data-label="檔名"><code>mvp2005patch1.exe</code></td><td data-label="大小" class="num">953 KB</td><td data-label="會覆蓋幾個檔" class="num">16</td></tr>
+      <tr><td data-label="檔名"><code>mvp2005patch2.exe</code></td><td data-label="大小" class="num">5.90 MB</td><td data-label="會覆蓋幾個檔" class="num">17</td></tr>
+      <tr><td data-label="檔名"><code>mvp2005patch3.exe</code></td><td data-label="大小" class="num">6.03 MB</td><td data-label="會覆蓋幾個檔" class="num">17</td></tr>
+      <tr class="hi"><td data-label="檔名"><code>mvp2005patch5.exe</code></td><td data-label="大小" class="num">6.71 MB</td><td data-label="會覆蓋幾個檔" class="num"><strong>19</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>沒有第 4 號。</strong>本站手上這批就是 1、2、3、5，
+     而且每一個檔案內部嵌的版本字串就是它自己的編號 ——
+     <u>不是有人把 4 號刪掉，是本站沒有它</u>。至於 EA 到底有沒有出過 4 號，
+     <span class="badge wip">未解</span> 本站不知道。</p>
+
+  <div class="card amber">
+    <p class="card-h">本站沒有執行過這些更新檔</p>
+    <p>下面所有結論都是<u>從更新檔本身讀出來的</u>：它裡面存著一份「我要覆蓋哪些路徑」的清單，
+       用文字掃描就看得到。<strong>本站沒有真的跑過任何一個更新檔</strong>，
+       所以「跑完之後檔案內容變成什麼」不在這一頁的範圍內。</p>
+    <p class="small">怎麼掃的：把整個檔案當位元組流，
+       同時用 <u>ASCII</u> 與 <u>UTF-16</u> 兩種編碼去找形如
+       <code>data\…\….副檔名</code> 的字串。兩種編碼都掃是為了保險 ——
+       Windows 安裝程式的路徑有時會存成 UTF-16。不過<u>這四個更新檔實測下來全部是 ASCII</u>，
+       UTF-16 那一輪一條路徑都沒多撈到。</p>
+  </div>
+
+  <h2>四個更新檔的目標清單</h2>
+  <p>路徑全部落在<strong>兩個資料夾</strong>裡，加上根目錄的主程式：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>目標</th><th class="num">P1</th><th class="num">P2</th><th class="num">P3</th><th class="num">P5</th><th>那是什麼</th></tr></thead>
+    <tbody>
+      <tr><td data-label="目標"><code>mvp2005.exe</code></td><td data-label="P1" class="num">✅</td><td data-label="P2" class="num">✅</td><td data-label="P3" class="num">✅</td><td data-label="P5" class="num">✅</td><td data-label="那是什麼">遊戲主程式</td></tr>
+      <tr><td data-label="目標"><code>data\database\roster.dat</code></td><td data-label="P1" class="num">✅</td><td data-label="P2" class="num">✅</td><td data-label="P3" class="num">✅</td><td data-label="P5" class="num">✅</td><td data-label="那是什麼">名冊</td></tr>
+      <tr><td data-label="目標"><code>data\database\attrib.dat</code></td><td data-label="P1" class="num">✅</td><td data-label="P2" class="num">✅</td><td data-label="P3" class="num">✅</td><td data-label="P5" class="num">✅</td><td data-label="那是什麼">球員能力</td></tr>
+      <tr><td data-label="目標"><code>data\database\lhattrib.dat</code><br><code>data\database\rhattrib.dat</code></td>
+          <td data-label="P1" class="num">✅</td><td data-label="P2" class="num">✅</td><td data-label="P3" class="num">✅</td><td data-label="P5" class="num">✅</td><td data-label="那是什麼">面對左投／右投的能力</td></tr>
+      <tr><td data-label="目標"><code>data\database\pitcher.dat</code></td><td data-label="P1" class="num">✅</td><td data-label="P2" class="num">✅</td><td data-label="P3" class="num">✅</td><td data-label="P5" class="num">✅</td><td data-label="那是什麼">投手資料</td></tr>
+      <tr><td data-label="目標"><code>bstats</code> · <code>fbstats</code> · <code>pstats</code><br>
+              <code>lhbstats</code> · <code>rhbstats</code> · <code>lhpstats</code> · <code>rhpstats</code></td>
+          <td data-label="P1" class="num">✅</td><td data-label="P2" class="num">✅</td><td data-label="P3" class="num">✅</td><td data-label="P5" class="num">✅</td><td data-label="那是什麼">各種成績統計</td></tr>
+      <tr><td data-label="目標"><code>career.dat</code> · <code>careerp.dat</code></td>
+          <td data-label="P1" class="num">✅</td><td data-label="P2" class="num">✅</td><td data-label="P3" class="num">✅</td><td data-label="P5" class="num">✅</td><td data-label="那是什麼">生涯成績</td></tr>
+      <tr><td data-label="目標"><code>data\frontend\sushared.big</code></td><td data-label="P1" class="num">✅</td><td data-label="P2" class="num">✅</td><td data-label="P3" class="num">✅</td><td data-label="P5" class="num">✅</td><td data-label="那是什麼">授權聲明畫面（見下）</td></tr>
+      <tr class="hi"><td data-label="目標"><code>data\frontend\load53.big</code></td><td data-label="P1" class="num">—</td><td data-label="P2" class="num"><strong>✅</strong></td><td data-label="P3" class="num">✅</td><td data-label="P5" class="num">✅</td><td data-label="那是什麼">其中一張載入畫面</td></tr>
+      <tr class="hi"><td data-label="目標"><code>data\database\manager.dat</code><br><code>data\database\org.dat</code></td>
+          <td data-label="P1" class="num">—</td><td data-label="P2" class="num">—</td><td data-label="P3" class="num">—</td><td data-label="P5" class="num"><strong>✅</strong></td><td data-label="那是什麼">教練與球團</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>只增不減。</strong>每一版都包含前一版的全部目標，
+     沒有任何一個檔案在後續版本被拿掉。</p>
+
+  <div class="card grass">
+    <p class="card-h">⭐ 對裝模組的人，這一頁真正的重點</p>
+    <p><code>data\database\</code> 底下總共有 <strong>19 個 <code>.dat</code></strong>，
+       更新檔碰了其中 <strong>16 個</strong>。沒被碰過的只有三個：
+       <code>hist.dat</code>、<code>team.dat</code>、<code>tstat.dat</code>。</p>
+    <p><strong>而那 16 個，全部落在名冊模組會覆蓋的範圍裡。</strong>
+       不過兩邊的範圍不是一樣大：本站手上四份名冊模組（台灣之光、亞洲球員、旅美球員、
+       <code>Taiwan_20091110</code>）<u>各自都附上全部 19 個 <code>.dat</code></u>，
+       連更新檔沒碰的 <code>hist.dat</code>、<code>team.dat</code>、<code>tstat.dat</code> 都換掉，
+       <strong>模組動到的比更新檔多三個</strong>。</p>
+    <ul class="plain">
+      <li><strong>先裝更新檔，再裝名冊模組。</strong>順序反過來，更新檔會把你的名冊蓋掉</li>
+      <li>球場、球衣、模型、大頭照、臉皮、動作、音訊、介面版面
+          <u>完全不受影響</u> —— 那些模組什麼時候裝都可以</li>
+      <li>更新檔會換掉 <code>mvp2005.exe</code>。
+          如果你對主程式做過<a href="../tutorials/run-in-2026/index.html">相容性修改</a>，
+          更新之後要重做</li>
+    </ul>
+  </div>
+
+  <h2>那個每一版都要換的畫面是什麼</h2>
+  <p><code>sushared.big</code> 裡面<strong>只有一張圖</strong>，
+     名字叫 <code>license.fsh</code> —— 授權與法律聲明的畫面。
+     四個更新檔每一版都換它。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th></th><th class="num">尺寸</th><th>像素格式</th><th class="num">解開後大小</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td><code>license.fsh</code>（授權畫面）</td><td data-label="尺寸" class="num">1024 × 512</td>
+          <td data-label="像素格式"><strong>32 位元無壓縮</strong></td><td data-label="解開後大小" class="num">2.00 MB</td></tr>
+      <tr><td>全部 60 張載入畫面</td><td data-label="尺寸" class="num">1024 × 512</td>
+          <td data-label="像素格式">DXT1（有損壓縮）</td><td data-label="解開後大小" class="num">0.25 MB</td></tr>
+    </tbody>
+  </table></div>
+  <p>同樣的尺寸，資料量差八倍。<strong>為什麼 EA 只有這一張不壓縮，本站不知道。</strong>
+     <span class="badge wip">未解</span></p>
+  <p class="small">⚠️ <strong>2026-09-05 訂正。</strong>這裡原本寫的是
+     「這不是隨便挑的：DXT1 會讓文字邊緣糊掉，而授權聲明整張都是字，60 張載入畫面是照片」。
+     本站後來把兩邊都解出來看過，<u>那個解釋不成立</u>：授權畫面是
+     <strong>一整頁球員照片，上面壓著商標與法律條文</strong>，不是純文字；
+     而 60 張載入畫面本站抽看了七張，<u>其中六張是一段說明文字配一張照片</u>
+     （另一張是純 logo），字比授權畫面還多，卻一樣走 DXT1。
+     <strong>「有字所以不壓縮」解釋不了這個差別。</strong></p>
+  <p class="small">60 張載入畫面的規格是 <strong>零變異</strong>：
+     全部 1024 × 512、全部 DXT1，沒有一張例外。
+     像素格式的意義見<a href="pixel-formats.html">圖片像素編碼</a>。</p>
+
+  <div class="card clay">
+    <p class="card-h">⚠️ 這一段本站寫錯過一次（發布前抓到）</p>
+    <p>初稿寫的是「<u>EA 在唯一一張純文字的畫面上用了無損格式，其餘全部壓縮</u>」。
+       聽起來很漂亮，<strong>但整句話是錯的</strong>。</p>
+    <p>把剛安裝好的原版<u>全部 52,719 筆影像記錄</u>掃過一遍：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>像素格式</th><th class="num">筆數</th><th class="num">佔比</th></tr></thead>
+      <tbody>
+        <tr><td data-label="像素格式">16 位元 4444（有 alpha）</td><td data-label="筆數" class="num">22,121</td><td data-label="佔比" class="num">41.96%</td></tr>
+        <tr><td data-label="像素格式">16 位元</td><td data-label="筆數" class="num">16,780</td><td data-label="佔比" class="num">31.83%</td></tr>
+        <tr class="hi"><td data-label="像素格式"><strong>32 位元無壓縮</strong></td><td data-label="筆數" class="num"><strong>6,834</strong></td><td data-label="佔比" class="num"><strong>12.96%</strong></td></tr>
+        <tr><td data-label="像素格式">DXT1</td><td data-label="筆數" class="num">3,437</td><td data-label="佔比" class="num">6.52%</td></tr>
+        <tr><td data-label="像素格式">DXT3</td><td data-label="筆數" class="num">3,071</td><td data-label="佔比" class="num">5.83%</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>無壓縮一點都不稀有（將近 13%），而 DXT 系列加起來只有 12%。</strong>
+       這款遊戲的主流其實是 16 位元。</p>
+    <p>還成立的部分是<u>那個範圍縮小之後的比較</u>：
+       在 1024 × 512 的整頁大圖裡，60 張載入畫面用 DXT1、唯一一張授權畫面用無壓縮。
+       <strong>那是一個具體的對照，不是一條通則。</strong></p>
+    <p class="small">⭐ 這條錯誤的形狀跟本站踩過好幾次的是同一個：
+       <u>看到一個漂亮的對比，就把它寫成整個遊戲的規律</u>。
+       發布前那次全量掃描就是為了防這件事 ——
+       <strong>寫下通則之前，先去數分母。</strong></p>
+    <p class="small">⚠️ <strong>本站另一頁的分母跟這裡差 28 筆，先講清楚。</strong>
+       上面的 <strong>52,719</strong> 是本頁這次掃描的分母，
+       可以拿表上的百分比反推驗證（<code>22,121 ÷ 52,719 ＝ 41.96%</code>、
+       <code>16,780 ÷ 52,719 ＝ 31.83%</code>、<code>6,834 ÷ 52,719 ＝ 12.96%</code>，三個都對得上）。
+       2026-08-29 本站拿同一份剛安裝好的英文版原版重跑一次
+       ——<u>只走頂層封裝檔，不拆巢狀封裝檔、不算散裝的 <code>.fsh</code></u>——
+       得到的還是 <strong>52,719</strong>，而且逐格相同：
+       <code>0x6D</code> 22,121、<code>0x78</code> 16,780、<code>0x7D</code> 6,834、
+       <code>0x60</code> 3,437、<code>0x61</code> 3,071，另有 <code>0x79</code> 431 與
+       <code>0x7F</code> 45，加起來正好 52,719。</p>
+    <p class="small">但<a href="pixel-formats.html">像素怎麼排</a>那頁描述同一份原版，寫的是
+       <strong>52,747</strong>，多出 <strong>28 筆</strong>。
+       <u>（2026-09-05 訂正：這一段原本標「未解」，寫「那 28 筆從哪裡來，本站還沒查出來」。已經對上了。）</u>
+       差別在口徑：本頁只走封裝檔，那一頁那一次<strong>連磁碟上散裝的 SHPI 檔一起數</strong>
+       （它自己寫著「掃了 424 個封裝檔與 <code>.fsh</code>」、「磁碟上直接是 SHPI 的 22 個」）。
+       本站把那 22 個散裝檔數了一遍：<code>data\misc\textures\</code> 18 個各 1 筆、
+       <code>data\igshapes\igcrsr.fsh</code> 1 筆、<code>igcrsr1.fsh</code> 與
+       <code>igcrsr9.fsh</code> 各 3 筆、<code>data\frontend\feonlyln.big</code>
+       （它其實是 SHPI，不是封裝檔）3 筆，<strong>合計正好 28 筆</strong>。
+       <strong>52,719 ＋ 28 ＝ 52,747，兩個數字是同一批資料的兩種口徑。</strong>
+       （同一個資料夾裡還有一顆原版本來就在的 <code>igcrsr.fsh.bak</code>，也是 SHPI、也含 1 筆，
+       兩邊都沒把它算進去。）</p>
+    <p class="small">光是加起來對得上還不夠，那只是「數量剛好」。真正把它釘住的是那一頁列的
+       <strong>9 筆 <code>0x7B</code></strong>：本頁這次掃過的 207 個封裝檔裡<u>一筆都沒有</u>，
+       那 9 筆全部在散裝檔裡（<code>feonlyln.big</code> 的 <code>BPP4·BPP5·BPP6</code>、
+       <code>igcrsr9.fsh</code> 的 <code>BPP4·BPP5·BPP6</code>、<code>igcrsr1.fsh</code> 的
+       <code>BPP2·BPP3·FTM2</code>，尺寸也跟那一頁列的逐項相同）。
+       那一頁能在 52,747 筆裡找到它們，就代表它那一次確實走過散裝檔。
+       這也是那一頁自己講過的紀律：<strong>兩個數字對不起來時，先確認它們是不是在數同一件事。</strong></p>
+  </div>
+
+  <h2>剛安裝好的原版是沒有更新過的</h2>
+  <p>本站用來比對的兩份「剛安裝好」的遊戲，主程式的編譯時間戳是：</p>
+  <div class="tablewrap"><table>
+    <tbody>
+      <tr><td>官方英文版 <code>mvp2005.exe</code></td><td class="num">2005-01-22</td></tr>
+      <tr><td>官方繁體中文版 <code>mvp2005.exe</code></td><td class="num">2005-02-16</td></tr>
+    </tbody>
+  </table></div>
+  <p>那是原始出貨的版本。<u>裝過更新檔的話，這個時間戳會變成更晚的日期</u> ——
+     所以這也是一個判斷「我這份有沒有更新過」的方法。
+     判斷檔案有沒有被動過的其他方法，見
+     <a href="original-vs-modded.html">原版與這台機器差在哪</a>。</p>
+
+  <div class="card clay">
+    <p class="card-h">本站沒有做、也不打算做的事</p>
+    <ul class="plain">
+      <li><strong>不提供更新檔下載</strong>。那是 EA 的檔案，本站不散布</li>
+      <li>沒有拆解更新檔的差分資料，所以<u>不知道每一版實際改了哪些位元組</u></li>
+      <li>沒有討論更新檔裡跟防拷保護有關的部分，
+          <strong>這個網站不碰那個題目</strong></li>
+    </ul>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> EA 為<strong>英文版</strong>出過的四個官方更新檔加起來只碰 19 個檔案，全部落在主程式、名冊資料庫與兩個介面圖檔上；球場、球衣、模型、大頭照、動作、音訊、介面版面一個都沒碰過。</li>
+    <li><strong>各版動幾個檔</strong> P1 動 16 個、P2 與 P3 各 17 個、P5 是 19 個，而且<strong>只增不減</strong>，每一版都包含前一版的全部目標，沒有任何檔案在後續版本被拿掉。</li>
+    <li><strong>對裝模組的人真正的重點</strong> <code>data\database\</code> 底下 19 個 <code>.dat</code>，更新檔碰了其中 16 個，沒被碰的只有 <code>hist.dat</code>、<code>team.dat</code>、<code>tstat.dat</code>，而那 16 個全部落在名冊模組會覆蓋的範圍裡（本站手上四份名冊模組<strong>各自都附上全部 19 個 <code>.dat</code></strong>，連那三個都換掉，比更新檔多動三個）。所以<strong>先裝更新檔，再裝名冊模組</strong>；更新檔還會換掉 <code>mvp2005.exe</code>，主程式做過的相容性修改要重做。</li>
+    <li><strong>沒有第 4 號</strong> 本站手上這批是 1、2、3、5，每個檔案內部嵌的版本字串就是它自己的編號，不是有人把 4 號刪掉。</li>
+    <li><strong>每一版都要換的那張圖</strong> <code>sushared.big</code> 裡只有一張 <code>license.fsh</code>，授權與法律聲明畫面，1024 × 512、32 位元無壓縮、解開 2.00 MB；同尺寸的 60 張載入畫面走 DXT1 只有 0.25 MB，規格零變異。<strong>（2026-09-05 訂正）</strong>這裡原本寫「整張都是字的畫面一個像素都不能糊，照片糊一點看不出來」，那個解釋不成立：授權畫面是球員照片上壓著商標與法律條文，60 張載入畫面抽看的七張裡有六張是說明文字配照片，<u>兩邊都有字</u>，EA 為什麼只有這一張不壓縮本站不知道。</li>
+    <li><strong>本頁發布前抓到自己寫錯一句</strong> 初稿寫「EA 在唯一一張純文字的畫面上用了無損格式，其餘全部壓縮」，整句是錯的。全量掃過剛安裝好的原版 52,719 筆影像記錄：32 位元無壓縮佔 12.96%，一點都不稀有；DXT1 加 DXT3 合計只有 12%；真正的主流是 16 位元（4444 佔 41.96%、16 位元佔 31.83%）。還成立的只有 1024 × 512 大圖那個範圍內的具體對照。<strong>寫下通則之前，先去數分母。</strong></li>
+    <li><strong>順手可用的判斷法</strong> 剛安裝好的原版主程式編譯時間戳，英文版是 2005-01-22、官方繁體中文版是 2005-02-16。裝過更新檔的話這個時間戳會變成更晚的日期，所以它也可以拿來判斷手上這份有沒有更新過。</li>
+    <li><strong>本站沒驗的</strong> <u>EA 為什麼只有授權畫面那一張用無壓縮，本站不知道</u>（原本給的「有字所以不壓縮」那個理由 2026-09-05 已訂正掉）；<u>本站沒有真的執行過任何一個更新檔</u>，所有結論都是從更新檔內部那份路徑清單讀出來的（ASCII 與 UTF-16 雙編碼掃描），「跑完之後檔案內容變成什麼」不在本頁範圍；也沒有拆解差分資料，所以不知道每一版實際改了哪些位元組；EA 到底有沒有出過 4 號未解；跟防拷保護有關的部分本站不碰，也不提供更新檔下載。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="database.html">名冊資料庫</a> —— 上面那 16 個檔各自裝什麼</li>
+    <li><a href="original-vs-modded.html">原版與這台機器差在哪</a> —— 怎麼判斷手上這份被動過什麼</li>
+    <li><a href="official-chinese.html">EA 自己的繁體中文版</a> —— 兩個語言版本逐檔比對</li>
+    <li><a href="patches-tc.html">官方繁體中文版的三個更新檔</a> —— 那三個 <code>_TC</code> 更新檔逐位元組比對的結果</li>
+  </ul>
+
+  <footer>
+    <p>本頁所有結論都是從英文版那四個官方更新檔的位元組內容讀出來的（ASCII 與 UTF-16 雙編碼掃描），
+       圖片規格則是解開剛安裝好的原版量測所得。<strong>本站沒有執行過任何一個更新檔</strong>，
+       所以「跑完之後會發生什麼」不在本頁範圍。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

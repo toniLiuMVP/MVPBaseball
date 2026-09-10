@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>課程地圖 — toni的MVP模組補習班</title>
+<meta name="description" content="MVP Baseball 2005 修改教學總覽：依難度分級，從新手基本功到進階格式逆向。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item on" href="index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item" href="../reference/index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="eyebrow" style="margin-top:36px">課程地圖</p>
+  <h1>全部教學，依難度分級</h1>
+  <p class="lede">照順序走最穩;想直接跳某一課也可以，每課開頭會列需要的前置。<strong>目前每一課都可以看</strong>。</p>
+
+
+  <div class="card grass">
+    <p class="card-h">每一課上面那個標籤，先看一眼</p>
+    <p><span class="badge ro">只看不動</span>
+       這一課<strong>不會動到你遊戲裡的任何檔案</strong>。就算全部照做一遍，遊戲還是原來的樣子。
+       第一次來、或是不確定的時候，從這些開始。</p>
+    <p><span class="badge rw">會改你的檔案</span>
+       這一課會<strong>真的改到遊戲資料夾裡的東西</strong>。
+      這一類目前有 <strong>29 張課程卡</strong>，就是下面掛著這個標籤的每一張
+       （其中一張是同一課的手動改法）。
+       <strong>本站附的腳本沒有例外</strong>：<u>先預覽、要加 <code>--apply</code> 才真的寫</u>，
+       而且<u>第一次寫入前會自動備份</u>、都有 <code>--restore</code> 可以還原。
+       但還是請先看過<a href="backup/index.html">備份那一課</a>。</p>
+    <p class="small">沒有標籤的是總覽或還沒開的課。</p>
+  </div>
+
+  <h2>Level 0 · 新手基本功</h2>
+    <div class="lesson">
+      <span class="t"><a href="exe-tuning/index.html">執行檔上的六個旋鈕</a></span>
+      <span class="d">一顆調好的 <code>mvp2005.exe</code> 跟原本那顆
+         <strong>只差 10 個位元組</strong>。這一課把六個旋鈕一個一個講完：
+         記憶體池、大位址旗標、解析度、IAT 目錄、節區權限、檔頭檢查碼
+         （那 10 個位元組落在其中四個上 —— 那顆對照檔沒有改解析度，檔頭檢查碼也剛好沒變）。
+         <u>六項裡只有一項真的會改變遊戲跑不跑得動</u>，其他五項的好處這一課講得很誠實
+         （<strong>本站沒有量到它們讓遊戲變快或變穩</strong>）。
+         ⛔ 不含任何保護措施相關內容。</span>
+      <span class="badge rw">會改你的檔案</span>
+      <span class="badge ok">✓ 可用</span>
+    </div>
+    <div class="lesson">
+      <span class="t"><a href="run-in-2026/index.html">2026 年的電腦怎麼跑得起 2005 年的遊戲</a></span>
+      <span class="d">這款遊戲是二十一年前為 Windows XP 做的 <u>32 位元程式</u>。
+         這一課講今天的 Windows 與 <strong>Apple Silicon 的 Mac</strong> 上會遇到什麼、
+         怎麼檢查你手上那份，以及「球場不能超過 20MB」那條老規矩<u>本站實際量到的結果</u>（那個數字站不住，順帶說明<strong>為什麼站上會有 10MB 與 20MB 兩個數字</strong>）。
+         Mac 那一節是在 M4 上實測的。也記下一個看起來像答案、實際上遊戲根本不讀的檔案。</span>
+      <span class="badge rw">會改你的檔案</span>
+      <span class="badge ok">✓ 可用</span>
+    </div>
+  <div class="lesson">
+    <span class="t"><a href="play-on-mac/index.html">在 Mac 上玩 MVP 2005</a></span>
+    <span class="d">macOS 沒有 32 位元、Apple Silicon 不是 x86 ——<strong>兩道死牆疊起來反而通了</strong>。
+       從裝 Wine 到啟動遊戲逐步寫完。<u>本站第一次真的把遊戲在 Mac 上跑起來</u>：
+       兩次獨立測量常駐 201.5 MB 與 190.3 MB、繪圖音效手把三套都初始化完成，
+       並老實寫出卡住的那兩關與<strong>本站沒有看到畫面</strong>這件事。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="controller-config/index.html">暖身課：打開一個遊戲的檔案</a></span>
+    <span class="d"><strong>不用工具、不用命令列、不用解壓縮。</strong>
+       用記事本打開遊戲資料夾裡的純文字設定檔,看懂它的結構,而且改壞了一定回得來。
+       順便發現 PC 版遊戲內部其實是一支 PlayStation 手把。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="../start.html">先學會六個基本操作</a></span>
+    <span class="d">開命令列、取路徑、顯示副檔名、備份觀念、裝 Python。後面每課都用得到。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <h2 id="trouble">🚑 問題排除 · 遊戲跑不動就先看這裡</h2>
+  <p class="small">這一節本來只有 <strong>1 堂教學</strong>，可是「光碟裝不起來」「中文版一進去就跳出」
+     「球場一換就當機」這三課，2026-08-29 之前是放在 Level 5「給想自己寫工具的人」——
+     你遊戲跑不動的時候，不會想去翻一個標著「進階」的區塊。已經搬過來了。</p>
+  <div class="lesson">
+    <span class="t"><a href="crash-diagnosis/index.html">遊戲當掉了怎麼辦</a></span>
+    <span class="d">先判斷是哪一種當機再對症下藥。附<strong>唯讀診斷腳本</strong>，檢查記憶體上限與資料量。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="mount-disc/index.html">不用每次放光碟（而且是為了保護它）</a></span>
+    <span class="d">那張碟已經二十一年了，每轉一次都在磨；而 2026 年很多機器根本沒有光碟機。
+       本站先把執行檔反組譯，查清楚<u>遊戲到底為什麼要找光碟</u>：那段程式列舉磁碟機、
+       比對 <code>DRIVE_CDROM</code>，然後找<strong>根目錄下有沒有 <code>data</code> 資料夾</strong>，
+       找到就從 <code>\database\</code> 讀檔；三十二台都沒有就直接回傳失敗
+       （同一支函式裡另有讀註冊表 <code>Installed From</code> 的退路，
+       但那條由呼叫端的旗標決定，這條路沒有開）。<strong>那是「資料在哪」不是「你有沒有正版」</strong> ——
+       它沒有讀任何防拷特徵。所以掛載你自己那張碟的映像，沒有規避任何東西。
+       ⚠️ 真的遇到防拷檢查的訊息，<u>本站幫不上忙也不會幫</u>。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="fix-chinese/index.html">中文版配大球場就跳出</a></span>
+    <span class="d">很多人是<u>退而求其次玩英文版</u>的，因為中文版一裝上大球場就會在讀取條跑完的瞬間跳出，沒有任何訊息。這件事卡了二十年。本站把執行檔反組譯到底，找到真正的原因：<strong>遊戲寫死了一塊 64 MB 的記憶體池</strong>，球場與字型都住在裡面；而中文字型的字圖集是 <strong>4 位元格式，Direct3D 8 吃不下</strong>，每一張都要在執行時展開，光字型就吃掉 <strong>13.50 MB</strong>（英文只要 0.37 MB）。池子挖不到就<u>拿 NULL 去填值</u>，當場跳出。<strong>兩個地方各改一個位元組就好了，中文一個字都不用砍</strong>。<u>不過照原版光碟安裝的那一份做不到這一步</u> —— 那塊記憶體的位置藏在防拷保護的加密區裡。本頁附完整研究過程與<u>我們走錯的十二條路</u>。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="shrink-big/index.html">球場超過 10MB 就當機</a></span>
+    <span class="d">社群傳了二十年的規矩，大家的理解是「球場做得太精緻」。把檔案量開之後<strong>原因有一半不是那樣</strong>:那個 18.44 MB 的球場，目錄指到的內容只有 <strong>5.19 MB</strong>，其餘 <u>71.9% 是沒有人指向的位元組</u> ——是安全改法一次次留下的舊版本;另一半是<strong>真的做得比較精緻</strong>，那種一個位元組都省不了。剛安裝好的原版孤兒比例中位數是 0.00%，證明這不是格式的性質。附腳本清完變回 5.20 MB，88 個項目逐位元組相同，一行還原。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="../reference/what-can-be-modded.html">什麼改得動、什麼還不行</a></span>
+    <span class="d">動手前先看這個，確認你想做的事目前做不做得到。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <h2>Level 1 · 第一次修改</h2>
+  <div class="lesson">
+    <span class="t"><a href="change-schedule-year/index.html">把賽程換到任何年份</a></span>
+    <span class="d">最快有感的一課：整季賽程搬到 2030 年，對戰組合全部保留。約 3 分鐘。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="hide-runner-speed/index.html">關掉跑壘者速度數值</a></span>
+    <span class="d">本站招牌教學：預覽 → 套用 → 還原，全自動備份與複驗。另附全手動版與完整原始碼。<br><strong>⚠ 需要裝過台灣名冊那類社群模組</strong> —— 這一課要改的版面檔不在 EA 原版裡。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <div class="lesson">
+    <span class="t"><a href="skip-intro/index.html">關掉開場動畫</a></span>
+    <span class="d">遊戲一開就是一段 19 MB 的動畫。這一課把它改短 ——
+       <strong>不是刪檔，也不是給你一個現成的短片</strong>，
+       而是拿你自己那一份，只留開頭幾格畫面、聲音整組丟掉，照原格式組回去。<br>
+       格式在四份剛安裝好的安裝上量過：<code>MVhd</code> 檔頭 32 bytes，
+       之後是「標記 ＋ 長度」的區塊，影像 <code>MV0K</code>／<code>MV0F</code>、
+       音訊 <code>SCHl</code>／<code>SCCl</code>／<code>SCDl</code>
+       （跟語音那幾課是同一組標記）。<u>可以一行還原，實測逐位元組相同</u>。<br>
+       ⚠️ 檔案層面全驗過，<strong>遊戲跑起來的畫面還沒實測</strong>。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <div class="lesson">
+    <span class="t"><a href="menu-text/index.html">改主選單的文字</a></span>
+    <span class="d">把「Play Now」改成「馬上開打」。關鍵是<strong>不用動版面檔</strong> ——
+       版面檔只放字串編號，真正的文字在字串表裡，改那個安全得多。
+       改完<u>檔案長度一個位元組都不變</u>，你沒點名的 6,349 條字串保證逐字相同。<br>
+       ⚠️ 只能改成同長或更短（中文字少，英文換中文通常夠用），
+       而且<strong>要先有中文字型</strong>否則會變空白或方框。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <div class="lesson">
+    <span class="t"><a href="make-chinese/index.html">把官方中文版的中文搬進英文版</a></span>
+    <span class="d">上一課要的<u>中文字型</u>從哪裡來：官方中文版把中文放在遊戲的<strong>日文槽位</strong>，
+       這一課教你從<strong>你自己那份官方中文版</strong>把文字表與字型搬到英文版的英文槽位去。
+       <strong>本站不附任何現成的包</strong>，全部用你手上那兩份原版加站上兩支腳本做出來。
+       ⚠️ 這一課只保證<u>中文顯示得出來</u>，<strong>不保證不會跳出</strong> ——
+       那要調的是記憶體池，看<a href="fix-chinese/index.html">中文版配大球場就跳出</a>。約 20 分鐘。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <div class="lesson">
+    <span class="t"><a href="team-logo/index.html">換球隊隊徽</a></span>
+    <span class="d">隊徽是 <code>logos.big</code> 裡的 132 張 DXT3 貼圖，匯出成 PNG 改完再換回去。<br>
+       ⭐ <strong>「哪個編號是哪一隊」是把圖匯出來親眼看定案的</strong> ——
+       126 個檔剛好配 126 支球隊<u>不算證據</u>，四條查證路線全部空手，
+       最後靠 <code>l000</code> 上面寫著 ANAHEIM 才確定規則是 <code>artid N → l(N-1)</code>。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <div class="lesson">
+    <span class="t"><a href="hud-color/index.html">改記分板的顏色</a></span>
+    <span class="d">記分板的底色與文字顏色是版面檔裡三個 0-255 的數字。那個欄位位置是<u>量出來的</u>：
+       拿元素名字當標準答案掃原版 44 個版面檔，1,057 個帶顏色名的元素有 <strong>1,028 個</strong>對得上。<br>
+       <strong>⚠ 改之前一定要先看「顯示」那一欄</strong> —— 關的元素改了顏色畫面上不會有變化，
+       而本站測試機的記分板色塊剛好<u>全部是關的</u>（原版是 14 開 3 關）。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <div class="lesson">
+    <span class="t"><a href="hide-runner-speed/manual.html">同一課的手動改法（不跑腳本）</a></span>
+    <span class="d">改用 BIG 編輯工具自己走一遍：取出、解壓、把那幾個顯示開關由 1 改成 0、重新壓回去<strong>接到檔尾</strong>。
+       步驟多也比較兇 —— 存錯方式會讓 <code>ingame.big</code> 裡 2.4 MB 資料靜靜消失而且不報錯，
+       <strong>建議先用腳本版成功一次再回來走這條</strong>。附改前改後對照與三條檢查清單。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="whats-original/index.html">怎麼看出哪些檔還沒被動過</a></span>
+    <span class="d">你拿到的遊戲很可能早就裝過東西。用檔案的修改時間就能分出哪些還是 2005 年出廠那一份，不用任何工具、不動任何檔案。附全程唯讀的檢查腳本。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="backup/index.html">備份與還原 SOP</a></span>
+    <span class="d">改任何東西之前的標準流程：該備份的只有五個檔、合計 3.9 MB，不必複製整個遊戲。附一支全程唯讀的檢查腳本，會告訴你備份在不在、哪一份比較舊。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <h2>Level 2 · 認識檔案格式（速查區）</h2>
+  <div class="lesson">
+    <span class="t"><a href="read-file-headers/index.html">五秒看穿一個檔案</a></span>
+    <span class="d">逆向入門第一課：用檔案開頭判斷格式。<strong>副檔名會騙人</strong>，全程唯讀不改檔。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="../reference/file-map.html">遊戲檔案地圖</a></span>
+    <span class="d">224 個封裝檔裝什麼、想改的東西在哪個檔。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="../reference/index.html">格式速查總覽</a></span>
+    <span class="d">遊戲檔案的三層結構：封裝 → 壓縮 → 內容。所有格式頁的入口。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="../reference/bigf.html">BIGF 封裝格式</a></span>
+    <span class="d">檔頭、目錄、mixed endian 陷阱，以及<strong>絕不能整包重新打包</strong>的原因。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="../reference/qfs.html">QFS / RefPack 壓縮</a></span>
+    <span class="d">四種指令編碼，以及不用寫壓縮器就能合法壓回去的技巧。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="../reference/fel.html">FEL 版面語法速查</a></span>
+    <span class="d">遊戲所有選單、HUD、轉場其實是純文字版面腳本 —— 解開就能改。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ v1</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="../reference/ingame-files.html">ingame.big 47 個版面檔對照</a></span>
+    <span class="d">想改哪一塊畫面，先從這張表找到對的檔案。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ v1</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="fel-recipes/index.html">介面實例集</a></span>
+    <span class="d">十則現成配方：關打者之眼、球速數字、打者姓名，
+       或<strong>把 EA 自己關掉的東西打開來看</strong>。每則的行數與文字都查過。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="fel-toolkit/index.html">介面萬用工具 fel_toolkit</a></span>
+    <span class="d">一支腳本搞定列出 / 搜尋 / 檢視 / 取出 / 開關。
+       <strong>遊戲裡任何一個介面元素，用名字就能找到並關掉</strong>。附自動備份與複驗。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <h2>Level 3 · 球員資料</h2>
+  <div class="lesson">
+    <span class="t"><a href="../reference/player-data.html">認識球員資料檔：哪些欄位能安全改</a></span>
+    <span class="d">誠實版：它其實是 CSV、每格帶索引前綴，而且大部分「能力值」不是 0-99。<strong>改能力前必讀</strong>。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="edit-stance/index.html">換打擊姿勢與投球姿勢</a></span>
+    <span class="d">只改一個數字就換一組動作。而且那個數字剛好對到動作庫的組別編號 ——
+       <strong>打擊 66 組對 66 組、投球 59 組對 59 組,一格不差</strong>。附可還原的腳本。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="make-a-player/index.html">把一位球員改成你想要的球員</a></span>
+    <span class="d"><strong>不用打任何指令 —— 雙擊就好。</strong>
+       遊戲不能「加人」,但可以「接收」:挑一位你不在乎的球員,
+       把名字、背號、跑壘速度改成你要的那個人。2009 年台灣社群就是這樣做的。約 10 分鐘。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="pack-a-mod/index.html">把你改好的東西打包成一包</a></span>
+    <span class="d">做完一整包想給朋友裝?本站每一支工具留下的<strong>備份就是「你改過什麼」的紀錄</strong>,
+       照著它打包成 <code>.mvpmod</code>。對方先預覽再裝、隨時退得回去。
+       路徑跳脫五種寫法本站實際打過自己,全部擋下。約 10 分鐘。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="stats-to-ratings/index.html">把真實成績換算成遊戲裡的能力值</a></span>
+    <span class="d">要做新年度名單最難的一題。<strong>這款遊戲出貨時同時附了真實成績與 EA 給的能力值</strong>，
+       剛安裝好的原版 2,921 人完全對得上 —— 所以公式不用發明，可以配出來而且誤差可以量。
+       配得出來的三條、配不出來的五欄，都寫清楚。約 15 分鐘。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+
+
+  <div class="lesson">
+    <span class="t"><a href="edit-speed/index.html">修改球員跑壘速度</a></span>
+    <span class="d">改能力值最安全的一個欄位，配自動備份與複驗。
+       另附<strong>「這一欄能不能改」的自助體檢工具</strong>。約 10 分鐘。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <h2>🗓 整年更新（統籌）</h2>
+  <p class="small">上面幾節是「怎麼改某一樣東西」。這一堂相反 ——
+     它不教任何新技術，只回答<u>八堂課要照什麼順序上、每一步做完怎麼確認、
+     卡住回哪一堂、全部做完怎麼一次退回去</u>。</p>
+  <div class="lesson">
+    <span class="t"><a href="yearly-update/index.html">一次更新整個年度</a></span>
+    <span class="d">名冊、能力值、臉、大頭照、語音、登入背景、賽程 ——
+       <strong>七樣東西各自有課，這一堂只負責把它們串起來</strong>。
+       依賴關係是從各支腳本實際讀寫哪個檔推出來的，可以自己驗；
+       附一張「全部退回去」的八行清單，還原順序不重要。
+       <u>沒有自己的腳本</u>，所有指令都逐字取自對應的那一堂。約 8 分鐘看完，八堂全部做完約 113 分鐘。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <h2>🎨 Level 4 · 外觀與畫面</h2>
+  <p class="small">這一節 2026-08-29 之前有 <strong>11 堂教學</strong>，是全站三分之一 ——
+     裡面混了聲音、裝模組、工具清單，那不是分類，是垃圾桶。
+     已經拆成三節，判準是<u>你動的是哪一種東西</u>，不是難度。
+     留在這裡的 7 堂，共同點是「改完你看得到」。</p>
+  <div class="lesson">
+    <span class="t"><a href="swap-face/index.html">幫球員換一張臉</a></span>
+    <span class="d">讓某位球員改用另一張 3D 臉皮。<strong>只改一個 800 KB 的文字檔，不必碰 535.9 MB 的大檔</strong>。
+       附腳本，一行指令可還原。約 10 分鐘。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="change-camera/index.html">把打擊視角調成你喜歡的角度</a></span>
+    <span class="d">遊戲裡的 <strong>39 個攝影機</strong>，位置與視野角度全部寫在一個純文字檔裡。
+       這一課改其中一個 —— <u>全站少數改完之後畫面會明顯不一樣的課</u>。
+       附預覽、自動備份、一行還原。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="uniforms/index.html">球衣模組：安裝與製作入門</a></span>
+    <span class="d">球衣檔怎麼命名、放在哪、一套包含哪 28 張貼圖，以及「1X 與 2X」到底差在哪 —— 答案跟大家以為的不一樣。<strong>本課只讀不寫</strong>，不提供任何檔案下載。最後一節列出把球衣寫回封裝檔的規則，但那是<u>規格，不是逐步流程</u> —— 這一課不會帶你動手裝。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+    <div class="lesson">
+      <span class="t"><a href="install-uniform/index.html">把一套球衣裝進遊戲</a></span>
+      <span class="d">社群球衣包解開之後是一堆 <code>.fsh</code>，要<u>分裝到三個不同的封裝檔</u>。
+         腳本會自動分類、先清點給你看哪些裝得進去哪些不行、確認之後才寫入，寫完逐位元組複驗。
+         也講清楚為什麼有些檔案裝不進去 —— 拿原版對照過，
+         那不是包壞了，是 EA 出貨時那兩個位置本來就只給一套球衣。
+         <strong>會改你的檔案</strong>，<u>這一次真的會動到</u>的那幾個封裝檔會先備份，畫面上會印出備份了哪幾個。</span>
+      <span class="badge rw">會改你的檔案</span>
+      <span class="badge ok">✓ 可用</span>
+    </div>
+  <div class="lesson">
+    <span class="t"><a href="new-face/index.html">做一張新的球員臉皮</a></span>
+    <span class="d">上面那課是換成已存在的臉；這課是自己做一張。臉皮貼圖是<u>攤平的 3D 展開圖</u>，不是正面照。這一課也講清楚一件事：<strong>不能「新增」一張臉，只能換掉沒人在用的編號</strong>，因為封裝檔的目錄在最前面，多加一項會逼得整包重新打包。腳本會當場算出哪些編號是空位。<strong>會改你的檔案</strong>，寫入前自動備份。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="swap-portrait/index.html">換球員大頭照（名單畫面那張照片）</a></span>
+    <span class="d">把你自己的圖<strong>壓成遊戲看得懂的格式</strong>再放回封裝檔，這是本站第一課真的<u>產生新的遊戲圖檔</u>，而不是換掉某個編號而已。附零相依腳本（連 PNG 讀寫都自己做，不必安裝任何套件），可查編號、匯出、換入、一行還原。<strong>會改你的檔案</strong>，但寫入前自動備份，寫入後自動複驗。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="swap-splash/index.html">換掉開機畫面</a></span>
+    <span class="d">開機大圖、標題頁、讀取畫面三張都量得出來、匯得出來，
+       <u>目前標題頁與讀取畫面換得回去，開機大圖那一張還匯不回去</u>，附本站自己寫的匯入工具。
+       更值得看的是<strong>怎麼查出來的</strong>：一份 2007 年的社群說明書說開機圖是根目錄的
+       <code>00000000.256</code>，<u>而本站這台機器上根本沒有那個檔</u>。
+       從執行檔的符號追到版面檔，再追到圖集裡同名的那張圖 ——
+       <strong>名字對上名字，不是數量對上數量</strong>。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <h2>🔊 聲音</h2>
+  <p class="small">改完你<u>聽</u>得到 —— 跟上面那節分開的理由就這一條。</p>
+  <div class="lesson">
+    <span class="t"><a href="swap-chant/index.html">把應援曲指給別的球員</a></span>
+    <span class="d">EA 錄了 57 組球員專屬應援曲，其中 56 位球員對得到（有一組在名冊裡找不到人）。把其中一首指給你想要的球員，
+       <u>只改一行純文字</u>，完全不動那個 54 MB 的音檔。
+       也講清楚範圍：這一課<strong>只做重新指派，不換音檔內容</strong>；
+       要換內容得把聲音編成 EA 自家的音訊格式，<u>那個編碼器 2026-08-29 做出來了</u>，
+       走下面〈<a href="make-voice/index.html">換掉遊戲的聲音</a>〉。
+       <strong>會改你的檔案</strong>，但只有一行,而且自動備份。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="make-voice/index.html">換掉遊戲的聲音</a></span>
+    <span class="d"><strong>本站卡最久的一格解開了。</strong>EA 的聲音格式現在解得開也寫得回去，
+       純 Python 零相依，<u>不需要任何二十年前流出的工具</u>。
+       解碼對照第三方工具 <strong>21,678,328 個取樣 0 個不同</strong>；編碼來回 <strong>98.1 dB</strong>。
+       頁上也寫了為什麼以前一千種組合全失敗 ——<strong>缺的不是聰明，是一份標準答案</strong>。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <h2>📦 模組：裝別人的、找現成的工具</h2>
+  <p class="small">上面幾節都是<strong>你自己動手改</strong>。這兩課相反：
+     一課是把別人做好的模組裝進去，一課是社群十幾年來寫過哪些工具。</p>
+  <div class="lesson">
+    <span class="t"><a href="auto-install/index.html">一整包模組自動歸位</a></span>
+    <span class="d">下載一包模組、解開一堆檔案、<u>不知道哪個要放哪</u> —— 這一課解決那個。
+       <strong>在你自己的遊戲上現場建索引</strong>（本站量到 96.6% 的檔名只有唯一歸屬），
+       不需要模組作者附設定檔。<strong>有多個去處時不猜，列出來讓你決定</strong>。
+       同一份邏輯也接進了網頁啟動器的「MOD 管理」分頁。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="community-tools/index.html">社群工具怎麼分工</a></span>
+    <span class="d">二十年來社群做過哪些工具、各自負責什麼，以及<strong>哪些工作本站現在有自己的做法</strong>，不必再去找工具。也講一件本來沒想到的事：最底層那幾支工具原本都<u>不是為棒球寫的</u> ——它們來自賽車、籃球、足球、冰球社群。<strong>本站不提供任何工具下載，也不放下載連結</strong>。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">📋 不知道從哪一課開始？</p>
+    <p>這一頁是<strong>照難度排</strong>的完整清單。如果你有明確的目的，
+       <a href="../plan.html">課表</a>那一頁把這些課排成六張<u>照順序上的表</u>，
+       每一堂都寫了為什麼排在那個位置；
+       只想快速找一件事怎麼做的話，去<a href="../do.html">我想做什麼</a>。</p>
+  </div>
+
+  <h2>🔧 Level 5 · 進階：給想自己寫工具的人</h2>
+  <p class="small">這一節本來有 <strong>6 堂教學</strong>，其中 3 堂是「遊戲跑不動」的急救題，
+     跟「寫工具」沒關係，已經搬到上面的<a href="#trouble">🚑 問題排除</a>。
+     剩下 3 堂教學才是真的在拆格式 —— 下面另外幾張卡片是速查條目，不是課。</p>
+
+  <div class="lesson">
+    <span class="t"><a href="unpack-big/index.html">封裝檔可以拆成散裝嗎</a></span>
+    <span class="d">官方中文版<u>沒有</u> <code>datafile.big</code> 與 <code>anims.big</code>，而是拆成散裝檔出貨。那本站的教學能不能整個簡化?<strong>三次實驗的答案是：可以，但只對那兩個封裝檔有效</strong>(<code>datafile</code> 跑得動、<code>fonts</code> 當機、<code>logos</code> 進不去)。真正的規則在執行檔裡：只有 <code>.ord</code>、<code>.orl</code>、<code>.txt</code> 三種副檔名有「資料夾+單檔」的路徑。這一頁記的是<u>一個誘人的想法怎麼被收斂成一條精確的規則</u>，以及推翻它的那次失敗為什麼比成功更有用。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <div class="lesson">
+    <span class="t"><a href="../tc2026/index.html">中文版為什麼會跳出，你能做到哪一步</a></span>
+    <span class="d"><strong>中文版一裝上大球場就跳出，真正的原因跟球場大小無關。</strong>
+       很多人是退而求其次玩英文版的 —— 中文版一裝上大球場就會在讀取條跑完的瞬間跳回桌面。
+       原因跟球場大小沒有關係：遊戲寫死一塊 <strong>64 MB</strong> 的記憶體池，
+       而中文字型的字圖集是 Direct3D 8 吃不下的 4 位元格式，每張都要執行時展開，
+       光字型就吃掉 <strong>13.5 MB</strong>（英文只要 0.37 MB）。
+       <strong>兩個地方各改一個位元組就好，中文一個字都不用砍。</strong>
+       <u>不過照原版光碟安裝的那一份做不到這一步</u> —— 那塊記憶體的位置藏在防拷保護的加密區裡；
+       那一課有四份實測，也寫了在這個前提下你還做得到什麼。
+       本頁含台美日三個法域的依據、超詳細步驟，以及<u>我們走錯的十條路</u>。</span>
+    <span class="badge rw">會改你的檔案</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="read-voice/index.html">拆開一個語音檔</a></span>
+    <span class="d">本站原本把「換播報語音」<u>整條路</u>標成做不到。重新去量之後：外殼解開了、<strong>兩個聲道不是交錯而是各自連續</strong>（社群語音包 1,945 段零例外，那批的母體本站已經指認不出來，改用說得出母體的 321 個雙聲道檔、2,382 段重跑，同樣零例外）、一個聲道裡每 15 個位元組一組（掃相位 <strong>97.7%</strong> vs 亂猜 50%）—— 當時只剩最後的還原公式沒解開，試了一千種組合，<u>那一格 2026-08-29 也解開了</u>（見上面〈換掉遊戲的聲音〉）。附唯讀腳本。還量到<strong>155 個台灣球員的兩位播報員其實是同一段錄音</strong>，以及一個差點推翻正確結論的假紅燈。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t">寫自己的修改工具</span>
+    <span class="d">格式規格已在速查區：<a href="../reference/bigf.html">BIGF</a> ·
+        <a href="../reference/qfs.html">QFS</a> · <a href="../reference/fel.html">FEL</a>。
+        每篇教學的腳本都附完整原始碼可當範本。</span>
+    <span class="badge ok">✓ 見速查</span>
+  </div>
+  <div class="lesson">
+    <span class="t">遊戲資源地圖：音訊 / 動畫 / 播報事件</span><span class="d">這一項本站原本規劃成一課，但寫到後來發現速查區的三頁已經完整涵蓋了，再寫一頁只是把同樣的東西講第二遍。所以改成直接指過去：<a href="../reference/file-map.html">檔案地圖</a>（整個 <code>data\</code> 底下有什麼、各在哪）、<a href="../reference/audio.html">播報與音訊系統</a>（音樂、音效、逐球播報的三層結構與事件表）、<a href="../reference/anims.html">動畫 anims.big</a>（投球揮棒守備跑壘的動作,一半是純文字）。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 見速查</span>
+  </div>
+
+  <div class="card blue" style="margin-top:36px">
+    <p class="card-h">想先看哪一課?</p>
+    <p><strong>想學的東西這裡還沒有？</strong>本站會依照大家的需求排優先順序 —— 新課上線會在
+       <a href="https://tonimvp.blogspot.com" rel="noopener">toni的MVP</a> 公告，
+       <strong>那裡的留言區不用開帳號就能留</strong>；想要來回追蹤的話也可以到
+       <a href="../report.html">GitHub Issues</a> 許願。</p>
+    <p class="small">⚠️ 貼腳本輸出之前，把路徑裡的使用者名稱改成 <code>XXX</code>
+       （<code>C:\Users\<u>〔你的名字〕</u>\…</code>）——
+       本站需要的是檔名與數字，<u>不需要知道你叫什麼</u>。</p>
+  </div>
+
+  <footer>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯。</p>
+    <p><a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/exe-tuning/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>執行檔上的六個旋鈕 — toni的MVP模組補習班</title>
+<meta name="description" content="一顆調好的 MVP Baseball 2005 執行檔改了什麼:記憶體池、大位址、解析度、IAT 目錄、節區權限、檔頭檢查碼六個旋鈕。參考那顆用到其中四個,差的 10 個位元組一個一個講,附兩支腳本,每個位移都在兩顆真的執行檔上量過。不含任何保護措施相關內容。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../../index.html">首頁</a>
+  <a class="item" href="../../start.html">新手基本功</a>
+  <a class="item" href="../../do.html">我想做什麼</a>
+  <a class="item" href="../../plan.html">課表</a>
+  <a class="item" href="../../tutorials/index.html">教學</a>
+  <a class="item" href="../../7min/index.html">七分鐘</a>
+  <a class="item" href="../../reference/index.html">速查</a>
+  <a class="item" href="../../coach/index.html">棒球教練</a>
+  <a class="item" href="../../story/index.html">故事</a>
+  <a class="item" href="../../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+
+  <p class="eyebrow"><a href="../index.html">教學</a> › 執行檔上的六個旋鈕</p>
+  <h1>執行檔上的六個旋鈕</h1>
+
+  <p class="lede">一顆調好的 <code>mvp2005.exe</code>，跟原本那顆只差
+     <strong>10 個位元組</strong>。這一課把那 10 個位元組
+     <u>一個一個</u>講完：改了什麼、為什麼要改、怎麼自己改、以及好處是什麼。
+     每一個數字都是在兩顆真的檔案上量出來的。</p>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法看<a href="../backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <div class="quickfix">
+    <p class="card-h">⚡ 速解</p>
+    <ol>
+      <li>下載 <a href="mvp_exe_pe.py" download>mvp_exe_pe.py</a>（零相依，
+          <a href="#src">完整原始碼在這一頁下面</a>）放到桌面。
+      <div class="ifnot"><b>按了下載之後，檔案跑到哪裡去了？</b>
+          <p><strong>瀏覽器多半不會問你要存哪裡</strong>，它會直接放進「下載」資料夾。
+             所以按完之後還有一步：</p>
+          <p><span class="sk">1</span>打開檔案總管（Mac 用 Finder），左邊點「<u>下載</u>」<br>
+             <span class="sk">2</span>找到那個 <code>.py</code> 檔<br>
+             <span class="sk">3</span><strong>把它拖到桌面</strong></p>
+          <p class="small">沒做這一步的話，後面 <code>cd</code> 到桌面再執行，
+             畫面會出現 <code>can't open file</code> —— 那不是你打錯，是檔案還在「下載」裡。</p>
+        </div>
+        <div class="ifnot"><b>如果檔名多了 .txt</b>
+        <p>照<a href="../../start.html">第 0 課操作三</a>把副檔名顯示出來，右鍵重新命名刪掉 <code>.txt</code>。</p>
+      </div></li>
+      <li>先看你那顆現在什麼狀態（<strong>唯讀，不會動到檔案</strong>）：
+      <p class="small">Windows:</p>
+<pre><code>python mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe"</code></pre>
+      <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe"</code></pre></li>
+      <li>三個檔頭層面的旋鈕，一次做完（先預覽）：
+      <p class="small">Windows:</p>
+<pre><code>python mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe" --iat --sections</code></pre>
+      <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe" --iat --sections</code></pre></li>
+      <li>確定了就加 <code>--apply</code>：
+      <p class="small">Windows:</p>
+<pre><code>python mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe" --iat --sections --apply</code></pre>
+      <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe" --iat --sections --apply</code></pre></li>
+      <li>另外三個旋鈕在<a href="../run-in-2026/index.html">讓它在 2026 年跑起來</a>那一課的工具：
+      <p class="small">Windows:</p>
+<pre><code>python mvp_modernize.py "〔你的遊戲資料夾〕/mvp2005.exe" --4gb --pool 128 --resolution 1920x1080 --apply</code></pre>
+      <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_modernize.py "〔你的遊戲資料夾〕/mvp2005.exe" --4gb --pool 128 --resolution 1920x1080 --apply</code></pre>
+          <p class="small">⚠️ <code>--pool</code> 在<u>照原版光碟安裝</u>的執行檔上做不到 ——
+             那種檔的程式碼是加密的，找不到記憶體池的樣態。本站手上四份照正常流程安裝的遊戲
+             （英文版 <code>6,972,001</code>、官方中文版 <code>7,525,175</code>、
+             中文版＋三個官方更新檔 <code>7,533,368</code>、社群安裝包 <code>7,525,175</code> bytes）
+             全部印「找不到」。
+             <strong>而且腳本會就這樣停下來，<code>--4gb</code> 與 <code>--resolution</code> 也不會被套用</strong>
+             （本站實測，檔案一個位元組都沒動）。遇到就把 <code>--pool 128</code> 拿掉再跑一次。
+             理由見<a href="../../tc2026/index.html">中文版那一課</a>的
+             「為什麼『調記憶體池』在你的遊戲上做不到」那一節
+             （<u>那一段在同意閘後面，要先勾完那三項才會出現</u>）。</p></li>
+      <li>後悔了就還原。<strong>兩支都套用過的話，順序是「後改的先還原」</strong>：
+          先還原 <code>mvp_exe_pe.py</code>，再還原 <code>mvp_modernize.py</code>。
+      <p class="small">Windows:</p>
+<pre><code>python mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe" --restore
+python mvp_modernize.py "〔你的遊戲資料夾〕/mvp2005.exe" --restore</code></pre>
+      <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe" --restore
+python3 mvp_modernize.py "〔你的遊戲資料夾〕/mvp2005.exe" --restore</code></pre>
+          <p class="small">⚠️ <strong>反過來做會卡住</strong>：先跑 <code>mvp_modernize.py --restore</code> 的話，
+             它會發現「現在這顆」多了 <code>mvp_exe_pe.py</code> 動過的位元組，
+             印「這份備份跟現在這顆執行檔對不上,不敢拿它覆蓋」然後停下來，
+             並建議你自己在檔案總管／Finder 裡複製備份 ——
+             照著做就會停在中間那個狀態。<u>照上面的順序跑就不會遇到。</u>
+             （只套用過其中一支的話，就只跑那一行。）</p>
+          <p class="small">🛟 <strong>改到一半按 Ctrl-C 也沒關係。</strong>
+             它會告訴你「換檔那一步」做了沒有：沒做過就是<u>一個位元組都沒有動到</u>，
+             做過了它會把該跑的 <code>--restore</code> 指令印出來給你。
+             這兩種情形都不是成功結束（結束碼 130），不會被誤當成做完了。</p></li>
+    </ol>
+  </div>
+
+  <h2 id="scope">先講這一課的界線</h2>
+  <div class="card clay">
+    <p class="card-h">⛔ 這一課不碰保護措施，一個字都不會講</p>
+    <p>MVP Baseball 2005 出貨時帶著防拷保護。<u>你那一份能不能改、要不要處理保護，
+       那是你跟你自己買的那張光碟之間的事</u>，本站
+       <a href="../../legal.html#no-drm">不提供、不教學、不連結</a>任何相關資訊。</p>
+    <p><strong>這一課講的是「保護以外的那些修改」。</strong>
+       本站拿來對照的那兩顆檔案，<u>都是 5,443,584 bytes、進入點都在 0x411F00、
+       六個節區的位址完全一樣</u> —— 也就是說，
+       <strong>它們之間的差異沒有一個跟保護有關。</strong></p>
+    <p class="small">怎麼判斷你那顆能不能做這一課，見下面
+       <a href="#can-i">「你那顆能不能改」</a>。</p>
+  </div>
+
+  <h2 id="six">六個旋鈕，一張表</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>旋鈕</th><th>改哪裡</th><th>做什麼</th><th>好處</th><th>誰負責</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="旋鈕"><strong>記憶體池</strong></td>
+          <td data-label="改哪裡"><code>0x3736F4</code> 與 <code>0x3CDD0C</code><br>各 1 位元組</td>
+          <td data-label="做什麼"><code>push 0x04000000</code> → <code>push 0x08000000</code><br>64 MiB → 128 MiB</td>
+          <td data-label="好處"><strong>中文版配大球場不再跳出。</strong>這是本站量到最有感的一項</td>
+          <td data-label="誰負責"><code>mvp_modernize.py --pool</code></td></tr>
+      <tr class="hi"><td data-label="旋鈕"><strong>大位址旗標</strong></td>
+          <td data-label="改哪裡"><code>0x00013E</code><br>1 位元組</td>
+          <td data-label="做什麼">Characteristics <code>0x010F</code> → <code>0x012F</code>（多了 <code>0x0020</code>）</td>
+          <td data-label="好處">32 位元程式的位址空間從 2 GB 變 4 GB。<u>單獨用沒感覺</u>，是給記憶體池撐空間的</td>
+          <td data-label="誰負責"><code>mvp_modernize.py --4gb</code></td></tr>
+      <tr><td data-label="旋鈕"><strong>解析度</strong></td>
+          <td data-label="改哪裡"><code>0x4C3FD8</code> 起<br>8 位元組</td>
+          <td data-label="做什麼"><code>640×480</code> → <code>1920×1080</code> / <code>2048×1080</code> / <code>3840×2160</code></td>
+          <td data-label="好處">畫面不再是 2005 年的 640×480</td>
+          <td data-label="誰負責"><code>mvp_modernize.py --resolution</code></td></tr>
+      <tr><td data-label="旋鈕"><strong>IAT 資料目錄</strong></td>
+          <td data-label="改哪裡"><code>0x000200</code><br>8 位元組</td>
+          <td data-label="做什麼"><code>RVA=0 size=0</code> → <code>RVA=0x473000 size=1264</code></td>
+          <td data-label="好處">檔頭合乎規格。填完匯入位址之後那 1,264 位元組會回到唯讀</td>
+          <td data-label="誰負責"><code>mvp_exe_pe.py --iat</code></td></tr>
+      <tr><td data-label="旋鈕"><strong>節區權限</strong></td>
+          <td data-label="改哪裡"><code>0x247</code>／<code>0x26F</code>／<code>0x2E7</code><br>各 1 位元組</td>
+          <td data-label="做什麼"><code>.text</code>、<code>.rdata</code>、<code>.rsrc</code> 拿掉<u>可寫</u></td>
+          <td data-label="好處">程式碼段不再是「可寫又可執行」。有東西想寫進程式碼會當場出錯，而不是默默改掉</td>
+          <td data-label="誰負責"><code>mvp_exe_pe.py --sections</code></td></tr>
+      <tr><td data-label="旋鈕"><strong>檔頭檢查碼</strong></td>
+          <td data-label="改哪裡"><code>0x000180</code><br>4 位元組</td>
+          <td data-label="做什麼">壞值 → 重算出來的正確值</td>
+          <td data-label="好處">兩支腳本都會<u>自動</u>處理，不用你操心。
+              兩支的規則不一樣：<code>mvp_exe_pe.py</code> 只要動過檔頭就一定重算；
+              <code>mvp_modernize.py</code> 是「原本是 0 就維持 0，原本有值才重算」，
+              不會替你在空欄位裡填一個新的進去</td>
+          <td data-label="誰負責">兩支都會自動處理</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="pool">① 記憶體池：唯一真的會讓遊戲不當的那一個</h2>
+  <p>兩個地方，各一個位元組。反組譯出來是同一條指令：</p>
+<pre><code>68 00 00 00 04     push 0x04000000     ← 67,108,864 = 64 MiB
+68 00 00 00 08     push 0x08000000     ← 134,217,728 = 128 MiB</code></pre>
+  <p><strong>為什麼要改：</strong>那塊池子是 2005 年照當時主機的額度切的。
+     中文字型在執行時要展開成貼圖，光是這一項就吃掉 <strong>13.5 MB</strong>，
+     再配一座大球場就滿了 —— <u>二十年來大家以為「中文版配大球場會跳出」是球場太大，
+     其實跟球場多大沒有關係</u>。完整的推導過程在
+     <a href="../../tc2026/index.html">中文版為什麼會跳出</a>那一課。</p>
+  <p><strong>好處：</strong>這是六項裡<u>唯一一項本站量到「有沒有做，結果不一樣」</u>的。
+     對照實驗做過：64 MB 兩次都當、128 MB 與 512 MB 都能玩。</p>
+
+  <h2 id="4gb">② 大位址旗標：單獨做沒有感覺</h2>
+  <p>一個位元組，把 PE 檔頭的 Characteristics 從 <code>0x010F</code> 改成
+     <code>0x012F</code>，多出來的 <code>0x0020</code> 就是
+     <code>IMAGE_FILE_LARGE_ADDRESS_AWARE</code>。
+     32 位元程式預設只能用 2 GB 位址空間，掛上這個旗標之後在 64 位元 Windows 上能用到 4 GB。</p>
+  <div class="card amber">
+    <p class="card-h">⚠️ 別把它當萬靈丹</p>
+    <p>網路上很多地方把「4GB Patch」講成解決當機的方法。
+       <strong>本站量到的是：單獨掛這個旗標，中文版配大球場照樣跳出。</strong>
+       因為卡住的是<u>遊戲自己切的那塊 64 MB 池子</u>，不是位址空間。
+       這兩層是不同的天花板，掛旗標只動外面那一層。</p>
+    <p>它真正的用途是<strong>給池子撐空間</strong>：池子放大到 128 MB 甚至更多之後，
+       整個行程的位址需求跟著上去，這時候 2 GB 那道牆才會變成問題。
+       <u>兩個一起做才有意義。</u></p>
+  </div>
+
+  <h2 id="res">③ 解析度：八個位元組，兩個數字</h2>
+  <p><code>0x4C3FD8</code> 起連續八個位元組，是兩個 32 位元整數，
+     小端序，前面是寬、後面是高：</p>
+  <p class="small">⚠️ <strong>這張解析度表是成對的。</strong>每一種尺寸都存兩筆，
+     一筆 16 位元色深、一筆 32 位元色深，兩筆相隔 16 個位元組
+     （<code>0x4C3FD8</code> 是 640×480 的 16 位元那一筆，
+     <code>0x4C3FE8</code> 是同一個尺寸的 32 位元那一筆）。
+     腳本會<u>兩筆一起換</u>；自己動手改十六進位的話只改前面那一筆，
+     32 位元色深那一筆還會停在 640×480。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>要什麼</th><th>寬（4 位元組）</th><th>高（4 位元組）</th><th>原始位元組</th></tr></thead>
+    <tbody>
+      <tr><td data-label="要什麼">原廠</td><td data-label="寬（4 位元組）">640 = <code>0x280</code></td>
+          <td data-label="高（4 位元組）">480 = <code>0x1E0</code></td>
+          <td data-label="原始位元組" class="mono">80 02 00 00 E0 01 00 00</td></tr>
+      <tr><td data-label="要什麼">1080p</td><td data-label="寬（4 位元組）">1920 = <code>0x780</code></td>
+          <td data-label="高（4 位元組）">1080 = <code>0x438</code></td>
+          <td data-label="原始位元組" class="mono">80 07 00 00 38 04 00 00</td></tr>
+      <tr><td data-label="要什麼">2K</td><td data-label="寬（4 位元組）">2048 = <code>0x800</code></td>
+          <td data-label="高（4 位元組）">1080 = <code>0x438</code></td>
+          <td data-label="原始位元組" class="mono">00 08 00 00 38 04 00 00</td></tr>
+      <tr class="hi"><td data-label="要什麼">4K</td><td data-label="寬（4 位元組）">3840 = <code>0xF00</code></td>
+          <td data-label="高（4 位元組）">2160 = <code>0x870</code></td>
+          <td data-label="原始位元組" class="mono">00 0F 00 00 70 08 00 00</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">本站測試機上那顆 <code>mvp2005.exe</code> 是 4K 那一版。
+     ⚠️ <strong>本站沒有實機確認</strong>介面元素在 4K 下會不會跑位 ——
+     版面檔是照 640×480 座標系寫的（見<a href="../../reference/hud-map.html">介面座標圖</a>），
+     放大之後怎麼縮放，本站沒有量過。</p>
+
+  <h2 id="pe">④⑤ 兩個檔頭層面的修正（這兩項是一組的）</h2>
+  <div class="card clay">
+    <p class="card-h">⚠️ 先講最重要的一句：這兩項<u>不能只做一個</u></p>
+    <p>載入器啟動時要把每個函式的真實位址填進 <strong>匯入位址表</strong>，
+       而那張表就住在 <code>.rdata</code> 裡。
+       <code>.rdata</code> 一旦變成唯讀，載入器就必須先把那幾頁<u>暫時改回可寫</u> ——
+       <strong>而它是照 IAT 資料目錄給的範圍去改的。</strong></p>
+    <p>目錄是空的，它就沒有任何範圍可以解鎖，位址填不進去，
+       <u>遊戲直接開不起來</u>。</p>
+    <p>所以：<strong>IAT 目錄是空的時候，<code>.rdata</code> 只能留著可寫。</strong>
+       社群那顆執行檔二十年來就是這樣繞過去的。
+       要收緊權限，必須同一次把目錄補回去。
+       <u>腳本會擋你</u> —— 只加 <code>--sections</code> 而目錄是空的，它會停下來不寫。</p>
+  </div>
+
+  <p><strong>④ IAT 資料目錄</strong>：PE 規格的第 13 個資料目錄要寫出
+     「匯入位址表在哪、多大」。本站量到的那顆是空的（<code>RVA=0 size=0</code>）。</p>
+  <p>腳本<strong>不是憑空造一個範圍</strong> ——
+     它掃過每一筆匯入描述子的 <code>FirstThunk</code>，沿著指標串走到 0，
+     算出 <code>RVA=0x473000 size=1264</code>，
+     <u>跟那顆調好的執行檔裡寫的完全相同</u>。
+     這樣同一支腳本才能用在別人那顆結構不同的檔案上。</p>
+
+  <p><strong>⑤ 節區權限</strong>：<code>.text</code>（程式碼）、
+     <code>.rdata</code>（唯讀資料）、<code>.rsrc</code>（資源）
+     三個節區都帶著<u>可寫</u>。程式碼段又可寫又可執行是最寬鬆的組合，
+     正常的編譯輸出不會這樣。
+     收緊之後 <code>.text</code> 變成讀+執行，另外兩個變成唯讀。
+     <strong><code>.data</code> 本來就該可寫，一律不碰。</strong></p>
+
+  <div class="card amber">
+    <p class="card-h">⚠️ 好處講誠實一點</p>
+    <p>④⑤ 這兩項是<strong>把檔案修正確</strong>，不是效能調整。
+       <u>本站沒有量到它們讓遊戲變快或變穩。</u></p>
+    <p>能講的好處只有這些：檔頭合乎規格，分析工具與防毒軟體不會因為
+       「程式碼段可寫」而多看兩眼；程式碼段唯讀之後，
+       如果執行時有東西想寫進程式碼，會當場出錯而不是默默改掉。</p>
+    <p><strong>誰跟你說改這兩項會讓遊戲變順，請他拿量測出來。</strong>
+       同一件事在<a href="../../tc2026/index.html">中文版那一課</a>也記著
+       （那一課的重點整理在同意閘後面，<u>要先勾完那三項才會出現</u>）。</p>
+  </div>
+
+  <h2 id="can-i">你那顆能不能改</h2>
+  <p>先跑唯讀那一步，看它印出什麼。<strong>這一步不會動到你的檔案。</strong></p>
+  <p class="small">Windows:</p>
+<pre><code>python mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe"</code></pre>
+  <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe"</code></pre>
+  <p>三種可能：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>看到什麼</th><th>意思</th><th>怎麼辦</th></tr></thead>
+    <tbody>
+      <tr><td data-label="看到什麼">正常印出三節（IAT 目錄／節區權限／檢查碼）</td>
+          <td data-label="意思">檔頭讀得動，這一課的東西都能做</td>
+          <td data-label="怎麼辦">照速解走</td></tr>
+      <tr><td data-label="看到什麼">「這不是 Windows 執行檔」或「找不到 PE 檔頭」</td>
+          <td data-label="意思">路徑指錯了，或那個檔壞了</td>
+          <td data-label="怎麼辦">確認路徑指到 <code>mvp2005.exe</code></td></tr>
+      <tr class="hi"><td data-label="看到什麼">三節都印出來，<u>但每一項都說「已經填好了 / 沒有需要收緊的」</u></td>
+          <td data-label="意思"><strong>你那顆本來就是好的</strong>，或者已經有人做過了</td>
+          <td data-label="怎麼辦">不用做。這一課對你只剩下
+              <a href="../run-in-2026/index.html">另外三個旋鈕</a></td></tr>
+    </tbody>
+  </table></div>
+  <p>另外一個判斷點：<strong>檔案大小</strong>。
+     本站對照的那兩顆都是 <code>5,443,584</code> bytes。
+     如果你那顆<u>明顯不一樣大</u>，它跟本站量的不是同一種來歷。
+     本站量到照原版光碟安裝的是 <code>6,972,001</code>（英文版）、
+     <code>7,525,175</code>（官方中文版）、<code>7,533,368</code>（中文版＋三個官方更新檔）——
+     那幾顆④⑤讀得動，但<u>記憶體池那一項做不到</u>（見上面速解第 5 步的提醒）。
+     比 <code>5,443,584</code> 還小很多的那種，超出本站能說的範圍。</p>
+
+  <h2 id="oops">❌ 出錯處理</h2>
+  <p>下面除了第一列是 Python 自己印的，其餘每一句都是<u>腳本自己會印出來的字</u>，
+     看到哪一句就對哪一列。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th style="width:34%">畫面上的訊息</th><th>原因</th><th>你要做的</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="畫面上的訊息" class="mono">can't open file '…\mvp_exe_pe.py'</td>
+          <td data-label="原因"><strong>檔案還在「下載」資料夾，不在桌面。</strong>
+              <u>這是本站最常見的第一個卡點。</u></td>
+          <td data-label="你要做的">開檔案總管左邊點「下載」，把那個 <code>.py</code> 拖到桌面，再跑一次</td></tr>
+      <tr><td data-label="畫面上的訊息" class="mono">這顆的 IAT 資料目錄是空的,現在把節區改成唯讀,遊戲會開不起來。</td>
+          <td data-label="原因">你只加了 <code>--sections</code> 沒加 <code>--iat</code>。
+              <u>這兩項是一組的</u>，目錄空著又把節區設唯讀，載入器沒有範圍可以解鎖來填匯入位址</td>
+          <td data-label="你要做的">把 <code>--iat</code> 一起加上去。
+              <strong>這一步是擋下來，不是寫壞了</strong> —— 檔案一個位元組都沒動</td></tr>
+      <tr class="hi"><td data-label="畫面上的訊息" class="mono">…是一個符號連結,指向…</td>
+          <td data-label="原因">執行檔或備份那個位置躺著一個指向資料夾外面的連結。
+              跟過去就會寫到別的檔案上</td>
+          <td data-label="你要做的">把那個連結移走，或直接對真正的檔案操作</td></tr>
+      <tr><td data-label="畫面上的訊息" class="mono">這份備份是壞的,不敢拿它覆蓋…</td>
+          <td data-label="原因">備份是 0 位元組或只剩半截（多半是上次備份途中被中斷）。
+              <u>拿它還原會把你的正本吃掉</u>，所以擋下來</td>
+          <td data-label="你要做的">改用你自己另外留的那一份備份
+              （<a href="../backup/index.html">備份與還原 SOP</a>）</td></tr>
+      <tr><td data-label="畫面上的訊息" class="mono">找不到備份:…</td>
+          <td data-label="原因">還沒跑過 <code>--apply</code>，或 <code>.exepebak</code> 被搬走了</td>
+          <td data-label="你要做的">確認遊戲資料夾裡有沒有那個 <code>.exepebak</code></td></tr>
+      <tr class="hi"><td data-label="畫面上的訊息" class="mono">❌ 複驗失敗:寫回去的內容跟預期不同。</td>
+          <td data-label="原因">寫進去的東西跟計畫對不上</td>
+          <td data-label="你要做的"><strong>它已經自動用剛剛驗過的備份還原回去了</strong>，
+              畫面上會說結果。自動還原沒成功的話，它會把
+              <code>--restore</code> 那一行印出來給你照著跑</td></tr>
+      <tr><td data-label="畫面上的訊息" class="mono">你按了 Ctrl-C。換檔那一步還沒發生,你的檔案一個位元組都沒有動到。</td>
+          <td data-label="原因">你中途中斷了，而且是在換檔之前</td>
+          <td data-label="你要做的">不用做任何事，<u>檔案一個位元組都沒有動到</u>。
+              另一種寫法是「但檔案已經換過去了」，那就照它印的
+              <code>--restore</code> 還原</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">💡 <strong>要寫成批次檔的話，看結束碼就夠了</strong>：
+     <code>0</code> = 做完了、<code>1</code> = 有守門攔下來或複驗失敗、
+     <code>2</code> = 參數或路徑不對、<code>130</code> = 你按了 Ctrl-C。
+     <u>被攔下來或被中斷都不會回 <code>0</code></u>。</p>
+
+  <h2 id="verify">驗證：10 個位元組，一個一個對過</h2>
+  <p>這一課的每個數字都是從<strong>兩顆真的檔案</strong>量出來的：
+     一顆是社群 2023 年那包裡的 <code>mvp2005.exe</code>，
+     一顆是照這一課調好的那顆。<u>兩顆都是 5,443,584 bytes，長度完全沒變。</u></p>
+  <p class="small">Windows:</p>
+<pre><code>python mvp_modernize.py mvp2005.exe --4gb --pool 128 --apply
+python mvp_exe_pe.py   mvp2005.exe --iat --sections --apply</code></pre>
+  <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_modernize.py mvp2005.exe --4gb --pool 128 --apply
+python3 mvp_exe_pe.py   mvp2005.exe --iat --sections --apply</code></pre>
+  <p>跑完之後把成品跟原本那顆逐位元組比對，<u>程式碼與檔頭旗標</u>動到的剛好是這 10 個：</p>
+  <p class="small">⚠️ <strong>你自己照上面兩行跑，會量到 14 個，那是對的。</strong>
+     多出來的 4 個是⑥檔頭檢查碼（<code>0x000180</code>–<code>0x000183</code>）——
+     兩支腳本都會自動重算它，而本站拿來對照的那顆<u>保留了原本的舊值沒有重算</u>，
+     所以那 4 格不在下面這張表裡。本站實測：跑完之後成品對原版差
+     <strong>14</strong> 個位元組，對參考那顆差 <strong>4</strong> 個，全部落在檢查碼那一欄。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>位移</th><th>幾個位元組</th><th>是什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="位移" class="mono">0x3736F4</td><td data-label="幾個位元組" class="num">1</td>
+          <td data-label="是什麼">記憶體池 ① <code>64</code> → <code>128</code> MiB</td></tr>
+      <tr class="hi"><td data-label="位移" class="mono">0x3CDD0C</td><td data-label="幾個位元組" class="num">1</td>
+          <td data-label="是什麼">記憶體池 ② <code>64</code> → <code>128</code> MiB</td></tr>
+      <tr><td data-label="位移" class="mono">0x00013E</td><td data-label="幾個位元組" class="num">1</td>
+          <td data-label="是什麼">大位址旗標</td></tr>
+      <tr><td data-label="位移" class="mono">0x000201</td><td data-label="幾個位元組" class="num">4</td>
+          <td data-label="是什麼">IAT 資料目錄（<code>RVA=0x473000 size=1264</code>）。
+              腳本畫面上會說「8 個位元組」，那是整個欄位的大小 ——
+              新值裡有 4 個位元組本來就是 <code>0x00</code>，所以真正變掉的是 4 個</td></tr>
+      <tr><td data-label="位移" class="mono">0x000247</td><td data-label="幾個位元組" class="num">1</td>
+          <td data-label="是什麼"><code>.text</code> 拿掉可寫</td></tr>
+      <tr><td data-label="位移" class="mono">0x00026F</td><td data-label="幾個位元組" class="num">1</td>
+          <td data-label="是什麼"><code>.rdata</code> 拿掉可寫</td></tr>
+      <tr><td data-label="位移" class="mono">0x0002E7</td><td data-label="幾個位元組" class="num">1</td>
+          <td data-label="是什麼"><code>.rsrc</code> 拿掉可寫</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">解析度不在這張表裡，因為那顆沒有改解析度。
+     要改的話是 <code>mvp_modernize.py --resolution 1920x1080</code>；
+     腳本會把 <code>0x4C3FD8</code>（16 位元色深）與 <code>0x4C3FE8</code>
+     （32 位元色深）<u>兩筆一起換</u>，各寫八個位元組 ——
+     換成 1080p 時真正變掉的是六個。</p>
+
+  <div class="card grass">
+    <p class="card-h">有一個旗標本站刻意不改</p>
+    <p>那顆檔案有第六個<u>沒有名字</u>的節區。本站的腳本原本的規則是
+       「凡是帶程式碼旗標又可寫的都收緊」，那會連它一起關掉寫入。</p>
+    <p>載入器有沒有需要寫進那一段，<u>本站還沒有在 Windows 上實測過這一項</u>。
+       所以規則改成白名單：只認 <code>.text</code>／<code>.rdata</code>／<code>.rsrc</code>
+       這三個標準名字，其他一律不碰。
+       <u>在測不到的地方，不要憑推理去動它。</u></p>
+  </div>
+
+  <h2 id="limits">這一課到哪裡為止（本站沒驗的）</h2>
+  <ul class="cross">
+    <li><strong>④⑤ 兩項一起做完之後在真實 Windows 上有沒有副作用，本站沒驗。</strong>
+        本站是在 Mac 上做二進位分析的，<u>④⑤ 都做完的那顆還沒有拿進 Windows 開過遊戲</u>。
+        （<u>不是完全沒進過 Windows</u>：<a href="../../tc2026/index.html">中文版為什麼會跳出</a>那一課裡，
+        ① 記憶體池的四種大小是 Windows 與 macOS 兩邊都做的實機測試；
+        而「把三個區段改回唯讀」那一版<u>在 Wine 上過了、拿進真的 Windows 連開都開不起來</u> ——
+        那正是上面那張卡在講的坑。）
+        重現實驗證明的是「那 10 個位移跟參考那顆一樣」，
+        <u>不是「跑起來沒問題」</u> —— 但參考那顆是班主任實際在玩的。</li>
+    <li><strong>4K 下介面會不會跑位，沒驗。</strong>版面檔是 640×480 座標系寫的。</li>
+    <li><strong>記憶體池最大能開多少，沒驗。</strong>對照實驗做到 512 MB 可以玩，
+        再上去沒試過。腳本接受 64 到 1024 MB。</li>
+    <li><strong>你那顆執行檔的來歷，本站不知道也不問。</strong>
+        這一課從「你手上已經有一顆能跑的執行檔」開始講。</li>
+  </ul>
+
+  <h2 id="how-it-works">這支腳本在做什麼</h2>
+  <p><code>mvp_exe_pe.py</code> 只做檔頭層面的三件事，<u>不碰任何一個位元組的程式碼</u>。
+     流程是：解析 PE 檔頭 → 算出該填什麼 → 寫到暫存檔再換過去 → 逐位元組複驗。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>哪一段</th><th>做什麼</th><th>為什麼要有它</th></tr></thead>
+    <tbody>
+      <tr><td data-label="哪一段"><code>parse_pe()</code></td>
+          <td data-label="做什麼">從 <code>0x3C</code> 找到 PE 檔頭，算出 Optional Header、
+              資料目錄、節區表、檢查碼各在哪</td>
+          <td data-label="為什麼要有它">後面每一步都要用這些位移。集中在一個地方算，
+              才不會四散在各處各算一次</td></tr>
+      <tr><td data-label="哪一段"><code>rva_to_off()</code></td>
+          <td data-label="做什麼">把虛擬位址換算成檔案位移</td>
+          <td data-label="為什麼要有它">檔頭裡寫的全是<u>虛擬位址</u>，
+              但我們要動的是<u>檔案</u>。兩者的對應由節區表決定，不是固定偏移量</td></tr>
+      <tr class="hi"><td data-label="哪一段"><code>compute_iat_range()</code></td>
+          <td data-label="做什麼">掃過每一筆匯入描述子的 <code>FirstThunk</code>，
+              沿著指標串走到 0，取最小起點與最大結尾</td>
+          <td data-label="為什麼要有它"><strong>IAT 的範圍是算出來的，不是抄來的。</strong>
+              這樣同一支腳本才能用在別人那顆結構不同的檔案上</td></tr>
+      <tr><td data-label="哪一段"><code>sections_to_tighten()</code></td>
+          <td data-label="做什麼">挑出 <code>.text</code>／<code>.rdata</code>／<code>.rsrc</code>
+              裡<u>目前可寫</u>的，回傳關掉可寫之後的新旗標</td>
+          <td data-label="為什麼要有它">白名單而不是規則判斷（理由見<a href="#verify">上面那張綠卡</a>）。
+              <u>另外它會先確認 IAT 目錄不是空的才肯動</u>，
+              不然改完遊戲會開不起來</td></tr>
+      <tr><td data-label="哪一段"><code>_recalc_checksum()</code></td>
+          <td data-label="做什麼">16 位元加總、進位摺回、再加檔案大小</td>
+          <td data-label="為什麼要有它">動過檔頭就一定要重算，
+              不然那個欄位會變錯。<u>參考的那顆原本就是錯的</u></td></tr>
+      <tr><td data-label="哪一段"><code>report()</code></td>
+          <td data-label="做什麼">把三項的現況印出來，<strong>什麼都不寫</strong></td>
+          <td data-label="為什麼要有它">預設就是唯讀。要動手必須明講參數，
+              而且還要再加 <code>--apply</code> 才會真的寫</td></tr>
+      <tr class="hi"><td data-label="哪一段"><code>apply_changes()</code></td>
+          <td data-label="做什麼">列出計畫 → 備份 → 寫暫存檔 → <code>os.replace</code> 換過去
+              → 讀回來逐位元組複驗</td>
+          <td data-label="為什麼要有它">備份與寫入都走「先寫暫存再換」，
+              中途斷電不會留下半截檔案。複驗確認<u>動到的剛好是計畫裡那些</u>。
+              <u>而且寫之前先擋符號連結</u> —— 備份路徑是拿檔名組出來的，
+              那裡若躺著一個指向資料夾外的連結，跟過去就會寫到別的檔案上。
+              <strong>複驗不過會自動用備份還原，並且以非 0 結束碼收場</strong>，
+              不會印一行 ❌ 然後假裝成功</td></tr>
+      <tr><td data-label="哪一段"><code>_restore_from_backup()</code></td>
+          <td data-label="做什麼">還原之前先驗備份：不是 0 位元組、
+              <code>MZ</code>／PE 節區表算得出來的長度不超過檔案、大小不能只剩一小半。
+              <strong>通過之後也不直接覆蓋正本</strong> —— 寫同資料夾的暫存檔 →
+              <code>fsync</code> → 讀回逐位元組比對 → <code>os.replace</code> 換上</td>
+          <td data-label="為什麼要有它">2026-08-30 實測過：<u>半截備份會把玩家的正本吃掉</u>。
+              全站每一支會還原的腳本都帶這一段。
+              <u>2026-09-05 唯讀稽核又抓到一件</u>：舊寫法 <code>shutil.copy2</code>
+              會先把正本截成 0 再複製，實測還原途中出錯，會讓
+              <code>5,443,584</code> bytes 的執行檔剩 <code>680,448</code></td></tr>
+      <tr><td data-label="哪一段"><code>selftest()</code></td>
+          <td data-label="做什麼">自己造一顆最小的 PE 出來，跑完整流程再驗結果。
+              <code>python3 mvp_exe_pe.py --selftest</code>（Windows 打 <code>python</code>），
+              十項全過才會印「總判定: ✅ 全部通過」</td>
+          <td data-label="為什麼要有它">不需要遊戲檔就能證明它是對的。
+              <u>包含十個區塊，每一道守門都下了餌</u> —— 把守門拆掉自我測試就會變紅。
+              除了原本兩個陰性對照（改過的檔再跑一次不該再動它、半截備份不可以蓋掉正本），
+              還有還原原子性、符號連結守衛（含指向不存在目標的斷鏈）、
+              寫入原子性、Ctrl-C 記錄這四類</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">另外三個旋鈕（記憶體池、大位址、解析度）在
+     <a href="../run-in-2026/index.html">讓它在 2026 年跑起來</a>那一課的
+     <code>mvp_modernize.py</code>，那一課也有同樣的一節說明。</p>
+
+  <h2 id="src">完整原始碼</h2>
+  <p><a href="mvp_exe_pe.py" download>mvp_exe_pe.py</a>（零相依，Python 3.7 以上）。
+     下面這一份跟你下載到的
+     <strong>一個字都沒有不同</strong>。可以先看過再決定要不要跑。</p>
+  <details>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1156 行）</summary>
+    <pre style="margin:10px 0 0">#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+mvp_exe_pe.py
+
+把一顆 MVP Baseball 2005 執行檔的 **PE 檔頭修回合乎規格**。
+兩件事,兩件都不碰程式碼本身:
+
+  ① 補回 IAT 資料目錄   ② 收緊節區的寫入權限
+
+  看你那顆現在是什麼狀態(唯讀,不會動到檔案)
+      python3 mvp_exe_pe.py "你的遊戲資料夾/mvp2005.exe"
+
+  預覽要改什麼(還是不會動到檔案)
+      python3 mvp_exe_pe.py "…/mvp2005.exe" --iat --sections
+
+  真的改(會先備份成 .exepebak)
+      python3 mvp_exe_pe.py "…/mvp2005.exe" --iat --sections --apply
+
+  還原
+      python3 mvp_exe_pe.py "…/mvp2005.exe" --restore
+
+  自我測試(不需要遊戲檔)
+      python3 mvp_exe_pe.py --selftest
+
+── 這支在做什麼、為什麼要做 ────────────────────────────────
+
+**① IAT 資料目錄**
+PE 規格的第 13 個資料目錄(索引 12)叫 Import Address Table,
+它要指出「匯入位址表在哪、多大」。有些執行檔這一欄是 `RVA=0, size=0`,
+等於沒填。Windows 載入器不靠它也載得起來(它會走匯入描述子),
+但這個欄位是**載入器把那一段暫時改成可寫、填完位址再改回唯讀**的依據。
+沒填 = 那一段的保護狀態由節區權限決定,而節區權限那時候常常是可寫的(見②)。
+補回去之後,那一段在填完匯入位址之後會回到唯讀。
+
+**② 節區寫入權限**
+有些執行檔的 `.text`(程式碼)、`.rdata`(唯讀資料)、`.rsrc`(資源)
+三個節區都帶著 **可寫** 旗標。程式碼段可寫又可執行是最寬鬆的組合,
+正常的編譯輸出不會這樣。
+收緊之後:`.text` 變成 讀+執行,`.rdata` 與 `.rsrc` 變成 唯讀。
+
+**好處是什麼(誠實版)**
+· 檔頭合乎規格,分析工具與防毒軟體不會因為「程式碼段可寫」而起疑。
+· 程式碼段唯讀之後,執行時如果有東西試圖寫進程式碼,會當場出錯而不是默默改掉。
+· ⚠️ **本站沒有量到它讓遊戲變快或變穩**。這兩項是「把檔案修正確」,
+  不是效能調整。誰跟你說改這個會變順,請他拿量測出來。
+
+**做不到、也不會做的事**
+· 這支**不碰任何保護措施,也不會告訴你怎麼處理保護**。你那顆能不能改,
+  是你自己那份遊戲的事。
+· 這支不改程式碼、不改解析度、不改記憶體池、**不動任何時間戳**。
+  那幾項在「讓它在 2026 年跑起來」那一課的 mvp_modernize.py。
+· 改完檔頭會自己重算檢查碼,詳見下面 `_recalc_checksum()`。
+
+備份副檔名 `.exepebak`,只認自己這一個,不會去動別課留下的 .bak。
+
+無外部相依,Python 3.7 以上即可。
+授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
+"""
+#
+# ─────────────────────────────────────────────────────────
+#  法律與免責(每一支本站腳本都帶著這一段)
+#
+#  · 本工具與 Electronic Arts 無任何官方關聯,也未經其授權或背書。
+#    MVP Baseball 2005 為 Electronic Arts 之作品與商標。
+#  · 本工具為原創程式碼,**不含任何 EA 的程式碼或資產**。
+#  · 本工具不提供、不教學、也不包含任何規避技術保護措施的功能。
+#  · 使用者應僅對自己合法取得的遊戲副本使用本工具,並自行承擔風險。
+#    使用前請自行確認你與遊戲發行商之間的使用者授權合約(EULA)。
+#  · 本工具按「現狀」提供,不附任何明示或默示的擔保。
+#  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
+#  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
+#    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
+#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+# ─────────────────────────────────────────────────────────
+import argparse
+import io
+import os
+import shutil
+import signal
+import struct
+import sys
+import tempfile
+
+BAK = '.exepebak'
+
+# PE 規格裡這兩個旗標的值。收緊權限就是把 WRITE 那一位關掉。
+SCN_CODE = 0x00000020            # IMAGE_SCN_CNT_CODE
+SCN_INITIALIZED = 0x00000040     # IMAGE_SCN_CNT_INITIALIZED_DATA
+SCN_EXECUTE = 0x20000000
+SCN_READ = 0x40000000
+SCN_WRITE = 0x80000000           # ← 要關掉的就是這一位
+
+# 資料目錄的索引。12 = Import Address Table(這支要補的那一個)。
+DIR_IMPORT = 1
+DIR_IAT = 12
+
+
+class DataError(Exception):
+    """檔案不是預期的樣子。一律用這個丟，好跟程式自己的 bug 分開。"""
+
+
+# ─────────────────────────────────────────────────────────
+#  讀 PE 檔頭
+#
+#  這一段只做「把檔頭的位置算出來」，不做任何判斷。
+#  所有位移都照 PE/COFF 規格：
+#    0x3C            → PE 檔頭在哪（e_lfanew）
+#    PE+0            → "PE\0\0"
+#    PE+6            → 節區數量
+#    PE+20           → Optional Header 有多大
+#    PE+24           → Optional Header 開始
+#    Optional+64     → CheckSum
+#    Optional+92     → 資料目錄有幾個
+#    Optional+96     → 資料目錄第一筆
+#    Optional+size   → 節區表開始，每筆 40 bytes
+# ─────────────────────────────────────────────────────────
+def parse_pe(d):
+    """回傳一個 dict，裝著這支會用到的所有位移。不是 PE 就丟 DataError。"""
+    if len(d) &lt; 0x40 or d[:2] != b'MZ':
+        raise DataError('這不是 Windows 執行檔（開頭不是 MZ）。')
+    pe = struct.unpack_from('&lt;I', d, 0x3C)[0]
+    if pe &lt;= 0 or pe + 24 &gt; len(d) or d[pe:pe + 4] != b'PE\0\0':
+        raise DataError('找不到 PE 檔頭，這個檔可能壞了或不是 PE 執行檔。')
+    nsec = struct.unpack_from('&lt;H', d, pe + 6)[0]
+    optsz = struct.unpack_from('&lt;H', d, pe + 20)[0]
+    opt = pe + 24
+    if opt + optsz &gt; len(d):
+        raise DataError('Optional Header 宣告的長度超出檔案結尾。')
+    ndir = struct.unpack_from('&lt;I', d, opt + 92)[0]
+    sect = opt + optsz
+    if sect + nsec * 40 &gt; len(d):
+        raise DataError('節區表超出檔案結尾，宣告 %d 個節區。' % nsec)
+    return {'pe': pe, 'opt': opt, 'nsec': nsec, 'ndir': ndir,
+            'dir': opt + 96, 'sect': sect, 'checksum': opt + 64}
+
+
+def read_dir(d, h, idx):
+    """讀第 idx 個資料目錄，回傳 (RVA, size)。超出範圍就回 (0, 0)。"""
+    if idx &gt;= h['ndir']:
+        return (0, 0)
+    return struct.unpack_from('&lt;II', d, h['dir'] + idx * 8)
+
+
+def read_sections(d, h):
+    """把節區表讀成一串 dict。名稱、虛擬位址、大小、旗標，以及旗標欄的位移。"""
+    out = []
+    for i in range(h['nsec']):
+        b = h['sect'] + i * 40
+        name = d[b:b + 8].rstrip(b'\0').decode('latin1') or '(無名)'
+        vsize, vaddr, rsize, raddr = struct.unpack_from('&lt;IIII', d, b + 8)
+        flags = struct.unpack_from('&lt;I', d, b + 36)[0]
+        out.append({'name': name, 'vaddr': vaddr, 'vsize': vsize,
+                    'raddr': raddr, 'rsize': rsize,
+                    'flags': flags, 'flags_off': b + 36})
+    return out
+
+
+def describe_flags(f):
+    """把節區旗標翻成人看得懂的幾個字。"""
+    bits = []
+    if f &amp; SCN_CODE:
+        bits.append('程式碼')
+    if f &amp; SCN_INITIALIZED:
+        bits.append('資料')
+    perm = ''.join(('讀' if f &amp; SCN_READ else '',
+                    '寫' if f &amp; SCN_WRITE else '',
+                    '執行' if f &amp; SCN_EXECUTE else ''))
+    return '%s · %s' % ('+'.join(bits) or '?', perm or '無權限')
+
+
+# ─────────────────────────────────────────────────────────
+#  ① 補回 IAT 資料目錄
+#
+#  匯入位址表(IAT)是一串指標,程式啟動時由 Windows 載入器把每個
+#  函式的真實位址填進去。它的位置藏在匯入描述子的 FirstThunk 欄位裡,
+#  而 PE 規格另外要求把「整段 IAT 的起點與長度」填在第 13 個資料目錄(索引 12)。
+#
+#  ⚠️ 那個目錄**不是**給載入器找 IAT 用的(它走匯入描述子就找得到)。
+#     它的用途是讓載入器知道「這一段要暫時開放寫入,填完再改回去」。
+#     沒填的話,那一段的可寫與否就完全由節區權限決定。
+#
+#  這裡不是憑空造一個範圍出來,而是**從匯入描述子自己算出來的**:
+#  掃過每一筆描述子的 FirstThunk,取最小的當起點;
+#  再沿著那一串 thunk 走到 0 為止,取最大的結尾。
+# ─────────────────────────────────────────────────────────
+def rva_to_off(secs, rva):
+    """把虛擬位址換成檔案位移。落在任何節區之外就回 None。"""
+    for s in secs:
+        if s['vaddr'] &lt;= rva &lt; s['vaddr'] + max(s['vsize'], s['rsize']):
+            return s['raddr'] + (rva - s['vaddr'])
+    return None
+
+
+def compute_iat_range(d, h, secs):
+    """從匯入描述子算出 IAT 應該是 (RVA, size)。算不出來就回 None。"""
+    imp_rva, imp_size = read_dir(d, h, DIR_IMPORT)
+    if not imp_rva:
+        return None
+    off = rva_to_off(secs, imp_rva)
+    if off is None:
+        raise DataError('匯入表的位址 0x%08X 不落在任何節區裡。' % imp_rva)
+
+    lo, hi = None, None
+    k = 0
+    while True:
+        b = off + k * 20
+        if b + 20 &gt; len(d):
+            break
+        fields = struct.unpack_from('&lt;IIIII', d, b)
+        if not any(fields):          # 全部是 0 = 描述子表結束
+            break
+        first_thunk = fields[4]
+        if first_thunk:
+            t = rva_to_off(secs, first_thunk)
+            if t is None:
+                raise DataError('第 %d 筆匯入的 FirstThunk 0x%08X 不在任何節區裡。'
+                                % (k, first_thunk))
+            # 沿著這一串指標走到 0 為止,一筆 4 bytes(32 位元執行檔)
+            n = 0
+            while t + n * 4 + 4 &lt;= len(d):
+                if struct.unpack_from('&lt;I', d, t + n * 4)[0] == 0:
+                    break
+                n += 1
+            n += 1                    # 把結尾那個 0 也算進去,規格是這樣算的
+            start, end = first_thunk, first_thunk + n * 4
+            lo = start if lo is None else min(lo, start)
+            hi = end if hi is None else max(hi, end)
+        k += 1
+        if k &gt; 4096:                  # 防呆:描述子表壞掉時不要無限跑
+            raise DataError('匯入描述子超過 4096 筆,這個檔看起來壞了。')
+    if lo is None:
+        return None
+    return (lo, hi - lo)
+
+
+# ─────────────────────────────────────────────────────────
+#  ② 收緊節區權限
+#
+#  規則很簡單:**只關掉不該有的寫入權限,絕不打開任何權限。**
+#  只動這三種節區,而且只在它們現在真的可寫的時候動:
+#    · 帶「程式碼」旗標的      → 程式碼不該可寫
+#    · .rdata(唯讀資料)      → 名字就叫唯讀
+#    · .rsrc(資源)           → 資源是唯讀資料
+#  `.data` 這種本來就該可寫的,一律不碰。
+# ─────────────────────────────────────────────────────────
+TIGHTEN_NAMES = ('.text', '.rdata', '.rsrc')
+
+
+def sections_to_tighten(secs):
+    """回傳 [(節區, 新旗標)]，只列真的需要動的。
+
+    ⚠️ **只動這三個有名字的節區，不動任何其他節區。**
+
+    這一條是量出來的，不是推理出來的。本站拿來當參考的那顆執行檔
+    （班主任 2026 年那顆）除了這三個之外，還有第六個**沒有名字**的節區，
+    裡面裝的是被工具重建過的匯入表。那顆的作者把它留成**可寫**，
+    只拿掉了「內容是資料」那個旗標。
+
+    這支原本的規則是「凡是帶程式碼旗標又可寫的都收緊」，那會連那個
+    無名節區一起關掉寫入 —— **比參考實作更激進**。載入器有沒有需要
+    寫進那一段，本站還沒有在 Windows 上實測過這一項。
+
+    在測不到的地方，**參考實作就是真相，不要憑推理改進它**。
+    所以規則改成白名單：只認 .text / .rdata / .rsrc 這三個標準名字。
+    """
+    out = []
+    for s in secs:
+        if not (s['flags'] &amp; SCN_WRITE):
+            continue                  # 已經是唯讀，不用動
+        if s['name'] in TIGHTEN_NAMES:
+            out.append((s, s['flags'] &amp; ~SCN_WRITE))
+    return out
+
+
+def _recalc_checksum(d, h):
+    """PE 檔頭的 CheckSum：16 位元加總（進位摺回）再加上檔案大小。
+
+    計算時把 CheckSum 欄位自己當成 0，這是規格規定的。
+    改完檔頭一定要重算，不然那個欄位就變成錯的
+    （本站量到的那顆原本就是錯的：檔頭裡存的那個值跟實算的 0x0053C452 對不上）。
+    """
+    b = bytearray(d)
+    struct.pack_into('&lt;I', b, h['checksum'], 0)
+    s = 0
+    for i in range(0, len(b) &amp; ~1, 2):
+        s += struct.unpack_from('&lt;H', b, i)[0]
+        s = (s &amp; 0xFFFF) + (s &gt;&gt; 16)
+    if len(b) &amp; 1:
+        s += b[-1]
+        s = (s &amp; 0xFFFF) + (s &gt;&gt; 16)
+    return (s + len(b)) &amp; 0xFFFFFFFF
+
+
+# ─────────────────────────────────────────────────────────
+#  寫檔的共用底座:符號連結守門 + 原子換檔
+#
+#  ⚠️ 這一段是 2026-09-05 唯讀稽核之後補的。讀者的遊戲檔絕對不能被弄壞,
+#     所以「寫入」這件事在這支裡只有一條路徑,而且那條路徑保證:
+#     要嘛整份換好,要嘛正本一個位元組都沒動。
+# ─────────────────────────────────────────────────────────
+
+# 換檔那一步到底做過沒有。按 Ctrl-C 的時候要靠它才說得出實話。
+# **三態,不是兩態** ——
+#   'none'       還沒走到換檔那一步     → 可以說「一個位元組都沒有動到」
+#   'replacing'  正要換、還沒確定換完    → 只能說「中斷時正在替換,請 --restore 或比對備份」
+#   'done'       os.replace() 已經做完   → 要說「已經改了,用 --restore」
+# 少了中間那一態,Ctrl-C 剛好落在 os.replace() 與登記之間就會謊報。
+_WROTE_TO_TARGET = {'path': None, 'state': 'none'}
+
+
+def _reset_mark():
+    """把三態旗標歸零。只有自我測試會用到 —— 正式流程一次只換一個檔。"""
+    _WROTE_TO_TARGET['path'] = None
+    _WROTE_TO_TARGET['state'] = 'none'
+
+
+class _NoInterrupt(object):
+    """把「os.replace + 登記」包成一段不會被 Ctrl-C 切開的動作。
+
+    這段期間收到的 SIGINT 先記著,離開這段之後再照常丟出來。
+    這樣 KeyboardInterrupt 的收尾看到的登記,一定跟磁碟上的真實狀態一致 ——
+    不會出現「檔案其實已經換過去了,而旗標還停在沒換」的那半行空隙。
+
+    ⚠️ 只**延後**,不吞掉:該丟的 KeyboardInterrupt 離開區塊時還是會丟。
+    ⚠️ 不是主執行緒的話 signal.signal() 會失敗,那就退回原本的行為 ——
+       不會比以前更糟,也不會因為裝不上處理器就讓整件事失敗。
+    """
+
+    def __enter__(self):
+        self._pending = False
+        self._old = None
+        try:
+            self._old = signal.signal(signal.SIGINT, self._remember)
+        except (ValueError, OSError):
+            self._old = None
+        return self
+
+    def _remember(self, signum, frame):
+        self._pending = True
+
+    def __exit__(self, exc_type, exc, tb):
+        if self._old is not None:
+            try:
+                signal.signal(signal.SIGINT, self._old)
+            except (ValueError, OSError):
+                pass
+        if self._pending and exc_type is None:
+            raise KeyboardInterrupt
+        return False
+
+
+def _refuse_symlink(p, what):
+    """目的地是符號連結就拒絕,不跟過去。
+
+    ⚠️ 用 os.path.islink() 不是 os.path.exists():後者對「指向不存在的目標」
+       的連結會回 False,等於看不見它,然後就一路跟出去寫到資料夾外面。
+       備份路徑是這支自己從檔名組出來的(檔名 + .exepebak),
+       那個位置剛好躺著一個連結是完全可能的事。
+    """
+    p = os.fspath(p)
+    if os.path.islink(p):
+        raise SystemExit(
+            '%s 是一個符號連結,指向 %s。\n'
+            '  不敢跟著它寫過去(那會動到這個資料夾以外的檔案)。\n'
+            '  請把那個連結移走,或直接對真正的檔案操作。'
+            % (what, os.path.realpath(p)))
+
+
+def _copy_times(src, dst):
+    """把時間戳等中繼資料帶過去。純粹是為了跟舊版 shutil.copy2 的行為一致 ——
+    失敗不影響檔案內容,所以吞掉例外就好,不要為了時間戳讓整件事失敗。"""
+    try:
+        shutil.copystat(src, dst)
+    except OSError:
+        pass
+
+
+def _atomic_write(dst, data, mode_from=None, tmp_tag='tmp', mark_target=False):
+    """把 data 寫成 dst,而且**中途失敗絕不留下半截的 dst**。
+
+    順序:同資料夾開一個唯一暫存檔(tempfile.mkstemp —— 名字不可預測,
+    也不會跟別人的檔撞名)→ 寫入 → flush → os.fsync(真的落到碟上)→
+    把原本的權限帶過去 → **讀回來逐位元組比對** → 最後才 os.replace() 換上。
+    os.replace() 在同一個檔案系統內是原子的:要嘛整份換過去,要嘛完全沒換。
+    任何一步失敗就把暫存檔刪掉,dst 一個位元組都不會動到。
+
+    ⚠️ 絕對不可以退回 shutil.copy2(來源, dst):copy2 會**先把 dst 截成
+       0 bytes** 再慢慢複製,中途 Ctrl-C、磁碟滿、外接碟被拔掉,就留下一顆
+       半截的遊戲檔 —— 而站上每一課都寫著「隨時可以 --restore」。
+    """
+    dst = os.fspath(dst)
+    _refuse_symlink(dst, '要寫入的目標(%s)' % os.path.basename(dst))
+    folder = os.path.dirname(os.path.abspath(dst)) or '.'
+    fd, tmp = tempfile.mkstemp(
+        dir=folder, prefix='.%s.%s-' % (os.path.basename(dst), tmp_tag))
+    try:
+        with os.fdopen(fd, 'wb') as f:
+            f.write(data)
+            f.flush()
+            os.fsync(f.fileno())
+        if mode_from and os.path.isfile(mode_from):
+            # mkstemp 一律 0600,要把原本的權限帶過去,不然還原完檔案權限就變了
+            shutil.copymode(mode_from, tmp)
+        with open(tmp, 'rb') as f:
+            if f.read() != data:
+                raise DataError('暫存檔讀回來跟要寫的內容不一樣,不敢拿它換掉正本。')
+        if mark_target:
+            # ⚠️ 進不可中斷區之前先登記「正在換」。Ctrl-C 剛好落在這裡的話,
+            #    收尾會說「中斷時正在替換,請 --restore 或比對備份」——
+            #    既不謊報「什麼都沒動到」,也不謊報「已經換好了」。
+            _WROTE_TO_TARGET['path'] = dst
+            _WROTE_TO_TARGET['state'] = 'replacing'
+        # ⚠️ 換名與登記必須綁在一起。中間被 Ctrl-C 切開的話,收尾看到的旗標
+        #    就跟磁碟上的真實狀態對不起來 —— 那正是「說謊」的來源。
+        with _NoInterrupt():
+            os.replace(tmp, dst)
+            if mark_target:
+                _WROTE_TO_TARGET['state'] = 'done'
+    except BaseException:
+        try:
+            os.remove(tmp)
+        except OSError:
+            pass
+        # 走到這裡代表換名**沒有發生**:要嘛還沒進不可中斷區,要嘛 os.replace()
+        # 自己丟了例外(同一個檔案系統內它是原子的,丟例外就是沒換)。
+        # **只有這種情形**才可以把旗標收回去;已經 'done' 的絕對不收。
+        if mark_target and _WROTE_TO_TARGET['state'] == 'replacing':
+            _reset_mark()
+        raise
+
+
+def _restore_from_backup(bak, dst):
+    """還原之前先擋掉明顯壞掉的備份。
+
+    ⚠️ 這裡**不能**比對「備份與目標大小相同」—— 本站多數腳本是把資料接到
+    檔尾來改檔(專案鐵律:封裝檔不可重新打包),改完之後正本本來就比備份大,
+    那樣比會擋掉每一次合法的還原。
+
+    ── 2026-08-30 補上三道(上線前資安稽核抓到的真漏洞)────────────────
+    原本只有「不是 0 bytes」+「BIGF 檔頭宣告長度」兩道。**BIGF 以外全破。**
+    實測拿「前 1/8 的半截備份」去還原,六支腳本把正本吃掉而且都印成功:
+        mvp_fix_loc / mvp_menu_text   .LOC        416,753 →  52,094
+        mvp_edit_speed / mvp_ratings
+        / mvp_player                  attrib.dat  840,643 → 105,080
+        mvp_modernize                 mvp2005.exe 5,443,584 → 680,448
+                                      (它還印「複驗:內容與備份相同 ✅」)
+    最後那個會讓遊戲**完全開不起來**,而站上每一課都寫著「隨時可以 --restore」。
+
+    現在檢查五件事:
+      1. 備份不是 0 bytes
+      2. BIGF:檔頭第 4-8 個位元組宣告的總長度要等於實際長度
+         (兩種位元組序都接受;哪些檔是大端、各有幾個,以 reference/bigf.html 量到的為準,這裡不寫會過期的數字)
+      3. LOCH(語系檔):檔頭指到的 LOCL 要在檔內,而且最後一條字串的位移
+         也要在檔內 —— 截斷之後那個位移一定會超出去
+      4. MZ(執行檔):PE 節區表裡 raw offset + raw size 的最大值不得超過檔案長度
+      5. **通用地板**:非 BIGF 的備份不得小於「要被蓋掉的那個檔」的一半。
+         非 BIGF 的工具都是原地改(大小幾乎不變),所以這條很安全;
+         BIGF 走 append 會越改越大,所以刻意**不套**這條,由第 2 道負責。
+    """
+    import struct
+    bak, dst = os.fspath(bak), os.fspath(dst)
+    # 兩端都不可以是符號連結。備份是連結 = 拿資料夾外的內容蓋遊戲檔;
+    # 目標是連結 = 寫穿到資料夾外面。兩種都在這裡擋掉,不跟過去。
+    _refuse_symlink(bak, '備份檔(%s)' % os.path.basename(bak))
+    _refuse_symlink(dst, '要還原的目標(%s)' % os.path.basename(dst))
+    if not os.path.exists(bak):
+        raise SystemExit('找不到備份:%s' % bak)
+    n = os.path.getsize(bak)
+    if n == 0:
+        raise SystemExit(
+            '備份是 0 bytes(多半是上次備份到一半被中斷),不敢拿它覆蓋 %s。' % dst)
+    with open(bak, 'rb') as _f:
+        head = _f.read(8)
+
+    def _stop(why):
+        raise SystemExit(
+            '這份備份是壞的,不敢拿它覆蓋 %s。\n'
+            '  %s\n'
+            '  多半是備份途中被中斷(磁碟滿、外接碟拔掉、按了 Ctrl-C)。\n'
+            '  請改用你自己另外留的那一份備份。' % (dst, why))
+
+    if len(head) == 8 and head[:4] == b'BIGF':
+        le = struct.unpack('&lt;I', head[4:8])[0]
+        be = struct.unpack('&gt;I', head[4:8])[0]
+        if le != n and be != n:
+            _stop('檔頭說它應該是 %d bytes(或 %d),實際只有 %d bytes。' % (le, be, n))
+        return _do_copy(bak, dst)
+
+    if len(head) &gt;= 4 and head[:4] == b'LOCH':
+        try:
+            d = open(bak, 'rb').read()
+            L = struct.unpack('&lt;I', d[16:20])[0]
+            if L + 16 &gt; n or d[L:L + 4] != b'LOCL':
+                _stop('語系檔的字串區(LOCL)應該在位移 %d,那裡不是 LOCL。' % L)
+            lcnt = struct.unpack('&lt;I', d[L + 12:L + 16])[0]
+            if lcnt &lt;= 0 or L + 16 + lcnt * 4 &gt; n:
+                _stop('語系檔的位移表被截斷了(宣告 %d 條)。' % lcnt)
+            last = struct.unpack('&lt;I', d[L + 16 + (lcnt - 1) * 4:L + 20 + (lcnt - 1) * 4])[0]
+            if L + last &gt;= n:
+                _stop('語系檔最後一條字串在位移 %d,超出檔案結尾(%d bytes)。'
+                      % (L + last, n))
+        except SystemExit:
+            raise
+        except (struct.error, IndexError):
+            _stop('讀不出語系檔的結構,它壞了。')
+
+    if len(head) &gt;= 2 and head[:2] == b'MZ':
+        try:
+            d = open(bak, 'rb').read()
+            pe = struct.unpack('&lt;I', d[0x3C:0x40])[0]
+            if pe + 24 &gt; n or d[pe:pe + 4] != b'PE\x00\x00':
+                _stop('執行檔的 PE 檔頭不在它該在的地方,檔案不完整。')
+            nsec = struct.unpack('&lt;H', d[pe + 6:pe + 8])[0]
+            optsz = struct.unpack('&lt;H', d[pe + 20:pe + 22])[0]
+            sec = pe + 24 + optsz
+            end = 0
+            for i in range(nsec):
+                o = sec + i * 40
+                if o + 40 &gt; n:
+                    _stop('執行檔的節區表被截斷了(宣告 %d 個節區)。' % nsec)
+                raw_sz, raw_off = struct.unpack('&lt;II', d[o + 16:o + 24])
+                end = max(end, raw_off + raw_sz)
+            if end &gt; n:
+                _stop('執行檔的節區指到 %d bytes,實際只有 %d bytes。' % (end, n))
+        except SystemExit:
+            raise
+        except (struct.error, IndexError):
+            _stop('讀不出執行檔的結構,它壞了。')
+
+    # 通用地板 —— 非 BIGF 走到這裡
+    if os.path.exists(dst):
+        live = os.path.getsize(dst)
+        if live &gt; 0 and n * 2 &lt; live:
+            _stop('備份只有 %d bytes,而要被蓋掉的那個檔有 %d bytes ——'
+                  '差太多了(不到一半)。' % (n, live))
+    return _do_copy(bak, dst)
+
+
+def _do_copy(bak, dst):
+    """真正覆蓋的那一步,單獨拆成一個函式,是為了讓上面每一道守門都寫成
+    「檢查不過就 raise,檢查過才走到這裡」,不會有哪一條路徑漏掉檢查。
+
+    ── 2026-09-05 改成原子還原(唯讀稽核抓到的真漏洞)────────────────
+    原本這裡是 shutil.copy2(bak, dst)。copy2 **先把 dst 截成 0 bytes**
+    再逐步複製 —— 備份就算通過了上面每一道檢查,只要複製途中按了 Ctrl-C、
+    磁碟滿了、外接碟被拔掉,遊戲正本就停在 0 bytes 或半截狀態。
+    還原後的比對只能發現「已經壞了」,擋不住正本先被截斷。
+
+    現在走 _atomic_write():暫存檔 → fsync → 讀回逐位元組比對 → os.replace。
+    失敗時正本原封不動,而且會照實說是哪一步失敗的。
+    """
+    bak, dst = os.fspath(bak), os.fspath(dst)
+    _refuse_symlink(bak, '備份檔(%s)' % os.path.basename(bak))
+    with open(bak, 'rb') as f:
+        data = f.read()
+    # 權限來源:正本還在就照正本的;正本被刪掉(最需要還原的那種情境)就照備份的
+    _atomic_write(dst, data, mode_from=(dst if os.path.isfile(dst) else bak),
+                  tmp_tag='restore', mark_target=True)
+    _copy_times(bak, dst)        # 舊版走 copy2,還原後會帶著備份的時間戳,維持一樣
+
+
+# Windows 主控台預設編碼(繁中是 cp950)存不下 ⚠️ ✅ 這類符號,
+# 輸出被重導向到檔案時會直接 UnicodeEncodeError 中斷。先把輸出轉成 UTF-8。
+# ⚠️ 這一段非補不可:--apply 是「先寫檔、再印成功訊息」,印到一半炸掉的話
+#    檔案其實已經改好了,讀者卻只看到 traceback,會以為失敗而重跑。
+try:
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+except (AttributeError, ValueError):                # Python 3.6 以下沒有 reconfigure
+    pass
+
+
+# ─────────────────────────────────────────────────────────
+#  報告：唯讀，什麼都不會動到
+# ─────────────────────────────────────────────────────────
+def report(path):
+    d = io.open(path, 'rb').read()
+    h = parse_pe(d)
+    secs = read_sections(d, h)
+    print('檔案:%s' % os.path.basename(path))
+    print('大小:%s bytes' % format(len(d), ','))
+
+    iat_rva, iat_size = read_dir(d, h, DIR_IAT)
+    print('\n① IAT 資料目錄')
+    if iat_rva:
+        print('   已經填好了:RVA=0x%08X size=%d' % (iat_rva, iat_size))
+    else:
+        print('   ⚠️ 沒有填(RVA=0 size=0)')
+        want = compute_iat_range(d, h, secs)
+        if want:
+            print('   從匯入描述子算出來應該是:RVA=0x%08X size=%d' % want)
+        else:
+            print('   這個檔沒有匯入表,算不出來。')
+
+    print('\n② 節區權限')
+    for s in secs:
+        mark = ''
+        if (s['flags'] &amp; SCN_WRITE) and ((s['flags'] &amp; SCN_CODE)
+                                         or s['name'] in TIGHTEN_NAMES):
+            mark = ('  ⚠️ 可寫' if s['name'] in TIGHTEN_NAMES
+                    else '  ⚠️ 可寫（不在白名單，這支不動它）')
+        print('   %-9s 0x%08X  %s%s'
+              % (s['name'], s['flags'], describe_flags(s['flags']), mark))
+    todo = sections_to_tighten(secs)
+    print('   %s' % ('要收緊的有 %d 個:%s'
+                     % (len(todo), '、'.join(s['name'] for s, _ in todo))
+                     if todo else '沒有需要收緊的 ✅'))
+
+    stored = struct.unpack_from('&lt;I', d, h['checksum'])[0]
+    calc = _recalc_checksum(d, h)
+    print('\n③ 檔頭檢查碼')
+    print('   檔內寫的 0x%08X · 實算 0x%08X  %s'
+          % (stored, calc, '相符 ✅' if stored == calc else '⚠️ 不符'))
+    print('\n（以上全部是讀出來的，這一步不會動到你的檔案。）')
+
+
+# ─────────────────────────────────────────────────────────
+#  真的改：先備份，寫到暫存檔再換過去，最後逐位元組複驗
+# ─────────────────────────────────────────────────────────
+def apply_changes(path, do_iat, do_sections, apply_it):
+    d = io.open(path, 'rb').read()
+    h = parse_pe(d)
+    secs = read_sections(d, h)
+    out = bytearray(d)
+    plan = []
+
+    if do_iat:
+        rva, size = read_dir(d, h, DIR_IAT)
+        if rva:
+            print('  ⓘ IAT 目錄本來就填好了，這一項不用做。')
+        else:
+            want = compute_iat_range(d, h, secs)
+            if not want:
+                print('  ⓘ 這個檔沒有匯入表，IAT 目錄這一項跳過。')
+            else:
+                struct.pack_into('&lt;II', out, h['dir'] + DIR_IAT * 8, *want)
+                plan.append('補回 IAT 資料目錄（RVA=0x%08X size=%d，8 個位元組）' % want)
+
+    if do_sections:
+        # ⚠️ 這兩項有先後關係,不是各自獨立的。
+        #
+        #    載入器要把匯入位址填進 .rdata,而 .rdata 一旦變成唯讀,
+        #    它就必須先把那幾頁暫時改回可寫 —— **而它是照 IAT 資料目錄
+        #    給的範圍去改的**。目錄是空的,它就沒有任何範圍可以解鎖,
+        #    填不進去,遊戲直接開不起來。
+        #
+        #    也就是說:**IAT 目錄是空的時候,.rdata 只能留著可寫。**
+        #    二十年來社群那顆執行檔就是這樣繞過去的。
+        #    要收緊權限,必須同一次把目錄補回去。
+        #
+        #    所以這裡擋下來,而不是寫完才發現遊戲開不起來。
+        iat_rva, _iat_sz = read_dir(out, h, DIR_IAT)
+        if not iat_rva:
+            raise DataError(
+                '這顆的 IAT 資料目錄是空的,現在把節區改成唯讀,遊戲會開不起來。\n'
+                '        載入器要靠那個目錄才知道哪一段可以暫時解鎖來填匯入位址。\n'
+                '        請把 --iat 一起加上去(兩個一起做才安全)。')
+        todo = sections_to_tighten(secs)
+        if not todo:
+            print('  ⓘ 沒有節區需要收緊，這一項不用做。')
+        for s, new in todo:
+            struct.pack_into('&lt;I', out, s['flags_off'], new)
+            plan.append('%s 拿掉可寫（0x%08X → 0x%08X，4 個位元組）'
+                        % (s['name'], s['flags'], new))
+
+    if not plan:
+        print('\n沒有要改的東西。')
+        return
+
+    # 檔頭動過就一定要重算檢查碼，不然那個欄位會變成錯的
+    before_ck = struct.unpack_from('&lt;I', out, h['checksum'])[0]
+    struct.pack_into('&lt;I', out, h['checksum'], 0)
+    new_ck = _recalc_checksum(bytes(out), h)
+    struct.pack_into('&lt;I', out, h['checksum'], new_ck)
+    if new_ck != before_ck:
+        plan.append('重算檔頭檢查碼（0x%08X → 0x%08X，4 個位元組）' % (before_ck, new_ck))
+
+    print('\n要做的事:')
+    for x in plan:
+        print('  · %s' % x)
+    changed = sum(1 for i in range(len(d)) if d[i] != out[i])
+    print('\n總共會動到 %d 個位元組（檔案長度不變:%s bytes）'
+          % (changed, format(len(d), ',')))
+
+    if not apply_it:
+        print('\n這是預覽，沒有寫入。確定了就加 --apply。')
+        return
+
+    bak = path + BAK
+    # ⚠️ 寫之前先擋符號連結。備份路徑是這支自己用「檔名 + .exepebak」組出來的,
+    #    那個位置躺著一個指向資料夾外面的連結是完全可能的事,跟過去就寫穿了。
+    _refuse_symlink(path, '要修改的執行檔(%s)' % os.path.basename(path))
+    _refuse_symlink(bak, '備份檔(%s)' % os.path.basename(bak))
+
+    # os.path.lexists() 而不是 exists():後者對「指向不存在目標」的連結會回
+    # False,那樣就會把一個連結當成「還沒有備份」而覆蓋掉它。
+    if not os.path.lexists(bak):
+        # 先寫同資料夾的唯一暫存檔,fsync + 讀回比對都過了才改名成備份。
+        # 中途斷掉留下的是暫存檔,不會有人把半截的東西當成完整備份。
+        _atomic_write(bak, d, mode_from=path, tmp_tag='part')
+        _copy_times(path, bak)   # 舊版走 copy2,備份會帶著原檔的時間戳,維持一樣
+        print('\n已備份:%s' % os.path.basename(bak))
+    else:
+        print('\n備份已經存在，沿用:%s' % os.path.basename(bak))
+
+    _atomic_write(path, bytes(out), mode_from=path, tmp_tag='new', mark_target=True)
+
+    # 複驗：讀回來逐位元組比對，動到的一定要剛好是計畫裡那些
+    back = io.open(path, 'rb').read()
+    diff = ([i for i in range(len(d)) if d[i] != back[i]]
+            if len(back) == len(d) else [])
+    if len(back) != len(d) or len(diff) != changed:
+        # ⚠️ 複驗不過就一定要非零結束,不可以只印一行 ❌ 然後照樣回 0。
+        #    手上還有剛剛逐位元組驗過的完整備份,所以先自動還原,再把指令印出來。
+        print('\n❌ 複驗失敗:寫回去的內容跟預期不同。')
+        try:
+            _restore_from_backup(bak, path)
+            print('   已經自動用備份還原回原狀:%s' % os.path.basename(path))
+        except BaseException as e:            # SystemExit 也要接住,不能讓它靜靜跳出去
+            print('   自動還原沒有成功(%s)。' % e)
+            print('   請手動還原:python3 mvp_exe_pe.py "%s" --restore' % path)
+        raise DataError('複驗失敗:寫回去的內容跟預期不同(上面已說明處理結果)。')
+    print('已寫入。複驗:改動的位元組剛好是預期那 %d 個，其他一個都沒動 ✅' % changed)
+    print('\n進遊戲看看。沒效果或有問題就 --restore。')
+
+
+# ─────────────────────────────────────────────────────────
+#  自我測試：自己造一顆最小的 PE 出來測，不需要遊戲檔
+#
+#  ⚠️ 測試要**兩個方向都測**：該改的有沒有改到，不該改的有沒有被動到。
+#     只測「改得動」的測試，遇到「什麼都改」的 bug 一樣會過。
+# ─────────────────────────────────────────────────────────
+def _fake_pe():
+    """造一顆結構正確的 32 位元 PE：兩個節區、一筆匯入、IAT 目錄留空。"""
+    SECT_ALIGN = 0x1000
+    d = bytearray(0x4000)
+    d[0:2] = b'MZ'
+    struct.pack_into('&lt;I', d, 0x3C, 0x80)          # e_lfanew
+    pe = 0x80
+    d[pe:pe + 4] = b'PE\0\0'
+    struct.pack_into('&lt;H', d, pe + 4, 0x014C)      # Machine = i386
+    struct.pack_into('&lt;H', d, pe + 6, 2)           # 兩個節區
+    struct.pack_into('&lt;H', d, pe + 20, 224)        # Optional Header 大小
+    opt = pe + 24
+    struct.pack_into('&lt;H', d, opt, 0x010B)         # PE32
+    struct.pack_into('&lt;I', d, opt + 92, 16)        # 16 個資料目錄
+    sect = opt + 224
+
+    text = {'name': b'.text', 'va': SECT_ALIGN, 'raw': SECT_ALIGN,
+            'size': SECT_ALIGN, 'flags': SCN_CODE | SCN_EXECUTE | SCN_READ | SCN_WRITE}
+    rdata = {'name': b'.rdata', 'va': SECT_ALIGN * 2, 'raw': SECT_ALIGN * 2,
+             'size': SECT_ALIGN * 2, 'flags': SCN_INITIALIZED | SCN_READ | SCN_WRITE}
+    for i, s in enumerate((text, rdata)):
+        b = sect + i * 40
+        d[b:b + len(s['name'])] = s['name']
+        struct.pack_into('&lt;IIII', d, b + 8, s['size'], s['va'], s['size'], s['raw'])
+        struct.pack_into('&lt;I', d, b + 36, s['flags'])
+
+    # .rdata 裡放一筆匯入描述子，FirstThunk 指到同一節區稍後的位置
+    imp_rva = rdata['va']
+    thunk_rva = rdata['va'] + 0x100
+    struct.pack_into('&lt;IIIII', d, rdata['raw'], 0, 0, 0, 0, thunk_rva)
+    struct.pack_into('&lt;IIIII', d, rdata['raw'] + 20, 0, 0, 0, 0, 0)   # 結束
+    t = rdata['raw'] + 0x100
+    struct.pack_into('&lt;III', d, t, 0x80001111, 0x80002222, 0)         # 兩筆 + 結尾 0
+    struct.pack_into('&lt;II', d, opt + 96 + DIR_IMPORT * 8, imp_rva, 40)
+    struct.pack_into('&lt;II', d, opt + 96 + DIR_IAT * 8, 0, 0)          # 故意留空
+    return bytes(d), thunk_rva
+
+
+def selftest():
+    # ⚠️ -O 會把 assert 整個拿掉。這一支的自我測試雖然走 chk() 不走 assert,
+    #    但全站十幾支腳本共用同一條規矩:selftest 一律不在 -O 下跑,免得哪一天
+    #    有人加了 assert 就變成假綠而沒人看得出來。
+    if sys.flags.optimize:
+        print('--selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠')
+        return 2
+    ok = True
+
+    def chk(cond, msg):
+        nonlocal ok
+        print('   %s %s' % ('✅' if cond else '🔴', msg))
+        if not cond:
+            ok = False
+
+    print('=== 自我測試 ===\n')
+    raw, thunk_rva = _fake_pe()
+    d = tempfile.mkdtemp(prefix='exepe_')
+    p = os.path.join(d, 'fake.exe')
+    io.open(p, 'wb').write(raw)
+    # 另外開一個「這個資料夾以外」的地方,專門給【8】符號連結那一項當靶。
+    outside_dir = tempfile.mkdtemp(prefix='exepe_outside_')
+    outside = os.path.join(outside_dir, 'do_not_touch.bin')
+    io.open(outside, 'wb').write(b'DO NOT TOUCH')
+    try:
+        h = parse_pe(raw)
+        secs = read_sections(raw, h)
+
+        print('【1】算得出 IAT 範圍嗎')
+        got = compute_iat_range(raw, h, secs)
+        chk(got == (thunk_rva, 12),
+            '算出 RVA=0x%08X size=%d（預期 0x%08X / 12）'
+            % (got[0], got[1], thunk_rva) if got else '算不出來')
+
+        print('\n【2】該收緊的收緊，不該動的不動')
+        todo = dict((s['name'], new) for s, new in sections_to_tighten(secs))
+        chk(set(todo) == {'.text', '.rdata'}, '挑出 .text 與 .rdata（實際:%s）'
+            % '、'.join(sorted(todo)) if todo else '一個都沒挑到')
+        chk(all(not (v &amp; SCN_WRITE) for v in todo.values()), '新旗標都不帶可寫')
+        chk(all((v &amp; SCN_READ) for v in todo.values()), '讀取權限都留著（沒有多關）')
+
+        print('\n【3】真的改一次，然後複驗')
+        apply_changes(p, True, True, True)
+        d2 = io.open(p, 'rb').read()
+        h2 = parse_pe(d2)
+        chk(len(d2) == len(raw), '檔案長度沒變')
+        chk(read_dir(d2, h2, DIR_IAT) == (thunk_rva, 12), 'IAT 目錄填好了')
+        s2 = dict((s['name'], s['flags']) for s in read_sections(d2, h2))
+        chk(not (s2['.text'] &amp; SCN_WRITE), '.text 不再可寫')
+        chk(s2['.text'] &amp; SCN_EXECUTE, '.text 還是可執行')
+        chk(struct.unpack_from('&lt;I', d2, h2['checksum'])[0] == _recalc_checksum(d2, h2),
+            '檢查碼跟著重算了')
+
+        print('\n【4】陰性對照：改過的檔再跑一次，不該再動它')
+        before = io.open(p, 'rb').read()
+        apply_changes(p, True, True, True)
+        chk(io.open(p, 'rb').read() == before, '第二次執行沒有再動任何位元組')
+
+        print('\n【5】還原守衛：半截備份不可以蓋掉正本')
+        bak = p + BAK
+        io.open(bak, 'wb').write(io.open(bak, 'rb').read()[:200])
+        live_before = io.open(p, 'rb').read()
+        try:
+            _restore_from_backup(bak, p)
+        except SystemExit:
+            pass
+        except Exception:
+            pass
+        chk(io.open(p, 'rb').read() == live_before, '正本沒有被半截備份蓋掉')
+
+        print('\n【6】還原的正常路徑:備份是好的就要真的蓋回去')
+        # ⚠️ 這一項不能省。【5】只證明「壞備份會被擋下」,而那條路在 raise 的
+        #    時候就結束了,永遠走不到真正覆蓋的那一行。也就是說,少了這一項的話
+        #    「合法還原每一次都崩潰」這種缺陷會躲過整套測試,總判定照樣印 ✅。
+        io.open(bak, 'wb').write(raw)                   # 放一份完好的備份回去
+        io.open(p, 'wb').write(b'\0' * len(raw))        # 把正本弄成不一樣的內容
+        _restore_from_backup(bak, p)
+        chk(io.open(p, 'rb').read() == raw, '備份完好時真的還原回來了(逐位元組相同)')
+
+        print('\n【7】還原是原子的:換檔那一步失敗,正本必須原封不動')
+        # ⚠️ 這一項是【6】的反面。【6】證明「備份好就還原得回來」,
+        #    但那條路徑就算是 shutil.copy2(先截斷再複製)也照樣會過。
+        #    真正要證的是**失敗的時候**正本沒有被截成半截。
+        io.open(bak, 'wb').write(raw)
+        io.open(p, 'wb').write(b'\xEE' * len(raw))
+        live7 = io.open(p, 'rb').read()
+        real_replace = os.replace
+
+        def _boom(_src, _dst):
+            raise OSError(28, '假裝磁碟滿了')
+
+        os.replace = _boom
+        try:
+            _restore_from_backup(bak, p)
+        except BaseException:
+            pass
+        finally:
+            os.replace = real_replace
+        chk(io.open(p, 'rb').read() == live7, '換檔失敗時正本一個位元組都沒動')
+        chk(len(io.open(p, 'rb').read()) == len(raw), '正本沒有被截短')
+        junk7 = [x for x in os.listdir(d) if x.startswith('.fake.exe.')]
+        chk(not junk7, '失敗之後沒有留下暫存檔(實際 %d 個)' % len(junk7))
+
+        print('\n【8】符號連結守衛:連結指到資料夾外面就拒絕,不跟過去')
+        os.remove(bak)
+        os.symlink(outside, bak)                       # 備份的位置放一個連結
+        live8 = io.open(p, 'rb').read()
+        refused = False
+        try:
+            _restore_from_backup(bak, p)
+        except SystemExit:
+            refused = True
+        except Exception:
+            pass
+        chk(refused, '--restore 拒絕了指向外面的備份連結')
+        chk(io.open(outside, 'rb').read() == b'DO NOT TOUCH', '資料夾外那個檔沒被動到')
+        chk(io.open(p, 'rb').read() == live8, '正本沒有被連結後面的內容蓋掉')
+
+        # 斷掉的連結(指向不存在的檔)也要認得出來。os.path.exists() 對它回 False,
+        # 少了 _restore_from_backup 開頭那一道,就會被當成「找不到備份」——
+        # 訊息指錯方向,讀者會去找一個其實躺在那裡的連結。
+        os.remove(bak)
+        os.symlink(os.path.join(outside_dir, 'nope.bin'), bak)
+        msg8 = ''
+        try:
+            _restore_from_backup(bak, p)
+        except BaseException as e:
+            msg8 = str(e)
+        chk('符號連結' in msg8,
+            '斷掉的連結也被認出是連結(訊息開頭:%s)' % msg8.split('\n')[0][:34])
+
+
+        p2 = os.path.join(d, 'fake2.exe')
+        io.open(p2, 'wb').write(raw)
+        os.symlink(outside, p2 + BAK)                  # --apply 也要擋
+        refused2 = False
+        try:
+            apply_changes(p2, True, True, True)
+        except SystemExit:
+            refused2 = True
+        except Exception:
+            pass
+        chk(refused2, '--apply 遇到連結備份也拒絕')
+        chk(io.open(outside, 'rb').read() == b'DO NOT TOUCH', '外面那個檔還是沒被動到')
+        chk(io.open(p2, 'rb').read() == raw, 'fake2.exe 一個位元組都沒被改')
+
+        print('\n【9】寫入是原子的:換檔失敗時不留半截的正本、也不留假備份')
+        p3 = os.path.join(d, 'fake3.exe')
+        io.open(p3, 'wb').write(raw)
+        os.replace = _boom                             # 連備份都換不上去
+        try:
+            apply_changes(p3, True, True, True)
+        except BaseException:
+            pass
+        finally:
+            os.replace = real_replace
+        chk(io.open(p3, 'rb').read() == raw, '備份就失敗時,正本原封不動')
+        chk(not os.path.lexists(p3 + BAK), '沒有留下一份半截的備份')
+        chk(not [x for x in os.listdir(d) if x.startswith('.fake3.exe.')],
+            '沒有留下暫存檔')
+
+        p4 = os.path.join(d, 'fake4.exe')
+        io.open(p4, 'wb').write(raw)
+
+        def _boom_on_exe(src, dstp):                   # 只讓「換正本」那一步失敗
+            if os.path.abspath(dstp) == os.path.abspath(p4):
+                raise OSError(28, '假裝磁碟滿了')
+            return real_replace(src, dstp)
+
+        os.replace = _boom_on_exe
+        try:
+            apply_changes(p4, True, True, True)
+        except BaseException:
+            pass
+        finally:
+            os.replace = real_replace
+        chk(io.open(p4, 'rb').read() == raw, '備份成功、換正本失敗時,正本仍是原樣')
+        chk(os.path.isfile(p4 + BAK) and io.open(p4 + BAK, 'rb').read() == raw,
+            '備份留下來而且是完整的(還原得回去)')
+        chk(not [x for x in os.listdir(d) if x.startswith('.fake4.exe.')],
+            '沒有留下暫存檔')
+
+        print('\n【10】Ctrl-C 要說得出實話:換檔做過沒做過分得出來')
+        # ⚠️ 兩個方向都要測。只測「做過會記錄」的話,「永遠記錄」的 bug 一樣會過,
+        #    那會讓預覽被中斷時謊報「檔案已經改了」。
+        p5 = os.path.join(d, 'fake5.exe')
+        io.open(p5, 'wb').write(raw)
+        _reset_mark()
+        apply_changes(p5, True, True, False)           # 只是預覽
+        chk(_WROTE_TO_TARGET['path'] is None
+            and _WROTE_TO_TARGET['state'] == 'none',
+            '預覽沒有記錄(被中斷時才說得出「什麼都沒動到」)')
+        apply_changes(p5, True, True, True)            # 真的寫
+        chk(_WROTE_TO_TARGET['path'] == p5
+            and _WROTE_TO_TARGET['state'] == 'done',
+            '真的換過檔就記錄下來(被中斷時才不會謊報沒動到)')
+        _reset_mark()
+
+        _atomic_write(os.path.join(d, 'plain.bin'), b'x', tmp_tag='probe')
+        chk(_WROTE_TO_TARGET['path'] is None,
+            '不是換正本的寫入(例如做備份)不會被記成「已改」')
+
+        print('\n【11】符號連結守衛:正本自己是連結、還原目標是連結,都要拒絕')
+        # ⚠️【8】測的是「備份的位置放了一個連結」。這一項補另外兩個寫入目的地:
+        #    ① --apply 的正本自己就是連結 ② --restore 要寫回去的目標是連結。
+        #    餌指向的是資料夾外面一顆**合法的 PE**,所以不會在解析階段就被擋掉 ——
+        #    真正要證的是「守衛擋下來」,不是「檔案看起來不對」。
+        outside_exe = os.path.join(outside_dir, 'real_outside.exe')
+        io.open(outside_exe, 'wb').write(raw)
+        p6 = os.path.join(d, 'fake6.exe')
+        os.symlink(outside_exe, p6)
+        refused6 = False
+        try:
+            apply_changes(p6, True, True, True)
+        except SystemExit:
+            refused6 = True
+        except Exception:
+            pass
+        chk(refused6, '--apply 遇到「正本自己是連結」就拒絕(不跟過去改外面那顆)')
+        chk(io.open(outside_exe, 'rb').read() == raw, '連結後面那顆檔一個位元組都沒被改')
+        chk(not os.path.lexists(p6 + BAK), '也沒有在連結旁邊留下備份')
+
+        p7 = os.path.join(d, 'fake7.exe')
+        os.symlink(outside_exe, p7)
+        io.open(p7 + BAK, 'wb').write(raw)             # 備份是好的,問題出在目標
+        refused7 = False
+        try:
+            _restore_from_backup(p7 + BAK, p7)
+        except SystemExit:
+            refused7 = True
+        except Exception:
+            pass
+        chk(refused7, '--restore 遇到「要寫回去的目標是連結」也拒絕')
+        chk(io.open(outside_exe, 'rb').read() == raw, '外面那顆檔還是沒被還原蓋過去')
+
+        print('\n【12】Ctrl-C 不可以說謊:不可中斷區與三態旗標')
+        # ⚠️ 這裡**不送真的訊號**。Windows 的 os.kill() 不是送訊號而是直接砍行程,
+        #    測試自己會死在那一行。改成直接呼叫「當下裝著的那個處理器」——
+        #    測到的是同一段邏輯:_NoInterrupt 有沒有把處理器換上去、有沒有收回來、
+        #    有沒有把該丟的 KeyboardInterrupt 留到離開區塊才丟。
+        old_sigint = signal.getsignal(signal.SIGINT)
+        trail = []
+        late = False
+        try:
+            with _NoInterrupt():
+                signal.getsignal(signal.SIGINT)(signal.SIGINT, None)
+                trail.append('區塊跑完了')
+        except KeyboardInterrupt:
+            late = True
+        chk(trail == ['區塊跑完了'], '區塊裡的動作沒有被中斷切開(它要先做完)')
+        chk(late, '離開區塊之後 KeyboardInterrupt 照樣丟出來(只延後,沒吞掉)')
+        chk(signal.getsignal(signal.SIGINT) is old_sigint, '原本的 Ctrl-C 處理器有還回去')
+
+        # 換檔失敗時旗標要收回「沒動到」,不可以卡在「正在換」——
+        # 卡住的話,一次失敗的預覽被 Ctrl-C 就會嚇讀者說「可能已經換過去了」。
+        p8 = os.path.join(d, 'fake8.exe')
+        io.open(p8, 'wb').write(raw)
+        _reset_mark()
+        os.replace = _boom
+        try:
+            _atomic_write(p8, b'x' * 32, mark_target=True)
+        except BaseException:
+            pass
+        finally:
+            os.replace = real_replace
+        chk(_WROTE_TO_TARGET['state'] == 'none',
+            '換檔失敗時旗標收回「沒動到」(不會卡在「正在換」嚇人)')
+        chk(io.open(p8, 'rb').read() == raw, '換檔失敗,正本仍是原樣')
+        _atomic_write(p8, b'x' * 32, mark_target=True)
+        chk(_WROTE_TO_TARGET['state'] == 'done' and _WROTE_TO_TARGET['path'] == p8,
+            '換檔成功時旗標是「已換」(被中斷才說得出實話)')
+        _reset_mark()
+
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
+        shutil.rmtree(outside_dir, ignore_errors=True)
+
+    print('\n' + '=' * 46)
+    print('總判定: %s' % ('✅ 全部通過' if ok else '❌ 有問題'))
+    return 0 if ok else 1
+
+
+def main():
+    ap = argparse.ArgumentParser(
+        description='把改過的 MVP Baseball 2005 執行檔的 PE 檔頭修回合乎規格。')
+    ap.add_argument('exe', nargs='?', help='遊戲執行檔的完整路徑（mvp2005.exe）')
+    ap.add_argument('--iat', action='store_true', help='補回 IAT 資料目錄')
+    ap.add_argument('--sections', action='store_true', help='收緊節區的寫入權限')
+    ap.add_argument('--apply', action='store_true', help='真的寫入（沒加就只是預覽）')
+    ap.add_argument('--restore', action='store_true', help='從 %s 還原' % BAK)
+    ap.add_argument('--selftest', action='store_true', help='自我測試，不需要遊戲檔')
+    a = ap.parse_args()
+
+    if a.selftest:
+        return selftest()
+    if not a.exe:
+        ap.print_help()
+        return 2
+
+    # 目標本身是符號連結的話:**要寫的時候一律拒絕,不跟過去**。
+    # ⚠️ 舊版是 realpath() 解開之後照樣寫。那等於「你指著 A,我去改 B」——
+    #    B 可能根本不在遊戲資料夾裡,而備份(.exepebak)又是照你打的 A 組出來的,
+    #    出事的時候還原會找不到對的東西。所以現在改成拒絕,請直接對真正的檔操作。
+    # 只讀的模式不受限制(不加參數的檢查、加了 --iat/--sections 但沒 --apply
+    # 的預覽)—— 讀不會弄壞任何人的檔案。
+    # 只看最後那一個檔;路徑中間的資料夾是連結沒關係(有人把遊戲放在別顆碟)。
+    if (a.apply or a.restore) and os.path.islink(a.exe):
+        _refuse_symlink(a.exe, '要修改的執行檔(%s)' % os.path.basename(a.exe))
+
+    # ⚠️ 「檔案不存在」不可以擋掉 --restore。最需要還原的情境正是
+    #    「執行檔被刪掉 / 被別的東西蓋掉」,那時候備份就躺在旁邊。
+    if not a.restore and not os.path.isfile(a.exe):
+        print('找不到這個檔:%s' % a.exe)
+        return 2
+    try:
+        if a.restore:
+            bak = a.exe + BAK
+            # 還原前:備份自己得是一顆執行檔(拿錯檔就擋下來)。
+            # 半截備份那一道更關鍵,由 _restore_from_backup() 驗 PE 節區表;
+            # 「不存在」與「0 bytes」也留給它講,它的訊息說得更清楚。
+            if (os.path.exists(bak) and os.path.getsize(bak) &gt; 0
+                    and io.open(bak, 'rb').read(2) != b'MZ'):
+                print('這份備份的開頭不是 MZ（不是執行檔），不敢拿它覆蓋 %s。' % a.exe)
+                return 1
+            _restore_from_backup(bak, a.exe)
+            # 還原後:整份逐位元組比對,不是只比開頭也不是只比長度。
+            same = (io.open(bak, 'rb').read() == io.open(a.exe, 'rb').read())
+            print('已還原:%s' % os.path.basename(a.exe))
+            print('複驗:內容與備份%s' % ('相同 ✅' if same else '不同 ❌'))
+            if not same:
+                print('還原後的內容跟備份對不起來,請手動檢查那兩個檔。')
+                return 1
+            return 0
+        if not (a.iat or a.sections):
+            report(a.exe)
+            return 0
+        apply_changes(a.exe, a.iat, a.sections, a.apply)
+        return 0
+    except DataError as e:
+        print('\n停下來了:%s' % e)
+        return 1
+
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        # ⚠️ 「什麼都沒動到」這句話只有在換檔那一步還沒發生的時候才可以說。
+        #    三態各講各的實話,一律以 130 結束(128 + SIGINT),**不可以回 0**。
+        _state = _WROTE_TO_TARGET['state']
+        _done = _WROTE_TO_TARGET['path']
+        if _state == 'none':
+            print('\n你按了 Ctrl-C。換檔那一步還沒發生,你的檔案一個位元組都沒有動到。')
+        elif _state == 'replacing':
+            print('\n你按了 Ctrl-C,而中斷的時候正在替換:%s' % _done)
+            print('這個檔可能已經換過去,也可能還沒有。請跟備份比對,或直接還原:')
+            print('  python3 mvp_exe_pe.py "%s" --restore' % _done)
+        else:
+            print('\n你按了 Ctrl-C,但檔案已經換過去了:%s' % _done)
+            print('要回到原狀請跑:python3 mvp_exe_pe.py "%s" --restore' % _done)
+        sys.exit(130)
+
+# ─────────────────────────────────────────────────────────
+#  MIT License
+#
+#  Copyright (c) 2026 toni
+#
+#  Permission is hereby granted, free of charge, to any person obtaining a copy
+#  of this software and associated documentation files (the "Software"), to deal
+#  in the Software without restriction, including without limitation the rights
+#  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#  copies of the Software, and to permit persons to whom the Software is
+#  furnished to do so, subject to the following conditions:
+#
+#  The above copyright notice and this permission notice shall be included in
+#  all copies or substantial portions of the Software.
+#
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#  THE SOFTWARE.
+# ─────────────────────────────────────────────────────────
+</pre>
+  </details>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong>：一顆調好的執行檔跟原本那顆只差
+        <u>10 個位元組</u>，落在這一課六個旋鈕裡的四個
+        （參考那顆沒改解析度，檢查碼也沒重算），
+        <strong>沒有一個跟保護措施有關</strong>。</li>
+    <li><strong>只有一個旋鈕真的會改變遊戲跑不跑得動</strong>：
+        <u>記憶體池 64 MiB → 128 MiB</u>，在
+        <code>0x3736F4</code> 與 <code>0x3CDD0C</code> 兩個地方各改一個位元組。
+        對照實驗做過：64 MB 兩次都當、128 MB 與 512 MB 都能玩。</li>
+    <li><strong>4GB 旗標單獨做沒有感覺</strong>。卡住的是遊戲自己切的池子，
+        不是位址空間。<u>兩個一起做才有意義。</u></li>
+    <li><strong>IAT 目錄的範圍是算出來的，不是抄來的</strong>：
+        腳本掃過每一筆匯入描述子的 <code>FirstThunk</code>，沿著指標串走到 0，
+        算出 <code>RVA=0x473000 size=1264</code>。<u>這樣它才能用在別人那顆檔案上。</u></li>
+    <li><strong>④⑤ 的好處要講誠實</strong>：那是把檔案修正確，不是效能調整。
+        <u>本站沒有量到它們讓遊戲變快或變穩。</u></li>
+    <li><strong>驗證方式</strong>：兩支腳本跑完之後逐位元組比對，
+        <u>程式碼與檔頭旗標動到的剛好是那 10 個</u>，檔案長度完全沒變。
+        你自己跑會再多動⑥檔頭檢查碼那 4 個位元組（合計 14 個），
+        因為參考那顆<u>沒有重算過檢查碼</u>。</li>
+    <li><strong>有一個旗標本站刻意不改</strong>：那個無名節區的可寫權限。
+        參考的那顆留著它，而本站還沒有在 Windows 上實測過這一項 ——
+        <u>在測不到的地方，參考實作就是真相，不要憑推理改進它。</u></li>
+    <li><strong>本站沒驗的</strong>：④⑤ 都做完的那顆在真實 Windows 上長期玩起來如何、
+        4K 下介面會不會跑位、記憶體池的上限。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../run-in-2026/index.html">讓它在 2026 年跑起來</a> —— 另外三個旋鈕在那裡</li>
+    <li><a href="../../tc2026/index.html">中文版為什麼會跳出</a> —— 記憶體池是怎麼被找出來的</li>
+    <li><a href="../../reference/hud-map.html">介面座標圖</a> —— 為什麼改解析度要留意版面</li>
+    <li><a href="../backup/index.html">備份與還原 SOP</a> —— 改壞了怎麼辦</li>
+  </ul>
+
+  <footer>
+    <p>本頁的位元組位移、數值與比對結果，皆為在兩顆實際的執行檔上量測所得
+       （皆為 5,443,584 bytes）。重現實驗證明的是那 10 個位移層面相同
+       （檔頭檢查碼那 4 個位元組除外，理由見<a href="#verify">驗證那一節</a>），
+       <u>④⑤ 都做完的檔案本站未在 Windows 上實機開過遊戲</u>。
+       本頁不涉及任何防盜拷措施之規避，相關提問一律不回應。
+       本站不提供任何遊戲檔案下載，包括執行檔。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../../legal.html">法律與版權說明</a> ·
+       <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
+  </footer>
+
+</div>
+<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

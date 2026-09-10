@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/bigf.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>BIGF 封裝格式 — toni的MVP模組補習班</title>
+<meta name="description" content="EA BIG 封裝檔完整規格：16 bytes 檔頭、目錄結構、mixed endian 陷阱，以及絕不能整包重新打包的原因。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 封裝格式</p>
+  <h1>BIGF 封裝格式</h1>
+  <p class="lede">遊戲裡幾乎所有資源都裝在 <code>.big</code> 檔裡 —— 本站測試機的 <code>data\</code> 底下，2026-09-05 數是 <strong>400 個</strong>（檔頭真的是 <code>BIGF</code> 的 383 個）；<u>剛安裝好的原版是 224 個</u>（<code>BIGF</code> 207 個；多出來的是後來裝的球場、大頭照與備份包）。
+     它是 EA 自家的封裝格式，結構出乎意料地簡單：一個 16 bytes 檔頭、一份目錄、然後是資料。
+     但<strong>寫回去</strong>有一個會毀檔的陷阱，本頁最後一節專講這件事。</p>
+
+  <h2>檔頭：16 bytes</h2>
+<pre><code>+0x00  4 bytes   magic「BIGF」
++0x04  4 bytes   檔案總大小      <span class="hl">← 多數是 little-endian，但有例外，見下</span>
++0x08  4 bytes   項目數量        <span class="cm">big-endian</span>
++0x0C  4 bytes   目錄區結束位置    <span class="cm">big-endian ← 不是第一筆資料的位置,見下</span></code></pre>
+
+  <div class="card blue">
+    <p class="card-h">我們改過這一段：<code>+0x0C</code> 不是「資料起始位置」</p>
+    <p>這頁上線時把 <code>+0x0C</code> 標成「資料起始位置」。拿剛安裝好的原版 207 個封裝檔逐一驗：</p>
+    <ul class="tick">
+      <li>它等於<strong>目錄區結束之後的位置</strong>（檔頭 ＋ 目錄 ＋ 8 個位元組的尾標）——
+          <strong>207 / 207 全中，零例外</strong>。</li>
+      <li>但它<u>不等於</u>第一筆資料真正的位置：只有 18 / 207 相同。
+          其餘 189 個中間隔著填充，其中 183 個是 1 到 3 個位元組，另外 6 個更大（11、14、19、86、96、119）。</li>
+    </ul>
+    <p><strong>要找資料，請讀目錄裡那一筆自己的 offset，不要拿這個欄位推。</strong></p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">⚠ 一手發現：檔頭是混合位元組序</p>
+    <p>同一個檔頭裡，<strong>總大小是 little-endian，項目數和資料起始是 big-endian</strong>。
+       這在 EA 的格式文件裡沒寫，全部當成 big-endian 讀會得到一個荒謬的檔案大小。</p>
+    <p><strong>實測證據</strong>：<code>misc.big</code> 的 offset 4 位元組是
+       <code>7E 03 00 00</code>。當成 big-endian 讀是 2,114,125,824 bytes（2 GB，明顯錯誤）；
+       當成 little-endian 讀是 <strong>894</strong>，正是該檔的真實大小。</p>
+  </div>
+
+  <h2>目錄：每個項目一筆</h2>
+  <p>接在檔頭後面，每筆長度不固定（因為檔名長度不一）：</p>
+<pre><code>4 bytes   資料位置(offset)    <span class="cm">big-endian</span>
+4 bytes   資料長度(size)      <span class="cm">big-endian</span>
+N bytes   檔名                <span class="cm">latin-1,以 \0 結尾,沒有長度前綴</span></code></pre>
+  <p>目錄結束後有一段 <strong>8 bytes 的尾標</strong>（<code>L234</code> + 4 bytes 旗標），
+     之後才是實際資料區。（<strong>資料區沒有固定的對齊規則。</strong>原版 207 個封裝檔裡，第一筆資料落在 128 倍數上的只有 <strong>8 個</strong> —— <code>misc.big</code> 剛好是其中之一。不要拿它推論通則。）</p>
+
+  <h3>用 Python 讀目錄</h3>
+<pre><code><span class="cm"># 完整可用版本見任一教學附的腳本,這裡是最小示範</span>
+import struct
+
+data = open('ingame.big', 'rb').read()
+assert data[:4] == b'BIGF'
+count = int.from_bytes(data[8:12], 'big')     <span class="cm"># 項目數:big-endian</span>
+pos = 16
+for _ in range(count):
+    offset, size = struct.unpack('&gt;II', data[pos:pos+8])
+    pos += 8
+    end = data.find(b'\x00', pos)             <span class="cm"># 檔名到 \0 為止</span>
+    name = data[pos:end].decode('latin-1')
+    pos = end + 1
+    print(f'{name:&lt;32} {offset:&gt;10} {size:&gt;10}')</code></pre>
+
+  <h2 id="orphan-def">「孤兒資料」是什麼，以及本站怎麼算它</h2>
+  <p>封裝檔裡常常有<u>目錄沒有指向的位元組</u>。本站叫它<strong>孤兒資料</strong>。
+     算法只有一個定義：</p>
+<pre>孤兒 ＝ 檔案總長 − 檔頭 16 − <span class="hl">目錄長度</span> − 目錄指到的長度總和</pre>
+  <p><strong>關鍵是那個「減目錄長度」。</strong>
+     目錄本身也是沒有人指向它的位元組，但它<u>不是孤兒</u> ——
+     它是這個格式必要的一部分。少減它會多算一點點。</p>
+  <div class="card clay">
+    <p class="card-h">⚠️ 2026-08-28：本站自己混用過兩種算法</p>
+    <p>同一個檔（測試機的 <code>ingame.big</code>）在站上出現過兩個孤兒數字，
+       差 <strong>1,495</strong>，而且從來沒有說明過差在哪。查出來是：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>算法</th><th class="num">結果</th><th>差在哪</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="算法"><strong>本站現在的定義</strong></td><td data-label="結果" class="num"><strong>2,468,068</strong></td>
+            <td data-label="差在哪">檔頭與目錄都不算孤兒</td></tr>
+        <tr><td data-label="算法">另一個舊數字</td><td data-label="結果" class="num">2,469,563</td>
+            <td data-label="差在哪">把檔頭 16 與目錄 1,479 也算進孤兒</td></tr>
+      </tbody>
+    </table></div>
+    <p><code>16 + 1,479 = 1,495</code> —— <strong>完全對上</strong>。
+       兩個數字都不是筆誤，是兩種算法。已統一成上面那個定義。</p>
+  </div>
+
+  <h2>用同一個定義重算一次</h2>
+  <p>下面全部是<u>用上面那個定義</u>量出來的，換算方式一致，可以互相比較：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>量的是什麼</th><th class="num">總長</th><th class="num">孤兒</th><th class="num">比例</th></tr></thead>
+    <tbody>
+      <tr><td data-label="量的是什麼"><code>ingame.big</code>　剛安裝好的原版</td><td data-label="總長" class="num">167,682</td>
+          <td data-label="孤兒" class="num">71</td><td data-label="比例" class="num"><strong>0.04%</strong></td></tr>
+      <tr class="hi"><td data-label="量的是什麼"><code>ingame.big</code>　本站測試機（裝過很多模組）</td><td data-label="總長" class="num">2,665,562</td>
+          <td data-label="孤兒" class="num">2,468,068</td><td data-label="比例" class="num"><strong>92.59%</strong></td></tr>
+      <tr><td data-label="量的是什麼">球場檔 87 個　剛安裝好的原版（中位數）</td><td data-label="總長" class="num">—</td>
+          <td data-label="孤兒" class="num">—</td><td data-label="比例" class="num"><strong>0.00%</strong>（最高 0.01%）</td></tr>
+      <tr><td data-label="量的是什麼">球場檔 87 個　本站測試機（中位數）</td><td data-label="總長" class="num">—</td>
+          <td data-label="孤兒" class="num">—</td><td data-label="比例" class="num"><strong>40.06%</strong>（最高 68.01%）</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>同一個檔名，兩份檔案，比例差 2,200 倍。</strong>
+     （92.590% 除以 0.04234% 是 <strong>2,187</strong>；上表那一欄四捨五入成 0.04%，拿捨入後的數字去除會多算成 2,300。）
+     所以站上任何一個孤兒數字，都要先問<u>量的是哪一份</u> ——
+     「92.6%」講的是<strong>本站測試機</strong>那一份，不是這個格式的性質。
+     剛出貨的原版幾乎沒有孤兒（中位數 0.00%），
+     孤兒是<u>後來一次次用安全改法疊出來的</u>。</p>
+  <p class="small">⚠️ 站上另一處寫「剛安裝好的原版孤兒只有 0.9%」，
+     那句用的是舊算法（把檔頭與目錄算進去）量 <code>ingame.big</code>。
+     換成現在的定義是 <strong>0.04%</strong>。已一併訂正。</p>
+
+  <h2>實測數據</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>封裝檔</th><th>內容</th><th class="num">項目數</th></tr></thead>
+    <tbody>
+      <tr><td data-label="封裝檔" class="mono">ingame.big</td><td data-label="內容">比賽中的介面版面檔（<a href="fel.html">FEL</a>）<span class="small">（這是本站測試機那一份；剛安裝好的原版是 44 項）</span></td><td data-label="項目數" class="num">47</td></tr>
+      <tr><td data-label="封裝檔" class="mono">frontend.big</td><td data-label="內容">選單介面版面檔</td><td data-label="項目數" class="num">196</td></tr>
+      <tr><td data-label="封裝檔" class="mono">anims.big</td><td data-label="內容">動畫三件套</td><td data-label="項目數" class="num">730</td></tr>
+      <tr><td data-label="封裝檔" class="mono">stadiums.big</td><td data-label="內容">球場縮圖（.fsh）</td><td data-label="項目數" class="num">93</td></tr>
+      <tr><td data-label="封裝檔" class="mono">schedule.big</td><td data-label="內容">賽程 CSV（<a href="../tutorials/change-schedule-year/index.html">教學</a>）</td><td data-label="項目數" class="num">9</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">讀寫 round-trip 測試（讀進來原樣寫回，比對是否位元組相同）：<strong>294 / 294 全數通過</strong>。
+     另做過注入測試：<code>frontend.big</code> 196 項加一項變 197，重新開啟驗證檔名與內容皆正確。</p>
+
+  <h2 id="append">⚠ 最重要的一節：寫回去的方式</h2>
+  <p>讀取很單純，<strong>寫回才是會毀檔的地方</strong>。直覺做法是「把所有項目讀出來、改完再重新打包」——
+     這會出事。</p>
+
+  <div class="card clay">
+    <p class="card-h">ingame.big 有 92.6% 的內容，目錄根本沒有指向</p>
+    <p>把 47 個項目的長度全部加起來只有 <strong>195,999 bytes</strong>，
+       但檔案本身是 <strong>2,665,562 bytes</strong>。
+       剩下那 <strong>2,468,068 bytes（92.59%）</strong>是目錄不指向、但確實還躺在檔案裡的資料。</p>
+    <p>用「重新打包」方式存檔，實測檔案會從 2.5 MB 變成 <strong>198,071 bytes</strong>。
+       47 個項目都還在、內容檢查也全過、<strong>不會有任何錯誤訊息</strong> ——
+       問題可能等到遊戲跑進某個特定畫面才爆出來。</p>
+  </div>
+
+  <h3>正確做法：接到檔尾</h3>
+  <p>不要重排任何東西，只做三件事：</p>
+  <ul class="tick">
+    <li>把新的資料<strong>接在檔案最後面</strong></li>
+    <li>改目錄中該項目的 <strong>8 個位元組</strong>（新的位置與長度）</li>
+    <li>改檔頭的 <strong>4 個位元組</strong>（檔案總大小，<strong>先讀一次確認是哪一種位元組順序</strong>，見下方訂正卡）</li>
+  </ul>
+  <p>原始資料區<strong>一個位元組都不動</strong>。檔案會變大一點，但什麼都不會遺失。</p>
+
+  <div class="card blue">
+    <p class="card-h">我們改過這一段：那個「little-endian」不是通則</p>
+    <p>這頁上線時，檔頭第 4 個位元組起的「檔案總大小」直接標成 little-endian。
+       後來把這台機器上的封裝檔都量過一次（當時 <strong>295 個</strong>真的是 <code>BIGF</code>，不含使用者自己複製的那份 <code>data</code> 備份；同一批裡副檔名是 <code>.big</code> 的有 312 個，差的那 17 個檔頭根本不是 <code>BIGF</code>，見本頁最後一節），結果是：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>檔頭那一欄的位元組順序</th><th class="num">檔數</th><th>哪些</th></tr></thead>
+      <tbody>
+        <tr><td data-label="檔頭那一欄的位元組順序">little-endian</td><td data-label="檔數" class="num">288</td><td data-label="哪些">絕大多數，包含本站教學動到的 <code>ingame.big</code>、<code>schedule.big</code></td></tr>
+        <tr class="hi"><td data-label="檔頭那一欄的位元組順序"><strong>big-endian</strong></td><td data-label="檔數" class="num">7</td>
+            <td data-label="哪些"><code>models.big</code>、<code>portrait.big</code>、<code>pnamedat.big</code>、
+                <code>pnamehdr.big</code>、三個球場夜間檔</td></tr>
+        <tr><td data-label="檔頭那一欄的位元組順序">兩種都對不上</td><td data-label="檔數" class="num">0</td><td data-label="哪些">沒有</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>所以寫回去之前先讀一次確認。</strong>用哪一種讀出來等於實際檔案大小，就用哪一種寫回去。
+       照字面一律寫 little-endian，會在上面那 7 個檔裡寫進跟原檔不同的位元組。</p>
+    <p class="small">⚠️ 2026-09-05 訂正：上面那張表是<u>當時</u>量的。那之後這台機器的 <code>data\</code> 又被動過 ——
+       多了一個封存原廠球場的資料夾，<code>stadium\</code> 本身也換成球場模組那一版。
+       同一個資料夾用檔頭重數一次是 <strong>384 個封裝檔：374 個 little-endian、10 個 big-endian、0 個兩種都對不上</strong>
+       （用檔頭認，所以連一個跟著教學做出來的 <code>schedule.big.bak</code> 也算在內）。
+       多出來的 3 個 big-endian 不是新的檔名，是同樣那三個球場夜間檔在<u>另一個球場資料夾</u>裡又有一份。
+       站上幾課教學寫的「384 個封裝檔裡有 10 個」就是這一次。<strong>結論沒有變，變的只是分母。</strong></p>
+    <p><strong>後來這一條查清楚了。</strong>把每個封裝檔的位元組順序，
+       跟它的檔案修改時間交叉比對：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>檔案的修改時間</th><th class="num">little-endian</th><th class="num">big-endian</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="檔案的修改時間"><strong>2004-2005（遊戲出廠那兩年）</strong></td>
+            <td data-label="little-endian" class="num">146</td><td data-label="big-endian" class="num"><strong>0</strong></td></tr>
+        <tr><td data-label="檔案的修改時間">2012 年以後（社群改過的）</td><td data-label="little-endian" class="num">142</td><td data-label="big-endian" class="num">7</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>出廠期的檔案沒有半個是 big-endian。</strong>
+       那 7 個 big-endian 的檔，時間戳分別落在 2012、2013 與 2023 年，
+       全部是後來被社群工具重新打包過的。</p>
+    <p class="small">⚠️ 2026-09-05 重跑：上面那張表是<u>當時</u>那 295 個的結果。
+       同一套量法在同一台機器上重跑那 384 個封裝檔，出廠期是
+       <strong>175 個 little-endian、big-endian 仍然掛零</strong>，
+       2012 年以後是 199 個 little-endian、10 個 big-endian。
+       多出來的是後來擺進 <code>data\</code> 的球場資料夾副本。<strong>結論沒有變。</strong></p>
+    <p>最直接的一組證據是球場檔：這台機器上同時留著同一個檔名的好幾份
+       <code>dodgnite.big</code>，一份在封存原廠球場的資料夾裡，
+       時間是 <strong>2004-12-24</strong>、little-endian；
+       另一份是球場模組那一套（現在遊戲用的 <code>stadium\</code> 放的就是它），時間是 <strong>2013-10-19</strong>、big-endian。
+       同一個檔名、同樣 88 個項目，只有這一欄的位元組順序不同。</p>
+    <p><strong>後來拿到真正的原版，直接驗證了這件事。</strong>
+       本站現在有一份<u>剛安裝好、從未被改動過</u>的英文版
+       （資料夾裡 1,191 個檔，其中 <strong>1,189 個</strong>的修改時間落在 2004-2005 年）。
+       <span class="small">⚠️ 這裡的「1,191」是<u>資料夾裡有幾個檔</u>。
+       另外兩個是 2003 年的 <code>TP03Patcher.dll</code> 與
+       <strong>2015 年的 <code>filelist.txt</code></strong> ——
+       後者顯然不是安裝程式產生的，所以「安裝產物」算起來是 1,190 個。
+       本頁後面提到的 1,191 是前一種口徑，兩個數字都對，差別在算不算那一個。</span>
+       那份剛安裝好的原版英文版裡，<strong>207 個封裝檔全部是 little-endian，一個 big-endian 都沒有</strong>；
+       另一份剛安裝好的原版繁體中文版，<code>data</code> 資料夾裡的 205 個封裝檔也全部是 little-endian。
+       這不再是從時間戳推的，是<u>拿原廠安裝直接數出來的</u>。</p>
+    <p class="small">所以寫回去的規則可以講得很明確：<strong>EA 原廠一律 little-endian</strong>。
+       但如果你手上那個檔已經被別人的工具打包過，它可能是 big-endian ——
+       <u>先讀一次，原檔是哪一種就照哪一種寫回去</u>，這樣不管拿到哪一份都不會寫錯。</p>
+  </div>
+
+<pre><code>data[field:field+8] = struct.pack('&gt;II', new_offset, len(payload))  <span class="cm"># 目錄:BE</span>
+data[4:8]          = struct.pack('&lt;I', len(data))                  <span class="cm"># 檔頭:LE</span></code></pre>
+
+  <div class="card grass">
+    <p class="card-h">這正是那 92.6% 的來源</p>
+    <p>這個檔案一路就是被這樣更新過來的，而遊戲始終讀得動 ——
+       等於這種存檔方式已經被十幾年的實際使用驗證過。</p>
+    <p>那片區域<strong>不是垃圾</strong>：裡面撈得出 <strong>13 個未壓縮的版面檔文字區塊</strong>，
+       合計 690,059 bytes，全部讀得出來。詳見
+       <a href="../story/orphan-data/index.html">一個檔案裡的地層</a>。</p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">我們改過這一段</p>
+    <p>這頁上線時，這裡寫「殘骸區撈得出 <strong>156 種舊版畫面代號</strong>
+       （<code>HUDLEFT1</code> 一路到 <code>HUDLEFT16</code>，而現行版本只有一個 <code>HUDLEFT</code>）」。</p>
+    <p><strong>重新量測後：156 這個數字量得出來，只是口徑不同。</strong>
+       它是把<u>整片沒被指向的位元組</u>一起掃的結果；
+       只看那 13 個讀得出整段文字的區塊是 <strong>143 種</strong>
+       （多出來的 13 個只出現在讀不成整段文字的地方，其中 3 個還是被壓縮資料切壞的名字）。
+       <strong>真正不對的是「舊版」兩個字</strong> —— 這些畫面代號<strong>每一種現行版本裡都還在</strong>。
+       至於 <code>HUDLEFT</code>，現行的
+       <code>fes_hudleft.fel</code> 有 <strong>26 個</strong>
+       （<code>HUDLEFT</code> 加上 <code>HUDLEFT1</code>–<code>HUDLEFT25</code>），
+       不是一個 —— 這一點與本站
+       <a href="fel.html">FEL 那頁</a>原本就寫的數字相符，是這裡寫錯了。</p>
+  </div>
+
+  <h2 id="sentinel">每個前端封裝檔的頭尾各有一個 1 位元組的標記（2026-08-28 量的）</h2>
+  <p>把剛安裝好的原版 <code>data\frontend\</code> 底下每個裝圖片的封裝檔攤開來數，
+     會看到一件一開始像是壞掉的事：<strong>目錄裡有一個名字出現兩次</strong>。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>封裝檔</th><th class="mono">重複的名字</th><th class="num">在目錄的第幾筆</th><th class="num">兩份的長度</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="封裝檔"><code>portrait.big</code></td><td data-label="重複的名字" class="mono">a2653.fsh</td><td data-label="在目錄的第幾筆" class="num">第 0 筆 與 第 2,392 筆（共 2,393）</td><td data-label="兩份的長度" class="num">各 1 byte</td></tr>
+      <tr class="hi"><td data-label="封裝檔"><code>uniforms.big</code></td><td data-label="重複的名字" class="mono">a022.fsh</td><td data-label="在目錄的第幾筆" class="num">第 0 筆 與 第 556 筆（共 557）</td><td data-label="兩份的長度" class="num">各 1 byte</td></tr>
+      <tr><td data-label="封裝檔"><code>stadiums.big</code></td><td data-label="重複的名字" class="mono">a1a01.fsh</td><td data-label="在目錄的第幾筆" class="num">第 0 筆 與 第 92 筆（共 93）</td><td data-label="兩份的長度" class="num">各 1 byte</td></tr>
+      <tr><td data-label="封裝檔"><code>bkgnds.big</code></td><td data-label="重複的名字" class="mono">a22bd.fsh</td><td data-label="在目錄的第幾筆" class="num">第 0 筆 與 第 106 筆（共 107）</td><td data-label="兩份的長度" class="num">各 1 byte</td></tr>
+      <tr><td data-label="封裝檔">…另外 13 個</td><td data-label="重複的名字" class="mono">都是 <code>a</code> 開頭</td><td data-label="在目錄的第幾筆" class="num">同樣是第一筆與最後一筆</td><td data-label="兩份的長度" class="num">各 1 byte</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>17 個封裝檔，17 個都是這樣，零例外</strong>，而且官方英文版與官方繁體中文版完全相同。</p>
+
+  <div class="card grass">
+    <p class="card-h">它們是一對書擋</p>
+    <ul class="plain">
+      <li><strong>第一份</strong>坐在<u>資料區的開頭</u> —— 目錄結束、資料開始的那一格</li>
+      <li><strong>第二份</strong>坐在<u>檔案的最後一個位元組</u> ——
+          它的位置正好等於「檔案長度減一」，<strong>17 個檔全部精確吻合</strong></li>
+    </ul>
+    <p>所以它們標的是<u>資料區的頭與尾</u>。名字也不是隨機的：
+       <code>aaw…</code> 在 <code>awards.big</code>、<code>abi…</code> 在 <code>bpitems.big</code>、
+       <code>acp…</code> 在 <code>coopplyr.big</code> —— <strong>字首對應封裝檔自己的縮寫</strong>。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">⚠️ 寫工具的人一定要知道這件事</p>
+    <ul class="plain">
+      <li><strong>用檔名當鍵建字典，會靜靜地少一筆。</strong>
+          兩筆同名，後面那筆會蓋掉前面那筆 ——
+          <u>不會報錯，只是數字對不上</u>。本站量 <code>bkgnds.big</code> 時
+          先得到 106，跟先前記的 107 差一個，追下去才發現這件事</li>
+      <li><strong>算「目錄指到多少位元組」時它們也在裡面</strong>，只是各佔 1 個位元組，
+          對總量沒有影響</li>
+      <li><strong>可以拿來當完整性檢查</strong>：前端的圖片封裝檔，
+          <u>第一筆與最後一筆的名字應該一樣、都是 1 個位元組、
+          而最後一筆的位置應該等於檔長減一</u>。三個條件有一個不成立，這個檔就被動過</li>
+    </ul>
+    <p class="small">球場那些封裝檔<u>沒有</u>這個結構（本站量的 87 個一個都沒有），
+       所以這是前端封裝檔的慣例，不是 BIGF 格式本身的規定。</p>
+  </div>
+
+  <h2 id="nested">封裝檔裡面還有封裝檔</h2>
+  <p>有兩個檔解開之後，<strong>裡面裝的是另一個封裝檔</strong>：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">外層</th><th class="num">外層大小</th><th class="mono">裡面唯一的項目</th>
+               <th class="num">解壓後</th><th class="num">內層項目數</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="外層" class="mono">data\initstaz.big</td><td data-label="外層大小" class="num">1,212,711</td>
+          <td data-label="裡面唯一的項目" class="mono">initstay.big</td><td data-label="解壓後" class="num">3,082,320</td><td data-label="內層項目數" class="num">34</td></tr>
+      <tr class="hi"><td data-label="外層" class="mono">data\initprgz.big</td><td data-label="外層大小" class="num">107,019</td>
+          <td data-label="裡面唯一的項目" class="mono">initpurge.big</td><td data-label="解壓後" class="num">332,704</td><td data-label="內層項目數" class="num">11</td></tr>
+    </tbody>
+  </table></div>
+  <p>兩個都是<strong>外層只裝一個項目</strong>，那個項目是 QFS 壓縮的，解開就是一個完整的 <code>BIGF</code>。
+     外層檔名結尾是 <code>z</code>，內層是原本的名字 —— <code>initstaz</code> 裝 <code>initstay</code>、
+     <code>initprgz</code> 裝 <code>initpurge</code>。
+     <span class="badge wip">為什麼要這樣包，檔案裡沒有寫</span></p>
+
+  <div class="card grass">
+    <p class="card-h">只有在這一層，項目名稱才會帶資料夾</p>
+    <p>本站把原版全部 <strong>207 個</strong>真的是 <code>BIGF</code> 的封裝檔目錄讀過一遍，
+       共 <strong>29,816</strong> 個項目：</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>項目名稱長什麼樣</th><th class="num">幾個</th></tr></thead>
+      <tbody>
+        <tr><td>單純的檔名（<code>ball.fsh</code>、<code>2118.fsh</code>）</td><td class="num">29,816</td></tr>
+        <tr class="hi"><td>帶資料夾路徑（<code>models/ball.o</code>）</td><td class="num"><strong>0</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p>可是<u>拆開那兩個內層之後</u>，45 個項目<strong>全部</strong>帶路徑：</p>
+<pre><code><span class="cm">initstay.big 的前幾個項目</span>
+<span class="hl">models/</span>bat.o          12,768
+<span class="hl">models/</span>brknbat.o      17,536
+<span class="hl">models/</span>ball.o          5,680
+<span class="hl">models/</span>hibody.ord    786,336
+<span class="hl">misc/</span>…</code></pre>
+    <p class="small">內層前置資料夾：<code>initstay</code> 是 <code>models</code> 33 個、<code>misc</code> 1 個；
+       <code>initpurge</code> 是 <code>models</code> 11 個。</p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">這解釋了一件老玩家會覺得奇怪的事</p>
+    <p>球具類的模組常常附一個 <code>.bat</code> 安裝檔，裡面會先
+       <code>mkdir models\textures</code> 再複製檔案，
+       很多人看不懂「不是丟進去就好了嗎」。</p>
+    <p>因為<strong>這一層的項目名稱本身就含資料夾</strong>，
+       重建它的工具得先把那個資料夾造出來，名稱才對得起來。
+       <span class="badge wip">「工具是這樣運作的」屬於推論</span>
+       —— 本站量到的是<u>名稱帶路徑</u>這個事實，
+       至於某個特定工具怎麼處理，本站沒有測。</p>
+  </div>
+
+  <h3>怎麼自己看一遍</h3>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data\initstaz.big --entries</code></pre>
+  <p>會印出：</p>
+<pre><code>封裝檔內共 1 個項目:
+
+  名稱                                             大小  內容是什麼(看檔頭認的)
+  ----------------------------------------------------------------------------
+  initstay.big                            1,212,663  <span class="hl">QFS → BIGF(裡面又有 34 個項目)</span>
+  ----------------------------------------------------------------------------
+  合計 1,212,663 bytes</code></pre>
+  <p class="small"><code>--entries</code> 跟 <code>--list</code> 的差別：
+     <code>--list</code> 只看版面檔，<code>--entries</code> 每個項目都列，
+     而且會解開來看檔頭認出它是什麼。
+     工具在<a href="../tutorials/fel-toolkit/index.html">介面萬用工具</a>那一課。</p>
+
+  <h2>其他變體</h2>
+  <ul class="plain">
+    <li><strong>BIG4</strong> —— EA 其他遊戲用的 little-endian 變體。<strong>MVP 2005 一個都沒有</strong>：剛安裝好的原版整套 1,191 個檔全部掃過檔頭，<code>BIG4</code> 命中 0 次；本站測試機那邊也是整棵資料夾逐檔掃（2026-09-05 掃到 4,974 個檔，這個數字會隨你自己放進去的模組變動），一樣 0 次。看到別的教學提到 BIG4，那是別的遊戲。</li>
+    <li><strong><code>*hdr.big</code></strong> —— <strong>名字看起來像，但要分兩種。</strong>原版 13 個 <code>*hdr.big</code> 裡，<u>8 個根本不是 BIGF</u>（<code>bdcsthdr</code>、<code>chanthdr</code>、<code>hsfxhdr</code>、<code>plchthdr</code>、<code>rallyhdr</code>、<code>pahdr</code>、<code>pbphdr</code>、<code>stdmhdr</code>），是另一種 EA 格式；<u>另外 5 個是貨真價實的 BIGF 封裝檔</u>（名字只有三個 —— <code>pnamehdr</code>、<code>tnamehdr</code>、<code>stdnmhdr</code>，前兩個各在兩個資料夾裡出現一次，裡面裝的是 <code>.hdr</code> 項目）。一樣是那句老話：<strong>看檔頭，不要看檔名。</strong></li>
+  </ul>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> <code>.big</code> 是 EA 自家的封裝格式，一個 16 位元組檔頭加一份目錄就讀得完，真正會毀檔的是<strong>寫回去</strong>，只能把新資料接到檔尾，整包重新打包會靜靜地丟掉東西。</li>
+    <li><strong>同一個檔頭混著兩種位元組順序</strong> 總大小是 little-endian，項目數與目錄結束位置是 big-endian。<code>misc.big</code> 的第 4 個位元組起是 <code>7E 03 00 00</code>，當 big-endian 讀是 2,114,125,824（2 GB，明顯錯誤），當 little-endian 讀是 <strong>894</strong>，正是該檔真實大小。</li>
+    <li><strong>最重要的一個數字</strong> 測試機的 <code>ingame.big</code> 有 2,665,562 個位元組，47 個項目加起來只有 195,999，剩下 <strong>2,468,068（92.59%）</strong>目錄根本不指向。用重新打包的方式存檔，實測會變成 198,071 個位元組，<u>47 個項目一個不少、內容檢查全過、不會有任何錯誤訊息</u>。正確做法只有三件事：資料接到檔尾、改目錄那 8 個位元組、改檔頭那 4 個位元組。</li>
+    <li><strong>訂正一：<code>+0x0C</code> 不是「資料起始位置」</strong>。它是<u>目錄區結束之後</u>的位置（檔頭 ＋ 目錄 ＋ 8 個位元組尾標），原版 207 個封裝檔 <strong>207／207 全中</strong>；但它不等於第一筆資料真正的位置，只有 18／207 相同，其餘中間隔著填充，最多差 119。要找資料請讀目錄裡那一筆自己的 offset。</li>
+    <li><strong>訂正二：little-endian 不是通則</strong>。這台機器<u>當時</u> 295 個封裝檔裡 288 個 little-endian、7 個 big-endian、0 個兩種都對不上（2026-09-05 那個資料夾又被動過之後重量是 384 個裡 374／10／0，結論沒變），而那 7 個的時間戳全部落在 2012 年以後；出廠期那 146 個檔<strong>一個 big-endian 都沒有</strong>（2026-09-05 重跑是出廠期 175 個、2012 年以後 199／10，一樣掛零）。同一台機器上留著同一個檔名的 <code>dodgnite.big</code>，封存原廠球場那份是 2004-12-24、little-endian，遊戲現在用的球場模組那份是 2013-10-19、big-endian，同樣 88 個項目只有這一欄不同。<u>寫回去之前先讀一次，原檔是哪一種就照哪一種寫。</u></li>
+    <li><strong>訂正三：本站自己混用過兩種孤兒算法</strong>。同一個檔出現過 2,468,068 與 2,469,563 兩個數字，差的 1,495 正好是 <code>16 ＋ 1,479</code>（檔頭與目錄算不算進孤兒），已統一成「不算」那個定義；站上另一處寫的原版孤兒 0.9% 也換算成 <strong>0.04%</strong>。另外原本寫的「撈得出 156 種舊版畫面代號、現行只有一個 <code>HUDLEFT</code>」：156 只是口徑不同（整片沒被指向的位元組一起掃），讀得出整段文字的那 13 個區塊是 <strong>143 種</strong>、每一種現行版本都還在，錯的是「舊版」兩個字；而 <code>fes_hudleft.fel</code> 有 26 個。</li>
+    <li><strong>前端封裝檔頭尾各有一個 1 位元組的書擋</strong> 目錄第一筆與最後一筆同名、各 1 個位元組，最後那筆的位置正好等於檔長減一，<strong>17 個封裝檔零例外</strong>，官方英文版與繁中版相同。<u>拿檔名當鍵建字典會靜靜地少一筆</u>，本站量 <code>bkgnds.big</code> 先得到 106、跟先前記的 107 差一個，追下去才發現。球場那 87 個封裝檔沒有這個結構，所以它是前端的慣例不是格式規定。</li>
+    <li><strong>本站沒驗的</strong> <code>initstaz</code>／<code>initprgz</code> 這兩個「封裝檔裡面還有封裝檔」<u>為什麼要這樣包，檔案裡沒有寫</u>；而「重建工具得先把資料夾造出來，名稱才對得起來」是推論，本站量到的只有<u>內層 45 個項目名稱全部帶路徑</u>這個事實，某個特定工具怎麼處理並沒有測。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="qfs.html">QFS / RefPack 壓縮</a> —— 封裝檔裡的項目常常還包一層壓縮</li>
+    <li><a href="fel.html">FEL 版面檔</a> —— 解開壓縮後的介面腳本</li>
+    <li><a href="../tutorials/change-schedule-year/index.html">實戰：換賽程年份</a> —— 用到本頁全部知識的完整流程</li>
+  </ul>
+
+  <footer>
+    <p>本頁所有數據皆取自實際解開的檔案內容，非推測。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

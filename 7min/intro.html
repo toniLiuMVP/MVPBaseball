@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/7min/intro.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>七分鐘學會置換遊戲開始影片並匯入遊戲 — toni的MVP模組補習班</title>
+<meta name="description" content="七分鐘跳過遊戲的開場動畫。含 EA 影片容器的格式說明與本站做不到的部分。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item on" href="index.html">七分鐘</a>
+  <a class="item" href="../reference/index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">七分鐘</a> › 開場影片</p>
+  <h1>七分鐘學會置換遊戲開始影片並匯入遊戲</h1>
+  <p class="lede">七分鐘做得完、而且<strong>絕大多數人真正想要的</strong>：<u>把開場動畫跳過去，直接進遊戲</u>。</p>
+  <div class="card">
+    <p class="card-h">⏱ 七分鐘怎麼分配</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>做什麼</th><th class="num">分鐘</th></tr></thead>
+      <tbody>
+        <tr><td>找到影片資料夾</td><td class="num">1</td></tr>
+        <tr><td>看懂哪個是真的、哪個已經是空的</td><td class="num">2</td></tr>
+        <tr><td>備份</td><td class="num">1</td></tr>
+        <tr><td>動手</td><td class="num">1</td></tr>
+        <tr><td>開遊戲確認</td><td class="num">2</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <h2>前置</h2>
+  <ul>
+    <li>已安裝的 MVP Baseball 2005</li>
+    <li>會用檔案總管 / Finder 就夠，<strong>這一堂不用打指令</strong></li>
+  </ul>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法看<a href="../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <h2>👉 你要做的事</h2>
+
+  <div class="step">
+    <div class="step-n">1</div>
+    <div>
+      <p><strong>找到影片資料夾。</strong></p>
+      <pre><code>data → frontend → movies</code></pre><p>裡面是一堆 <code>.vp6</code>。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">2</div>
+    <div>
+      <p><strong>先看檔案大小，你會發現一件事。</strong></p>
+      <div class="card"><p class="card-h">本站在測試機上量到的</p><p>16 個影片檔裡，<strong>15 個大小完全一樣(1,940 bytes)、內容一模一樣</strong> ——是同一個「一秒空白」的檔被複製了十五份。只有一個是真的(829,172 bytes、5 秒、有聲音)。</p><p>換句話說，<u>這份遊戲的開場動畫早就被前人用空白檔蓋掉了</u> ——那正是社群跳過開場的標準做法。而它同時證明了一件事：<strong>遊戲會乖乖接受一個外來的影片檔</strong>。</p></div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">3</div>
+    <div>
+      <p><strong>先把整個 <code>movies</code> 資料夾複製一份備份。</strong></p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">4</div>
+    <div>
+      <p><strong>把那個一秒空白檔，複製並改名蓋掉你想跳過的影片。</strong></p>
+      <p>例如你想跳過某支開場，就把已經是空白的那個檔複製一份、改成那支影片的檔名蓋過去。<strong>用的是你自己遊戲裡本來就有的檔案</strong>，不需要下載任何東西。</p>
+    </div>
+  </div>
+
+  <h2>✅ 怎麼知道成功了</h2>
+  <ul>
+    <li>開遊戲時原本的動畫不見了，直接進選單</li>
+    <li>遊戲沒有當掉</li>
+  </ul>
+
+  <h2>❌ 出錯處理</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>症狀</th><th>怎麼辦</th></tr></thead>
+    <tbody>
+      <tr><td>遊戲當掉</td><td>把備份資料夾蓋回去。有些影片可能不能是空的</td></tr>
+      <tr><td>動畫還在</td><td>檔名要完全一樣，包含大小寫</td></tr>
+      <tr><td>找不到一秒空白的檔</td><td>代表你這份是原版、還沒被人動過。改走<a href="../tutorials/skip-intro/index.html">關掉開場動畫</a>那一課，用你自己那一份生短版</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card red">
+    <p class="card-h">⚠️ 這一課到哪裡為止</p>
+    <p><strong>要放你自己的影片進去，本站目前做不到。</strong></p><p>這些檔是 EA 自己的容器：開頭四個字是 <code>MVhd</code>，裡面裝的是 On2 VP6 影像，加上 EA 的 ADPCM 聲音。免費的 <code>ffmpeg</code> <u>解得開，但沒有 VP6 編碼器</u> ——跟音訊那邊是同一個狀況：<strong>能讀不能寫。</strong></p><p>容器本身其實很單純(32 位元組檔頭，接著一連串區塊：影格與音訊各有自己的標記)，真正卡住的是<u>產生 VP6 影像資料</u>那一格。本站把已知的部分寫在下面連過去的頁面，不假裝做得到。</p><p><strong>拿原版安裝、找不到那個空白檔的人：這一課的做法對你不成立。</strong>上面第 4 步用的是「你這份遊戲裡已經有前人留下的空白檔」——本站測試機那 15 個 1,940 bytes 的檔就是，而你這份裡沒有。從零自己生一個空白檔也繞不過同一格：那 1,940 bytes 裡，32 位元組的 <code>MVhd</code> 檔頭之後接的是 1 個 <code>MV0K</code> 關鍵影格加 24 個 <code>MV0F</code> 後續影格，而做出影格資料要的正是上面那個沒有的 VP6 編碼器。原版使用者請改走<a href="../tutorials/skip-intro/index.html">關掉開場動畫</a>那一課：那支腳本拿<u>你自己那一份 <code>mvpintro.vp6</code></u>，只留開頭幾格畫面、聲音整組丟掉再照原格式組回去，<strong>不需要現成的空白檔，也不需要任何外來的影片檔</strong>。那一課要下載本站那支腳本、打一行指令，不像這一頁純用檔案總管就做得完。</p>
+  </div>
+
+
+  <h2>想弄懂為什麼</h2>
+  <ul class="plain">
+    <li><a href="../tutorials/skip-intro/index.html">關掉開場動畫</a> —— 這個容器的檔頭與區塊格式在那一課全部拆開了，也是原版使用者的做法</li>
+    <li><a href="../reference/file-map.html">遊戲檔案地圖</a> —— 影片在整份檔案裡的位置</li>
+    <li><a href="splash.html">七分鐘換開始畫面</a> —— 靜態圖這邊本站做得到</li>
+    <li><a href="../reference/tools-archive.html">二十年工具清冊</a></li>
+  </ul>
+
+  <footer>
+    <p>本頁是「下課七分鐘」系列，只講一件事怎麼做完。
+       原理、量測過程與本站驗到哪裡為止，寫在上面連過去的完整課程裡。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

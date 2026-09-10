@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/audio.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>播報與音訊系統 — toni的MVP模組補習班</title>
+<meta name="description" content="MVP Baseball 2005 的 13 個音訊分區：每區同一套六檔模板、.off 索引的加總驗證法、以及 .big 在這裡其實有三種不同格式。所有數字現場量測。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 播報與音訊系統</p>
+  <h1>播報與音訊系統</h1>
+  <p class="lede">主播的每一句話、場館廣播、觀眾應援、全壘打音效 ——
+     全都在 <code>data/audio/</code> 底下。這一區<strong>比整個遊戲其他部分加起來還大</strong>，
+     而且它的索引檔是純文字，你可以直接打開驗算。</p>
+
+  <h2>先看規模</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>項目</th><th class="num">數字</th><th>備註</th></tr></thead>
+    <tbody>
+      <tr><td data-label="項目">音訊分區</td><td data-label="數字" class="num">13 個</td><td data-label="備註">每個分區一個資料夾</td></tr>
+      <tr><td data-label="項目">檔案數</td><td data-label="數字" class="num">111 個</td><td data-label="備註">相對於它的體積，檔案數少得驚人</td></tr>
+      <tr class="hi"><td data-label="項目">合計大小</td><td data-label="數字" class="num">736.9 MB</td><td data-label="備註">其中 729 MB 集中在 <code>cd/</code> 一個資料夾</td></tr>
+      <tr><td data-label="項目">最大的單一檔案</td><td data-label="數字" class="num">212 MB</td><td data-label="備註"><code>cd/spch_pbp/pbpdat.big</code>，主播的全部語音</td></tr>
+      <tr><td data-label="項目">主播語音的名稱條目</td><td data-label="數字" class="num">23,013 條</td><td data-label="備註">其中 18,492 個不重複名稱</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">上面每個數字都是把 <code>data/audio/</code> 現場走過一遍數出來的，不是引用他人資料。</p>
+
+  <h2>每個分區都是同一套模板</h2>
+  <p>13 個分區裡有 <strong>6 個結構完全一致</strong>，各自 6 個檔，
+     而且這 6 個分區的副檔名組成一模一樣（<code>.txt</code>、<code>.nam</code>、<code>.evt</code>、
+     <code>.big</code>、以及兩個 <code>.off</code>）。以觀眾應援 <code>chants/</code> 為例：</p>
+<pre><code>chants/
+  spch_cht.txt      <span class="cm">名稱表(純文字,可以直接讀)</span>
+  spch_cht.nam      <span class="cm">名稱表(二進位版)</span>
+  events.evt        <span class="cm">事件表(二進位)</span>
+  chanthdr.big      <span class="cm">標頭資料</span>
+  chanthdr.off      <span class="cm">標頭索引(純文字)</span>
+  chantdat.off      <span class="cm">資料索引(純文字)</span>
+
+cd/chants/
+  chantdat.big      <span class="cm">← 真正的聲音在這裡,56 MB</span></code></pre>
+
+  <div class="card amber">
+    <p class="card-h">索引跟聲音是分開放的</p>
+    <p>注意最後一行：<strong>索引在 <code>audio/chants/</code>，聲音本體在 <code>audio/cd/chants/</code></strong>。
+       13 個分區都是這樣。</p>
+    <p><code>cd</code> 這個名字透露了設計意圖 —— 2005 年的遊戲，
+       體積龐大的語音是預期從光碟串流播放的，所以索引留在硬碟、資料放在「光碟」那一側。
+       <span class="badge wip">推測</span> 這個解讀本站未經證實。</p>
+  </div>
+
+  <h2>那個叫 <code>.off</code> 的檔可以直接驗算</h2>
+  <p>索引檔 <code>.off</code> 是<strong>純文字</strong>，打開就看得懂，每行兩個數字：</p>
+<pre><code><span class="cm">chantdat.off 的前四行(原檔內容)</span>
+0,865536,
+865536,805632,
+1671168,1658624,
+3329792,917760,
+      │      └── 這一段有多長
+      └───────── 這一段從第幾個位元組開始</code></pre>
+  <p>把每一行的兩個數字加起來，就是下一行的開頭：
+     <code>0 + 865536 = 865536</code>，<code>865536 + 805632 = 1671168</code>。
+     一路對到最後一行都不會斷。</p>
+
+  <div class="card grass">
+    <p class="card-h">一條可以自己驗證的規則</p>
+    <p>把 <code>.off</code> 裡<strong>所有的「長度」加起來</strong>，
+       結果會<strong>剛好等於它對應那個資料檔的大小</strong>。</p>
+    <p>本站把全部 <strong>16 個 <code>.off</code> 檔</strong>都算了一遍：
+       <strong>16 個全部完全相符，一個 byte 都不差</strong>。而且每一段都緊接著上一段，
+       中間沒有任何空隙、也沒有重疊。</p>
+  </div>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">索引檔</th><th class="num">段數</th><th class="num">長度加總</th><th class="num">對應檔案大小</th><th>結果</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="索引檔" class="mono">pbpdat.off</td><td data-label="段數" class="num">2,056</td><td data-label="長度加總" class="num">212,219,648</td><td data-label="對應檔案大小" class="num">212,219,648</td><td data-label="結果"><span class="badge ok">相符</span></td></tr>
+      <tr><td data-label="索引檔" class="mono">pbphdr.off</td><td data-label="段數" class="num">2,056</td><td data-label="長度加總" class="num">107,484</td><td data-label="對應檔案大小" class="num">107,484</td><td data-label="結果"><span class="badge ok">相符</span></td></tr>
+      <tr><td data-label="索引檔" class="mono">chantdat.off</td><td data-label="段數" class="num">90</td><td data-label="長度加總" class="num">56,474,880</td><td data-label="對應檔案大小" class="num">56,474,880</td><td data-label="結果"><span class="badge ok">相符</span></td></tr>
+      <tr><td data-label="索引檔" class="mono">padat.off</td><td data-label="段數" class="num">66</td><td data-label="長度加總" class="num">13,428,480</td><td data-label="對應檔案大小" class="num">13,428,480</td><td data-label="結果"><span class="badge ok">相符</span></td></tr>
+      <tr><td data-label="索引檔" class="mono">rallydat.off</td><td data-label="段數" class="num">3</td><td data-label="長度加總" class="num">13,075,456</td><td data-label="對應檔案大小" class="num">13,075,456</td><td data-label="結果"><span class="badge ok">相符</span></td></tr>
+      <tr><td data-label="索引檔" class="mono">plchtdat.off</td><td data-label="段數" class="num">17</td><td data-label="長度加總" class="num">11,826,432</td><td data-label="對應檔案大小" class="num">11,826,432</td><td data-label="結果"><span class="badge ok">相符</span></td></tr>
+      <tr><td data-label="索引檔" class="mono">hsfxdat.off</td><td data-label="段數" class="num">3</td><td data-label="長度加總" class="num">6,396,928</td><td data-label="對應檔案大小" class="num">6,396,928</td><td data-label="結果"><span class="badge ok">相符</span></td></tr>
+      <tr><td data-label="索引檔" class="mono">stdmdat.off</td><td data-label="段數" class="num">2</td><td data-label="長度加總" class="num">5,339,392</td><td data-label="對應檔案大小" class="num">5,339,392</td><td data-label="結果"><span class="badge ok">相符</span></td></tr>
+      <tr><td data-label="索引檔" class="mono">bdcstdat.off</td><td data-label="段數" class="num">3</td><td data-label="長度加總" class="num">4,872,192</td><td data-label="對應檔案大小" class="num">4,872,192</td><td data-label="結果"><span class="badge ok">相符</span></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">全部 16 個索引檔分成兩半：8 個資料索引（<code>*dat.off</code>）與
+     8 個標頭索引（<code>*hdr.off</code>）。上表列出 8 個資料索引，
+     外加 <code>pbphdr.off</code> 當作標頭索引的例子；沒列出的 7 個標頭索引同樣全部相符。</p>
+
+  <div class="card blue">
+    <p class="card-h">為什麼這件事重要</p>
+    <p>逆向一個沒有文件的格式，最難的是<strong>「怎麼知道自己猜對了」</strong>。
+       這裡剛好給了一個免費的檢查點：如果你對 <code>.off</code> 的理解是對的，
+       數字加起來就會剛好等於檔案大小；差一個 byte 就代表你哪裡想錯了。</p>
+    <p>這種「格式自己帶著驗算方法」的情況不常見，遇到了要用。</p>
+  </div>
+
+  <h2><code>.big</code> 在這裡有三種完全不同的格式</h2>
+  <p><code>data/audio/</code> 底下有 28 個副檔名是 <code>.big</code> 的檔案。
+     實測前四個位元組，<strong>只有 12 個是真的 BIGF 封裝檔</strong>：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">檔數</th><th class="mono">開頭四碼</th><th>實際是什麼</th><th>哪些檔</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="檔數" class="num">12</td><td data-label="開頭四碼" class="mono">BIGF</td><td data-label="實際是什麼">真的封裝檔</td>
+          <td data-label="哪些檔">10 個是球員名／隊名／球場名（<code>pname</code>、<code>tname</code>、<code>stdnm</code>），
+              另外 2 個是裝純文字 CSV 的資料庫（<code>crowddb/audiocsv.big</code>、<code>speechdb/speechdb.big</code>）</td></tr>
+      <tr class="hi"><td data-label="檔數" class="num">8</td><td data-label="開頭四碼" class="mono">SCHl</td><td data-label="實際是什麼">EA 的音訊串流容器</td>
+          <td data-label="哪些檔">全部是 <code>cd/</code> 底下的 <code>*dat.big</code>，也就是聲音本體</td></tr>
+      <tr><td data-label="檔數" class="num">8</td><td data-label="開頭四碼" class="mono">各不相同</td><td data-label="實際是什麼">各分區自己的標頭格式</td>
+          <td data-label="哪些檔">全部是 <code>*hdr.big</code>，八個檔的開頭四碼<strong>沒有兩個一樣</strong></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card clay">
+    <p class="card-h">副檔名會騙人，這裡是最好的例子</p>
+    <p>同一個副檔名、同一個資料夾底下，代表三種毫無關係的格式。
+       如果你寫的工具看到 <code>.big</code> 就直接套 BIGF 解析器，
+       28 個檔裡會有 16 個當場失敗。</p>
+    <p>正確做法是<strong>看開頭四個位元組</strong>，不是看副檔名。
+       <a href="../tutorials/read-file-headers/index.html">五秒看穿一個檔案</a>教的就是這件事。</p>
+  </div>
+
+  <h2>主播語音：三層名稱，而且對不上</h2>
+  <p>主播 <code>spch_pbp/</code> 是全遊戲最大的一區。它的名稱表 <code>spch_pbp.txt</code>
+     是 1.1 MB 的純文字，長這樣：</p>
+<pre><code>1b_pbp_ex                          <span class="cm">← 群組標頭(沒有數字)</span>
+yil.6+.1                    230656 <span class="cm">← 名稱 + 在資料檔裡的位置</span>
+yil.6+.3                    241152
+yil.6+.4                    251648</code></pre>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>層</th><th>檔案</th><th class="num">數量</th></tr></thead>
+    <tbody>
+      <tr><td data-label="層">名稱層</td><td data-label="檔案" class="mono">spch_pbp.txt</td><td data-label="數量" class="num">23,013 條名稱<br><span class="small">分屬 8,889 個群組</span></td></tr>
+      <tr class="hi"><td data-label="層">索引層</td><td data-label="檔案" class="mono">pbpdat.off</td><td data-label="數量" class="num">2,056 段</td></tr>
+      <tr><td data-label="層">事件層</td><td data-label="檔案" class="mono">events.evt</td><td data-label="數量" class="num">205,530 bytes（二進位）</td></tr>
+    </tbody>
+  </table></div>
+
+  <p><strong>23,013 個名稱，但只有 2,056 個資料段。</strong>
+     這兩個數字差了十倍以上，所以名稱跟資料段<strong>不是一對一</strong>。
+     名稱表裡的 23,013 條只用到 5,704 個不重複的位置值，
+     代表<strong>同一段聲音會被很多個名稱共用</strong>。</p>
+
+  <div class="card amber">
+    <p class="card-h">這裡要誠實</p>
+    <p>本站<strong>已經解開</strong> <code>events.evt</code> 的<u>外層</u>結構
+       （見<a href="#evt">下方「事件表自己會驗算」</a>），
+       但沒有解出每筆事件裡各欄位的意思，也沒有解出三層之間確切的對應規則。
+       上面列的是量得到的數量關係，不是機制說明。</p>
+    <p>能確定的是：這三個檔的數字彼此對不上，所以<strong>不能假設「第 N 個名稱對應第 N 段聲音」</strong>。
+       任何想換掉主播語音的工具，都得先解決這個對應問題。</p>
+  </div>
+
+  <h2>13 個分區各是什麼</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">資料夾</th><th class="num">大小</th><th>裝什麼</th><th>證據</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="資料夾" class="mono">cd</td><td data-label="大小" class="num">729.0 MB</td><td data-label="裝什麼">所有分區的聲音本體，外加 9 首選單音樂</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 底下依分區分資料夾，檔名與各分區的 <code>.off</code> 一一對應</td></tr>
+      <tr><td data-label="資料夾" class="mono">spch_pbp</td><td data-label="大小" class="num">2.8 MB</td><td data-label="裝什麼">主播（逐球播報）的索引</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 對應 <code>cd/</code> 底下 212 MB 的資料</td></tr>
+      <tr><td data-label="資料夾" class="mono">spch_pa</td><td data-label="大小" class="num">0.4 MB</td><td data-label="裝什麼">場館廣播的索引</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 群組名有 <code>7th_inning_stretch</code>；<code>first_aid</code>、<code>guest_services</code> 這一類
+              是 <code>annnc_end</code> 群組底下的條目</td></tr>
+      <tr><td data-label="資料夾" class="mono">aems</td><td data-label="大小" class="num">4.3 MB</td><td data-label="裝什麼">環境音效庫</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 18 個 <code>.abk</code>；<code>cd/aems/</code> 有 <code>vendor</code>、<code>crowd4a</code>、<code>heckle</code> 系列</td></tr>
+      <tr><td data-label="資料夾" class="mono">chants</td><td data-label="大小" class="num">＜0.1 MB</td><td data-label="裝什麼">觀眾應援的索引</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 名稱表叫 <code>spch_cht</code>，資料 56 MB</td></tr>
+      <tr class="hi"><td data-label="資料夾" class="mono">plyr_cht</td><td data-label="大小" class="num">0.1 MB</td>
+          <td data-label="裝什麼"><strong>場上球員互相喊話</strong>（不是應援）</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 17 個群組、623 個音檔：
+              <code>playpredict</code> 197、<code>defalign</code> 177、<code>preplay</code> 93、
+              <code>onthefly</code> 87、<code>inplay_call</code> 19、<code>inplay_confirm</code> 22、<code>steal</code> 11。
+              <u>本站原本照名字猜成「球員專屬應援」，打開看才知道猜錯</u></td></tr>
+      <tr class="hi"><td data-label="資料夾" class="mono">rally</td><td data-label="大小" class="num">＜0.1 MB</td>
+          <td data-label="裝什麼"><strong>管風琴助威曲</strong></td>
+          <td data-label="證據"><span class="badge ok">實測</span> 3 個群組：<code>org_lng</code>（長）、
+              <code>org_shrt</code>（短）、<code>takemeOUTwCrowd</code>。
+              38 個音檔裡 <code>org</code> 開頭 30 個，另有 <code>beat</code> 3、
+              <code>rock</code> 2、<code>trmpt</code>（小號）2</td></tr>
+      <tr class="hi"><td data-label="資料夾" class="mono">hmrn_sfx</td><td data-label="大小" class="num">＜0.1 MB</td>
+          <td data-label="裝什麼"><strong>全壘打音效</strong>：煙火與警報，兩支球隊另有火車與霧笛</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 3 個群組：<code>generic</code>、
+              <code>teamspecific:03</code>、<code>teamspecific:19</code>。
+              21 個音檔裡 16 個帶 <code>fireworks</code> 或 <code>siren</code>，
+              另外 5 個是 <code>trainhorn1.03</code>、<code>cablecar.19</code>、<code>foghorn1.19</code>、
+              <code>foghorn2.19</code>、<code>watersplash.19</code></td></tr>
+      <tr class="hi"><td data-label="資料夾" class="mono">stadium</td><td data-label="大小" class="num">＜0.1 MB</td>
+          <td data-label="裝什麼"><strong>只有兩座球場有專屬音效</strong>，而且是火車跟飛機</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 群組只有 <code>stadiums:03</code>、
+              <code>stadiums:29</code>；9 個音檔是 <code>train</code>、
+              <code>airpln727</code>／<code>737</code>／<code>777</code>、
+              <code>airplnpassenger</code>。詳見<a href="#twostadiums">下面</a></td></tr>
+      <tr><td data-label="資料夾" class="mono">bdcst_mx</td><td data-label="大小" class="num">＜0.1 MB</td>
+          <td data-label="裝什麼"><strong>轉播的轉場音樂</strong></td>
+          <td data-label="證據"><span class="badge ok">實測</span> 3 個群組：<code>intro</code>（開場）、
+              <code>firstinningtrans</code>（第一局轉場）、<code>inningtrans</code>（每局轉場），
+              共 5 個音檔</td></tr>
+      <tr><td data-label="資料夾" class="mono">orca</td><td data-label="大小" class="num">0.2 MB</td><td data-label="裝什麼">前端／暫停選單音效</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 兩個檔開頭都是 <code>BNKl</code>，<strong>雖然副檔名一個 <code>.bnk</code> 一個 <code>.gen</code></strong></td></tr>
+      <tr class="hi"><td data-label="資料夾" class="mono">crowddb</td><td data-label="大小" class="num">0.1 MB</td>
+          <td data-label="裝什麼"><strong>群眾反應的機率表</strong></td>
+          <td data-label="證據"><span class="badge ok">實測</span> 裡面是
+              <strong>21 個純文字 CSV、1,478 條規則</strong>。詳見<a href="#csvdb">下面</a></td></tr>
+      <tr class="hi"><td data-label="資料夾" class="mono">speechdb</td><td data-label="大小" class="num">＜0.1 MB</td>
+          <td data-label="裝什麼"><strong>播報事件分類資料庫</strong></td>
+          <td data-label="證據"><span class="badge ok">實測</span>
+              <strong>12 個純文字 CSV、1,568 筆</strong>。詳見<a href="#csvdb">下面</a></td></tr>
+    </tbody>
+  </table></div>
+
+    <div class="card clay">
+    <p class="card-h">⚠️ 本站 2026-08-28 把 batdit 從上面那一列搬出來了</p>
+    <p>上一版把 <code>batdit</code> 跟 <code>batmini</code>、<code>ptcmini</code>、<code>minicom</code>
+       放在同一列，寫成「小遊戲的音效」。<strong>下面那三份證據講的其實只有
+       <code>batmini</code> 與 <code>ptcmini</code></strong>（它們對上 BMG／PMG），
+       <u><code>batdit</code> 是被順手一起放進去的</u>。</p>
+    <p>打開它自己的控制檔就知道了。<code>audio\aems\batdit.abk</code> 只有 3,612 個位元組，
+       裡面全是控制字串，其中三條寫著：</p>
+    <div class="tablewrap"><table>
+      <tbody>
+        <tr class="hi"><td class="mono">CgBatterDitty_Vol</td><td>打者上場音樂的音量</td></tr>
+        <tr><td class="mono">gBatdit_on_or_off</td><td>開關</td></tr>
+        <tr><td class="mono">gBatterditty_kill</td><td>中斷播放</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>「Batter Ditty」就是打者上場音樂</strong>，跟
+       <a href="player-codes.html#ditty">出場音樂曲風</a>那一欄是同一個東西。
+       這也解釋了大小差異：<code>batdit.abk</code> 只有 3.5 KB 的控制字串，
+       而 <code>batmini.abk</code> 與 <code>ptcmini.abk</code> 各有 642 KB 與 594 KB
+       的實際音效資料 —— <u>它們根本不是同一種檔</u>。</p>
+    <p class="small">對應的音訊庫 <code>audio\cd\aems\batdit.ast</code> 是 17.6 MB、
+       裡面有 <strong>86 段</strong> SCHl 音訊（<code>batmini.ast</code> 24 段、<code>ptcmini.ast</code> 2 段）。</p>
+    <p class="small">⭐ 這個錯的形狀：<u>三份證據只證了兩個檔名，而結論被套到四個上</u>。
+       檔名長得像（都以 <code>bat</code> 開頭、都在同一個資料夾）就一起歸類，
+       是最容易發生的分類錯誤。<strong>證據涵蓋到哪裡，結論就只能寫到哪裡。</strong></p>
+  </div>
+
+<h2 id="aems">噓聲、小販、裁判在哪裡</h2>
+  <p>環境音效放在 <code>audio\aems\</code>，只有 <strong>20 個檔</strong>。
+     而且<u>檔名直接說了它是什麼</u>：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">檔名</th><th class="num">幾個</th><th>是什麼</th><th class="num">最大的那個</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="檔名" class="mono">heckle a–e</td><td data-label="幾個" class="num">5</td><td data-label="是什麼"><strong>噓聲</strong></td><td data-label="最大的那個" class="num">62 KB</td></tr>
+      <tr class="hi"><td data-label="檔名" class="mono">ump a–c</td><td data-label="幾個" class="num">3</td><td data-label="是什麼"><strong>裁判</strong></td><td data-label="最大的那個" class="num">228 KB</td></tr>
+      <tr class="hi"><td data-label="檔名" class="mono">crowd4a／4b</td><td data-label="幾個" class="num">2</td><td data-label="是什麼">觀眾</td>
+          <td data-label="最大的那個" class="num"><strong>1.4 MB</strong><br><span class="small">全區最大</span></td></tr>
+      <tr class="hi"><td data-label="檔名" class="mono">vendor／vndrcbp</td><td data-label="幾個" class="num">2</td><td data-label="是什麼"><strong>小販</strong></td><td data-label="最大的那個" class="num">17 KB</td></tr>
+      <tr><td data-label="檔名" class="mono">sfx a／b</td><td data-label="幾個" class="num">2</td><td data-label="是什麼">一般音效</td><td data-label="最大的那個" class="num">92 KB</td></tr>
+      <tr class="hi"><td data-label="檔名" class="mono">batmini／ptcmini／<br>minicom</td><td data-label="幾個" class="num">3</td>
+          <td data-label="是什麼"><strong>小遊戲的音效。</strong><span class="badge ok">已確認</span>
+              <span class="small">原本標「推測」，2026-08-26 用三份互相獨立的證據關掉了 —— 見下方</span></td>
+          <td data-label="最大的那個" class="num">642 KB</td></tr>
+      <tr class="hi"><td data-label="檔名" class="mono">batdit</td><td data-label="幾個" class="num">1</td>
+          <td data-label="是什麼"><strong>打者上場音樂。</strong><span class="badge ok">已確認</span>
+              <span class="small">2026-08-28 從上一列搬出來 —— 見下方</span></td>
+          <td data-label="最大的那個" class="num">3.5 KB</td></tr>
+      <tr><td data-label="檔名" class="mono">tpevents</td><td data-label="幾個" class="num">2</td>
+          <td data-label="是什麼">唯二不是 <code>.abk</code> 的<br><span class="small"><code>.a1c</code> 與 <code>.csi</code></span></td>
+          <td data-label="最大的那個" class="num">16 KB</td></tr>
+    </tbody>
+  </table></div>
+  <div class="card grass">
+    <p class="card-h">「名字帶 mini」原本是推測，現在關掉了</p>
+    <p>本站原本只敢寫「檔名帶 <code>mini</code>，可能跟小遊戲有關」。
+       後來在另外三個完全不同的地方各找到一份證據：</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>證據</th><th>在哪</th></tr></thead>
+      <tbody>
+        <tr><td>混音表裡有 <code>BMGVolume</code>、<code>PMGVolume</code>、<code>FMGVolume</code>
+                三組獨立的音量群組，各自還有自己的音樂音量</td>
+            <td><a href="datafile.html#audio">總設定檔</a></td></tr>
+        <tr><td>遊戲的文字檔裡有 <u>Batting Mini Game</u>、<u>Pitching Mini Game</u>
+                這兩句選單文字</td>
+            <td><code>IGENG.LOC</code></td></tr>
+        <tr><td><code>frontend\minigame.big</code> 裡 35 個版面檔，
+                名字是 <code>fes_bmggamesummary.fel</code>、<code>fes_hudleftbmg.fel</code> 這一類；
+                另有 <code>minibat.big</code> 與 <code>minipit.big</code> 各裝一張圖</td>
+            <td>封裝檔目錄</td></tr>
+      </tbody>
+    </table></div>
+    <p>音效檔名 <code>batmini</code>／<code>ptcmini</code> 對上
+       <code>BMG</code>／<code>PMG</code>，
+       <strong>三份證據來自三種不同的檔，互相對得起來。</strong></p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">查下去發現一個更有意思的東西：有一個小遊戲只存在於程式內部</p>
+    <p>混音表裡除了 <code>BMG</code>、<code>PMG</code> 之外還有第三組 <code>FMG</code>
+       （<code>FMGVolume</code>、<code>FMGMusicVol%</code>），
+       而<a href="datafile.html#camera">攝影機那邊</a>也有一筆記錄叫
+       <code>FieldingMiniGame</code>。</p>
+    <p>但是把玩家看得到的東西找一遍：</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>找什麼</th><th>結果</th></tr></thead>
+      <tbody>
+        <tr><td>語系檔裡有沒有「Fielding Mini Game」這句</td><td><strong>兩個語系檔都沒有</strong></td></tr>
+        <tr><td><code>audio\aems\</code> 底下有沒有守備小遊戲的音效庫</td>
+            <td><strong>20 個檔全部列出來看過，沒有</strong>（只有 <code>batmini</code>、<code>ptcmini</code>）</td></tr>
+        <tr class="hi"><td>玩家看得到的第三個小遊戲是什麼</td>
+            <td><strong>Untimed Pitching Mini Game</strong>（無時限投球），不是守備</td></tr>
+      </tbody>
+    </table></div>
+    <p>所以情況是：<strong>守備小遊戲在程式內部有音量群組、有專屬攝影機，
+       卻沒有任何一句玩家看得到的文字，也沒有自己的音效。</strong></p>
+    <p class="small">這通常代表「做到一半沒出」，但本站<u>沒有證據</u>說它是被砍掉的
+       —— 也可能是共用了別的資源。<span class="badge wip">未解</span>
+       另外，混音表裡還有第四組 <code>HRS</code>，那個玩家看得到：
+       語系檔裡是 <u>Home Run Showdown</u>。</p>
+  </div>
+
+  <p>18 個 <code>.abk</code> 檔的開頭四個位元組全部是 <code>ABKC</code>。
+     <code>audio\cd\aems\</code> 底下另有 11 個 <code>.ast</code>，檔名一一對應。</p>
+  <div class="card clay">
+    <p class="card-h">⚠️ 本站原本在這裡寫反了</p>
+    <p>原文是「<strong>觀眾的音檔比噓聲大二十倍</strong> ——
+       <code>crowd4a.abk</code> 有 1.4 MB，而五個噓聲檔加起來還不到 200 KB」，
+       然後說「合理，觀眾聲要一直播」。</p>
+    <p><strong>那是拿索引在比，不是拿聲音在比。</strong>
+       <code>.abk</code> 是索引與音色控制，真正的聲音在
+       <code>audio\cd\aems\</code> 的 <code>.ast</code> 裡。
+       兩邊一起列出來就看得很清楚：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th></th><th class="num">索引 <code>.abk</code></th>
+                 <th class="num">聲音 <code>.ast</code></th></tr></thead>
+      <tbody>
+        <tr><td><code>crowd4a</code>（觀眾）</td>
+            <td data-label="索引 .abk" class="num">1,402,292</td><td data-label="聲音 .ast" class="num">24,356,352</td></tr>
+        <tr class="hi"><td>五個噓聲檔加起來</td>
+            <td data-label="索引 .abk" class="num">181,144</td><td data-label="聲音 .ast" class="num"><strong>64,998,016</strong></td></tr>
+        <tr><td><strong>誰比較大</strong></td>
+            <td data-label="索引 .abk" class="num">觀眾大 <strong>7.7 倍</strong></td>
+            <td data-label="聲音 .ast" class="num"><strong>噓聲大 2.7 倍</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>方向是反的。</strong>索引大不代表聲音多 ——
+       <u>那一句連推理都是錯的</u>：本站當時還替它編了一個「觀眾聲要一直播」的解釋，
+       而那個解釋讓錯誤看起來更可信。</p>
+    <p class="small">順帶訂正上一行：「<code>audio\cd\aems\</code> 底下另有 11 個
+       <code>.ast</code>，檔名一一對應」——
+       <u>11 個是對的，但 18 個 <code>.abk</code> 裡只有 11 個有同名的 <code>.ast</code></u>，
+       不是全部對應。剩下 7 個（<code>crowd4b</code>、<code>umpa/b/c</code>、
+       <code>sfxa/b</code>、<code>minicom</code>）沒有自己的 <code>.ast</code>。
+       <span class="badge wip">那 7 個的聲音放在哪，本站還沒查</span></p>
+  </div>
+
+  <h2 id="chants">應援曲：索引是純文字，而且看得出來 EA 幫誰錄了</h2>
+  <p>上面說過聲音本體在 <code>cd\chants\chantdat.big</code>（56 MB）。
+     可是<strong>索引 <code>chants\spch_cht.txt</code> 是純文字，記事本直接打得開</strong>：</p>
+<pre><code><span class="cm">spch_cht.txt 的開頭(原檔內容)</span>
+<span class="hl">beat_backs</span>
+beat_backs.lg.01.wav             0
+beat_backs.md.01.wav        432640
+<span class="hl">mvp</span>
+mvp.lg.01.wav                    0
+mvp.md.01.wav               458752
+<span class="hl">pchants:0004</span>
+pchant.0004.typ1.1.lg.01.wav     0</code></pre>
+  <p>格式很單純：<strong>一行群組名，底下每個音檔一行，後面那個數字是它在資料檔裡的位置</strong>。
+     原版共 <strong>90 個群組、103 個音檔</strong>。</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>群組長什麼樣</th><th class="num">幾個</th><th>是什麼</th></tr></thead>
+    <tbody>
+      <tr><td data-label="群組長什麼樣" class="mono">有名字的</td><td data-label="幾個" class="num">7</td>
+          <td data-label="是什麼"><code>beat_backs</code>、<code>beat_la</code>、<code>larry</code>、<code>mvp</code>、
+              <code>overrated</code>、<code>rally_monkey</code>、<code>tomahawk</code></td></tr>
+      <tr class="hi"><td data-label="群組長什麼樣" class="mono">tchants:NN</td><td data-label="幾個" class="num">26</td><td data-label="是什麼"><strong>球隊的隊呼</strong></td></tr>
+      <tr class="hi"><td data-label="群組長什麼樣" class="mono">pchants:NNNN</td><td data-label="幾個" class="num">57</td><td data-label="是什麼"><strong>某一位球員專屬的應援曲</strong></td></tr>
+      <tr><td data-label="群組長什麼樣"><strong>合計</strong></td><td data-label="幾個" class="num"><strong>90</strong></td><td data-label="是什麼">群組</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">驗算：這個檔非空行共 <strong>193</strong> 行 ＝ 群組 90 ＋ 音檔 103，
+     一行不多一行不少。</p>
+
+  <div class="card blue">
+    <p class="card-h">那個 <code>.lg</code>／<code>.md</code> 不是隨便標的</p>
+    <p>103 個音檔裡，<code>lg</code> 有 96 個、<code>md</code> 有 <strong>7</strong> 個。
+       把這 7 個 <code>md</code> 是誰的列出來：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>群組類型</th><th class="num">幾組</th><th>每組有幾個音檔</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="群組類型">有名字的（<code>tomahawk</code> 那七個）</td><td data-label="幾組" class="num">7</td>
+            <td data-label="每組有幾個音檔"><strong>剛好一個 <code>lg</code> ＋ 一個 <code>md</code></strong></td></tr>
+        <tr><td data-label="群組類型">球隊隊呼</td><td data-label="幾組" class="num">26</td>
+            <td data-label="每組有幾個音檔">22 組一個、3 組兩個、1 組三個 —— <u>全部是 <code>lg</code></u></td></tr>
+        <tr><td data-label="群組類型">球員專屬</td><td data-label="幾組" class="num">57</td>
+            <td data-label="每組有幾個音檔">56 組一個、1 組兩個 —— <u>全部是 <code>lg</code></u></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>7 個 <code>md</code> 剛好對應 7 個有名字的應援，一個不多一個不少。</strong>
+       其他 83 組一個 <code>md</code> 都沒有。</p>
+    <p>所以這兩個字尾<u>不是「檔案格式」或「音質」之類每個檔都會有的東西</u> ——
+       它是<strong>只有那七個全場性的應援才錄了兩種版本</strong>。
+       至於那兩種版本差在哪（人數？長度？強度？），
+       <span class="badge wip">檔案裡沒有寫，本站沒有答案</span></p>
+    <p class="small">另外，檔名結尾的 <code>.01</code>／<code>.02</code>／<code>.03</code>
+       是<strong>同一段的第幾個版本</strong>：
+       第 2 號球隊錄了三段，第 18、19、20 號各兩段，
+       球員裡只有一個號碼錄了兩段。<br>
+       球員的檔名帶 <code>typ1</code>、球隊的帶 <code>gen1</code>，
+       這兩個字串各代表什麼<span class="badge wip">未解</span></p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">那四位數編號指向誰，可以自己對出來</p>
+    <p><code>pchants:0004</code> 的 <code>0004</code>，是球員資料檔裡
+       <strong><code>playerattrib_audioid</code></strong> 那一欄的值
+       （剛安裝好的原版排在第 17 欄，本站測試機那份社群名冊排在第 16 欄，
+       <a href="player-fields.html#col-shift">欄號會因名冊而異</a>）。</p>
+    <p>把 57 個編號拿去 <a href="database.html">原版的 <code>attrib.dat</code></a> 對：
+       <strong>56 個對得上</strong>，剩下 1 個對不上（下面說）。</p>
+  </div>
+
+  <h3>EA 幫這 56 個人錄了專屬應援曲</h3>
+  <p>編號小於 2000 的 <strong>43 位</strong>，是 2004 年當時的現役球員：</p>
+  <div class="tablewrap"><table>
+    <tbody>
+      <tr><td class="num">4</td><td>Bobby Abreu</td><td class="num">24</td><td>Garret Anderson</td><td class="num">46</td><td>Jeff Bagwell</td></tr>
+      <tr><td class="num">67</td><td>Carlos Beltran</td><td class="num">79</td><td>Lance Berkman</td><td class="num">95</td><td>Aaron Boone</td></tr>
+      <tr><td class="num">96</td><td>Bret Boone</td><td class="num">195</td><td>Jose Cruz Jr.</td><td class="num">215</td><td>Carlos Delgado</td></tr>
+      <tr><td class="num">230</td><td>J.D. Drew</td><td class="num">240</td><td>Jim Edmonds</td><td class="num">289</td><td>Rafael Furcal</td></tr>
+      <tr><td class="num">304</td><td>Brian Giles</td><td class="num">333</td><td>Ken Griffey Jr.</td><td class="num">339</td><td>Vladimir Guerrero</td></tr>
+      <tr><td class="num">367</td><td>Todd Helton</td><td class="num">404</td><td>Torii Hunter</td><td class="num">421</td><td>Derek Jeter</td></tr>
+      <tr><td class="num">435</td><td>Andruw Jones</td><td class="num">438</td><td>Chipper Jones</td><td class="num">482</td><td>Carlos Lee</td></tr>
+      <tr><td class="num">483</td><td>Derrek Lee</td><td class="num">503</td><td>Paul Lo Duca</td><td class="num">510</td><td>Javy Lopez</td></tr>
+      <tr><td class="num">517</td><td>Mike Lowell</td><td class="num">636</td><td>Trot Nixon</td><td class="num">656</td><td>Magglio Ordonez</td></tr>
+      <tr><td class="num">724</td><td>Manny Ramirez</td><td class="num">757</td><td>Alex Rodriguez</td><td class="num">761</td><td>Ivan Rodriguez</td></tr>
+      <tr><td class="num">765</td><td>Scott Rolen</td><td class="num">805</td><td>Richie Sexson</td><td class="num">808</td><td>Gary Sheffield</td></tr>
+      <tr><td class="num">867</td><td>Mike Sweeney</td><td class="num">875</td><td>Miguel Tejada</td><td class="num">879</td><td>Frank Thomas</td></tr>
+      <tr><td class="num">880</td><td>Jim Thome</td><td class="num">940</td><td>Vernon Wells</td><td class="num">962</td><td>Preston Wilson</td></tr>
+      <tr><td class="num">1069</td><td>Aubrey Huff</td><td class="num">1239</td><td>Albert Pujols</td><td class="num">1263</td><td>Ichiro</td></tr>
+      <tr><td class="num">1363</td><td>Marcus Giles</td><td class="num">—</td><td></td><td class="num">—</td><td></td></tr>
+    </tbody>
+  </table></div>
+  <p>編號 2126 之後的 <strong>13 位</strong>，全部是<strong>傳奇球員</strong>：</p>
+  <div class="tablewrap"><table>
+    <tbody>
+      <tr><td class="num">2126</td><td>Luis Aparicio</td><td class="num">2127</td><td>Richie Ashburn</td><td class="num">2128</td><td>Yogi Berra</td></tr>
+      <tr><td class="num">2129</td><td>Lou Brock</td><td class="num">2130</td><td>Rod Carew</td><td class="num">2138</td><td>Reggie Jackson</td></tr>
+      <tr><td class="num">2141</td><td>Al Kaline</td><td class="num">2142</td><td>Harmon Killebrew</td><td class="num">2147</td><td>Willie McCovey</td></tr>
+      <tr><td class="num">2148</td><td>Joe Morgan</td><td class="num">2153</td><td>Pee Wee Reese</td><td class="num">2161</td><td>Willie Stargell</td></tr>
+      <tr><td class="num">2164</td><td>Billy Williams</td><td class="num">—</td><td></td><td class="num">—</td><td></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">現役球員的編號散在 4 到 1363 之間，傳奇球員擠在 2126–2164。
+     <u>編號本身就把兩群人分開了。</u><br>
+     上表有一位只有一個字：<strong>Ichiro</strong>。
+     他在資料裡<u>姓有、名是空的</u> —— 57 個人裡只有他這樣。</p>
+
+  <div class="card clay">
+    <p class="card-h">有一首應援曲，找不到它是為誰錄的</p>
+    <p>57 個編號裡有一個對不到人：<code>pchants:0538</code> 有音檔，
+       但 <strong>538 這個 <code>audioid</code> 在原版的球員資料檔裡不存在</strong>。
+       本站另外去看裝了模組那台，也沒有。</p>
+    <p>不過先別急著說「這是被砍掉的球員」——
+       原版用到的 <code>audioid</code> 只有 <strong>1,300 個</strong>，
+       範圍卻是 3 到 2665，<u>中間有 1,363 個空號</u>。
+       538 只是其中一個。</p>
+    <p><strong>能確定的是：這首應援曲存在，而它指向的編號沒有人使用。</strong>
+       至於為什麼，本站沒有答案。<span class="badge wip">未解</span></p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">這就是 2008 年台灣玩家換應援曲的地方</p>
+    <p>當年社群把台灣模組的加油歌換進遊戲，動的就是這一套：
+       <u>把聲音接進資料檔、在索引裡加一行、讓球員的 <code>audioid</code> 對上</u>。</p>
+    <p>本站<strong>沒有</strong>提供做這件事的腳本，也<strong>沒有</strong>散布任何聲音檔。
+       這一節只講「檔案是怎麼組織的」。
+       <span class="badge ok">✓ 可用</span> 想把某一首應援曲指給別的球員，<a href="../tutorials/swap-chant/index.html">有一課教這個</a>（只改一行純文字）。</p>
+    <p><strong>⚠️ 2026-08-29 訂正：這裡原本寫「放進自己錄的音檔目前還做不到 —— 那需要把聲音編成 EA 自家格式，本站還沒有做出那個編碼器」。
+       那個編碼器後來做出來了</strong> —— 見<a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>。
+       本站拿那支腳本對這個 56 MB 的 <code>chantdat.big</code> 實際跑過：它是<strong>編碼器 2</strong>、
+       2 聲道 24000 Hz、裡面 103 段，其中 <strong>40 段</strong>解得完整，可以匯出成 WAV、也可以編回去；
+       另外 63 段有區塊切不出相位，腳本會<u>拒絕寫入</u>（對不齊就不寫，那是保護不是故障）。</p>
+    <p class="small">⚠️ 提醒一件跟技術無關的事：<strong>把別人的音樂放進遊戲檔案，
+       跟你自己在家聽是兩回事。</strong>自己錄的、有授權的、或已進入公有領域的才拿來用。</p>
+  </div>
+
+  <h2 id="teamid">檔名裡那個數字，是球隊資料表裡的一欄</h2>
+  <p>索引檔裡到處是 <code>tchants:19</code>、<code>teamspecific:03</code>、
+     <code>stadiums:29</code> 這種寫法。那個數字對得到人：
+     <a href="database.html">球隊資料檔</a> <code>team.dat</code>
+     第 6 欄 <code>team_artid</code>，值是 <strong>1 到 126</strong> 的連號。</p>
+
+  <h3>26 支球隊有自己的隊呼</h3>
+  <p>把 26 個 <code>tchants:NN</code> 對回球隊：</p>
+  <div class="tablewrap"><table>
+    <tbody>
+      <tr><td class="num">1</td><td>Anaheim Angels</td><td class="num">2</td><td>Oakland Athletics</td><td class="num">3</td><td>Seattle Mariners</td></tr>
+      <tr><td class="num">4</td><td>Texas Rangers</td><td class="num">5</td><td>Chicago White Sox</td><td class="num">6</td><td>Cleveland Indians</td></tr>
+      <tr><td class="num">7</td><td>Detroit Tigers</td><td class="num">8</td><td>Kansas City Royals</td><td class="num">9</td><td>Minnesota Twins</td></tr>
+      <tr><td class="num">10</td><td>Baltimore Orioles</td><td class="num">13</td><td>Tampa Bay Devil Rays</td><td class="num">14</td><td>Toronto Blue Jays</td></tr>
+      <tr><td class="num">15</td><td>Arizona Diamondbacks</td><td class="num">16</td><td>Colorado Rockies</td><td class="num">17</td><td>Los Angeles Dodgers</td></tr>
+      <tr><td class="num">18</td><td>San Diego Padres</td><td class="num">19</td><td>San Francisco Giants</td><td class="num">20</td><td>Chicago Cubs</td></tr>
+      <tr><td class="num">21</td><td>Cincinnati Reds</td><td class="num">22</td><td>Houston Astros</td><td class="num">23</td><td>Milwaukee Brewers</td></tr>
+      <tr><td class="num">24</td><td>Pittsburgh Pirates</td><td class="num">25</td><td>St. Louis Cardinals</td><td class="num">27</td><td>Florida Marlins</td></tr>
+      <tr><td class="num">29</td><td>New York Mets</td><td class="num">30</td><td>Philadelphia Phillies</td><td class="num">—</td><td></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card grass">
+    <p class="card-h">1 到 30 裡面，剛好缺四支</p>
+    <div class="tablewrap"><table>
+      <tbody>
+        <tr class="hi"><td class="num">11</td><td>Boston Red Sox</td></tr>
+        <tr class="hi"><td class="num">12</td><td>New York Yankees</td></tr>
+        <tr class="hi"><td class="num">26</td><td>Atlanta Braves</td></tr>
+        <tr class="hi"><td class="num">28</td><td>Washington Nationals</td></tr>
+      </tbody>
+    </table></div>
+    <p>而同一個索引檔裡，另外有<strong>七個不用編號、直接取名字</strong>的應援：</p>
+<pre><code>beat_backs   beat_la   larry   mvp   overrated   rally_monkey   tomahawk</code></pre>
+    <p><strong>本站量到的就到這裡</strong>：26 個有編號、7 個有名字、
+       1 到 30 裡缺這四支。
+       <u>檔案裡沒有任何一行把「名字」跟「球隊」連起來</u>，
+       所以本站<strong>不寫「哪個名字是哪一隊的」</strong>。
+       <span class="badge wip">名字與球隊的對應未解</span></p>
+    <p class="small">值得一提的是第 28 號：那支球隊在這款遊戲出的那一年
+       <u>才剛換城市、換名字</u>。新球隊還沒有應援可以錄，是說得通的
+       —— 但這是推想，不是量到的。<span class="badge wip">推測</span></p>
+  </div>
+
+  <h2 id="twostadiums">只有兩座球場有專屬音效，而且是火車跟飛機</h2>
+  <p><code>stadium\std_spec.txt</code> 整份只有<strong>兩個</strong>群組、九個音檔：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">群組</th><th>對到哪一隊</th><th>音檔</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="群組" class="mono">stadiums:03</td><td data-label="對到哪一隊">Seattle Mariners</td>
+          <td data-label="音檔"><code>train</code>（2 個檔）</td></tr>
+      <tr class="hi"><td data-label="群組" class="mono">stadiums:29</td><td data-label="對到哪一隊">New York Mets</td>
+          <td data-label="音檔"><code>airpln727</code>、<code>airpln737</code>、
+              <code>airpln777</code>、<code>airplnpassenger</code>（7 個檔）</td></tr>
+    </tbody>
+  </table></div>
+  <p>全遊戲 <strong>87 個球場封裝檔（58 座場地）</strong>，只有這兩座有自己的環境音效，
+     而且內容是<strong>一列火車跟四種飛機</strong>（連機型都分開錄：727、737、777、還有一種客機）。</p>
+  <div class="card clay">
+    <p class="card-h">為什麼是這兩座，檔案裡沒有寫</p>
+    <p><strong>本站量到的是</strong>：只有這兩個編號有專屬音效，內容是火車與飛機。
+       <span class="badge wip">原因未解</span></p>
+    <p class="small">一個站外的背景知識（<u>不是本站量到的</u>）：
+       這兩座球場都以「比賽中聽得到交通工具」出名，一座旁邊有鐵路，
+       一座在機場航道底下。本站把它寫在這裡當脈絡，
+       但<strong>不主張 EA 是為了這個才錄的</strong>。</p>
+  </div>
+
+  <h2 id="csvdb">兩個資料庫打開就是 Excel 表</h2>
+  <p>站上原本把 <code>crowddb</code> 與 <code>speechdb</code> 標成「未確認」，
+     理由是「只有一個 <code>.big</code>」。
+     <strong>把它們打開之後，裡面完全沒有加密也沒有壓縮，就是純文字 CSV。</strong></p>
+
+  <h3>群眾在什麼情況下發出什麼聲音，是一張表</h3>
+  <p><code>crowddb\audiocsv.big</code> 裡有 <strong>21 個 CSV、合計 1,478 條規則</strong>，
+     一個檔對應一種場上事件：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">檔</th><th>什麼事件</th><th class="num">規則數</th>
+               <th class="mono">檔</th><th>什麼事件</th><th class="num">規則數</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="檔" class="mono">foulcont.csv</td><td data-label="什麼事件">界外球</td><td data-label="規則數" class="num">224</td>
+          <td data-label="檔" class="mono">forceout.csv</td><td data-label="什麼事件">封殺</td><td data-label="規則數" class="num">168</td></tr>
+      <tr><td data-label="檔" class="mono">hitreslt.csv</td><td data-label="什麼事件">安打結果</td><td data-label="規則數" class="num">144</td>
+          <td data-label="檔" class="mono">catchout.csv</td><td data-label="什麼事件">接殺</td><td data-label="規則數" class="num">104</td></tr>
+      <tr><td data-label="檔" class="mono">heckevnt.csv</td><td data-label="什麼事件">噓聲事件</td><td data-label="規則數" class="num">104</td>
+          <td data-label="檔" class="mono">hitcont.csv</td><td data-label="什麼事件">擊球接觸</td><td data-label="規則數" class="num">104</td></tr>
+      <tr><td data-label="檔" class="mono">runscord.csv</td><td data-label="什麼事件">得分</td><td data-label="規則數" class="num">77</td>
+          <td data-label="檔" class="mono">ball.csv</td><td data-label="什麼事件">壞球</td><td data-label="規則數" class="num">72</td></tr>
+      <tr><td data-label="檔" class="mono">swngstrk.csv</td><td data-label="什麼事件">揮棒好球</td><td data-label="規則數" class="num">64</td>
+          <td data-label="檔" class="mono">lkstrike.csv</td><td data-label="什麼事件">看球好球</td><td data-label="規則數" class="num">64</td></tr>
+      <tr><td data-label="檔" class="mono">homerun.csv</td><td data-label="什麼事件">全壘打</td><td data-label="規則數" class="num">32</td>
+          <td data-label="檔" class="mono">walk.csv</td><td data-label="什麼事件">四壞</td><td data-label="規則數" class="num">32</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">另外 9 個：<code>chants</code>（40）、<code>landfoul</code>（48）、
+     <code>swngstko</code>（52）、<code>lkstriko</code>（52）、<code>newbater</code>（32）、
+     <code>landfair</code>（24）、<code>htbypich</code>（16）、<code>steal</code>（16）、
+     <code>heckgen</code>（9）。</p>
+
+  <p><strong>拿全壘打那個檔來看，一行是這樣：</strong></p>
+<pre><code><span class="cm">homerun.csv 的表頭與兩行</span>
+team_at_bat,runs_scored_play,game_state,crowd1_reaction,crowd1_percent,and_or,crowd2_reaction,crowd2_percent
+away,1,<span class="hl">earlyclose</span>,oh_medium,100,and,none,0
+away,1,<span class="hl">lateclose</span>,<span class="hl">oh_high</span>,100,and,<span class="hl">angry</span>,100</code></pre>
+  <p>兩行的差別只有一欄：<strong>比賽進行到哪個階段</strong>。
+     客隊在比賽前段打出帶一分打點的全壘打，主場觀眾發出中等的「喔——」；
+     同一件事發生在<u>後段的接近比賽</u>，觀眾就變成
+     <strong>高強度的「喔——」加上憤怒，兩種都 100%</strong>。</p>
+  <div class="card grass">
+    <p class="card-h">這代表什麼</p>
+    <p><strong>觀眾不是隨機播音效的。</strong>它有一張表，
+       欄位是「誰在打擊、跑回幾分、比賽階段」，
+       輸出是「播哪一種反應、機率多少、要不要疊第二種」。</p>
+    <p>而這張表<u>是純文字，記事本打得開</u>。
+       <span class="badge wip">本站沒有實機驗證改了會怎樣</span></p>
+  </div>
+
+  <h3>播報員那邊還多一層：EA 自己給台詞打分數</h3>
+  <p><code>speechdb\speechdb.big</code> 裡有 <strong>12 個 CSV、合計 1,568 筆</strong>：
+     204 個事件類別、166 條限制條件、8 種計數器、64 個觸發時機、76 個虛擬事件，
+     以及六張把它們串起來的對照表。</p>
+  <p>其中最短的那個檔只有 7 行，卻是整批資料裡最有人味的一份 ——
+     它是<strong>「這句話放在這個情境有多合適」的評分標準</strong>：</p>
+<pre><code><span class="cm">ContextualEventRatings.csv(EA 自己寫的分類名稱)</span>
+ 100.00   Perfection
+  10.00   Correct but jarring/random
+   2.00   Partial coverage
+   1.00   Bad samples
+   0.00   Just plain wrong
+  <span class="hl">-1.00   Might get us sued</span>
+<span class="hl">-1000.00  If we play this everyone will die</span></code></pre>
+  <div class="card clay">
+    <p class="card-h">那兩行是開發者寫的，不是本站翻的</p>
+    <p>倒數兩個分類的原文就是
+       <code>Might get us sued</code>（可能害我們被告）與
+       <code>If we play this everyone will die</code>（放這句的話大家都會死）。
+       分別是 <strong>−1</strong> 分與 <strong>−1000</strong> 分。</p>
+    <p>這是一份<u>內部評分表</u>，跟著遊戲一起出貨了。
+       它讓人看到 2004 年那個音訊團隊實際在煩惱什麼：
+       不是「這句話好不好聽」，是<strong>「這句話會不會出事」</strong>。</p>
+    <p class="small">本站只列出這 7 個分類名稱與分數 ——
+       那是<u>資料格式的一部分</u>，不是台詞內容。
+       本站不轉載任何一句播報台詞。</p>
+  </div>
+
+  <h2 id="evt">事件表自己會驗算</h2>
+  <p>八個分區各有一個 <code>events.evt</code>。它是二進位檔，但結構單純，
+     而且<strong>自己帶著一道驗算</strong> —— 算得對就代表你讀對了。</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th class="mono">位元組</th><th>是什麼</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">1–4</td><td>固定是 <code>03 12 3C 07</code>（八個檔完全一樣）</td></tr>
+      <tr class="hi"><td class="mono">5–8</td><td><strong>事件表從第幾個位元組開始</strong></td></tr>
+      <tr class="hi"><td class="mono">9–12</td><td><strong>分區編號</strong>（0 到 7）</td></tr>
+      <tr class="hi"><td class="mono">17–20</td><td><strong>事件有幾筆</strong></td></tr>
+      <tr><td class="mono">接下來</td><td>每筆 32 個位元組的事件表</td></tr>
+      <tr><td class="mono">再接下來</td><td>一串以 0 結尾的事件名稱</td></tr>
+    </tbody>
+  </table></div>
+  <div class="card grass">
+    <p class="card-h">驗算式</p>
+<pre style="margin:8px 0 0"><code>事件表起點 + 筆數 × 32 = 名稱表的起點
+名稱表切出來的字串數   = 筆數</code></pre>
+    <p style="margin-top:8px"><strong>八個檔全部通過，零例外。</strong></p>
+  </div>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">分區</th><th class="num">編號</th><th class="num">事件筆數</th>
+      <th class="num">切出來的名稱數</th><th class="num">檔案大小</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="分區" class="mono">spch_pbp</td><td data-label="編號" class="num">0</td><td data-label="事件筆數" class="num">472</td>
+          <td data-label="切出來的名稱數" class="num">472</td><td data-label="檔案大小" class="num">205,530</td></tr>
+      <tr><td data-label="分區" class="mono">spch_pa</td><td data-label="編號" class="num">1</td><td data-label="事件筆數" class="num">23</td><td data-label="切出來的名稱數" class="num">23</td><td data-label="檔案大小" class="num">2,800</td></tr>
+      <tr><td data-label="分區" class="mono">plyr_cht</td><td data-label="編號" class="num">2</td><td data-label="事件筆數" class="num">7</td><td data-label="切出來的名稱數" class="num">7</td><td data-label="檔案大小" class="num">6,328</td></tr>
+      <tr><td data-label="分區" class="mono">chants</td><td data-label="編號" class="num">3</td><td data-label="事件筆數" class="num">10</td><td data-label="切出來的名稱數" class="num">10</td><td data-label="檔案大小" class="num">1,108</td></tr>
+      <tr><td data-label="分區" class="mono">rally</td><td data-label="編號" class="num">4</td><td data-label="事件筆數" class="num">3</td><td data-label="切出來的名稱數" class="num">3</td><td data-label="檔案大小" class="num">286</td></tr>
+      <tr class="hi"><td data-label="分區" class="mono">stadium</td><td data-label="編號" class="num">5</td><td data-label="事件筆數" class="num">1</td><td data-label="切出來的名稱數" class="num">1</td>
+          <td data-label="檔案大小" class="num"><strong>104</strong></td></tr>
+      <tr><td data-label="分區" class="mono">hmrn_sfx</td><td data-label="編號" class="num">6</td><td data-label="事件筆數" class="num">1</td><td data-label="切出來的名稱數" class="num">1</td><td data-label="檔案大小" class="num">220</td></tr>
+      <tr><td data-label="分區" class="mono">bdcst_mx</td><td data-label="編號" class="num">7</td><td data-label="事件筆數" class="num">3</td><td data-label="切出來的名稱數" class="num">3</td><td data-label="檔案大小" class="num">271</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>分區編號 0 到 7，一個不缺</strong>，順序跟上面那張分區表對得起來。</p>
+  <div class="card blue">
+    <p class="card-h">想自己驗，從最小的那個開始</p>
+    <p><code>stadium\events.evt</code> 只有 <strong>104 個位元組</strong>、只有一筆事件。
+       用<a href="../tutorials/read-file-headers/index.html">十六進位工具</a>打開，
+       <u>整個檔可以用眼睛數完</u>。算對了再去看 472 筆的那個大檔。</p>
+  </div>
+  <div class="card clay">
+    <p class="card-h">解開的是外殼，不是內容</p>
+    <p>知道「有幾筆、每筆佔幾個位元組、事件叫什麼名字」，
+       但<strong>每筆那 32 個位元組裡各欄位是什麼意思，本站沒有解出</strong>；
+       第 13–16 個位元組也還沒解讀。<span class="badge wip">未解</span></p>
+  </div>
+
+  <h2 id="asf">那 9 個 <code>.asf</code> 不是 ASF</h2>
+  <p>選單音樂的副檔名是 <code>.asf</code>，看起來就是微軟的
+     Advanced Systems Format。<strong>不是。</strong></p>
+  <p>微軟 ASF 的檔案開頭四個位元組是 <code>30 26 B2 75</code>。
+     實際打開這 9 個檔：</p>
+<pre><code>menu1.asf   53 43 48 6c   SCHl
+menu2.asf   53 43 48 6c   SCHl
+   ...(9 個全部一樣)</code></pre>
+  <p><code>SCHl</code> 就是這一頁前面講過的 <strong>EA 自家音訊容器</strong>。
+     換句話說，選單音樂跟主播語音<u>用的是同一種容器</u>，只是副檔名不同。</p>
+  <div class="card grass">
+    <p class="card-h">整個 <code>data\</code> 底下沒有一個真正的 ASF</p>
+    <p>本站把 <code>data\</code> 底下所有 <code>.asf</code>、<code>.wma</code>、<code>.mp3</code>
+       全部掃過一遍，比對檔頭：<strong>一個真的都沒有。</strong>
+       9 個 <code>.asf</code> 全是 <code>SCHl</code>，其餘兩種副檔名一個檔都沒有。</p>
+    <p>自己驗（把路徑換成你的遊戲資料夾）：</p>
+<pre style="margin:8px 0 0"><code>xxd -l 4 "…\data\audio\cd\music\menu1.asf"</code></pre>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">⚠️ 本站改過這一段</p>
+    <p>這頁與另外兩頁原本寫「選單音樂<strong>檔案層級直接換，不必解析格式</strong>」。
+       <u>那句話沒有任何量測支持</u> —— 照字面把一個 MP3 改名成
+       <code>menu1.asf</code> 丟進去，是在賭遊戲讀不讀得動，而<strong>本站沒有實測過</strong>。</p>
+    <p>現在改成上面的寫法：副檔名是騙人的，容器是 <code>SCHl</code>，
+       裡面是 EA 自己的編碼。</p>
+    <p class="small">（2026-09-05 訂正：這一段原本接著寫「最內層的聲音編碼本站沒有解開，
+       所以本站不寫換選單音樂的教學」，還掛著一個未解徽章。那句話已經失效 ——
+       最內層的編碼 2026-08-29 解開了（見下面<a href="#voice-swap">換播報語音那一節</a>的狀態表），
+       課也開了：<a href="../7min/music.html">七分鐘置換遊戲音樂</a>、
+       <a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>。
+       但<u>格子是定長的</u>，比原本長的歌會被切掉，所以仍然不是「丟進去就好」。）</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">✅ 這個問號 2026-08-28 關掉了</p>
+    <p>這一段原本寫著：「本站測試機這 9 個檔的日期是 2023 年，代表已經被模組換過，
+       所以 <u>EA 原廠出貨時是不是也用 <code>SCHl</code>，本站無法確認</u>。」</p>
+    <p>後來拿到<strong>兩份剛安裝好、沒動過的遊戲</strong>（官方英文版與官方繁體中文版），
+       同樣的量法再跑一次：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th></th><th class="num"><code>.asf</code> 個數</th><th class="num">開頭是 SCHl</th><th class="num">真正的微軟 ASF</th></tr></thead>
+      <tbody>
+        <tr><td>剛安裝好的英文版</td><td data-label=".asf 個數" class="num">9</td><td data-label="開頭是 SCHl" class="num"><strong>9</strong></td><td data-label="真正的微軟 ASF" class="num">0</td></tr>
+        <tr><td>剛安裝好的中文版</td><td data-label=".asf 個數" class="num">9</td><td data-label="開頭是 SCHl" class="num"><strong>9</strong></td><td data-label="真正的微軟 ASF" class="num">0</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>是 EA 自己這樣出貨的</strong>，不是模組留下的。
+       兩份原版的 <code>data\</code> 底下也<u>一個 <code>.wma</code>、<code>.mp3</code>、<code>.wav</code>、<code>.ogg</code> 都沒有</u>。</p>
+    <p class="small">順便把語音也整份數了。剛安裝好的中文版 <code>data/audio/</code> 裡，
+       封裝檔內共 14,023 筆：<strong>6,995 筆聲音全部是 <code>SCHl</code>（100%）</strong>、
+       6,995 筆是配對的檔頭記錄、33 筆是純文字的事件與對照表。
+       <u>聲音與檔頭剛好 1:1</u>，跟這一頁前面講的配對關係對得起來。</p>
+    <p class="small">⚠️ 這裡有一個容易上當的數字：如果把 14,023 筆一起算，
+       「SCHl 佔 49.88%」看起來像有一半格式不明。
+       <strong>分母裡混了本來就不是聲音的檔頭記錄。</strong>
+       算比例之前先問分母裡有什麼 —— 這是本站反覆踩到的坑。</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">二十年前的社群教學早就在轉「asf」了 —— 但那是 EA 的 asf</p>
+    <p>2008 年 7 月，一位叫 <code>brime</code> 的玩家在遊戲基地寫過一篇做應援曲的教學，
+       裡面的關鍵一行是用 EA 自己的 <code>sx</code> 工具批次轉檔，
+       轉完<u>再把副檔名改成 <code>.dat</code></u> 丟進遊戲。</p>
+    <p>那篇教學把中間產物叫作「asf」。<strong>照字面看會以為是 Windows Media，
+       但實際做出來的東西開頭是 <code>SCHl</code></strong> ——
+       因為轉檔的是 EA 自己的工具，它口中的 asf 是 EA 的 asf。</p>
+    <p><strong>同一個副檔名，兩種完全不同的格式。</strong>
+       當年沒有人被這件事絆倒，是因為大家用的都是 EA 的工具，
+       一路上根本沒機會遇到微軟那個 ASF。
+       <u>會踩到坑的是二十年後照著文字重做的人</u> —— 例如本站。</p>
+    <p class="small">本站不重貼那篇教學的內容，也不提供任何工具下載。
+       這裡記的是<strong>它讓本站確認了什麼</strong>：容器從 2005 年到現在沒有變過。</p>
+  </div>
+
+  <h2>想換聲音的話</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>你可能想做的事</th><th>現況</th></tr></thead>
+    <tbody>
+      <tr><td>換掉選單音樂</td>
+          <td><span class="badge lv">做得到但有但書</span> <code>cd/music/</code> 底下 9 個 <code>.asf</code>（<code>menu1</code>–<code>menu9</code>），
+              但<strong>那個副檔名是騙人的</strong> —— 見上面〈<a href="#asf">那 9 個 <code>.asf</code> 不是 ASF</a>〉。
+              做法見<a href="../7min/music.html">七分鐘置換遊戲音樂</a>；
+              <u>格子是定長的</u>，比原本長的歌會被切掉</td></tr>
+      <tr class="hi"><td>換掉主播唸的名字</td>
+          <td><span class="badge ok">做得到</span> —— 而且二十年前就有人做了，見下方訂正</td></tr>
+      <tr><td>加入中文播報</td>
+          <td><span class="badge lv">做得到但工作量極大</span> 技術路徑同上一列（格式已經解開），
+              卡的是 <code>spch_pbp.txt</code> 那 23,013 條名稱要一條一條錄，不是格式沒解開</td></tr>
+      <tr><td>換掉全壘打音效／應援</td>
+          <td><span class="badge lv">兩半不一樣</span> 索引結構已清楚；SCHl 內部編碼 2026-08-29 解開了
+              （見<a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>）。
+              本站實測：應援曲 <code>chantdat.big</code> 是<strong>編碼器 2</strong>，103 段裡 40 段寫得回去；
+              全壘打音效 <code>hsfxdat.big</code> 是<strong>編碼器 3</strong>，那一種 2026-08-30 已經處理了
+              （卡的是位元組序不是編碼器），但這個檔的 19 段編碼器 3 目前<strong>一段都解不出來</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>完整的可改／不可改分級見 <a href="what-can-be-modded.html">什麼改得動、什麼還不行</a>。</p>
+
+  <h2 id="voice-swap">⚠️ 本站 2026-08-28 訂正：換播報語音<u>做得到</u></h2>
+  <div class="card clay">
+    <p class="card-h">錯在哪</p>
+    <p>本頁原本把「換掉主播的某一句話」標成 <span class="badge wip">未解</span>，
+       理由是「<u>SCHl 內部編碼未解</u>」。</p>
+    <p><strong>那個理由把「未解」貼在錯的層次。</strong>
+       要換語音，需要的不是「把 EA 的音訊解碼出來」，
+       而是「<u>產生一個遊戲吃得下去的檔</u>」—— 那是兩件事。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">證據：社群做的語音檔跟 EA 的不是同一種子格式，而遊戲照吃</p>
+    <p>本站把剛安裝好的原版與兩個社群語音包的每一個聲音檔，
+       讀它們 <code>SCHl</code> 後面那四個位元組：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th></th><th class="num">聲音檔數</th><th>子格式</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td><strong>剛安裝好的原版</strong></td><td data-label="聲音檔數" class="num">6,995</td>
+            <td data-label="子格式"><strong><code>PT</code> —— 6,995 個全部是，零例外</strong></td></tr>
+        <tr class="hi"><td>一個社群語音包</td><td data-label="聲音檔數" class="num">481</td>
+            <td data-label="子格式"><strong><code>GSTR</code> 474 個</strong>、<code>PT</code> 7 個</td></tr>
+        <tr><td>另一個台灣語音包</td><td data-label="聲音檔數" class="num">69</td><td data-label="子格式"><code>GSTR</code> 63 個、<code>PT</code> 6 個</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>那些包是當年真的裝來玩的。</strong>所以遊戲<u>兩種子格式都吃</u> ——
+       而 <code>GSTR</code>（generic stream）正是 EA 自家轉檔工具的輸出。</p>
+    <p>換句話說：<strong>不必解開 EA 的編碼，用 EA 自己的工具產生一個就好。</strong>
+       2008 年那批社群教學記錄的正是這個流程。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">整條路每一段的狀態</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>步驟</th><th>狀態</th></tr></thead>
+      <tbody>
+        <tr><td>檔頭 <code>.hdr</code>（16 個位元組）</td>
+            <td><span class="badge ok">完全解開</span> 前四個位元組 = 編號 × 65536 + 類別碼。
+                原版 4,580/4,580、社群 447/450、另一包 69/69 全部成立，
+                而類別碼在原版與社群<u>完全一致</u>
+                （見<a href="voice-header.html">語音檔頭</a>）</td></tr>
+        <tr><td>聲音 <code>.dat</code> 的容器</td>
+            <td><span class="badge ok">完全解開</span> <code>SCHl</code>，遊戲吃 <code>PT</code> 也吃 <code>GSTR</code>
+                （原版 6,995/6,995 標籤長度吻合）</td></tr>
+        <tr><td>聲音資料<strong>怎麼擺</strong></td>
+            <td><span class="badge ok">完全解開</span> 每段開頭是取樣數 + 聲道起點表，
+                <u>兩個聲道各自連續，不是交錯</u>；社群包 1,945 段零例外
+                （見<a href="../tutorials/read-voice/index.html">拆開一個語音檔</a>）</td></tr>
+        <tr><td>一個聲道裡<strong>怎麼切</strong></td>
+            <td><span class="badge ok">完全解開</span> 每 15 個位元組一組。
+                掃相位 <strong>97.7%</strong>，切錯時約 50%（＝亂猜的水準）；左右聲道各自獨立印證</td></tr>
+        <tr><td>怎麼產生一個 <code>GSTR</code></td>
+            <td><span class="badge ok">有現成路徑</span> EA 自己的轉檔工具，社群用了二十年</td></tr>
+        <tr><td>配對規則</td>
+            <td><span class="badge ok">完全解開</span> <code>a</code>／<code>c</code>／<code>d</code> 三個要做齊，
+                <code>.hdr</code> 與 <code>.dat</code> 一比一
+                （見<a href="../tutorials/crash-diagnosis/index.html#voice-pair">當機診斷</a>）</td></tr>
+        <tr class="hi"><td><strong>15 個位元組還原成 28 個取樣的公式</strong></td>
+            <td><span class="badge ok">2026-08-29 解開了</span> —— 係數表與位移公式都出來了，
+                解碼對照 ffmpeg 的 <strong>21,678,328 個取樣 0 個不同</strong>，
+                編碼寫回去再讀出來 <strong>98.1 dB</strong>。做法見
+                <a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>。
+                <br><span class="small">（原本這一格寫「未解 —— 試過一千種以上的參數組合，最好只有 0.16」。
+                那不是不夠努力，是<u>當時沒有東西能告訴我「你錯了」</u>；
+                後來拿 ffmpeg 當標準答案，一次就對上。）</span></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>所以本站原本說「做不到」是錯的。</strong>正確的說法是：
+       <u>做得到，而本站還沒有從頭到尾做過一次</u>。</p>
+    <p class="small">（2026-09-06 訂正：「還沒有從頭到尾做過一次」這句已經過期。
+       <a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>那一課 2026-08-29 開了，
+       檔案層級的一整趟本站走過：拿剛安裝好的原版切出的 8 個區塊做「匯出 → 匯入 →
+       再用 <code>ffmpeg</code> 當獨立解碼器讀回來」，<strong>0 個取樣不同</strong>。
+       <u>還沒驗的只剩最後一步</u> —— 換完之後遊戲裡真的會不會唸出來，本站沒有實機聽過。）</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">這一課後來做出來了（2026-08-29）</p>
+      <p>這裡原本寫「因為它需要一支<u>本站沒有、也不散布</u>的轉檔工具，
+         那一步目前只有 EA 自己的工具做得到」。</p>
+      <p><strong>那句話已經不成立。</strong>本站現在有一支純 Python、零相依的編碼器
+         （<code>mvp_audio.py</code>），寫得回去，課也開了：
+         <a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>。</p>
+      <p class="small">⭐ 這條訂正的教訓：<u>「未解」要貼在真正卡住的那一格，不要貼在整條路上</u>。
+       本站原本因為「編碼沒解開」就把整件事標成做不到，
+       但真正需要的能力是「產生」不是「解讀」 —— 而那一格早就有人走通了。</p>
+    <p class="small">⭐ 後續：那一格後來整個關掉了。本站先把容器<u>裡面</u>量開
+         （聲道怎麼擺、一個聲道裡怎麼切），最後連「15 個位元組怎麼變回 28 個取樣」也解開了。
+       完整過程（含一個差點推翻正確結論的假紅燈）在
+       <a href="../tutorials/read-voice/index.html">拆開一個語音檔</a>。</p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 音訊這一區比整個遊戲其他部分加起來還大，它的索引是純文字、可以自己加總驗算，而這裡的副檔名一再騙人。</li>
+    <li><strong>規模與那道免費驗算</strong> 13 個分區、111 個檔、736.9 MB，其中 729 MB 集中在 <code>cd/</code>，最大的單一檔是 212 MB 的主播語音。<code>.off</code> 索引是純文字，把裡面所有「長度」加起來會剛好等於對應資料檔的大小，本站算過的 <strong>16 個全部相符，一個 byte 都不差</strong>。<code>events.evt</code> 也自帶一道驗算，八個檔零例外。</li>
+    <li><strong>最容易誤讀的：看副檔名</strong> <code>data/audio/</code> 底下 28 個 <code>.big</code>，真正是 BIGF 封裝檔的只有 12 個（8 個是 <code>SCHl</code> 音訊容器、8 個 <code>*hdr.big</code> 開頭四碼沒有兩個一樣）。看到 <code>.big</code> 就套 BIGF 解析器，28 個裡會有 16 個當場失敗。9 個選單音樂的 <code>.asf</code> 也不是微軟 ASF，兩份剛安裝好的原版量下來都是 9 個全部 <code>SCHl</code>。判準是開頭四個位元組。</li>
+    <li><strong>名稱跟聲音不是一對一</strong> 主播那一區有 23,013 條名稱（18,492 個不重複），卻只有 2,056 個資料段，只用到 5,704 個不重複的位置值。<u>不能假設「第 N 個名稱對應第 N 段聲音」</u>。</li>
+    <li><strong>本站訂正一：方向整個寫反了</strong> 原本寫「觀眾的音檔比噓聲大二十倍」，那是拿<u>索引</u>在比。真正的聲音在 <code>.ast</code> 裡，論聲音是噓聲大 2.7 倍、論索引才是觀眾大 7.7 倍。更糟的是本站當時還替它編了一個「觀眾聲要一直播」的解釋，讓錯誤看起來更可信。</li>
+    <li><strong>本站訂正二：「未解」貼錯了層次</strong> 換播報語音原本標成做不到，理由是「SCHl 內部編碼未解」。實際上要換語音需要的是<strong>產生一個遊戲吃得下去的檔</strong>，不是把 EA 錄的解碼出來；社群語音包用的是 <code>GSTR</code> 子格式而遊戲照吃。同一輪也把 <code>batdit</code> 從「小遊戲音效」那一列搬出來，它是打者上場音樂，原本的三份證據只證了 <code>batmini</code> 與 <code>ptcmini</code> 兩個檔名。</li>
+    <li><strong>順手撿到的</strong> <code>speechdb</code> 裡跟著遊戲出貨的是一張 EA 內部評分表，最低兩級寫著 <code>Might get us sued</code>（−1 分）與 <code>If we play this everyone will die</code>（−1000 分）。另外全遊戲 87 個球場封裝檔（58 座場地）只有兩座有專屬環境音效，內容是一列火車跟四種飛機；EA 錄了 57 組球員專屬應援曲（剛安裝好的英文版原版、剛安裝好的中文版原版、本站測試機三份 <code>spch_cht.txt</code> 都是 57 組，號碼集合完全相同），其中 56 組在兩份原版的名冊裡對得到球員、13 位是傳奇球員，剩下的 <code>pchants:0538</code> 指向沒有人使用的編號；編號本身就把兩群人分開了。</li>
+    <li><strong>本站沒驗的</strong> 應援曲 <code>lg</code>／<code>md</code> 兩種版本差在哪、檔名裡的 <code>typ1</code>／<code>gen1</code> 各代表什麼、七個有名字的應援分別屬於哪一隊、<code>pchants:0538</code> 為什麼指向一個沒人使用的編號、那兩座球場為什麼是它們、<code>events.evt</code> 每筆 32 個位元組裡的欄位意義、18 個 <code>.abk</code> 裡沒有同名 <code>.ast</code> 的那 7 個聲音放在哪，全部未解。群眾反應那張機率表改了會怎樣，本站沒有實機驗證。（「15 個位元組還原成 28 個取樣」的公式原本也列在這一條裡，2026-08-29 已經解開 —— 對照 ffmpeg 驗過 21,678,328 個取樣 0 個不同，見上面〈整條路每一段的狀態〉那張表。）</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="file-map.html">遊戲檔案地圖</a> —— 音訊只是 224 個封裝檔的其中一區</li>
+    <li><a href="../tutorials/read-file-headers/index.html">五秒看穿一個檔案</a> ——
+        自己動手確認那 28 個 <code>.big</code> 其實有三種格式</li>
+    <li><a href="bigf.html">BIGF 封裝格式</a> —— 那 12 個真的是封裝檔的長什麼樣</li>
+  </ul>
+
+  <footer>
+    <p>本頁的音訊數字皆為現場走過 <code>data/audio/</code> 全 111 個檔量測所得；
+       牽涉名冊、總設定檔、語系檔、版面檔與兩份剛安裝好的原版之處，各自在該段落標明來源；
+       標示為「命名佐證」「推測」「未確認」之處未經證實，本站不寫成定論。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

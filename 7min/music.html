@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/7min/music.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>七分鐘學會置換遊戲音樂並匯入遊戲 — toni的MVP模組補習班</title>
+<meta name="description" content="七分鐘搞懂遊戲的九首選單音樂放在哪、怎麼換、以及為什麼 MP3 直接改名沒用。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item on" href="index.html">七分鐘</a>
+  <a class="item" href="../reference/index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">七分鐘</a> › 換音樂</p>
+  <h1>七分鐘學會置換遊戲音樂並匯入遊戲</h1>
+  <p class="lede">遊戲的選單音樂就是<strong>九個檔案</strong>，放在一個資料夾裡，名字從 <code>menu1</code> 排到 <code>menu9</code>。七分鐘做得完的是：<u>減少曲數、調整順序、或換成你手上其他的 EA 格式音樂檔</u>。</p>
+  <div class="card">
+    <p class="card-h">⏱ 七分鐘怎麼分配</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>做什麼</th><th class="num">分鐘</th></tr></thead>
+      <tbody>
+        <tr><td>找到那九個檔</td><td class="num">1</td></tr>
+        <tr><td>備份</td><td class="num">1</td></tr>
+        <tr><td>動手改</td><td class="num">3</td></tr>
+        <tr><td>進遊戲確認</td><td class="num">2</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <h2>前置</h2>
+  <ul>
+    <li>已安裝的 MVP Baseball 2005</li>
+    <li>會用檔案總管 / Finder 就夠了，<strong>這一堂不用打指令</strong></li>
+  </ul>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法看<a href="../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <h2>👉 你要做的事</h2>
+
+  <div class="step">
+    <div class="step-n">1</div>
+    <div>
+      <p><strong>找到音樂資料夾。</strong></p>
+      <p>從遊戲資料夾往下走：</p><pre><code>data → audio → cd → music</code></pre><p>裡面就是 <code>menu1.asf</code> 到 <code>menu9.asf</code>，合計約 84 MB（<u>本站測試機</u>那份被社群模組換過的；剛安裝好的原版是約 57 MB）。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">2</div>
+    <div>
+      <p><strong>先整個資料夾複製一份當備份。</strong></p>
+      <div class="card"><p class="card-h">這一步不能跳</p><p>接下來是直接改檔名跟刪檔。<strong>備份是唯一的還原方法。</strong></p></div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">3</div>
+    <div>
+      <p><strong>動手。</strong></p>
+      <ul><li><strong>只想聽某幾首</strong>：把不要的刪掉，剩下的建議改成 <code>menu1</code> 起連續編號。<span class="small">⚠️ <u>連號這件事本站沒有實機驗過</u>：執行檔裡是九條寫死的完整路徑（<code>AUDIO/CD/MUSIC/MENU1.ASF</code> 到 <code>MENU9.ASF</code>，沒有 <code>%d</code> 格式字串），所以刪掉中間某一首會怎樣、要不要重排，本站只能推測。先備份再試。</span></li><li><strong>想換順序</strong>：互相改檔名就好。</li><li><strong>手上有別的 EA 音訊檔</strong>：改成 <code>menuN.asf</code> 丟進來。</li></ul>
+    </div>
+  </div>
+
+  <h2>✅ 怎麼知道成功了</h2>
+  <ul>
+    <li>資料夾裡剩下的檔名都還是 <code>menuN.asf</code> 的形式（建議從 <code>menu1</code> 起連號，<u>但連號與否本站沒有實機驗過</u>）</li>
+    <li>進遊戲聽選單音樂</li>
+  </ul>
+
+  <h2>❌ 出錯處理</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>症狀</th><th>怎麼辦</th></tr></thead>
+    <tbody>
+      <tr><td>選單沒聲音</td><td>副檔名打錯，或檔名不是 <code>menuN.asf</code> 的形式。把備份複製回來重來</td></tr>
+      <tr><td>遊戲當掉</td><td>檔案格式不對。這個遊戲吃的不是一般的 MP3</td></tr>
+      <tr><td>想全部還原</td><td>把備份資料夾整個蓋回去</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card red">
+    <p class="card-h">⚠️ 這一課到哪裡為止</p>
+    <p><strong>把你的 MP3 直接改名成 <code>menu1.asf</code> 是沒用的。</strong>那個副檔名雖然是 <code>.asf</code>，但<u>不是微軟的那個 ASF</u> ——它是 EA 自己的容器，檔頭寫著 <code>SCHl</code>，裡面是 EA 專用的 ADPCM 編碼。</p><p>免費的 <code>ffmpeg</code> <strong>解得開這五種 EA 音訊格式（<code>adpcm_ea</code> 與 <code>r1</code>／<code>r2</code>／<code>r3</code>／<code>xas</code>，本站量的是 ffmpeg 8.1.1），但一個編碼器都沒有</strong>。<u>但你不必去找當年社群的轉檔工具了</u>——<strong>本站自己寫了一支編碼器</strong>：純 Python、零相依，見<a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>。這九個檔正好是它最有把握的那一種：實測 <code>menu1.asf</code> 到 <code>menu9.asf</code> 每個都是<u>編碼器 1</u>、一段、沒有切不出相位的區塊，<code>--import</code> 的預覽全部過關。</p><p><strong>但格子是定長的。</strong>你的歌塞進去不會讓檔案變大：比原本短的補靜音、比原本長的<u>直接被切掉</u>。以 <code>menu1.asf</code> 為例，本站量到的格子長度是 <strong>10,839,168 個取樣</strong>（44100 Hz 立體聲，約 246 秒；那是<u>本站測試機</u>那份被社群模組換過的 <code>menu1.asf</code>，剛安裝好的原版是 6,204,205 個取樣、29400 Hz、約 211 秒），想放更長的歌沒有辦法。</p><p class="small">⚠️ 這一段原本寫的是「要真的塞進自己的歌，需要當年社群那些轉檔工具」。<strong>那句話已經失效</strong>，這裡改成本站現在真的做得到的路。<a href="../reference/tools-archive.html">二十年工具清冊</a>仍然值得看——當年那支編碼器其實是 EA 原廠流出的 <code>sx.exe</code>。本站不散布工具本體。</p>
+  </div>
+
+
+  <h2>想弄懂為什麼</h2>
+  <ul class="plain">
+    <li><a href="../reference/audio.html">播報與音訊系統</a> —— 九首選單音樂本站量過</li>
+    <li><a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a> —— 本站自己寫的編碼器</li>
+    <li><a href="../reference/tools-archive.html">二十年工具清冊</a> —— 當年社群靠哪些工具做這件事</li>
+    <li><a href="chant.html">七分鐘做應援曲</a></li>
+  </ul>
+
+  <footer>
+    <p>本頁是「下課七分鐘」系列，只講一件事怎麼做完。
+       原理、量測過程與本站驗到哪裡為止，寫在上面連過去的完整課程裡。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

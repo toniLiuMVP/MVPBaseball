@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/voice-header.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>語音檔頭的 16 個位元組 — toni的MVP模組補習班</title>
+<meta name="description" content="2008 年遊戲基地精華區那篇語音教學說「用 WinHex 在第 2、3 欄填編號」。本站把 6,995 個檔頭全部量過:編號在第 2-3 個位元組、長度區塊數在第 8-9 個位元組,兩份原版都 100% 零例外。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 語音檔頭的 16 個位元組</p>
+  <h1>語音檔頭的 16 個位元組</h1>
+  <p class="lede">2008 年，遊戲基地精華區有一篇〈語音檔製做法 新版〉，
+     把自製球員語音的流程一步一步寫下來。最後那一步是
+     「<u>用 WinHex 開啟這 3 個檔，在第 2 欄處填 1E，第 3 欄處填 00</u>」。
+     那是整篇最難照做、也最沒解釋的一步。<strong>本站把兩份原版裡全部 6,995 個檔頭拆開來數，
+     把那 16 個位元組每一格是什麼弄清楚了。</strong></p>
+
+  <div class="card amber">
+    <p class="card-h">先說本站對那篇教學的態度</p>
+    <p>那篇文章記錄的<strong>流程是對的</strong>，而且在 2008 年沒有任何工具的情況下，
+       有人願意把「先轉 wav、剪接、再轉 asf、改副檔名、手動改檔頭」寫成十幾個步驟公開出來，
+       這件事本身就是這個社群能存在的原因。</p>
+    <p>本站沒有轉載它，也不會提供那些工具。這一頁做的是另一件事：
+       <u>把它沒解釋的那一步，用可以重跑的量測補上</u>。</p>
+    <p class="small">原文標題〈語音檔製做法 新版〉，遊戲基地「美國職棒大聯盟系列」精華區 ﹥ 模組製作。
+       本站不轉載全文、不提供原檔，只逐字引用其中兩句以便對照。</p>
+  </div>
+
+  <h2>第一個坑：檔頭跟聲音不住在同一個地方</h2>
+  <p>聲音本體是 <code>.dat</code>，檔頭是 <code>.hdr</code>，兩個一定成對。
+     但它們在<strong>兩棵不同的資料夾樹</strong>裡：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>是什麼</th><th class="mono">路徑</th><th class="num">原版項目數</th></tr></thead>
+    <tbody>
+      <tr><td data-label="是什麼">聲音本體</td><td data-label="路徑" class="mono">data\audio\<strong>cd</strong>\spch_pbp\pnamedat.big</td><td data-label="原版項目數" class="num">4,580</td></tr>
+      <tr class="hi"><td data-label="是什麼">檔頭</td><td data-label="路徑" class="mono">data\audio\spch_pbp\pname<strong>hdr</strong>.big</td><td data-label="原版項目數" class="num">4,580</td></tr>
+    </tbody>
+  </table></div>
+  <p>差別只在中間那個 <code>cd</code> 資料夾。<strong>兩邊的檔名集合完全相同</strong>
+     ——「少做任何一個都會導致遊戲跳出」這句提醒，說的就是這件事。</p>
+
+  <h2>16 個位元組長什麼樣</h2>
+  <div class="card amber">
+    <p class="card-h">先修一句：<u>不是每個檔頭都 16 個位元組</u></p>
+    <p>這一頁的標題寫「16 個位元組」，那對<strong>球員名那一庫</strong>是對的
+       （4,580 個裡 4,565 個是 16，另外 15 個是 20）。但其他幾庫完全不是：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th class="mono">封裝檔</th><th>是什麼</th><th class="num">檔頭大小</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="封裝檔" class="mono">spch_pbp\pnamehdr.big</td><td data-label="是什麼">播報員唸球員名</td>
+            <td data-label="檔頭大小" class="num"><strong>16</strong>（4,565）／20（15）</td></tr>
+        <tr><td data-label="封裝檔" class="mono">spch_pbp\stdnmhdr.big</td><td data-label="是什麼">播報員的固定句</td><td data-label="檔頭大小" class="num">16 ～ 36，六種</td></tr>
+        <tr><td data-label="封裝檔" class="mono">spch_pbp\tnamehdr.big</td><td data-label="是什麼">播報員唸隊名</td><td data-label="檔頭大小" class="num">72 ～ 148，<u>九種</u></td></tr>
+        <tr class="hi"><td data-label="封裝檔" class="mono">spch_pa\pnamehdr.big</td><td data-label="是什麼">球場廣播唸球員名</td>
+            <td data-label="檔頭大小" class="num"><strong>32</strong>，2,106 個全部一樣</td></tr>
+        <tr><td data-label="封裝檔" class="mono">spch_pa\tnamehdr.big</td><td data-label="是什麼">球場廣播唸隊名</td><td data-label="檔頭大小" class="num">28（60）／32（31）</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>但下面那兩個欄位（編號、長度）的位置在五庫都一樣</strong>
+       —— 6,995 次比對全部成立，那才是這一頁真正在講的事。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">「多出來的部分」現在解開了一半</p>
+    <p>本站原本寫「多出來的部分接在後面，沒有解讀」。這次把 6,995 個檔頭的
+       <strong>第 4 與第 5 個位元組</strong>逐一列出來，兩件事很清楚：</p>
+    <p><strong>一、第 4 個位元組在同一個庫裡是常數。</strong>
+       它不隨檔案變，只隨「你在哪一個庫」變：</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th class="mono">語音庫</th><th class="num">項目數</th>
+                 <th class="num">位元組 4</th><th>檔頭長度與位元組 5 的關係</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td class="mono">spch_pbp\tnamehdr</td><td class="num">124</td><td class="num">2</td>
+            <td><strong>長度 ＝ 4 × 位元組5 ＋ 20</strong>　<u>124 / 124 零例外</u></td></tr>
+        <tr class="hi"><td class="mono">spch_pa\tnamehdr</td><td class="num">91</td><td class="num">1</td>
+            <td><strong>長度 ＝ 4 × 位元組5 ＋ 12</strong>　<u>91 / 91 零例外</u></td></tr>
+        <tr><td class="mono">spch_pa\pnamehdr</td><td class="num">2,106</td><td class="num">3</td>
+            <td>位元組5 全是 1、長度全是 32 —— <u>只有一種組合，推不出關係</u></td></tr>
+        <tr><td class="mono">spch_pbp\pnamehdr</td><td class="num">4,580</td><td class="num">0</td>
+            <td rowspan="2">檔頭長度<u>不是位元組5 的簡單線性關係</u>（<code>pnamehdr</code> 只有 16／20 兩種，<code>stdnmhdr</code> 有 16 ～ 36 共六種）
+                <span class="badge wip">未解</span></td></tr>
+        <tr><td class="mono">spch_pbp\stdnmhdr</td><td class="num">94</td><td class="num">0 或 1</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>二、兩個庫的長度可以完全算出來。</strong>
+       那兩條線性關係各自零例外，而且常數不一樣（＋20 與 ＋12），
+       代表<u>不同的庫用不同的檔頭配置</u>，不是同一套。</p>
+    <p class="small">剩下三個庫還沒解。<span class="badge wip">未解</span>
+       但比原本的「多出來的部分沒有解讀」精確多了。</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">這一段是怎麼寫出來的（值得記一下）</p>
+    <p>本站跑了一輪內部覆驗，其中一份回報說這一整段解開了，
+       還給了一條通用公式（<code>長度 ＝ 12 ＋ (2 ＋ 位元組4) × 位元組5</code>），
+       並宣稱「13,990 / 13,990 零例外」。</p>
+    <p><strong>本站照著跑了一遍：那條公式在 6,995 個檔裡只成立 56 個。</strong></p>
+    <p>但那份回報不是全錯 —— 它指出的方向（第 4、第 5 個位元組）是對的，
+       而且它提到的 <code>tnamehdr</code> 那條「4 × 段數 ＋ 20」<u>完全正確</u>。
+       錯的是<strong>把一個庫成立的規律寫成五個庫的通則</strong>。</p>
+    <p class="small">上面那張表是本站自己重量的，不是照抄的。
+       <u>拿到一份漂亮的報告，第一件事是自己跑一次。</u></p>
+  </div>
+  <p>原版 <code>0003a.hdr</code>（球員名那一庫，16 個位元組），整份就這麼長：</p>
+<pre><code><span class="cm">位元組  0  1   2  3   4  5  6  7   8  9 10 11  12 13 14 15</span>
+       E1 36  <span class="hl">03 00</span>  00 01 00 00  <span class="nu">0B 00</span> 00 00  00 00 70 70
+       └─┬─┘  └─┬─┘              └─┬─┘
+       類別    <span class="hl">編號 3</span>            <span class="nu">區塊數減一 11</span></code></pre>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">位元組</th><th>是什麼</th><th>怎麼驗的</th></tr></thead>
+    <tbody>
+      <tr><td data-label="位元組" class="num">0–1</td><td data-label="是什麼"><strong>類別標記</strong>。哪一種語音就是哪一組固定值</td>
+          <td data-label="怎麼驗的">同一類的檔全部一樣，零例外（見下表）</td></tr>
+      <tr class="hi"><td data-label="位元組" class="num">2–3</td><td data-label="是什麼"><strong>編號</strong>（16 位元、低位在前）。就是檔名前面那個數字</td>
+          <td data-label="怎麼驗的"><strong>6,995 / 6,995 相符</strong></td></tr>
+      <tr><td data-label="位元組" class="num">4–7</td><td data-label="是什麼">幾乎全是固定值。<span class="badge wip">未解</span></td>
+          <td data-label="怎麼驗的">位元組 6、7 在全部 6,995 個檔頭裡都是 <code>00</code>；位元組 4 是各庫自己的常數（這一庫 4,580 個全是 <code>00</code>，其他庫見上表）</td></tr>
+      <tr class="hi"><td data-label="位元組" class="num">8–9</td><td data-label="是什麼"><strong>長度</strong>，單位是 256 位元組的區塊，<u>而且要減一</u></td>
+          <td data-label="怎麼驗的"><strong>6,995 / 6,995 相符</strong></td></tr>
+      <tr><td data-label="位元組" class="num">10–15</td><td data-label="是什麼">其餘。<span class="badge wip">未解</span></td>
+          <td data-label="怎麼驗的">位元組 10–13 在全部檔案裡都是 <code>00</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card grass">
+    <p class="card-h">那個「減一」不是筆誤</p>
+    <p>原版全部 6,995 個聲音檔，<strong>長度都是 256 的整數倍</strong>，一個例外都沒有。
+       而檔頭第 8–9 個位元組寫的是「區塊數<u>減一</u>」。</p>
+    <p>上面那個例子：檔頭寫 <code>0B</code>（11），聲音檔實際 3,072 位元組 = 12 × 256。
+       <strong>11 + 1 = 12。</strong></p>
+    <p class="small">驗算方式：<code>(第 8–9 位元組的值 + 1) × 256 == .dat 的長度</code>。
+       兩份原版（英文版與 EA 官方繁中版）各 6,995 個檔，<strong>合計 13,990 次比對全部成立</strong>。</p>
+    <p class="small">⚠️ 一個誠實的但書：本站那份繁中版備份
+       <a href="official-chinese.html">有 45 個位元組的損壞</a>，
+       而受影響的 20 個檔裡包含 <code>spch_pbp\tnamedat.big</code>（隊名語音）。
+       這一頁的公式<u>算的是檔案長度，不是內容</u>，
+       而位元組層級的損壞不會改變長度 —— 所以那 124 筆不受影響，
+       兩份備份也給出完全一樣的結果。
+       但範圍還是講清楚比較好。</p>
+  </div>
+
+  <h2>類別標記對照</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th class="mono">位元組 0–1</th><th>是哪一種</th><th class="num">原版數量</th><th class="mono">封裝檔</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">E1 36</td><td>球員語音 <code>a</code>（球評唸姓氏）</td><td class="num">1,462</td><td class="mono" rowspan="3">spch_pbp\pnamehdr.big</td></tr>
+      <tr><td class="mono">E3 36</td><td>球員語音 <code>c</code>（主播唸全名）</td><td class="num">1,486</td></tr>
+      <tr><td class="mono">E5 36</td><td>球員語音 <code>d</code>（主播唸姓氏）</td><td class="num">1,632</td></tr>
+      <tr class="hi"><td class="mono">9A 4A</td><td>隊名</td><td class="num">124</td><td class="mono">spch_pbp\tnamehdr.big</td></tr>
+      <tr><td class="mono">2B 3F</td><td>固定句（第一種）</td><td class="num">56</td><td class="mono" rowspan="2">spch_pbp\stdnmhdr.big</td></tr>
+      <tr><td class="mono">80 49</td><td>固定句（第二種）</td><td class="num">38</td></tr>
+      <tr><td class="mono">10 20</td><td>球場廣播的球員名</td><td class="num">2,106</td><td class="mono">spch_pa\pnamehdr.big</td></tr>
+      <tr><td class="mono">11 20</td><td>球場廣播的隊名</td><td class="num">91</td><td class="mono">spch_pa\tnamehdr.big</td></tr>
+    </tbody>
+  </table></div>
+  <p><code>a</code> / <code>c</code> / <code>d</code> 這三個尾碼，<strong>光看檔頭第 0 個位元組就知道是哪一個</strong>
+     —— <code>E1</code>、<code>E3</code>、<code>E5</code>，4,580 個檔零例外。</p>
+  <p class="small">括號裡那三個名字不是本頁量的，是
+     <a href="player-voice.html#suffix">球員語音那一頁</a>用
+     <code>spch_pbp.txt</code> 的類別編號集合逐一比對出來的（三組集合完全相同，
+     再加一道音檔長度佐證）。<u>三個數量跟那一頁列的一模一樣</u>，確定是同一組資料。</p>
+
+  <h2>那句「第 2 欄、第 3 欄」差了一格</h2>
+  <p>原文教的是：編號 30 換成十六進位是 <code>001E</code>，
+     然後「在第 2 欄處填 <code>1E</code>，第 3 欄處填 <code>00</code>」。</p>
+  <p>本站量到的是：<strong>編號在第 2 和第 3 個位元組</strong>（從 0 數起），
+     也就是十六進位編輯器裡<u>第 3 欄和第 4 欄</u>。</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>把編號放在哪</th><th class="num">6,995 個檔裡對幾個</th></tr></thead>
+    <tbody>
+      <tr><td>第 0–1 個位元組</td><td class="num">0</td></tr>
+      <tr><td>第 1–2 個位元組（照原文字面）</td><td class="num">0</td></tr>
+      <tr class="hi"><td><strong>第 2–3 個位元組</strong></td><td class="num"><strong>6,995</strong></td></tr>
+      <tr><td>第 3–4 個位元組</td><td class="num">0</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">這很可能只是「欄」從 1 還是從 0 數起的差別，十八年前也沒有人能拿 6,995 個檔去對。
+     照原文字面做會把編號寫到左邊一格，而左邊那一格是類別標記
+     —— 改壞它，遊戲會拿這個檔當成別種語音。</p>
+
+  <h2>不是每個球員都有三個檔</h2>
+  <p>原版 <code>pnamedat.big</code> 裡有 <strong>1,673 個編號</strong>，
+     但三個尾碼齊全的只有 1,255 個：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>有哪幾個</th><th class="num">編號數</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td><code>a</code> + <code>c</code> + <code>d</code>（齊全）</td><td class="num">1,255</td></tr>
+      <tr><td><code>c</code> + <code>d</code></td><td class="num">191</td></tr>
+      <tr><td><code>a</code> + <code>d</code></td><td class="num">166</td></tr>
+      <tr><td><code>a</code> + <code>c</code></td><td class="num">40</td></tr>
+      <tr><td>只有 <code>d</code></td><td class="num">20</td></tr>
+      <tr><td>只有 <code>a</code></td><td class="num">1</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>EA 自己出貨的東西就有四分之一是不齊的。</strong>
+     所以「一定要三個都做」不是遊戲的要求，
+     真正的要求是<u>你做了幾個 <code>.dat</code>，就要有對應的幾個 <code>.hdr</code></u>
+     —— 那篇教學的下一句其實也是這樣寫的。</p>
+
+  <div class="card clay">
+    <p class="card-h">社群做的語音有一半不遵守這條規則，而遊戲照跑</p>
+    <p>本站測試機（裝過台灣模組）的 <code>pnamedat.big</code> 有 12,450 個配對，
+       但其中只有 6,253 個的長度是 256 的整數倍
+       —— 剩下那 6,197 個<strong>連套用這條公式的前提都不成立</strong>。
+       而長度真的對齊的那 6,253 個裡，有 6,176 個（98.8%）符合公式。</p>
+    <p>換句話說：當年的社群工具產出的檔案不照 EA 的規矩，<u>而這台機器一直是能玩的</u>。</p>
+    <p class="small"><strong>本站沒有去驗遊戲到底有沒有讀這一欄</strong>，也沒有做「故意寫錯看會不會壞」的實驗。
+       量到的就是「這台有 6,197 個不對齊的檔，而它是本站所有教學的測試機」這件事本身。
+       <span class="badge wip">未驗</span></p>
+  </div>
+
+  <h2>看四個位元組就知道這個語音不是 EA 錄的</h2>
+  <p>上面講的是 <code>.hdr</code>。而聲音本體 <code>.dat</code> 的<u>前 12 個位元組</u>
+     也藏著一件很好用的事：</p>
+<pre><code><span class="cm">原版 0003a.dat 的開頭</span>
+53 43 48 6C  1C 00 00 00  <span class="hl">50 54 00 00</span>  06 01 65 FD
+ S  C  H  l   ← 長度 →     <span class="hl">P  T \0 \0</span>
+
+<span class="cm">本站測試機 0001a.dat 的開頭</span>
+53 43 48 6C  20 00 00 00  <span class="nu">47 53 54 52</span>  01 00 00 00
+ S  C  H  l   ← 長度 →     <span class="nu">G  S  T  R</span></code></pre>
+  <p>第 8 到 11 個位元組是<strong>「這個檔是哪一套工具做的」</strong>。實測：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>哪一批檔案</th><th class="num">數量</th><th class="mono">PT\0\0</th><th class="mono">GSTR</th><th class="mono">其他</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="哪一批檔案"><strong>剛安裝好的原版全庫</strong></td><td data-label="數量" class="num">4,580</td>
+          <td data-label="PT\0\0" class="num"><strong>4,580</strong></td><td data-label="GSTR" class="num"><strong>0</strong></td><td data-label="其他" class="num">0</td></tr>
+      <tr class="hi"><td data-label="哪一批檔案">測試機裡<u>跟原版逐位元組相同</u>的</td><td data-label="數量" class="num">3,692</td>
+          <td data-label="PT\0\0" class="num"><strong>3,692</strong></td><td data-label="GSTR" class="num"><strong>0</strong></td><td data-label="其他" class="num">0</td></tr>
+      <tr><td data-label="哪一批檔案">測試機裡<u>原版沒有、後來加的</u></td><td data-label="數量" class="num">7,988</td>
+          <td data-label="PT\0\0" class="num">1,680</td><td data-label="GSTR" class="num">5,778</td><td data-label="其他" class="num">530</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card grass">
+    <p class="card-h">所以這是一條<u>單向</u>的判定</p>
+    <p><strong>看到 <code>GSTR</code> → 一定不是這兩份 2005 原版留下來的。</strong>
+       兩份原版全庫零個 <code>GSTR</code>，而測試機裡跟原版逐位元組相同的 3,692 個也零個。</p>
+    <p><strong>但反過來不成立。</strong>看到 <code>PT\0\0</code> <u>不代表</u>是原廠的
+       —— 後來加的 7,988 個裡就有 1,680 個是 <code>PT\0\0</code>。</p>
+    <p class="small">為什麼會有兩套,本站不知道 —— 能量到的只有「原版清一色一種、後來加的混著兩種」。
+       <span class="badge wip">未解</span>
+       另外測試機裡還有 1 個檔開頭根本是 <code>RIFF</code>／<code>WAVE</code>，
+       也就是一個沒轉檔就丟進來的 Windows 音效檔。</p>
+  </div>
+
+  <h2>另一個 1.17 MB 的純文字對照表</h2>
+  <p><code>data\audio\spch_pbp\spch_pbp.txt</code>，<strong>31,902 行</strong>，
+     裡面是<u>原始錄音的檔名</u>與它在資料裡的位置：</p>
+<pre><code>1000ms_40
+1000ms.wav                       0
+1100ms.wav                       3840
+800ms.wav                        7936
+900ms.wav                        11264
+100ms_40
+100ms.wav                        0</code></pre>
+  <p>沒有縮排的是<strong>群組名</strong>，縮排的是「檔名 + 從群組開頭算起的位移」。
+     每個群組的位移都<u>從 0 重新起算</u>。</p>
+  <p>這份表把 EA 當年錄音室裡的檔名留了下來
+     —— <code>1000ms.wav</code>、<code>800ms.wav</code> 這種名字看得出是<u>停頓長度</u>。</p>
+  <p class="small">本站沒有把這張表跟實際音訊對起來，也沒有解讀群組名的命名規則。
+     <span class="badge wip">未解</span></p>
+
+  <h2>順帶：有一個 212 MB 的語音檔完全不照這套規矩</h2>
+  <p><code>data\audio\cd\spch_pbp\pbpdat.big</code> 是整個遊戲最大的音訊檔
+     —— <strong>212,219,648 個位元組</strong>，播報員的所有講評都在裡面。</p>
+  <p>它<u>不是封裝檔</u>。開頭四個位元組不是 <code>BIGF</code>，是 <code>SCHl</code>
+     —— 也就是說<strong>整個檔案就是一長串音訊串流接在一起</strong>，沒有目錄。</p>
+  <p>那怎麼找得到某一段？<strong>索引是一個純文字檔</strong>，
+     就在旁邊的 <code>data\audio\spch_pbp\pbpdat.off</code>：</p>
+<pre><code><span class="cm">pbpdat.off 前三行</span>
+0,15360,
+15360,7168,
+22528,10752,</code></pre>
+  <p>每一行是「從第幾個位元組開始，長度多少」。全檔 <strong>2,056 行</strong>，
+     把所有長度加起來是 <strong>212,219,648</strong> ——
+     <u>剛好等於 <code>pbpdat.big</code> 的大小，一個位元組不多不少。</u></p>
+  <p class="small">所以 EA 在同一個遊戲裡用了兩套索引做法：
+     大部分東西用 <code>BIGF</code> 把目錄放在檔頭，
+     而這個 212 MB 的檔把目錄拆出來放成一個純文字檔。
+     <strong>為什麼要這樣做，本站不知道。</strong><span class="badge wip">未解</span>
+     一個猜得到但沒證據的方向是「這個檔太大，不想為了讀目錄先載入檔頭」——
+     本站沒有辦法驗證，所以只記錄現象。</p>
+
+  <h2>怎麼自己重跑一次</h2>
+  <p>不需要本站的工具。用 <a href="../tutorials/fel-toolkit/index.html">FEL 萬用工具</a>
+     或任何能讀 BIG 封裝檔的東西，把兩個封裝檔的目錄列出來，然後對每一組同名的檔案算：</p>
+<pre><code><span class="cm"># 檔頭第 2-3 個位元組(低位在前)應該等於檔名前面的數字</span>
+編號 = 檔頭[2] + 檔頭[3] * 256
+
+<span class="cm"># 檔頭第 8-9 個位元組(低位在前)加一,乘 256,應該等於聲音檔的長度</span>
+長度 = (檔頭[8] + 檔頭[9] * 256 + 1) * 256</code></pre>
+  <p class="small">本站兩條都跑過 13,990 次（兩份原版 × 6,995 個檔），沒有一次不成立。
+     你手上那份如果裝過模組，數字會不一樣 —— 那正是上面那張卡在講的事。</p>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 2008 年那篇語音教學最難照做、也最沒解釋的一步是「用 WinHex 手改檔頭」，本站把兩份剛安裝好的原版<strong>各 6,995 個檔頭</strong>拆開來數，把那幾個位元組每一格是什麼弄清楚了。</li>
+    <li><strong>兩條你可以自己重跑的公式</strong> 編號在<strong>第 2 到 3 個位元組</strong>（低位在前），長度在<strong>第 8 到 9 個位元組</strong>，單位是 256 位元組的區塊<u>而且要減一</u>，所以 <code>(值 ＋ 1) × 256 ＝ .dat 的長度</code>。兩條各 6,995／6,995 相符，兩份原版合計 <strong>13,990 次比對全部成立</strong>；原版全部 6,995 個聲音檔的長度都是 256 的整數倍，一個例外都沒有。</li>
+    <li><strong>原文那句「第 2 欄、第 3 欄」差了一格</strong> 本站量到編號在第 2、3 個<u>位元組</u>（從 0 數起），也就是十六進位編輯器裡的第 3、4 欄。四種放法只有這一種對得上 6,995 個檔，其餘三種都是 0。<strong>照字面做會把編號寫到左邊一格，而那一格是類別標記</strong>，改壞它遊戲會把這個檔當成別種語音。</li>
+    <li><strong>先修自己的標題：不是每個檔頭都 16 個位元組</strong>。那對球員名那一庫成立（4,580 個裡 4,565 個是 16、另外 15 個是 20），但<u>播報員唸隊名</u>那庫是 72 到 148 共九種、<u>球場廣播唸球員名</u>那庫 2,106 個全部是 32。<u>不變的是上面那兩個欄位的位置，五個庫都一樣。</u></li>
+    <li><strong>拿到一份漂亮的報告，第一件事是自己跑一次</strong> 一輪內部覆驗回報說這段全解了，給了一條通用公式並宣稱「13,990／13,990 零例外」，<strong>本站照著跑只成立 56 個</strong>。它不是全錯，方向（第 4、第 5 個位元組）對，<code>tnamehdr</code> 那條「長度 ＝ 4 × 位元組5 ＋ 20」124／124 也完全正確，錯在<u>把一個庫成立的規律寫成五個庫的通則</u>。</li>
+    <li><strong>EA 自己出貨的東西就有四分之一不齊</strong> 原版 1,673 個編號裡三個尾碼齊全的只有 1,255 個，其餘是 <code>c＋d</code> 191、<code>a＋d</code> 166、<code>a＋c</code> 40、只有 <code>d</code> 20、只有 <code>a</code> 1。所以「一定要三個都做」不是遊戲的要求，真正的要求是<u>你做了幾個 <code>.dat</code> 就要有對應的幾個 <code>.hdr</code></u>，而那兩種檔住在兩棵不同的資料夾樹裡，差別只在中間那個 <code>cd</code>。</li>
+    <li><strong>看四個位元組就知道這個語音不是 EA 錄的，但只能單向判定</strong> <code>.dat</code> 第 8 到 11 個位元組是工具標記，剛安裝好的原版 4,580 個<strong>全部是 <code>PT\0\0</code>、零個 <code>GSTR</code></strong>，測試機裡跟原版逐位元組相同的 3,692 個也一樣。<u>但看到 <code>PT\0\0</code> 不代表是原廠的</u>，後來加的 7,988 個裡就有 1,680 個是。</li>
+    <li><strong>本站沒驗的</strong> 檔頭第 4 到 7、10 到 15 個位元組大部分<u>未解</u>，五個庫裡還有三個庫的長度算不出來；為什麼會有 <code>PT\0\0</code> 與 <code>GSTR</code> 兩套工具標記不知道；那個 31,902 行的 <code>spch_pbp.txt</code> 沒有跟實際音訊對起來、群組命名規則也沒解讀；212 MB 的 <code>pbpdat.big</code> 為什麼把目錄拆成一個純文字檔（2,056 行，長度加總 212,219,648 剛好等於檔案大小）本站不知道，只記錄現象。最誠實的一條：測試機那 12,450 個配對裡有 <strong>6,197 個長度根本不是 256 的倍數</strong>，連套用公式的前提都不成立，<u>而這台機器一直是能玩的</u>，本站<strong>沒有去驗遊戲到底有沒有讀這一欄</strong>，也沒做故意寫錯的實驗。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="player-voice.html">播報員為什麼不唸新球員的名字</a> —— 這件事的使用者版本</li>
+    <li><a href="audio.html">播報音訊系統</a> —— 整個音訊區的結構</li>
+    <li><a href="player-numbers.html">兩套球員編號</a> —— <code>audioid</code> 怎麼對到這些檔名</li>
+    <li><a href="bigf.html">BIG 封裝檔格式</a> —— 怎麼把這些檔案列出來</li>
+    <li><a href="original-vs-modded.html">原版與這台的對照</a> —— 為什麼本站每個數字都要標是哪一份</li>
+  </ul>
+
+  <footer>
+    <p>本頁的檔頭欄位數字為現場打開兩份「剛安裝好、從未改動」的 MVP Baseball 2005
+       （英文版與 EA 官方繁體中文版）量測所得，各 6,995 個檔頭。
+       頁中標明「本站測試機」的那幾格（12,450 個配對、6,253／6,197、
+       3,692／7,988 與 <code>PT\0\0</code>／<code>GSTR</code> 的分佈）
+       量自一台裝過台灣模組的機器，不是原版數字。
+       標示為「未解」「未驗」之處本站尚未解讀或尚未實機確認。
+       本站不提供任何語音檔案，也不提供製作語音的工具。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/fel-archives.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>版面檔裝在哪些封裝檔 — toni的MVP模組補習班</title>
+<meta name="description" content="遊戲共有 332 個版面檔、141,767 行、2,044 個畫面,分散在六個封裝檔裡。哪個畫面在哪個檔,一張表看完。附一個副檔名騙人的例子。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 版面檔裝在哪些封裝檔</p>
+  <h1>版面檔裝在哪些封裝檔</h1>
+  <p class="lede">本站前面幾頁都在講 <code>ingame.big</code> 的 47 個<a href="fel.html">版面檔</a>。
+     那只是<strong>整個遊戲的七分之一</strong>。
+     把 <code>data\frontend</code> 底下每一個封裝檔都掃過一遍，
+     真正的數字是 <strong>332 個版面檔、141,767 行、2,044 個畫面</strong>。</p>
+
+  <h2>六個封裝檔，各裝什麼</h2>
+  <figure class="figbox">
+  <div class="figscroll">
+<svg class="barchart" viewBox="-4 -4 648 254" role="img" aria-label="六個封裝檔的版面檔行數長條圖:frontend.big 82,204 行最多,title.big 122 行最少">
+<text x="110" y="25.68" class="bl">frontend.big</text>
+<rect x="118" y="8" width="446.0" height="26" class="bar"><title>frontend.big:196 個版面檔 · 82,204 行 · 839 個畫面</title></rect>
+<text x="571.0" y="25.68" class="bv">82,204 行</text>
+<text x="110" y="61.68" class="bl">ingame.big</text>
+<rect x="118" y="44" width="122.2" height="26" class="bar"><title>ingame.big:47 個版面檔 · 22,516 行 · 410 個畫面</title></rect>
+<text x="247.2" y="61.68" class="bv">22,516 行</text>
+<text x="110" y="97.68" class="bl">cooplay.big</text>
+<rect x="118" y="80" width="114.3" height="26" class="bar"><title>cooplay.big:44 個版面檔 · 21,076 行 · 402 個畫面</title></rect>
+<text x="239.3" y="97.68" class="bv">21,076 行</text>
+<text x="110" y="133.68" class="bl">minigame.big</text>
+<rect x="118" y="116" width="75.8" height="26" class="bar"><title>minigame.big:35 個版面檔 · 13,969 行 · 371 個畫面</title></rect>
+<text x="200.8" y="133.68" class="bv">13,969 行</text>
+<text x="110" y="169.68" class="bl">apt.big</text>
+<rect x="118" y="152" width="10.2" height="26" class="bar"><title>apt.big:7 個版面檔 · 1,880 行 · 19 個畫面</title></rect>
+<text x="135.2" y="169.68" class="bv">1,880 行</text>
+<text x="110" y="205.68" class="bl">title.big</text>
+<rect x="118" y="188" width="2.0" height="26" class="bar"><title>title.big:3 個版面檔 · 122 行 · 3 個畫面</title></rect>
+<text x="127.0" y="205.68" class="bv">122 行</text>
+<line x1="118" y1="4" x2="118" y2="216" class="ax"/>
+<text x="118" y="234" class="bn">合計 332 個版面檔 · 141,767 行 · 2,044 個畫面</text>
+</svg>
+  </div>
+  <figcaption><b>資料來源</b>：把 <code>data\frontend</code> 底下 98 個
+     <code>.big</code> 逐一打開數出來的。行數是解壓後的實際行數。</figcaption>
+  </figure>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">封裝檔</th><th class="num">版面檔</th><th class="num">行數</th>
+      <th class="num">畫面</th><th>裝什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="封裝檔" class="mono">frontend.big</td><td data-label="版面檔" class="num">196</td><td data-label="行數" class="num">82,204</td><td data-label="畫面" class="num">839</td>
+        <td data-label="裝什麼"><strong>選單、球員卡、賽季畫面</strong> —— 比賽以外的全部</td></tr>
+      <tr><td data-label="封裝檔" class="mono">ingame.big</td><td data-label="版面檔" class="num">47</td><td data-label="行數" class="num">22,516</td><td data-label="畫面" class="num">410</td>
+        <td data-label="裝什麼">比賽進行中的 HUD、暫停選單、重播<br>
+            <span class="small">（<a href="ingame-files.html">這 47 個有獨立對照表</a>）</span></td></tr>
+      <tr><td data-label="封裝檔" class="mono">cooplay.big</td><td data-label="版面檔" class="num">44</td><td data-label="行數" class="num">21,076</td><td data-label="畫面" class="num">402</td>
+        <td data-label="裝什麼">王朝模式的球團經營畫面</td></tr>
+      <tr><td data-label="封裝檔" class="mono">minigame.big</td><td data-label="版面檔" class="num">35</td><td data-label="行數" class="num">13,969</td><td data-label="畫面" class="num">371</td>
+        <td data-label="裝什麼">小遊戲</td></tr>
+      <tr><td data-label="封裝檔" class="mono">apt.big</td><td data-label="版面檔" class="num">7</td><td data-label="行數" class="num">1,880</td><td data-label="畫面" class="num">19</td>
+        <td data-label="裝什麼">球員養成</td></tr>
+      <tr><td data-label="封裝檔" class="mono">title.big</td><td data-label="版面檔" class="num">3</td><td data-label="行數" class="num">122</td><td data-label="畫面" class="num">3</td>
+        <td data-label="裝什麼">開頭標題</td></tr>
+      <tr><td data-label="封裝檔"><strong>合計</strong></td><td data-label="版面檔" class="num"><strong>332</strong></td>
+        <td data-label="行數" class="num"><strong>141,767</strong></td><td data-label="畫面" class="num"><strong>2,044</strong></td><td data-label="裝什麼"></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">「裝什麼」那一欄是從檔名與畫面代號推的，本站沒有逐一開遊戲確認。
+     另外 <strong>91 個封裝檔裡一個版面檔都沒有</strong> —— 那些裝的是圖片、球衣、球場、球員照片。
+     <br>⚠️ <strong>這 332 個是量<u>本站測試機</u>得到的。</strong>拿兩份剛安裝好的原版（英文版與官方中文版）
+     跑同一支工具，六個封裝檔合計是 <strong>329 個版面檔、140,250 行</strong>。
+     差的 3 個全部在 <code>ingame.big</code>：原版 44 個，這台 47 個
+     （<a href="original-vs-modded.html">原版與這台機器差在哪</a>）。
+     本頁下半段「背景圖反查」那一節量的是<u>原版那 329 個</u>，所以那裡寫 329 不是筆誤。</p>
+
+  <div class="card grass">
+    <p class="card-h">最大的那個不是最大的檔</p>
+    <p><code>frontend.big</code> 只有 2.1 MB，卻裝著 196 個版面檔、82,204 行 ——
+       <strong>是 ingame.big 的 3.6 倍</strong>。純文字壓縮得很兇，所以檔案小不代表內容少。</p>
+    <p>相對地 <code>portrait.big</code> 有 253.6 MB，裡面<strong>一個版面檔都沒有</strong>，
+       全是<a href="portrait.html">球員照片</a>。</p>
+  </div>
+
+  <h2>一個副檔名騙人的例子</h2>
+  <p>掃的時候有一個檔讀不出來：</p>
+<pre><code>⚠ feonlyln.big 讀不出來:檔頭前四碼不是 BIGF,這不是 EA 封裝檔</code></pre>
+  <p>去看它的前 16 個位元組：</p>
+<pre><code>00000000: 5348 5049 40ce 0000 0300 0000 4733 3537   SHPI@.......G357</code></pre>
+  <p><code>SHPI</code> 不是封裝檔的標記，是<a href="portrait.html">圖片容器</a>的標記。
+     <strong>這個檔叫 <code>.big</code>，但它其實是一個圖片檔。</strong></p>
+  <div class="card amber">
+    <p class="card-h">為什麼這件事值得寫出來</p>
+    <p>如果工具遇到讀不出來的檔就整個中斷，你會以為是工具壞了。
+       實際上是<strong>這個檔本來就不是那種格式</strong>。</p>
+    <p>本站的工具遇到這種情況會<u>照實說是哪個檔、為什麼讀不出來，然後繼續掃剩下的</u>。
+       判斷檔案類型要看<strong>檔頭</strong>，不是看副檔名 —— 這條規矩整個站通用。</p>
+  </div>
+
+  <h2>怎麼自己掃一遍</h2>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --bigs</code></pre>
+  <div class="seen"><b>你會看到</b>
+<pre style="margin:8px 0 0"><code>掃 〈你的遊戲資料夾〉/data/frontend
+
+  封裝檔                        大小      項目   版面檔      行數
+  ------------------------------------------------------------------
+  frontend.big                   2.1 MB    196     196    82,204
+  ingame.big                     2.5 MB     47      47    22,516
+  ...
+  ------------------------------------------------------------------
+  合計 6 個封裝檔                                332     332   141,767
+
+  另外 91 個封裝檔裡沒有版面檔(圖片、球衣、球場那些)。
+  ⚠ feonlyln.big 讀不出來:檔頭前四碼不是 BIGF,這不是 EA 封裝檔</code></pre>
+  </div>
+  <p class="small">你的數字可能不一樣 —— 如果你在那個資料夾裡放過自己的備份檔，
+     它們也會被一起掃到。</p>
+
+  <h2>換一個封裝檔來看</h2>
+  <p>本站所有介面指令預設都吃 <code>ingame.big</code>。加 <code>--big</code> 就換一個：</p>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data/frontend/frontend.big --list</code></pre>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data/frontend/frontend.big --strings fes_mainmenu.fel</code></pre>
+  <div class="seen"><b>第二個指令你會看到</b>
+<pre style="margin:8px 0 0"><code>字串表共 6626 條
+  這些版面檔裡有 41 處引用字串,其中 41 處查得到文字
+
+  版面檔                                行號 元素                       編號 文字
+  ------------------------------------------------------------------------------
+  fes_mainmenu.fel                  155 TITLE                   270 Main Menu
+  fes_mainmenu.fel                  172 INSIDEEA                 14 EA SPORTS™ Extras
+  fes_mainmenu.fel                  186 ROSTER                  280 Manage Rosters
+  fes_mainmenu.fel                  200 MYMVP                 16306 My MVP
+  fes_mainmenu.fel                  214 GAMEMODES                13 Game Modes
+  fes_mainmenu.fel                  228 PLAYNOW                  12 Play Now</code></pre>
+  </div>
+  <p class="small">「字串表共 6626 條」跟<a href="loc-strings.html">文字表那頁</a>寫的
+     7,936 條不衝突 —— 兩張表有 1,310 個編號是重疊的，工具把它們合併成一份來查。
+     <a href="loc-strings.html#overlap">重疊的那 1,310 個裡有 15 個文字不一樣</a>，那是另一個故事。</p>
+
+  <p><strong>那就是主選單。</strong>每一項都是一行，每一行都有顯示開關。
+     <a href="../tutorials/fel-recipes/index.html">介面實例集</a>裡關掉東西的做法，
+     換上 <code>--big</code> 就能用在這裡。</p>
+  <div class="card clay">
+    <p class="card-h">但先想清楚再關主選單</p>
+    <p>關掉比賽中的一個數字，最壞就是看不到那個數字。
+       <strong>關掉主選單的一項，可能整個模式進不去。</strong></p>
+    <p>本站的工具寫入前一定先備份、一行指令可以還原
+       （<a href="../tutorials/fel-toolkit/index.html">看工具那頁</a>），
+       但還是建議先在<u>複本</u>上試。</p>
+  </div>
+
+  <h2 id="bkgnds">背景圖：哪一張出現在哪個畫面（2026-08-28 量的）</h2>
+  <p>前端的整頁背景圖不在版面檔裡，而在 <code>data\frontend\bkgnds.big</code>
+     裡的 <strong>107 張 <code>.fsh</code></strong>。
+     檔名是四個字元的代號（<code>58bd</code>、<code>03be</code>…），
+     <u>光看名字完全不知道它是哪個畫面</u>。</p>
+  <p>但可以反查：把 <strong>329 個</strong>版面檔全部解開，看哪一個引用了哪個代號。</p>
+  <p class="small">⚠️ 這一節的母體是<u>剛安裝好的原版</u>（六個封裝檔合計 329 個版面檔），
+     不是本頁上半段那張表的 332 個。差的 3 個在 <code>ingame.big</code>，是本站測試機被模組加上去的，
+     反查背景圖時把它們算進來只會多出這台機器才有的東西。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">背景圖</th><th>出現在哪個畫面</th><th class="num">被幾個版面引用</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="背景圖" class="mono">58bd</td><td data-label="出現在哪個畫面"><strong>開場畫面</strong>（<code>fes_start</code>）</td><td data-label="被幾個版面引用" class="num">1</td></tr>
+      <tr><td data-label="背景圖" class="mono">01be</td><td data-label="出現在哪個畫面">啟動動畫、遊戲模式選單、名單管理</td><td data-label="被幾個版面引用" class="num">3</td></tr>
+      <tr class="hi"><td data-label="背景圖" class="mono">03be</td><td data-label="出現在哪個畫面"><strong>主選單</strong>與線上相關畫面</td><td data-label="被幾個版面引用" class="num">6</td></tr>
+      <tr class="hi"><td data-label="背景圖" class="mono">03bf · 03bg · 03bh</td><td data-label="出現在哪個畫面"><strong>主選單</strong>（同一個畫面的另外三張）</td><td data-label="被幾個版面引用" class="num">各 1</td></tr>
+      <tr><td data-label="背景圖" class="mono">29bd · 29be · 29bf</td><td data-label="出現在哪個畫面">遊戲模式選單（三張）</td><td data-label="被幾個版面引用" class="num">各 1</td></tr>
+      <tr><td data-label="背景圖" class="mono">29bg</td><td data-label="出現在哪個畫面">遊戲模式選單＋設定畫面</td><td data-label="被幾個版面引用" class="num">2</td></tr>
+      <tr><td data-label="背景圖" class="mono">45bd</td><td data-label="出現在哪個畫面">名單管理</td><td data-label="被幾個版面引用" class="num">1</td></tr>
+      <tr><td data-label="背景圖" class="mono">52bd</td><td data-label="出現在哪個畫面">網路對戰、成績選單</td><td data-label="被幾個版面引用" class="num">2</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>這也證實了一件二十年前的觀察。</strong>2008 年有人在論壇上列過一份
+     「換開場畫面要動哪些檔」的清單，其中寫著
+     <u><code>03be</code>／<code>03bf</code>／<code>03bg</code>／<code>03bh</code>「這 4 張是變換圖」</u>、
+     <u><code>29bd</code>～<code>29bg</code>「這 4 張是變換圖」</u>。
+     <strong>實測完全對得上</strong>：<code>03bf</code>、<code>03bg</code>、<code>03bh</code>
+     全部屬於同一個主選單版面，<code>29bd</code>–<code>29bf</code> 全部屬於同一個模式選單版面。
+     他當年不知道版面檔可以解開，是靠試出來的。</p>
+
+  <div class="card clay">
+    <p class="card-h">那份清單裡有一個檔在原版不存在</p>
+    <p>同一份清單列了 13 個代號。本站拿剛安裝好的原版比對：
+       <strong>12 個在 <code>bkgnds.big</code> 裡，1 個不在</strong>
+       （<code>50st</code>）。掃過整個 <code>frontend\</code>，
+       <u><code>##st</code> 形式的檔只有 <code>bkgnds.big</code> 裡的 <code>60st</code>–<code>65st</code> 六個，沒有 <code>50st</code></u>。</p>
+    <p><span class="badge wip">未解</span> 那個代號從哪來，本站不知道。
+       兩種可能：它來自某個模組（那份清單是寫給<u>已經裝了東西的人</u>看的），
+       或者當年就打錯了。<strong>本站沒有證據分辨。</strong></p>
+    <p class="small">這跟本站在<a href="../story/2008-roster/index.html">2008 年那份名單</a>
+       遇到的是同一件事：<u>當年的清單描述的是「那台機器上有」，不是「EA 出貨就有」</u>。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">⚠️ 有一個檔改下去會一次影響 136 個畫面</p>
+    <p>同一份清單還提到 <code>feonly.big</code> 裡的 <code>mainart.fsh</code>，
+       說那是「進去主畫面那張標圖」。<strong>那個描述不完整，而差別很重要。</strong></p>
+    <div class="tablewrap"><table>
+      <tbody>
+        <tr><td>它裡面有幾張圖</td><td class="num"><strong>6 張</strong>（不是一張），全部 32 位元無壓縮</td></tr>
+        <tr class="hi"><td>有幾個版面檔載入它</td><td class="num"><strong>136 個</strong>（剛安裝好的原版 329 個版面檔的 41%）</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>它是一個共用貼圖集，不是一張標題圖。</strong>
+       改它不只影響主畫面 —— <u>四成的前端畫面都會跟著變</u>。
+       想只換標題的話，要改的是它裡面那一張子圖，不是整個檔。</p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 本站前面幾頁講的 <code>ingame.big</code> 47 個版面檔只是整個遊戲的七分之一，六個封裝檔加起來是 <strong>332 個版面檔、141,767 行、2,044 個畫面</strong>（本站測試機；剛安裝好的原版是 <strong>329 個、140,250 行</strong>，差的 3 個在 <code>ingame.big</code>）。</li>
+    <li><strong>最大的那個不是最大的檔</strong> <code>frontend.big</code> 只有 2.1 MB，卻裝著 196 個版面檔、82,204 行，是 <code>ingame.big</code> 的 <strong>3.6 倍</strong>；反過來 <code>portrait.big</code> 有 253.6 MB，裡面一個版面檔都沒有。另外還有 <strong>91 個封裝檔完全不含版面檔</strong>，裝的是圖片、球衣、球場、球員照片。</li>
+    <li><strong>判斷檔案類型要看檔頭，不是副檔名</strong> <code>feonlyln.big</code> 掃不出來，因為它前四碼是 <code>SHPI</code>（圖片容器）而不是 <code>BIGF</code>。這個檔叫 <code>.big</code>，其實是一張圖。本站的工具遇到這種情況會照實說是哪個檔、為什麼讀不出來，然後繼續掃剩下的。</li>
+    <li><strong>二十年前那份清單，實測對得上</strong> 2008 年有人在論壇列過「換開場畫面要動哪些檔」，寫著 <code>03be</code>／<code>03bf</code>／<code>03bg</code>／<code>03bh</code> 是一組變換圖、<code>29bd</code> 到 <code>29bg</code> 是另一組。把原版那 329 個版面檔全部解開反查，<u>完全吻合</u>：那幾張各自屬於同一個主選單版面與同一個模式選單版面。他當年不知道版面檔可以解開，是靠試出來的。</li>
+    <li><strong>本站訂正了那份清單的一句話</strong> 清單說 <code>feonly.big</code> 裡的 <code>mainart.fsh</code> 是「進去主畫面那張標圖」。量下去是 <strong>6 張圖不是一張</strong>，而且被 <strong>136 個版面檔載入</strong>（剛安裝好的原版 329 個的 41%）。它是共用貼圖集，改它會讓四成的前端畫面跟著變；想只換標題要改的是裡面那一張子圖。</li>
+    <li><strong>關主選單比關比賽中的數字危險</strong> 關掉比賽中的一個數字，最壞就是看不到那個數字；<strong>關掉主選單的一項，可能整個模式進不去</strong>。工具寫入前會先備份、一行指令可以還原，但仍建議先在<u>複本</u>上試。</li>
+    <li><strong>兩個字串表數字不衝突</strong> 工具顯示「字串表共 6626 條」跟<a href="loc-strings.html">文字表那頁</a>的 7,936 條是同一回事，兩張表有 <strong>1,310 個編號重疊</strong>，工具合併成一份來查，其中 15 個編號的文字兩邊不一樣。</li>
+    <li><strong>本站沒驗的</strong> 表上「裝什麼」那一欄是依<u>檔名與畫面代號推的</u>，本站沒有逐一開遊戲確認。那份 2008 清單列的 13 個代號，比對剛安裝好的原版是 12 個在、<strong>1 個不在</strong>（<code>50st</code>）；掃過整個 <code>frontend\</code>，<code>##st</code> 形式的檔只有 <code>bkgnds.big</code> 裡的 <code>60st</code>–<code>65st</code> 六個，沒有 <code>50st</code>；它是來自某個模組還是當年打錯，本站沒有證據分辨。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../tutorials/fel-toolkit/index.html">介面萬用工具</a> —— <code>--bigs</code> 與 <code>--big</code> 的完整說明</li>
+    <li><a href="ingame-files.html">ingame.big 47 個版面檔對照</a> —— 比賽中那 47 個逐檔說明（可搜尋）</li>
+    <li><a href="hud-map.html">介面座標圖</a> —— 元素在畫面上的位置</li>
+    <li><a href="bigf.html">BIGF 封裝檔格式</a> —— 封裝檔本身怎麼組成的</li>
+  </ul>
+
+  <footer>
+    <p>本頁的封裝檔數量、版面檔數量、行數、畫面數皆為現場掃描
+       <code>data\frontend</code> 量測所得。「裝什麼」一欄為依檔名與畫面代號的推斷，本站未逐一開遊戲確認。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

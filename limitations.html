@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/limitations.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>本站做不到的事 — toni的MVP模組補習班</title>
+<meta name="description" content="這一頁收攏站上每一課自己寫的「本站沒驗的」與未解標記。內容一個字都不是新寫的，全部是各課原本就有的句子，由程式收集，所以清單不會漏收哪一頁。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="index.html">首頁</a>
+  <a class="item" href="start.html">新手基本功</a>
+  <a class="item" href="do.html">我想做什麼</a>
+  <a class="item" href="plan.html">課表</a>
+  <a class="item" href="tutorials/index.html">教學</a>
+  <a class="item" href="7min/index.html">七分鐘</a>
+  <a class="item" href="reference/index.html">速查</a>
+  <a class="item" href="coach/index.html">棒球教練</a>
+  <a class="item" href="story/index.html">故事</a>
+  <a class="item" href="about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">首頁</a> › 本站做不到的事</p>
+  <h1>本站做不到的事</h1>
+  <p class="lede">這一頁把站上每一課自己寫的「本站沒驗的」收攏到一起。<strong>內容一個字都不是新寫的</strong> —— 全部是各課原本就有的句子，由程式從頁面裡收集出來，所以<u>清單不會漏收哪一頁</u>；句子本身會不會過期，取決於那一課解開一件事之後有沒有回頭改它。</p>
+
+  <div class="card clay">
+    <p class="card-h">📊 現在的數字</p>
+    <ul>
+      <li><strong>95 頁</strong>帶著明確的留白</li>
+      <li><strong>95 條</strong>「本站沒驗的」</li>
+      <li><strong>198 個</strong>未解 / 未驗 / 推測的標記</li>
+    </ul>
+    <p class="small">這三個數字是程式數出來的，不是手寫的。每次發布都會重新數一次。</p>
+  </div>
+
+  <div class="card">
+    <p class="card-h">為什麼要有這一頁</p>
+    <p>一個教人改遊戲檔的站，最危險的不是「不知道」，是<strong>把不知道的講得像知道</strong>。本站的做法是每一課自己在結尾寫清楚它到哪裡為止 ——但那樣分散在一百多頁裡，沒有人會一頁一頁翻。</p>
+    <p>所以有這一頁。<u>它不是新的內容，是同一批句子的另一種排法</u>：你想知道某一課有多可靠，就看它在這裡有沒有留白、留了什麼。</p>
+  </div>
+
+  <h2>教學（39 頁）</h2>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/auto-install/index.html">一整包模組自動歸位</a></p>
+    <ul>
+      <li>「裝完之後遊戲畫面正不正常」本站未驗，驗的是檔案有沒有正確寫進去、還原是不是逐位元組回到原狀；另外巢狀壓縮封裝檔裡的項目，索引讀得到但不寫回去，要重壓一整層風險比較高，本站目前不做。備份完不完整靠的是收據，所以本工具做的備份驗得出來；2026-09-05 以前留下、沒有收據的舊 .autobak 本站不敢自動還原，那一種只能自己手動複製回去。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/backup/index.html">備份與還原 SOP</a></p>
+    <ul>
+      <li>schedule.big 疊三次年份之後還能不能玩，沒有真的開遊戲跑完一個球季；也沒有量過任何社群模組動到哪些檔（裝第三方模組前請整個 data 複製一份）；controller.cfg 什麼時候被建立、刪掉會不會自己長回來，同樣沒有實測；另外二十支會寫檔的工具，本站沒有逐支實跑過 --restore 把畫面抄下來。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/change-camera/index.html">把打擊視角調成你喜歡的角度</a> <span class="badge wip">3 個未解標記</span></p>
+    <ul>
+      <li>四件。一、沒有進遊戲看過任何一個改動的畫面，檔案層面驗得很徹底、畫面層面一次都沒看。二、X 跟 Z 各自是哪個方向沒比對過，只知道是水平位置的兩個方向。三、數值改到極端（鏡頭跑到看台外、穿進地板、FOV 設 1 或 179）沒試，也不建議拿正式存檔去試。四、欄位數不同的攝影機共用同一張名稱表，這件事是推論。名稱表有兩張，39 台是用「往前找最近的表頭」這條位置規則分給它們的：32 台落在打擊表、7 台落在守備表，零例外。這 39 筆記錄分佈在 11 種欄位數（87 到 116，在本站測試機那份封裝的 datafile.big 上量的），其中真的有 116 欄的只有 4 筆，其餘是拿管到它那一段的名稱表去讀的。速查頁那份「9 項一致性檢查在剛安裝好的原版英文版上全中」不能拿來當證據（2026-09-05 訂正）：那一輪是訂正之前拿 116 欄那張表去讀全部 39 筆做的，正是本站當年把 7 台守備視角一起讀錯還不自知的原因，而且整張表刻意位移 +1 格，9 項裡照樣中 6 項。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/change-schedule-year/index.html">把賽程換到任何年份</a></p>
+    <ul>
+      <li>本站只量過兩台機器，剛安裝好的原版與一台裝過模組的（明星賽那一節另外多數了一份 2010 年的社群賽程檔，那一份不在本站目前留存的檔案裡）。這一頁 2026-08-28 與 2026-09-03 各訂正過一次，兩次都是同一種病：把只在一台機器上量到的東西寫成通則（第一次是「MLB 主賽程沒壓縮」，第二次是「MLB 補零、春訓不補零」）。你手上若是別的賽程模組，狀態與場次本站都沒看過。另外原版 mlb162_1.dat 有 3,061 列空白填充列（1 列夾在表頭與第一場之間，3,060 列接在 2,431 場真實比賽後面），自己寫工具的人不能假設每一行都是一場比賽。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/community-tools/index.html">社群工具怎麼分工</a> <span class="badge wip">1 個未解標記</span></p>
+    <ul>
+      <li>那四支記憶體類工具本站沒有執行過，上面是從程式檔本身讀出它引用了哪些系統功能；它們在相容層底下會怎樣站上標「未解」，沒有實測過，只是說明為什麼這類工具比檔案類的更容易失效。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/controller-config/index.html">暖身課：打開一個遊戲的檔案</a> <span class="badge wip">1 個未解標記</span></p>
+    <ul>
+      <li>直接刪掉 controller.cfg 會怎樣沒有測，只從「遊戲會自己重印」推測它會重新產生，不要拿這件事當還原方法；那支 mvp2005padcfg 本站也沒有實際跑過，寫的是讀它的說明與原始碼得到的。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/crash-diagnosis/index.html">遊戲當掉了怎麼辦</a> <span class="badge wip">3 個未解標記</span></p>
+    <ul>
+      <li>大容量硬碟存不了名冊的成因只是推測、沒有實測驗證；「有檔頭沒聲音」會不會真的讓遊戲跳出也沒實測；老闆模式切主場觀眾席視角就當掉這一條，踩了十幾年至今無解。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/edit-speed/index.html">修改球員跑壘速度</a></p>
+    <ul>
+      <li>--audit 的形狀判定只能排除錯的、不能證明對的（拿第 2 欄「背號」去體檢，結果也是「寬而平均」）。投手的 fastball_control 與其他幾個 control 在統計上是同一個形狀、很可能也可以改，但本站未實機驗證，所以這支腳本連寫都不讓你寫。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/edit-stance/index.html">換打擊姿勢與投球姿勢</a> <span class="badge wip">2 個未解標記</span></p>
+    <ul>
+      <li>這一頁自己列了三件，一是沒有進遊戲一組一組看過每個姿勢長什麼樣、只證明了數字對到那一組動作庫，二是本站測試機那份名冊裡，打擊姿勢有 4 個編號（32、53、57、62）、投球姿勢有 14 個編號沒有任何人在用（剛安裝好的原版不一樣：打擊只有 23 號沒人用、投球 59 個代號全部有人用），那些動作庫檔案都存在但設下去會不會正常沒試，三是同一組動作套在體型差很多的球員身上會不會怪，沒驗。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/exe-tuning/index.html">執行檔上的六個旋鈕</a></p>
+    <ul>
+      <li>④⑤ 都做完的那顆在真實 Windows 上長期玩起來如何、4K 下介面會不會跑位、記憶體池的上限。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/fel-recipes/index.html">介面實例集</a> <span class="badge wip">2 個未解標記</span></p>
+    <ul>
+      <li>本站沒有實機跑過每一則的畫面結果。能保證的是檔案確實被正確修改、可以完整還原，不能保證遊戲一定會照你想的顯示；B 組更是連遊戲會不會用到那些元素都沒驗證，模組當初為什麼要關掉揮棒時機回饋，本站也不知道。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/fel-toolkit/index.html">介面萬用工具 fel_toolkit</a></p>
+    <ul>
+      <li>頁尾列出的驗證全在檔案層面（11 種畸形輸入皆不中斷、還原後位元組完全一致、還原途中失敗時正本原封不動、暫存檔不跟著符號連結走、重複執行不會累積改動、寫入後複驗 47 個項目仍可讀）。成功標準最後一條「進遊戲後畫面確實改變」是留給你自己確認的那一項。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/fix-chinese/index.html">中文版配大球場就跳出</a> <span class="badge wip">1 個未解標記</span></p>
+    <ul>
+      <li>沒有直接看到那行 OUT OF MEMORY，它走 OutputDebugStringA，本站在 Wine 底下沒有攔成功（真 Windows 上用 DebugView 應該看得到，但還沒實測）；分不出是「總量不夠」還是「最大的連續空塊不夠」，因為池子調大兩種都會改善；不知道 128 MB 是不是最省的值，只知道 64 不行、128 與 512 可以，門檻在那中間某處；13.50 MB 是算出來的，不是量到的，一條從字型檔量、一條從執行檔的程式碼推，兩邊在小數點後兩位對上，但都不是遊戲執行時的真實用量。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/hide-runner-speed/index.html">關掉轉播畫面右側的跑壘者速度數值</a></p>
+    <ul>
+      <li>唯一沒被驗證的是遊戲實際跑起來的畫面。檔案層面全過了（寫入後自動複驗、還原逐位元組比對、47 / 47 解壓重壓一致），但「開一場比賽、確認那個數字真的不見了」只能你自己做，而且壘上沒人本來就不會顯示。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/hide-runner-speed/manual.html">不跑腳本的手動改法</a></p>
+    <ul>
+      <li>一壘被宣告兩次，遊戲實際採用的是哪一份，本站沒有量到能下定論的證據，所以兩份都關才是安全的做法。另外這頁的行號、位元組數、項目數全部量自本站手上那一份，你那份不同很正常，所以每一步的驗收都看「改前改後有沒有變」，不是「有沒有等於本文寫的數字」。這條路也仍然要跑別人寫的程式，只是換成你自己挑、自己信得過的那一支；備份是你自己做的，沒有 --restore 幫你。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/hud-color/index.html">改記分板的顏色</a></p>
+    <ul>
+      <li>RT 第二組三元組是什麼不知道（兩個對照樣本它都是黑的，分不出來），所以工具只動第一組；TX 的其餘五組三元組也沒驗；而且本站沒有在遊戲裡看過改色後的畫面 —— 檔案層面全驗過，遊戲層面要你幫忙看。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/install-uniform/index.html">把一套球衣裝進遊戲</a></p>
+    <ul>
+      <li>本站的實測是在三個封裝檔的複本上跑的（10 個檔逐位元組相符、三個封裝檔項目數不變、檔頭大小欄位正確、還原後 SHA-256 與原檔全部相同）。成功標準最後那一條「進遊戲，那支球隊的球衣變了」要你自己用眼睛確認，不在本站測過的清單裡。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/make-a-player/index.html">把一位球員改成你想要的球員</a></p>
+    <ul>
+      <li>沒有實機確認轉播畫面、沒測過既有王朝存檔、名字長度上限不是從遊戲程式量出來的（22 守的是單一欄位，而九份名冊裡單一欄位最長只有 15）。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/make-chinese/index.html">把官方中文版的中文搬進英文版</a> <span class="badge wip">4 個未解標記</span></p>
+    <ul>
+      <li>整個流程本站沒有實機開過遊戲，只驗到檔案結構、腳本行為與名字對得上；「遊戲執行時會照語系把 _en 換成該語系後綴」是推論，沒有反組譯證實，而且「英文版執行檔一定跑在英文語系」是假設（三顆執行檔都同時含四個語系檔名，mvp.ini 裡沒有語系設定，而且 mvp.ini 只有中文版安裝才有）；少掉那個 95 字的英文 dflt 會不會有影響、把 au20b/Tw24/dflt 拿掉會在哪些畫面缺字、做出來的成品配大球場會不會照樣跳出，全部要進遊戲才知道；那 22 個同大小差異檔裡兩個非 +8 的 20 位元組欄位是什麼、社群那份 hrdbg（158 字 72,544）從哪來，本站都不知道。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/make-voice/index.html">換掉遊戲的聲音</a></p>
+    <ul>
+      <li>換完之後遊戲裡真的會不會唸出來沒有驗，驗的是「檔案寫進去了、而且寫的內容正確」；另外檔頭沒寫取樣率的那些段（剛安裝好的原版量到單聲道 30,707 段、雙聲道 117 段）匯出時寫的 22050 是預設值不是量到的、編碼器 3 現在解得開但不是每一段都解得開（測試機那份 data\audio 的 8,909 段裡還有 586 段解不出）、有些段連對照工具也解不開，而 98.1 dB 是把本來就是這個格式的聲音再編一次的數字，全新錄音大約 35 dB；擋符號連結那一道只擋得住目的檔與備份檔本身，沒有擋「父資料夾是符號連結」（擋它會誤傷把整個遊戲資料夾做成連結這種正常用法），而 Windows 的 junction／reparse point 本站還沒實測。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/menu-text/index.html">改主選單的文字</a></p>
+    <ul>
+      <li>沒有在遊戲裡看過改完的選單；沒有試過把字串改長（刻意不做）；同一條字串可能被很多畫面共用，改一次全部都變，本站沒有逐一追過每條字串被誰用到。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/mount-disc/index.html">不用每次放光碟（而且是為了保護它）</a> <span class="badge wip">1 個未解標記</span></p>
+    <ul>
+      <li>以上對執行檔行為的描述全部來自靜態反組譯，本站量不到「你的機器上實際會不會走到這一段」，那取決於你當初怎麼安裝。而且映像與掛載的步驟本站只在 macOS 上驗過，Windows 那一半是依系統內建功能寫的，標記為未驗，這一段還沒在 Windows 上實測。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/new-face/index.html">做一張新的球員臉皮</a> <span class="badge wip">1 個未解標記</span></p>
+    <ul>
+      <li>測試機少掉那 5 張貼圖到底是怎麼掉的，頁面只寫「多半是社群重新打包時掉的」，沒有真的查出來；「不影響其他項目」這件事是抽驗 299 個其他項目零位元組變動，不是四千多個項目逐一全查。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/pack-a-mod/index.html">把你改好的東西打包成一包</a></p>
+    <ul>
+      <li>沒有測過超過 1 GB 的包、沒有測過包含 models.big 這種大檔（本站測試機那份 536 MB，剛安裝好的原版是 165 MB）的實際體感、也還沒有在 Windows 上實跑過這支腳本（路徑判斷有寫 Windows 的案例，但還沒實測）。「試寫」那一關對應的是 Windows 的檔案鎖定，本站只在 Mac 上 用唯讀資料夾模擬過，還沒在 Windows 上實跑。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/play-on-mac/index.html">在 Mac 上玩 MVP 2005</a> <span class="badge wip">2 個未解標記</span></p>
+    <ul>
+      <li>本站是在沒有人看著螢幕的情況下測的，沒有看到畫面。繪圖 d3d8.dll、音效 dsound.dll、手把 dinput.dll 三套都載入了，但切換螢幕顯示模式（NtUserChangeDisplaySettings … returned -2）與畫第一張畫面（glClear 的 GL_INVALID_FRAMEBUFFER_OPERATION）兩關是 ❌，那也可能只是無頭環境的必然結果，本站分不出來，所以不寫成定論。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/read-file-headers/index.html">五秒看穿一個檔案</a></p>
+    <ul>
+      <li>那張對照表的說法是「遊戲裡的檔案幾乎都落在這三類」，不是全部。本頁自己開了回報管道收「本站還沒寫到的格式」，代表這份清單本來就沒有掃遍全部的檔。Windows 那兩行 PowerShell 寫法也還沒在 Windows 上實測，版本差異依據的是微軟官方文件。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/read-voice/index.html">拆開一個語音檔</a></p>
+    <ul>
+      <li>這一課量到的是外殼、聲道擺法、切法，不含還原成聲音的那一步 —— 那一步在換掉遊戲的聲音解開並驗證，本課自己沒有驗過任何一段還原出來的波形。另外「取樣率 48,000 Hz」還沒定案：那批檔自己標的是 22,050 Hz（8,767 個裡 7,841 個），跟 48,000 Hz 最多只能對一個，本站沒量出哪一個對。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/run-in-2026/index.html">2026 年的電腦怎麼跑得起 2005 年的遊戲</a> <span class="badge wip">4 個未解標記</span></p>
+    <ul>
+      <li>本站從來沒有量過遊戲執行時到底吃多少記憶體，所以不列任何分配數字，也答不出 4 GB 夠不夠、球場放多大才會當。mvp2005fix 本站只讀過原始碼、量過自己的執行檔，沒有實際跑過。Mac 那一節驗到的是「這台 Mac 能執行 32 位元 Windows 程式」，不是「遊戲全程順跑」。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/shrink-big/index.html">球場超過 10MB 就當機</a> <span class="badge wip">1 個未解標記</span></p>
+    <ul>
+      <li>「為什麼檔案大會害到遊戲」在這一課只是推論，這一課沒有量遊戲執行時的記憶體，只能確定清完檔案變回 5.20 MB。（中文版配大球場就跳出那一課後來量了：跳出的原因是一塊寫死的 64 MB 記憶體池，跟球場檔大小沒有關係 —— 把球場縮小並不會讓中文版不跳出。）實機測試是一個人、一台機器、一包球場，證明的是「這件事做得到」，不是「你那包一定沒問題」。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/skip-intro/index.html">關掉開場動畫</a> <span class="badge wip">4 個未解標記</span></p>
+    <ul>
+      <li>遊戲跑起來的實際畫面。檔案層面全驗過（格式合法、影格數對得上、還原逐位元組相同），遊戲層面要你幫忙看。測試機那份是社群 2008 年換的，不是本站驗的。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/stats-to-ratings/index.html">把真實成績換算成遊戲裡的能力值</a></p>
+    <ul>
+      <li>沒有實機確認改完的能力值在遊戲裡的手感；公式是用 2004 年那批球員配的，用在打擊環境差很多的年代（例如 2040）會不會系統性偏移，本站沒有辦法驗；也沒有測過投手以外的 pitcher.dat 欄位。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/swap-chant/index.html">把應援曲指給別的球員</a></p>
+    <ul>
+      <li>腳本只驗得到「檔案改對了」，驗不到「遊戲會不會照這個索引播放」，那要靠你的耳朵，本站沒有辦法自動測這件事，所以不會寫成「一定會生效」。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/swap-face/index.html">幫球員換一張臉</a></p>
+    <ul>
+      <li>有球員指向不存在的臉皮時，這一頁寫的是遊戲「通常」會退回顯示通用臉，用的就是「通常」兩個字，沒有附任何實機數字；「臉沒變」時列的三個原因（改到二刀流的另一列、存檔快取、那張臉根本不存在）也是排查清單，同樣沒有數字。至於做一張遊戲裡本來沒有的新臉，那要動 models.big，不在這一頁的量測範圍，做法見〈做一張新的球員臉皮〉那一課。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/swap-splash/index.html">換掉開機畫面</a></p>
+    <ul>
+      <li>換完之後遊戲畫面實際長什麼樣，本站沒看到，驗的是「檔案寫進去了而且內容正確」；腳本只處理 0x60 與 0x7D 兩種格式，其他一律拒絕不亂猜；那份 2007 年說明書講的 00000000.256，本站不能斷定它當年是錯的，只能說在這台機器上它不存在，而 splash.fsh 存在。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/team-logo/index.html">換球隊隊徽</a> <span class="badge wip">1 個未解標記</span></p>
+    <ul>
+      <li>只親眼確認過四個編號、只換得了每個檔排在最前面的那一張（一個隊徽有 7 張貼圖，而剛安裝好的原版裡有 54 個檔排第一的不是同名那一張）、l994-l999 那六個是什麼不知道、而且沒有在遊戲裡看過換好的隊徽。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/uniforms/index.html">球衣模組：安裝與製作入門</a> <span class="badge wip">5 個未解標記</span></p>
+    <ul>
+      <li>本站沒有真的換一套球衣進遊戲跑給你看，這頁量的是檔案結構與規格，任何關於遊戲畫面會怎樣的說法都不寫；哪個字母對應哪一套球衣沒解出來；28 個代號對應身上哪個部位沒把貼圖畫出來對過；怎麼把改好的圖壓縮回 FSH 沒有做；遊戲程式怎麼決定要載哪一個檔沒有讀執行碼。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/unpack-big/index.html">封裝檔可以拆成散裝嗎</a></p>
+    <ul>
+      <li>anims.big 還沒實測（規則預期會過，如果跑不動這條規則就要重寫）；其他封裝檔特別是圖檔類的還沒一個一個試，純文字的可行不保證圖檔也可行；「EA 為什麼只替那三個副檔名開路」是推論，本站量得到樣板存在，量不到當初的決定。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/whats-original/index.html">怎麼看出哪些檔還沒被動過</a></p>
+    <ul>
+      <li>時間戳證明不了內容有沒有變，要確定只有拿兩份檔案逐位元組比對一途；原版那個 .bak 跟本尊差 428 個位元組，本站沒有進遊戲看那兩張游標差在哪；上面所有數字都是本站那一台機器的值，你自己那一份不一樣是正常的。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/yearly-update/index.html">一次更新整個年度</a></p>
+    <ul>
+      <li>這個順序是從各堂實際讀寫哪個檔推出來的，沒有找學生照著跑過；總時數 113 分是各堂標示時間的加總，不是計時量到的。</li>
+    </ul>
+  </div>
+
+  <h2>速查（33 頁）</h2>
+  <div class="card">
+    <p class="card-h"><a href="reference/anims.html">動畫 anims.big</a> <span class="badge wip">7 個未解標記</span></p>
+    <ul>
+      <li>.data 裡那 327,712 個位元組實際代表什麼骨架、什麼影格，本站沒有解讀，所以改不動動作本身；42 個位元組的 Banklist.axt 只列 5 個名字，用途沒有查出來；「為什麼 PC 版的資料全是 MIPS 目標檔」只有猜想沒有證據；87 個球場封裝檔裡那 31 個模型各是什麼、miscmod.big 那 14 個檔裝什麼，都只看了檔名，沒有畫出來對照過。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/audio.html">播報與音訊系統</a> <span class="badge wip">9 個未解標記</span></p>
+    <ul>
+      <li>應援曲 lg／md 兩種版本差在哪、檔名裡的 typ1／gen1 各代表什麼、七個有名字的應援分別屬於哪一隊、pchants:0538 為什麼指向一個沒人使用的編號、那兩座球場為什麼是它們、events.evt 每筆 32 個位元組裡的欄位意義、18 個 .abk 裡沒有同名 .ast 的那 7 個聲音放在哪，全部未解。群眾反應那張機率表改了會怎樣，本站沒有實機驗證。（「15 個位元組還原成 28 個取樣」的公式原本也列在這一條裡，2026-08-29 已經解開 —— 對照 ffmpeg 驗過 21,678,328 個取樣 0 個不同，見上面〈整條路每一段的狀態〉那張表。）</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/bigf.html">BIGF 封裝格式</a> <span class="badge wip">1 個未解標記</span></p>
+    <ul>
+      <li>initstaz／initprgz 這兩個「封裝檔裡面還有封裝檔」為什麼要這樣包，檔案裡沒有寫；而「重建工具得先把資料夾造出來，名稱才對得起來」是推論，本站量到的只有內層 45 個項目名稱全部帶路徑這個事實，某個特定工具怎麼處理並沒有測。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/database.html">資料檔總覽 database</a> <span class="badge wip">8 個未解標記</span></p>
+    <ul>
+      <li>rookie.big 與 progress.big 未解；rhattrib.dat 為什麼只多記一邊未確認；投球那段的位元 41 到 42 未解、盜壘失敗只是推測；華盛頓被標成「室內」的搬家解釋是推論，沒有直接證據；唯一那筆「得分少於全壘打」被判斷成名冊本身的錯誤資料，本站也寫明那是判斷不是證明。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/datafile.html">總設定檔 datafile</a> <span class="badge wip">5 個未解標記</span></p>
+    <ul>
+      <li>這一頁講的全部是「檔案裡寫了什麼」，改了之後遊戲會有什麼反應，本站一次都沒有實機試過，所以這頁不是教學，沒有步驟也沒有成功標準。另外還掛著這些：拿 116 那張表去讀全部 39 筆「九項全中」，那是在剛安裝好的原版英文版上量的（同一套檢查搬到官方中文版就有五項掉下來，見上面），而且刻意位移 +1 也拿得到 6 分，鑑別力沒有本站原本以為的強，所以只標成推論；攝影機家族的確切總數未定（換判準掃到 223 筆，裡面混著 skillbase、fintweak 這些明顯不是攝影機的東西）；選單上的 Batter Pitcher Camera 與 Hitter's Eye Camera 對到哪筆記錄未解；為什麼只有那三個球場項目覆寫守備視角沒有答案；lawn.o 是不是除草機模型只是推測，本站沒把模型畫出來看過；FieldingMiniGame 這台攝影機與混音表那組 FMG 名字對得上，但本站沒有在遊戲裡看到過這個守備小遊戲；PC 版多打亮牛棚與休息區的實際視覺差異，本站沒有主機版可以比對。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/dynasty-save.html">王朝存檔長什麼樣</a> <span class="badge wip">2 個未解標記</span></p>
+    <ul>
+      <li>本站不知道第 N 個位元組代表什麼，欄位整組未解；「後半可能是球員名單、賽程」只是從差異分佈推的推測；兩群怎麼分也沒有解釋。所以本站沒有、也不會提供改存檔的教學或工具，真要自己試就先複製一份到別的資料夾。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/fel-archives.html">版面檔裝在哪些封裝檔</a> <span class="badge wip">1 個未解標記</span></p>
+    <ul>
+      <li>表上「裝什麼」那一欄是依檔名與畫面代號推的，本站沒有逐一開遊戲確認。那份 2008 清單列的 13 個代號，比對剛安裝好的原版是 12 個在、1 個不在（50st）；掃過整個 frontend\，##st 形式的檔只有 bkgnds.big 裡的 60st–65st 六個，沒有 50st；它是來自某個模組還是當年打錯，本站沒有證據分辨。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/fel.html">FEL 版面語法速查</a> <span class="badge wip">5 個未解標記</span></p>
+    <ul>
+      <li>那兩行三字母指令遊戲拿它們怎麼辦沒有驗證，是哪一個工具或哪一次改動造成的也查不出來；SG 的用途、KA 那 403 欄浮點數都還沒解讀；遊戲怎麼把 640×480 這個版面座標系換算到你的實際解析度，本站也沒有量過。另外附一條方法上的教訓：換行符第一次量錯，因為 datafile.big 裡那 460 個 .txt 全是壓縮的，直接在壓縮位元組裡數會得到一堆假的「混合」，量之前先問「我的量法本身可信嗎」。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/file-map.html">遊戲檔案地圖</a></p>
+    <ul>
+      <li>字型的容器層解開了，每個字的點陣圖與間距沒有；動畫是編譯過的 3D 骨架關鍵影格；球場可以換貼圖改光源，但重建幾何需要完整的 3D 管線。這三格目前都改不動。播報語音原本也列在這裡，2026-08-28 訂正為做得到（見音訊那頁的訂正）；那裡剩下的未解是音檔索引跨三個檔案的編號系統彼此對不上，不是「換不了」；「15 個位元組怎麼還原成 28 個取樣」那一格已經在 2026-08-29 解開（見上面「目前還改不了的東西」那一列的訂正與換掉遊戲的聲音）。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/fonts.html">字型檔 .ffn</a> <span class="badge wip">6 個未解標記</span></p>
+    <ul>
+      <li>字圖集與字元表讀得出來（見本頁「誠實邊界」的 2026-09-05 訂正），但本站沒有從零產生一份、再寫回去的辦法，所以做不出新字型、也加不了原本沒有的字；那 1,088 個位元組到底是什麼仍未解；檔頭第 9 到 10 個位元組「看起來像版本號」是推測；四個檔內容相同是誰、什麼時候做的無法確認；「為什麼借日文槽位」是推想，檔案裡沒有寫。還有一件事要記得：這份 fonts.big 檔案日期是 2022 年 11 月，不是 2005 年的原廠狀態，本頁描述的是它現在長什麼樣。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/how-we-measured.html">本站怎麼量的</a></p>
+    <ul>
+      <li>量不到執行時的記憶體用量（凡是講「遊戲跑起來會怎樣」的都是從程式碼推的）、量不到「遊戲讀不讀得動」、量不到別人機器上的行為，也量不到已經關站的那些論壇。測試機那份指紋是活的會一直變，只有那四份沒有疊過模組的安裝與四包球場是穩定基準；英文版那 1,191 個檔裡有一個日期是 2015 年的 filelist.txt，站上 1,191 與 1,190 兩個數字都出現過，差別在算不算它。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/hud-map.html">介面座標圖</a> <span class="badge wip">1 個未解標記</span></p>
+    <ul>
+      <li>三件事本站沒有驗證。一、沒有跟實機畫面比對過，圖上畫的是檔案裡宣告的座標，不是遊戲跑起來的樣子。二、遊戲程式可以在執行時搬動元素，版面檔那頁已經證實群組的顯示開關會被程式覆寫，位置同理。三、640 × 480 是版面座標系，不是你的螢幕解析度，遊戲怎麼縮放本站未解讀。另外「TX:RATING 在畫面上看得到」的依據是網友的實機截圖，不是本站自己開遊戲拍的；圖例第 6、7 兩組顯示的是佔位字串，所以本站只寫得出這格能放幾個字，不寫它實際放的是哪一項數據。這張圖要當「找元素的地圖」用，不要當「畫面預覽圖」用。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/ingame-files.html">ingame.big 47 個版面檔對照</a></p>
+    <ul>
+      <li>alib_ingamelogos 裡 TS: 這個指令的用途未確認。而且整張表量的是這台機器那一份，檔名與畫面的對應關係大致可用，但不要當成「原版一定有」。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/loc-strings.html">文字表 .LOC</a></p>
+    <ul>
+      <li>寫回 .LOC 的工具後來做了（見 中文版配大球場就跳出那一課）；字型檔的字圖集與字元表讀得出來，仍然沒解的是從零產生一份、再寫回去，中文字要顯示得出來字型裡得先有那些字。但要「從零做一套中文字型」才需要它 —— 而本站的中文化教學是搬官方現成的,繞過這一塊,見把官方中文搬進英文版。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/models.html">模型與臉皮 models.big</a> <span class="badge wip">9 個未解標記</span></p>
+    <ul>
+      <li>.ord 的幾何欄位沒有逐欄解讀，接起來知道是一個 MIPS 目標檔，但裡面的機器碼與資料段在做什麼沒有解；為什麼測試機缺那 6 個號碼、那 890 張是誰換成 0x60 的、photo 欄實際用途，都還是未解（2026-09-05 訂正：本頁原本還在這裡列了「把新圖壓縮回去那一半」與「大頭照的編號怎麼對應」，這兩件都已經解開了 —— 見做一張新的球員臉皮與兩套球員編號）；2009 年那份模組沒處理的兩個撞號（Rod Carew c442、Lou Gehrig c423）本站沒有實機看過遊戲裡長什麼樣。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/official-chinese.html">EA 自己的繁體中文版是怎麼做的</a> <span class="badge wip">8 個未解標記</span></p>
+    <ul>
+      <li>「拿整份官方繁中版安裝去裝大球場會不會跳出」本站還沒實測（那一課測的是把中文語系檔與字型蓋在英文版上），這一頁只是把兩件量到的事擺在一起。那 45 個損壞的位元組為什麼全部落在 32 的倍數上、而且永遠是同一個位元，仍然不知道。mvp2005.exe 兩版差 553 KB 差在哪、minibat.big 差在哪，本站沒有拆。寫回 .LOC 的工具後來做了,字型的字符點陣也讀得出來了;還沒解的是從零產生一張字圖集與一張字元表再寫回去 —— 做不出新字型,也加不了原本沒有的字。但本站的中文化教學是搬官方現成的中文(繞過字型那塊),見把官方中文搬進英文版。本站不散布任何遊戲檔案。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/original-vs-modded.html">原版與這台機器差在哪</a> <span class="badge wip">1 個未解標記</span></p>
+    <ul>
+      <li>原版有、這台沒有的那 5 個臉皮編號，是哪一次改動造成的本站不知道。另外整頁只是兩份遊戲的對照，你自己的遊戲會是第三種數字，裝過什麼就長什麼樣，要量自己那一份請用「怎麼看出哪些檔還沒被動過」那一課的腳本。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/patches-tc.html">官方繁體中文版的三個更新檔，到底改了什麼</a> <span class="badge wip">1 個未解標記</span></p>
+    <ul>
+      <li>沒有真的拿更新後的版本配大球場開來玩，「解決不了跳出」是從量到的旗標、解析度表、字型與球場零改動推的；三個安裝程式只掃了它們宣告的路徑清單，沒有拆開差分資料，所以「第 N 個實際改了哪些位元組」講不出來；.text 有 94.4% 的位元組不同只代表換了加密金鑰，EA 到底改了多少程式碼本站量不出來；授權畫面下半那塊（y 417–454）位元組變了但文字讀起來一模一樣，變了什麼看不出來。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/patches.html">官方更新檔動了哪些檔</a> <span class="badge wip">2 個未解標記</span></p>
+    <ul>
+      <li>EA 為什麼只有授權畫面那一張用無壓縮，本站不知道（原本給的「有字所以不壓縮」那個理由 2026-09-05 已訂正掉）；本站沒有真的執行過任何一個更新檔，所有結論都是從更新檔內部那份路徑清單讀出來的（ASCII 與 UTF-16 雙編碼掃描），「跑完之後檔案內容變成什麼」不在本頁範圍；也沒有拆解差分資料，所以不知道每一版實際改了哪些位元組；EA 到底有沒有出過 4 號未解；跟防拷保護有關的部分本站不碰，也不提供更新檔下載。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/pixel-formats.html">圖片的像素怎麼排</a> <span class="badge wip">4 個未解標記</span></p>
+    <ul>
+      <li>0x7E 這個代號在十萬多筆記錄裡一張樣本都找不到，無從實測，徽章仍然是未解。0x7B 的內部排法也還沒解開，本站沒有解出來也不猜；它那九個調色盤裡有七個是 256 筆全部灰階，剩下兩個雖然各有 133 筆不是灰階，但其中 118 筆第 1 與第 3 個位元組相等、差的只有中間那一格，所以前三個位元組是 RGB 還是 BGR 本站無法判斷（連裝滿模組的測試機都掃過，最大彩度只有 21）。項目名稱 BPP2 到 BPP6 是什麼意思，本站不知道。壓縮那一半後來做了：0x60（DXT1）與 0x61（DXT3）兩種都壓得回去，用在換大頭照、做新臉皮、換開機畫面三課；其餘代號沒有做，腳本遇到會直接拒絕而不是猜。最後要分開講的是強度：「每像素幾個位元組」是本站量到的，「代號叫什麼名字」是 2002 年那份 FSHTOOL 說明書說的，兩件事不一樣。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/player-codes.html">球員代號對照表</a> <span class="badge wip">8 個未解標記</span></p>
+    <ul>
+      <li>揮棒型態五種各自長什麼樣 —— 代號對名字有社群編輯器的設定檔可查（只有五種，2 和 3 號不存在），但本站沒有實機改一格確認過，2026-08-28 撤回的是另一條路（原本以為字串 14900–14906 是這一欄的名字，其實那是打擊姿勢選單的選項）；姿勢的名字掃遍剛安裝好的原版一個都找不到，只能標明出處；出場音樂曲風與襪子高度都只到「推論」，本站沒有進遊戲聽過也沒找到七組對應的音樂；骨架 25 是一位 2008 年工具作者自己的推測、本站沒有實機驗證；體型「遊戲說五種資料只用三種」與襪子名稱兩份不同都未解；打擊姿勢編號 23 整份名冊沒有人在用，維持未知。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/player-data.html">球員資料檔的真相</a></p>
+    <ul>
+      <li>標「可以寫」只代表格式安全，不代表遊戲真的把那個數字當成該項能力用，真正的對齊需要實際玩遊戲觀察，本站不做效果保證。把 0-99 寫進 0-4 的欄位遊戲會怎麼處理超出範圍的值，沒有人實測過，能確定的只有原本的星級資訊會被破壞。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/player-fields.html">球員資料檔全欄位清單</a> <span class="badge wip">4 個未解標記</span></p>
+    <ul>
+      <li>生日第五個樣本 Mike Trout 反推出 1948-01-31，差了一個月，四比一之下本站採 1947-12-31 但沒有再往下追；「一點等於多少錢」只有說明書那一句話撐著，是推論不是量測；org.dat 的 org_budget 34 個球團裡 30 個是同一個值、4 個是 0（原版那個值是 100000、本站測試機是 65535），未實機驗證；百分比總和不是 100 遊戲會怎麼處理沒有驗；本站實際改過並進遊戲確認過的能力欄位只有 speed 一欄（投手的 control 只是統計形狀相同，沒有實機驗證，改球員速度那一課的腳本也不讓你寫）；成績換算成能力值那一課另外寫過 lrattrib_power（左右兩個檔）與 pitchattrib_stamina，寫完讀回來逐項比對，但同樣沒有實機確認手感。其他欄位沒有一欄一欄實測過改動的後果。另外附一條教訓：本站試過一個不依賴外部資料的幣值檢定，結果證明那個檢定沒有用，$3,000 得 0.261、隨機亂數中位數 0.254，一個在答案為真時也不會亮的指標，測出來的 0 是它自己的性質。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/player-numbers.html">兩套球員編號</a> <span class="badge wip">4 個未解標記</span></p>
+    <ul>
+      <li>能不能自己新增一個 c901.fsh 讓遊戲讀到，本站沒有測過，已知的只有「原本沒有」，不是「不能有」；901 到 915 那 15 個罐頭臉長什麼樣沒查出來；四位數號碼是誰決定的、能不能自己指定也沒驗過；那 68 個有號碼卻沒有圖的人遊戲畫面上會顯示什麼沒有實機看過，255 張沒人用的圖是怎麼來的也沒有查出來。另外跟名單內容有關的數字量自一台裝過台灣模組的機器，你自己跑會得到別的結果，不會變的是格式。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/player-voice.html">播報員為什麼不唸新球員的名字</a> <span class="badge wip">4 個未解標記</span></p>
+    <ul>
+      <li>.dat 裡面聲音怎麼編碼已於 2026-08-29 解開（見換掉遊戲的聲音），但這頁講的 pnamedat.big 用的容器分支（編碼器 3）也已於 2026-08-30 解開（7,092 段裡解得出 6,674 段，那組「抽 200 段完整解出 0 段」是修好之前量的），所以「做自己的球員語音」現在只缺錄音來源；a／c／d 三者數量為什麼不一樣沒答案；audioid 的 0、1、2 差在哪、以及為什麼有 12 個人共用 audioid = 1（那組檔案是存在的）都沒查出來；最重要的是把 audioid 改成別人的號碼、遊戲是不是真的會唸出那個人的名字，本站沒有實機驗過，那是從檔名對應推論的。還有，這頁的名單類數字量自測試機（attrib.dat 被模組換過，跟原版不是同一份，內容自 2026-04-14 那份快照以來沒變、sha256 相同，但檔案日期被後來的操作換掉了），而且欄位順序會變，46 欄裡有 27 欄兩份名冊對不上，永遠不要記欄號。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/portrait.html">大頭照 portrait.big</a> <span class="badge wip">10 個未解標記</span></p>
+    <ul>
+      <li>0x61 那批是誰換的、什麼時候換的未解；那三個 mel 出自哪一次改動、那組 CRLF 哪裡來的都沒有證據；portrait.big 裡多出來的 2 張 0x7C（256 bytes，三份剛安裝好的原版都是同樣那兩張）不在說明書清單裡，不知道是什麼，data\igshapes\igcrsr.fsh 那塊 0x7C 長 576 同樣不知道是什麼；把資料區頭尾夾起來的那兩筆 1 位元組項目做什麼用不知道；st00 到 st63 那 64 張未確認；四字母第 3 碼為什麼固定不知道，「第 1 碼的 a 就是 901」只是推測；Buy ERTS 與 EAGL 的用途和正式全名本站不主張；models.big 那 671 次只是壓縮後看得見的殘影，精確數字未做。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/qfs.html">QFS / RefPack 壓縮</a></p>
+    <ul>
+      <li>這一頁列出的驗證全部停在檔案層面：272 種不同長度的資料各壓一次，逐一檢查每個控制位元組是否落在規格允許的值域，再用另一套獨立寫的解壓器解回來比對，全部通過。頁面上沒有列出任何「在遊戲裡跑起來」的測試。另外，檔頭那一行「旗標 &amp;amp; 0x01 == 1 → 10 bytes」本站在兩份安裝上都取不到樣本，不是量到的。那次訂正也是一個提醒：本站測試機上的檔案跟剛安裝好的原版不一樣，看到跟本頁對不起來的數字，先確認你手上那份被工具改寫過沒有。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/source-traces.html">執行檔裡剩下的原始碼痕跡</a></p>
+    <ul>
+      <li>投打節奏那五個參數「單位是秒」是猜的，而且很可能不對，二進位裡沒有任何字串寫 time 或 delay。跑者 AI 那五張名字表在零售版沒有任何指標指向，所以「引擎保留了瞬移跑者的能力」只能降級成「保留了這個名字」。「某條路徑屬於某個 .cpp」多半是鄰接推論。本站不反組譯，這些表都是唯讀知識，沒有提供改動的工具，也沒有驗證過改了會怎樣。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/stadium.html">球場檔 stadium</a> <span class="badge wip">6 個未解標記</span></p>
+    <ul>
+      <li>幾何資料在 .ord／.orl，本站尚未解讀，所以改球場尺寸、幫白天版加夜間版、新增球場都還做不到；四碼場地代號對應哪一座真實球場沒有查證；「EA 把光影先算好燒進模型與貼圖」的解釋跟數字一致但沒驗過遊戲引擎實際怎麼處理，不寫成定論；那 16 組光源的數值本站沒有改過也沒解讀單位。另外 metpnite 是唯一不用 07night 的夜間版、29 組配對裡的白天版也有 5 座 shadow.dat 小於 100 位元組（44 個白天版全算則是 12 座），原因都不知道。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/team-limit.html">為什麼你加不了新球隊</a> <span class="badge wip">4 個未解標記</span></p>
+    <ul>
+      <li>本站沒有真的加一欄進去跑跑看，「主程式不認得就會被忽略」是從「遊戲照名字認欄位、而那張清單在主程式裡」推出來的；本站沒有去動主程式裡那一串欄位名（站上執行檔那一課動的是記憶體池、大位址與解析度，不是這一串），所以「改了主程式能不能加隊」不在討論範圍；小聯盟那 90 隊有沒有同樣的限制沒有查；美術編號剛好等於隊徽編號加一已經驗起來了（換球隊隊徽把原版的 l000、l001、l005、l125 匯出成 PNG 親眼看過，四個都吻合且涵蓋號段頭尾），還沒驗的是「遊戲程式是不是照這一欄去抓隊徽檔」；小聯盟那七格改名對應真實世界的時間也沒有查證。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/tools-archive.html">二十年工具清冊</a></p>
+    <ul>
+      <li>這一頁的功能敘述來自逐個解開後閱讀隨附說明書，本站未逐支實際執行驗證。當機那課裡那句「高更新率時降低解析度」的真正來歷，本站仍然不知道。本站也不提供任何一支工具的下載：那是別人的作品、多半沒有明確授權條款，而且好幾支的原始發布站已經關閉，來源真偽無法驗證。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/voice-header.html">語音檔頭的 16 個位元組</a> <span class="badge wip">8 個未解標記</span></p>
+    <ul>
+      <li>檔頭第 4 到 7、10 到 15 個位元組大部分未解，五個庫裡還有三個庫的長度算不出來；為什麼會有 PT\0\0 與 GSTR 兩套工具標記不知道；那個 31,902 行的 spch_pbp.txt 沒有跟實際音訊對起來、群組命名規則也沒解讀；212 MB 的 pbpdat.big 為什麼把目錄拆成一個純文字檔（2,056 行，長度加總 212,219,648 剛好等於檔案大小）本站不知道，只記錄現象。最誠實的一條：測試機那 12,450 個配對裡有 6,197 個長度根本不是 256 的倍數，連套用公式的前提都不成立，而這台機器一直是能玩的，本站沒有去驗遊戲到底有沒有讀這一欄，也沒做故意寫錯的實驗。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="reference/what-can-be-modded.html">什麼改得動、什麼還不行</a> <span class="badge wip">9 個未解標記</span></p>
+    <ul>
+      <li>自製大頭照與臉皮圖片的結構讀得出來，壓回去那一半本站自己也寫了（0x60 DXT1 與 0x61 DXT3），但自己產生的檔遊戲吃不吃還沒實測過；字型只解開外層容器，單一個字的點陣圖與間距沒解，所以能換整包不能改單字；動畫的動作資料是編譯過的骨架關鍵影格，等於要重寫一套 3D 工具；從零設計新球場的幾何結構不可行；遊戲規則、AI 行為與數值公式寫在程式裡，本站不涉及修改程式碼。這張表會變，而且「還沒做」跟「做不到」本站不用同一個標記。</li>
+    </ul>
+  </div>
+
+  <h2>故事（15 頁）</h2>
+  <div class="card">
+    <p class="card-h"><a href="story/2008-roster/index.html">2008 年那份名單裡的每一個人</a> <span class="badge wip">2 個未解標記</span></p>
+    <ul>
+      <li>李振昌那張大頭照 3497 為什麼在兩個檔裡都找不到，本站不知道；2008 年做這份名冊的人確實查過號碼（說明檔後半段那張「空閒臉皮位置」清單就是證據），但他查的是自己那份名冊基底、不是 EA 原版，有沒有再往 EA 原版對過一次，本站不知道。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="story/build-2004/index.html">平安夜凌晨的兩次建置</a> <span class="badge wip">2 個未解標記</span></p>
+    <ul>
+      <li>時間戳只說明「什麼時候編譯」，不能證明當時有人坐在電腦前，建置伺服器在凌晨跑批次是業界常態，「有人熬夜趕在假期前收工」很容易想像，但檔案裡沒有任何東西能證實；封包的用途是看名字推測的；為什麼同一次批次會混兩種換行符號未解，那個「來源檔來自不同人的機器」的猜想本站沒有量到任何東西支持。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="story/community-voices/index.html">EA 沒錄的名字，台灣人自己錄了</a> <span class="badge wip">14 個未解標記</span></p>
+    <ul>
+      <li>SCDl 裡的聲音編碼本頁沒有解，全頁講的都是外殼（那一層 2026-08-29／30 已經解開，本站拿那一課的腳本對這 69 個檔跑過，65 個匯得出 WAV）；.hdr 第 9 個位元組本頁六種猜法最高只對上 8.2%，後來量出來是長度（單位 256 位元組的區塊而且要減一），但這 69 個社群檔沒有一個照那條規則寫，為什麼不知道；「a 與 d 是姓、c 是全名」在本頁寫的時候只是推測（同姓比例 86.3% 與 86.2%、c 的長度是 a 的 2.28 倍）、本站沒有聽過任何一個檔，2026-08-28 已由播報員那頁從 spch_pbp.txt 的類別集合解開，還開著的是 a 與 d 各自用在哪些播報情境；把這些檔裝回遊戲播報員會不會唸這 23 個名字，沒有實機驗過，因為這個資料夾根本不在遊戲會讀的路徑上；還有 2378 原本是誰、被標成「原有」的胡金龍 2884 為什麼一個檔都沒有、林柏佑 3498 的檔在哪。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="story/fourteen-years/index.html">十四年後打開自己的模組資料夾</a> <span class="badge wip">2 個未解標記</span></p>
+    <ul>
+      <li>那 62 個單字本站沒有實際聽過，也沒有驗證拼接是怎麼做的，只從檔名與結構推到那裡。「為什麼換成標準版臉皮編號就不會跳出」是當年那些人的解釋，本站量得出兩版差 442 個欄位，但沒有辦法驗證那個因果。「這批檔案經手過不只一個人」是推論，量到的只是兩種語言的預設圖層名同時存在，同一個人換過 Photoshop 語言版本也會產生一樣的結果。還有一塊會永遠鎖著：兩個臉皮包（約 93 MB）是標頭加密的壓縮檔，連裡面有哪些檔案都看不到，密碼多半寫在早就關站的論壇貼文裡，本站不會去嘗試破解。最後，有四件事檔案永遠答不出來，只能靠當年在場的人：那批球衣底稿當初為什麼開始做、那 62 個字怎麼挑的、號段當年是怎麼談的、2009 年之後為什麼停了。知道其中任何一件就歡迎告訴我們。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="story/hidden-legends/index.html">名單裡藏著 61 個名人堂球員</a> <span class="badge wip">3 個未解標記</span></p>
+    <ul>
+      <li>怎麼在遊戲裡把他們叫出來沒有試過，遊戲的文字檔 FEENG.LOC 裡含 unlock（不分大小寫）的字串有 13 條，其中兩條點名 Legends 與 Heroes 兩隊、寫著要先把那一隊的 25 位球員全部解鎖（介面文字表對「每隊 25 人」的又一次印證），但本站沒有實機驗證任何解鎖方式；把第 44 欄改成 0 會發生什麼，沒動也沒進遊戲看；為什麼 Chimaera 是混的、Argonauts 一個都沒有，檔案裡沒有寫。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="story/hidden-website/index.html">遊戲裡藏著一整個網站</a> <span class="badge wip">4 個未解標記</span></p>
+    <ul>
+      <li>115 個 Flash 檔的畫面長什麼樣沒有還原，只從裡面撈出文字；FAKEGAME 實際在什麼情況下會跳是推測；那 48 個端點回傳什麼格式、當年實際怎麼運作未解。本站沒有、也不會嘗試連線任何伺服器，這頁全部是讀本機檔案讀出來的。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="story/mvpmods-2026/index.html">二十年的樞紐關掉了</a></p>
+    <ul>
+      <li>這一頁不含任何本站自己的量測，這是全站唯一一頁做不到平常那種強度的。做不到就說出來，而不是把二手的寫成一手的。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="story/my-collection/index.html">二十六個資料夾，為什麼留著</a></p>
+    <ul>
+      <li>檔案的修改日期不是作品完成日也不是下載日，只能說明那個檔在那一刻被寫入，本頁的日期一律當成時間邊界；這二十六個不是當年台灣模組圈的全部，只是一個人收到的部分；本站沒有放任何模組檔本體，也不外連、不寫真實姓名與聯絡方式。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="story/orphan-data/index.html">一個檔案裡的地層</a> <span class="badge wip">3 個未解標記</span></p>
+    <ul>
+      <li>暫停選單那三份誰先誰後、誰改的、什麼時候改的，本站沒有辦法從檔案本身判斷。那個孤零零跑到第 2,531,736 個位元組、跟其他 46 個隔著 1.7 MB 的 fes_ingamesettings.fel，「某次有人把大部分內容重寫進前段、之後又有人單獨改了設定畫面接到檔尾」這個解釋跟位置分佈一致，但本站沒有證據，不寫成定論。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="story/people-2009/index.html">2009 年那份名冊是誰做的</a></p>
+    <ul>
+      <li>問「這六個之外還有沒有其他人」，收藏者的回答是「有很多，但我不記得了」。那就是答案，本站不補。所以這一頁能列出來的只有留下痕跡的那幾個，而留下痕跡跟做得多不多，是兩回事。這一頁的署名與統計來自三份一手文件加上當年資料夾的名字：2009 年 11 月 10 日那份說明書的原文（那張 53 列的球員表）、同一包的 History.txt（語音那一條），以及班主任 2009 年 4 月 27 日的另一份說明檔（隊徽、球衣與球場名稱）。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="story/seniors/index.html">名冊以外的，都是前輩做的</a></p>
+    <ul>
+      <li>測試機上那份中文化模組是誰做的（沒有署名，不猜）；還有多少人沒被這 37 篇寫到（一定還有，數不出來）。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="story/stance-choices/index.html">王建民用的是 Smoltz 的投球姿勢</a> <span class="badge wip">3 個未解標記</span></p>
+    <ul>
+      <li>Bonds 是第幾號查不出來，因為本站的方法是「看誰在用那個編號再去對名字」，而這個名字對應的球員根本不在名單裡，沒有人可以當錨點（原本寫的第 42 號是用錯的對應方式算的，正確的第 42 號叫 Burnitz）。Jon Dowd 那一段只推到「看起來像是一個位置被留下來了，但名字沒有」，檔案裡沒有任何一行把他跟別人連起來，本站不主張他是誰的替身；那個年代授權談判的說法是站外背景知識，不是本站量到的。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="story/taiwan-modders/index.html">2008 年，一群人在論壇上把台灣球員裝進遊戲</a></p>
+    <ul>
+      <li>這六個來源是不是當年全部的人（只是這一個人收到的）、每個人實際做了幾個作品、當年他們知不知道空號只剩 4 個——這些本頁都證明不了；引號內除了「把某某的臉皮編號給予之」那句（那是當年模組說明檔的寫法）全是班主任原話，其他人的想法本站沒有。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="story/toni-2009/index.html">當年那兩份說明書，一句一句拿今天的檔案對過</a> <span class="badge wip">2 個未解標記</span></p>
+    <ul>
+      <li>另外兩條備註（c813、c678）超過原版上限 c606，原版沒有那些編號，所以那兩句講的是當時那份模組基底而不是 EA 原版，本站沒解開。當年紀錄裡那 49 條影片連結今天還通不通，本站也沒有逐條測試。而檔案裡沒有、只有當事人知道的四件事一律留白不猜：那 23 個沒有臉皮的球員是找不到還是來不及做、2009 年 5 月與 9 月的空白發生了什麼、校一條球速要花多久、2009 年 10 月之後為什麼停下來。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="story/tool-lineage/index.html">這些工具不是為棒球寫的</a></p>
+    <ul>
+      <li>eazip.exe 掃不到 BIGF 那一格只能寫「量不到」而不是「不支援」，它的說明書整篇都在講這件事；為什麼掃不到本站沒查證，也不歸因給 UPX。EAGL 這個代號在 EA 其他遊戲裡是不是同一套沒查證；資料夾那 6 個 2026 年的日期來由沒查證；檔名數字前綴在原站怎麼編的也沒查證。名字一律只留當年公開發表的圈內代號，唯一例外是 GPL 條款本身要求保留著作權聲明的 Denis Auroux，即使如此他的信箱與個人網址一樣不放。</li>
+    </ul>
+  </div>
+
+  <h2>七分鐘（1 頁）</h2>
+  <div class="card">
+    <p class="card-h"><a href="7min/exe.html">七分鐘調好你的執行檔</a></p>
+    <ul>
+      <li>檔頭那三項都做完的那顆在真實 Windows 上長期玩起來如何、4K 下介面會不會跑位。（記憶體池那一項不在此列：四種大小是 Windows 與 macOS 兩邊都做過的實機測試。）原理與逐位元組的完整說明在 執行檔上的六個旋鈕。</li>
+    </ul>
+  </div>
+
+  <h2>棒球教練（1 頁）</h2>
+  <div class="card">
+    <p class="card-h"><a href="coach/index.html">棒球教練</a></p>
+    <ul>
+      <li>第三欄的「台灣講法」是慣用語不是量測，不同世代、不同轉播用詞會有出入；而且本站沒有在遊戲裡逐欄改過看效果 —— 這一頁講的是「這個欄位叫什麼、是什麼意思」，不是「改了之後遊戲裡會怎樣」。</li>
+    </ul>
+  </div>
+
+  <h2>其他（6 頁）</h2>
+  <div class="card">
+    <p class="card-h"><a href="do.html">我想做什麼</a></p>
+    <ul>
+      <li>這一頁是索引，除了「做不到」那張表裡引用的那一條名冊量測（測試機那份的 3,247 位球員），不含本站自己的量測。每一條的驗證程度以它連過去的那一課為準。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="glossary.html">名詞小教室</a></p>
+    <ul>
+      <li>這些英文是依站上自己的用法訂的，不是查字典來的；不同社群對同一個東西可能有別的叫法。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="plan.html">課表</a></p>
+    <ul>
+      <li>這些課表沒有真的找學生跑過，順序是依據每一堂的前置需求與難度排的，不是實測出來的學習成效。時間也是各課自己標的估計值，不是計時量到的。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="report.html">回報與下架</a></p>
+    <ul>
+      <li>GitHub 那兩條管道本站都還沒有實際走過一次，沒辦法告訴您送出之後多久會有回應；留言區那條是從 2008 年就在用的。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="start.html">新手基本功：先學會六個基本操作</a></p>
+    <ul>
+      <li>這一課本身沒有量測任何數字，頁面自己標了保留的有三處。一是常見安裝位置那條路徑，舊機器或 32 位元系統可能是 C:\Program Files\EA SPORTS，自己改過安裝位置的話這一招完全沒用，要改用前兩種找法；二是 python 印出 2.7 時，頁面寫的是「有可能是兩個版本都裝了，只是這個名字指到舊的那個」，那也是可能性，要靠 py -3 或 python3 實際試出來；三是操作一補的 PowerShell 那一段（內建 5.1 與自己裝的 7 之差、$PSVersionTable.PSVersion 這行看版本的指令）依據的是微軟官方文件，還沒在 Windows 上實測。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tc2026/index.html">中文版為什麼會跳出，以及你能做到哪一步。</a></p>
+    <ul>
+      <li>本站量不到執行時的記憶體用量，「128 MB 夠不夠」是實測出來的不是算出來的，真正的門檻在 64 與 128 之間某處。13.5 MB 是算的不是量的：它等於中文那些 4 位元字圖集的總像素乘上 4 位元組，本站從字型檔量、另一條線從程式碼推，兩邊在小數點後兩位對上，但都不是執行期的實測。光碟原版的程式碼段是加密的，無法與社群那顆逐位元組比對，所以「社群那顆的程式碼有沒有被動過手腳」本站是靠間接證據。另外有 15 個函式的本體在社群那顆執行檔裡就已經是空的，幾塊 C++ 例外處理表的指標被清零，這些不是本站造成的，也補不回來。最後一步只有你能做：用完整的中文語系加上你最大的那座球場打一場完整的比賽，本站驗得到「檔案是對的」，驗不到「遊戲讀得動」。</li>
+    </ul>
+  </div>
+
+  <footer>
+    <p>這一頁由 <code>.tools/gen_limitations.py</code> 產生，每次發布重新收集一次。<u>不要手改</u> —— 要改的是各課自己那一段，改完這一頁會跟著變。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="legal.html">法律與版權說明</a> · <a href="changelog.html">更新紀錄</a> · <a href="index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

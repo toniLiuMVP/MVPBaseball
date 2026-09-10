@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>toni的MVP模組補習班 — MVP Baseball 2005 手把手修改教學</title>
+<meta name="description" content="不會用電腦也能跟著做的 MVP Baseball 2005 修改教學。每一步都告訴你會看到什麼、沒看到怎麼辦，改之前一定先備份。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item on" href="index.html">首頁</a>
+  <a class="item" href="start.html">新手基本功</a>
+  <a class="item" href="do.html">我想做什麼</a>
+  <a class="item" href="plan.html">課表</a>
+  <a class="item" href="tutorials/index.html">教學</a>
+  <a class="item" href="7min/index.html">七分鐘</a>
+  <a class="item" href="reference/index.html">速查</a>
+  <a class="item" href="coach/index.html">棒球教練</a>
+  <a class="item" href="story/index.html">故事</a>
+  <a class="item" href="about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+
+
+  <p class="eyebrow" style="margin-top:40px">MVP BASEBALL 2005 · 手把手修改教學</p>
+  <h1>不會用電腦，<br>也能自己改遊戲。</h1>
+  <p class="lede">這裡教你一步一步修改自己電腦裡的 EA MVP Baseball 2005：關掉不想看的介面、
+     調整球員、換球衣。每個步驟都告訴你<strong>會看到什麼</strong>、<strong>沒看到該怎麼辦</strong>。</p>
+
+  <div class="btnrow">
+    <a class="btn" href="tutorials/controller-config/index.html">我是新手，從暖身課開始</a>
+    <a class="btn ghost" href="tutorials/index.html">看全部教學</a>
+  </div>
+
+  <a class="hero-note" href="tc2026/index.html">
+    <span class="t">🎉 中文化版本的 MVP Baseball 2005 終於不會跳出了</span>
+    <span class="d">卡了二十年，而且<u>跟球場大小沒有關係</u> ——
+      遊戲寫死一塊 <strong>64 MB</strong> 的記憶體池，中文字型光展開成貼圖就吃掉
+      <strong>13.5 MB</strong>。<strong>兩個地方各改一個位元組就解決，中文一個字都不用砍。</strong>
+      <u>不過照原版光碟安裝的那一份做不到這一步</u> —— 那塊記憶體的位置藏在防拷保護的加密區裡。
+      那一課有四份實測，也寫了在這個前提下你還做得到什麼。
+      <span class="go">看怎麼做 →</span></span>
+  </a>
+
+  <p class="small" style="margin:12px 0 0">
+    本站<strong>不提供任何遊戲檔案下載</strong> —— 教的是用你自己那份遊戲、配上站上的腳本自己改。
+    （站上唯一能下載的是本站自己寫的教學腳本，包括換球員工具。）
+    <u>本站不散布遊戲本體，請自備正版遊戲光碟</u>。</p>
+
+  <h2>本站三個承諾</h2>
+  <div class="grid">
+    <div class="card">
+      <p class="card-h">1 · 不用會寫程式</p>
+      <p>每一行指令都可以整行複製貼上。真正需要動腦的只有一件事：確認你改的是正確的檔案，而這件事我們也會教你怎麼確認。</p>
+    </div>
+    <div class="card">
+      <p class="card-h">2 · 一定先教你備份</p>
+      <p><u>凡是附腳本的教學</u>，動手前都先自動備份，改壞了<strong>一行指令就能還原</strong>，還原後跟原本一模一樣，不是「差不多」而已。少數不用腳本的課，第一步會手把手帶你自己複製一份。</p>
+    </div>
+    <div class="card">
+      <p class="card-h">3 · 卡住有地方問</p>
+      <p><u>動手的</u>教學裡，約一半最後都附「回報範本」，照著填，遠比只說「不能用」更快得到幫助；
+         沒有範本的那些課，照<a href="report.html">回報頁</a>說的填「你的系統、你跑了哪一行、看到什麼輸出」也一樣。</p>
+    </div>
+  </div>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 不管你要做哪一課，第一步都一樣：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定與手把設定。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> ——
+       整包備份保的是「你玩到現在的一切」，包括你的王朝進度。
+       完整做法看<a href="tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <a href="coach/index.html" class="card blue" style="display:block;text-decoration:none;border-left:5px solid var(--btn-bg)">
+    <p class="card-h" style="margin:0 0 6px">⚾ 看不懂遊戲裡的英文？先去找棒球教練</p>
+    <p style="margin:0">站上每一課都在叫你改 <code>playerattrib_platediscipline</code> 這種欄位。
+       <strong>棒球教練</strong>把遊戲裡所有棒球術語列成三欄 ——
+       遊戲裡的英文、EA 官方繁體中文、台灣棒球圈的講法，每一條都附說明。
+       <u>順便告訴你官方中文有十一個譯得會誤導</u>（最要緊的一個：
+       <code>Earned Run Average</code> 譯成「得分率」，其實是<strong>防禦率</strong>）。</p>
+  </a>
+
+  <h2>從這裡開始</h2>
+  <div class="lesson">
+    <span class="badge lv">暖身課</span>
+    <span class="t"><a href="tutorials/controller-config/index.html">打開一個遊戲的檔案</a></span>
+    <span class="d"><strong>什麼工具都不用</strong> —— 記事本打開遊戲資料夾裡一個純文字檔，
+       看懂它的結構，而且改壞了一定回得來。
+       完全沒改過遊戲檔案的人<u>從這裡開始</u>。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="badge lv">第 0 課</span>
+    <span class="t"><a href="start.html">新手基本功：先學會六個基本操作</a></span>
+    <span class="d">找到遊戲資料夾、開命令列、取得檔案路徑、顯示副檔名、備份觀念、裝 Python。後面每一課都用得到。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="badge lv">第 1 課</span>
+    <span class="t"><a href="tutorials/change-schedule-year/index.html">把賽程換到任何年份</a></span>
+    <span class="d">最快有感：整季賽程搬到你要的年份，約 3 分鐘，隨時可還原。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="badge lv">第 2 課</span>
+    <span class="t"><a href="tutorials/hide-runner-speed/index.html">關掉轉播畫面右側的跑壘者速度數值</a></span>
+    <span class="d">本站招牌教學：一支小程式自動改好、自動備份、自動複驗。另附全手動版與完整原始碼。（需要裝過台灣模組）</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="badge lv">下課時間</span>
+    <span class="t"><a href="7min/index.html">下課七分鐘 · 十三堂主題短課</a></span>
+    <span class="d">每堂只講一件事怎麼做完：改跑壘速度、做大頭照、換臉皮、裝球衣、做語音、應援曲、
+       轉播畫面、視角、換音樂、換開機畫面、跳過開場動畫、調執行檔。
+       <strong>外加一堂從零開始的電腦課</strong> —— 看到「打開命令提示字元」會卡住的人先看那堂。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="badge lv">Mac</span>
+    <span class="t"><a href="tutorials/play-on-mac/index.html">在 Mac 上玩 MVP 2005</a></span>
+    <span class="d">macOS 沒有 32 位元、Apple Silicon 不是 x86，<strong>兩道死牆疊起來反而通了</strong>。
+       本站第一次真的把遊戲在 Mac 上跑起來，並老實寫出卡住的那兩關。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="badge lv">更多</span>
+    <span class="t"><a href="tutorials/index.html">課程地圖</a> · <a href="reference/index.html">格式速查</a></span>
+    <span class="d">依難度分級的完整課程，以及遊戲檔案格式的技術速查。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <div class="card clay" style="margin-top:26px">
+    <p class="card-h">遊戲當掉了？</p>
+    <p>裝了模組之後開不起來、或玩到一半跳回桌面 —— 這是最常見的問題。
+       <a href="tutorials/crash-diagnosis/index.html"><strong>先跑診斷判斷是哪一種當機</strong></a>，
+       附唯讀腳本，不會動到你的檔案。</p>
+  </div>
+
+  <h2>當年那些事</h2>
+  <p style="margin:-4px 0 14px">如果你 2008 年玩過台灣模組，這一區是為你寫的。
+     全部從當年留下的檔案裡量出來，不靠回憶。</p>
+  <div class="lesson">
+    <span class="badge lv">故事</span>
+    <span class="t"><a href="story/build-2004/index.html">平安夜凌晨的兩次建置</a></span>
+    <span class="d">從 243 個動畫封包的時間戳，還原 2004 年開發團隊做完這款遊戲動畫的最後幾小時。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="badge lv">故事</span>
+    <span class="t"><a href="story/hidden-website/index.html">遊戲裡藏著一整個網站</a></span>
+    <span class="d">519 個檔案是一整套 2005 年的社群網站，記事本就打得開 ——
+       裡面有一個拼錯三次的字，和一個永遠翻不出人話的錯誤訊息。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="badge lv">故事</span>
+    <span class="t"><a href="story/stance-choices/index.html">王建民用的是 Smoltz 的投球姿勢</a></span>
+    <span class="d">2009 年做名冊的人逐一寫下「誰用誰的姿勢」，還附了理由。
+       十七年後打開那份檔案：<strong>十條逐一比對，十條全中。</strong></span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="badge lv">故事</span>
+    <span class="t"><a href="story/fourteen-years/index.html">十四年後打開自己的模組資料夾</a></span>
+    <span class="d">2004 年的第一個 <code>.psd</code>、2006 年那 4,392 個檔的高峰、
+       <strong>一個字一個字錄下來的中文播報</strong>。全部從檔案本身量出來，不靠回憶。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="badge lv">故事</span>
+    <span class="t"><a href="story/community-voices/index.html">EA 沒錄的名字，台灣人自己錄了</a></span>
+    <span class="d">語音資料夾裡有 23 個人的名字，是當年有人自己對著麥克風錄下來的。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="badge lv">故事</span>
+    <span class="t"><a href="story/2008-roster/index.html">2008 年那份名單裡的每一個人</a></span>
+    <span class="d">一份 2008 年的更新說明，把 <strong>33 位旅美球員</strong>的臉皮編號、
+       大頭照編號、當時在哪一隊、那張臉是誰做的，<u>一人一行列了出來</u>。
+       十八年後打開遊戲檔案，那些編號<u>幾乎全部還在</u>（本站量的九位裡只有一張大頭照找不到）。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="badge lv">故事</span>
+    <span class="t"><a href="story/index.html">還有八篇</a></span>
+    <span class="d">一個檔案裡的地層（<u>本站測試機那份</u>介面檔有 92.6% 目錄不指向）、
+       2009 年那兩份說明書、以及工具是從哪個社群借來的。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+
+  <h2>這個站是誰做的</h2>
+  <p>toni 從 2008 年開始在「<a href="https://tonimvp.blogspot.com" rel="noopener">toni的MVP</a>」
+     寫 MVP Baseball 2005 的台灣模組。他自己做的是<strong>台灣之光名冊</strong>與大頭照素材 46 份裡的 27 份；
+     <u>球衣、隊徽、球場、臉皮、CTS 這些是社群前輩做的</u>，他做的是整合成懶人包、寫教學。
+     這個站是它的續篇：把十幾年累積的修改知識，整理成連完全新手都能照著做的教學。</p>
+  <p class="small">誰做了什麼有一張完整的表，每一條都附他當年自己寫的原話 ——
+     <a href="story/seniors/index.html">名冊以外，都是前輩做的</a>。
+     站本身的來歷見<a href="about.html">關於本站</a>。</p>
+
+  <div class="card clay">
+    <p class="card-h">開始之前，三件事先說清楚</p>
+    <ul class="cross" style="margin-bottom:0">
+      <li>本站<strong>不散布遊戲本體，請自備正版遊戲光碟</strong>。</li>
+      <li>本站<strong>不教任何破解、繞過保護</strong>的方法，相關問題一律不回答。</li>
+      <li>本站<strong>不散布社群或第三方的遊戲檔案</strong> —— 我們教你改自己的檔，工具都附完整原始碼。
+          （本站<u>不提供任何遊戲檔案下載</u>，包括執行檔。見<a href="legal.html#tc-pack">法律說明</a>。）</li>
+    </ul>
+  </div>
+
+  <footer>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯。</p>
+    <p>MVP Baseball 2005 為 Electronic Arts 之作品與商標。本站不使用遊戲畫面截圖，全站圖表皆為本站依量測數據自行繪製；唯一的點陣圖是球衣那一課的局部對照圖，權利歸屬與處理方式見<a href="legal.html">法律頁</a>第 6 節。</p>
+    <p>本站<u>教學文字</u>採 <a href="https://creativecommons.org/licenses/by/4.0/deed.zh-hant" rel="noopener">CC BY 4.0</a>、<u>腳本</u>採 <a href="https://opensource.org/licenses/MIT" rel="noopener">MIT</a> 授權 —— 歡迎轉載修改，依 CC BY 4.0 署名（標示本站名稱與網址、保留授權聲明、註明是否修改）即可（<strong>站內的點陣圖片、社群模組與第三方工具不在此授權範圍</strong>；本站自己畫的向量圖表屬 CC BY，詳見<a href="legal.html">法律頁</a>）。</p>
+    <p><a href="legal.html">法律與版權說明 / 下架管道</a> · <a href="changelog.html">更新紀錄</a> · <a href="about.html">關於本站</a> · <a href="report.html">回報與下架</a></p>
+  </footer>
+</div>
+<script src="assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

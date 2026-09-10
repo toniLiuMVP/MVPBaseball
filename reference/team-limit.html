@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/team-limit.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>為什麼你加不了新球隊 — toni的MVP模組補習班</title>
+<meta name="description" content="因為球隊名字不是資料,是欄位名。三十支球隊的縮寫直接寫在球隊檔的表頭裡,而那張表頭清單一字不差地也存在主程式裡。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 為什麼你加不了新球隊</p>
+  <h1>為什麼你加不了新球隊</h1>
+  <p class="lede">想把中職六隊、或第七第八隊加進去，是模組玩家最常碰到的硬牆。
+     這頁講清楚<strong>那道牆在哪一層</strong> ——
+     球隊名字<u>不是資料，是欄位名</u>。而欄位名寫在主程式裡。</p>
+
+  <h2>先看球隊檔本身</h2>
+  <p><code>data\database\team.dat</code> 跟其他<a href="database.html">資料檔</a>一樣是純文字，
+     記事本就打得開：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>量到的</th><th class="num">數字</th></tr></thead>
+    <tbody>
+      <tr><td>資料列</td><td class="num"><strong>126</strong></td></tr>
+      <tr class="hi"><td>欄位</td><td class="num"><strong>55</strong></td></tr>
+      <tr class="hi"><td>其中名字本身就是球隊縮寫的欄位</td>
+          <td class="num"><strong>32</strong><br><span class="small">30 支球隊 + 2 個聯盟</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>126 列是這樣組成的：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>是什麼</th><th class="num">幾隊</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td><strong>大聯盟</strong></td><td class="num">30</td></tr>
+      <tr><td>3A ／ 2A ／ 1A 各 30 隊</td><td class="num">90</td></tr>
+      <tr><td>兩隊明星隊 + 兩隊未來之星</td><td class="num">4</td></tr>
+      <tr><td>兩隊在名冊裡、但沒有球衣也沒有播報語音的隊伍<br>
+          <span class="small"><code>Burnaby Argonauts</code> 與 <code>Burnaby Chimaera</code>，美術編號 125、126</span></td><td class="num">2</td></tr>
+      <tr><td><strong>合計</strong></td><td class="num"><strong>126</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">（2026-09-05 訂正：最後那一列原本寫「沒有球衣也<u>沒有球員</u>」。
+     「沒有球衣」量得到 —— 球衣檔的號碼只到 <code>123</code>，這兩隊沒有；
+     但「沒有球員」是錯的：<u>剛安裝好的原版</u>名單裡這兩隊各有 25 名球員，
+     本站測試機這一份是一支 25 名、另一支 0 名，<strong>沒有任何一份安裝是兩隊都空的</strong>。
+     兩邊都真的沒有的是<u>播報語音</u>。）</p>
+
+  <h2 id="cols">關鍵：球隊名字是欄位名</h2>
+  <p>打開 <code>team.dat</code> 第一行，你會看到這些欄位：</p>
+<pre><code>team_vs_ana  team_vs_oak  team_vs_sea  team_vs_tex  team_vs_cws
+team_vs_cle  team_vs_det  team_vs_kc   team_vs_min  team_vs_bal
+team_vs_bos  team_vs_nyy  team_vs_tam  team_vs_tor  team_vs_ari
+team_vs_col  team_vs_la   team_vs_sdp  team_vs_sfg  team_vs_cub
+team_vs_cin  team_vs_hou  team_vs_mil  team_vs_pit  team_vs_stl
+team_vs_atl  team_vs_fla  team_vs_mon  team_vs_nym  team_vs_phi
+team_vs_al   team_vs_nl</code></pre>
+  <p>這是「這一隊對上那一隊的成績」。<strong>三十支球隊，就是三十個欄位。</strong></p>
+  <div class="card clay">
+    <p class="card-h">所以「加一隊」的意思是「加一個欄位」</p>
+    <p>不是在某個地方把數字從 30 改成 31，
+       是<u>要讓每一列多長出一格 <code>team_vs_&lt;新隊&gt;</code></u>。</p>
+    <p>而遊戲是<strong>照名字認欄位</strong>的 —— 你可以把欄位重新排列、可以少給幾欄，
+       遊戲照樣讀得懂。但是<strong>它只認得它本來就知道的名字。</strong></p>
+  </div>
+
+  <h2 id="fossil">七個化石欄位名</h2>
+  <p>這件事有一個非常直接的證據：<strong>欄位名停在 2004 年，資料卻走到了 2023 年。</strong></p>
+  <div class="tablewrap"><table>
+    <thead><tr><th class="mono">欄位名</th><th>那是誰</th><th>這份名冊裡現在叫什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td class="mono">team_vs_mon</td><td><strong>蒙特婁博覽會</strong></td>
+          <td>華盛頓國民（<code>WSH</code>）<br>
+              <span class="small">2005 年搬家，也就是這款遊戲出貨那一年</span></td></tr>
+      <tr><td class="mono">team_vs_tam</td><td>坦帕灣魔鬼魚</td><td>坦帕灣光芒（<code>TB</code>）</td></tr>
+      <tr><td class="mono">team_vs_fla</td><td>佛羅里達馬林魚</td><td>邁阿密馬林魚（<code>MIA</code>）</td></tr>
+      <tr><td class="mono">team_vs_ana</td><td>安那罕天使</td><td>洛杉磯天使（<code>LAA</code>）</td></tr>
+      <tr><td class="mono">team_vs_sdp</td><td rowspan="3">2004 年用的縮寫寫法</td><td>聖地牙哥（<code>SD</code>）</td></tr>
+      <tr><td class="mono">team_vs_sfg</td><td>舊金山（<code>SF</code>）</td></tr>
+      <tr><td class="mono">team_vs_cub</td><td>芝加哥小熊（<code>CHC</code>）</td></tr>
+    </tbody>
+  </table></div>
+  <p>把三十個欄位名跟球隊檔<u>第一欄</u>（<code>unique_team</code>，也就是 <code>Ana</code>
+     <code>Fla</code> 這種 2004 年的寫法，這份名冊沒有動它）對一次：
+     <strong>有五個欄位名對不到任何一支現在的球隊</strong>
+     （<code>mon</code> <code>tam</code> <code>sdp</code> <code>sfg</code> <code>cub</code>），
+     同時<strong>有五支球隊沒有對應的欄位名</strong>
+     （這一欄寫成 <code>Was</code> <code>TB</code> <code>SD</code> <code>SF</code> <code>ChC</code>，
+     也就是現在的 <code>WSH</code> <code>TB</code> <code>SD</code> <code>SF</code> <code>CHC</code>）。</p>
+  <p class="small">（2026-09-05 訂正：這裡原本只寫「跟三十支球隊的代碼對一次」，沒有講是哪一欄，
+     跟上面那張表對不起來。改拿上表最後一欄那個短代碼（<code>team_short_name</code>）去對，
+     答案是<strong>七對七</strong>，多出來的兩對正是 <code>ana</code> → <code>LAA</code>
+     與 <code>fla</code> → <code>MIA</code> —— 也就是上表七個化石的全部。
+     <u>數字用一欄、名字用另一欄，是本頁原本弄混的地方。</u>）</p>
+  <div class="card grass">
+    <p class="card-h">中文化模組改得動資料，改不動欄位名</p>
+    <p>這份名冊已經被更新到 2023 年 —— 隊名、球員、成績全都換過了。
+       <strong>但那三十個欄位名一個都沒動。</strong></p>
+    <p>不是懶得改，是<u>改了遊戲就讀不到</u>。下一節就是原因。</p>
+  </div>
+
+  <h2 id="exe">為什麼欄位名不能改</h2>
+  <p>那三十二個欄位名<strong>也存在遊戲的主程式裡</strong>，而且是一模一樣的三十二個。</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>比對</th><th class="num">結果</th></tr></thead>
+    <tbody>
+      <tr><td><code>team.dat</code> 表頭裡的 <code>team_vs_*</code></td><td class="num">32 個</td></tr>
+      <tr><td>主程式裡的 <code>team_vs_*</code></td><td class="num">32 個</td></tr>
+      <tr class="hi"><td><strong>兩邊是不是完全相同</strong></td>
+          <td class="num"><strong>是，一個不多一個不少</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>而且主程式還認得<strong>五個這份名冊根本沒有的欄位</strong>：
+     <code>team_hidden</code>、<code>team_windtype</code>、<code>team_winddirection</code>、
+     <code>team_tier_payroll</code>、<code>team_tier_winpct</code>。</p>
+  <div class="card blue">
+    <p class="card-h">程式的清單可以比檔案長，反過來不行</p>
+    <p>檔案少給幾欄，遊戲就當那幾欄沒有 —— 沒問題。<br>
+       檔案多給一欄叫 <code>team_vs_cpbl</code>，<strong>程式的清單裡沒有這個名字，它就只會被忽略。</strong></p>
+    <p>換句話說：<strong>球隊清單不是資料，是程式碼。</strong>
+       名冊裡那 126 列，只是把主程式裡早就定好的格子「填上內容」而已。</p>
+  </div>
+  <div class="card amber">
+    <p class="card-h">怎麼自己看到這件事</p>
+    <p>用任何十六進位檢視器打開遊戲主程式，搜文字 <code>team_vs_</code>。
+       你會看到那一整串名字排在一起。<strong>全程唯讀，不需要任何特殊工具。</strong></p>
+    <p><span class="badge wip">本站沒有教怎麼動這一串名字</span>
+       這一節的用途是<u>解釋那道牆為什麼在那裡</u>，不是教你拆牆。</p>
+    <p class="small">（2026-09-05 訂正：這裡原本寫「本站不提供、不教學任何修改執行檔的方法」，
+     那句話已經不成立 —— 站上有一課
+     <a href="../tutorials/exe-tuning/index.html">執行檔上的六個旋鈕</a>，
+     教的是記憶體池、大位址、解析度那幾格，跟這一串欄位名無關。
+     現在正確的說法是：<strong>本站不散布任何改好的執行檔</strong>，也
+     <a href="../legal.html#no-drm">不提供、不教學、不連結</a>任何規避防盜拷措施的資訊，
+     而<u>主程式裡這一串球隊欄位名，本站沒有動過也沒有教怎麼動</u>。）</p>
+  </div>
+
+  <h2>同一個數字，四個地方各自對得上</h2>
+  <p>「球隊數量是固定的」這件事，不只寫在一個地方：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>哪裡</th><th class="num">量到</th><th>對上什麼</th></tr></thead>
+    <tbody>
+      <tr><td data-label="哪裡" class="mono">team.dat</td><td data-label="量到" class="num">126 列</td><td data-label="對上什麼">—</td></tr>
+      <tr class="hi"><td data-label="哪裡" class="mono">team.dat 的美術編號欄</td><td data-label="量到" class="num">1–126<br><span class="small">連號無跳號</span></td>
+          <td data-label="對上什麼">每一隊一個編號，用完為止<br>
+              <span class="small">它剛好等於隊徽編號 +1
+              （<a href="../tutorials/team-logo/index.html">換球隊隊徽</a>那一課把原版的
+              <code>l000</code>、<code>l001</code>、<code>l005</code>、<code>l125</code>
+              匯出成 PNG 親眼看過，四個都吻合而且涵蓋號段頭尾）。<span class="badge wip">推測</span>
+              「遊戲是不是照這一欄去拿隊徽」本站沒有驗過</span></td></tr>
+      <tr class="hi"><td data-label="哪裡" class="mono">frontend\logos.big</td>
+          <td data-label="量到" class="num">132 項<br><span class="small">= 126 + 6</span></td>
+          <td data-label="對上什麼"><strong>126 個隊徽</strong>（<code>l000</code>–<code>l125</code> 連號）<br>
+              多出來的 6 個是 <code>l994</code>–<code>l999</code>，不對應任何球隊</td></tr>
+      <tr class="hi"><td data-label="哪裡" class="mono">audio\spch_pbp\tnamehdr.big</td><td data-label="量到" class="num">124 項<br><span class="small">1–124 連號</span></td>
+          <td data-label="對上什麼"><strong>播報員唸球隊名字的音檔</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>隊徽是 126、播報語音是 124、名冊是 126。
+     <strong>三個數字不一樣，但每一個都是固定的、而且都用滿了。</strong></p>
+  <p class="small">播報語音少的那兩格，對應的正是名冊最後那兩支 <code>Burnaby</code> 隊
+     （美術編號 125、126）—— 它們連球衣都沒有，本來就不會被唸到。這跟
+     <a href="player-voice.html">播報員為什麼不唸新球員的名字</a>是同一件事：
+     <strong>那些名字是錄音，不是合成的。</strong></p>
+
+  <div class="card grass">
+    <p class="card-h">附帶：這解掉了本站另一頁的一個「未解」</p>
+    <p><a href="database.html">資料檔總覽</a>原本寫「<code>org.dat</code> 的編號對不到
+       <code>team.dat</code>，是另一套系統，本站沒有解出」。<strong>那是錯的。</strong></p>
+    <p>它就是同一串識別碼的<u>十進位寫法</u> ——
+       <code>193451509</code> = <code>0xb87d5f5</code> = <code>team.dat</code> 的 <code>00b87d5f5</code>。
+       實測 <strong>124 個非零的值全部對得上</strong>，
+       而且對出來的組織關係完全合理（天使 → 它的 3A、2A、1A 農場球隊）。</p>
+    <p class="small">舊頁已同步訂正。<strong>「對不到」通常不是「是另一套系統」，是「還沒換算過」。</strong></p>
+  </div>
+
+  <h2>所以，加第 31 支球隊會卡在哪</h2>
+  <p>逐項列出來。綠色是本站教得動的，紅色是本站沒有辦法的：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>要動什麼</th><th>難度</th><th>說明</th></tr></thead>
+    <tbody>
+      <tr><td data-label="要動什麼">球隊檔加一列</td><td data-label="難度"><span class="badge ok">做得到</span></td>
+          <td data-label="說明">純文字，照現有格式加一列就好</td></tr>
+      <tr class="hi"><td data-label="要動什麼"><strong>球隊檔加一個 <code>team_vs_&lt;新隊&gt;</code> 欄位</strong></td>
+          <td data-label="難度"><span class="badge wip">做不到</span></td>
+          <td data-label="說明"><strong>主程式不認得這個名字。</strong>加了也會被忽略</td></tr>
+      <tr><td data-label="要動什麼">組織檔、戰績檔、名單檔</td><td data-label="難度"><span class="badge ok">做得到</span></td><td data-label="說明">全是純文字</td></tr>
+      <tr><td data-label="要動什麼">隊徽</td><td data-label="難度"><span class="badge lv">很痛但做得到</span></td>
+          <td data-label="說明">封裝檔加一項技術上可行，但要自己做
+              <a href="pixel-formats.html">FSH 貼圖</a></td></tr>
+      <tr><td data-label="要動什麼">球衣</td><td data-label="難度"><span class="badge lv">很痛但做得到</span></td>
+          <td data-label="說明">同上，而且一隊要好幾個檔</td></tr>
+      <tr class="hi"><td data-label="要動什麼"><strong>播報員唸新隊名</strong></td><td data-label="難度"><span class="badge wip">做不到</span></td>
+          <td data-label="說明">要有人錄音 —— <a href="audio.html#voice-swap">語音格式本站已經解開了</a>，
+              卡住的是<u>沒有人唸過新隊名</u><br>
+              <span class="small">（2026-09-05 訂正：這一格原本寫「語音格式本站未解」，
+              那個理由 2026-08-28 就被本站自己撤回了）</span></td></tr>
+      <tr><td data-label="要動什麼">賽程</td><td data-label="難度"><span class="badge lv">很痛但做得到</span></td>
+          <td data-label="說明">賽程檔是純文字，但每一場都要自己排</td></tr>
+    </tbody>
+  </table></div>
+  <div class="card clay">
+    <p class="card-h">結論：可以「換」，不能「加」</p>
+    <p>把某一支大聯盟球隊<strong>整支換成一支中職球隊</strong>（名稱、隊徽、球衣、球員全換）
+       —— <u>做得到</u>，而且這正是所有台灣模組的做法。</p>
+    <p>在三十支之外<strong>再加一支</strong> —— <u>本站沒有辦法</u>。
+       牆在主程式那一層，不在資料檔。</p>
+  </div>
+
+  <h2 id="asia">那社群當年怎麼把中職放進去的（2026-08-28 量的）</h2>
+  <p>既然加不了第 31 支球隊，2008 年那份台灣名冊是怎麼做出來的？
+     拿它的 <code>team.dat</code> 跟剛安裝好的原版逐列比：</p>
+  <div class="tablewrap"><table>
+    <tbody>
+      <tr><td>列數</td><td class="num">126 → <strong>126</strong>（一列都沒有多）</td></tr>
+      <tr class="hi"><td>有變動的列</td><td class="num"><strong>41 列</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>答案是：整個大聯盟被換掉了。</strong>那 41 列這樣拆：
+     <strong>32 列</strong>是大聯盟三十隊加兩支明星隊被整個換成亞洲球隊，
+     <strong>2 列</strong>是遊戲自帶的 <code>MVP Legends</code> 與 <code>MVP Heroes</code> 也被拿去用，
+     <strong>7 列</strong>是小聯盟更名。</p>
+  <p class="small">（2026-09-05 訂正：這裡原本寫「分成兩種完全不同的改法」，
+     底下兩張卡片卻只交代 32 格與 6 格，加起來 38，短少的 3 列沒有講 ——
+     那 3 列是被拿去用的 <code>MVP Legends</code>、<code>MVP Heroes</code>，
+     以及小聯盟第 7 列 <code>Norwich Navigators</code> → <code>Connecticut Defenders</code>。）</p>
+
+  <div class="card grass">
+    <p class="card-h">第一種：32 格 —— 大聯盟全隊換成亞洲球隊</p>
+    <p>原版的 30 支大聯盟球隊<u>加上兩支明星隊</u>，全部被佔用：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>換成</th><th class="num">幾格</th><th>例子（原版的格子 → 改成）</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="換成"><strong>中華職棒</strong></td><td data-label="幾格" class="num">9</td>
+            <td data-label="例子（原版的格子 → 改成）">Anaheim Angels → Brother Elephants、Cleveland Indians → Uni-President Lions、
+                Detroit Tigers → LaNew Bears…</td></tr>
+        <tr><td data-label="換成">日本職棒</td><td data-label="幾格" class="num">12</td>
+            <td data-label="例子（原版的格子 → 改成）">Oakland Athletics → Chunichi Dragons、San Francisco Giants → Yomiuri Giants…</td></tr>
+        <tr><td data-label="換成">韓國職棒</td><td data-label="幾格" class="num">8</td>
+            <td data-label="例子（原版的格子 → 改成）">Chicago White Sox → Busan Lotte Giants、Los Angeles Dodgers → Samsung Lions…</td></tr>
+        <tr><td data-label="換成">其他</td><td data-label="幾格" class="num">3</td>
+            <td data-label="例子（原版的格子 → 改成）">兩支明星隊改成東西區、外加一支代表隊</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small">另外 <code>MVP Legends</code> 與 <code>MVP Heroes</code>
+       那兩支遊戲自帶的隊伍（聯盟編號 10）也被拿去用了。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">⭐ 但他們只改了名字 —— 41 格裡有 40 格的球隊個性原封不動</p>
+    <p>球隊檔除了名字之外，還有一整排<strong>球隊 AI 行為</strong>的欄位：
+       換代打的積極度、盜壘傾向、犧牲觸擊、守備佈陣、投手調度……</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>欄位</th><th class="num">41 格裡被改過幾次</th></tr></thead>
+      <tbody>
+        <tr><td>隊名（長／短／城市／識別碼）</td><td class="num">35–40 次</td></tr>
+        <tr class="hi"><td><strong>九個 AI 行為欄位</strong></td><td class="num"><strong>各 1 次</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>所以那些亞洲球隊，打起來就是它佔用的那支大聯盟球隊。</strong>
+       兄弟象用的是天使隊的個性、統一獅用的是印地安人隊的、
+       興農牛用的是小熊隊的 —— 名字換了，AI 沒換。</p>
+    <p>唯一的例外是一支日職球隊（佔的是紅人隊的格子），
+       它的九個行為欄位全部被調過。</p>
+    <p class="small">這不是批評 —— 那份名冊要做的是<u>把人和隊名放進去</u>，
+       而那是最耗工的部分。行為欄位是另一個層次的調校，
+       <strong>而且從資料上完全看得出來他們停在哪裡。</strong></p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">第二種：7 格 —— 只是把小聯盟隊名更新到當時</p>
+    <p>其中<strong>六格城市沒變</strong>，<u>只換了隊名的後半</u>：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>城市</th><th>原版（2005 年）</th><th>改成</th></tr></thead>
+      <tbody>
+        <tr><td data-label="城市">Scranton/WB</td><td data-label="原版（2005 年）">Red Barons</td><td data-label="改成">Yankees</td></tr>
+        <tr><td data-label="城市">Syracuse</td><td data-label="原版（2005 年）">SkyChiefs</td><td data-label="改成">Chiefs</td></tr>
+        <tr><td data-label="城市">Salt Lake</td><td data-label="原版（2005 年）">Stingers</td><td data-label="改成">Bees</td></tr>
+        <tr><td data-label="城市">Potomac</td><td data-label="原版（2005 年）">Cannons</td><td data-label="改成">Nationals</td></tr>
+        <tr><td data-label="城市">Vero Beach</td><td data-label="原版（2005 年）">Dodgers</td><td data-label="改成">Devil Rays</td></tr>
+        <tr><td data-label="城市">Lakeland</td><td data-label="原版（2005 年）">Tigers</td><td data-label="改成">Flying Tigers</td></tr>
+      </tbody>
+    </table></div>
+    <p>第七格<u>連城市一起換掉了</u>：<code>Norwich Navigators</code> →
+       <code>Connecticut Defenders</code>（美術編號 66）。它跟上面那六格不同，
+       球隊檔的識別碼、城市、長名、短名<strong>四欄全改</strong>，
+       上面那六格只動了長名一欄。</p>
+    <p>這七格跟中職一點關係都沒有 —— <strong>那是把小聯盟球隊的名字更新到 2008 年的樣子</strong>。
+       <span class="badge wip">推論</span> 本站沒有查證那些改名在真實世界發生的時間，
+       但除了 <code>Norwich</code> 那一格之外，六格全部是「同一個城市、換一個綽號」這個形態。</p>
+    <p class="small">值得記的是：做那份名冊的人<u>連玩家幾乎不會看到的小聯盟隊名都順手更新了</u>。</p>
+  </div>
+
+  <h2>這頁不能告訴你什麼</h2>
+  <div class="card blue">
+    <p class="card-h">三件事</p>
+    <p style="margin-top:6px">
+       一、<strong>本站沒有實際加一欄進去跑跑看。</strong>
+       「主程式不認得就會被忽略」是從「遊戲照名字認欄位、而那張名字清單在主程式裡」推出來的。
+       <span class="badge wip">推測</span><br>
+       二、<strong>本站沒有去動主程式裡那一串欄位名</strong>，所以「改了主程式能不能加隊」不在討論範圍。
+       <span class="small">（站上的<a href="../tutorials/exe-tuning/index.html">執行檔上的六個旋鈕</a>
+       動的是記憶體池、大位址與解析度，不是這一串。）</span><br>
+       三、小聯盟那 90 隊有沒有同樣的限制，本站沒有查。<span class="badge wip">未解</span></p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 球隊名字<u>不是資料，是欄位名</u>。<code>team.dat</code> 表頭裡那 32 個 <code>team_vs_*</code> 一字不差地也存在遊戲主程式裡，所以你可以「換」一支球隊，<strong>不能「加」一支</strong>。</li>
+    <li><strong>規模</strong> <code>team.dat</code> 126 列、55 欄，其中 <strong>32 欄的名字本身就是球隊縮寫</strong>（30 支球隊 ＋ 2 個聯盟）。126 列 ＝ 30 支大聯盟 ＋ 90 支小聯盟 ＋ 4 支明星與未來之星 ＋ 2 支沒有球衣也沒有播報語音的 <code>Burnaby</code> 隊（<u>它們是有球員的</u>，見上面的訂正）。</li>
+    <li><strong>欄位名停在 2004 年，資料卻走到 2023 年</strong> <code>team_vs_mon</code> 是蒙特婁博覽會、<code>tam</code> 是魔鬼魚、<code>fla</code> 是佛羅里達馬林魚、<code>ana</code> 是安那罕天使。三十個欄位名跟球隊檔第一欄（<code>unique_team</code>）對，<strong>有五個對不到現在任何一支球隊</strong>，同時<strong>有五支球隊沒有對應的欄位名</strong>；改拿短代碼那一欄去對是七對七，多的兩對是 <code>ana</code> → <code>LAA</code> 與 <code>fla</code> → <code>MIA</code>。中文化模組把隊名球員成績全換過了，那三十個欄位名一個都沒動，不是懶得改，是改了遊戲就讀不到。</li>
+    <li><strong>程式的清單可以比檔案長，反過來不行</strong> 主程式裡的 32 個 <code>team_vs_*</code> 跟 <code>team.dat</code> 表頭一個不多一個不少，而且主程式還多認得 5 個名冊根本沒有的欄位。檔案少給幾欄，遊戲就當那幾欄沒有；檔案多給一個 <code>team_vs_cpbl</code>，<strong>程式清單裡沒有這個名字，它就只會被忽略</strong>。</li>
+    <li><strong>同一件事四個地方各自對得上</strong> <code>team.dat</code> 126 列、美術編號 1–126 連號無跳號、<code>logos.big</code> 132 項（126 個隊徽 <code>l000</code>–<code>l125</code>，多出來的 6 個不對應任何球隊）、播報語音索引 124 項。三個數字不一樣但每一個都固定而且用滿了；語音少的那兩格，正是名冊最後那兩支沒有球衣也沒有播報語音的 <code>Burnaby</code> 隊。</li>
+    <li><strong>這一頁順手訂正了本站另一頁的「未解」</strong> 資料檔總覽原本寫「<code>org.dat</code> 的編號對不到 <code>team.dat</code>，是另一套系統，本站沒有解出」，<strong>那是錯的</strong>。它就是同一串識別碼的十進位寫法（<code>193451509</code> ＝ <code>0xb87d5f5</code>），124 個非零值全部對得上，組織關係也完全合理。教訓：<strong>「對不到」通常不是「另一套系統」，是「還沒換算過」。</strong></li>
+    <li><strong>社群當年怎麼把中職放進去</strong> 2008 年那份台灣名冊<u>一列都沒有多</u>，126 對 126，41 列有變動。30 支大聯盟加 2 支明星隊共 32 格被整個佔用（中職 9、日職 12、韓職 8、其他 3），另外 2 格是遊戲自帶的 <code>MVP Legends</code> 與 <code>MVP Heroes</code> 也被拿去用，剩下 7 格只是把小聯盟隊名更新到當時（其中 6 格只換綽號，第 7 格 <code>Norwich Navigators</code> → <code>Connecticut Defenders</code> 連城市一起換）。但 41 格裡隊名被改了 35 到 40 次，<strong>九個球隊 AI 行為欄位各只被改過 1 次</strong>，所以那些亞洲球隊打起來就是它佔用的那支大聯盟球隊（兄弟象用天使隊的個性、統一獅用印地安人隊的），只有一支日職隊是例外。</li>
+    <li><strong>本站沒驗的</strong> 本站<u>沒有真的加一欄進去跑跑看</u>，「主程式不認得就會被忽略」是從「遊戲照名字認欄位、而那張清單在主程式裡」推出來的；本站沒有去動主程式裡那一串欄位名（站上<a href="../tutorials/exe-tuning/index.html">執行檔那一課</a>動的是記憶體池、大位址與解析度，不是這一串），所以「改了主程式能不能加隊」不在討論範圍；小聯盟那 90 隊有沒有同樣的限制沒有查；美術編號剛好等於隊徽編號加一<u>已經驗起來了</u>（<a href="../tutorials/team-logo/index.html">換球隊隊徽</a>把原版的 <code>l000</code>、<code>l001</code>、<code>l005</code>、<code>l125</code> 匯出成 PNG 親眼看過，四個都吻合且涵蓋號段頭尾），還沒驗的是「遊戲程式是不是照這一欄去抓隊徽檔」；小聯盟那七格改名對應真實世界的時間也沒有查證。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="database.html">資料檔總覽</a> —— 球隊檔在哪、其他資料檔是什麼</li>
+    <li><a href="what-can-be-modded.html">什麼改得動</a> —— 全站的可改／不可改總表</li>
+    <li><a href="player-voice.html">播報員為什麼不唸新球員的名字</a> —— 語音那道牆的完整版</li>
+    <li><a href="../tutorials/change-schedule-year/index.html">把整季賽程搬到任何年份</a> —— 賽程檔實際動手</li>
+  </ul>
+
+  <footer>
+    <p>本頁的欄位數、列數、封裝檔項目數皆為現場打開 <code>data\database\team.dat</code>、
+       <code>data\frontend\logos.big</code>、<code>data\audio\</code> 底下的語音索引與遊戲主程式量測所得；
+       全程唯讀。主程式部分僅以十六進位檢視器讀取其中的文字，
+       <strong>本站不散布任何改好的執行檔，這一頁也沒有教怎麼動主程式裡那一串欄位名</strong>。
+       標示為「推測」「未解」之處未經證實。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

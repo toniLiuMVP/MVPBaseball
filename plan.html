@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/plan.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>課表 — toni的MVP模組補習班</title>
+<meta name="description" content="六張課表，照學生的目的排。每一堂都標了為什麼在這個位置、要花多久、學完會什麼。不用從第一課讀到最後一課——照你的班別上就好。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="index.html">首頁</a>
+  <a class="item" href="start.html">新手基本功</a>
+  <a class="item" href="do.html">我想做什麼</a>
+  <a class="item on" href="plan.html">課表</a>
+  <a class="item" href="tutorials/index.html">教學</a>
+  <a class="item" href="7min/index.html">七分鐘</a>
+  <a class="item" href="reference/index.html">速查</a>
+  <a class="item" href="coach/index.html">棒球教練</a>
+  <a class="item" href="story/index.html">故事</a>
+  <a class="item" href="about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px">課表</p>
+  <h1>課表</h1>
+  <p class="lede">站上有近四十堂課。<strong>你不需要全部上。</strong>
+     這一頁把它們排成<u>六張課表</u>，每一張是給一種目的的人 ——
+     照著順序上，每一堂都寫了<strong>為什麼排在這個位置</strong>。</p>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法看<a href="tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <div class="quickfix" id="quick">
+    <p class="card-h">⚡ 我該上哪一班？</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>你的情況</th><th>去這一班</th><th class="num">堂數</th><th class="num">總時數</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="你的情況"><a class="rowlink" href="#a"><strong>不太會用電腦，想把喜歡的球員放進遊戲</strong></a></td>
+            <td data-label="去這一班"><a href="#a">入門班</a></td><td data-label="堂數" class="num">6</td><td data-label="總時數" class="num">約 60 分</td></tr>
+        <tr><td data-label="你的情況"><a class="rowlink" href="#b">遊戲跑不動、玩到一半跳出來</a></td>
+            <td data-label="去這一班"><a href="#b">急救班</a></td><td data-label="堂數" class="num">5</td><td data-label="總時數" class="num">約 38 分</td></tr>
+        <tr><td data-label="你的情況"><a class="rowlink" href="#c">想讓球員看起來像本人</a></td>
+            <td data-label="去這一班"><a href="#c">外觀班</a></td><td data-label="堂數" class="num">6</td><td data-label="總時數" class="num">約 100 分</td></tr>
+        <tr><td data-label="你的情況"><a class="rowlink" href="#d">想做新一年的名單</a></td>
+            <td data-label="去這一班"><a href="#d">年度更新班</a></td><td data-label="堂數" class="num">9</td><td data-label="總時數" class="num">約 111 分</td></tr>
+        <tr><td data-label="你的情況"><a class="rowlink" href="#e">做好了想給朋友裝</a></td>
+            <td data-label="去這一班"><a href="#e">發布班</a></td><td data-label="堂數" class="num">5</td><td data-label="總時數" class="num">約 42 分</td></tr>
+        <tr><td data-label="你的情況"><a class="rowlink" href="#f">想自己看懂檔案、寫工具</a></td>
+            <td data-label="去這一班"><a href="#f">拆解班</a></td><td data-label="堂數" class="num">5</td><td data-label="總時數" class="num">約 55 分</td></tr>
+      </tbody>
+    </table></div>
+    <p class="tail">⚠️ 總時數是<strong>各堂標示時間的加總</strong>，不含卡住重來的時間。
+       第一次做通常會比較久 —— 那很正常，不是你的問題。</p>
+  </div>
+
+  <h2 id="a">① 入門班 —— 6 堂 · 約 60 分鐘</h2>
+  <p><strong>給誰：</strong>不太會用電腦，但想把喜歡的球員放進遊戲的人。</p>
+  <p><strong>上完你會：</strong>把遊戲裡任何一位球員改成你想要的人 ——
+     名字、背號、臉、應援曲，而且隨時退得回去。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">第</th><th>課</th><th class="num">時間</th><th>為什麼排在這裡</th></tr></thead>
+    <tbody>
+      <tr><td data-label="第" class="num">1</td><td data-label="課"><a href="tutorials/controller-config/index.html">暖身課：打開一個遊戲的檔案</a></td>
+          <td data-label="時間" class="num">10 分</td><td data-label="為什麼排在這裡"><strong>什麼工具都不用。</strong>先證明給自己看：遊戲的檔案不是天書，改壞了也回得來</td></tr>
+      <tr class="hi"><td data-label="第" class="num">2</td><td data-label="課"><a href="start.html">新手基本功</a></td>
+          <td data-label="時間" class="num">15 分</td><td data-label="為什麼排在這裡">把後面每一堂都會用到的<u>六個操作</u>練一次。<strong>裡面有一張表把 11 個電腦詞一次講完</strong></td></tr>
+      <tr><td data-label="第" class="num">3</td><td data-label="課"><a href="tutorials/backup/index.html">備份與還原 SOP</a></td>
+          <td data-label="時間" class="num">10 分</td><td data-label="為什麼排在這裡">動手之前的保險。<u>這一堂不能跳</u></td></tr>
+      <tr class="hi"><td data-label="第" class="num">4</td><td data-label="課"><a href="tutorials/make-a-player/index.html">把一位球員改成你想要的球員</a></td>
+          <td data-label="時間" class="num">10 分</td><td data-label="為什麼排在這裡"><strong>本班的主菜，而且不用打任何指令</strong>——雙擊就好</td></tr>
+      <tr><td data-label="第" class="num">5</td><td data-label="課"><a href="tutorials/swap-face/index.html">幫球員換一張臉</a></td>
+          <td data-label="時間" class="num">10 分</td><td data-label="為什麼排在這裡">名字換好了，換張臉他就真的像那個人</td></tr>
+      <tr><td data-label="第" class="num">6</td><td data-label="課"><a href="tutorials/swap-chant/index.html">把應援曲指給別的球員</a></td>
+          <td data-label="時間" class="num">5 分</td><td data-label="為什麼排在這裡">最後加一首歌。<u>只改一行文字，最容易有成就感</u></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">卡在第 2 堂就好？那也可以 —— 直接跳到
+     <a href="tutorials/make-a-player/index.html">第 4 堂</a>，它是全站唯一不用打指令的工具。</p>
+
+  <h2 id="b">② 急救班 —— 5 堂 · 約 38 分鐘</h2>
+  <p><strong>給誰：</strong>遊戲裝好了跑不動、或玩到一半跳回桌面的人。<u>先能玩，再談改。</u></p>
+  <p><strong>上完你會：</strong>自己判斷是哪一類問題，而且知道下一步該做什麼。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">第</th><th>課</th><th class="num">時間</th><th>為什麼排在這裡</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="第" class="num">1</td><td data-label="課"><a href="tutorials/crash-diagnosis/index.html">遊戲當掉了怎麼辦</a></td>
+          <td data-label="時間" class="num">5 分</td><td data-label="為什麼排在這裡"><strong>先分類再修。</strong>不知道是哪一種問題就亂試，只會越弄越糟</td></tr>
+      <tr><td data-label="第" class="num">2</td><td data-label="課"><a href="tutorials/run-in-2026/index.html">2026 年的電腦怎麼跑得起 2005 年的遊戲</a></td>
+          <td data-label="時間" class="num">15 分</td><td data-label="為什麼排在這裡">「根本開不起來」多半是這一堂。大位址、解析度、相容性一次處理</td></tr>
+      <tr><td data-label="第" class="num">3</td><td data-label="課"><a href="tutorials/fix-chinese/index.html">中文版配大球場就跳出</a></td>
+          <td data-label="時間" class="num">3 分</td><td data-label="為什麼排在這裡">台灣玩家最常撞的一個。<u>卡了二十年，一行指令解決</u></td></tr>
+      <tr><td data-label="第" class="num">4</td><td data-label="課"><a href="tutorials/shrink-big/index.html">球場超過 10MB 就當機</a></td>
+          <td data-label="時間" class="num">5 分</td><td data-label="為什麼排在這裡">裝了社群球場才開始當的話，看這堂</td></tr>
+      <tr><td data-label="第" class="num">5</td><td data-label="課"><a href="tutorials/mount-disc/index.html">不用每次放光碟</a></td>
+          <td data-label="時間" class="num">10 分</td><td data-label="為什麼排在這裡">能玩了之後的生活品質。順便保護你那片實體光碟</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="c">③ 外觀班 —— 6 堂 · 約 100 分鐘</h2>
+  <p><strong>給誰：</strong>想讓球員看起來、穿起來都像本人的人。<u>由易到難排。</u></p>
+  <p><strong>上完你會：</strong>臉、大頭照、姿勢、球衣、開機畫面全部換過一輪。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">第</th><th>課</th><th class="num">時間</th><th>為什麼排在這裡</th></tr></thead>
+    <tbody>
+      <tr><td data-label="第" class="num">1</td><td data-label="課"><a href="tutorials/swap-face/index.html">幫球員換一張臉</a></td>
+          <td data-label="時間" class="num">10 分</td><td data-label="為什麼排在這裡"><strong>只改一個文字檔</strong>，不碰 536 MB 的大檔。從這裡開始最安全</td></tr>
+      <tr><td data-label="第" class="num">2</td><td data-label="課"><a href="tutorials/edit-stance/index.html">換打擊姿勢與投球姿勢</a></td>
+          <td data-label="時間" class="num">10 分</td><td data-label="為什麼排在這裡">同樣只改一個數字，但畫面上的差別很大</td></tr>
+      <tr><td data-label="第" class="num">3</td><td data-label="課"><a href="tutorials/swap-portrait/index.html">換球員大頭照</a></td>
+          <td data-label="時間" class="num">20 分</td><td data-label="為什麼排在這裡">第一次要用到修圖軟體。<u>難度從這裡開始上升</u></td></tr>
+      <tr><td data-label="第" class="num">4</td><td data-label="課"><a href="tutorials/install-uniform/index.html">把一套球衣裝進遊戲</a></td>
+          <td data-label="時間" class="num">15 分</td><td data-label="為什麼排在這裡">裝別人做好的球衣，不必自己修圖</td></tr>
+      <tr><td data-label="第" class="num">5</td><td data-label="課"><a href="tutorials/swap-splash/index.html">換掉開機畫面</a></td>
+          <td data-label="時間" class="num">15 分</td><td data-label="為什麼排在這裡">每次開遊戲都看得到，儀式感最強的一堂</td></tr>
+      <tr class="hi"><td data-label="第" class="num">6</td><td data-label="課"><a href="tutorials/new-face/index.html">做一張新的球員臉皮</a></td>
+          <td data-label="時間" class="num">30 分</td><td data-label="為什麼排在這裡"><strong>★★★，全站最難的一堂。</strong>要看得懂展開圖。前五堂做完再來</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="d">④ 年度更新班 —— 9 堂 · 約 111 分鐘</h2>
+  <p><strong>給誰：</strong>想把整個遊戲更新成新一個年度的人。</p>
+  <p><strong>上完你會：</strong>把一批球員換成新名單，能力值有依據、臉與大頭照對得上、
+     播報員唸得出新名字、登入畫面與賽程也是新的一年，最後打包成一包給別人裝。</p>
+  <div class="card blue">
+    <p class="card-h">📋 這一班有一堂統籌課，先上它</p>
+    <p>下面第 1 堂<a href="tutorials/yearly-update/index.html">一次更新整個年度</a>
+       不教任何新技術 —— 它回答的是其他八堂都沒回答的事：
+       <u>先做哪一件、做完怎麼確認真的成了、卡住回哪一堂、全部做完怎麼一次還原</u>。
+       ⚠️ <strong>2026-08-29 訂正</strong>：這一班原本只有 5 堂 68 分，
+       而且臉（<code>swap-face</code>）與登入背景（<code>swap-splash</code>）
+       被放在 ③ 外觀班 —— 但要做「新一年的完整名冊」，那兩樣是必要的，不是外觀選配。</p>
+  </div>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">第</th><th>課</th><th class="num">時間</th><th>為什麼排在這裡</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="第" class="num">1</td><td data-label="課"><a href="tutorials/yearly-update/index.html">一次更新整個年度</a></td>
+          <td data-label="時間" class="num">看完約 8 分</td><td data-label="為什麼排在這裡"><strong>本班的地圖。</strong>先看順序與依賴，
+              才不會在第五堂發現前面要重做。<u>它也是唯一列出「全部退回去」那七行的地方</u></td></tr>
+      <tr><td data-label="第" class="num">2</td><td data-label="課"><a href="tutorials/backup/index.html">備份與還原 SOP</a></td>
+          <td data-label="時間" class="num">10 分</td><td data-label="為什麼排在這裡">整年要動七類檔案，這一堂是唯一的保險</td></tr>
+      <tr><td data-label="第" class="num">3</td><td data-label="課"><a href="tutorials/make-a-player/index.html">把一位球員改成你想要的球員</a></td>
+          <td data-label="時間" class="num">10 分</td><td data-label="為什麼排在這裡">先學會改一個，再談改一批。<u>這一堂有 CSV 批次模式</u>。
+              <strong>必須排在臉／大頭照／語音之前</strong> —— 那三樣都是對著某位球員做的</td></tr>
+      <tr class="hi"><td data-label="第" class="num">4</td><td data-label="課"><a href="tutorials/stats-to-ratings/index.html">把真實成績換算成能力值</a></td>
+          <td data-label="時間" class="num">15 分</td><td data-label="為什麼排在這裡"><strong>本班的核心。</strong>公式是從遊戲自己出貨的資料配出來的，
+              誤差量過 —— <u>而配不出來的欄位它會直接拒絕，不編數字給你</u></td></tr>
+      <tr><td data-label="第" class="num">5</td><td data-label="課"><a href="tutorials/swap-face/index.html">幫球員換一張臉</a></td>
+          <td data-label="時間" class="num">10 分</td><td data-label="為什麼排在這裡">名冊改完才知道要換誰的臉。只改一個文字檔，很快</td></tr>
+      <tr><td data-label="第" class="num">6</td><td data-label="課"><a href="tutorials/swap-portrait/index.html">換球員大頭照</a></td>
+          <td data-label="時間" class="num">20 分</td><td data-label="為什麼排在這裡">新球員要有照片。批量做這一步最花時間，排在後面</td></tr>
+      <tr><td data-label="第" class="num">7</td><td data-label="課"><a href="tutorials/make-voice/index.html">換掉遊戲的聲音</a></td>
+          <td data-label="時間" class="num">20 分</td><td data-label="為什麼排在這裡">播報員唸得出新名字。<u>八堂裡唯一能用耳朵驗的</u></td></tr>
+      <tr><td data-label="第" class="num">8</td><td data-label="課"><a href="tutorials/swap-splash/index.html">換掉開機畫面</a></td>
+          <td data-label="時間" class="num">15 分</td><td data-label="為什麼排在這裡">不依賴名冊，隨時可做。放這裡是因為前面卡住時可以先做它換心情</td></tr>
+      <tr><td data-label="第" class="num">9</td><td data-label="課"><a href="tutorials/change-schedule-year/index.html">把賽程換到任何年份</a></td>
+          <td data-label="時間" class="num">3 分</td><td data-label="為什麼排在這裡">名單對了，日期也要對。<u>全站最快有感的一堂</u>，留在最後當收尾</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">想做<strong>全新的臉</strong>（不是指到現成的），再加
+     <a href="tutorials/new-face/index.html">做一張全新的臉</a>，多 30 分；
+     做好想給朋友裝，接<a href="#e">⑤ 發布班</a>。</p>
+
+  <h2 id="e">⑤ 發布班 —— 5 堂 · 約 42 分鐘</h2>
+  <p><strong>給誰：</strong>做好了想給朋友裝的人。</p>
+  <p><strong>上完你會：</strong>把你的改動打包成一包，對方一行指令裝好、隨時退得回去。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">第</th><th>課</th><th class="num">時間</th><th>為什麼排在這裡</th></tr></thead>
+    <tbody>
+      <tr><td data-label="第" class="num">1</td><td data-label="課"><a href="tutorials/whats-original/index.html">怎麼看出哪些檔還沒被動過</a></td>
+          <td data-label="時間" class="num">2 分</td><td data-label="為什麼排在這裡">發布前先搞清楚<u>你到底改了什麼</u>。2 分鐘，但省下之後所有麻煩</td></tr>
+      <tr><td data-label="第" class="num">2</td><td data-label="課"><a href="tutorials/backup/index.html">備份與還原 SOP</a></td>
+          <td data-label="時間" class="num">10 分</td><td data-label="為什麼排在這裡">你要給別人的東西，自己得先能還原</td></tr>
+      <tr><td data-label="第" class="num">3</td><td data-label="課"><a href="tutorials/make-a-player/index.html">把一位球員改成你想要的球員</a></td>
+          <td data-label="時間" class="num">10 分</td><td data-label="為什麼排在這裡">沒有改動就沒有東西可以打包。CSV 批次在這一堂</td></tr>
+      <tr class="hi"><td data-label="第" class="num">4</td><td data-label="課"><a href="tutorials/pack-a-mod/index.html">把你改好的東西打包成一包</a></td>
+          <td data-label="時間" class="num">10 分</td><td data-label="為什麼排在這裡"><strong>本班的主菜。</strong>本站每支工具留下的備份<u>就是「你改過什麼」的紀錄</u>，
+              不用自己記</td></tr>
+      <tr><td data-label="第" class="num">5</td><td data-label="課"><a href="tutorials/auto-install/index.html">一整包模組自動歸位</a></td>
+          <td data-label="時間" class="num">10 分</td><td data-label="為什麼排在這裡">反過來：別人給你散裝檔案時怎麼裝</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="f">⑥ 拆解班 —— 5 堂 · 約 55 分鐘</h2>
+  <p><strong>給誰：</strong>想自己看懂遊戲檔案、甚至寫自己的工具的人。</p>
+  <p><strong>上完你會：</strong>拿到任何一個沒看過的檔，能自己判斷它是什麼、怎麼拆。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">第</th><th>課</th><th class="num">時間</th><th>為什麼排在這裡</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="第" class="num">1</td><td data-label="課"><a href="tutorials/read-file-headers/index.html">五秒看穿一個檔案</a></td>
+          <td data-label="時間" class="num">10 分</td><td data-label="為什麼排在這裡"><strong>整個拆解班的鑰匙。</strong>檔頭前幾個位元組就告訴你它是什麼</td></tr>
+      <tr><td data-label="第" class="num">2</td><td data-label="課"><a href="tutorials/unpack-big/index.html">封裝檔可以拆成散裝嗎</a></td>
+          <td data-label="時間" class="num">10 分</td><td data-label="為什麼排在這裡">遊戲九成資源都在封裝檔裡。先學會拆，才有東西看</td></tr>
+      <tr><td data-label="第" class="num">3</td><td data-label="課"><a href="tutorials/fel-toolkit/index.html">介面萬用工具</a></td>
+          <td data-label="時間" class="num">15 分</td><td data-label="為什麼排在這裡">介面版面檔解開後是<u>純文字</u>——這是最好上手的一種格式</td></tr>
+      <tr><td data-label="第" class="num">4</td><td data-label="課"><a href="tutorials/read-voice/index.html">拆開一個語音檔</a></td>
+          <td data-label="時間" class="num">10 分</td><td data-label="為什麼排在這裡">音訊比文字難，但本站已經把它整個解開了</td></tr>
+      <tr><td data-label="第" class="num">5</td><td data-label="課"><a href="tutorials/uniforms/index.html">球衣模組：安裝與製作入門</a></td>
+          <td data-label="時間" class="num">10 分</td><td data-label="為什麼排在這裡">貼圖格式入門。讀完接得上<a href="reference/index.html">速查區</a>那 33 頁</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card blue">
+    <p class="card-h">⏱ 只有下課時間？</p>
+    <p><a href="7min/index.html">下課七分鐘</a>那十三堂是<strong>獨立的短課</strong>，
+       不屬於任何一班 —— 一件事、七分鐘、做完就走。
+       想先嚐一口再決定要不要上整班的話，從那裡開始。</p>
+  </div>
+
+  <h2>沒有排進課表的課</h2>
+  <p>還有幾堂是<u>看情況才需要</u>的，所以不放進任何一班：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>課</th><th>什麼時候才需要</th></tr></thead>
+    <tbody>
+      <tr><td><a href="tutorials/play-on-mac/index.html">在 Mac 上玩 MVP 2005</a></td>
+          <td>你用 Mac。<u>那就先上這堂，再回去你的班</u></td></tr>
+      <tr><td><a href="tutorials/hide-runner-speed/index.html">關掉跑壘者速度數值</a></td>
+          <td>你覺得那個數字礙眼</td></tr>
+      <tr><td><a href="tutorials/change-camera/index.html">把打擊視角調成你喜歡的角度</a></td>
+          <td>你想換視角</td></tr>
+      <tr><td><a href="tutorials/fel-recipes/index.html">介面實例集</a></td>
+          <td>你想關掉某個特定的畫面元素 —— 查得到就直接抄</td></tr>
+      <tr><td><a href="tutorials/hud-color/index.html">改記分板的顏色</a></td>
+          <td>你想換記分板的配色</td></tr>
+      <tr><td><a href="tutorials/menu-text/index.html">改主選單的文字</a></td>
+          <td>你想把主選單上的英文換成中文</td></tr>
+      <tr><td><a href="tutorials/team-logo/index.html">換球隊隊徽</a></td>
+          <td>你想換隊徽</td></tr>
+      <tr><td><a href="tutorials/skip-intro/index.html">關掉開場動畫</a></td>
+          <td>你不想每次開遊戲都等那段開場動畫</td></tr>
+      <tr><td><a href="tutorials/edit-speed/index.html">修改球員跑壘速度</a></td>
+          <td>你只想單獨改一個能力值欄位 —— <u>這一課挑的是最安全的那一個</u></td></tr>
+      <tr><td><a href="tutorials/make-chinese/index.html">把官方中文版的中文搬進英文版</a></td>
+          <td>你手上有官方中文版，想把中文搬到英文版</td></tr>
+      <tr><td><a href="tutorials/exe-tuning/index.html">執行檔上的六個旋鈕</a></td>
+          <td>你想自己動手調執行檔 —— 記憶體、解析度、大位址</td></tr>
+      <tr><td><a href="tutorials/community-tools/index.html">社群工具怎麼分工</a></td>
+          <td>你想知道二十年來大家用什麼工具。<u>這是讀的，不是做的</u></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 近四十堂課你不需要全部上。找到你的班，照順序上那 5-9 堂。</li>
+    <li><strong>六張課表</strong> 入門（60 分）· 急救（38 分）· 外觀（100 分）·
+        年度更新（111 分）· 發布（42 分）· 拆解（55 分）。</li>
+    <li><strong>每一堂都寫了為什麼排在那個位置</strong> ——
+        順序不是照難度，是照<u>你需要它的時候</u>。</li>
+    <li><strong>入門班的第一堂什麼工具都不用</strong>，第四堂不用打任何指令。
+        真的卡住可以直接跳到第四堂。</li>
+    <li><strong>先能玩再談改</strong> 遊戲跑不動的人請先上急救班，不要從入門班開始。</li>
+    <li><strong>總時數怎麼算的</strong> 各堂標示時間的加總，<u>不含卡住重來的時間</u>。
+        第一次做通常比較久。</li>
+    <li><strong>本站沒驗的</strong> 這些課表<u>沒有真的找學生跑過</u>，
+        順序是依據每一堂的前置需求與難度排的，不是實測出來的學習成效。
+        時間也是各課自己標的估計值，不是計時量到的。</li>
+  </ul>
+
+  <footer>
+    <p>本頁為課程規劃索引，內容全部指向站內既有課程；
+       各課的量測、驗證與未驗事項以該課頁面所載為準。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="legal.html">法律與版權說明</a> ·
+       <a href="changelog.html">更新紀錄</a> ·
+       <a href="index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

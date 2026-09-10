@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/whats-original/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>怎麼看出哪些檔還沒被動過 — toni的MVP模組補習班</title>
+<meta name="description" content="你拿到的遊戲可能早就裝過模組。用檔案的修改時間就能分出哪些還是 2005 年出廠那一份。實測 1090 個檔,774 個沒被動過。附全程唯讀的檢查腳本。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../../index.html">首頁</a>
+  <a class="item" href="../../start.html">新手基本功</a>
+  <a class="item" href="../../do.html">我想做什麼</a>
+  <a class="item" href="../../plan.html">課表</a>
+  <a class="item on" href="../index.html">教學</a>
+  <a class="item" href="../../7min/index.html">七分鐘</a>
+  <a class="item" href="../../reference/index.html">速查</a>
+  <a class="item" href="../../coach/index.html">棒球教練</a>
+  <a class="item" href="../../story/index.html">故事</a>
+  <a class="item" href="../../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="../index.html">教學</a> › 怎麼看出哪些檔還沒被動過</p>
+  <h1>怎麼看出哪些檔還沒被動過</h1>
+  <p class="lede">你手上那份 MVP Baseball 2005，<strong>很可能早就被裝過東西了</strong>。
+     如果是朋友給的、或是網路上找來的整包，那幾乎是一定的。
+     動手改之前先搞清楚哪些檔還是原廠那一份 ——
+     這件事不用任何工具，<strong>看檔案的修改時間就知道</strong>。</p>
+
+  <div class="grid">
+    <div class="card"><p class="card-h">難度</p><p>★☆☆ 只是看檔案內容以外的資訊</p></div>
+    <div class="card"><p class="card-h">時間</p><p>約 2 分鐘</p></div>
+    <div class="card"><p class="card-h">會改到東西嗎</p><p><strong>不會，全程唯讀</strong></p></div>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">一句話版本</p>
+    <p>遊戲資料夾裡修改時間<strong>還停在 2004 或 2005 年</strong>的檔案，
+       多半還是原廠那一份；時間比較新的，代表被某個東西寫過。</p>
+    <p class="small">判準是<strong>整個 2004 年加整個 2005 年</strong>，不是某一段幾個月的區間。
+       出廠期的檔本來就散得很開：本站測試機那一份 <code>data</code> 重新掃過，
+       被算成出廠期的檔最早是 <strong>2004-05-04</strong>、最晚是 <strong>2005-02-09</strong>，
+       其中 25 個早於 2004 年 12 月。<a href="#eabak">剛安裝好的原版</a>也一樣，
+       它的 <code>data</code> 底下最早的檔是 2004-05-01。</p>
+  </div>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <div class="quickfix" id="quick">
+    <p class="card-h">⚡ 只想趕快做完？照這四步</p>
+    <ol>
+      <li>下載 <a href="mvp_check_original.py" download>mvp_check_original.py</a>。放桌面就可以，不需要放進遊戲資料夾。</li>
+      <li>開命令列跑它，把遊戲資料夾的完整路徑放在後面，路徑有空白要用引號包起來
+          <p class="small">Windows:</p>
+  <pre><code>python mvp_check_original.py "你的遊戲資料夾"</code></pre>
+          <p class="small">Mac / Linux:</p>
+  <pre><code>python3 mvp_check_original.py "你的遊戲資料夾"</code></pre>
+          第一行會印「找到 data 資料夾,只掃它。」<br>
+          <span class="small">Windows 打 <code>python3</code> 常會跳出 Microsoft Store，那是假的：關掉，
+          改打 <code>py -3</code> 或 <code>python</code>（見<a href="../../start.html">第 0 課</a>）。</span></li>
+      <li>直接看【3】各資料夾那張表：<strong>比例接近 100% 的大概沒被動過</strong>可以當比對基準，<strong>比例很低的裝過模組</strong>、要還原就從那裡找起，右邊那欄會告訴你<strong>最新被動過的那一個檔</strong>是哪一個、哪一年。</li>
+      <li>想知道球員名冊有沒有被換過，數 <code>attrib.dat</code> 的<strong>資料列</strong>（<u>扣掉第一行表頭</u>）：不是 2,921 就是被換過了。<span class="small">用記事本或 <code>wc -l</code> 直接數會得到 2,922，那是連表頭一起算的。</span></li>
+    </ol>
+    <p class="tail">全程唯讀，它只讀檔案的屬性，不打開任何檔案的內容，也不連網。
+       結果是「先看哪裡」的地圖，不是判決。
+       想知道為什麼，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+  </div>
+
+  <h2>為什麼值得先看一眼</h2>
+  <p>本站每一課都會叫你先備份。但備份只保住「你現在這一刻的狀態」——
+     如果你拿到的遊戲已經裝過三個模組，備份下來的還是那三個模組。</p>
+  <p>知道哪些檔沒被動過，有三個實際用處：</p>
+  <ul class="tick">
+    <li><strong>出事的時候知道要還原什麼。</strong>某一課改壞了，
+        你至少知道原本那個檔是不是還在別的地方。</li>
+    <li><strong>看懂為什麼你的數字跟本站不一樣。</strong>
+        本站量到的行號、項目數、檔案大小，是本站這台機器上那一份的值。
+        如果你的檔案被別人改過，數字對不上是正常的。</li>
+    <li><strong>不會把別人的作品當成原廠的。</strong>
+        這一點對想自己做模組的人特別重要。</li>
+  </ul>
+
+  <h2>本站測試機實測</h2>
+  <p>把 <code>data\</code> 底下 <strong>1,090 個檔</strong>的修改時間全部撈出來（下表 13 列加起來就是 1,090）：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th class="num">年份</th><th class="num">檔數</th><th>什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td class="num"><strong>2004</strong></td><td class="num">113</td><td rowspan="2"><strong>出廠期，合計 774 個（71.0%）</strong></td></tr>
+      <tr class="hi"><td class="num"><strong>2005</strong></td><td class="num">661</td></tr>
+      <tr><td class="num">2006</td><td class="num">2</td><td rowspan="4">零星的早期改動</td></tr>
+      <tr><td class="num">2008</td><td class="num">15</td></tr>
+      <tr><td class="num">2012</td><td class="num">56</td></tr>
+      <tr><td class="num">2013</td><td class="num">5</td></tr>
+      <tr><td class="num">2015</td><td class="num">1</td><td rowspan="2">更零星</td></tr>
+      <tr><td class="num">2017</td><td class="num">1</td></tr>
+      <tr><td class="num">2020</td><td class="num">27</td><td rowspan="4">近年的球場與模組</td></tr>
+      <tr><td class="num">2021</td><td class="num">22</td></tr>
+      <tr><td class="num">2022</td><td class="num">13</td></tr>
+      <tr class="hi"><td class="num">2023</td><td class="num"><strong>172</strong></td></tr>
+      <tr><td class="num">2026</td><td class="num">2</td><td>本站自己動到的兩個檔（<code>database\attrib.dat</code>、<code>database\schedule.big</code>）</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>拆到各個資料夾看，差異非常大：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">資料夾</th><th class="num">檔數</th><th class="num">出廠期</th><th class="num">比例</th><th>本站的判讀</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="資料夾" class="mono">easo\</td><td data-label="檔數" class="num">519</td><td data-label="出廠期" class="num">519</td><td data-label="比例" class="num"><strong>100%</strong></td><td data-label="本站的判讀"><a href="../../story/hidden-website/index.html">那個藏起來的網站</a>整包原封不動</td></tr>
+      <tr class="hi"><td data-label="資料夾" class="mono">stadium - MVP2005原始\</td><td data-label="檔數" class="num">88</td><td data-label="出廠期" class="num">88</td><td data-label="比例" class="num"><strong>100%</strong></td><td data-label="本站的判讀">本站另外留的<strong>原廠那 88 個球場檔</strong> —— 遊戲不讀這個資料夾，它只是擺在旁邊當比對基準</td></tr>
+      <tr><td data-label="資料夾" class="mono">anims\</td><td data-label="檔數" class="num">1</td><td data-label="出廠期" class="num">1</td><td data-label="比例" class="num">100%</td><td data-label="本站的判讀">只有一個檔</td></tr>
+      <tr><td data-label="資料夾" class="mono">misc\</td><td data-label="檔數" class="num">33</td><td data-label="出廠期" class="num">32</td><td data-label="比例" class="num">97%</td><td data-label="本站的判讀">只有一張材質被換過</td></tr>
+      <tr><td data-label="資料夾" class="mono">audio\</td><td data-label="檔數" class="num">111</td><td data-label="出廠期" class="num">40</td><td data-label="比例" class="num">36%</td><td data-label="本站的判讀">語音庫換過</td></tr>
+      <tr class="hi"><td data-label="資料夾" class="mono">stadium\</td><td data-label="檔數" class="num">88</td><td data-label="出廠期" class="num">30</td><td data-label="比例" class="num"><strong>34%</strong></td><td data-label="本站的判讀">遊戲正在讀的那一份：<strong>2023 年那包球場</strong>，88 個裡只剩 30 個是原廠的</td></tr>
+      <tr><td data-label="資料夾" class="mono">igshapes\</td><td data-label="檔數" class="num">6</td><td data-label="出廠期" class="num">2</td><td data-label="比例" class="num">33%</td><td data-label="本站的判讀">介面圖形換過</td></tr>
+      <tr><td data-label="資料夾" class="mono">frontend\</td><td data-label="檔數" class="num">115</td><td data-label="出廠期" class="num">25</td><td data-label="比例" class="num">22%</td><td data-label="本站的判讀">選單與載入畫面大改過</td></tr>
+      <tr class="hi"><td data-label="資料夾" class="mono">database\</td><td data-label="檔數" class="num">27</td><td data-label="出廠期" class="num">2</td><td data-label="比例" class="num"><strong>7%</strong></td><td data-label="本站的判讀">球員名冊<strong>幾乎全換</strong> —— 這正是台灣模組動的地方</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">上面這兩張表是在本站測試機上量的，<strong>2026-09-05 重新掃過</strong>。
+     資料夾那張只列主要的九個；剩下的是根目錄那幾個檔，
+     以及本站擺在旁邊的備份副本（另一個 2023 年球場資料夾、兩個字型資料夾），
+     它們一樣算在那 1,090 個檔裡，所以總數比一份乾淨安裝多。
+     你自己的數字會不一樣，那正是這一課的重點：<strong>先量你自己那一份</strong>。</p>
+  <p class="small">（2026-09-05 訂正：本頁早先登的是 <strong>999 個檔、744 個出廠期、74.5%</strong>，
+     而且 <code>stadium\</code> 那一列寫 88／88＝100%「球場一個都沒被動過」。那是同一台機器
+     <u>某一個時間點</u>的快照 —— 現在 <code>stadium\</code> 裡放的是 2023 年那包球場，
+     原廠那 88 個檔在旁邊的 <code>stadium - MVP2005原始\</code>。上面是今天重跑的數字。）</p>
+
+  <h2>這個方法解掉了一個本站原本標「未解」的問題</h2>
+  <div class="card grass">
+    <p class="card-h">封裝檔的檔頭到底該用哪一種位元組順序</p>
+    <p><a href="../../reference/bigf.html">BIGF 封裝格式</a>那頁原本寫「檔案總大小是 little-endian」。
+       後來量了 295 個封裝檔，發現<strong>有 7 個是 big-endian</strong>，通則不成立。
+       但當時查不出為什麼，只能標「未解」。</p>
+    <p>用時間戳一交叉比對，答案立刻出來：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>檔案的修改時間</th><th class="num">little-endian</th><th class="num">big-endian</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="檔案的修改時間"><strong>2004-2005（出廠期）</strong></td><td data-label="little-endian" class="num">146</td><td data-label="big-endian" class="num"><strong>0</strong></td></tr>
+        <tr><td data-label="檔案的修改時間">2012 年以後</td><td data-label="little-endian" class="num">142</td><td data-label="big-endian" class="num">7</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>出廠期的檔案沒有半個是 big-endian。</strong>
+       那些 big-endian 全部是後來被社群工具重新打包過的。</p>
+    <p>最乾淨的一組對照是球場檔：這台機器上同時留著兩份 <code>dodgnite.big</code>。
+       遊戲正在讀的 <code>stadium\</code> 裡那一份是 <strong>2013-10-19</strong>、big-endian；
+       另一份 <strong>2004-12-24</strong> 的是 little-endian，擺在本站留的原廠備份
+       <code>stadium - MVP2005原始\</code> 裡。同樣 88 個項目，只有那一欄不同。</p>
+    <p class="small">（2026-09-05 訂正：本頁早先把這兩份的位置寫反了 —— 那時候
+       <code>stadium\</code> 裡放的還是 2004 年那一份。上面那張表是當年量 295 個封裝檔的結果；
+       同一套量法今天在這台機器上重跑是 <strong>384 個</strong>（多出來的是後來擺進來的球場資料夾副本），
+       出廠期 <strong>175 個 little-endian、big-endian 仍然掛零</strong>，
+       2012 年以後 199 個 little-endian、10 個 big-endian。<u>結論沒有變。</u>）</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">⚠ 時間戳會說謊 —— 三種情況</p>
+    <p><strong>一、複製的方式會影響它。</strong>有些複製方式會保留原始時間，
+       有些會把時間變成「你複製的那一刻」。從壓縮檔解出來的通常沿用壓縮檔裡記的時間。
+       所以一個顯示 2023 年的檔，有可能只是被複製過，內容完全沒變。</p>
+    <p><strong>二、時間可以被改。</strong>做模組的人如果想，可以把時間設回 2005 年。
+       本站沒有辦法分辨這種情況。</p>
+    <p><strong>三、時間新不代表內容變了。</strong>有些工具只是打開檔案看一看，
+       卻順手把整個檔重寫了一次。</p>
+    <p>所以這是一張<strong>「先看哪裡」的地圖，不是判決</strong>。
+       要確定內容有沒有變，只有一個方法：<u>拿兩份檔案逐位元組比對</u>。</p>
+  </div>
+
+  <h2 id="eabak">連原版裡都有一個 <code>.bak</code></h2>
+  <p>看到 <code>.bak</code> 就以為「這台被人動過」是很自然的直覺。<u>但那個直覺會出錯。</u></p>
+  <p>本站把<strong>剛安裝好、從未改動的原版</strong>整份掃過，
+     只找到<strong>一個</strong> <code>.bak</code>（那是英文版那一份；本站另一份剛安裝好的
+     <u>官方繁體中文版</u>還多一個 <code>data\credits.BAK</code>，2005-02-17，
+     同樣落在它自己的出貨期內）：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">檔</th><th class="num">大小</th><th class="num">檔案日期</th></tr></thead>
+    <tbody>
+      <tr><td data-label="檔" class="mono">data\igshapes\igcrsr.fsh</td><td data-label="大小" class="num">525,264</td><td data-label="檔案日期" class="num">2004-12-04 20:01:20</td></tr>
+      <tr class="hi"><td data-label="檔" class="mono">data\igshapes\igcrsr.fsh<strong>.bak</strong></td><td data-label="大小" class="num">525,184</td><td data-label="檔案日期" class="num"><strong>同一秒</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>兩個檔的時間戳一模一樣，都是 2004 年 12 月 4 日晚上 8 點 01 分 20 秒（台北時間）。</strong>
+     而那份英文版安裝的 <code>data\</code> 底下，檔案日期全部落在 2004-05 到 2005-01 之間，
+     <u>沒有任何一個檔比出貨日更晚</u>。</p>
+  <p class="small">⏱ <strong>本頁的時間戳都是用台北時間讀出來的</strong>（上面那張表也是）。
+     同一個檔換成<u>世界標準時間</u>是 <strong>2004-12-04 12:01:20</strong>，兩者差 8 小時。
+     <a href="../../story/build-2004/index.html">那批平安夜的時間戳</a>，
+     以及<a href="../../reference/stadium.html">球場速查</a>那頁的 <code>lighting.csv</code>，
+     寫的都是世界標準時間 —— 拿它們跟這一頁對照時要先換算。<u>「兩個檔同一秒」這件事不受影響。</u></p>
+  <p class="small">（2026-09-05 訂正：這句原本寫的是「整份安裝」，那是錯的。<code>data\</code> 以外
+     還有兩個例外：<code>TP03Patcher.dll</code> 是 2003-06-26，比出貨還早；
+     <code>filelist.txt</code> 是 2015-05-31，比出貨晚了十年 ——
+     <a href="../../reference/how-we-measured.html">怎麼量的</a>那一頁也記著它。）</p>
+  <div class="card grass">
+    <p class="card-h">那是 EA 自己留下的</p>
+    <p>兩份都是合法的圖片檔（同一張 512×256、同一個格式代號 <code>0x7D</code>），
+       但內容不同：<strong>428 個位元組不一樣</strong>，
+       而且影像資料後面那段附加資料的長度差 80（928 對 848）。</p>
+    <p>換句話說：這是<u>同一張游標圖的兩個版本</u>，
+       開發時留下的備份跟著母片一起壓進零售版了。</p>
+    <p class="small">本站沒有進遊戲看那兩張差在哪。<span class="badge wip">未實機驗證</span></p>
+  </div>
+  <div class="card clay">
+    <p class="card-h">所以這一課的判斷要多一條</p>
+    <p><strong>「有 <code>.bak</code>」不等於「被動過」。</strong>
+       要看的是<u>時間戳</u>：跟旁邊的檔同一秒、而且落在 2004–2005 之間的，是原廠的；
+       日期是你自己玩遊戲那幾年的，才是後來加的。</p>
+    <p class="small">本站自己也差點在這裡誤判 —— 在「剛安裝好的原版」裡看到一個
+       <code>.bak</code>，第一反應是「那這份不乾淨」。
+       <u>是看了時間戳才發現它比遊戲上市還早。</u></p>
+  </div>
+
+  <h2 id="realcase">一個真實的例子：一份中文懶人包到底動了什麼</h2>
+  <p>本站手上有一份 2023 年整理的中文化整合包。
+     把它跟<u>剛安裝好的英文版原版</u>比一次 ——
+     <strong>只比同名檔的大小，不看內容</strong>，檔名層級多出來或少掉的不算在內 ——
+     同名而大小不同的只有 65 個：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>動了什麼</th><th class="num">幾個檔</th><th>看得出來的意圖</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="動了什麼" class="mono">data\fonts\fonts.big</td><td data-label="幾個檔" class="num">1</td>
+          <td data-label="看得出來的意圖"><strong>換成中文字型</strong> —— 204 KB → 1.68 MB，檔名從
+              <code>_en</code> 變 <code>_jp</code>（<a href="../../reference/fonts.html#chinese">為什麼是 jp</a>）</td></tr>
+      <tr class="hi"><td data-label="動了什麼" class="mono">mvp2005.exe</td><td data-label="幾個檔" class="num">1</td>
+          <td data-label="看得出來的意圖"><strong>主程式被改過</strong> —— 大了 553 KB</td></tr>
+      <tr class="hi"><td data-label="動了什麼" class="mono">data\frontend\</td><td data-label="幾個檔" class="num">61</td>
+          <td data-label="看得出來的意圖">大多是 <code>load*.big</code>：<strong>換載入畫面</strong></td></tr>
+      <tr><td data-label="動了什麼" class="mono">filelist.txt</td><td data-label="幾個檔" class="num">1</td><td data-label="看得出來的意圖">檔案清單跟著變長</td></tr>
+      <tr><td data-label="動了什麼" class="mono">Support\EasyReqs.xml</td><td data-label="幾個檔" class="num">1</td><td data-label="看得出來的意圖">系統需求那張表：處理器從 800 MHz 寫成 700 MHz。<u>說明文件那一整套確實換掉了</u>（<code>EA Help\</code> 274 個檔換成 <code>European Help Files\</code> 276 個），但那是檔名層級的差異，不在這張表裡</td></tr>
+      <tr class="hi"><td data-label="動了什麼"><strong><code>data\database\</code>（球員名冊）</strong></td>
+          <td data-label="幾個檔" class="num"><strong>0</strong></td>
+          <td data-label="看得出來的意圖"><strong>一個位元組都沒動。</strong><br>
+              <code>attrib.dat</code>、<code>team.dat</code>、<code>roster.dat</code>
+              跟原版逐位元組相同</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card amber">
+    <p class="card-h">⚠️ 2026-09-05 訂正：上面那 65 個差異，大部分不是整合包作者動的</p>
+    <p>本站後來拿到<strong>官方繁體中文版</strong>剛安裝好的那一份，拿同一包整合包再比一次：
+       <strong>2,389 個同名檔，大小不同的是 0 個</strong>，繁中版有而整合包沒有的也是 0 個。
+       再抽驗 <code>fonts.big</code>、<code>attrib.dat</code>、<code>frontend\load42.big</code>、
+       <code>Support\EasyReqs.xml</code>、<code>filelist.txt</code> 五個檔的 SHA-256，
+       跟官方繁中版逐位元組相同。</p>
+    <p>換句話說：上面那張表量到的形狀，其實是
+       <strong>EA 官方英文版 vs EA 官方繁體中文版</strong>的差別。
+       中文字型、載入畫面、說明文件那幾列都是 EA 自己做的，不是整合包作者做的。
+       這份整合包自己加的東西是<u>檔名層級</u>的：比官方繁中版多出 12 個檔
+       （光碟映像、第三方工具、幾個執行檔變體），再加上一個<strong>大小一樣、內容不同的
+       <code>mvp2005.exe</code></strong> —— 而「只比大小」這套方法，本來就抓不到同大小的差異。</p>
+    <p class="small">底下那條結論不受影響，反而更硬：<code>data\database\</code> 那 23 個檔在
+       英文版、官方繁體中文版、這份整合包三邊<u>逐位元組相同</u>。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">這件事對你的意義</p>
+    <p><strong>「裝了中文包」跟「球員名單被換過」是兩件不同的事。</strong></p>
+    <p>很多人以為整合包一定連名單一起換掉了，所以不敢動。
+       但這一份的名冊<u>完全是原廠的</u> ——
+       意思是你照著本站
+       <a href="../edit-speed/index.html">改能力值</a>那幾課做，
+       數字會跟站上寫的對得起來。</p>
+    <p class="small">⚠️ 這是<u>某一份</u>整合包的結果，不是所有整合包都這樣。
+       你手上那份動了什麼，還是要自己看一眼
+       —— 最快的方法是數 <code>attrib.dat</code> 的<strong>資料列</strong>（<u>扣掉第一行表頭</u>，
+       用記事本或 <code>wc -l</code> 直接數會得到 2,922），
+       不是 2,921 就是被換過了（見速查頁的<a href="../../reference/database.html#compare">拿這張表驗你自己那份名單被換過沒</a>）。</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">本站不會提供那份整合包</p>
+    <p>它裡面有<strong>遊戲本體的光碟映像檔</strong>與<strong>第三方修改工具</strong>。
+       本站<u>不散布、也不說明去哪裡拿</u>。
+       這一節只講「拿一份已知的整合包跟原版比對，會看到什麼樣的差異形狀」。</p>
+  </div>
+
+  <h2>自己跑一次</h2>
+  <p>本站寫了一支唯讀的小程式做這件事。它只讀檔案的屬性，
+     <strong>不打開任何檔案的內容</strong>，也不連網。</p>
+
+  <div class="step">
+    <div class="step-n">1</div>
+    <div>
+      <div class="step-t">下載腳本，放到方便的地方</div>
+      <p class="step-why">桌面就可以。它不需要放進遊戲資料夾。</p>
+      <div class="btnrow" style="margin-top:8px">
+        <a class="btn" href="mvp_check_original.py" download>⬇ 下載 mvp_check_original.py</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">2</div>
+    <div>
+      <div class="step-t">開命令列，把遊戲資料夾的路徑放在後面</div>
+      <p class="step-why">不會開命令列的話，先看<a href="../../start.html">第 0 課</a>。</p>
+      <p class="small">Windows:</p>
+<pre><code>python mvp_check_original.py "<span class="hl">你的遊戲資料夾</span>"</code></pre>
+      <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_check_original.py "<span class="hl">你的遊戲資料夾</span>"</code></pre>
+      <p class="small">Windows 打 <code>python3</code> 常會跳出 Microsoft Store，那是假的：關掉，
+         改打 <code>py -3</code> 或 <code>python</code>。</p>
+      <div class="seen"><b>你會看到</b>
+<pre style="margin:8px 0 0"><code>  找到 data 資料夾,只掃它。
+
+  【1】整體
+    共 <span class="nu">1090</span> 個檔,其中 <span class="nu">774</span> 個的時間落在 2004-2005 年(71.0%)。</code></pre>
+      </div>
+      <div class="ifnot"><b>如果沒看到</b>
+        <ul>
+          <li>印「找不到這個資料夾」→ 路徑打錯了。路徑有空白要用引號包起來。</li>
+          <li>印「這個資料夾裡沒有檔案」→ 指到空資料夾了，確認是不是遊戲的安裝位置。</li>
+          <li>印「這裡一個檔都讀不到,但不是空的」→ 那是<strong>權限</strong>問題，路徑不必改。腳本會把讀不進去的路徑列出來；Windows 可以改用「以系統管理員身分執行」再跑一次。</li>
+          <li>完全沒反應或跳出視窗一閃就沒 → 看<a href="../crash-diagnosis/index.html">問題排除那一課</a>。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">3</div>
+    <div>
+      <div class="step-t">看【3】那張各資料夾的表</div>
+      <p class="step-why">這是整份輸出裡最有用的一段。</p>
+      <ul class="plain">
+        <li><strong>比例接近 100%</strong> —— 這個資料夾大概沒被動過，可以當比對基準</li>
+        <li><strong>比例很低</strong> —— 裝過模組。要還原就從這裡找起</li>
+        <li>右邊那欄會告訴你<strong>最新被動過的那一個檔是哪一個、哪一年</strong>，那通常就是線索的起點</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>📋 回報範本</h2>
+  <p>卡住或做成了，複製下面這段填一填：</p>
+<pre><code>檢查原廠 status: ✅ / ❌
+我的 attrib.dat 有幾個資料列(扣掉第一行表頭): ___     (原版是 2,921 列,整個檔 2,922 行)
+腳本判斷有幾個檔被動過: ___
+被動過的檔案清單(前五個): ___
+我的遊戲是: 全新安裝 / 裝過中文包 / 裝過名冊 / 不知道
+異常訊息: ___</code></pre>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 遊戲資料夾裡修改時間還停在 2004 或 2005 年的檔案多半還是原廠那一份，時間比較新的代表被某個東西寫過。判準是整個 2004 年加整個 2005 年，不是某一段幾個月的區間：本站測試機那一份 <code>data</code> 重新掃過，被算成出廠期的檔最早 2004-05-04、最晚 2005-02-09，其中 25 個早於 2004 年 12 月。</li>
+    <li><strong>關鍵數字</strong>（2026-09-05 重新量過）本站測試機 <code>data\</code> 底下 1,090 個檔，774 個（71.0%）落在出廠期。<code>easo\</code> 是 100%，本站另外留的原廠球場備份 <code>stadium - MVP2005原始\</code> 88／88 也是 100%；遊戲正在讀的 <code>stadium\</code> 換成 2023 年那包，只剩 34%，<code>database\</code> 只有 7%，球員名冊幾乎全換，那正是台灣模組動的地方。</li>
+    <li><strong>順手解掉的未解題</strong> BIGF 檔頭該用哪一種位元組順序。量了 295 個封裝檔，出廠期那一列 146 個 little-endian、big-endian <strong>掛零</strong>；2012 年以後那一列 142 個 little-endian、7 個 big-endian。同一台機器上兩份 <code>dodgnite.big</code>：2004-12-24 那份 little-endian，2013-10-19 那份 big-endian，同樣 88 個項目只有那一欄不同（現在遊戲正在讀的是 2013 那一份）。2026-09-05 用同一套量法重跑是 384 個封裝檔，出廠期 175 個 little-endian、<strong>big-endian 仍然掛零</strong>，結論沒有變。</li>
+    <li><strong>最容易踩的雷</strong> 看到 <code>.bak</code> 就以為這台被動過。剛安裝好的英文版原版裡就有一個 <code>data\igshapes\igcrsr.fsh.bak</code>，跟本尊同一秒（台北時間 2004-12-04 20:01:20，世界標準時間 12:01:20），是 EA 自己留下的；官方繁體中文版還多一個 <code>data\credits.BAK</code>（2005-02-17），一樣在出貨期內。要看的是時間戳，不是有沒有 <code>.bak</code>。</li>
+    <li><strong>時間戳會說謊，三種情況</strong> 有些複製方式不保留原始時間、模組作者可以刻意把時間改回 2005 年、有些工具只是讀過檔案卻順手整個重寫。所以這是地圖不是判決。</li>
+    <li><strong>「裝了中文包」跟「名單被換過」是兩件事</strong> 本站比對的那份 2023 年中文整合包，跟英文版原版之間有 65 個同名而大小不同的檔（字型 <code>fonts.big</code> 204 KB 變 1.68 MB、61 個 <code>frontend\</code> 檔等）——但那些<strong>幾乎都是 EA 官方繁體中文版本身就有的</strong>：拿它跟官方繁中版比，2,389 個同名檔沒有一個大小不同。而 <code>data\database\</code> 那 23 個檔在英文版、官方繁中版、這份整合包三邊逐位元組相同。這是某一份整合包的結果，不是每一份都這樣。</li>
+    <li><strong>安全網</strong> 腳本全程唯讀，整份只有讀取檔案屬性的呼叫，沒有一處寫入，不會修改、搬移或刪除任何檔案，也不連網。</li>
+    <li><strong>本站沒驗的</strong> 時間戳證明不了內容有沒有變，要確定只有拿兩份檔案逐位元組比對一途；原版那個 <code>.bak</code> 跟本尊差 428 個位元組，本站沒有進遊戲看那兩張游標差在哪；上面所有數字都是本站那一台機器的值，你自己那一份不一樣是正常的。</li>
+  </ul>
+
+  <h2 id="how-it-works">這支腳本在做什麼</h2>
+  <p>沒讀過程式碼也沒關係，這一段把它的流程講完。</p>
+  <p>它的原理只有一句話：<strong>修改時間還停在 2004 或 2005 年的檔案，
+     多半還是原廠那一份。</strong>判準就是底下那張表裡的 <code>SHIP_YEARS</code>，
+     整個 2004 年加整個 2005 年，不是某一段幾個月的區間。
+     程式把整個 <code>data</code> 走一遍，<u>只讀檔案屬性、不開任何一個檔的內容</u>，
+     把每個檔按年份分成「出廠期」與「後來被寫過」兩堆，
+     再按第一層資料夾統計比例，最後印成四段報告。</p>
+  <p>整份只有 <code>os.walk</code>、<code>os.stat</code>、<code>os.path.*</code> 這些讀取呼叫，
+     連一個 <code>open()</code> 都沒有，也不連網。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>哪一段</th><th>做什麼</th><th>為什麼要有它</th></tr></thead>
+    <tbody>
+      <tr><td data-label="哪一段"><code>SHIP_YEARS</code></td>
+          <td data-label="做什麼">出廠期的判準，目前是 <code>(2004, 2005)</code>。</td>
+          <td data-label="為什麼要有它">這是「是不是這兩個年份之一」的比對，
+              不是「介於兩者之間」，所以 2006 年的檔就不算出廠期。
+              放寬到整整兩年，是因為不同地區、不同版本的壓片日期不一樣。
+              改這兩個數字等於改掉整份報告的判準。</td></tr>
+      <tr><td data-label="哪一段"><code>scan()</code></td>
+          <td data-label="做什麼">用 <code>os.walk</code> 走一次資料夾，
+              對每個檔取最後修改時間換算成年份，
+              同時累加到「年份」與「第一層資料夾」兩份統計裡。</td>
+          <td data-label="為什麼要有它">只走一次是刻意的。走兩次的話，
+              萬一中間有東西變了，兩段報告會互相打架，而且沒有人看得出來。
+              掃到讀不了的檔就跳過那一個，不讓整份掃描斷在別人的一個壞檔上；
+              而且會在【1】底下講明跳過了幾個、是哪幾個，那些沒有算進比例。</td></tr>
+      <tr><td data-label="哪一段"><code>scan()</code> 裡記「最新被動過的一個」那個 <code>elif</code></td>
+          <td data-label="做什麼">只有「不在出廠期」的檔才會更新這個欄位，
+              比的是修改時間本身（<code>st_mtime</code>），不是只比年份。</td>
+          <td data-label="為什麼要有它">所以那一欄記的是<strong>最新的那個被動過的檔</strong>，
+              不是「這個資料夾裡最新的檔」。前者才是找模組時的線索起點。
+              比到秒是必要的：只比年份的話，同一年裡印出來的會是
+              「剛好第一個被走到的那個檔」，跟先後無關。
+              讀程式碼時要注意那是 <code>elif</code> 不是 <code>if</code>，
+              兩者印出來的東西完全不同。</td></tr>
+      <tr><td data-label="哪一段"><code>human()</code></td>
+          <td data-label="做什麼">把位元組數換成 KB、MB、GB。</td>
+          <td data-label="為什麼要有它">誠實說：目前沒有任何地方呼叫它。
+              <code>scan()</code> 確實有把每個資料夾的總位元組數累加起來，
+              但【3】那張表最後沒有印出那一欄。
+              這件事寫在它的說明字串裡，讀原始碼的人不用自己找一遍。</td></tr>
+      <tr><td data-label="哪一段"><code>main()</code> 開頭</td>
+          <td data-label="做什麼">讀路徑；如果那底下有 <code>data</code>，
+              就自動縮到 <code>data</code> 只掃它。</td>
+          <td data-label="為什麼要有它">外面那一層是安裝程式、說明檔與執行檔，
+              它們本來就不是判斷模組的線索，混進來只會把出廠期的比例稀釋掉。</td></tr>
+      <tr><td data-label="哪一段"><code>main()</code> 的【1】</td>
+          <td data-label="做什麼">印總檔數、出廠期檔數，以及兩者的百分比。</td>
+          <td data-label="為什麼要有它">一個數字就看得出這一份大概是什麼狀況。
+              本站測試機是 1,090 個檔裡 774 個落在出廠期，71.0%。</td></tr>
+      <tr><td data-label="哪一段"><code>main()</code> 的【2】</td>
+          <td data-label="做什麼">每一年幾個檔，用 <code>#</code> 畫成長條圖，
+              檔數最多的那一年當滿格 40 格。</td>
+          <td data-label="為什麼要有它">年份分布會直接把「這台裝過哪個年代的東西」攤開來。
+              長條至少畫一格，是為了讓只有一兩個檔的年份不要變成空白，
+              空白看起來像沒有資料，而不是「很少」。</td></tr>
+      <tr><td data-label="哪一段"><code>main()</code> 的【3】</td>
+          <td data-label="做什麼">依檔數由多到少，列出每個第一層資料夾的檔數、
+              出廠期檔數、比例，以及最新被動過的那一個檔。</td>
+          <td data-label="為什麼要有它">整份輸出裡最有用的一段。
+              比例接近 100% 的可以當比對基準，比例很低的就是裝過模組、要還原就從那裡找起。
+              資料夾那一欄是照<u>終端機的顯示寬度</u>切的（中文字算兩格），
+              所以名字裡有中文也不會把整張表推歪；最後一欄在行尾，照舊按字元數切掉尾巴。</td></tr>
+      <tr><td data-label="哪一段"><code>main()</code> 的【4】</td>
+          <td data-label="做什麼">印四行固定文字，教你怎麼讀上面三段。</td>
+          <td data-label="為什麼要有它">很多人只會把終端機的結果複製給別人看，
+              那時候網頁不在旁邊。所以「時間戳是地圖不是判決」這句話，
+              要跟著結果一起走。</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">這一支沒有備份也沒有還原功能，因為它從頭到尾沒有要寫任何東西。
+     做不到的事一起講清楚：時間戳是檔案的屬性、不是內容的雜湊，
+     它證明不了內容有沒有變；要確定只有逐位元組比對一途，
+     那是<a href="../../reference/how-we-measured.html">怎麼量的</a>那一頁的
+     <code>mvp_fingerprint.py</code> 在做的事。
+     它也分不出是誰改的，只知道某個檔的時間不在出廠期。
+     另外提醒一句：輸出<u>第一行</u>印的是你自己給的完整路徑，
+     整段貼給別人之前先把那一行遮掉（【3】那一欄的檔名是相對路徑，不帶你的帳號名）。</p>
+
+  <h2 id="source">完整原始碼</h2>
+  <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。不必下載也能先看過一遍。</p>
+  <details>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（337 行）</summary>
+<pre style="margin:10px 0 0">#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""mvp_check_original.py — 看看你的 MVP Baseball 2005 有哪些檔還沒被動過。
+
+    python3 mvp_check_original.py "遊戲安裝資料夾"
+
+原理只有一句話:遊戲資料夾裡凡是修改時間還停在 2004 或 2005 年的檔案,
+多半還是原廠那一份;時間比較新的,代表被某個東西寫過。
+
+判準是「年份是不是 2004 或 2005」(底下的 SHIP_YEARS),不是某一段幾個月的區間。
+放寬到整整兩年,是因為不同地區、不同版本的壓片日期不一樣,而且出廠期那一堆檔
+本來就散得很開:本站測試機那一份 data 重新掃過,被算成出廠期的檔最早是
+2004-05-04、最晚是 2005-02-09,其中 25 個早於 2004 年 12 月。
+剛安裝好的原版也一樣,它的 data 底下最早的檔是 2004-05-01。
+你自己那一份的數字不一樣是正常的。
+
+這支程式全程唯讀。它不會修改、搬移或刪除任何檔案,也不會連網。
+整份只有讀取檔案屬性的呼叫,沒有一處寫入。
+
+⚠️ 時間戳是線索,不是證據。三種情況會讓它說謊:
+   1. 有些複製方式不保留原始時間(檔案會變成「今天」)
+   2. 模組作者可以刻意把時間改回去
+   3. 工具只是讀過檔案卻順手重寫了一次,內容其實沒變
+   所以請把它當成「先看哪裡」的地圖,不要當成判決。
+
+── 輸入 ─────────────────────────────────────────────
+  一個路徑,指到遊戲的安裝資料夾。
+  如果那底下有 data,腳本就只掃 data:安裝程式、說明檔、執行檔本來就不是
+  判斷模組的線索,混進來只會把比例稀釋掉。
+  以 - 開頭的參數一律當旗標略過,所以 -h 與 --help 不會被誤當成路徑。
+
+── 輸出 ─────────────────────────────────────────────
+  只印到畫面,不產生任何檔案:
+    【1】總共幾個檔,其中幾個落在出廠期,佔幾成;
+         如果有路徑讀不進去(權限不足或掃描當下被鎖住),會在這一段
+         底下列出來並講明「沒有算進上面那個比例」。
+    【2】每一年各有幾個檔,附一條 # 長條圖
+    【3】各個第一層子資料夾:檔數、出廠期檔數、比例,
+         以及「最新被動過的那一個檔」(比的是修改時間,不是只比年份)
+    【4】怎麼讀這份結果
+  結束碼:0 = 跑完了或印出說明,1 = 路徑不存在、資料夾裡沒有檔案,
+  或那個資料夾整個讀不進去。
+  ⚠️ 開頭那一行「掃描 …」印的是你自己給的完整路徑。如果遊戲裝在
+     你的家目錄（帳號名那一層） 這種地方,把整段輸出貼給別人之前記得先遮掉;
+     【3】那一欄的檔名是相對路徑,不帶你的帳號名。
+
+── 安全網在哪 ───────────────────────────────────────
+  不需要,因為它沒有可以出錯的動作:整份只有 os.walk、os.stat、os.path.*
+  這些讀取呼叫,連一個 open() 都沒有,不寫入、不刪除、不搬移,也不連網。
+  (另外用 unicodedata 算中文字在終端機佔幾格,那個只看字串,不碰檔案。)
+
+── 做不到的事 ───────────────────────────────────────
+  · 證明不了內容有沒有變。時間戳是檔案的屬性,不是內容的雜湊;
+    要確定只有逐位元組比對一途(本站的 mvp_fingerprint.py 做那件事)。
+  · 分不出是誰改的。它只知道某個檔的時間不在出廠期,不知道是哪個模組寫的。
+  · 只分到第一層子資料夾。frontend 底下再分幾層,全部算進 frontend 那一列。
+  · 它讀的是「最後修改時間」。有些系統另外還記著建立時間,這支不看那一個。
+  · 讀不進去的路徑不會被算進來。它不會安靜地跳過去 —— 有幾個、是哪幾個
+    都印在【1】底下,但那些檔的年份確實不在統計裡,比例是「讀得到的那些」
+    算出來的。
+
+授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
+"""
+#
+# ─────────────────────────────────────────────────────────
+#  法律與免責(每一支本站腳本都帶著這一段)
+#
+#  · 本工具與 Electronic Arts 無任何官方關聯,也未經其授權或背書。
+#    MVP Baseball 2005 為 Electronic Arts 之作品與商標。
+#  · 本工具為原創程式碼,**不含任何 EA 的程式碼或資產**。
+#  · 本工具不提供、不教學、也不包含任何規避技術保護措施的功能。
+#  · 使用者應僅對自己合法取得的遊戲副本使用本工具,並自行承擔風險。
+#    使用前請自行確認你與遊戲發行商之間的使用者授權合約(EULA)。
+#  · 本工具按「現狀」提供,不附任何明示或默示的擔保。
+#  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
+#  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
+#    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
+#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+# ─────────────────────────────────────────────────────────
+import os
+import sys
+import time
+import unicodedata
+
+# ── 輸出編碼(繁體中文 Windows 專用的一道保險)──────────────
+# 繁中 Windows 的預設編碼是 cp950,編不出 ✅ ⚠ ✗ 這些符號。
+# 直接在主控台跑不會有事(Python 走 Windows 的 Unicode API),
+# 但只要把輸出導到檔案或接管線 —— 而那正是新手最常被教的存檔方式:
+#     python3 這支腳本.py "你的遊戲資料夾" &gt; 結果.txt
+# —— 就會 UnicodeEncodeError,而且是「跑到一半才炸」,
+# 前面印出來的東西看起來都好好的,更難判斷發生什麼事。
+try:
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+except Exception:
+    pass   # Python 3.6 以前沒有 reconfigure;那就維持原樣,不要為了保險而炸掉
+
+
+# 遊戲出貨的時間範圍。放寬到整個 2004 與 2005 年,
+# 因為不同地區、不同版本的壓片日期不一樣。
+# 底下是用 `y in SHIP_YEARS` 比對,也就是「是不是這兩個年份之一」,
+# 不是「介於兩者之間」;2006 年的檔就不算出廠期了。
+# 這兩個數字決定【1】那個百分比,改它等於改掉整份報告的判準。
+SHIP_YEARS = (2004, 2005)
+
+
+def human(n):
+    """把位元組數換成人看得懂的單位。1 KB 一律當 1024 bytes 算。
+
+    ⚠️ 目前這支腳本沒有任何地方呼叫它:scan() 確實把每個資料夾的總位元組數
+       累加在 d['bytes'] 裡,但【3】那張表最後沒有印出那一欄。
+       寫在這裡是為了讓讀原始碼的人不用自己找一遍。
+    """
+    # 逐級除以 1024,除到數字小於 1024 或者已經升到 GB 為止。
+    for unit in ('bytes', 'KB', 'MB', 'GB'):
+        if n &lt; 1024 or unit == 'GB':
+            # bytes 印整數(位元組再切小數沒有意義),其他單位印一位小數。
+            return '%.1f %s' % (n, unit) if unit != 'bytes' else '%d bytes' % n
+        n /= 1024.0
+
+
+def pad(s, width, right=False):
+    """把字串補到指定的「顯示寬度」,超出就切掉尾巴。中文字算兩格。
+
+    不能直接用 '%-16s':那個數的是字元數,一個中文字算一格,
+    但終端機上它佔兩格 —— 只要資料夾名有中文(台灣模組包很常見,
+    像 `fonts - 舊版備份`),整張表就會被推歪。
+    east_asian_width 回 'W'(寬)或 'F'(全形)的字算兩格,其餘算一格。
+    """
+    w = 0
+    kept = []
+    for ch in s:
+        cw = 2 if unicodedata.east_asian_width(ch) in ('W', 'F') else 1
+        if w + cw &gt; width:
+            break        # 切在中文字的前面,不會切出半個字
+        kept.append(ch)
+        w += cw
+    fill = ' ' * (width - w)
+    return fill + ''.join(kept) if right else ''.join(kept) + fill
+
+
+def scan(root):
+    """回傳 {子資料夾: {'n':檔數, 'ship':出廠期檔數, 'bytes':總大小,
+                        'newest':(修改時間, 年, 相對路徑) 或 None}}
+
+    第二個回傳值是 {年份: 檔數},給【2】那張長條圖用。
+    第三個回傳值是「讀不進去而被跳過的路徑」清單(相對於 root)。
+    整個函式只呼叫 os.walk 與 os.stat,一個檔案的內容都沒有打開。
+    """
+    out = {}
+    years = {}
+    skipped = []
+
+    def note(p):
+        # os.walk 預設會把讀不進去的資料夾「整個安靜地跳過」。
+        # 對這支腳本特別致命:它的產出就是一個百分比,少算的檔不會留下痕跡,
+        # 讀者看到的比例是錯的而他不會知道。所以全部收起來,最後印出來。
+        # 存相對路徑而不是絕對路徑:這份輸出很多人會整段貼給別人看。
+        try:
+            rel = os.path.relpath(p, root)
+        except (ValueError, TypeError):
+            # ValueError:Windows 跨磁碟機時 relpath 會丟例外。
+            # TypeError:例外物件沒有 filename(p 是 None)。
+            rel = str(p)
+        # relpath 會把 root 自己算成 '.',單獨印一個點沒有人看得懂。
+        skipped.append('(你給的那個資料夾本身)' if rel == '.' else rel)
+
+    # onerror 收的是「打不開這個資料夾」;底下 os.stat 的 except 收的是
+    # 「這一個檔的屬性讀不到」。兩種都要記,不然比例會靜靜地少算。
+    walk = os.walk(root, onerror=lambda e: note(getattr(e, 'filename', None)))
+    for dirpath, dirnames, filenames in walk:
+        # 就地改寫 dirnames 是 os.walk 的用法:改這個 list 才會讓它不要走進去,
+        # 把新的 list 指派給別的名字沒有用。
+        # 跳過 . 開頭是為了略過 .git 這類跟遊戲無關的東西,它們會把年份分布拉歪。
+        dirnames[:] = [d for d in dirnames if not d.startswith('.')]
+        for fn in filenames:
+            # 檔案同理,略過 .DS_Store 這種作業系統自己產生的。
+            if fn.startswith('.'):
+                continue
+            p = os.path.join(dirpath, fn)
+            try:
+                st = os.stat(p)
+            except OSError:
+                # 權限不足、連結斷掉、掃到一半檔案被刪掉:
+                # 跳過這一個就好,不要讓整份掃描中斷在別人的一個壞檔上。
+                # 但要記下來 —— 跳過幾個檔就是少算幾個檔。
+                note(p)
+                continue
+            # st_mtime 是「最後修改時間」,用本機時區換算成年份。
+            # 跨時區看同一份檔案,12/31 與 1/1 的檔可能被分到不同年;
+            # 對這個用途無所謂,因為判準是「2004-2005 還是更後面」。
+            y = time.localtime(st.st_mtime).tm_year
+            years[y] = years.get(y, 0) + 1
+            rel = os.path.relpath(dirpath, root)
+            # 只取第一層資料夾名當分組。stadium\a\b\c.big 一律算進 stadium 那一列,
+            # 因為玩家換模組的單位就是「哪一個資料夾」,不是「第幾層」。
+            top = rel.split(os.sep)[0] if rel != '.' else '(根目錄)'
+            d = out.setdefault(top, {'n': 0, 'ship': 0, 'bytes': 0, 'newest': None})
+            d['n'] += 1
+            d['bytes'] += st.st_size
+            if y in SHIP_YEARS:
+                d['ship'] += 1
+            elif d['newest'] is None or st.st_mtime &gt; d['newest'][0]:
+                # 注意這是 elif:出廠期的檔永遠不會更新 newest。
+                # 所以 newest 記的是「最新的那個被動過的檔」,
+                # 不是「這個資料夾裡最新的檔」。前者才是讀者要找的線索起點。
+                # 比的是 st_mtime 不是年份:同一年裡也要挑真正最後被寫過的那一個,
+                # 只比年份的話會變成「那一年裡剛好第一個被走到的檔」,跟先後無關。
+                d['newest'] = (st.st_mtime, y, os.path.relpath(p, root))
+    return out, years, skipped
+
+
+def main():
+    """讀參數、掃一次資料夾,然後把四段報告印出來。"""
+    # 這裡濾的是單一個 '-' 開頭(姊妹腳本 mvp_check_setup.py 濾的是 '--'),
+    # 所以 -h 與 --help 都不會被誤當成路徑。
+    args = [a for a in sys.argv[1:] if not a.startswith('-')]
+    if '--help' in sys.argv or '-h' in sys.argv or not args:
+        # 沒給路徑,跟明講要看說明,都印檔頭那份文件。
+        # 這裡回 0 不是 1:使用者問用法而他得到了用法,那不是錯誤。
+        print(__doc__)
+        return 0
+
+    root = args[0]
+    # 給的是安裝資料夾的話就自動縮到 data:遊戲的內容都在那裡,
+    # 外面那層是安裝程式與說明檔,混進來只會把出廠期的比例稀釋掉。
+    data = os.path.join(root, 'data')
+    if os.path.isdir(data):
+        root = data
+        print('  找到 data 資料夾,只掃它。')
+    elif not os.path.isdir(root):
+        print('  找不到這個資料夾:%s' % root)
+        print('  請把遊戲安裝資料夾的完整路徑放在後面,例如:')
+        print('    python3 mvp_check_original.py "C:\\Program Files (x86)\\EA SPORTS\\MVP Baseball 2005"')
+        return 1
+
+    print('  掃描 %s' % root)
+    print()
+    # 只走一次資料夾,四段報告全部從這一次的結果算出來。
+    # 走兩次的話,萬一中間有東西變了,兩段報告會互相打架而且沒人看得出來。
+    out, years, skipped = scan(root)
+    total = sum(d['n'] for d in out.values())
+    ship = sum(d['ship'] for d in out.values())
+    if not total:
+        if skipped:
+            # 一個檔都沒讀到、而且掃描過程有東西讀不進去 —— 那是權限問題,
+            # 不是路徑問題。講成「路徑可能給錯了」會害讀者去改一個沒有錯的路徑。
+            print('  這裡一個檔都讀不到,但不是空的:有 %d 個路徑因為權限不足'
+                  % len(skipped))
+            print('  或掃描當下被鎖住而跳過:')
+            for rel in sorted(skipped)[:5]:
+                print('       · %s' % rel)
+            if len(skipped) &gt; 5:
+                print('       · …還有 %d 個沒列出來。' % (len(skipped) - 5))
+            print('  先確認你對它有讀取權限,路徑不必改')
+            print('  (Windows 可以改用「以系統管理員身分執行」再跑一次)。')
+        else:
+            print('  這個資料夾裡沒有檔案。路徑可能給錯了。')
+        return 1
+
+    print('  【1】整體')
+    print('    共 %d 個檔,其中 %d 個的時間落在 %d-%d 年(%.1f%%)。'
+          % (total, ship, SHIP_YEARS[0], SHIP_YEARS[1], ship * 100.0 / total))
+    if skipped:
+        # 少算的檔一定要講出來,不然上面那個百分比是錯的而沒有人看得出來。
+        print('    ⚠️ 另有 %d 個路徑讀不進去(權限不足或掃描當下被鎖住),'
+              % len(skipped))
+        print('       沒有算進上面這個比例:')
+        for rel in sorted(skipped)[:5]:   # 排序過,同一台機器重跑列出來的是同幾個
+            print('       · %s' % rel)
+        if len(skipped) &gt; 5:
+            print('       · …還有 %d 個沒列出來。' % (len(skipped) - 5))
+    print()
+
+    print('  【2】各年份有幾個檔')
+    # 長條圖以「檔數最多的那一年」當滿格 40 個 #,其他年份照比例縮。
+    top = max(years.values())
+    for y in sorted(years):
+        mark = ' ← 出廠期' if y in SHIP_YEARS else ''
+        # max(1, ...) 保證只有一兩個檔的年份也看得到一格。
+        # 少了這個保護,那些年會變成空白,看起來像沒有資料而不是「很少」。
+        bar = '#' * max(1, int(round(years[y] * 40.0 / top)))
+        print('    %d  %5d  %s%s' % (y, years[y], bar, mark))
+    print()
+
+    print('  【3】各資料夾')
+    # 整份輸出裡最有用的一段。依檔數由多到少排,量體大的資料夾先看到。
+    print('    %s %s %s %s   %s'
+          % (pad('資料夾', 16), pad('檔數', 6, True), pad('出廠期', 8, True),
+             pad('比例', 7, True), '最新被動過的一個'))
+    for k, d in sorted(out.items(), key=lambda x: -x[1]['n']):
+        pct = d['ship'] * 100.0 / d['n']
+        # newest 只有在出現過「非出廠期」的檔時才有值(否則是 None),
+        # 所以沒值就代表這個資料夾整個沒被動過。
+        newest = '%d 年 %s' % (d['newest'][1], d['newest'][2]) if d['newest'] else '(全是出廠期)'
+        # 資料夾欄用 pad() 依「顯示寬度」切到 16 格 —— 中文字佔兩格,
+        # 用 %-16s 只要名字有中文就會歪掉。最後一欄在行尾,不影響對齊,
+        # 所以照舊用字元數硬切 44。切掉的都是尾巴,前面那段通常就夠認人。
+        print('    %s %6d %8d %6.0f%%   %s' % (pad(k, 16), d['n'], d['ship'], pct, newest[:44]))
+    print()
+
+    # 最後這一段是固定文字,不是算出來的。放進輸出而不是只寫在網頁上,
+    # 是因為很多人只會把終端機的結果複製給別人看,那時候網頁不在旁邊。
+    print('  【4】怎麼讀這份結果')
+    print('    比例接近 100% 的資料夾:大概沒被動過,可以當成比對的基準。')
+    print('    比例很低的資料夾:裝過模組。要還原就從這裡找。')
+    print('    ⚠️ 時間戳會說謊 —— 有些複製方式不保留時間,也有人會刻意改。')
+    print('       這是「先看哪裡」的地圖,不是判決。')
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
+
+# ─────────────────────────────────────────────────────────
+#  MIT License
+#
+#  Copyright (c) 2026 toni
+#
+#  Permission is hereby granted, free of charge, to any person obtaining a copy
+#  of this software and associated documentation files (the "Software"), to deal
+#  in the Software without restriction, including without limitation the rights
+#  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#  copies of the Software, and to permit persons to whom the Software is
+#  furnished to do so, subject to the following conditions:
+#
+#  The above copyright notice and this permission notice shall be included in
+#  all copies or substantial portions of the Software.
+#
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#  THE SOFTWARE.
+# ─────────────────────────────────────────────────────────
+</pre>
+  </details>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../backup/index.html">備份與還原 SOP</a> —— 知道哪些沒動過之後，下一步是把該備份的備份好</li>
+    <li><a href="../../reference/file-map.html">檔案地圖</a> —— 每個資料夾裝什麼</li>
+    <li><a href="../../reference/bigf.html">BIGF 封裝格式</a> —— 上面那個位元組順序的完整說明</li>
+  </ul>
+
+  <footer>
+    <p>本頁的所有數字都是在一台實際安裝過台灣模組的機器上量的，
+       用的就是本頁提供的那支腳本。你自己那一份的數字會不一樣，那是正常的。
+       時間戳是線索不是證據，本頁已列出三種它會說謊的情況。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../../legal.html">法律與版權說明</a> ·
+       <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/anims.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>動畫 anims.big — toni的MVP模組補習班</title>
+<meta name="description" content="MVP Baseball 2005 的動畫檔：243 個動作庫、純文字的建置清單，以及 .ord 與 .orl 其實是同一個檔案被切成兩半的證據。所有數字現場量測。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 動畫 anims.big</p>
+  <h1>動畫 anims.big</h1>
+  <p class="lede">投球、揮棒、守備、跑壘的每一個動作，全部在一個 8.5 MB 的檔案裡。
+     這一區有個很特別的地方：<strong>730 個項目裡有 244 個是純文字，其餘是標準格式的目標檔</strong> ——
+     所以你電腦上現成的工具就讀得動。</p>
+
+  <div class="card grass">
+    <p class="card-h">這一頁講的是原廠檔案</p>
+    <p>本站測試機的 <code>anims.big</code> 檔案日期是 <strong>2005 年 1 月</strong>，
+       沒有被改過（判斷方法見<a href="models.html">模型那頁</a>）。
+       所以這頁描述的是 EA 出貨時的樣子。</p>
+  </div>
+
+  <h2>先看規模</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>項目</th><th class="num">數字</th><th>備註</th></tr></thead>
+    <tbody>
+      <tr><td data-label="項目">檔案大小</td><td data-label="數字" class="num">8.5 MB</td><td data-label="備註"><code>data/anims/anims.big</code></td></tr>
+      <tr><td data-label="項目">項目數</td><td data-label="數字" class="num">730 個</td><td data-label="備註">244 個 <code>.axt</code> ＋ 243 個 <code>.ord</code> ＋ 243 個 <code>.orl</code></td></tr>
+      <tr class="hi"><td data-label="項目">動作庫（bank）</td><td data-label="數字" class="num">243 個</td><td data-label="備註">每個 bank 三個檔</td></tr>
+      <tr class="hi"><td data-label="項目">動畫檔總數</td><td data-label="數字" class="num">2,024 個</td><td data-label="備註">由建置清單加總得出；其中 <code>sd_dugupset_int02_03a</code> 被兩個庫各列一次，不重複的名字是 2,023 個</td></tr>
+      <tr><td data-label="項目">壓縮</td><td data-label="數字" class="num">0 個</td><td data-label="備註"><strong>這個封裝檔完全沒有壓縮</strong>，跟遊戲裡其他地方都不一樣</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">上面每個數字都是把 <code>anims.big</code> 現場打開數出來的，不是引用他人資料。</p>
+
+  <h2 id="extra">多出來的那一個檔</h2>
+  <p>244 個 <code>.axt</code> 對 243 個 <code>.ord</code>，多出來的叫 <code>Banklist.axt</code>。
+     它只有 <strong>42 個位元組</strong>，內容是一行字：</p>
+<pre><code>CLOSE_UP DEF_BANK FACIAL HANDBANK MIDDLE</code></pre>
+  <p>243 個 bank 裡，只有這 5 個被列在清單上。
+     實測這 5 個<strong>正好就是動畫數量最多的前 5 名</strong>，一個不差。
+     <span class="badge wip">未確認</span> 但清單的用途是什麼，本站沒有查出來。</p>
+
+  <h2><code>.axt</code>：直接就是純文字</h2>
+  <p>不用解壓、不用工具，記事本打開就能看（244 個 <code>.axt</code> 加起來只有 156,755 個位元組，佔整包的 1.75%）：</p>
+<pre><code>[Version 0.03]
+	1103890691	Dec 24 2004 04:18:11        <span class="cm">這個 bank 何時打包</span>
+
+[Bank]
+	CLOSE_UP                            <span class="cm">bank 名稱</span>
+
+[Directory]
+	D:/mvp2004/artwork/anims            <span class="cm">當年的來源路徑</span>
+
+[Files] 84                              <span class="cm">這個 bank 裝了 84 個動畫</span>
+	u_readyidle          1103876064	Dec 24 2004 00:14:24
+	sb_strike04          1103875954	Dec 24 2004 00:12:34
+	sb_strike03          1103875954	Dec 24 2004 00:12:34
+	...</code></pre>
+
+  <div class="tablewrap"><table>
+    <thead><tr><th>檢查 243 個 <code>.axt</code></th><th class="num">結果</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td>版本標記</td><td class="num">全部是 <code>0.03</code></td></tr>
+      <tr class="hi"><td>來源目錄</td><td class="num">全部是 <code>D:/mvp2004/artwork/anims</code></td></tr>
+      <tr><td>打包時間範圍</td><td class="num">2 分 36 秒</td></tr>
+    </tbody>
+  </table></div>
+  <p>243 個 bank 全部在 <strong>2 分 36 秒</strong>內打包完（本地時間 04:17:57 到 04:20:33）。
+     而裡面的動畫檔本身是<strong>四個小時前</strong>編譯的 ——
+     這段時間差的故事在<a href="../story/build-2004/index.html">平安夜凌晨的兩次建置</a>。</p>
+
+  <h2>最重要的發現：<code>.ord</code> 跟 <code>.orl</code> 是同一個檔被切成兩半</h2>
+  <p>先看 <code>.ord</code> 的開頭四個位元組：</p>
+<pre><code>7F 45 4C 46      <span class="cm">= .ELF ← 這是標準的目標檔格式,不是 EA 私有格式</span></code></pre>
+  <p>但如果你直接拿 ELF 工具去讀它，會失敗。原因是檔頭裡寫著
+     「section 表在第 342,176 個位元組」，<strong>而整個 <code>.ord</code> 只有 327,776 個位元組</strong>。
+     指到檔案外面去了。</p>
+
+  <div class="card grass">
+    <p class="card-h">把兩個檔接起來就對了</p>
+    <p><code>.ord</code> 的長度 327,776 ＋ <code>.orl</code> 的長度 14,640 ＝ <strong>342,416</strong>。
+       342,176 落在這個範圍內。</p>
+    <p>本站把 <strong>243 個 bank 全部接起來測試</strong>：
+       <strong>243 / 243 都變成可以正常解析的 ELF</strong>，section 名稱全部合法，一個例外都沒有。</p>
+  </div>
+
+  <p>接起來之後，裡面是這樣：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">section</th><th>裝什麼</th><th class="num">CLOSE_UP 的大小</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="section" class="mono">.data</td><td data-label="裝什麼">動畫資料本體</td><td data-label="CLOSE_UP 的大小" class="num">327,712</td></tr>
+      <tr><td data-label="section" class="mono">.shstrtab</td><td data-label="裝什麼">section 的名字</td><td data-label="CLOSE_UP 的大小" class="num">48</td></tr>
+      <tr><td data-label="section" class="mono">.strtab</td><td data-label="裝什麼">符號的名字</td><td data-label="CLOSE_UP 的大小" class="num">80</td></tr>
+      <tr><td data-label="section" class="mono">.symtab</td><td data-label="裝什麼">符號表</td><td data-label="CLOSE_UP 的大小" class="num">64</td></tr>
+      <tr><td data-label="section" class="mono">.rel.data</td><td data-label="裝什麼">重定位資料</td><td data-label="CLOSE_UP 的大小" class="num">14,208</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card amber">
+    <p class="card-h">切割點是有規則的</p>
+    <p><strong><code>.ord</code> 的長度，剛好等於 <code>.data</code> 這一段結束的位置。</strong>
+       243 個 bank 全部符合，零例外。</p>
+    <p>換句話說，EA 把一個完整的目標檔<strong>從資料結束的地方切開</strong>：
+       前半段（資料）叫 <code>.ord</code>，後半段（各種表格）叫 <code>.orl</code>。</p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">這對你有什麼用</p>
+    <p>接起來之後，<strong>你電腦上現成的 ELF 工具就讀得動</strong>，
+       不必自己寫解析器。想看某個 bank 有哪些符號、資料多大、重定位表多長，
+       用系統內建的工具就有答案。</p>
+    <p>這在逆向裡是難得的好運：<strong>大部分遊戲資料都是廠商自己發明的格式，
+       這裡卻是業界標準。</strong></p>
+  </div>
+
+  <h2>ELF 檔頭透露的事</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>欄位</th><th class="num">243 個 bank 的值</th><th>意思</th></tr></thead>
+    <tbody>
+      <tr><td data-label="欄位" class="mono">e_type</td><td data-label="243 個 bank 的值" class="num">1</td><td data-label="意思">可重定位目標檔（還沒連結成執行檔的中間產物）</td></tr>
+      <tr class="hi"><td data-label="欄位" class="mono">e_machine</td><td data-label="243 個 bank 的值" class="num">8</td><td data-label="意思"><strong>MIPS 架構</strong></td></tr>
+      <tr><td data-label="欄位">section 數</td><td data-label="243 個 bank 的值" class="num">6</td><td data-label="意思">243 個全部一樣</td></tr>
+      <tr><td data-label="欄位">符號數</td><td data-label="243 個 bank 的值" class="num">4</td><td data-label="意思">243 個全部一樣</td></tr>
+    </tbody>
+  </table></div>
+  <p>每個 bank 的四個符號裡，有兩個是看得懂的：</p>
+<pre><code>__EAGL_TOOLLIB_VERSION:::EAGL_TOOLLIB_VERSION-4
+__AnimationBank:::CLOSE_UP</code></pre>
+  <div class="card clay">
+    <p class="card-h">這裡要誠實</p>
+    <p><code>e_machine = 8</code> 在 ELF 規格裡就是 MIPS，這是<strong>讀出來的事實</strong>。</p>
+    <p>至於「為什麼 PC 版的遊戲資料是 MIPS 架構的目標檔」——
+       合理的猜想跟同期主機平台有關，
+       <span class="badge wip">推測</span> 但本站沒有證據，不寫成定論。</p>
+  </div>
+
+  <h2 id="wholegame">整個遊戲有多少這種檔</h2>
+  <p>上面講的是 <code>anims.big</code>。本站把原版<strong>全部 207 個封裝檔、29,816 個項目</strong>
+     逐一解開，看哪些的開頭是 <code>7F 45 4C 46</code>：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">封裝檔</th><th class="num">是 ELF 的項目</th><th>裝什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="封裝檔" class="mono">data\models.big</td><td data-label="是 ELF 的項目" class="num">549</td><td data-label="裝什麼">球員模型</td></tr>
+      <tr><td data-label="封裝檔" class="mono">data\anims\anims.big</td><td data-label="是 ELF 的項目" class="num">243</td><td data-label="裝什麼">動作庫（本頁上面在講的）</td></tr>
+      <tr class="hi"><td data-label="封裝檔" class="mono">data\stadium\*.big</td><td data-label="是 ELF 的項目" class="num">87 × 31 ＝ 2,697</td><td data-label="裝什麼">球場</td></tr>
+      <tr><td data-label="封裝檔" class="mono">data\misc\miscmod.big</td><td data-label="是 ELF 的項目" class="num">14</td><td data-label="裝什麼">雜項模型</td></tr>
+      <tr class="hi"><td data-label="封裝檔"><strong>合計</strong></td><td data-label="是 ELF 的項目" class="num"><strong>3,503</strong></td><td data-label="裝什麼"></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card grass">
+    <p class="card-h">87 個球場封裝檔，每一個剛好 31 個</p>
+    <p><strong>零變異。</strong>不是「大部分是 31」，是 87 個檔全部剛好 31，
+       一個 30 或 32 都沒有。</p>
+    <p class="small">87 是<u>檔數不是場地數</u>：檔名去掉 <code>day</code>／<code>nite</code> 之後只剩
+       <strong>58 個場地代號</strong>，其中 29 個日夜各一份、29 個只有一份
+       （<code>astrdome</code>、<code>metrdome</code>、<code>olymdome</code>、<code>tropdome</code>
+       這幾個巨蛋就在後面這半），29 × 2 ＋ 29 ＝ 87。</p>
+    <p>球場之間差很多 —— 有巨蛋、有露天、有 1900 年代的老球場 ——
+       可是<u>模型檔的數量一模一樣</u>。
+       這代表 EA 有一套固定的球場模型清單，每個檔照著填。
+       <span class="badge wip">哪 31 個各是什麼，本站還沒對照出來</span></p>
+  </div>
+
+  <h3>3,503 個裡面，只有 14 個是完整的</h3>
+  <p>本頁上面說 <code>.ord</code> 的段落表指到檔案外面去，要接上 <code>.orl</code> 才完整。
+     把這個判斷套到全部 3,503 個身上：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>段落表在哪</th><th class="num">幾個</th><th>意思</th></tr></thead>
+    <tbody>
+      <tr><td data-label="段落表在哪">指到檔案外面</td><td data-label="幾個" class="num">3,489</td><td data-label="意思">要接上另一半</td></tr>
+      <tr class="hi"><td data-label="段落表在哪">落在自己檔內</td><td data-label="幾個" class="num"><strong>14</strong></td><td data-label="意思">本身就是完整的 ELF</td></tr>
+    </tbody>
+  </table></div>
+  <p>那 14 個<strong>全部在 <code>data\misc\miscmod.big</code> 裡</strong>，
+     而那個檔的 ELF 項目<u>剛好就是這 14 個</u> ——
+     換句話說：<strong>miscmod.big 裡 100% 是完整的，其他所有封裝檔 0%。</strong></p>
+<pre><code><span class="cm">miscmod.big 裡那 14 個</span>
+aple.o   bern.o   bli1.o   bli2.o   lawn.o   moon.o   obj1.o
+obj2.o   obj3.o   obj4.o   pla1.o   pla2.o   roof.o   tran.o</code></pre>
+  <p class="small">看名字像是場景裡的雜物（草皮、月亮、屋頂、植物之類），
+     但本站<u>沒有把它們畫出來對照過</u>，所以只講檔名長什麼樣。
+     <span class="badge wip">內容未驗</span></p>
+
+  <div class="card blue">
+    <p class="card-h">這 14 個的價值在哪</p>
+    <p>它們證明<strong>「切成兩半」不是這個格式的規定</strong>。
+       同一款遊戲、同一個工具鏈、同樣是 MIPS 目標檔，
+       這 14 個就是整個放進去的。</p>
+    <p>所以拆開 <code>.ord</code>／<code>.orl</code> 這件事，
+       是 EA 針對<u>某些用途</u>做的選擇，不是格式逼他們這麼做。
+       <span class="badge wip">為什麼只有這一個檔例外，本站沒有答案</span></p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">3,503 個全部是 MIPS</p>
+    <p><code>e_machine</code> 這個欄位在 3,503 個裡面<strong>全部都是 8</strong>，
+       一個例外都沒有 —— 不只 <code>anims.big</code> 的 243 個，
+       球場、球員模型、雜項模型也全是。</p>
+    <p>上面那段「為什麼 PC 版的資料是 MIPS」的疑問，
+       範圍因此從動作庫擴大到<u>整個遊戲的模型資料</u>。
+       答案還是<span class="badge wip">未解</span>。</p>
+  </div>
+
+
+  <h2>243 個 bank 怎麼分</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th class="mono">名稱</th><th class="num">bank 數</th><th class="num">動畫數</th><th>說明</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td class="mono">DEF_BANK</td><td class="num">1</td><td class="num">1,052</td>
+          <td><strong>一個 bank 就裝了全部 2,024 個動畫的一半以上</strong>，3.08 MB</td></tr>
+      <tr><td class="mono">CLOSE_UP</td><td class="num">1</td><td class="num">84</td><td>特寫鏡頭</td></tr>
+      <tr><td class="mono">MIDDLE</td><td class="num">1</td><td class="num">50</td><td></td></tr>
+      <tr><td class="mono">FACIAL</td><td class="num">1</td><td class="num">48</td><td>表情</td></tr>
+      <tr><td class="mono">HANDBANK</td><td class="num">1</td><td class="num">16</td><td></td></tr>
+      <tr class="hi"><td class="mono">SIGB####</td><td class="num">66</td><td class="num" rowspan="2">536</td>
+          <td rowspan="2"><strong>打擊與投球的姿勢庫</strong>。<code>SIGB</code> 檔名裡是 <code>b_</code> 開頭，
+              <code>SIGP</code> 則對應投球　<span class="badge wip">命名佐證</span></td></tr>
+      <tr><td class="mono">SIGP####</td><td class="num">59</td></tr>
+      <tr><td class="mono">N 開頭各系列</td><td class="num">113</td><td class="num">—</td>
+          <td><code>NFHA</code>／<code>NDMGR</code>／<code>NBDECK</code> 等，多數只有 1～2 個動畫</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card blue">
+    <p class="card-h">125 個專屬動作庫，多數掛著球員名字</p>
+    <p><code>SIGB</code> 66 個加 <code>SIGP</code> 59 個 ＝ <strong>125 個專屬 bank</strong>，共 536 個動畫檔。</p>
+    <p class="small">（2026-09-05 訂正：這一格原本寫「125 位球員有自己的動作」，那是錯的。
+       把 125 個庫的動作檔名全部列出來看，通篇掛著球員名字的是 <strong>102 個</strong>；
+       另外 23 個裝的是通用姿勢與投法 —— <code>SIGB0000</code>–<code>SIGB0006</code> 是共用的打擊擺動
+       （<code>b_gwiggle</code>、<code>b_bwiggle</code>、<code>b_clwiggle</code> 這種，
+       其中 <code>SIGB0000</code> 裡混了一個 <code>b_jedmondshrtofirst_l</code>）、<code>SIGP0000</code>–<code>SIGP0009</code>
+       是上肩／側投／下勾／蝴蝶球這類投法通稱（<code>p_stlosubmarinelo</code>、<code>p_loloknucklelo</code>）、
+       再加 <code>cooperstown01</code>–<code>03</code> 的泛用填充各兩組。）</p>
+    <p>打開其中最大的那個（<code>SIGB0014</code>，15 個動畫）會看到這些檔名：
+       <code>b_ichirowiggle</code>、<code>b_ichirotobpreswing</code>、<code>b_ichiroswinglos</code>。
+       <strong>連準備動作的小晃動都單獨做了一個。</strong></p>
+  </div>
+
+  <h2>能改到什麼程度</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>你可能想做的事</th><th>現況</th></tr></thead>
+    <tbody>
+      <tr><td>知道某個 bank 裝了哪些動畫</td>
+          <td><span class="badge ok">完全可改</span> <code>.axt</code> 是純文字，直接讀</td></tr>
+      <tr><td>用標準工具檢視 bank 結構</td>
+          <td><span class="badge ok">完全可改</span> 接起 <code>.ord</code>＋<code>.orl</code> 即可</td></tr>
+      <tr><td>改動作本身（揮棒姿勢、投球姿勢）</td>
+          <td><span class="badge wip">未解</span> <code>.data</code> 裡的動畫資料本站未解讀</td></tr>
+      <tr><td>幫新球員加專屬動作</td>
+          <td><span class="badge wip">未解</span> 同上，且需要處理重定位表</td></tr>
+    </tbody>
+  </table></div>
+  <div class="card clay">
+    <p class="card-h">誠實邊界</p>
+    <p>本站解出的是<strong>外層容器</strong>：bank 怎麼組織、檔案怎麼切、符號叫什麼。
+       <code>.data</code> 裡面那 327,712 個位元組實際代表什麼骨架、什麼影格，
+       <strong>本站沒有解讀</strong>。</p>
+    <p>所以目前這一頁的價值是「看得懂結構」，不是「改得動動作」。</p>
+  </div>
+
+  <h2 id="names">動作的名字讀得出來</h2>
+  <p>每個動作庫（<code>.axt</code>）都是純文字，裡面就是一份動作清單。
+     而這份清單<strong>自己會驗算</strong>：</p>
+  <div class="card grass">
+    <p class="card-h">每個庫都先宣告自己有幾個動作</p>
+<pre style="margin:8px 0"><code>[Files] 6
+    b_jeterpractice       1103875574  Dec 24 2004 00:06:14
+    b_jeterstepfwd        1103875574  Dec 24 2004 00:06:14
+    b_jetertostance       1103875574  Dec 24 2004 00:06:14
+    ...</code></pre>
+    <p><code>[Files]</code> 後面那個數字，跟底下實際列出來的行數比對：
+       <strong>243 個動作庫全部相符，零例外。</strong></p>
+    <p class="small">第 244 個 <code>.axt</code> 是<a href="#extra">上面講過的那個清單檔</a>，
+       它沒有 <code>[Files]</code> 這一行，所以不參與這個檢查。</p>
+  </div>
+
+  <h2>動作名字的前綴</h2>
+  <p>把 243 個庫裡全部 <strong>2,024 個動作名字</strong>攤開，
+     會看到它們都帶著一個字母開頭的前綴：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">前綴</th><th class="num">幾個動作</th><th>推測是什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="前綴" class="mono">f_</td><td data-label="幾個動作" class="num">592</td><td data-label="推測是什麼">守備</td></tr>
+      <tr class="hi"><td data-label="前綴" class="mono">b_</td><td data-label="幾個動作" class="num">571</td><td data-label="推測是什麼"><strong>打擊</strong>（下面有直接證據）</td></tr>
+      <tr><td data-label="前綴" class="mono">r_</td><td data-label="幾個動作" class="num">344</td><td data-label="推測是什麼">跑壘</td></tr>
+      <tr><td data-label="前綴" class="mono">s_</td><td data-label="幾個動作" class="num">151</td><td data-label="推測是什麼">—</td></tr>
+      <tr class="hi"><td data-label="前綴" class="mono">p_</td><td data-label="幾個動作" class="num">139</td><td data-label="推測是什麼"><strong>投球</strong>（下面有直接證據）</td></tr>
+      <tr><td data-label="前綴" class="mono">c_</td><td data-label="幾個動作" class="num">48</td><td data-label="推測是什麼">—</td></tr>
+      <tr><td data-label="前綴" class="mono">u_</td><td data-label="幾個動作" class="num">19</td><td data-label="推測是什麼">—</td></tr>
+      <tr><td data-label="前綴" class="mono">h_</td><td data-label="幾個動作" class="num">16</td><td data-label="推測是什麼">—</td></tr>
+      <tr><td data-label="前綴">合計</td><td data-label="幾個動作" class="num">1,880</td><td data-label="推測是什麼"></td></tr>
+      <tr><td data-label="前綴" class="mono">兩個字母的前綴<br><span class="small">例如 <code>sb_</code></span></td>
+          <td data-label="幾個動作" class="num">144</td><td data-label="推測是什麼">—</td></tr>
+      <tr><td data-label="前綴"><strong>總計</strong></td><td data-label="幾個動作" class="num"><strong>2,024</strong></td>
+          <td data-label="推測是什麼">跟上面量到的動作總數一致</td></tr>
+    </tbody>
+  </table></div>
+  <p><span class="badge wip">推測</span>
+     「守備／打擊／跑壘」是從字母猜的（<code>f</code>ield、<code>b</code>at、<code>r</code>un）。
+     <strong>但 <code>b_</code> 與 <code>p_</code> 這兩個有直接證據。</strong></p>
+
+  <div class="card grass">
+    <p class="card-h">兩個前綴可以被完全證實</p>
+    <p><a href="../tutorials/edit-stance/index.html">換打擊姿勢那一課</a>量到：
+       打擊姿勢的編號對到 <code>SIGB</code> 開頭的庫、投球姿勢對到 <code>SIGP</code>。</p>
+    <p>把那些庫打開看裡面的動作前綴：</p>
+    <div class="tablewrap" style="margin:8px 0"><table class="stack">
+      <thead><tr><th>庫</th><th class="num">幾個</th><th>裡面的動作前綴</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="庫" class="mono">SIGB0000–SIGB0065</td><td data-label="幾個" class="num">66</td>
+            <td data-label="裡面的動作前綴"><strong>全部是 <code>b_</code></strong></td></tr>
+        <tr class="hi"><td data-label="庫" class="mono">SIGP0000–SIGP0058</td><td data-label="幾個" class="num">59</td>
+            <td data-label="裡面的動作前綴"><strong>全部是 <code>p_</code></strong></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>125 個庫，零例外。</strong>
+       打擊姿勢庫裡只有打擊動作、投球姿勢庫裡只有投球動作 ——
+       <u><code>b</code> 是 bat、<code>p</code> 是 pitch，這兩個不是猜的。</u></p>
+  </div>
+
+  <h2>244 個庫分成兩種</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>庫名開頭</th><th class="num">幾個</th><th>是什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="庫名開頭" class="mono">SIGB／SIGP</td><td data-label="幾個" class="num">125</td>
+          <td data-label="是什麼"><strong>打擊與投球的姿勢庫</strong> —— 66 個打擊姿勢 + 59 個投球姿勢</td></tr>
+      <tr><td data-label="庫名開頭">其他 41 種名字<br><span class="small">DEF_BANK、FACIAL、HANDBANK、
+          CLOSE_UP、N 開頭的一批…</span></td>
+          <td data-label="幾個" class="num">119</td><td data-label="是什麼">共用動作</td></tr>
+      <tr><td data-label="庫名開頭"><strong>合計</strong></td><td data-label="幾個" class="num"><strong>244</strong></td>
+          <td data-label="是什麼">其中一個是清單檔</td></tr>
+    </tbody>
+  </table></div>
+  <p>本頁上面量到的「<strong>125 個專屬 bank</strong>」，
+     在<a href="../tutorials/edit-stance/index.html">換姿勢那一課</a>被從完全不同的方向再量了一次
+     （66 + 59），<strong>兩邊撞到同一個數字</strong>。</p>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 8.5 MB 的 <code>anims.big</code> 裝了 243 個動作庫、2,024 筆動畫清單（不重複的名字是 2,023 個），而且<strong>完全沒有壓縮</strong>；它 730 個項目裡有 244 個是記事本就讀得懂的純文字，其餘是業界標準的 ELF 目標檔，你電腦上現成的工具就讀得動。</li>
+    <li><strong>最重要的發現</strong> <code>.ord</code> 開頭是 <code>7F 45 4C 46</code>（<code>.ELF</code>），但檔頭寫「section 表在第 342,176 個位元組」，而整個 <code>.ord</code> 只有 327,776 個位元組。接上 <code>.orl</code> 的 14,640 就是 342,416，<strong>243 / 243 全部變成可正常解析的 ELF</strong>，而且 <code>.ord</code> 的長度剛好等於 <code>.data</code> 結束的位置，零例外。</li>
+    <li><strong>規模數字</strong> 730 個項目 ＝ 244 個 <code>.axt</code> ＋ 243 個 <code>.ord</code> ＋ 243 個 <code>.orl</code>。<code>DEF_BANK</code> 一個庫就裝了 1,052 個動畫（3.08 MB），超過總數一半；<code>SIGB</code> 66 ＋ <code>SIGP</code> 59 ＝ <strong>125 個專屬動作庫</strong>（其中 102 個的動作檔名帶著球員名字，另外 23 個是通用姿勢與投法），共 536 個動畫。</li>
+    <li><strong>整個遊戲一起看</strong> 207 個封裝檔、29,816 個項目裡有 <strong>3,503 個 ELF</strong>（球員模型 549、動作庫 243、球場 87 × 31 ＝ 2,697、雜項 14），<code>e_machine</code> 全部是 8（MIPS），一個例外都沒有。87 個球場封裝檔（58 個場地代號，日夜分開算）每一個剛好 31 個，零變異。</li>
+    <li><strong>只有 14 個是完整的</strong> 3,489 個要接上另一半，那 14 個全部在 <code>data\misc\miscmod.big</code>，而那個檔的 ELF 項目剛好就是這 14 個。所以「切成兩半」是 EA 針對某些用途做的選擇，<u>不是格式規定</u>。</li>
+    <li><strong>兩個前綴不是猜的</strong> <code>b_</code> 571 個、<code>p_</code> 139 個。<code>SIGB</code> 那 66 個庫裡<strong>全部是 <code>b_</code></strong>、<code>SIGP</code> 那 59 個庫裡<strong>全部是 <code>p_</code></strong>，125 個庫零例外，所以 <code>b</code> ＝ bat、<code>p</code> ＝ pitch。<code>f_</code>、<code>r_</code> 那幾個仍然只是從字母猜的。</li>
+    <li><strong>每個庫自己會驗算</strong> <code>.axt</code> 的 <code>[Files]</code> 宣告數跟底下實際列出的行數，243 個庫全部相符。243 個庫版本全是 <code>0.03</code>、來源目錄全是 <code>D:/mvp2004/artwork/anims</code>，整批在 <strong>2 分 36 秒</strong>內打包完，而裡面的動畫本身是四個小時前編譯的。</li>
+    <li><strong>本站沒驗的</strong> <code>.data</code> 裡那 327,712 個位元組實際代表什麼骨架、什麼影格，本站沒有解讀，所以改不動動作本身；42 個位元組的 <code>Banklist.axt</code> 只列 5 個名字，用途沒有查出來；「為什麼 PC 版的資料全是 MIPS 目標檔」只有猜想沒有證據；87 個球場封裝檔裡那 31 個模型各是什麼、<code>miscmod.big</code> 那 14 個檔裝什麼，都只看了檔名，沒有畫出來對照過。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../story/build-2004/index.html">平安夜凌晨的兩次建置</a> —— 這些時間戳背後的故事</li>
+    <li><a href="../tutorials/read-file-headers/index.html">五秒看穿一個檔案</a> —— 自己確認 <code>.ord</code> 真的是 ELF</li>
+    <li><a href="what-can-be-modded.html">什麼改得動、什麼還不行</a> —— 完整的現況分級</li>
+  </ul>
+
+  <footer>
+    <p>本頁 <code>anims.big</code> 的數字皆為現場打開全 730 個項目量測所得，「整個遊戲有多少這種檔」那一節則是掃過原版全部 207 個封裝檔、29,816 個項目量到的；
+       標示為「命名佐證」「推測」「未確認」之處未經證實，本站不寫成定論。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

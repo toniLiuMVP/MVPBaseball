@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-t1m0wuuNQQuRuSk2Tp1yYgiS0+PvheBMjZqnPNnWMmU='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tc2026/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>中文版為什麼會跳出 — toni的MVP模組補習班</title>
+<meta name="description" content="二十年來中文版一裝上大球場就跳出，所以很多人退而求其次玩英文版。原因找到了：遊戲寫死一塊 64 MB 的記憶體池，而中文字型光展開成貼圖就吃掉 13.5 MB。兩個地方各改一個位元組就解決了。本頁含完整做法、我們走錯的十條路，以及台美日三個法域的依據。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item" href="../reference/index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="eyebrow" style="margin-top:40px">2026-08-29 · 卡了二十年的問題</p>
+  <h1>中文版為什麼會跳出，<br>以及你能做到哪一步。</h1>
+  <p class="lede">很多人是<u>退而求其次玩英文版</u>的。不是不想看中文，
+     是中文版一裝上比較大的球場，就會在讀取條跑完的那一瞬間跳回桌面，
+     沒有任何錯誤訊息。這件事卡了二十年，社群的結論是「球場檔不要超過 10MB」。
+     <strong>那個結論是錯的，真正的原因跟球場大小沒有關係。</strong></p>
+
+  <div class="card grass">
+    <p class="card-h">一句話的答案</p>
+    <p>遊戲開機時跟系統要<u>一整塊 64 MB</u> 的記憶體，然後自己切給球場、字型、所有資料用。
+       中文字型的字圖集是 <strong>Direct3D 8 吃不下的 4 位元格式</strong>，
+       每一張都得在執行時整張展開 —— 光字型就吃掉 <strong>13.5 MB</strong>，
+       英文只要 0.37 MB。那顆池子先被吃掉五分之一，再也塞不下一座大球場。</p>
+    <p><strong>把那塊記憶體改成 128 MB 就好了。</strong>
+       —— 道理是這樣，但<u>這一步在照原版光碟安裝的遊戲上做不到</u>：
+       那塊記憶體的位置藏在防拷保護的加密區裡，工具搆不到。
+       為什麼、以及你還能做什麼，寫在下面<u>「為什麼調記憶體池在你的遊戲上做不到」</u>那一節
+       （跟操作步驟一樣，勾完下面那三項才看得到）。</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">⚠️ 先講清楚三件事</p>
+    <p><strong>一、本站不提供遊戲本體。</strong>
+       你必須自己擁有一份合法的 MVP Baseball 2005。本站沒有、也不會提供遊戲。</p>
+    <p><strong>二、本站不教任何規避防盜拷的做法。</strong>
+       這是<a href="../legal.html">法律與版權說明</a>第 3 節的紅線。
+       這一頁做的是「<u>把你自己那份程式改成配合你自己的機器</u>」，
+       跟光碟檢查、授權驗證完全是兩件事。</p>
+    <p><strong>三、動任何檔案之前先備份。</strong>本頁每一步都會告訴你備份什麼。</p>
+  </div>
+
+  <h2 id="law">你有權這樣做嗎：台灣、美國、日本怎麼寫的</h2>
+  <p>「買了遊戲，可以自己改它嗎？」這個問題三個法域都有明文，方向一樣（合法持有的人可以為了在自己的機器上使用而動它），
+     <strong>但條件各不相同</strong>，下面逐條列原文：</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th style="width:14%">法域</th><th style="width:20%">條文</th><th>內容</th></tr></thead>
+    <tbody>
+      <tr><td data-label="法域">🇹🇼 台灣</td><td data-label="條文"><strong>著作權法 §59</strong></td>
+          <td data-label="內容">「合法電腦程式著作重製物之<u>所有人</u>得因<strong>配合其所使用機器之需要，修改其程式</strong>，
+              或因備用存檔之需要重製其程式。<strong>但限於該所有人自行使用。</strong>」</td></tr>
+      <tr><td data-label="法域">🇺🇸 美國</td><td data-label="條文"><strong>17 U.S.C. §117(a)</strong></td>
+          <td data-label="內容">the <u>owner of a copy</u> of a computer program may make an <strong>adaptation</strong>
+              created as an <strong>essential step in the utilization</strong> of the program
+              in conjunction with a machine, and that it is <strong>used in no other manner</strong>.</td></tr>
+      <tr><td data-label="法域">🇯🇵 日本</td><td data-label="條文"><strong>著作権法 §47条の3</strong>
+          <br><span class="small">翻案：§47条の6 第1項第6号</span></td>
+          <td data-label="內容">プログラムの著作物の複製物の<u>所有者</u>が、<strong>自ら</strong>当該著作物を
+              電子計算機において<strong>実行</strong>するために必要と認められる限度において、
+              <strong>複製</strong>することができる。
+              <br><span class="small">（2026-09-05 訂正：本站原本引成「複製又は翻案」，
+              現行條文只寫「複製」。<u>翻案</u>的依據是 §47条の6 第1項第6号 ——
+              它把 §47条の3 第1項對應到翻案，實質效果一樣，但不在 §47条の3 本身。）</span>
+              <br><span class="small">⚠️ <strong>日本這一條救不了另一件事。</strong>
+              §47条の3 是「著作権の制限」那一批規定，而日本著作権法 §50 明文說這一批
+              <u>不得解釋為影響著作者人格権</u>，所以它涵蓋不到 §20 的<u>同一性保持権</u>。
+              日本讀者請先看法律頁的<a href="../legal.html#jp">給日本讀者的說明</a>。</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card grass">
+    <p class="card-h">三條放在一起看：方向一樣，條件不一樣</p>
+    <p><strong>合法持有正版的人，可以為了在自己的機器上使用而修改程式。</strong>
+       「把 2005 年寫死的 64 MB 記憶體池，改成 2026 年的機器該有的 128 MB」
+       ——本站認為這落在台灣 §59 講的「配合其所使用機器之需要」與美國 §117(a) 的 essential step 範圍內；
+       <u>這是本站的解讀，不是法院說的，也不是三個法域共同認證的</u>。</p>
+    <p><strong>三條都限制用途，但寫法不同。</strong>
+       台灣寫「但限於該所有人自行使用」；美國寫「used in no other manner」，而且 §117(b) 對複本與改作的移轉另有限制；
+       日本 §47条の3 寫的是「自ら…実行するために必要と認められる限度」內的<u>複製</u>，翻案要再經 §47条の6 對應，另外還有 §20 那一層（見下）。</p>
+    <p class="small">美國 §117(b) 講得更細：依本條做出來的複本，
+       只能<u>連同整個程式的全部權利一起轉讓</u>時才可以移轉。</p>
+    <p class="small">⚠️ <strong>日本要另外看。</strong>
+       日本那一條之外還有 §20 的<u>同一性保持権</u>，
+       而 §47条の3 這類權利限制規定救不了它 ——
+       所以上面那句「可以為了配合自己的機器修改程式」，
+       在日本<u>不能照著讀</u>。細節與那件判決寫在
+       <a href="../legal.html#jp">給日本讀者的說明</a>。</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">⚠️ 這件事有兩種做法，法律上不一樣 —— 本頁只教其中一種</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th></th><th>做法</th><th>三個法域怎麼看</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td><strong>路線 A</strong></td>
+            <td data-label="做法">用腳本改<u>你自己那顆</u>執行檔</td>
+            <td data-label="三個法域怎麼看">✅ 本站認為落在 §59 / §117(a) 的範圍內（<u>本站解讀</u>，不是法院結論）
+                <br><span class="small">🇯🇵 日本另有<u>同一性保持権</u>的問題，
+                §47条の3 這類權利限制規定救不了，見<a href="../legal.html#jp">給日本讀者的說明</a></span></td></tr>
+        <tr><td><strong>路線 B</strong><br><span class="small">本頁沒有</span></td>
+            <td data-label="做法">下載別人改好的現成包
+                <br><span class="small">本站 2026-08-30 拿掉了，理由寫在下面（勾完下面那三項才看得到）；
+                你在別處還是會看到這種包</span></td>
+            <td data-label="三個法域怎麼看">⚠️ 上面那三條<u>不涵蓋</u>「拿別人改好的複本」。
+                那是另一個問題，由你自己判斷</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>本頁只有 A。</strong>改的是你自己的檔，出事隨時可以還原。
+       B 那一欄留在表裡，是因為你在別的地方還是會遇到現成包，
+       而那時候適用的法條跟這裡不一樣 —— 這張表要講的就是那個差別。</p>
+  </div>
+
+  <div class="card" id="gate" style="border:2px solid var(--btn-bg)">
+    <p class="card-h">往下之前，請確認</p>
+    <p class="small">📋 <strong>勾完這三項，下面才會出現「⚡ 只想趕快做完？照這五步」
+       跟完整的操作步驟。</strong>現在看不到步驟不是頁面壞了。
+       <br>只想知道<u>為什麼會跳出、原理是什麼</u>的話，不用勾 ——
+       上面那張綠色的「一句話的答案」不設條件，隨時看得到。
+       頁尾的<a href="#recap">📌 重點整理</a>跟操作步驟一樣在勾完之後才出現。</p>
+    <p><label style="display:block;margin:10px 0;cursor:pointer">
+      <input type="checkbox" id="ck1"> 我擁有一份合法的 MVP Baseball 2005，本站沒有提供遊戲給我。</label>
+    <label style="display:block;margin:10px 0;cursor:pointer">
+      <input type="checkbox" id="ck2"> 我了解上面三個法域的條文，也了解「改自己那顆」跟「拿別人改好的」在法律上不一樣。</label>
+    <label style="display:block;margin:10px 0;cursor:pointer">
+      <input type="checkbox" id="ck3"> 我會先備份，並且知道出問題時怎麼還原。</label></p>
+    <p><button class="btn" id="agree" type="button" disabled>我了解，往下看</button>
+       <span class="small" id="hint" style="margin-left:10px">三項都勾選才能繼續</span></p>
+    <p class="small">📐 <strong>這一頁的排版跟站上其他課不一樣，說明一下</strong>：
+       本站的慣例是「⚡ 速解」放在最上面，給不想讀完的人先看。
+       <u>這一頁刻意沒有那樣做</u> —— 速解裡是<strong>可執行的指令</strong>，
+       而上面那三個框是<strong>法律同意</strong>，指令放在同意之後才對。
+       反過來說，<a href="#recap">📌 重點整理</a>是觀念不是指令，本來不必設條件，
+       但它跟操作步驟放在同一塊，所以一樣要勾完才出現。
+       <span class="small">（這條例外 2026-09-03 定案，並且寫進了上線前的檢查器：
+       <u>帶同意閘的頁，速解必須在閘之後</u>，
+       下一個加同意閘的頁會被自動守著，不必靠人記得這一頁是特例。）</span></p>
+  </div>
+
+  <div id="body" hidden>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法看<a href="../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <div class="quickfix" id="quick">
+    <p class="card-h">⚡ 只想趕快做完？照這五步（路線 A）</p>
+    <ol>
+      <li>用檔案總管（Mac 用 Finder）把你的 <code>mvp2005.exe</code> 複製一份放旁邊，
+          改名成 <code>mvp2005.exe.我的備份</code>。<strong>這一步不能跳。</strong></li>
+      <li>下載 <a href="../tutorials/run-in-2026/mvp_modernize.py" download>mvp_modernize.py</a>，
+          <strong>從「下載」資料夾拖到桌面</strong>，再切到桌面。
+  <pre><code>cd %USERPROFILE%\Desktop</code></pre>
+  <pre><code>cd ~/Desktop</code></pre></li>
+      <li>先唯讀看一眼：下面這行<strong>最後空一格就停住</strong>，把遊戲的
+          <code>mvp2005.exe</code> 拖進視窗，再按 Enter。
+          看到「<code>記憶體池 64 MB</code>」就代表可以改；看到「<code>找不到</code>」
+          代表你手上是<u>光碟原版</u>的執行檔，這一項做不到（<a href="#pool">為什麼</a>）。
+  <pre><code>python mvp_modernize.py </code></pre>
+  <pre><code>python3 mvp_modernize.py </code></pre></li>
+      <li>預覽，這一行還是不會動到檔案（會列出 <strong>6 個位元組</strong>）。
+  <pre><code>python mvp_modernize.py "&lt;剛才那個路徑&gt;" --pool 128</code></pre>
+  <pre><code>python3 mvp_modernize.py "&lt;剛才那個路徑&gt;" --pool 128</code></pre></li>
+      <li>確定了才真的改：同一行最後加上 <code>--apply</code>。出事就改跑 <code>--restore</code>。
+  <pre><code>python mvp_modernize.py "&lt;路徑&gt;" --pool 128 --apply</code></pre>
+  <pre><code>python3 mvp_modernize.py "&lt;路徑&gt;" --pool 128 --apply</code></pre></li>
+    </ol>
+    <p class="tail">改完<strong>一定要用完整的中文語系加上你最大的那座球場，打一場完整的比賽</strong>
+       —— 本站驗得到「檔案是對的」，驗不到「遊戲讀得動」。
+       想懂為什麼會跳出，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+  </div>
+
+  <h2>路線 A：改你自己那顆（本站建議）</h2>
+  <p class="small">指令都給兩行：<strong>上面 Windows、下面 Mac</strong>。只跑你自己那一行。
+     不會開終端機的話，先看<a href="../start.html">新手基本功</a>的「操作一：打開命令提示字元」。</p>
+
+  <div class="step">
+    <div class="step-n">1</div>
+    <div>
+      <div class="step-t">備份。這一步不能跳</div>
+      <p>用檔案總管（Mac 用 Finder）把你的 <code>mvp2005.exe</code> 複製一份，
+         改名成 <code>mvp2005.exe.我的備份</code> 放在旁邊。</p>
+      <p class="step-why">腳本自己也會備份，但你自己那一份是最後一道保險。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">2</div>
+    <div>
+      <div class="step-t">下載腳本，放到桌面，切到桌面</div>
+      <p><a href="../tutorials/run-in-2026/mvp_modernize.py" download>mvp_modernize.py</a>（零相依，不用安裝任何東西）</p>
+<pre><code>cd %USERPROFILE%\Desktop</code></pre>
+<pre><code>cd ~/Desktop</code></pre>
+      <div class="ifnot"><b>按了下載之後檔案跑到哪去了？</b>
+        <p>瀏覽器多半直接放進「下載」資料夾。打開檔案總管（Finder）左邊點「下載」，
+           把那個 <code>.py</code> <strong>拖到桌面</strong>。
+           沒做這步後面會出現 <code>can't open file</code>。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">3</div>
+    <div>
+      <div class="step-t">先看你手上那顆是什麼 —— 完全唯讀</div>
+<pre><code>python mvp_modernize.py </code></pre>
+<pre><code>python3 mvp_modernize.py </code></pre>
+      <p><span class="sk">a</span>上面那行<strong>最後空一格就停住</strong>。<br>
+         <span class="sk">b</span>把遊戲的 <code>mvp2005.exe</code> <u>檔案本身</u>拖進終端機視窗。<br>
+         <span class="sk">c</span>按 Enter。</p>
+      <p>看到「<code>記憶體池 64 MB</code>」就代表可以改。
+         看到「找不到」代表你手上是<u>光碟原版</u>的執行檔，程式碼是加密的，這一項做不到。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">4</div>
+    <div>
+      <div class="step-t">預覽 —— 還是不會動到檔案</div>
+<pre><code>python mvp_modernize.py "&lt;剛才那個路徑&gt;" --pool 128</code></pre>
+<pre><code>python3 mvp_modernize.py "&lt;剛才那個路徑&gt;" --pool 128</code></pre>
+      <p>它會先講總共會改幾個位元組，再把位置列出來（畫面上最多列前 16 個，總數以前面那一句為準）。本站在測試機那顆 5,443,584 位元組的 <code>mvp2005.exe</code> 上實測是 <strong>6 個位元組</strong>，6 個位置全部列得出來。</p>
+      <p class="step-why"><strong>跟「改的是一個位元組」這個說法不衝突。</strong>
+         記憶體池是<u>兩處</u>，每一處雖然佔四個位元組，
+         但 64 MB（<code>0x04000000</code>）跟 128 MB（<code>0x08000000</code>）
+         只差最高位那一個 —— 兩處各差 1 個，加上跟著重算的檔頭校驗值 4 個，合起來就是 6。
+         「一個位元組」講的是<u>那一處的差別</u>，這裡列的是<u>整個檔案被動到的總數</u>。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">5</div>
+    <div>
+      <div class="step-t">確定了才真的改</div>
+      <p class="step-why">會先備份，寫完再讀回來確認「改動的位元組剛好是預期那幾個，其他一個都沒動」。</p>
+<pre><code>python mvp_modernize.py "&lt;路徑&gt;" --pool 128 --apply</code></pre>
+<pre><code>python3 mvp_modernize.py "&lt;路徑&gt;" --pool 128 --apply</code></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">6</div>
+    <div>
+      <div class="step-t">用<u>完整的中文語系</u>加上你最大的那座球場，打一場完整的比賽</div>
+      <p><strong>這一步不能跳。</strong>本站驗得到「檔案是對的」，驗不到「遊戲讀得動」。</p>
+    </div>
+  </div>
+
+  <h3>✅ 成功了會看到</h3>
+  <ul>
+    <li>再跑一次第 3 步，「記憶體池」顯示 <strong>128 MB</strong></li>
+    <li>中文語系 + 大球場<strong>進得去比賽</strong>，而且<strong>中文一個字都沒少</strong>（完全沒動字型）</li>
+  </ul>
+
+  <h3>❌ 出錯了怎麼辦</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>看到什麼</th><th>怎麼做</th></tr></thead>
+    <tbody>
+      <tr><td>「找不到記憶體池的樣態」</td><td>你這顆是光碟原版，程式碼加密，做不到</td></tr>
+      <tr><td><code>python</code> 不是內部或外部命令</td><td>Windows 改打 <code>py -3 mvp_modernize.py …</code></td></tr>
+      <tr><td><code>can't open file</code></td><td>腳本還在「下載」資料夾，沒拖到桌面</td></tr>
+      <tr><td>改完遊戲開不起來</td><td>立刻 <code>--restore</code>，或把第 1 步的備份複製回去</td></tr>
+      <tr><td>128 MB 還是會當</td><td>試 <code>--pool 256</code>。還是當就回報 —— 那代表不只這一個原因</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>還原</h3>
+<pre><code>python mvp_modernize.py "&lt;路徑&gt;" --restore</code></pre>
+<pre><code>python3 mvp_modernize.py "&lt;路徑&gt;" --restore</code></pre>
+
+  <h2 id="whyfail">為什麼「路線 B：現成包」被拿掉了</h2>
+  <span id="pack"></span>
+  <p>這一頁以前有第二條路：下載一個現成的包，解壓縮覆蓋上去就好。
+     那個包<strong>2026-08-30 起拿掉了</strong>，而拿掉的過程本身值得寫下來，
+     因為它是本站「核實 &gt; 推理」踩過最深的一次。</p>
+
+  <div class="card amber">
+    <p class="card-h">⚠️ 那顆現成的 <code>mvp2005.exe</code> 不是「改了 83 個位元組」</p>
+    <p>包裡的說明寫著那顆執行檔「總共改了 83 個位元組,遊戲內容一個位元組都沒改」。
+       2026-08-29 拿這台機器上的原版<u>逐一比對</u>之後發現：那個「83」是相對於
+       <strong>一顆讀者手上沒有的中間產物</strong>量的。相對於你自己安裝的那一顆，
+       它還<strong>少了一整層防拷保護</strong>。</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th></th><th class="num">檔案大小</th><th>程式進入點</th><th>防拷保護區段</th></tr></thead>
+      <tbody>
+        <tr><td>原版 英文版</td><td data-label="檔案大小" class="num">6,972,001</td><td data-label="程式進入點"><code>stxt371</code></td><td data-label="防拷保護區段">✅ 還在</td></tr>
+        <tr><td>原版 官方中文版</td><td data-label="檔案大小" class="num">7,525,175</td><td data-label="程式進入點"><code>stxt371</code></td><td data-label="防拷保護區段">✅ 還在</td></tr>
+        <tr><td>官方中文版＋三更新</td><td data-label="檔案大小" class="num">7,533,368</td><td data-label="程式進入點"><code>stxt371</code></td><td data-label="防拷保護區段">✅ 還在</td></tr>
+        <tr class="hi"><td>那顆現成包的 exe</td><td data-label="檔案大小" class="num">5,443,584</td><td data-label="程式進入點"><code>.text</code></td><td data-label="防拷保護區段">❌ 已移除</td></tr>
+      </tbody>
+    </table></div>
+    <p>比英文版原版小 1.5 MB、比官方中文版小 2.1 MB，程式進入點從保護層（<code>stxt371</code>）
+       搬到真正的程式碼（<code>.text</code>）。
+       本站的自我約束是<strong>「不散布遊戲本體」</strong> ——
+       一顆拿掉保護層的執行檔不在那條線的裡面，所以連同整個下載區一起拿掉了。
+       中文化改成教你<u><a href="../tutorials/make-chinese/index.html">用你自己那份官方中文版自己做</a></u>。</p>
+  </div>
+
+  <h2 id="pool">為什麼「調記憶體池」在你的遊戲上做不到</h2>
+  <p>這是本頁最需要先講清楚的一件事，因為它會影響上面路線 A 你做得到哪一步。
+     <strong>調記憶體池那一步，在照原版光碟安裝的遊戲上做不到</strong> ——
+     本站實測四份安裝（英文版、官方中文版、官方中文版＋三更新，還有一份社群 PK 版），
+     這四份的 <code>mvp2005.exe</code> 都是<u>仍帶著保護層的原版</u>，
+     <u>四份全部</u>印「記憶體池:找不到」。
+     <span class="small">（這跟上一節那顆<u>已經沒有保護層</u>的 5,443,584 位元組執行檔
+     <strong>不是同一個東西</strong> —— 那一顆<strong>找得到</strong>記憶體池。）</span></p>
+
+  <h3>機制：保護層是怎麼擋住工具的</h3>
+  <p>一顆帶防拷保護的執行檔，結構是這樣的：程式一開機<strong>不是先跑遊戲，
+     是先跑保護層</strong>（進入點落在 <code>stxt371</code>）。保護層做完光碟檢查，
+     把真正的遊戲碼（<code>.text</code>）<u>在記憶體裡解開</u>，再跳進去。</p>
+  <p>關鍵在：<strong><code>.text</code> 在磁碟上是密文。</strong>
+     那塊 64 MB 記憶體池的常數就藏在 <code>.text</code> 裡 ——
+     工具去掃磁碟上的位元組，掃到的是加密後的亂數，所以印「找不到」。
+     這不是工具壞了，是它<u>本來就穿不透加密區</u>。</p>
+
+  <div class="card">
+    <p class="card-h">📎 這層保護叫什麼？版本有分歧，本站兩個都不寫死</p>
+    <p>這層保護是 <strong>Macrovision SafeDisc</strong>，但確切版本本站<u>不下定論</u>，
+       因為兩邊證據方向相反、都不是官方：</p>
+    <ul>
+      <li>光碟保存專案 <strong>Redump</strong> 把這片光碟記成 <strong>SafeDisc 4.00.003（v4）</strong>。</li>
+      <li>但逆向分析普遍把 <code>stxt371</code> / <code>stxt774</code> / <code>.data1</code>
+          這幾個區段名<u>當成 SafeDisc 2.x 的代表特徵</u>，而 4.x 通常不再用這組固定名稱。
+          本站手上四份安裝的 exe <strong>全部帶著這三個區段</strong>（量得到，自己驗）。</li>
+    </ul>
+    <p>光碟壓製的版本（Redump 量的）跟執行檔加殼的版本<u>可能不是同一個</u>，
+       而本站沒讀到那份逆向分析的原文，兩邊都是間接證據。所以本站只說
+       「一層 SafeDisc 保護」，<strong>版本號留白</strong> ——
+       這一格沒有 A 級官方來源（EA 與 Macrovision 依商業慣例不公布個別遊戲的子版本號），
+       有 A 級來源之前不寫死。</p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">🔬 那這東西在研究上是怎麼被看懂的？</p>
+    <p>保存與資安圈對這類保護層有一套研究上的通稱，叫 unwrap（脫殼）。
+       <u>本站不描述它是怎麼做的</u>。</p>
+    <p><strong>本站不援引任何「還原工程」例外。</strong>台灣著作權法 §80-2 第 3 項第 8 款確實列了「為進行還原工程者」，
+       但那是一條有前提的例外（主管機關訂有《著作權法第八十條之二第三項各款內容認定要點》，第十二點寫的是：經合法授權使用之人、為了讓另行創作的程式跟其他程式相容、限必要範圍且不侵害著作權），
+       <u>本站沒有做那件事，也不替讀者判斷它成不成立</u>——法律頁第 4 節 2026-09-05 已經把它從依據裡拿掉，這一頁跟著拿掉。</p>
+    <p>所以<strong>本站到此為止，不提供任何「怎麼拆」的步驟</strong>。
+       理由是同一條線：規避防盜拷措施本身、以及把規避的方法或成品提供給大家，都是 §80-2 管的事（罰則見 §96-1）；
+       那也是本站在<a href="../legal.html">法律說明</a>第 3 節自己畫的紅線。本站教的一直是「改你自己那一份」，不是「拆掉誰的鎖」。</p>
+  </div>
+
+  <h3>那路線 A 到底還能做什麼？</h3>
+  <p>保護層擋住的只有「藏在加密區裡」的那些。<u>加密區外面的東西照樣改得動</u>：</p>
+  <ul>
+    <li><strong>大位址旗標</strong>（4GB）—— PE 檔頭裡，在加密區外面，改得到。
+        本站手上那份社群 <code>MVP_PK</code> 的大位址就是這樣被打開的。</li>
+    <li><strong>解析度表</strong> —— 用內容找到位置（不是寫死），也在加密區外面，改得到。</li>
+    <li><strong>不改 exe 也能過日子</strong>：知道哪些球場在 64 MB 裡塞得下、
+        怎麼把大球場的貼圖瘦身，就能避開跳出。這條路一顆位元組都不用碰執行檔。</li>
+  </ul>
+  <p class="small">⚠️ 也就是說：路線 A 的 <code>--resolution</code> 與大位址你做得到，
+     <code>--pool</code> 在有保護層的安裝上做不到 —— 上面路線 A 的<u>第 3 步就是在分辨這件事</u>，
+     那一步印「找不到」的話，就是這一節講的情況。</p>
+
+
+  <h2 id="wrong">我們走錯的路</h2>
+  <p>這一節是本頁最有用的部分。<u>每一條錯路當時都很合理</u>，
+     而好幾條是被<strong>本站自己的舊紀錄</strong>或<strong>本站自己寫的檢查工具</strong>帶偏的。</p>
+
+  <div class="tablewrap"><table>
+    <thead><tr><th style="width:34%">我們以為</th><th>實際</th></tr></thead>
+    <tbody>
+      <tr><td>球場檔太大（社群傳了二十年）</td>
+          <td>把球場清乾淨降到 8.51 MB 還是當；<u>同一顆檔</u>跑英文版完全正常。
+              同一個檔案一邊當一邊不當，問題就不在那個檔案裡</td></tr>
+      <tr><td>是語系檔壞了</td>
+          <td>測「英文字型 + 中文語系檔」→ <strong>可以玩</strong>。語系檔清白</td></tr>
+      <tr class="hi"><td>那就把字型砍小</td>
+          <td>方向「有效」但那是繞路，<u>而且砍字型正是缺字的唯一來源</u>。
+              轉折點是一句提問：<strong>「為什麼一定要瘦身字型，而不能擴充該擴充的設定？」</strong></td></tr>
+      <tr><td>中文字型先天只有 1,529 字，一定缺字</td>
+          <td><strong>錯。</strong>語系檔用到 1,536 個字元，字型提供 1,529 個，
+              缺的 8 個是 <code>©</code> <code>®</code> <code>™</code>、不斷行空白，
+              加上四個只出現一兩次的壞字。<u>中文字型本來是完整的</u></td></tr>
+      <tr><td>六個中文字型檔完全一樣</td>
+          <td><strong>錯。</strong>只有三個一樣。看到「大小都是 287,072」就下結論，
+              那正是本站自己列為紅燈的「數量剛好對得上」</td></tr>
+      <tr><td>執行檔被加密，反組譯這條路是死的</td>
+          <td>那對<u>光碟原版</u>成立，對社群那顆不成立（熵 6.575，沒有保護區段）。
+              一句沒標明適用範圍的舊紀錄，差點讓整條路被放棄</td></tr>
+      <tr><td>找到了！「球場記憶體配額」</td>
+          <td>反組譯出來它只是把「超出多少 K」<u>印成一句話畫到畫面上</u>，
+              而且整支函式被開發旗標擋著。<strong>字串長得像凶手，拆開來是記事本</strong></td></tr>
+      <tr><td>本站的診斷腳本說「不是記憶體」</td>
+          <td><strong>那是腳本自己錯了。</strong>297 行 log 全是模擬層的雜訊，
+              遊戲的訊息一行都沒收到。判斷只看「行數 &gt; 5」，
+              把「什麼都沒抓到」判成了「抓到了但沒問題」</td></tr>
+      <tr><td>當機位址就是鐵證</td>
+          <td>那支填值常式有 <strong>59 個呼叫點</strong>，證明不了是哪一條路</td></tr>
+      <tr class="hi"><td>把三個區段改回唯讀是安全的</td>
+          <td><strong>Wine 過了，真的 Windows 連開都開不起來。</strong>
+              而且我們推錯了兩次原因，第三次才對 ——
+              對的那次不是想出來的，是<u>做了四個只差一個位元組的檔案，讓檔案自己回答</u>。
+              真因是那顆執行檔的 <strong>IAT 資料目錄是空的</strong>（<code>RVA=0 size=0</code>）：
+              載入器靠這張表才知道要先把哪幾頁改成可寫來填匯入位址。
+              把那張表算回去（<code>RVA=0x473000 size=1264</code>）之後，
+              三個區段的「可寫」就都拿得掉了</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card clay">
+    <p class="card-h">如果這一節只能留一句</p>
+    <p><strong>Wine 過不代表 Windows 過。</strong>
+       模擬層對記憶體保護的執行沒有真 Windows 嚴格，它會放行 Windows 會擋下來的東西。
+       <u>只在模擬層上測，等於沒測。</u></p>
+  </div>
+
+  <h2>已知的缺陷與邊界</h2>
+  <ul>
+    <li><strong>15 個函式的本體在社群那顆執行檔裡就已經是空的</strong>（只剩 9 個位元組的開場白）。
+        這不是本站造成的，也<u>補不回來</u> —— 被清掉的內容不存在於任何地方</li>
+    <li><strong>幾塊 C++ 例外處理表的指標被清零</strong>，同上</li>
+    <li><strong>本站量不到執行時的記憶體用量。</strong>
+        「128 MB 夠不夠」是實測出來的，不是算出來的。真正的門檻在 64 與 128 之間某處</li>
+    <li><strong>13.5 MB 是算的不是量的</strong>：它等於中文那些 4 位元字圖集的總像素 × 4 位元組。
+        本站從字型檔量、另一條線從程式碼推，兩邊在小數點後兩位對上，但都不是執行期的實測</li>
+    <li><strong>光碟原版的程式碼段是加密的</strong>，無法與社群那顆逐位元組比對。
+        所以「社群那顆的程式碼有沒有被動過手腳」這一格，本站是靠間接證據，不是量到的</li>
+  </ul>
+
+  <h2>完整的研究過程</h2>
+  <p>這一頁是結論。想看怎麼一步一步查到的，在
+     <a href="../tutorials/fix-chinese/index.html">中文版配大球場就跳出</a>那一課，
+     以及<a href="../reference/how-we-measured.html">本站怎麼量的</a>。</p>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 中文版一裝上大球場就跳出的原因找到了，<u>跟球場大小沒有關係</u>：遊戲開機時跟系統要<strong>一整塊 64 MB</strong> 的記憶體池自己切給所有資料用，而中文字型是 Direct3D 8 吃不下的 4 位元格式、每張都得在執行時整張展開，<strong>光字型就吃掉 13.5 MB</strong>（英文只要 0.37 MB），池子先被吃掉五分之一就再也塞不下一座大球場。把那塊記憶體改成 <strong>128 MB</strong> 就好了 —— 但<u>這一步在照原版光碟安裝的遊戲上做不到</u>（那塊記憶體的位置藏在防拷保護的加密區裡），見<a href="#pool">「為什麼調記憶體池在你的遊戲上做不到」</a>。</li>
+    <li><strong>那個傳了二十年的結論是錯的</strong> 社群說「球場檔不要超過 10MB」。實際是把球場清乾淨降到 <strong>8.51 MB 還是當</strong>，而且<u>同一顆檔跑英文版完全正常</u>。同一個檔案一邊當一邊不當，問題就不在那個檔案裡。另一條被推翻的是「中文字型先天缺字」：語系檔用到 1,536 個字元、字型提供 1,529 個，缺的 8 個是 <code>©</code> <code>®</code> <code>™</code>、不斷行空白加四個只出現一兩次的壞字，<strong>中文字型本來就是完整的</strong>，而<u>砍字型正是缺字的唯一來源</u>。</li>
+    <li><strong>4GB Patch 為什麼救不了這個</strong> 大位址旗標放大的是「程式<u>最多能用到多少</u>位址空間」，記憶體池是「遊戲<u>實際跟系統要了多大一塊</u>」。<strong>塞不下是因為櫃子小，不是房間小。</strong>兩件事都要做，但互不取代，這也是為什麼幾乎每個人都套過 4GB Patch 卻還是照當。</li>
+    <li><strong>你可主張有權這樣做，但兩條路法律上不一樣</strong> 台灣著作權法 §59、美國 17 U.S.C. §117(a)、日本著作権法 §47条の3（翻案的依據是 §47条の6 第1項第6号）三個法域都有明文，方向一樣、條件各不相同：<strong>合法持有正版的人可以為了在自己的機器上使用而修改程式，但用途受限</strong>（台灣限自行使用；美國限 essential step 且 §117(b) 限制移轉；日本寫的是複製、翻案要另看 §47条の6）。所以路線 A（用腳本改<u>你自己那顆</u>執行檔）本站認為落在台美這兩條的範圍內（本站解讀，不是法院結論）；路線 B（下載別人改好的現成包）<u>那三條不涵蓋</u>。<strong>日本要另外看</strong>：§47条の3 是權利限制規定，救不了 §20 的<u>同一性保持権</u>，日本讀者請先看<a href="../legal.html#jp">給日本讀者的說明</a>。本站建議走 A，結果完全一樣，而且出事隨時可以還原。前提是：本站不提供遊戲本體、不教任何規避防盜拷的做法、動任何檔案之前先備份。</li>
+    <li><strong>實際改了什麼（2026-08-30 訂正）</strong> 本站原本照著那個包的說明寫「83 個位元組,遊戲內容一個位元組都沒改」。那個 83 是相對於一顆<u>讀者手上沒有的中間產物</u>量的 —— 相對於你自己安裝的那一顆，它還少了一整層防拷保護。<a href="#whyfail">上面「為什麼路線 B 被拿掉」那一節</a>有逐一比對的四份數字。這一條留著，是因為它正是本頁「我們走錯的路」要講的：<strong>把一個相對於錯的基準量出來的數字，當成事實寫了上去。</strong></li>
+    <li><strong>順手修好一個二十年沒人補的缺陷</strong> 社群那顆執行檔的 <strong>IAT 資料目錄是空的</strong>，Windows 載入器靠這張表知道要先把哪幾頁改成可寫才能填匯入位址，表是空的就等於<u>只要 <code>.rdata</code> 是唯讀就直接開不起來</u>。二十年來每個工具都只能把它留成可寫來繞過，本站把那張表算出來補回去，<u>三個區段的「可寫」就都拿得掉了</u>（<code>.text</code> 變成讀＋執行，<code>.rdata</code> 與 <code>.rsrc</code> 變成唯讀）。<a href="#wrong">上面「我們走錯的路」</a>那一節有這件事是怎麼查出來的。</li>
+    <li><strong>走錯的路才是最有用的一節</strong> 好幾條是被<u>本站自己的舊紀錄或自己寫的檢查工具</u>帶偏的。本站的診斷腳本說「不是記憶體」，<strong>那是腳本自己錯了</strong>：297 行 log 全是模擬層的雜訊、遊戲的訊息一行都沒收到，而判斷只看「行數大於 5」，<u>把「什麼都沒抓到」判成了「抓到了但沒問題」</u>。看到「六個中文字型檔大小都是 287,072」就結論它們完全一樣，實際只有三個一樣，那正是本站自己列為紅燈的「數量剛好對得上」。如果這一節只能留一句：<strong>Wine 過不代表 Windows 過</strong>，三個區段改唯讀在 Wine 上過了、真的 Windows 連開都開不起來，而且原因推錯兩次，第三次對的那次不是想出來的，是<u>做了四個只差一個位元組的檔案，讓檔案自己回答</u>。</li>
+    <li><strong>本站沒驗的</strong> <strong>本站量不到執行時的記憶體用量</strong>，「128 MB 夠不夠」是實測出來的不是算出來的，真正的門檻在 64 與 128 之間某處。<strong>13.5 MB 是算的不是量的</strong>：它等於中文那些 4 位元字圖集的總像素乘上 4 位元組，本站從字型檔量、另一條線從程式碼推，兩邊在小數點後兩位對上，但<u>都不是執行期的實測</u>。光碟原版的程式碼段是加密的，無法與社群那顆逐位元組比對，所以「社群那顆的程式碼有沒有被動過手腳」本站是靠間接證據。另外有 15 個函式的本體在社群那顆執行檔裡<u>就已經是空的</u>，幾塊 C++ 例外處理表的指標被清零，這些不是本站造成的，也<strong>補不回來</strong>。最後一步只有你能做：用完整的中文語系加上你最大的那座球場打一場完整的比賽，<u>本站驗得到「檔案是對的」，驗不到「遊戲讀得動」</u>。</li>
+  </ul>
+
+  </div><!-- /body -->
+
+  <footer>
+    <p>本頁每一個數字都是實際跑出來的：四種記憶體池大小的實機測試（Windows 與 macOS 兩邊）、
+       24 個字型檔的字圖集格式與尺寸、1,536 vs 1,529 的字元對帳、
+       四顆執行檔的熵與區段、以及改動後逐位元組的差異比對。
+       推論的部分已在文中標明。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var cks=[document.getElementById('ck1'),document.getElementById('ck2'),document.getElementById('ck3')];
+  var btn=document.getElementById('agree'), hint=document.getElementById('hint');
+  var body=document.getElementById('body'), gate=document.getElementById('gate');
+  function sync(){
+    var all=cks.every(function(c){return c.checked});
+    btn.disabled=!all;
+    hint.textContent=all?'':'三項都勾選才能繼續';
+  }
+  cks.forEach(function(c){c.addEventListener('change',sync)});
+  btn.addEventListener('click',function(){
+    body.hidden=false;
+    gate.style.borderColor='';
+    btn.textContent='已確認';
+    btn.disabled=true;
+    hint.textContent='';
+    body.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  sync();
+})();
+</script>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

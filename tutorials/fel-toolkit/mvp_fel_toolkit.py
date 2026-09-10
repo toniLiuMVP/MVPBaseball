@@ -1,0 +1,2445 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+mvp_fel_toolkit.py — MVP Baseball 2005 介面版面檔萬用工具
+
+一支腳本搞定：列出、搜尋、檢視、取出、開關任何介面元素。
+不用再為每一個修改各寫一支程式。
+
+═══ 這支在做什麼 ═══════════════════════════════════════════════
+
+遊戲的每一塊介面（比賽中的 HUD、選單、轉場畫面）都寫在 .fel「版面檔」裡。
+版面檔用 EA 的 QFS 壓縮，裝在 data/frontend/*.big 這種封裝檔裡面。
+這支腳本把它解出來當**純文字**讀，讓你用元素的名字（例如 SPEED、RATING）
+就能找到它在哪一個檔的第幾行、它在 640x480 畫面上的哪個位置、
+它顯示的是哪一句話，必要時把它關掉。
+
+順便也讀寫總設定檔 datafile.txt 裡的攝影機（視角座標與視野角度）。
+
+吃什麼（輸入）
+  · 第一個參數：遊戲資料夾（裡面要看得到 data 這個子資料夾）
+  · --big 指定要處理哪一個封裝檔，預設 data/frontend/ingame.big
+  · 字串表 data/FEENG.LOC、IGENG.LOC（英文版與多數社群中文化模組），
+    或 data/FEJPN.LOC、IGJPN.LOC（EA 官方繁體中文版把中文放在日文槽位）
+  · 攝影機模式吃 data/datafile/datafile.big；官方中文版沒有那個封裝檔，
+    改吃散裝的 data/datafile/datafile.txt
+
+吐什麼（輸出）
+  · 十四個模式裡有九個只把表格印到畫面，遊戲檔一個位元組都不寫：
+    --list、--entries、--bigs、--find、--show、--strings、--where、
+    --cameras、--camera（不加 --set）
+  · --extract 不動遊戲檔，但會另外寫一個純文字檔（既有的檔不覆蓋，會拒絕）
+  · --toggle 與 --camera --set 加了 --apply 才會改遊戲檔；沒加只印預覽
+  · --restore 與 --restore-datafile 是例外：它們的工作就是拿備份覆寫遊戲檔，
+    所以「沒加 --apply 只預覽」對這兩個不成立，打下去就直接還原
+
+常用流程（先看，再改，最後才 --apply）：
+
+    列出封裝檔裡有哪些版面檔
+        python3 mvp_fel_toolkit.py "<遊戲資料夾>" --list
+
+    找出名字含某個字的元素（會掃封裝檔裡的每一個版面檔）
+        python3 mvp_fel_toolkit.py "<遊戲資料夾>" --find SPEED
+
+    看某個版面檔的內容
+        python3 mvp_fel_toolkit.py "<遊戲資料夾>" --show fes_hudleft.fel
+        python3 mvp_fel_toolkit.py "<遊戲資料夾>" --show fes_hudleft.fel --screen HUDLEFT
+
+    把整個版面檔存成文字檔（唯讀，方便你用編輯器慢慢看）
+        python3 mvp_fel_toolkit.py "<遊戲資料夾>" --extract fes_hudleft.fel out.txt
+
+    關掉／打開某個元素（先預覽，確定了再加 --apply）
+        python3 mvp_fel_toolkit.py "<遊戲資料夾>" --toggle fes_ingameinfobar.fel RATING off
+        python3 mvp_fel_toolkit.py "<遊戲資料夾>" --toggle fes_ingameinfobar.fel RATING off --apply
+
+    還原
+        python3 mvp_fel_toolkit.py "<遊戲資料夾>" --restore
+
+安全網
+  · 預設唯讀：--toggle 與 --camera --set 沒加 --apply 一律只預覽
+    （--restore 與 --restore-datafile 例外：它們就是來覆寫的，不吃 --apply）
+  · 第一次 --apply 先做備份（<封裝檔>.feltoolbak／<目標>.datafilebak），
+    之後再改幾次都保留最早那一份，所以 --restore 永遠回到你動手之前
+  · 備份、寫入、還原三件事都是原子的：先在同一個資料夾開一個名字隨機的
+    暫存檔（別人先佔不到）、寫完 fsync 落地、驗過內容，最後才改名換上。
+    中途斷掉不會留下半截檔，遊戲正本也不會先被截成 0 bytes
+  · 還原前先擋掉明顯壞掉的備份（見 _restore_from_backup 的五道把關；
+    散裝的 datafile.txt 另外再驗「結尾是換行、最後一行是完整記錄」）
+  · 寫入採 append：新資料接到檔尾，只改目錄 8 bytes + 檔頭 4 bytes，
+    原本的位元組一個都不動。就算新資料是壞的，舊資料還躺在檔案裡
+  · 寫完立刻重讀複驗；對不上就丟例外（結束碼非 0）並叫你 --restore
+  · 不跟著符號連結（symlink）寫：遊戲檔、備份檔、--extract 的輸出檔
+    是連結就停下來，不會在你沒說要動的地方動手
+  · 換名那一步不會被 Ctrl-C 切成兩半：中斷時程式自己知道檔案「還沒動」、
+    「正在換」還是「已經換過」，會照實講，不會叫你自己回頭猜
+  · 自我測試（不需要遊戲資料夾，也不碰任何遊戲檔）：
+        python3 mvp_fel_toolkit.py --selftest
+
+做不到的事（先講清楚，省得你找）
+  · 只能改「顯示開關」那一欄（元素名稱後面第 1 個參數）。
+    座標、顏色、字型、文字內容都改不了
+  · 只有兩道關卡都過的行能開關：指令要在 TOGGLEABLE 那張表裡，
+    而且那一行的第 1 個參數真的讀得到 0 或 1（見 visibility_of）
+  · VR / LS / LF / END 冒號後面只有一格，沒有第 1 個參數；TS 那一格放的是
+    空白，SF 放的是版面檔檔名；KA / VS / SC 那一格是 0 或 1，但本站沒有
+    獨立證據證明它就是顯示開關，所以一律不放行。TOGGLEABLE 裡的 SE 與 TE
+    同樣沒有那一欄，是那張表列錯了，被第二道關卡擋著，寫不下去
+  · 不能新增或刪除行；行數變了就中止
+  · 不會重新打包封裝檔。重新打包會丟掉目錄指不到的資料，
+    那是本專案的鐵律，這支腳本從頭到尾只用 append
+  · 壓縮用的是「不做字串比對的合法編碼」，所以檔案會變大（解出來一樣正確）
+  · 關掉父群組可能被遊戲程式在執行時覆寫回來。
+    要關單一元素，改它自己那一行
+  · 攝影機只放行 X / Y / Z / FOV / Pitch / Heading / Roll /
+    OffsetX / OffsetY / OffsetZ，而且那一格現在必須本來就是數字；
+    你給的新值也必須是一般的十進位數字（nan / inf 這類寫法一律拒絕）
+  · 不驗證「改完在遊戲裡長怎樣」。檔案層面全過不代表畫面對了，
+    那一步得你自己開遊戲看
+
+零相依：只用 Python 3.7+ 內建功能。
+自包含：整支腳本就是這一個檔。
+
+授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
+"""
+#
+# ─────────────────────────────────────────────────────────
+#  法律與免責(每一支本站腳本都帶著這一段)
+#
+#  · 本工具與 Electronic Arts 無任何官方關聯,也未經其授權或背書。
+#    MVP Baseball 2005 為 Electronic Arts 之作品與商標。
+#  · 本工具為原創程式碼,**不含任何 EA 的程式碼或資產**。
+#  · 本工具不提供、不教學、也不包含任何規避技術保護措施的功能。
+#  · 使用者應僅對自己合法取得的遊戲副本使用本工具,並自行承擔風險。
+#    使用前請自行確認你與遊戲發行商之間的使用者授權合約(EULA)。
+#  · 本工具按「現狀」提供,不附任何明示或默示的擔保。
+#  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
+#  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
+#    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
+#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+# ─────────────────────────────────────────────────────────
+
+import os
+import re
+import sys
+import shutil
+import signal
+import struct
+import hashlib
+import argparse
+import tempfile
+import collections
+
+# ── 備份的原子性(2026-08-29 上線前稽核加)────────────────────────────
+# 原本是直接 shutil.copy2(遊戲檔, .bak)。複製途中被中斷(磁碟滿、外接碟拔掉、
+# Windows 上按 Ctrl-C)會留下一個**半截的 .bak**;下一次執行看到它「存在」
+# 就印「備份已存在,保留最早那一份」繼續改遊戲檔,之後 --restore
+# 會拿那個半截檔覆蓋掉正本。
+#
+# 實測(2026-08-29):把 2,665,562 bytes 的備份截成 300,000 bytes,
+# 本站防護最嚴的那支還原指令三道把關全過、印「✓ 已從備份還原」、exit code 0,
+# 2.66 MB 的遊戲檔當場被 300 KB 蓋掉。magic 只看開頭,看不出後面少了多少。
+
+# ── 猜得到的暫存名 + 符號連結(2026-09-05 第二輪唯讀稽核抓到)──────────
+# 上面那個修法(先寫暫存檔再改名)方向是對的,但暫存檔叫 <目的檔>.part ——
+# **名字猜得到**。有人先在那個名字上放一個指向資料夾外面的符號連結,
+# shutil.copy2 / open(...,'wb') 會順著連結把外面那個檔截斷;
+# 後面的 os.replace 只換掉連結本身,傷害在那之前就已經造成了。
+#
+# ⚠️ os.path.exists() 對「指向不存在目標的符號連結」回傳 False,擋不住這件事。
+#    要用 os.path.islink / os.path.lexists —— 它們看的是連結本身。
+#
+# 修法兩件:(1) 暫存檔一律用 tempfile.mkstemp 開在同一個資料夾裡,
+# 名字是隨機的,而且 mkstemp 內部用 O_CREAT|O_EXCL,別人先佔就開不起來;
+# (2) 遊戲檔與備份檔本身是符號連結就直接停下來,不跟著它走。
+
+# ── 換名那一刻的 Ctrl-C(2026-09-06 第三輪唯讀稽核 🔴 A-5)──────────────
+# 上一版是「先把路徑記進 _REPLACED,再 os.replace,只有 OSError 才把記錄拿掉」。
+# 方向是對的(寧可多說「換過了」),但它把每一次「其實還沒換」的中斷也講成
+# 「換過了」,而且中間那一格沒有名字 —— 使用者只看得到「動了」跟「沒動」兩種話。
+#
+# 現在是三態:
+#     還沒動      → 兩張表都是空的,訊息說「一個位元組都沒有被動到」
+#     正在換 X    → X 在 _REPLACING 裡,訊息說「中斷時正在替換 X」
+#     已換 X      → X 在 _REPLACED 裡,訊息說「已經換過了」並印還原指令
+# 而「os.replace + 登記」這兩行被 _NoInterrupt 包起來,中間收到 Ctrl-C 會先記著、
+# 離開這一段才丟出來 —— 所以收尾看到的登記一定跟磁碟上的狀態一致,
+# 「正在換」那一格幾乎不會被踩到,它是最後一道保險。
+
+_REPLACED = []          # 已經真的換掉的檔(給檔尾 Ctrl-C 的訊息用)
+_REPLACING = []         # 正在換、還不知道換成功沒有的檔(同上)
+
+
+class _NoInterrupt(object):
+    """把「os.replace + 登記」包起來:這段期間收到 Ctrl-C 先記著,離開之後再照常丟出。
+
+    這樣 KeyboardInterrupt 的收尾看到的登記一定跟磁碟上的狀態一致。
+    包起來的只有兩行,不會讓使用者覺得「按了沒反應」。
+    """
+
+    def __enter__(self):
+        self._pending = False
+        self._old = None
+        try:
+            self._old = signal.signal(signal.SIGINT, self._remember)
+        except (ValueError, OSError):   # 非主執行緒等情況:退回原本行為,不會更糟
+            self._old = None
+        return self
+
+    def _remember(self, signum, frame):
+        self._pending = True
+
+    def __exit__(self, exc_type, exc, tb):
+        if self._old is not None:
+            signal.signal(signal.SIGINT, self._old)
+        if self._pending and exc_type is None:
+            raise KeyboardInterrupt
+        return False
+
+
+def _replace_and_record(tmp, target, record=True):
+    """換名 —— 這是整支腳本唯一會動到既有檔案的一步,所以只寫在這裡一個地方。
+
+    順序:先登記「正在換」→ 不可中斷地(os.replace + 改登記)→ 登記「已換」。
+    os.replace 是原子的:丟 OSError 就是一個位元組都沒換,「正在換」那筆可以拿掉。
+
+    record=False 用在「建立備份檔」那一次:那個名字本來不存在,換上去不會蓋掉
+    使用者的東西,不該讓 Ctrl-C 的訊息叫他去 --restore 一個備份。
+    """
+    if record:
+        _REPLACING.append(target)
+    try:
+        with _NoInterrupt():
+            os.replace(tmp, target)
+            if record:
+                _REPLACING.remove(target)
+                _REPLACED.append(target)
+    except OSError:
+        if record and target in _REPLACING:
+            _REPLACING.remove(target)   # 換名確定沒發生
+        raise
+
+
+def _refuse_symlink(path, what):
+    """目的檔是符號連結就停下來 —— 不跟著它寫過去。
+
+    為什麼不是「跟著連結走就好」:這支腳本的備份與還原都以檔名為單位
+    (<封裝檔>.feltoolbak 就放在遊戲檔旁邊)。連結指到哪裡不在我們的掌握裡,
+    寫過去等於在使用者沒說要動的地方動手,而備份還留在這一邊,對不回來。
+    """
+    if os.path.islink(path):
+        raise DataError(
+            '%s是一個符號連結(symlink):%s\n'
+            '  本工具不跟著連結寫過去 —— 連結指向的檔案不在你要改的資料夾裡,\n'
+            '  萬一要還原也對不回來。請直接對真正的那個檔案跑一次。'
+            % (what, path))
+
+
+def _sha256(path):
+    """整份檔案的 sha256。
+
+    還原時拿它做「逐位元組相同」的判斷:結果跟一個一個位元組比一樣,
+    但不必把兩份檔同時讀進記憶體(遊戲的封裝檔可以到一百多 MB)。
+    """
+    h = hashlib.sha256()
+    with open(path, 'rb') as f:
+        for blk in iter(lambda: f.read(1 << 20), b''):
+            h.update(blk)
+    return h.hexdigest()
+
+
+def _mkstemp_beside(path, tag):
+    """在 path 所在的**同一個資料夾**開一個別人佔不到的暫存檔,回傳 (fd, 路徑)。
+
+    同一個資料夾是必要條件:os.replace 只有在同一個檔案系統上才是原子的,
+    寫到 /tmp 再搬過來就不是了。
+    名字開頭加一個點只是為了在檔案總管裡不礙眼;真正擋住「有人先佔位」的
+    是 mkstemp 自己的 O_CREAT|O_EXCL 加隨機字尾。
+    """
+    d = os.path.dirname(os.path.abspath(path)) or '.'
+    return tempfile.mkstemp(dir=d, prefix='.' + os.path.basename(path) + tag)
+
+
+def _atomic_copy(src, dst):
+    """備份要嘛完整、要嘛不存在 —— 中間狀態不會留在 dst 這個名字上。
+
+    ⚠️ 本站有些腳本用 pathlib.Path 存路徑,有些用字串。
+       2026-08-29 第一版寫成 dst + '.part',在 Path 上直接 TypeError,
+       等於所有備份都失敗 —— 而且「半截備份被擋下來」那個測試照樣是綠的。
+       是陰性對照(先證明正常流程真的會產生備份)抓到的。
+       2026-09-05 起連字尾都不接了,改用 mkstemp(見上面那一段)。
+    """
+    # 兩邊都先過 os.fspath:呼叫端可能給字串也可能給 Path。
+    src, dst = os.fspath(src), os.fspath(dst)
+    _refuse_symlink(src, '要備份的來源檔')
+    _refuse_symlink(dst, '備份檔')
+    # 先寫到一個別人佔不到的隨機暫名,寫完才改名成正式的備份名。
+    fd, part = _mkstemp_beside(dst, '.part-')
+    try:
+        with os.fdopen(fd, 'wb') as out_, open(src, 'rb') as in_:
+            shutil.copyfileobj(in_, out_)
+            out_.flush()
+            os.fsync(out_.fileno())    # 換名之前先讓內容真的落到磁碟
+        shutil.copystat(src, part)     # 權限與時間跟著來源走(copy2 原本就會做)
+        # os.replace 是原子的;包在 _NoInterrupt 裡是為了不讓 Ctrl-C 落在它中間。
+        # record=False:備份檔這個名字本來不存在,換上去沒有蓋掉任何東西,
+        # 不該讓收尾的訊息叫使用者去還原它。
+        _replace_and_record(part, dst, record=False)
+    # 連 Ctrl-C(KeyboardInterrupt)與 SystemExit 都要接。使用者按下去的
+    # 那一刻正是最容易產生半截檔的時候,所以這裡是 BaseException 不是 Exception。
+    except BaseException:
+        try:
+            if os.path.lexists(part):
+                os.remove(part)
+        except OSError:
+            pass
+        raise
+
+
+def _atomic_write_bytes(path, data):
+    """把 data 寫成 path:要嘛整份換上去,要嘛 path 完全沒被動到。
+
+    腳本裡三個「寫回遊戲檔」的地方全部走這裡(改攝影機的散裝 .txt 與封裝 .big、
+    開關元素的封裝 .big)。跟 _atomic_copy 同一套做法,差別只在來源是記憶體裡
+    的位元組而不是另一個檔。
+
+    ⚠️ 2026-09-05 之前這三個地方各自寫 open(路徑 + '.tmp', 'wb'):名字猜得到
+       (見上面那一段),而且整支腳本沒有一個 fsync —— 原本的說明還特地寫著
+       「斷電不在保證範圍內」。現在換名之前會先 fsync。
+    """
+    path = os.fspath(path)
+    _refuse_symlink(path, '要寫入的遊戲檔')
+    fd, tmp = _mkstemp_beside(path, '.tmp-')
+    try:
+        with os.fdopen(fd, 'wb') as f_:
+            f_.write(data)
+            f_.flush()
+            os.fsync(f_.fileno())
+        if os.path.exists(path):
+            # mkstemp 開出來的是 0600。直接換上去會讓原本讀得到這個遊戲檔的
+            # 其他使用者/程式突然讀不到,所以把正本的權限套過來。
+            shutil.copymode(path, tmp)
+        # 換名 + 登記走同一個出口(見 _replace_and_record):
+        # 這兩件事被包成不可中斷的一段,Ctrl-C 落在中間也不會讓收尾說錯話。
+        _replace_and_record(tmp, path)
+    except BaseException:
+        try:
+            if os.path.lexists(tmp):
+                os.remove(tmp)
+        except OSError:
+            pass
+        raise
+
+
+def _restore_from_backup(bak, dst):
+    """還原之前先擋掉明顯壞掉的備份。
+
+    ⚠️ 這裡**不能**比對「備份與目標大小相同」—— 本站多數腳本是把資料接到
+    檔尾來改檔(專案鐵律:封裝檔不可重新打包),改完之後正本本來就比備份大,
+    那樣比會擋掉每一次合法的還原。
+
+    ── 2026-08-30 補上三道(上線前資安稽核抓到的真漏洞)────────────────
+    原本只有「不是 0 bytes」+「BIGF 檔頭宣告長度」兩道。**BIGF 以外全破。**
+    實測拿「前 1/8 的半截備份」去還原,六支腳本把正本吃掉而且都印成功:
+        mvp_fix_loc / mvp_menu_text   .LOC        416,753 →  52,094
+        mvp_edit_speed / mvp_ratings
+        / mvp_player                  attrib.dat  840,643 → 105,080
+        mvp_modernize                 mvp2005.exe 5,443,584 → 680,448
+                                      (它還印「複驗:內容與備份相同 ✅」)
+    最後那個會讓遊戲**完全開不起來**,而站上每一課都寫著「隨時可以 --restore」。
+
+    現在檢查五件事:
+      1. 備份不是 0 bytes
+      2. BIGF:檔頭第 4-8 個位元組宣告的總長度要等於實際長度
+         (兩種位元組序都接受;哪些檔是大端、各有幾個,以 reference/bigf.html 量到的為準,這裡不寫會過期的數字)。
+         ⚠️ 只有「宣稱得比實際大」才算被截斷,才拒絕。反過來(宣稱得比實際小)
+         是打包器沒更新這一欄,備份其實是完整的 —— 一律拒絕會變成
+         「改得進去、永遠還原不回來」的單向陷阱。那種檔改走它自己的目錄:
+         每一項的 offset + size 都要落在檔案裡面,截斷的備份一定會超出去
+      3. LOCH(語系檔):檔頭指到的 LOCL 要在檔內,而且最後一條字串的位移
+         也要在檔內 —— 截斷之後那個位移一定會超出去
+      4. MZ(執行檔):PE 節區表裡 raw offset + raw size 的最大值不得超過檔案長度
+      5. **通用地板**:非 BIGF 的備份不得小於「要被蓋掉的那個檔」的一半。
+         非 BIGF 的工具都是原地改(大小幾乎不變),所以這條很安全;
+         BIGF 走 append 會越改越大,所以刻意**不套**這條,由第 2 道負責。
+    """
+    import struct
+    bak, dst = os.fspath(bak), os.fspath(dst)
+    if not os.path.exists(bak):
+        raise SystemExit('找不到備份:%s' % bak)
+    n = os.path.getsize(bak)
+    if n == 0:
+        raise SystemExit(
+            '備份是 0 bytes(多半是上次備份到一半被中斷),不敢拿它覆蓋 %s。' % dst)
+    with open(bak, 'rb') as _f:
+        head = _f.read(8)
+
+    def _stop(why):
+        raise SystemExit(
+            '這份備份是壞的,不敢拿它覆蓋 %s。\n'
+            '  %s\n'
+            '  多半是備份途中被中斷(磁碟滿、外接碟拔掉、按了 Ctrl-C)。\n'
+            '  請改用你自己另外留的那一份備份。' % (dst, why))
+
+    # 第 2 道(封裝檔):檔頭 +0x04 起的 4 個位元組寫著「這個檔應該多大」。
+    # 這一欄兩種位元組順序都遇得到,所以兩種都算一次,任一種對得上就放行;
+    # 被截斷的備份兩種都對不上。
+    if len(head) == 8 and head[:4] == b'BIGF':
+        le = struct.unpack('<I', head[4:8])[0]
+        be = struct.unpack('>I', head[4:8])[0]
+        if le != n and be != n:
+            # 只有「檔頭宣稱的比實際大」才是被截斷的樣子。
+            if min(le, be) > n:
+                _stop('檔頭說它應該是 %d bytes(或 %d),實際只有 %d bytes。'
+                      % (le, be, n))
+            # 反過來(檔頭那一欄本來就寫得比實際小)不可以判死:那是打包器沒更新
+            # 這一欄,備份很可能是完整的。寫入端明文允許這種檔(size_field_order
+            # 兩種都對不上時退回 little-endian),所以這裡若一律拒絕,就會變成
+            # 「改得進去、永遠還原不回來」的單向陷阱,而訊息還會叫使用者去用
+            # 別的備份 —— 那一份其實是逐位元組完整的。
+            # 改用這個格式自己的目錄來驗:每一項的資料都要落在檔案裡面。
+            # 被截斷的備份,後面的項目一定會指到檔尾外面。
+            try:
+                d = open(bak, 'rb').read()
+                cnt = int.from_bytes(d[8:12], 'big')
+                if not 0 < cnt < MAX_ENTRIES:
+                    _stop('封裝檔的目錄說有 %d 個項目,讀不出來。' % cnt)
+                q = 16
+                for i in range(cnt):
+                    if q + 8 > n:
+                        _stop('封裝檔的目錄在第 %d 項處被截斷。' % (i + 1))
+                    o, sz = struct.unpack('>II', d[q:q + 8])
+                    if o + sz > n:
+                        _stop('封裝檔第 %d 項的資料指到 %d bytes,實際只有 %d bytes。'
+                              % (i + 1, o + sz, n))
+                    q = d.find(b'\x00', q + 8)
+                    if q < 0:
+                        _stop('封裝檔第 %d 項的名稱沒有結束符。' % (i + 1))
+                    q += 1
+            except SystemExit:
+                raise
+            except (struct.error, IndexError, OSError):
+                _stop('讀不出封裝檔的目錄結構,它壞了。')
+        return _do_copy(bak, dst)
+
+    # 第 3 道(語系檔):檔頭 +16 的 4 個位元組(小端)指向 LOCL 字串區,
+    # 順著它走到最後一條字串的位移。截斷過的檔那個位移一定會指到檔尾外面。
+    if len(head) >= 4 and head[:4] == b'LOCH':
+        try:
+            d = open(bak, 'rb').read()
+            L = struct.unpack('<I', d[16:20])[0]
+            if L + 16 > n or d[L:L + 4] != b'LOCL':
+                _stop('語系檔的字串區(LOCL)應該在位移 %d,那裡不是 LOCL。' % L)
+            lcnt = struct.unpack('<I', d[L + 12:L + 16])[0]
+            if lcnt <= 0 or L + 16 + lcnt * 4 > n:
+                _stop('語系檔的位移表被截斷了(宣告 %d 條)。' % lcnt)
+            last = struct.unpack('<I', d[L + 16 + (lcnt - 1) * 4:L + 20 + (lcnt - 1) * 4])[0]
+            if L + last >= n:
+                _stop('語系檔最後一條字串在位移 %d,超出檔案結尾(%d bytes)。'
+                      % (L + last, n))
+        except SystemExit:
+            raise
+        except (struct.error, IndexError):
+            _stop('讀不出語系檔的結構,它壞了。')
+
+    # 第 4 道(執行檔):MZ 檔頭 +0x3C 指向 PE 檔頭;PE +6 是節區數、
+    # +20 是選用檔頭長度。每個節區描述固定 40 個位元組,其中 +16 是原始長度、
+    # +20 是原始位移。最遠的節區指到哪裡,檔案至少就要有多長。
+    if len(head) >= 2 and head[:2] == b'MZ':
+        try:
+            d = open(bak, 'rb').read()
+            pe = struct.unpack('<I', d[0x3C:0x40])[0]
+            if pe + 24 > n or d[pe:pe + 4] != b'PE\x00\x00':
+                _stop('執行檔的 PE 檔頭不在它該在的地方,檔案不完整。')
+            nsec = struct.unpack('<H', d[pe + 6:pe + 8])[0]
+            optsz = struct.unpack('<H', d[pe + 20:pe + 22])[0]
+            sec = pe + 24 + optsz
+            end = 0
+            for i in range(nsec):
+                o = sec + i * 40
+                if o + 40 > n:
+                    _stop('執行檔的節區表被截斷了(宣告 %d 個節區)。' % nsec)
+                raw_sz, raw_off = struct.unpack('<II', d[o + 16:o + 24])
+                end = max(end, raw_off + raw_sz)
+            if end > n:
+                _stop('執行檔的節區指到 %d bytes,實際只有 %d bytes。' % (end, n))
+        except SystemExit:
+            raise
+        except (struct.error, IndexError):
+            _stop('讀不出執行檔的結構,它壞了。')
+
+    # 通用地板 —— 非 BIGF 走到這裡
+    if os.path.exists(dst):
+        live = os.path.getsize(dst)
+        if live > 0 and n * 2 < live:
+            _stop('備份只有 %d bytes,而要被蓋掉的那個檔有 %d bytes ——'
+                  '差太多了(不到一半)。' % (n, live))
+    return _do_copy(bak, dst)
+
+
+def _do_copy(bak, dst):
+    """真正動手覆蓋的地方 —— 但它不是「一行 copy2」,是先寫旁邊、驗過才換名。
+
+    獨立成一個函式,是為了讓上面每一道把關都只有這一個出口。
+    以後有人加新的檢查,不會不小心繞過去。
+
+    ── 2026-09-05 改成原子還原(第二輪唯讀稽核 🔴 第 1 條)──────────────
+    原本是 shutil.copy2(備份, 遊戲檔)。copy2 會**先把遊戲檔截成 0 bytes**
+    再一段一段寫回去。上面那五道把關擋得住「備份是壞的」,擋不住
+    「複製到一半斷掉」(Ctrl-C、磁碟滿、外接碟被拔)—— 那一種壞掉的是正本,
+    備份還好好的,但使用者手上已經沒有能玩的遊戲檔了。
+    而還原之後才做的比對只能告訴他「已經壞了」,擋不住它壞。
+
+    現在的順序:
+      1. 在遊戲檔旁邊開一個別人佔不到的隨機暫存檔(mkstemp,不是猜得到的名字)
+      2. 寫完 flush + fsync,再把正本原本的權限套到暫存檔上
+      3. 讀回來跟備份比 sha256 —— 不一樣就整個放棄
+      4. 都對了才 os.replace 換名。換名是原子的:正本要嘛是舊的、要嘛是新的
+    任何一步失敗都把暫存檔刪掉,正本一個位元組都沒被動到。
+    """
+    bak, dst = os.fspath(bak), os.fspath(dst)
+    _refuse_symlink(bak, '備份檔')
+    _refuse_symlink(dst, '要還原的目標檔')
+    fd, tmp = _mkstemp_beside(dst, '.restore-')
+    try:
+        with os.fdopen(fd, 'wb') as out_, open(bak, 'rb') as in_:
+            shutil.copyfileobj(in_, out_)
+            out_.flush()
+            os.fsync(out_.fileno())
+        if os.path.exists(dst):
+            shutil.copymode(dst, tmp)
+        if _sha256(tmp) != _sha256(bak):
+            raise DataError(
+                '寫出來的內容跟備份對不起來,已經放棄這次還原 ——\n'
+                '  %s 一個位元組都沒有被動到,你原本的檔案還在。' % dst)
+        try:
+            st = os.stat(bak)
+            os.utime(tmp, (st.st_atime, st.st_mtime))
+        except OSError:
+            pass                       # 時間戳沒設成功不影響內容,不值得放棄還原
+        # 換名 + 登記走同一個出口(見 _replace_and_record):
+        # 這兩件事被包成不可中斷的一段,Ctrl-C 落在中間也不會讓收尾說錯話。
+        _replace_and_record(tmp, dst)
+    except BaseException:
+        try:
+            if os.path.lexists(tmp):
+                os.remove(tmp)
+        except OSError:
+            pass
+        raise
+
+
+
+
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
+except Exception:
+    pass
+
+# 這兩個上限不是為了效能,是為了擋掉「檔案自己宣稱的數字」:
+# 壞掉或被動過手腳的檔可以宣稱要解壓 4 GB、或宣稱目錄有兩億項,
+# 照著做就是把記憶體吃光。
+MAX_UNCOMPRESSED = 64 * 1024 * 1024
+MAX_ENTRIES = 100000
+VISIBILITY_FIELD = 1          # 元件名稱之後的第 1 個參數 = 顯示開關
+DEFAULT_BIG = os.path.join('data', 'frontend', 'ingame.big')
+
+# 可以考慮動的指令。這張表是第一道關卡,不是最後一道:find_targets 過完
+# 這張表,還要再問一次 visibility_of,那一行的第 1 個參數真的讀得到
+# 0 或 1 才會動手。兩道都過才寫得下去。
+#
+# 哪些指令有那一欄,是在本站測試機的 data/frontend/ 上數的:六個封裝檔、
+# 332 個版面檔、141,767 行(其中 141,765 行認得出指令,另外 2 行是空行;
+# 同一個資料夾裡還有一個跟 frontend.big 位元組完全相同的舊備份,
+# 沒有算進去)。
+#   · 冒號後面只有一格,沒有第 1 個參數:VR 3,376 行、LS 5,057、
+#     LF 943、END 332,還有 SE 10,316 與 TE 3,154(長相就是 VR:78、
+#     SE:xbu0、TE:14182;END 那一行冒號後面是空的)。SE 與 TE 留在這張
+#     表裡是這張表列錯了,不是它們真的有
+#     那一欄;它們過不了 visibility_of 那一關,所以不會壞檔。
+#   · 有第 1 個參數、那一格卻不是開關:TS 331 行放的是空白,
+#     SF 1,002 行放的是版面檔檔名(SF:NAVBAR,fes_navbar.fel,…)。
+#   · 有 0 或 1 卻刻意不放行:KA 355 行、VS 128 行、SC 2,044 行。
+#     SC 是 2,036 個 1 配 8 個 0,第 4 到第 7 欄 2,044 行全部是
+#     0,0,640,480,版面配置跟 TX/SH/RT 同款;但本站沒有獨立證據證明
+#     那一格就是顯示開關,所以一律不放行。
+# 不在表裡、又不屬於上面幾類的指令,第 1 個參數是別的東西,寫進去就是壞檔。
+TOGGLEABLE = {'GR', 'GG', 'SG', 'TX', 'TL', 'TE', 'TB', 'SH', 'RT',
+              'SL', 'SE', 'BU', 'FC', 'FR'}
+
+
+class DataError(Exception):
+    """檔案不存在或格式不符預期。訊息是給人看的。"""
+
+
+# ─────────────────────────────────────────────────────────
+#  QFS / RefPack
+# ─────────────────────────────────────────────────────────
+def size_field_order(raw):
+    """看檔頭那一欄用哪一種位元組順序,回傳 '<'(little)或 '>'(big)。
+
+    BIGF 檔頭 +0x04 起的四個位元組是「檔案總大小」。用哪一種順序不是這個格式
+    天生的性質,是看手上這一份被誰重新打包過。本站用 BIGF 檔頭認過三份 data
+    資料夾:兩份剛安裝好的原版(英文版 207 個封裝檔、繁體中文版 205 個)全部是
+    little-endian,連兩份裡最大的封裝檔 models.big(172,992,803 bytes)也是;
+    big-endian 只出現在本站測試機那份疊過模組的 data 資料夾,384 個封裝檔裡
+    有 10 個,分別是 models.big、frontend/portrait.big、
+    audio/spch_pbp/pnamehdr.big、audio/cd/spch_pbp/pnamedat.big,加上
+    coornite / dodgnite / wrignite 三個球場夜間檔(stadium 與它的原版球場
+    備份資料夾各一套)。
+    ⚠️ 不可以照檔名或檔案大小猜:同一份測試機裡,檔名一樣的
+    audio/spch_pa/pnamehdr.big 與 audio/cd/spch_pa/pnamedat.big 反而是
+    little-endian。寫回去時必須沿用原檔那一種,不然會寫進跟原檔不同的位元組。
+    兩種都對不上時退回 little-endian —— 那代表這個檔的檔頭本來就不一致,
+    寫回去之後的複驗會再偵測一次,兩種都對不上就會擋下來。
+    """
+    n = len(raw)
+    if struct.unpack('<I', raw[4:8])[0] == n:
+        return '<'
+    if struct.unpack('>I', raw[4:8])[0] == n:
+        return '>'
+    return '<'
+
+
+def qfs_decompress(data):
+    """把 EA 的 QFS(社群又叫 RefPack)解開。不是 QFS 就原樣回傳。
+
+    認法是**第 2 個位元組等於 0xFB**,第 1 個位元組是旗標(最常見 0x10)。
+    接著是「解開之後有多大」,這個數字是 big-endian:
+      · 旗標最低位為 1 → 位移 6 起算 4 個位元組,本體從第 10 個位元組開始
+      · 否則           → 位移 2 起算 3 個位元組,本體從第 5 個位元組開始
+
+    本體是一連串控制碼。每個控制碼帶 0 到 3 個(或一整段)原樣位元組,
+    外加一次「往回抄」的指令,那就是壓縮省下來的地方。
+    每一種控制碼各佔幾個位元組、抄多長多遠,見下面主迴圈各分支的註解。
+    """
+    if len(data) < 2 or data[1] != 0xFB:
+        return data
+    if data[0] & 0x01:
+        if len(data) < 10:
+            raise DataError('QFS 檔頭不完整')
+        size = int.from_bytes(data[6:10], 'big'); pos = 10
+    else:
+        if len(data) < 5:
+            raise DataError('QFS 檔頭不完整')
+        size = int.from_bytes(data[2:5], 'big'); pos = 5
+    if not 0 <= size <= MAX_UNCOMPRESSED:
+        raise DataError('QFS 宣稱解壓尺寸異常:%d' % size)
+
+    out = bytearray()
+    end = len(data)
+
+    def guard():
+        # ⚠️ 只檢查檔頭宣稱的大小是不夠的 —— 那是「檔案自己說的」。
+        #    一個惡意檔可以宣稱很小(通過上面那道),再用反向參照無限吐資料,
+        #    把記憶體吃光。實際輸出也必須有上限,而且上限就是它自己宣稱的大小。
+        if len(out) > size:
+            raise DataError('QFS 解出來的資料超過檔頭宣稱的 %d 位元組 —— '
+                            '這個檔可能已損毀或被動過手腳' % size)
+
+    def copy_back(offset, length):
+        """從已經解出來的資料往回 offset 個位元組,抄 length 個過來。
+
+        ⚠️ 抄的範圍可以跟自己重疊(offset 小於 length),那不是 bug 是刻意的:
+           這種編碼用它來表示「同一個樣式連續重複」。所以只能一個一個抄,
+           不可以整段切片複製,切片會抄到還沒生出來的位元組。
+        """
+        if not 0 < offset <= len(out):
+            raise DataError('QFS 反向參照越界 offset=%d' % offset)
+        src = len(out) - offset
+        for _ in range(length):
+            out.append(out[src]); src += 1
+        guard()
+
+    # 主迴圈:一次讀一個控制碼。控制碼的值落在哪個區間,
+    # 就決定它自己佔幾個位元組、後面帶幾個原樣位元組、要往回抄多長多遠。
+    while pos < end:
+        b0 = data[pos]
+        # 0xFC-0xFF:結束碼。只帶 0 到 3 個原樣位元組(壓縮端拿它收尾),讀完就停。
+        if b0 >= 0xFC:
+            n = b0 & 0x03; pos += 1
+            out += data[pos:pos + n]; break
+        # 0xE0-0xFB:純原樣段,一次 4 到 112 個位元組,不往回抄。
+        # (再往上就撞進 0xFC 的區間了,所以 112 是這一族的上限。)
+        if b0 >= 0xE0:
+            n = ((b0 & 0x1F) << 2) + 4; pos += 1
+            out += data[pos:pos + n]; pos += n; continue
+        # 0xC0-0xDF:控制碼佔 4 個位元組。往回抄 5 到 1,028 個,最遠 131,072。
+        if b0 >= 0xC0:
+            b1, b2, b3 = data[pos + 1], data[pos + 2], data[pos + 3]; pos += 4
+            n = b0 & 0x03
+            length = ((b0 & 0x0C) << 6) + b3 + 5
+            offset = ((b0 & 0x10) << 12) + (b1 << 8) + b2 + 1
+        # 0x80-0xBF:佔 3 個位元組。往回抄 4 到 67 個,最遠 16,384。
+        elif b0 >= 0x80:
+            b1, b2 = data[pos + 1], data[pos + 2]; pos += 3
+            n = (b1 >> 6) & 0x03
+            length = (b0 & 0x3F) + 4
+            offset = ((b1 & 0x3F) << 8) + b2 + 1
+        # 0x00-0x7F:最短的一種,佔 2 個位元組。往回抄 3 到 10 個,最遠 1,024。
+        else:
+            b1 = data[pos + 1]; pos += 2
+            n = b0 & 0x03
+            length = ((b0 & 0x1C) >> 2) + 3
+            offset = ((b0 & 0x60) << 3) + b1 + 1
+        # 上面三種共用的收尾:先吐 n 個原樣位元組,再做那一次往回抄。
+        out += data[pos:pos + n]; pos += n
+        copy_back(offset, length)
+    # 結束碼那一段可能多吐幾個位元組,以檔頭宣稱的長度為準切掉。
+    return bytes(out[:size])
+
+
+def qfs_compress_literal(data):
+    """純 literal 編碼:不做字串比對,瞬間完成,格式一樣合法。
+
+    代價是檔案略大,但因為我們是「接到檔尾」,大一點沒有影響。
+    """
+    n = len(data)
+    # 檔頭 5 個位元組:0x10 0xFB 是 QFS 的招牌,後面 3 個是「解開後多大」,
+    # big-endian。對應 qfs_decompress 那兩條路裡「旗標最低位為 0」的那一條。
+    out = bytearray([0x10, 0xFB, (n >> 16) & 0xFF, (n >> 8) & 0xFF, n & 0xFF])
+    # 0xE0 那一族的段長一定是 4 的倍數,所以先把除不盡的 0-3 個位元組留給結束碼。
+    tail = n % 4
+    body = n - tail
+    pos = 0
+    # 每段最多 112 個位元組,再大就撞進 0xFC(結束碼)的區間。
+    while pos < body:
+        chunk = min(112, body - pos)
+        out.append(0xE0 | ((chunk - 4) // 4))
+        out += data[pos:pos + chunk]
+        pos += chunk
+    # 結束碼順便把剛才留下來的餘數帶完。
+    out.append(0xFC | tail)
+    out += data[pos:]
+    return bytes(out)
+
+
+# ─────────────────────────────────────────────────────────
+#  BIG 目錄
+# ─────────────────────────────────────────────────────────
+def list_entries(data):
+    """讀封裝檔的目錄,回傳 [(名稱, TOC 欄位位置, 資料 offset, 資料長度), ...]
+
+    BIGF 的檔頭是 16 個位元組:
+        +0x00  'BIGF' 四個字
+        +0x04  整個檔案多大(這一欄兩種位元組順序都遇得到,見 size_field_order)
+        +0x08  目錄有幾項    ← big-endian
+        +0x0C  目錄區結束位置 ← big-endian
+               (**不是**第一筆資料的位置。本站拿剛安裝好的原版 207 個封裝檔驗過,
+                中間常有 1 到 3 個位元組的填充,最多的一個差 119)
+    接著每一項是「4 位元組位移 + 4 位元組長度」(**兩個都是 big-endian**),
+    後面接一個以 NUL(0x00)結尾的名字,長度不固定。
+
+    第二欄那個「TOC 欄位位置」是這一項的 8 個位元組在檔案裡的位置。
+    留著它,寫回去時就只要改那 8 個位元組,不必重寫整個目錄。
+    而「不重寫整個目錄」正是這支腳本不會弄丟孤兒資料的原因。
+    """
+    if len(data) < 16 or data[:4] != b'BIGF':
+        raise DataError('檔頭前四碼不是 BIGF,這不是 EA 封裝檔')
+    count = int.from_bytes(data[8:12], 'big')
+    if not 0 < count < MAX_ENTRIES:
+        raise DataError('目錄項目數異常(%d),檔案可能已損毀' % count)
+    items = []
+    pos = 16                       # 目錄緊接在 16 個位元組的檔頭後面
+    for i in range(count):
+        field = pos
+        # 每一步都先確認還讀得到。被截斷的檔要在這裡停下來講人話,
+        # 而不是丟一個使用者看不懂的 struct.error。
+        if pos + 8 > len(data):
+            raise DataError('目錄在第 %d 項處被截斷' % (i + 1))
+        offset, size = struct.unpack('>II', data[pos:pos + 8])
+        pos += 8
+        # 名字沒有長度欄位,只能一路找到 NUL 為止。
+        end = data.find(b'\x00', pos)
+        if end < 0:
+            raise DataError('第 %d 項的名稱沒有結束符' % (i + 1))
+        if offset + size > len(data):
+            raise DataError('第 %d 項的資料範圍超出檔案結尾' % (i + 1))
+        items.append((data[pos:end].decode('latin-1', 'replace'), field, offset, size))
+        pos = end + 1
+    return items
+
+
+# ─────────────────────────────────────────────────────────
+#  FEL 解析(只做我們需要的:指令 / 名稱 / 顯示開關)
+# ─────────────────────────────────────────────────────────
+def fel_line_count(text):
+    """算行數。
+
+    版面檔的換行是 CRLF,直接 count('\\r\\n')+1 會把結尾那個空字串多算一行。
+    但「結尾有沒有換行符」不可以寫死:本站測試機那份 ingame.big(裝過模組)
+    是 47 個版面檔,其中 46 個以 CRLF 結尾,例外是 fes_hudleft.fel;剛安裝好的原版
+    是 44 個版面檔,44 個全部以 CRLF 結尾(本站三份未改動的安裝量到的都一樣)。
+    所以下面用「拆完之後最後一段是不是空字串」動態判斷,兩種都算得對。
+    """
+    parts = text.split('\r\n')
+    if parts and parts[-1] == '':
+        parts.pop()
+    return len(parts)
+
+
+def fel_lines(text):
+    """把版面檔逐行拆開,產出 (行號從1起, 原始行, 縮排, 指令, 名稱, 參數list)。
+
+    版面檔一行長這樣:
+        TX:名稱,顯示開關,保留,X,Y,寬,高,…,字型.ffn,字串編號,對齊,R,G,B,…
+        ↑指令 ↑冒號後面用逗號分隔的參數,第 0 個是名稱
+
+    縮排代表階層(群組 GR 底下的元素會多縮幾格),所以縮排要留著給 --where 用。
+    看不出指令的行(空行、沒有冒號的行)照樣產出,只是後三欄是 None。
+    這樣行號才不會跳號,而行號正是使用者拿去對照的東西。
+    """
+    for i, raw in enumerate(text.split('\r\n')):
+        stripped = raw.lstrip(' ')
+        indent = len(raw) - len(stripped)
+        if not stripped or ':' not in stripped:
+            yield i + 1, raw, indent, None, None, None
+            continue
+        cmd, _, rest = stripped.partition(':')
+        parts = rest.split(',')
+        name = parts[0] if parts else ''
+        yield i + 1, raw, indent, cmd, name, parts
+
+
+def visibility_of(parts):
+    """這一行的顯示開關是什麼:'1' 開、'0' 關、None 代表這一行沒有這一欄。
+
+    只認 '0' 與 '1' 兩個值,其他東西(空白、別的數字)一律當成「沒有開關」。
+    寧可少認一行,也不要把不確定的欄位當成開關去寫。寫錯就是壞檔。
+    """
+    if parts is None or len(parts) <= VISIBILITY_FIELD:
+        return None
+    v = parts[VISIBILITY_FIELD].strip()
+    return v if v in ('0', '1') else None
+
+
+# ─────────────────────────────────────────────────────────
+#  .LOC 字串表:把版面檔裡的「字串編號」換成真正的文字
+#
+#  結構(實測 IGENG.LOC / FEENG.LOC 皆同):
+#    LOCH  20 bytes 檔頭
+#    LOCI  索引:每 4 bytes = (LOCL 索引 << 16) | 字串編號
+#    LOCL  文字:count + 位移表 + UTF-16LE 內容
+# ─────────────────────────────────────────────────────────
+def load_loc(path):
+    """回傳 {字串編號: 文字}。讀不到就回空 dict,不中斷主流程。"""
+    try:
+        d = open(path, 'rb').read()
+    except OSError:
+        return {}
+    if len(d) < 32 or d[:4] != b'LOCH':
+        return {}
+    try:
+        # ⚠️ 這個檔全部是 little-endian,跟 BIGF 目錄(big-endian)剛好相反。
+        #    兩種順序在同一支腳本裡並存,讀錯一個就整片是亂數。
+        # LOCI 索引區:+24 是這一區多長、+28 是有幾條,條目從 +32 開始。
+        loci_size = struct.unpack('<I', d[24:28])[0]
+        icnt = struct.unpack('<I', d[28:32])[0]
+        # 每條 4 個位元組:高 16 位是「第幾條文字」,低 16 位是「字串編號」。
+        # 版面檔上寫的是字串編號,所以非得靠這張表才轉得到文字。
+        ents = [struct.unpack('<I', d[32 + i * 4:36 + i * 4])[0] for i in range(icnt)]
+        # LOCL 文字區緊接在 20 個位元組的檔頭 + 整個 LOCI 區之後。
+        L = 20 + loci_size
+        if d[L:L + 4] != b'LOCL':
+            return {}
+        lsize = struct.unpack('<I', d[L + 4:L + 8])[0]
+        lcnt = struct.unpack('<I', d[L + 12:L + 16])[0]
+        # 位移表:每條 4 個位元組,而且是**相對於 LOCL 這個位置**,
+        # 不是相對於檔案開頭;少加這個 L 就會讀到別的地方去。
+        offs = [struct.unpack('<I', d[L + 16 + i * 4:L + 20 + i * 4])[0] for i in range(lcnt)]
+
+        def text(i):
+            """第 i 條文字。
+
+            沒有長度欄位,所以用「下一條的起點」當這一條的終點;
+            最後一條沒有下一條,拿整個 LOCL 區的長度收尾。
+            內容是 UTF-16LE(一個字兩個位元組),尾巴補的 NUL 要去掉。
+            """
+            a = L + offs[i]
+            b = L + offs[i + 1] if i + 1 < lcnt else L + lsize
+            return d[a:b].decode('utf-16-le', 'replace').rstrip('\x00')
+
+        out = {}
+        for x in ents:
+            idx, sid = x >> 16, x & 0xFFFF
+            if idx < lcnt:
+                out[sid] = text(idx)
+        return out
+    except (struct.error, IndexError):
+        return {}
+
+
+# 字串表的檔名跟語言版本綁在一起。
+# ⚠️ EA 官方繁體中文版**不是**把中文塞進 ENG 檔,而是另外放一對 JPN 檔
+#    (FEJPN.LOC / IGJPN.LOC),ENG 那一對根本不存在。
+#    這支工具原本只找 ENG,所以在繁中版上會回傳 0 筆 —— 而且不報錯,
+#    只是後面每一個字串都顯示不出來。那正是本站最怕的靜默失敗。
+LOC_NAMES = ('FEENG.LOC', 'IGENG.LOC',      # 英文版與大多數社群中文化模組
+             'FEJPN.LOC', 'IGJPN.LOC')      # EA 官方繁體中文版
+
+
+def load_all_loc(gamedir):
+    """比賽中與前端兩張表都讀。比賽中的優先。
+
+    四個候選檔名都試,有幾個讀到幾個。回傳空的代表一個都沒找到。
+    """
+    out = {}
+    for name in LOC_NAMES:
+        p = os.path.join(gamedir, 'data', name)
+        if os.path.isfile(p):
+            out.update(load_loc(p))
+    return out
+
+
+def loc_files_present(gamedir):
+    """實際找到哪幾個字串表 —— 讀不到的時候要能告訴使用者查過哪些。"""
+    return [n for n in LOC_NAMES
+            if os.path.isfile(os.path.join(gamedir, 'data', n))]
+
+
+def string_id_of(parts):
+    """TX 這類指令的參數裡,字型檔後面那個數字就是字串編號。"""
+    if not parts:
+        return None
+    for i, c in enumerate(parts):
+        if c.strip().lower().endswith('.ffn') and i + 1 < len(parts):
+            v = parts[i + 1].strip()
+            if v.isdigit():
+                return int(v)
+    return None
+
+
+def cmd_strings(texts, strings, fn=None):
+    """把版面檔裡的字串編號換成真正的文字印出來(唯讀)。
+
+    為什麼要有它:版面檔上寫的是「字型.ffn,1234」這種編號,
+    光看版面檔不知道那一格在遊戲裡顯示什麼字。有這個模式,不用開遊戲
+    就認得出「哦,這個元素就是畫面上那行字」。
+
+    讀不到字串表時**不會靜默跳過**,那正是本站最怕的失敗方式。
+    所以這裡把查過哪四個檔名、為什麼有四個,全部印出來給使用者看。
+    """
+    if not strings:
+        print('\n讀不到字串表。')
+        print('  本工具會找這四個檔:%s' % '、'.join(LOC_NAMES))
+        print('  (前兩個是英文版與多數社群中文化模組用的;')
+        print('   後兩個是 EA 官方繁體中文版用的 —— 它把中文放在日文的槽位。)')
+        print('  請確認你的遊戲資料夾底下的 data\\ 裡至少有其中一個。')
+        return
+    print('\n字串表共 %d 條' % len(strings))
+    files = [fn] if fn else sorted(texts)
+    if fn and fn not in texts:
+        raise DataError('封裝檔裡沒有 %s。先用 --list 看有哪些。' % fn)
+    rows = []
+    for f in files:
+        for ln, raw, ind, cmd, name, parts in fel_lines(texts[f]):
+            sid = string_id_of(parts)
+            if sid is None:
+                continue
+            rows.append((f, ln, name, sid, strings.get(sid)))
+    known = [r for r in rows if r[4] is not None]
+    print('  這些版面檔裡有 %d 處引用字串,其中 %d 處查得到文字\n' % (len(rows), len(known)))
+    print('  %-30s %6s %-20s %6s %s' % ('版面檔', '行號', '元素', '編號', '文字'))
+    print('  ' + '-' * 88)
+    seen = set()
+    for f, ln, name, sid, txt in rows[:300]:
+        if txt is None:
+            txt = '(表裡沒有這個編號)'
+        key = (f, sid)
+        if key in seen:
+            continue
+        seen.add(key)
+        print('  %-30s %6d %-20s %6d %s' % (f[:30], ln, (name or '')[:20], sid, txt[:40]))
+    if len(rows) > 300:
+        print('  …只顯示前 300 筆,用 --strings <版面檔> 縮小範圍')
+
+
+# ─────────────────────────────────────────────────────────
+#  各種動作
+# ─────────────────────────────────────────────────────────
+def load_big(path):
+    """把整個封裝檔一次讀進記憶體。
+
+    ingame.big 這種檔是幾 MB 等級,一次讀完最單純;後面所有解析都在
+    記憶體裡做,不會邊讀邊改遊戲檔。
+    """
+    try:
+        return open(path, 'rb').read()
+    except OSError as e:
+        raise DataError('讀不到 %s:%s' % (path, e))
+
+
+def fel_texts(raw, items):
+    """把封裝檔裡每一個版面檔解壓成文字,回傳 {檔名: 文字}。
+
+    用 latin-1 解碼是刻意的:latin-1 把 0 到 255 每一個位元組一對一映射成
+    一個字元,所以「解碼再編碼回去」保證拿回一模一樣的位元組。
+    版面檔實際上是 ASCII,但用 latin-1 才不會在遇到意外位元組時炸掉或走樣。
+
+    解不開的項目直接跳過不中斷:一個壞掉的項目不該讓整個封裝檔都看不了。
+    """
+    out = {}
+    for n, field, o, s in items:
+        if not n.lower().endswith('.fel'):
+            continue
+        try:
+            out[n] = qfs_decompress(raw[o:o + s]).decode('latin-1')
+        except DataError:
+            pass
+    return out
+
+
+def _geom(parts):
+    """版面檔一行的第 4-7 個欄位是 X, Y, 寬, 高。回傳 None 代表這行沒有座標。"""
+    if parts is None or len(parts) < 7:
+        return None
+    try:
+        g = [float(parts[i]) for i in (3, 4, 5, 6)]
+    except ValueError:
+        return None
+    return g
+
+
+def cmd_where(texts, strings, fn):
+    """列出一個版面檔裡「顯示中」的元素在畫面上的位置。
+
+    座標是 640x480 這個固定畫面的絕對座標,不是相對於上層群組。
+    實測 ingame.big 全部 18,649(這台被模組疊過的測試機 47 個版面檔的母體;原版是 44 個) 個有座標的元素,用四種「落在畫面內」的
+    判定條件各算一次,絕對解讀都是相對解讀的兩倍以上:
+        整個框都在畫面內   96.4% 對 18.9%
+        左上角在畫面內     98.5% 對 25.2%
+        框與畫面有重疊     99.4% 對 25.7%
+        中心點在畫面內     99.0% 對 23.6%
+        (2026-08-29 訂正:這四對原本寫 49.1 / 91.0 / 88.5 / 83.2,
+         是整欄左移一格、讀成「保留欄, X, Y, 寬」算出來的。
+         錨點:SC: 那一行用第 4-7 欄讀出來剛好是 0,0,640,480 = 畫面本身;
+         用第 3-6 欄讀寬度會變成 0。只有一種讀法成立。)
+    不管怎麼定義,絕對解讀都贏。
+    """
+    if fn not in texts:
+        raise DataError('封裝檔裡沒有 %s。先用 --list 看有哪些。' % fn)
+    print('\n%s 裡顯示中的元素(畫面是 640x480)\n' % fn)
+    print('   行號    X    Y   寬 x 高  指令:名稱                文字 / 所屬群組')
+    print('  ' + '-' * 76)
+    # stack 記的是「現在在哪幾層群組裡面」。版面檔沒有結束標記,階層完全靠縮排,
+    # 所以縮排一回到同層或更淺,就把上面那幾層彈掉。印出來的「所屬群組」靠它。
+    stack, n = [], 0
+    for ln, raw, ind, cmd, name, parts in fel_lines(texts[fn]):
+        if not cmd:
+            continue
+        while stack and stack[-1][0] >= ind:
+            stack.pop()
+        if cmd in ('GR', 'GG', 'SG'):
+            stack.append((ind, name))
+        # 只看得見的三種:文字、貼圖、色塊。群組本身不佔畫面,不列。
+        if cmd not in ('TX', 'SH', 'RT'):
+            continue
+        if visibility_of(parts) != '1':
+            continue
+        g = _geom(parts)
+        if g is None or g[2] <= 0 or g[3] <= 0:
+            continue
+        sid = string_id_of(parts)
+        txt = strings.get(sid, '') if sid else ''
+        tail = ('「%s」  ' % txt) if txt else ''
+        tail += '< ' + '/'.join(x for _, x in stack)
+        print('  %5d %4g %4g  %4gx%-4g %-22s %s'
+              % (ln, g[0], g[1], g[2], g[3], cmd + ':' + name, tail))
+        n += 1
+    print('\n  共 %d 個。全程唯讀。' % n)
+
+
+def cmd_bigs(gamedir):
+    """掃 data/frontend 底下每一個封裝檔,看哪些裝著版面檔。
+
+    有些檔案叫 .big 但根本不是 EA 封裝檔(實測 feonlyln.big 的檔頭是
+    SHPI,那是圖片容器不是封裝檔),所以這裡讀不出來就照實說,不當錯誤。
+    """
+    import glob
+    folder = os.path.join(gamedir, 'data', 'frontend')
+    paths = sorted(glob.glob(os.path.join(folder, '*.big')))
+    if not paths:
+        raise DataError('%s 裡沒有 .big。第一個參數是不是給錯資料夾了?' % folder)
+    print('\n掃 %s\n' % folder)
+    print('  封裝檔                        大小      項目   版面檔      行數')
+    print('  ' + '-' * 66)
+    # 三類分開報,不混為一談:
+    #   hit   裝著版面檔的
+    #   other 是封裝檔,但裡面一個版面檔都沒有(圖片、球衣、球場那些)
+    #   bad   根本讀不出來的(例如檔頭是 SHPI 的那種,它不是封裝檔)
+    hit, other, bad = [], 0, []
+    for path in paths:
+        base = os.path.basename(path)
+        try:
+            raw = load_big(path)
+            items = list_entries(raw)
+            texts = fel_texts(raw, items)
+        except (DataError, OSError) as e:
+            bad.append((base, str(e)))
+            continue
+        if not texts:
+            other += 1
+            continue
+        lines = sum(fel_line_count(t) for t in texts.values())
+        hit.append((base, os.path.getsize(path), len(items), len(texts), lines))
+    for b, size, n, nf, lines in sorted(hit, key=lambda r: -r[4]):
+        print('  %-26s %7.1f MB %6d %7d %9s' % (b, size / 1048576.0, n, nf, format(lines, ',')))
+    print('  ' + '-' * 66)
+    print('  %-26s %10s %6d %7d %9s'
+          % ('合計 %d 個封裝檔' % len(hit), '',
+             sum(r[2] for r in hit), sum(r[3] for r in hit),
+             format(sum(r[4] for r in hit), ',')))
+    print('\n  另外 %d 個封裝檔裡沒有版面檔(圖片、球衣、球場那些)。' % other)
+    for b, msg in bad:
+        print('  ⚠ %s 讀不出來:%s' % (b, msg))
+    print('\n  想看某一個:--big data/frontend/<檔名> --list')
+
+
+def sniff(blob):
+    """回傳這個項目「是什麼」。看內容,不看檔名。
+
+    為什麼不看檔名:封裝檔裡的名字是打包的人取的,被模組疊過的封裝檔裡
+    什麼名字都可能出現。開頭那幾個位元組才是真的:
+    第 2 個位元組是 0xFB 代表 QFS 壓縮,解開之後再看一次裡面是什麼
+    (常見的是又一層 BIGF,或純文字)。
+    """
+    if len(blob) < 4:
+        return '太短'
+    if len(blob) > 1 and blob[1] == 0xFB:          # QFS/RefPack
+        try:
+            u = qfs_decompress(blob)
+        except DataError as e:
+            return 'QFS(解不開:%s)' % e
+        inner = u[:4].decode('latin-1', 'replace')
+        if u[:4] == b'BIGF':
+            try:
+                n = len(list_entries(u))
+                return 'QFS → BIGF(裡面又有 %d 個項目)' % n
+            except DataError:
+                return 'QFS → BIGF(目錄讀不出來)'
+        if all(32 <= c < 127 or c in (9, 10, 13) for c in u[:64]):
+            return 'QFS → 純文字'
+        return 'QFS → %s' % inner
+    return blob[:4].decode('latin-1', 'replace')
+
+
+def cmd_entries(raw, items):
+    """列出封裝檔裡的每一個項目 —— 不管是不是版面檔。
+
+    跟 --list 的差別:--list 只看版面檔並解析行數,
+    這個是「先看看裡面到底有什麼」,對圖片、模型、球場那些封裝檔才有用。"""
+    print('\n封裝檔內共 %d 個項目:\n' % len(items))
+    print('  %-36s %12s  %s' % ('名稱', '大小', '內容是什麼(看檔頭認的)'))
+    print('  ' + '-' * 76)
+    # 一邊印一邊統計種類:項目多的封裝檔逐項看沒有意義,
+    # 「裡面九成是 QFS 壓縮的貼圖」這種結論才有用。
+    kinds = {}
+    for n, f, o, s in items:
+        k = sniff(raw[o:o + s])
+        kinds[k] = kinds.get(k, 0) + 1
+        print('  %-36s %12s  %s' % (n[:36], format(s, ','), k))
+    print('  ' + '-' * 76)
+    print('  合計 %s bytes' % format(sum(i[3] for i in items), ','))
+    if len(kinds) > 1 or len(items) > 6:
+        print('\n  種類統計:')
+        for k, v in sorted(kinds.items(), key=lambda x: -x[1]):
+            print('    %-46s %d 個' % (k, v))
+    paths = [n for n, _, _, _ in items if '/' in n or '\\' in n]
+    if paths:
+        print('\n  ⚠ 有 %d 個項目的名稱帶資料夾路徑(這在 MVP 的封裝檔裡很少見)。' % len(paths))
+    print()
+
+
+# ─────────────────────────────────────────────────────────
+#  總設定檔 datafile.txt —— 攝影機
+#
+#  格式:每行  0x<識別碼> <欄位數> <名字或表頭> ;編號 值;編號 值…
+#  「欄位數」那個數字不是型別編號,是這一行有幾個欄位(21,548 行零例外)。
+#
+#  ⚠️ 欄位名稱表是**另外一種列**(第三個欄位也是數字,不是 <名字>),
+#     不是攝影機那一列自己帶的。攝影機由**兩張**表管:116 欄那張管打擊、
+#     128 欄那張管守備;而哪一張表管哪幾台是**看位置**決定的,
+#     往前最近的那一張就是它適用的表,不是拿欄位數去配。
+#     本站量了 9 份有攝影機記錄的總設定檔(6 份封裝版 datafile.big、
+#     3 份散裝版 datafile.txt),9 份全部都是 123 列表頭、其中 99 列帶欄位名、
+#     39 台攝影機;116 欄那張管打擊 32 台,128 欄那張管守備 6 台加 HeadViewer。
+#     拿欄位數去配一定會錯:剛安裝好的原版英文版 datafile.big 裡
+#     有 4 台攝影機自己的那一列欄位數也是 116,而它們都不是名稱表。
+#  ⚠️ 表頭在第幾行、每個欄位是幾號,兩者都跟著版本跑,見 camera_table 的說明。
+#
+#  ⚠️ 2026-08-28 訂正。這裡原本寫「編號在攝影機家族之間共用 —— 拿它去讀
+#     其他 38 筆,X/Y/Z/FOV/Pitch/Heading/Roll 全是數字…9 項全中」。
+#     **那句話只對 Batting 那 32 台成立。**
+#     Fielding 6 台 + HeadViewer 記的是相對位移,跟打擊視角不是同一套編號。
+#     拿打擊表的座標欄去讀守備視角,讀到的那一格裝的是
+#     「OffsetX#OffsetY#OffsetZ」這種標籤字串,不是數字;
+#     拿打擊表的 FOV 那一格去讀,讀到的是另一個欄位,不可能是視野角度。
+#
+#  ⚠️ 2026-09-03 再訂正:上面原本舉的欄位編號跟著版本跑,已經拿掉。
+#     本站量了 9 份有攝影機記錄的總設定檔:6 份是**封裝版**
+#     (遊戲裡有 datafile.big,剛安裝好的原版英文版就是這種),
+#     3 份是**散裝版**(沒有 datafile.big,datafile.txt 直接躺在資料夾裡,
+#     官方中文版就是這種)。行號與編號**組內完全一致,兩組之間整個重排過**:
+#
+#       FieldingView1 的這一格         封裝版        散裝版
+#       OffsetX / OffsetY / OffsetZ    ;19 ;20 ;21   ;13 ;14 ;15
+#       緊接在後面那兩格的標籤字串     ;22 ;23       ;16 ;17
+#       ;53 這一格叫什麼               Pitch         VerticalFraming
+#       真正的 FOV 是幾號              ;65           ;46
+#       守備名稱表在第幾行             8516          9216
+#       FieldingView1 在第幾行         8519          9219
+#
+#     打擊名稱表兩組都在第 7940 行,打擊表的 ;53 兩組也都叫 FOV。
+#     ⚠️ 這 9 份裡封裝的 6 份全是英文版基底、散裝的 3 份全是中文版基底,
+#     所以「是封裝散裝造成的、還是英文中文造成的」,用這批檔分不開。
+#     能確定的只有一條:不要記編號,讓程式去讀表頭,這支工具就是這樣做的。
+#
+#     後果是真的:訂正之前 --set X=5 會把那個字串換成 5,把記錄寫壞,
+#     而工具自己的複驗還會說「讀回來的內容與預期相同 ✅」——
+#     因為它只檢查「寫進去的跟打算寫的一樣」,不檢查「這欄該不該寫」。
+#     現在改成:**要寫的那一格,現在的值必須本來就是數字**,否則拒絕。
+#
+#     教訓跟本站在球場那一課踩的是同一個:拿最漂亮的樣本(Batting 32 台
+#     全中)推出通則,而反例就在同一份檔案裡。
+# ─────────────────────────────────────────────────────────
+DATAFILE_ENTRY = 'datafile.txt'
+CAM_RE = re.compile(r'^0x([0-9a-f]+) (\d+)<([^>]*)>(.*)$')
+HDR_RE = re.compile(r'^0x([0-9a-f]+) (\d+) (\d+)(.*)$')
+# 只放行「一望即知是數字」的欄位。其他欄位(對焦目標、標記點名稱、
+# 各種開關)改錯的後果不好預測,這支工具不碰。
+# 2026-08-28 加 OffsetX/Y/Z:守備視角沒有絕對的 X/Y/Z,它記的是相對位移,
+# 那三欄在守備表裡是純數字(FieldingView1 = 0.00 / 3.00 / 0.00)。
+# 名字在自己那張表裡找,所以打擊視角不會多出這三個選項。
+CAM_SETTABLE = ('X', 'Y', 'Z', 'FOV', 'Pitch', 'Heading', 'Roll',
+                'OffsetX', 'OffsetY', 'OffsetZ')
+# 「一般的十進位數字」長什麼樣。刻意**不**收 nan / inf / infinity,也不收
+# Python 才認得的底線寫法(1_0)—— 那幾種 float() 全都收得下,遊戲卻讀不懂。
+PLAIN_NUMBER_RE = re.compile(r'^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$')
+# 散裝 datafile.txt 的一行長什麼樣:0x<識別碼> <欄位數> 之後才是內容。
+# 還原之前拿它驗備份的最後一行完不完整。
+DATAFILE_RECORD_RE = re.compile(rb'^0x[0-9a-f]+ \d+')
+_INF = float('inf')
+
+
+def _is_number(v):
+    """這一格是不是數字。
+
+    這不是在做輸入檢查,是**護欄**:同一個欄位編號在打擊視角是座標,
+    在守備視角可能是一段結構字串。本來不是數字的格子一律不准寫。
+    """
+    try:
+        float(v)
+        return True
+    except (TypeError, ValueError):
+        return False
+
+
+def _pairs(rest):
+    """把「;編號 值;編號 值…」拆成 [(編號, 值), …]。
+
+    值本身可以有空白(例如 OffsetX#OffsetY#OffsetZ 那種標籤),
+    所以一路吃到下一個分號為止,不能拿空白當分隔。
+    """
+    return [(int(a), b) for a, b in re.findall(r';(\d+) ([^;]*)', rest)]
+
+
+def loose_datafile(path):
+    """這個路徑是不是散裝的 datafile.txt(不是封裝檔)。
+
+    ⚠️ 2026-08-28 加。官方中文版**沒有 datafile.big** ——
+       它把整個 data/datafile/ 散裝成 466 個 .txt 直接放在資料夾裡,
+       datafile.txt 就躺在那裡。data/anims/ 也一樣(730 個散裝檔,沒有 anims.big)。
+       本站在此之前所有量測都是拿英文版做的,所以這一課對裝中文版的人
+       是從頭到尾跑不起來的。這個判斷式就是為了那件事。
+    """
+    return os.path.isfile(path) and os.path.basename(path).lower() == DATAFILE_ENTRY
+
+
+def datafile_text(raw, items, loose_path=None):
+    """把 datafile.txt 解出來成一整份文字。散裝的直接讀,封裝的從裡面取出來。
+
+    封裝檔裡那一份**不一定壓縮過**(第 2 個位元組是 0xFB 才是),所以先看再決定。
+    一樣用 latin-1 解碼,理由跟 fel_texts 相同:一個位元組換一個字元,
+    寫回去的時候拿得回原本的位元組。
+    """
+    if loose_path:
+        with open(loose_path, 'rb') as _f:
+            return _f.read().decode('latin-1')
+    hit = [x for x in items if x[0] == DATAFILE_ENTRY]
+    if not hit:
+        raise DataError('這個封裝檔裡沒有 %s。\n'
+                        '  英文版的攝影機在 data/datafile/datafile.big;\n'
+                        '  官方中文版沒有那個封裝檔,請改指 data/datafile/datafile.txt。'
+                        % DATAFILE_ENTRY)
+    _, _, off, size = hit[0]
+    blob = raw[off:off + size]
+    if len(blob) > 1 and blob[1] == 0xFB:
+        blob = qfs_decompress(blob)
+    return blob.decode('latin-1')
+
+
+def camera_table(text):
+    """回傳 (名稱→(行號, 欄位數, {編號:值}, 這一台適用的欄位名表), 主表)。
+
+    ⚠️ 2026-08-28 重寫。原本的做法是「找欄位數 116 那一列當名稱表,
+       套用到全部 39 台攝影機」。**那是錯的,而且會寫壞檔案。**
+
+       這個檔裡有**不只一張**攝影機名稱表,而**一張表管的是它後面那一段,
+       到下一張表為止**:
+
+         116 欄那張 → 後面 32 台 BattingView*
+         128 欄那張 → 後面 7 台 FieldingView1-6 + HeadViewer
+
+       ⚠️ 表頭在第幾行、每個欄位是幾號,兩者都跟著版本跑,所以這裡不寫死。
+       本站量的 9 份有攝影機記錄的總設定檔分成兩組,組內完全一致:
+       6 份封裝版(有 datafile.big)守備名稱表在第 8516 行、
+       FieldingView1 在第 8519 行;3 份散裝版(只有 datafile.txt)
+       分別在第 9216 行與第 9219 行。打擊名稱表兩組都在第 7940 行。
+
+       兩張表的編號完全不同。同一個 ;13,打擊表在封裝版叫 LocMarkerName、
+       在散裝版叫 LocationObject;守備表在封裝版叫 RelativeObject、
+       在散裝版才叫 OffsetX。;53 打擊表兩組都叫 FOV,守備表在封裝版叫
+       Pitch、在散裝版叫 VerticalFraming。
+
+       怎麼確定不是巧合(錨點,不是數量吻合):守備表說某三格是
+       OffsetX/OffsetY/OffsetZ,而剛安裝好的原版裡 FieldingView1 那三格
+       正好是 0.00/3.00/0.00,緊接在後面的兩格就寫著字串
+       「OffsetX#OffsetY#OffsetZ」(封裝版 ;22/;23,散裝版 ;16/;17),
+       **標籤字串跟同一張表的欄位名對得起來**,而且跟打擊視角
+       (X/Y/Z 三格之後緊接著寫「X#Y#Z」的格子)是同一個結構。
+
+       用「往前找最近的表頭」這條規則跑一次:32 台全落在打擊表、
+       7 台全落在守備表,**零例外、零模稜兩可**。
+    """
+    cams = {}
+    cur = None                     # 目前生效的欄位名稱表 = 往前最近的那一張
+    for i, line in enumerate(text.split('\n')):
+        # 表頭列(第三個欄位是數字)= 一張新的欄位名稱表。從這一行往下,
+        # 攝影機的編號就要照這張表解讀,直到下一張表出現為止。
+        m = HDR_RE.match(line)
+        if m:
+            t = {n: v.strip() for n, v in _pairs(m.group(4)) if v.strip()}
+            if t:
+                cur = t
+            continue
+        # 資料列(第三個欄位是 <名字>)。只挑攝影機。
+        # 這個檔有兩萬多行,絕大多數跟視角無關。
+        m = CAM_RE.match(line)
+        if m and re.search(r'(Batting|Fielding)View|HeadViewer', m.group(3)):
+            if not cur:
+                raise DataError('第 %d 行的攝影機「%s」前面找不到任何欄位名稱表。'
+                                % (i + 1, m.group(3)))
+            cams[m.group(3)] = (i, int(m.group(2)),
+                                {n: v.strip() for n, v in _pairs(m.group(4))},
+                                cur)
+    if not cams:
+        raise DataError('這個檔裡找不到任何攝影機。')
+    # 主表 = 最多台攝影機共用的那一張(給還在用舊回傳值的地方)
+    main = max((c[3] for c in cams.values()),
+               key=lambda t: sum(1 for c in cams.values() if c[3] is t))
+    return cams, main
+
+
+def cmd_cameras(text):
+    """把總設定檔裡的攝影機列成一張表(唯讀)。
+
+    每一台用**它自己那一張**欄位名稱表去讀,不是全部套同一張。
+    這是 2026-08-28 訂正的重點,原因見 camera_table 的說明。
+    讀出來不是數字的格子標成「(不是數字)」,那是在提醒使用者
+    那一格是結構欄位而不是座標,別拿它當 X/Y 去改。
+    """
+    cams, names = camera_table(text)
+    print('\n這個檔裡有 %d 個攝影機:\n' % len(cams))
+    print('  %-28s %9s %9s %9s %8s %8s %9s'
+          % ('名稱', 'X', 'Y', 'Z', 'FOV', 'Pitch', 'Heading'))
+    print('  ' + '-' * 86)
+    fams = {}
+    for nm in sorted(cams):
+        _, _, f, nt = cams[nm]
+        fams.setdefault(id(nt), []).append(nm)
+        # 每一台用**它自己那一張**名稱表,不是全部套同一張。
+        ix = {v: k for k, v in nt.items()}
+        def g(k, _f=f, _ix=ix):
+            n = _ix.get(k)
+            v = _f.get(n, '') if n is not None else ''
+            return v if (v == '' or _is_number(v)) else '(不是數字)'
+        print('  %-28s %9s %9s %9s %8s %8s %9s'
+              % (nm, g('X'), g('Y'), g('Z'), g('FOV'), g('Pitch'), g('Heading')))
+    if len(fams) > 1:
+        print()
+        print('  ⚠️ 這 %d 台攝影機不是共用同一張欄位名稱表(這個檔裡有 %d 張)。'
+              % (len(cams), len(fams)))
+        print('     守備視角記的是相對位移,沒有絕對的 X/Y ——')
+        print('     上面標「(不是數字)」的格子是結構欄位,不是座標。')
+    print('\n  想看某一個的全部欄位:--camera <名稱>')
+    print('  想改:--camera <名稱> --set FOV=30,Y=60   (沒加 --apply 只是預覽)')
+
+
+def cmd_camera_show(text, name):
+    """列出某一台攝影機的全部欄位(唯讀)。
+
+    每一欄後面會標「←可改」或「←這一欄不是數字,不能改」。
+    兩個條件要同時成立才標可改:名稱表說它在白名單裡,**而且**
+    這一格現在真的是數字。只滿足前者就寫下去,會把結構欄位換成座標。
+    """
+    cams, names = camera_table(text)
+    if name not in cams:
+        near = [c for c in cams if name.lower() in c.lower()]
+        raise DataError('找不到攝影機「%s」。%s' % (
+            name, ('你是不是要找:' + '、'.join(sorted(near)[:6])) if near
+            else '先用 --cameras 看有哪些。'))
+    ln, cnt, f, names = cams[name]
+    print('\n%s —— 第 %d 行,共 %d 個欄位\n' % (name, ln + 1, cnt))
+    print('  %5s  %-30s %s' % ('編號', '欄位名', '值'))
+    print('  ' + '-' * 60)
+    for n in sorted(f):
+        v = f[n]
+        if v == '':
+            continue
+        # 只有「名稱表說可改」而且「現在真的是數字」才標可改,見上方訂正。
+        star = (' ←可改' if names.get(n) in CAM_SETTABLE and _is_number(v)
+                else (' ←這一欄不是數字,不能改' if names.get(n) in CAM_SETTABLE else ''))
+        print('  %5d  %-30s %s%s' % (n, names.get(n, '(這個編號沒有名字)'), v, star))
+    ok = sorted(v for k, v in names.items()
+                if v in CAM_SETTABLE and _is_number(f.get(k, '')))
+    print('\n  這一台可改的欄位:%s' % ('、'.join(ok) or '(沒有)'))
+
+
+def _apply_sets(text, name, sets):
+    """算出「改完之後的整份文字」,回傳 (新文字, [(欄位名, 舊值, 新值)])。**不寫檔。**
+
+    預覽跟真的寫入走的是同一條路,預覽只是不把結果存下來,
+    所以「你看到的預覽」跟「真的會寫進去的東西」不可能不一致。
+    """
+    cams, _main = camera_table(text)
+    if name not in cams:
+        raise DataError('找不到攝影機「%s」。先用 --cameras 看有哪些。' % name)
+    ln, cnt, f, names = cams[name]   # ← 這一台自己的名稱表,不是全域那一張
+    idx = {v: k for k, v in names.items()}
+    lines = text.split('\n')
+    line = lines[ln]
+    changes = []
+    for key, val in sets:
+        if key not in CAM_SETTABLE:
+            here = sorted(v for k, v in names.items()
+                           if v in CAM_SETTABLE and _is_number(f.get(k, '')))
+            raise DataError('欄位「%s」不在可改清單裡。\n'
+                            '  這一台(%s)可以改的是:%s'
+                            % (key, name, '、'.join(here) or '(沒有)'))
+        try:
+            fval = float(val)
+        except ValueError:
+            raise DataError('「%s」的值要是數字,你給的是「%s」' % (key, val))
+        # ⚠️ float() 收得下的東西比遊戲讀得懂的多:nan、inf、infinity,
+        #    還有 Python 才認得的底線寫法(1_0),以及大到溢位成 inf 的 1e400。
+        #    那幾種寫進總設定檔就是遊戲讀不懂的壞值,而且下面逐台逐欄的複驗
+        #    照樣全過 —— 它比對的是「寫進去的跟打算寫的一樣」,
+        #    不是「這個值遊戲讀不讀得懂」。所以這裡再過一道:
+        #    字面上要是一般的十進位數字,數值也要是有限的。
+        if not PLAIN_NUMBER_RE.match(val) or fval != fval or fval in (_INF, -_INF):
+            raise DataError('「%s」的值要是一般的十進位數字(例如 30、25.3、-1.5),'
+                            '不能是 nan / inf 這一類寫法,你給的是「%s」' % (key, val))
+        # ⚠️ 2026-08-28:每台攝影機用自己那一張名稱表,所以「這個名字在
+        #    這一台存不存在」要先問。原本直接 idx[key] 會丟 KeyError ——
+        #    對守備視角下 --set X=5 就會噴 traceback 而不是講人話。
+        if key not in idx:
+            avail = sorted(v for k, v in names.items()
+                           if v in CAM_SETTABLE and _is_number(f.get(k, '')))
+            raise DataError(
+                '%s 沒有「%s」這一欄。\n'
+                '  這個檔裡有不只一張欄位名稱表,守備視角(FieldingView1-6)與\n'
+                '  HeadViewer 用的跟打擊視角不是同一張 —— 它們記的是相對位移\n'
+                '  (OffsetX / OffsetY / OffsetZ),沒有絕對的 X/Y/Z。\n'
+                '  這一台可以改的是:%s\n'
+                '  想看全部欄位:--camera %s'
+                % (name, key, '、'.join(avail) or '(沒有可改的數字欄位)', name))
+        n = idx[key]
+        if n not in f:
+            raise DataError('%s 這個攝影機沒有 %s 這一欄(它只有 %d 個欄位)'
+                            % (name, key, cnt))
+        old = f[n]
+        # ⚠️ 2026-08-28 加的護欄,見檔案上方的訂正說明。
+        #    名稱表是照 Batting 家族編的;守備視角同一個編號裝的是
+        #    「OffsetX#OffsetY#OffsetZ」這種結構字串。原本會把它換成數字,
+        #    等於拿掉遊戲要用的欄位。規則很簡單:**本來不是數字的格子不准寫**。
+        if old.strip() and not _is_number(old):
+            raise DataError(
+                '%s 的「%s」現在裝的是「%s」,不是數字 —— 不動它。\n'
+                '  欄位名稱表是照打擊視角編的,守備視角(FieldingView1-6)與\n'
+                '  HeadViewer 用的是另一套編號,同一個編號在那裡是別的東西。\n'
+                '  這一格改下去會把遊戲要用的欄位拿掉,所以這支工具拒絕。'
+                % (name, key, old))
+        # 只換這一格,前後一個字元都不動。
+        # 用正則鎖住「;編號 」這個開頭再吃到下一個分號為止 ——
+        # 早一版用字串比對(而且還把值 re.escape 過)找不到目標,
+        # 那是把正則跟字串兩套 API 混用的典型錯誤。
+        cell = re.compile(r'(;%d )([^;]*)' % n)
+        hits = cell.findall(line)
+        if len(hits) != 1:
+            raise DataError('第 %d 行裡「;%d 」出現 %d 次(應該剛好一次),中止'
+                            % (ln + 1, n, len(hits)))
+        if hits[0][1] != old:
+            raise DataError('第 %d 行第 %d 欄現在是「%s」,跟先前讀到的「%s」不一致,中止'
+                            % (ln + 1, n, hits[0][1], old))
+        line = cell.sub(lambda m: m.group(1) + val, line, count=1)
+        changes.append((key, old, val))
+        f[n] = val
+    lines[ln] = line
+    new_text = '\n'.join(lines)
+    if len(new_text.split('\n')) != len(text.split('\n')):
+        raise DataError('行數改變了,中止')
+    return new_text, changes
+
+
+def cmd_camera_set(bigpath, raw, items, text, name, sets, apply_it, loose_path=None):
+    """改攝影機欄位。沒加 --apply 就只印預覽,一個位元組都不寫。
+
+    兩條路:散裝的 datafile.txt 直接整份覆寫(官方中文版走這條);
+    封裝在 datafile.big 裡的走 append:接到檔尾 + 只改目錄與檔頭。
+
+    兩條路寫完都會重讀複驗,但強度不一樣,說明的時候不要混講:
+
+    · 封裝版:重讀 → 重新解出文字 → 逐台逐欄比對前後的攝影機表,
+      證明「**只有**指定的那幾欄變了」,最後印「✅ 複驗通過」。
+    · 散裝版:只把檔案讀回來跟算好的內容整份比對。它抓得到寫壞、寫半截、
+      編碼跑掉,但沒有回頭比「算好的內容跟原本的檔案只差那幾欄」。
+      它印的是「複驗:讀回來的內容與預期相同 ✅」,不會印「✅ 複驗通過」。
+
+    只驗「寫進去的跟打算寫的一樣」抓不到「一開始就算錯欄位」那一類錯。
+    散裝版目前就停在這個強度,而官方中文版走的正是這一條。
+    """
+    new_text, changes = _apply_sets(text, name, sets)
+    print('\n【預覽】%s\n' % name)
+    print('  %-12s %12s  →  %s' % ('欄位', '現在', '改成'))
+    print('  ' + '-' * 44)
+    for k, o, v in changes:
+        print('  %-12s %12s  →  %s' % (k, o or '(空)', v))
+    d = len(new_text) - len(text)
+    print('\n  文字長度變化:%+d 位元組 · 行數不變' % d)
+    if not apply_it:
+        print('\n  以上只是預覽,沒有改到任何檔案。')
+        print('  確定要改的話,在同一行指令最後加上 --apply')
+        return
+
+    target = loose_path or bigpath
+    backup = target + '.datafilebak'
+    # 動手之前先確認這兩個名字都是「真的檔案」而不是符號連結。
+    # 連結指到資料夾外面的話,寫過去就是在使用者沒說要動的地方動手。
+    _refuse_symlink(target, '要修改的遊戲檔')
+    _refuse_symlink(backup, '備份檔')
+    if not os.path.exists(backup):
+        _atomic_copy(target, backup)
+        print('\n  已備份 → %s' % os.path.basename(backup))
+    else:
+        print('\n  備份已存在,保留最早那一份 → %s' % os.path.basename(backup))
+
+    if loose_path:
+        # 散裝版(官方中文版):直接改那個 .txt,沒有封裝檔要維護。
+        _atomic_write_bytes(loose_path, new_text.encode('latin-1'))
+        print('  已寫入 %s(散裝版,沒有封裝檔要更新)' % os.path.basename(loose_path))
+        with open(loose_path, 'rb') as f_:
+            back = f_.read().decode('latin-1')
+        if back != new_text:
+            raise DataError('讀回來的內容跟預期不符,請立刻 --restore-datafile')
+        # ⚠️ 這一句只證明「寫回去的檔案跟算好的內容一樣」,沒有逐台逐欄比對。
+        #    逐欄那一段在下面封裝版才有,所以這條路刻意不印「✅ 複驗通過」,
+        #    免得讀者以為兩條路一樣嚴。頁面上的成功標準也照這個分開寫。
+        print('  複驗:讀回來的內容與預期相同 ✅')
+        return
+
+    # ── 封裝版:新資料接到檔尾,舊資料一個位元組都不動 ──────────────
+    # 為什麼不重新打包:這種封裝檔裡常有目錄指不到的孤兒資料(社群模組疊出來的),
+    # 「讀出全部再打包回去」會把它們整批丟掉。
+    blob = qfs_compress_literal(new_text.encode('latin-1'))
+    entry = next(x for x in items if x[0] == DATAFILE_ENTRY)
+    _, field, _, _ = entry
+    out = bytearray(raw)
+    new_off = len(out)
+    out += blob
+    # 目錄那 8 個位元組:新位移 + 新長度,固定 big-endian。
+    struct.pack_into('>II', out, field, new_off, len(blob))
+    # 檔頭 +0x04 的「檔案總大小」:這一欄兩種位元組順序都遇得到,
+    # 所以先量原檔用的是哪一種,再照那一種寫回去。
+    order = size_field_order(raw)
+    struct.pack_into(order + 'I', out, 4, len(out))
+    # 先寫暫存檔、fsync,再改名換上:腳本中途被打斷(按 Ctrl-C、磁碟滿、
+    # 外接碟被拔)留下來的是那個暫存檔,原本的封裝檔完好。
+    # 暫存檔的名字是隨機的,別人先佔不到(見 _atomic_write_bytes)。
+    _atomic_write_bytes(bigpath, out)
+    print('  已寫入:新資料接在第 %d 個位元組,只改了目錄 8 bytes + 檔頭 4 bytes' % new_off)
+    print('  ⚠ 這個檔會變大 —— 本工具用的是「不做壓縮的合法編碼」,')
+    print('     解出來一樣正確,但體積接近解壓後的大小。')
+
+    # ── 複驗 ──
+    raw2 = load_big(bigpath)
+    actual = os.path.getsize(bigpath)
+    order_after = size_field_order(raw2)
+    declared = struct.unpack(order_after + 'I', raw2[4:8])[0]
+    if declared != actual:
+        raise DataError('檔頭寫的大小 %d 跟實際 %d 對不上,請立刻 --restore-datafile'
+                        % (declared, actual))
+    items2 = list_entries(raw2)
+    if len(items2) != len(items):
+        raise DataError('寫入後項目數變了,請立刻 --restore-datafile')
+    t2 = datafile_text(raw2, items2)
+    if t2 != new_text:
+        raise DataError('讀回來的內容跟預期不符,請立刻 --restore-datafile')
+    # 逐欄確認:只有指定的那幾欄變了,其他一個都沒動
+    before, _ = camera_table(text)
+    after, _ = camera_table(t2)
+    if set(before) != set(after):
+        raise DataError('寫入後攝影機數量變了,請立刻 --restore-datafile')
+    moved = []
+    for nm in before:
+        if before[nm][2] != after[nm][2]:
+            moved.append(nm)
+    if moved != [name]:
+        raise DataError('動到的攝影機不是只有 %s,而是 %s,請立刻 --restore-datafile'
+                        % (name, moved))
+    diff = {k for k in before[name][2]
+            if before[name][2][k] != after[name][2].get(k)}
+    _, names_after = camera_table(t2)
+    want = {k for k, v in names_after.items() if v in dict((c[0], 1) for c in changes)}
+    print('  複驗:%d 個項目全部讀得回 · 攝影機 %d 個 · 只有「%s」被改動'
+          % (len(items2), len(after), name))
+    print('  複驗:這個攝影機有 %d 個欄位被改,預期 %d 個'
+          % (len(diff), len(changes)))
+    if len(diff) != len(changes):
+        raise DataError('改動的欄位數不對,請立刻 --restore-datafile')
+    print('  複驗:檔頭寫的大小 %d = 實際檔案大小 ✅' % declared)
+    print('  ✅ 複驗通過')
+
+
+def cmd_restore_datafile(bigpath, loose_path=None):
+    """把總設定檔還原成本工具做的那一份備份。
+
+    只認自己的 .datafilebak,不會去碰別課留下的備份。
+    覆蓋之前先看備份的開頭像不像該有的樣子(封裝版看 BIGF,
+    散裝版看它是不是以數字或 0x 開頭的那種文字檔),
+    真正的長度把關在 _restore_from_backup 裡。
+
+    ⚠️ 散裝版(官方中文版走的那一條)只看開頭是不夠的:開頭對、後面被截掉的
+       備份,_restore_from_backup 只剩「不得小於一半」那道通用地板擋著 ——
+       截掉 40% 照樣過,遊戲的總設定檔當場被砍半,而且還印
+       「複驗:內容與備份相同 ✅」。
+       這個格式有東西可以驗:它是一行一筆記錄、以換行收尾的文字檔
+       (本站量的 4 份 —— 3 份散裝版加 1 份剛安裝好的原版封裝版解出來的 ——
+       都是 21,548 行、都以換行結束,最後一行都是完整的一筆記錄)。
+       所以再加兩道:備份的最後一個位元組要是換行,最後一行要是一筆完整的記錄。
+       截斷幾乎一定停在半行,這兩道就會擋下來。
+    """
+    target = loose_path or bigpath
+    backup = target + '.datafilebak'
+    if not os.path.exists(backup):
+        raise DataError('找不到備份 %s。這支工具只還原它自己做的備份。'
+                        % os.path.basename(backup))
+    with open(backup, 'rb') as _f:
+        head = _f.read(4)
+    if loose_path:
+        # 散裝版的備份是純文字,不會有 BIGF 檔頭。檢查它像不像 datafile。
+        if not head[:2].isdigit() and not head.startswith(b'0x'):
+            raise DataError('備份檔看起來不像 datafile.txt,不敢拿它覆蓋。')
+        # 尾巴也要驗(見上面的說明):完整的 datafile.txt 以換行收尾,
+        # 最後一行是一筆完整的記錄。截斷的備份停在半行,這兩道過不了。
+        # 只讀最後 64 KiB 就夠:本站量到最長的一行是 8,263 bytes,這個窗是它的八倍。
+        WINDOW = 65536
+        bak_size = os.path.getsize(backup)
+        with open(backup, 'rb') as _f:
+            _f.seek(max(0, bak_size - WINDOW))
+            tail = _f.read()
+        if not tail.endswith(b'\n'):
+            raise DataError('這份備份的結尾不是換行 —— 它多半是備份到一半被中斷的\n'
+                            '  半截檔(完整的 %s 每一行都以換行結束)。不敢拿它覆蓋。'
+                            % DATAFILE_ENTRY)
+        body = tail[:-1]
+        # 窗裡看不到上一個換行(= 最後一行比整個窗還長)時,看不出這一行從哪裡開始,
+        # 就不做這道判斷 —— 寧可少擋一次,也不要把好的備份誤判成壞的。
+        if b'\n' in body or bak_size <= WINDOW:
+            last = body.rsplit(b'\n', 1)[-1]
+            if not DATAFILE_RECORD_RE.match(last):
+                raise DataError('這份備份的最後一行不是一筆完整的記錄,它壞了。'
+                                '不敢拿它覆蓋。')
+    elif head != b'BIGF':
+        raise DataError('備份檔開頭不是 BIGF,不敢拿它覆蓋。')
+    _restore_from_backup(backup, target)
+    same = open(backup, 'rb').read() == open(target, 'rb').read()
+    print('\n  已還原 ← %s' % os.path.basename(backup))
+    print('  複驗:內容與備份%s' % ('相同 ✅' if same else '不同 ❌'))
+    if not same:
+        raise DataError('還原後內容跟備份不一樣,請手動檢查。')
+
+
+def cmd_list(raw, items):
+    """列出封裝檔裡的版面檔:壓縮後大小、解壓後大小、行數、畫面數(唯讀)。
+
+    這是沒給任何模式時的預設動作。使用者第一次跑,先讓他看到
+    「這個檔裡有什麼」,再從裡面挑一個往下查。
+    """
+    fels = [(n, o, s) for n, f, o, s in items if n.lower().endswith('.fel')]
+    print('\n封裝檔內共 %d 個項目,其中 %d 個版面檔:\n' % (len(items), len(fels)))
+    print('  %-34s %9s %9s %7s %7s' % ('檔名', '壓縮後', '解壓後', '行數', '畫面'))
+    print('  ' + '-' * 70)
+    tot_lines = 0
+    for n, o, s in sorted(fels):
+        try:
+            t = qfs_decompress(raw[o:o + s]).decode('latin-1')
+        except DataError:
+            print('  %-34s %9d %9s' % (n, s, '(解不開)')); continue
+        lines = fel_line_count(t)
+        screens = len(re.findall(r'^SC:', t, re.M))
+        tot_lines += lines
+        print('  %-34s %9d %9d %7d %7d' % (n, s, len(t), lines, screens))
+    print('  ' + '-' * 70)
+    print('  合計 %d 行\n' % tot_lines)
+
+
+def cmd_find(texts, pattern, cmd_filter=None):
+    """掃過全部版面檔,找名字含這個關鍵字的元素(唯讀)。
+
+    這是整支工具的入口動作:你只知道畫面上有個東西叫 SPEED,
+    但不知道它在哪一個檔的第幾行。比對一律轉大寫,因為版面檔裡的
+    名稱習慣是全大寫,而使用者不會想管大小寫。
+
+    最後印的「分佈」是刻意的:同一個名字散在好幾個檔裡時,
+    你要先知道該改哪一個。
+    """
+    pat = pattern.upper()
+    hits = []
+    for fn in sorted(texts):
+        for ln, raw, ind, cmd, name, parts in fel_lines(texts[fn]):
+            if not cmd or not name:
+                continue
+            if cmd_filter and cmd != cmd_filter.upper():
+                continue
+            if pat not in name.upper():
+                continue
+            hits.append((fn, ln, cmd, name, visibility_of(parts), raw.strip()))
+    if not hits:
+        print('\n找不到名字含「%s」的元素。' % pattern)
+        print('提示:名稱通常是全大寫英文,例如 SPEED、RATING、SCORE。')
+        return
+    print('\n找到 %d 個元素:\n' % len(hits))
+    print('  %-32s %6s %-4s %-22s %s' % ('版面檔', '行號', '指令', '名稱', '顯示'))
+    print('  ' + '-' * 78)
+    for fn, ln, cmd, name, vis, _ in hits[:200]:
+        mark = {'1': '開', '0': '關'}.get(vis, '—')
+        print('  %-32s %6d %-4s %-22s %s' % (fn, ln, cmd, name[:22], mark))
+    if len(hits) > 200:
+        print('  …另外還有 %d 個' % (len(hits) - 200))
+    byfile = collections.Counter(h[0] for h in hits)
+    print('\n  分佈:', ', '.join('%s×%d' % (f.replace('fes_', '').replace('.fel', ''), c)
+                                 for f, c in byfile.most_common(6)))
+
+
+def cmd_show(texts, fn, screen=None, limit=80):
+    """把某個版面檔印出來(唯讀),行首標行號,關掉的行標一個 ✕。
+
+    --screen 可以只看一個畫面:從那個 SC 開始,到下一個 SC 或 END 為止。
+    不指定畫面時預設只印前 80 行。有些版面檔上千行,整份倒到終端機
+    對讀者沒有幫助。
+    """
+    if fn not in texts:
+        raise DataError('封裝檔裡沒有 %s。先用 --list 看有哪些。' % fn)
+    t = texts[fn]
+    lines = list(fel_lines(t))
+    if screen:
+        want = screen.upper()
+        start = end = None
+        for ln, raw, ind, cmd, name, parts in lines:
+            if cmd == 'SC' and name.upper() == want:
+                start = ln
+            elif start and cmd in ('SC', 'END') and ln > start:
+                end = ln; break
+        if start is None:
+            names = [n for _, _, _, c, n, _ in lines if c == 'SC']
+            raise DataError('%s 裡沒有畫面「%s」。有的是:%s'
+                            % (fn, screen, ', '.join(names[:12])))
+        end = end or len(lines)
+        lines = [l for l in lines if start <= l[0] < end]
+        print('\n%s / 畫面 %s(第 %d–%d 行)\n' % (fn, screen, start, end - 1))
+    else:
+        # 行數要跟 --list 報的是同一個數字:fel_lines 會把結尾換行造成的那個
+        # 空字串也產出來,fel_line_count 不會 —— 不對齊的話同一個版面檔
+        # 在兩個模式報的行數會差 1(而且 --show 會多印一行空的),
+        # 而頁面到處拿 --list 的行數當對照。
+        total = fel_line_count(t)
+        lines = lines[:total]
+        print('\n%s(共 %d 行,顯示前 %d 行)\n' % (fn, total, min(limit, total)))
+        lines = lines[:limit]
+    for ln, raw, ind, cmd, name, parts in lines:
+        vis = visibility_of(parts)
+        mark = {'1': ' ', '0': '✕'}.get(vis, ' ')
+        print('  %5d %s %s' % (ln, mark, raw[:96]))
+    print('\n  ✕ = 這一行的顯示開關是 0(關閉)')
+
+
+def cmd_extract(texts, fn, outpath):
+    """把整個版面檔存成純文字檔,方便用編輯器慢慢看(不動遊戲檔)。
+
+    輸出檔已經存在就拒絕,不覆蓋使用者的東西。
+    ⚠️ 存出來的是 CRLF 換行,而且**必須維持 CRLF**。
+       編輯器統一成 LF 會讓檔案少掉「行數」個位元組,那個檔就壞了。
+    """
+    if fn not in texts:
+        raise DataError('封裝檔裡沒有 %s。先用 --list 看有哪些。' % fn)
+    # ⚠️ 這裡不可以用 os.path.exists:它對「指向不存在目標的符號連結」回傳 False,
+    #    接著 open(...,'wb') 就會順著那個連結,把連結指向的檔案截斷。
+    #    lexists 看的是連結本身,連結在就算「已經存在」。
+    if os.path.lexists(outpath):
+        raise DataError('%s 已經存在,換一個檔名以免覆蓋你的東西。' % outpath)
+    # 輸出路徑是使用者自己給的,可能指到不存在的資料夾或沒有權限的地方。
+    # 那時候要講人話,不要丟一個使用者看不懂的 traceback ——
+    # 跟這支腳本在別處的標準一致。
+    # O_CREAT|O_EXCL:「不存在才建立」由作業系統一次做完,上面那道檢查跟這裡
+    # 之間就算被人塞了一個符號連結進來,也會在這裡失敗而不是跟著它走。
+    try:
+        fd = os.open(outpath, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
+        with os.fdopen(fd, 'wb') as f:
+            f.write(texts[fn].encode('latin-1'))
+    except OSError as e:
+        raise DataError('寫不出 %s:%s\n'
+                        '  (輸出檔要放在已經存在、而且有寫入權限的資料夾裡)'
+                        % (outpath, e))
+    print('\n  已存成 %s(%d bytes)' % (outpath, len(texts[fn])))
+    print('  這是唯讀動作,沒有改到遊戲檔案。')
+    print('  ⚠ 用編輯器打開時注意:這個檔是 CRLF 換行,存檔不要改成 LF。')
+
+
+def find_targets(text, name, cmd_filter=None):
+    """在一個版面檔裡找出「叫這個名字、而且真的有顯示開關」的每一行。
+
+    四道篩選缺一不可:認得出指令、指令屬於 TOGGLEABLE、
+    (指定了 --cmd 的話)指令要對得上、而且這一行的第 1 個參數真的是 0 或 1。
+    最後那一道是關鍵:沒有開關欄的行如果被改,寫進去的就是別的欄位。
+
+    同名的會全部回傳,不是只回第一個:同一個元素常常在四個壘包各有一份,
+    只改一份的話其他情境還是會冒出來。
+    """
+    want = name.upper()
+    out = []
+    for ln, raw, ind, cmd, nm, parts in fel_lines(text):
+        if not cmd or nm is None:
+            continue
+        if cmd not in TOGGLEABLE:
+            continue
+        if cmd_filter and cmd != cmd_filter.upper():
+            continue
+        if nm.upper() != want:
+            continue
+        if visibility_of(parts) is None:
+            continue
+        out.append((ln, raw, cmd, parts))
+    return out
+
+
+def set_visibility(raw_line, parts, value):
+    """把第 1 個參數換成 value,其餘原封不動。
+
+    刻意用「拆開再接回去」而不是正則取代:元素名稱裡可能出現任何字元,
+    這一行後面還有座標與顏色,亂比對會改到別的地方。
+    連縮排都照原樣接回去。縮排在版面檔裡是有意義的,它代表階層。
+    """
+    stripped = raw_line.lstrip(' ')
+    indent = raw_line[:len(raw_line) - len(stripped)]
+    cmd, _, rest = stripped.partition(':')
+    cells = rest.split(',')
+    cells[VISIBILITY_FIELD] = value
+    return indent + cmd + ':' + ','.join(cells)
+
+
+def cmd_toggle(bigpath, raw, items, texts, fn, name, state, cmd_filter, apply_it):
+    """開關某個元素。沒加 --apply 就只印預覽,一個位元組都不寫。
+
+    流程:找出目標行 → 印預覽(已經是那個狀態的會說「不動」)→
+    產生新的版面檔文字 → 備份 → 接到檔尾 → 重讀複驗。
+
+    已經是目標狀態的行會被跳過,所以重複跑同一道指令不會累積改動。
+    複驗任何一項對不上就丟例外,並要使用者立刻 --restore。
+    """
+    if fn not in texts:
+        raise DataError('封裝檔裡沒有 %s。先用 --list 看有哪些。' % fn)
+    value = '1' if state == 'on' else '0'
+    targets = find_targets(texts[fn], name, cmd_filter)
+    if not targets:
+        raise DataError('%s 裡找不到可開關的元素「%s」。\n'
+                        '   先用 --find %s 看它在哪個檔、叫什麼。' % (fn, name, name))
+
+    print('\n【預覽】%s 裡的「%s」' % (fn, name))
+    print('  找到 %d 行:\n' % len(targets))
+    changed = 0
+    for ln, line, cmd, parts in targets:
+        cur = visibility_of(parts)
+        if cur == value:
+            print('  %5d  %-4s 已經是「%s」,不動' % (ln, cmd, '開' if value == '1' else '關'))
+        else:
+            changed += 1
+            print('  %5d  %-4s %s → %s' % (ln, cmd,
+                                           '開' if cur == '1' else '關',
+                                           '開' if value == '1' else '關'))
+    if changed == 0:
+        print('\n  全部已經是這個狀態,不需要改動。')
+        return
+    print('\n  會改動 %d 行。' % changed)
+
+    if not apply_it:
+        print('\n  以上只是預覽,沒有改到任何檔案。')
+        print('  確定要改的話,在同一行指令最後加上 --apply')
+        return
+
+    # ── 產生新的 fel 文字 ──
+    old_text = texts[fn]
+    lines = old_text.split('\r\n')
+    for ln, line, cmd, parts in targets:
+        if visibility_of(parts) == value:
+            continue
+        lines[ln - 1] = set_visibility(line, parts, value)
+    new_text = '\r\n'.join(lines)
+    if len(new_text.split('\r\n')) != len(old_text.split('\r\n')):
+        raise DataError('行數改變了,中止')
+
+    # ── 備份 ──
+    backup = bigpath + '.feltoolbak'
+    # 這兩個名字都必須是真的檔案。是符號連結就停 —— 理由同 cmd_camera_set。
+    _refuse_symlink(bigpath, '要修改的遊戲檔')
+    _refuse_symlink(backup, '備份檔')
+    if not os.path.exists(backup):
+        _atomic_copy(bigpath, backup)
+        print('\n  已備份 → %s' % os.path.basename(backup))
+    else:
+        print('\n  備份已存在,保留最早那一份 → %s' % os.path.basename(backup))
+
+    # ── 接到檔尾 + 只改目錄 ──
+    blob = qfs_compress_literal(new_text.encode('latin-1'))
+    entry = next(x for x in items if x[0] == fn)
+    _, field, _, _ = entry
+    out = bytearray(raw)
+    new_off = len(out)
+    out += blob
+    struct.pack_into('>II', out, field, new_off, len(blob))
+    # ⚠️ 檔頭第 5-8 個位元組是「整個檔案多大」,它跟緊接著的項目數/目錄長度
+    #    (固定 big-endian)不一樣 —— 這一欄兩種順序都遇得到。
+    #    實測這台機器上 295 個 BIGF 檔:288 個 little-endian、7 個 big-endian
+    #    (models.big / portrait.big / pnamedat.big / pnamehdr.big 與三個球場夜間檔)。
+    #    所以不能寫死,要先看原檔用哪一種,就照那一種寫回去。
+    order = size_field_order(raw)
+    struct.pack_into(order + 'I', out, 4, len(out))
+
+    _atomic_write_bytes(bigpath, out)
+    print('  已寫入:新資料接在第 %d 個位元組,只改了目錄 8 bytes + 檔頭 4 bytes' % new_off)
+
+    # ── 複驗 ──
+    raw2 = load_big(bigpath)
+
+    # 檔頭那一欄要跟實際檔案大小相等。
+    # 這條檢查是後來補的:本工具曾經把這一欄寫成 big-endian,
+    # 檔案內容全對、所有項目都讀得回來、複驗照樣印「通過」——
+    # 因為讀取端根本不看這一欄。寫入端改壞的東西,要由讀取端以外的檢查抓。
+    #
+    # ⚠️ 但補上去的第一版是一句恆真式:寫入時用 order 寫,複驗時
+    #    用同一個 order 讀 —— 不論 order 選對選錯都一定相等,
+    #    它抓不到註解裡說要抓的那個錯。
+    #    改成「重新偵測一次」:size_field_order 是拿兩種順序去比對
+    #    實際檔案大小的,所以它偵測到的順序才是這個檔真正寫成什麼樣。
+    actual = os.path.getsize(bigpath)
+    order_after = size_field_order(raw2)
+    declared = struct.unpack(order_after + 'I', raw2[4:8])[0]
+    if declared != actual:
+        raise DataError('檔頭寫的大小 %d 跟實際 %d 對不上(兩種位元組順序都對不上),'
+                        '請立刻 --restore' % (declared, actual))
+    if order_after != order:
+        raise DataError('檔頭大小欄寫成了 %s-endian,原檔是 %s-endian,請立刻 --restore'
+                        % ('big' if order_after == '>' else 'little',
+                           'big' if order == '>' else 'little'))
+
+    items2 = list_entries(raw2)
+    if len(items2) != len(items):
+        raise DataError('寫入後項目數變了,請立刻 --restore')
+    t2 = fel_texts(raw2, items2)
+    if fn not in t2:
+        raise DataError('寫入後讀不回 %s,請立刻 --restore' % fn)
+    if t2[fn] != new_text:
+        raise DataError('寫回的內容與預期不符,請立刻 --restore')
+    still = [ln for ln, _, _, p in find_targets(t2[fn], name, cmd_filter)
+             if visibility_of(p) != value]
+    print('  複驗:%d 個項目全部讀得回 · 目標元素 %d 個未套用'
+          % (len(items2), len(still)))
+    if still:
+        raise DataError('有 %d 行沒套用成功,請立刻 --restore' % len(still))
+    print('  複驗:檔頭寫的大小 %d = 實際檔案大小 ✅' % declared)
+    print('  ✅ 複驗通過')
+
+
+def cmd_restore(bigpath):
+    """把封裝檔還原成第一次 --apply 之前的樣子。
+
+    只認自己建立的 .feltoolbak。覆蓋之前兩邊都要先確認開頭是 BIGF:
+    拖錯檔案時要停下來,不能無聲蓋掉別的東西然後回報成功。
+    """
+    backup = bigpath + '.feltoolbak'
+    if not os.path.exists(backup):
+        raise DataError('找不到備份 %s。這支腳本只在第一次 --apply 時建立備份。'
+                        % os.path.basename(backup))
+    # ⚠️ 覆蓋之前先確認兩邊都真的是封裝檔。
+    #    2026-08-25 上線前稽核抓到:原本這裡完全不驗格式,
+    #    拖錯檔就會拿舊快照無聲蓋掉別的東西,而且回報成功。
+    with open(backup, 'rb') as _f:
+        if _f.read(4) != b'BIGF':
+            raise DataError('這個備份不是本工具建立的(開頭不是 BIGF):%s'
+                            % os.path.basename(backup))
+    with open(bigpath, 'rb') as _f:
+        if _f.read(4) != b'BIGF':
+            raise DataError(
+                '要還原的目標開頭不是 BIGF:%s\n'
+                '  兩種可能,先分清楚是哪一種:\n'
+                '  (1) 路徑指錯了 —— 這時候不該還原,先確認 --big 指到哪個檔;\n'
+                '  (2) 這個遊戲檔本身已經壞到連檔頭都不是 BIGF 了。\n'
+                '      這支工具分不出是哪一種,所以停在這裡。\n'
+                '      確定是 (2) 的話:把壞掉的那個檔改名留著,\n'
+                '      再把 %s 複製成原本的檔名 —— 還原本來就只是這一步。'
+                % (os.path.basename(bigpath), os.path.basename(backup)))
+    _restore_from_backup(backup, bigpath)
+    same = open(backup, 'rb').read() == open(bigpath, 'rb').read()
+    print('\n  已從備份還原 → %s' % os.path.basename(bigpath))
+    print('  位元組完全一致:%s' % ('✅ 是' if same else '❌ 否'))
+    # ⚠️ 印一個 ❌ 然後正常結束(結束碼 0)是不行的:呼叫它的批次檔、
+    #    或照著頁面一步一步做的人,看的是結束碼。不一致就是失敗。
+    #    (走到這裡幾乎不可能:_do_copy 換名之前就比過 sha256 了。
+    #     真的走到,代表換名之後又有別的東西動了這個檔。)
+    if not same:
+        raise DataError('還原後的內容跟備份不一樣,請手動檢查 —— '
+                        '備份 %s 還在原地,沒有被動過。'
+                        % os.path.basename(backup))
+
+
+# ─────────────────────────────────────────────────────────
+#  自我測試(--selftest):不需要遊戲資料夾,也不碰任何遊戲檔。
+#  全部在一個丟得掉的暫存資料夾裡做。
+#
+#  每一道守門都下餌 —— 只驗「正常流程會過」的測試,分不出
+#  「擋住了」跟「這段程式根本沒跑到」。下面每一組都是一正一反。
+# ─────────────────────────────────────────────────────────
+def selftest():
+    """回傳 0 = 全過。任何一條不成立就丟 AssertionError,結束碼非 0。
+
+    ⚠️ 不可以在 python3 **-O** 底下跑:那個旗標會把 assert 整段拿掉,
+       底下每一個餌的判斷句就一條都不執行,螢幕上照樣一路印「通過」——
+       那是一片**假的綠燈**,比沒有測試更危險。所以第一件事就是把它擋掉。
+    """
+    if sys.flags.optimize:
+        print('--selftest 不能在 python3 -O 底下跑:-O 會把 assert 整段拿掉,'
+              '底下那些餌一個都不會執行,你會看到一片假的綠燈。'
+              '請拿掉 -O 再跑一次。')
+        return 2
+    passed = []
+
+    def ok(what):
+        passed.append(what)
+
+    # ── 一、純邏輯:壓縮解壓來回、顯示開關的認法 ──────────────────
+    # 樣本照版面檔的真實長相寫:指令冒號、逗號分隔、CRLF 換行。
+    sample = ('SC:HUD,1,0,0,0,640,480\r\n'
+              '  TX:SPEED,1,0,10,20,30,40\r\n'
+              '  RT:BAR,0,0,1,2,3,4\r\n'
+              '  VR:78\r\n').encode('latin-1')
+    assert qfs_decompress(qfs_compress_literal(sample)) == sample, 'QFS 來回對不上'
+    # 反向餌:不是 QFS 的資料要原樣回傳,不可以硬解
+    assert qfs_decompress(b'hello world') == b'hello world', '不是 QFS 卻被動到了'
+    ok('QFS 來回 + 非 QFS 原樣回傳')
+
+    text = sample.decode('latin-1')
+    rows = {nm: parts for _l, _r, _i, _c, nm, parts in fel_lines(text) if nm}
+    assert visibility_of(rows['SPEED']) == '1', 'TX 的顯示開關讀錯'
+    assert visibility_of(rows['BAR']) == '0', 'RT 的顯示開關讀錯'
+    # 反向餌:VR 冒號後面只有一格,沒有第 1 個參數,不可以硬讀成開關
+    assert visibility_of(rows['78']) is None, 'VR 沒有開關欄卻讀出了值'
+    ok('顯示開關:正反兩面 + 沒有那一欄的行')
+
+    # 反向餌:find_targets 兩道關卡。SC 那一行第 1 個參數也是 1,
+    # 但 SC 不在 TOGGLEABLE 裡,不可以被找出來。
+    assert len(find_targets(text, 'SPEED')) == 1, 'TX 目標找不到'
+    assert find_targets(text, 'HUD') == [], 'SC 不該被當成可開關的目標'
+    ok('目標篩選:可開關的找得到、不可開關的擋得住')
+
+    # set_visibility 只可以動那一格,別的欄位一個字都不能變
+    line = '  TX:SPEED,1,0,10,20,30,40'
+    newline = set_visibility(line, line.lstrip(' ').partition(':')[2].split(','), '0')
+    assert newline == '  TX:SPEED,0,0,10,20,30,40', '改開關時動到了別的欄位'
+    ok('改開關只動那一格(連縮排都留著)')
+
+    # ── 二、檔案安全。以下每一組都在暫存資料夾裡做,不碰遊戲檔 ─────
+    d = tempfile.mkdtemp(prefix='fel_selftest_')
+    outside = os.path.join(d, 'OUTSIDE_不可以被動到.txt')
+    OUTSIDE_BODY = b'this file lives outside and must never be touched'
+    try:
+        # (1) 備份:先在猜得到的 <備份>.part 名字上放一個指向外面的符號連結。
+        #     舊版會順著它把外面那個檔截斷;現在的 mkstemp 名字是隨機的,
+        #     這個連結從頭到尾沒有人碰。
+        box = os.path.join(d, 'box'); os.mkdir(box)
+        game = os.path.join(box, 'ingame.big')
+        with open(game, 'wb') as f:
+            f.write(b'BIGF' + b'\x00' * 60)
+        with open(outside, 'wb') as f:
+            f.write(OUTSIDE_BODY)
+        bak = game + '.feltoolbak'
+        os.symlink(outside, bak + '.part')          # 餌
+        _atomic_copy(game, bak)
+        assert open(outside, 'rb').read() == OUTSIDE_BODY, \
+            '備份順著 <備份>.part 符號連結把資料夾外面的檔案截斷了'
+        assert open(bak, 'rb').read() == open(game, 'rb').read(), '備份內容不對'
+        assert os.path.islink(bak + '.part'), '餌被動到了(它應該原封不動)'
+        os.remove(bak + '.part')
+        ok('備份不理會猜得到的 <備份>.part 符號連結')
+
+        # (2) 寫入遊戲檔:同一個餌換成 <遊戲檔>.tmp
+        os.symlink(outside, game + '.tmp')          # 餌
+        _atomic_write_bytes(game, b'BIGF' + b'\x11' * 60)
+        assert open(outside, 'rb').read() == OUTSIDE_BODY, \
+            '寫入順著 <遊戲檔>.tmp 符號連結把資料夾外面的檔案截斷了'
+        assert open(game, 'rb').read() == b'BIGF' + b'\x11' * 60, '寫入的內容不對'
+        assert game in _REPLACED, '換掉了檔案卻沒有記下來(Ctrl-C 的訊息會說謊)'
+        os.remove(game + '.tmp')
+        ok('寫入不理會猜得到的 <遊戲檔>.tmp 符號連結,而且會記錄「換過了」')
+
+        # (3) 還原到一半失敗:正本必須原封不動。
+        #     用 monkeypatch 讓 os.replace 丟例外 —— 那正是「換名前一刻斷掉」。
+        before = open(game, 'rb').read()
+        real_replace = os.replace
+
+        def _boom(*a, **k):
+            raise OSError('selftest:假裝在換名這一刻斷掉')
+        os.replace = _boom
+        try:
+            _do_copy(bak, game)
+        except OSError:
+            pass
+        else:
+            raise AssertionError('還原途中出錯卻沒有丟例外')
+        finally:
+            os.replace = real_replace
+        assert open(game, 'rb').read() == before, \
+            '還原失敗卻動到了正本(這正是舊版 copy2 會做的事)'
+        assert not [x for x in os.listdir(box) if x.startswith('.')], \
+            '失敗之後留下了暫存檔'
+        assert _REPLACED.count(game) == 1, \
+            'os.replace 丟 OSError(換名確定沒發生)卻多記了一筆'   # 只有 (2) 那一次
+        assert game not in _REPLACING, \
+            '換名失敗了,「正在換」那一筆卻沒有清掉(收尾會說它可能換過了)'
+        ok('還原中途失敗:正本原封不動、暫存檔清乾淨、兩張登記表都對')
+
+        # (4) 還原時內容對不上:一樣不可以換上去。
+        #     讓複製寫出錯的位元組,sha256 那一關就該把它擋下來。
+        real_copyfileobj = shutil.copyfileobj
+
+        def _wrong(src, dst_, *a, **k):
+            dst_.write(b'WRONG')
+        shutil.copyfileobj = _wrong
+        try:
+            _do_copy(bak, game)
+        except DataError:
+            pass
+        else:
+            raise AssertionError('寫出來的內容跟備份不一樣,卻照樣換上去了')
+        finally:
+            shutil.copyfileobj = real_copyfileobj
+        assert open(game, 'rb').read() == before, '內容對不上卻動到了正本'
+        ok('還原內容對不上:擋下來,正本原封不動')
+
+        # (5) 正常還原:這是陰性對照 —— 沒有它的話,上面兩條就算是
+        #     「_do_copy 根本沒在做事」也會是綠的。
+        _do_copy(bak, game)
+        assert open(game, 'rb').read() == open(bak, 'rb').read(), '正常還原沒有還原成功'
+        ok('正常還原真的會把備份寫回去(陰性對照)')
+
+        # (6) 目標本身是符號連結:停下來,不跟著它走。
+        link = os.path.join(box, 'link.big')
+        os.symlink(outside, link)
+        for fn_, args in ((_atomic_write_bytes, (link, b'x')),
+                          (_do_copy, (bak, link)),
+                          (_atomic_copy, (game, link))):
+            try:
+                fn_(*args)
+            except DataError:
+                pass
+            else:
+                raise AssertionError('目標是符號連結卻照樣寫了下去')
+        assert open(outside, 'rb').read() == OUTSIDE_BODY, '順著符號連結動到了外面的檔'
+        ok('目標是符號連結:三個寫入入口都停下來')
+
+        # (7) --extract 的輸出檔:指向外面的**斷掉的**符號連結。
+        #     os.path.exists 對它回傳 False,舊版會順著它建檔;
+        #     現在 lexists + O_EXCL 兩道都會擋。
+        dangling = os.path.join(box, 'out.txt')
+        os.symlink(os.path.join(d, '不存在的目標.txt'), dangling)
+        assert not os.path.exists(dangling) and os.path.lexists(dangling), \
+            '這個餌沒有布置成功(它應該是一個斷掉的符號連結)'
+        try:
+            cmd_extract({'a.fel': 'x'}, 'a.fel', dangling)
+        except DataError:
+            pass
+        else:
+            raise AssertionError('輸出檔是斷掉的符號連結卻照樣寫了下去')
+        assert not os.path.exists(os.path.join(d, '不存在的目標.txt')), \
+            '順著斷掉的符號連結把檔案建到外面去了'
+        ok('--extract 擋得下斷掉的符號連結')
+
+        # (8) 換名那一段不可以被 Ctrl-C 切成兩半。
+        #     這裡不送真的訊號(Windows 的 os.kill 不接受 SIGINT),而是直接呼叫
+        #     「這一刻裝著的那個 SIGINT 處理器」—— 使用者按下 Ctrl-C 時,
+        #     Python 做的就是這一件事。餌:沒有 _NoInterrupt 的話,那個處理器
+        #     是預設的,當場就丟 KeyboardInterrupt,下面那一行永遠跑不到。
+        before_h = signal.getsignal(signal.SIGINT)
+        ran = []
+        try:
+            with _NoInterrupt():
+                h = signal.getsignal(signal.SIGINT)
+                assert h is not before_h, '_NoInterrupt 沒有把 SIGINT 處理器換掉'
+                h(signal.SIGINT, None)          # 等同使用者在這一刻按下 Ctrl-C
+                ran.append('這一段跑完了')       # 舊寫法會在上一行就跳出去
+        except KeyboardInterrupt:
+            ran.append('離開之後才丟出來')
+        else:
+            raise AssertionError('_NoInterrupt 把 Ctrl-C 吃掉了,離開之後沒有補丟')
+        assert ran == ['這一段跑完了', '離開之後才丟出來'], \
+            'Ctrl-C 落在換名那一段:應該先記著、離開才丟,實際是 %s' % ran
+        assert signal.getsignal(signal.SIGINT) is before_h, \
+            '離開之後沒有把原本的 SIGINT 處理器裝回去'
+        ok('Ctrl-C 落在換名那一段:先記著、離開才丟,處理器也裝得回去')
+
+        # (9) 三態登記:換名成功之後,那個檔只能出現在「已換」那一張表裡。
+        #     這是 (8) 的陰性對照 —— 沒有它的話,「正在換」永遠是空的
+        #     也會是綠的(那代表登記根本沒在做事)。
+        moved = os.path.join(box, 'threestate.big')
+        with open(moved, 'wb') as f:
+            f.write(b'BIGF' + b'\x00' * 4)
+        assert moved not in _REPLACED and moved not in _REPLACING, '餌沒有布置乾淨'
+        _atomic_write_bytes(moved, b'BIGF' + b'\x22' * 4)
+        assert moved in _REPLACED, '換過了卻沒有登記「已換」'
+        assert moved not in _REPLACING, '換完了「正在換」那一筆卻沒有移走'
+        ok('三態登記:換完只留在「已換」那一張表裡')
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
+
+    print('自我測試:%d 組全部通過' % len(passed))
+    for i, w in enumerate(passed, 1):
+        print('  %d. %s' % (i, w))
+    return 0
+
+
+# ─────────────────────────────────────────────────────────
+def main():
+    """讀參數,決定要做哪一件事。
+
+    順序是有講究的,不是隨便排的:
+      1. --bigs 完全不需要封裝檔路徑,先處理
+      2. 判斷使用者指的是封裝檔還是散裝的 datafile.txt(官方中文版沒有封裝檔)
+      3. --entries 與攝影機相關的模式排在「有沒有版面檔」那道關卡**之前**:
+         圖片、模型、球場、總設定檔一個版面檔都沒有,但一樣該看得到裡面有什麼
+      4. 其餘版面檔模式
+    回傳值就是行程的結束碼:0 成功、2 是使用者給錯東西。
+    """
+    ap = argparse.ArgumentParser(
+        description='MVP Baseball 2005 介面版面檔萬用工具')
+    ap.add_argument('gamedir', help='遊戲資料夾(裡面要有 data 這個子資料夾)')
+    ap.add_argument('--big', default=DEFAULT_BIG,
+                    help='要處理的封裝檔,相對於遊戲資料夾(預設 %s)' % DEFAULT_BIG)
+    ap.add_argument('--list', action='store_true', help='列出封裝檔裡的版面檔')
+    ap.add_argument('--entries', action='store_true',
+                    help='列出封裝檔裡的每一個項目(不限版面檔,任何封裝檔都能用)')
+    ap.add_argument('--cameras', action='store_true',
+                    help='列出總設定檔裡的全部攝影機與座標(要搭配 --big data/datafile/datafile.big)')
+    ap.add_argument('--camera', metavar='名稱',
+                    help='顯示某一個攝影機的全部欄位')
+    ap.add_argument('--set', metavar='欄位=值,…', dest='cam_set',
+                    help='搭配 --camera,改欄位。白名單有十個名字:'
+                         'X/Y/Z/FOV/Pitch/Heading/Roll,加上守備那張表才有的 '
+                         'OffsetX/OffsetY/OffsetZ。每一台實際能改的是其中七個,'
+                         '而且那一格本來就要是數字')
+    ap.add_argument('--restore-datafile', action='store_true', dest='restore_datafile',
+                    help='把總設定檔還原成本工具做的備份。有 datafile.big 就還原它;'
+                         '官方中文版沒有那個封裝檔,還原的是散裝的 datafile.txt')
+    ap.add_argument('--bigs', action='store_true',
+                    help='掃 data/frontend,看哪些封裝檔裝著版面檔(唯讀)')
+    ap.add_argument('--find', metavar='關鍵字', help='掃全部版面檔,找名字含這個字的元素')
+    ap.add_argument('--show', metavar='版面檔', help='顯示某個版面檔的內容')
+    ap.add_argument('--screen', metavar='畫面代號', help='搭配 --show,只看某一個畫面')
+    ap.add_argument('--extract', nargs=2, metavar=('版面檔', '輸出檔'), help='存成文字檔(唯讀)')
+    ap.add_argument('--strings', nargs='?', const='', metavar='版面檔',
+                    help='把版面檔裡的字串編號換成真正的文字(唯讀)')
+    ap.add_argument('--where', metavar='版面檔',
+                    help='列出這個版面檔裡顯示中的元素在畫面上的座標(唯讀)')
+    ap.add_argument('--toggle', nargs=3, metavar=('版面檔', '元素名', 'on/off'),
+                    help='開關某個元素')
+    ap.add_argument('--cmd', metavar='指令', help='搭配 --find/--toggle,只針對某種指令(例如 TX)')
+    ap.add_argument('--lines', type=int, default=80, help='--show 顯示幾行(預設 80)')
+    ap.add_argument('--apply', action='store_true', help='真的寫入(沒加就只是預覽)')
+    ap.add_argument('--restore', action='store_true', help='從備份還原')
+    args = ap.parse_args()
+
+    if args.bigs:
+        cmd_bigs(args.gamedir); return 0
+
+    bigpath = os.path.join(args.gamedir, args.big)
+
+    # ⚠️ 2026-08-28 加:官方中文版沒有 datafile.big。
+    #    它把 data/datafile/ 散裝成 466 個 .txt,datafile.txt 就躺在資料夾裡
+    #    (data/anims/ 也一樣,730 個散裝檔沒有 anims.big)。
+    #    本站在此之前所有量測都是拿英文版做的,所以這一課對裝中文版的人
+    #    是從頭到尾跑不起來的 —— 工具會在這裡就報「找不到封裝檔」。
+    #    這一段就是為了那件事:先看使用者指的是不是散裝的 datafile.txt;
+    #    如果他指的是 datafile.big 而那個檔不存在,就自動找旁邊的 datafile.txt。
+    loose_path = None
+    if loose_datafile(bigpath):
+        loose_path = bigpath
+    elif not os.path.isfile(bigpath) and os.path.basename(bigpath).lower() == 'datafile.big':
+        cand = os.path.join(os.path.dirname(bigpath), DATAFILE_ENTRY)
+        if os.path.isfile(cand):
+            loose_path = cand
+            print('  找不到 %s,但同一個資料夾裡有散裝的 %s —— 改用它。'
+                  % (os.path.basename(bigpath), DATAFILE_ENTRY))
+            print('  (官方中文版就是這樣:整個 data/datafile/ 是散裝的,沒有封裝檔)')
+
+    if not loose_path and not os.path.isfile(bigpath):
+        print('❌ 找不到 %s' % bigpath)
+        print('   請確認第一個參數是遊戲資料夾(裡面應該要有 data 這個子資料夾)。')
+        print('   如果你裝的是官方中文版,攝影機在 data/datafile/datafile.txt(散裝,沒有封裝檔)。')
+        return 2
+
+    if args.restore:
+        cmd_restore(bigpath); return 0
+
+    if loose_path:
+        raw = b''
+        items = []
+    else:
+        raw = load_big(bigpath)
+        items = list_entries(raw)
+
+    # --entries 在「有沒有版面檔」那道關卡之前處理 ——
+    # 圖片、模型、球場那些封裝檔一個版面檔都沒有,但一樣該看得到裡面有什麼。
+    if args.entries:
+        cmd_entries(raw, items); return 0
+
+    # 攝影機在 datafile.big,那個檔一個版面檔都沒有,同樣要在關卡之前。
+    if args.restore_datafile:
+        cmd_restore_datafile(bigpath, loose_path); return 0
+    if args.cameras or args.camera:
+        text = datafile_text(raw, items, loose_path)
+        if args.cameras and not args.camera:
+            cmd_cameras(text); return 0
+        if args.cam_set:
+            sets = []
+            for part in args.cam_set.split(','):
+                if '=' not in part:
+                    print('❌ --set 要寫成「欄位=值」,用逗號分隔多組。你給的是「%s」' % part)
+                    return 2
+                k, v = part.split('=', 1)
+                sets.append((k.strip(), v.strip()))
+            cmd_camera_set(bigpath, raw, items, text, args.camera, sets, args.apply, loose_path)
+        else:
+            cmd_camera_show(text, args.camera)
+        return 0
+
+    texts = fel_texts(raw, items)
+    if not texts:
+        raise DataError('%s 裡沒有任何版面檔。是不是指定錯封裝檔了?' % os.path.basename(bigpath))
+
+    if args.list:
+        cmd_list(raw, items)
+    elif args.find:
+        cmd_find(texts, args.find, args.cmd)
+    elif args.show:
+        cmd_show(texts, args.show, args.screen, args.lines)
+    elif args.extract:
+        cmd_extract(texts, args.extract[0], args.extract[1])
+    elif args.where:
+        cmd_where(texts, load_all_loc(args.gamedir), args.where)
+    elif args.strings is not None:
+        cmd_strings(texts, load_all_loc(args.gamedir), args.strings or None)
+    elif args.toggle:
+        fn, name, state = args.toggle
+        if state.lower() not in ('on', 'off'):
+            print('❌ 第三個參數要是 on 或 off,你給的是「%s」' % state)
+            return 2
+        cmd_toggle(bigpath, raw, items, texts, fn, name, state.lower(), args.cmd, args.apply)
+    else:
+        cmd_list(raw, items)
+        print('  想找某個元素:--find <關鍵字>')
+        print('  想看某個檔  :--show <版面檔>')
+        print('  想看別的封裝檔:--bigs')
+        print('  想知道在畫面哪:--where <版面檔>')
+        print('  想關某個元素:--toggle <版面檔> <元素名> off')
+    return 0
+
+
+if __name__ == '__main__':
+    # --selftest 排在最前面判斷:它不需要遊戲資料夾,
+    # 走進 main() 反而會因為「沒給路徑」被 argparse 擋下來。
+    if '--selftest' in sys.argv:
+        sys.exit(selftest())
+    try:
+        sys.exit(main())
+    except DataError as e:
+        print('\n❌ %s' % e)
+        sys.exit(1)
+    except PermissionError as e:
+        # 遊戲裝在 C:\Program Files (x86)\EA SPORTS\ 這種受保護的資料夾時,
+        # --apply 第一步做備份就會撞上 —— 而那正是這個遊戲的預設安裝位置。
+        # 這裡要講人話,不能讓使用者看到一整片英文 traceback。
+        print('\n❌ 沒有權限寫入:%s' % e)
+        print('   遊戲裝在 C:\\Program Files 這種受保護的資料夾時會這樣。')
+        print('   以系統管理員身分開命令提示字元再跑一次,')
+        print('   或把整個遊戲資料夾複製到桌面再改。')
+        print('   (遊戲檔沒有被改到)')
+        sys.exit(1)
+    except KeyboardInterrupt:
+        # ⚠️ 不可以無條件說「沒有改到任何檔案」:寫入(os.replace)是在複驗
+        #    **之前**就完成的,使用者在「已寫入」印出來之後才按 Ctrl-C,
+        #    檔案已經換掉了。
+        #    2026-09-05 之前這裡是叫使用者「自己回頭看有沒有印過『已寫入』」——
+        #    那是把判斷丟回給最慌的那個人。現在程式自己記,而且分三態:
+        #    還沒動 / 正在換(_REPLACING)/ 已換(_REPLACED),這裡照著講。
+        print('\n已中斷。')
+        if _REPLACING:
+            # 幾乎不會走到這裡(換名跟登記被 _NoInterrupt 包在一起了),
+            # 它是最後一道保險:寧可說「不知道換成功沒有」,也不要說錯。
+            print('⚠ 中斷的那一刻正在替換下面這些檔,換成功沒有無法確定:')
+            for _p in _REPLACING:
+                print('   · %s' % _p)
+            print('  跑一次 --restore 退回動手之前,或自己拿備份比對一下。')
+            print('  (改攝影機那條路是 --restore-datafile)')
+        if _REPLACED:
+            print('⚠ 下面這些檔已經換過了:')
+            for _p in _REPLACED:
+                print('   · %s' % _p)
+            print('  要退回動手之前:跑一次 --restore')
+            print('  (改攝影機那條路是 --restore-datafile)')
+            print('  這些是換名確定做完的檔,不是「可能」—— 不還原就是改過的狀態。')
+        elif not _REPLACING:
+            # 兩張表都是空的才可以講這句話 —— 「正在換」也是動過的一種。
+            print('遊戲檔一個位元組都沒有被動到 —— 換名那一步還沒發生。')
+            print('(旁邊可能留著一份完整的備份檔,那是好的,可以留著也可以刪掉。)')
+        sys.exit(130)
+
+# ─────────────────────────────────────────────────────────
+#  MIT License
+#
+#  Copyright (c) 2026 toni
+#
+#  Permission is hereby granted, free of charge, to any person obtaining a copy
+#  of this software and associated documentation files (the "Software"), to deal
+#  in the Software without restriction, including without limitation the rights
+#  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#  copies of the Software, and to permit persons to whom the Software is
+#  furnished to do so, subject to the following conditions:
+#
+#  The above copyright notice and this permission notice shall be included in
+#  all copies or substantial portions of the Software.
+#
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#  THE SOFTWARE.
+# ─────────────────────────────────────────────────────────

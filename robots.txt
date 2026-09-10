@@ -1,0 +1,7 @@
+# toni的MVP模組補習班
+# 這個站歡迎被搜尋到 —— 它就是為了讓找不到答案的人找得到而寫的。
+
+User-agent: *
+Allow: /
+
+Sitemap: https://toniliumvp.github.io/MVPBaseball/sitemap.xml

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/official-chinese.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>EA 自己的繁體中文版是怎麼做的 — toni的MVP模組補習班</title>
+<meta name="description" content="2005 年 2 月,EA 出過官方繁體中文版。把它跟英文版逐檔比對:913 個共同檔案只有 65 個不同,中文被放進日文的槽位,字型檔脹大八倍。全部是量出來的。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › EA 自己的繁體中文版</p>
+  <h1>EA 自己的繁體中文版是怎麼做的</h1>
+  <p class="lede">本站一直以為「MVP Baseball 2005 的中文化」是社群做的。
+     <strong>不是。2005 年 2 月，EA 自己出過一個繁體中文版。</strong>
+     把它跟英文版逐檔比對，可以直接看出一間遊戲公司當年是怎麼做在地化的 ——
+     而且答案跟社群的做法<u>完全不一樣</u>。</p>
+
+  <div class="card amber">
+    <p class="card-h">三句話版本</p>
+    <p><b>一、</b>913 個共同檔案裡<strong>只有 65 個大小不同</strong>，
+       其餘 848 個大小相同（其中 825 個逐位元組一模一樣）。
+       在地化只動了 <strong>7%</strong>。</p>
+    <p><b>二、</b>中文<strong>沒有覆蓋英文</strong>，而是放進<u>日文的槽位</u>
+       （<code>IGJPN.LOC</code> / <code>FEJPN.LOC</code>）。</p>
+    <p><b>三、</b>字型檔從 <strong>205 KB 脹到 1.68 MB</strong>，八倍。中文字要有字才顯示得出來。</p>
+  </div>
+
+  <h2>先講證據：這確實是 EA 出的，不是誰後來改的</h2>
+  <p>本站手上有四份<strong>沒有疊過模組</strong>的安裝：英文版、官方繁體中文版、<code>PK</code> 版，
+     以及官方繁體中文版<a href="patches-tc.html">套過三個官方更新檔</a>的那一份。
+     這一節比的是前兩份<strong>剛安裝好、從未被改動過</strong>的遊戲：一份英文版、一份繁體中文版。
+     判斷它是不是原廠，看檔案的修改時間最直接：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>檔案</th><th class="num">英文版</th><th class="num">繁中版</th></tr></thead>
+    <tbody>
+      <tr><td data-label="檔案" class="mono">mvp2005.exe</td><td data-label="英文版" class="num">2005-01-22</td><td data-label="繁中版" class="num">2005-02-16</td></tr>
+      <tr><td data-label="檔案" class="mono">data\fonts\fonts.big</td><td data-label="英文版" class="num">2004-12-03</td><td data-label="繁中版" class="num">2005-02-17</td></tr>
+      <tr class="hi"><td data-label="檔案" class="mono">文字表 .LOC</td><td data-label="英文版" class="num">2005-01-11</td><td data-label="繁中版" class="num"><strong>2005-02-18</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>繁中版那 65 個不同的檔，<strong>63 個的時間落在 2005 年 2 月</strong>，
+     比英文版晚大約五週（另外兩個是 2005 年 1 月的 <code>Support\EasyReqs.xml</code>
+     與 2009 年的 <code>filelist.txt</code>）。這是一間公司照著發行排程做完再出貨的樣子，
+     不是誰在多年後拿工具改的 —— 那種改法留下的時間戳會是後來的年份。</p>
+  <p class="small">整份繁中安裝 2,389 個檔，其中 2,386 個落在 2004-2005 年。剩下三個是安裝程式自己產生的清單、一個 2003 年的元件，還有一個的時間戳是 2026 年（<code>data\audio\cd\spch_pbp\pbpdat.big</code>，2026-08-25）—— 那是本站把它複製到這台機器留下的痕跡，內容跟來源逐位元組相同。
+     <strong>時間戳告訴你檔案什麼時候到這顆硬碟，不是它什麼時候被做出來。</strong>
+     怎麼用時間戳判斷檔案有沒有被動過，見<a href="../tutorials/whats-original/index.html">那一課</a>。</p>
+
+  <h2>在地化只動了 7%</h2>
+  <p>兩份安裝有 913 個路徑相同的檔案。逐一比大小：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>比對結果</th><th class="num">檔數</th><th>是什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="比對結果"><strong>大小相同</strong></td><td data-label="檔數" class="num"><strong>848</strong></td>
+          <td data-label="是什麼">球員資料、球場、動畫、音效、模型 —— 遊戲本體幾乎原封不動。其中 825 個逐位元組相同，另外 23 個大小相同但內容有差（見下）</td></tr>
+      <tr><td data-label="比對結果">不同</td><td data-label="檔數" class="num">65</td><td data-label="是什麼">見下表</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card amber">
+    <p class="card-h">那 23 個「大小一樣、內容不一樣」的，多數不是在地化改的</p>
+    <p>本站原本只比了檔案大小，就寫「其餘 848 個位元組一模一樣」。
+       真的逐位元組比之後，發現有 23 個大小相同但內容有差。攤開來看：</p>
+    <ul>
+      <li><strong>20 個檔、總共 45 個位元組</strong>，差別全部是同一種：
+          <u>繁中版那一份把某個位元組的第 3 個位元設成 1</u>，英文版是 0。
+          <strong>45 個位元組，方向一個例外都沒有。</strong></li>
+      <li>剩下 <strong>3 個</strong>才是真的不一樣：
+          <code>feonlyln.big</code>、<code>igcrsr9.fsh</code>、<code>eauninstall.exe</code>。</li>
+    </ul>
+    <p>那 20 個裡有球場幾何、過場影片、背景音樂、觀眾加油聲。
+       <strong>在地化不會只動球場幾何一個位元。</strong>
+       所以第一個念頭是「某一份掉了位元」。<u>再多量兩件事之後，那個念頭也被推翻了</u>：</p>
+    <ul>
+      <li><strong>45 個位置全部是 32 的倍數。</strong>
+          隨機的位元錯誤不會這樣落點 —— 45 個位置剛好都對齊 32 的機率是 1/32 的 45 次方。</li>
+      <li><strong>那 45 個位元組的第 4 個位元，兩份都是 1。</strong>
+          差的永遠是第 3 個位元，而且永遠是繁中版那份把它設成 1。</li>
+    </ul>
+    <p>本站另外有第三份安裝可以當公親：<strong>那 45 個位元組，它 45 次都站英文版那一邊。</strong></p>
+
+    <p class="card-h" style="margin-top:14px">✅ 後來確定了：是<u>本站這份繁中版備份</u>壞的</p>
+    <p>那 45 個位元組裡，有幾個落在 <code>data\models.big</code> 的球衣貼圖裡。
+       把那個檔在兩邊各解開一次：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th></th><th class="mono">u025k.fsh 解出幾張圖</th><th>格式代號</th></tr></thead>
+      <tbody>
+        <tr><td>英文版</td><td data-label="u025k.fsh 解出幾張圖" class="num">28</td><td data-label="格式代號"><code>0x6D</code> ×5、<code>0x78</code> ×23（都是正常的）</td></tr>
+        <tr class="hi"><td>本站的繁中版備份</td><td data-label="u025k.fsh 解出幾張圖" class="num">28</td>
+            <td data-label="格式代號"><strong>其中 8 張是 <code>0x45</code></strong> —— 這個代號在整個遊戲的任何地方都不存在</td></tr>
+      </tbody>
+    </table></div>
+    <p>而且那 8 張裡有一張的尺寸解出來是 <strong>寬 0</strong>。
+       <u>寬度 0 的圖不可能是誰刻意做出來的。</u></p>
+    <p><strong>所以那 45 個位元組是損壞，而且壞的是這一份繁中版備份。</strong>
+       兩份獨立的安裝（英文版與第三份）在這 45 個位置上完全一致。</p>
+    <p class="small">⚠️ 但「損壞」跟「隨機」是兩回事，上面那兩條量測還是成立的：
+       45 個位置全部對齊 32、方向零例外。<strong>是什麼東西能系統性地
+       在 32 位元組邊界上把同一個位元設起來，本站仍然不知道。</strong>
+       <span class="badge wip">未解</span><br>
+       也請注意範圍：這講的是<u>本站手上這一份備份</u>，
+       不是「EA 出的繁體中文版有問題」。</p>
+    <p class="small">⚠️ <strong>那到底是什麼，本站不知道</strong>，也不打算編一個機制出來
+       —— 這個站已經在同樣的地方跌過好幾次了。<span class="badge wip">未解</span><br>
+       已經排除的三件事：不是本站複製造成的（兩份本機檔跟來源的 md5 相同）、
+       不是隨機損壞（落點與位元位置都太規律）、
+       也不是落在沒人讀的區域（在封裝檔裡的那 14 個位元組，全部落在目錄真的指到的項目內）。</p>
+  </div>
+  <p>那 65 個是哪些：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">檔案</th><th class="num">英文版</th><th class="num">繁中版</th><th>差別</th></tr></thead>
+    <tbody>
+      <tr><td data-label="檔案" class="mono">load*.big（60 個）</td><td data-label="英文版" class="num">—</td><td data-label="繁中版" class="num">—</td>
+          <td data-label="差別"><strong>載入畫面</strong>。畫面上的字是<u>畫進圖裡</u>的，所以整張圖要重做</td></tr>
+      <tr class="hi"><td data-label="檔案" class="mono">data\fonts\fonts.big</td><td data-label="英文版" class="num">204,820</td><td data-label="繁中版" class="num"><strong>1,683,513</strong></td>
+          <td data-label="差別"><strong>脹了 8.2 倍</strong>，見下一節</td></tr>
+      <tr><td data-label="檔案" class="mono">mvp2005.exe</td><td data-label="英文版" class="num">6,972,001</td><td data-label="繁中版" class="num">7,525,175</td>
+          <td data-label="差別">執行檔本身就不一樣（多 553 KB）。<span class="badge wip">未解</span> 差在哪本站沒有拆</td></tr>
+      <tr><td data-label="檔案" class="mono">filelist.txt</td><td data-label="英文版" class="num">35,686</td><td data-label="繁中版" class="num">79,084</td>
+          <td data-label="差別">安裝用的檔案清單，跟著變長</td></tr>
+      <tr><td data-label="檔案" class="mono">data\frontend\minibat.big</td><td data-label="英文版" class="num">253,292</td><td data-label="繁中版" class="num">243,897</td>
+          <td data-label="差別"><span class="badge wip">未解</span> 本站沒有拆開看</td></tr>
+      <tr><td data-label="檔案" class="mono">Support\EasyReqs.xml</td><td data-label="英文版" class="num">824</td><td data-label="繁中版" class="num">822</td>
+          <td data-label="差別">安裝需求描述，差 2 個位元組</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">「913 個共同檔案」只是<u>兩邊路徑相同</u>的那些。
+     兩份安裝的檔案總數其實差很多：英文版 1,191 個、繁中版 2,389 個
+     —— <strong>英文版獨有 278 個、繁中版獨有 1,476 個</strong>。
+     其中說明文件資料夾的差別（英文版 <code>Support\EA Help\</code>、
+     繁中版 <code>Support\European Help Files\</code>）<strong>各佔兩百多個</strong>：
+     英文版獨有的 278 個裡有 <strong>272 個</strong>是說明文件，<u>幾乎就是全部</u>；
+     繁中版獨有的 1,476 個裡說明文件只佔 <strong>273 個</strong>，
+     真正的大頭是下面那一節講的兩個封裝檔被拆開來的 1,196 個散檔。</p>
+
+  <div class="card grass">
+    <p class="card-h">最值得注意的一件事：中文沒有覆蓋英文</p>
+    <p>英文版的文字表是 <code>IGENG.LOC</code> 與 <code>FEENG.LOC</code>。
+       繁中版<strong>那兩個檔完全不存在</strong>，取而代之的是
+       <code>IGJPN.LOC</code> 與 <code>FEJPN.LOC</code>。</p>
+    <p><strong><code>JPN</code> 是日文的語言代號。</strong>
+       本站把 <code>IGJPN.LOC</code> 解開來數：<u>4,838 個漢字、0 個日文假名</u>，
+       裡面是<strong>繁體中文</strong>。</p>
+    <p>連字型檔名也留著同樣的痕跡：繁中版的字型叫
+       <code>twcnb_jp.ffn</code>、<code>twc18_jp.ffn</code> ——
+       <code>twc</code> 看起來是 Taiwan Chinese，後綴卻是 <code>_jp</code>。</p>
+    <p class="small"><strong>為什麼用日文槽位，本站不知道。</strong>
+       可以想到幾個理由，但那都是猜的，本站不寫。
+       <u>能確定的只有：檔名是 JPN，內容是繁體中文。</u></p>
+  </div>
+
+  <h2>兩個封裝檔，繁中版是拆開來出貨的</h2>
+  <p>上面那張表比的是「913 個路徑相同的檔案」。但兩份安裝的<u>檔案總數差很多</u>
+     —— 英文版 1,191 個、繁中版 2,389 個。多出來的一千多個，大部分集中在兩個資料夾：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">資料夾</th><th>英文版</th><th>繁中版</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="資料夾" class="mono">data\anims\</td>
+          <td data-label="英文版">1 個檔：<code>anims.big</code>（8,956,128 bytes）</td>
+          <td data-label="繁中版"><strong>730 個散檔</strong>，<u>沒有 <code>anims.big</code></u></td></tr>
+      <tr class="hi"><td data-label="資料夾" class="mono">data\datafile\</td>
+          <td data-label="英文版">1 個檔：<code>datafile.big</code>（2,857,593 bytes）</td>
+          <td data-label="繁中版"><strong>466 個散檔</strong>，<u>沒有 <code>datafile.big</code></u></td></tr>
+    </tbody>
+  </table></div>
+  <p>散檔不是翻譯過的東西 —— <strong>466 個 <code>datafile</code> 散檔裡，含中文的是 0 個。</strong>
+     抽 <code>01day.txt</code> 出來比：英文版封裝檔裡那份是壓縮的 4,470 位元組，
+     繁中版那份是同樣內容的<u>未壓縮明文</u>，11,934 位元組。</p>
+  <p><strong>繁中版就是把這兩包拆開、解壓縮之後出貨的。為什麼要這樣做，本站不知道。</strong>
+     <span class="badge wip">未解</span>
+     整體結果是繁中版少了兩個封裝檔：全遊戲 <code>.big</code> 英文版 224 個、繁中版 222 個。</p>
+
+  <div class="card amber">
+    <p class="card-h">這解釋了一件 2008 年就被記下來的事</p>
+    <p>本站的班主任 2008 年寫過一份模組安裝懶人包，裡面記了一條當年的經驗法則：</p>
+    <p style="padding-left:14px;border-left:3px solid var(--rule)">
+       <strong>中文版裝新球場一定會跳出，所以建議玩英文語系的。</strong></p>
+    <p class="small">（大意如此，非原文。原文是十八年前的公開貼文，
+       本站不逐字引用也不附出處連結。）</p>
+    <p>當年沒有辦法說明為什麼。現在兩份原版擺在一起量，至少可以確定一件事：</p>
+    <p><strong>球場檔本身兩邊是一樣的。</strong>87 個球場封裝檔裡有 83 個逐位元組相同，
+       剩下 4 個的差異是<u>本頁上方講的那 23 個檔</u>那件事，跟中文化無關。</p>
+    <p>而<u>社群模組的安裝程式要去改的那兩個封裝檔，在繁中版根本不存在</u>。
+       一個去找 <code>data\anims\anims.big</code> 的安裝程式，
+       在繁中版上找不到那個檔案。</p>
+    <p class="small">⚠️ <strong>這一頁沒有驗過這是不是跳出的原因</strong>，也沒有做「拿繁中版裝模組看會不會跳」的實驗。
+       量到的是「那兩個封裝檔在繁中版不存在」這件事本身，以及「球場檔兩邊一樣」。
+       把這兩件事跟 2008 年那個觀察擺在一起，是<u>這一節</u>能做到的極限。<span class="badge wip">未驗</span></p>
+    <p class="small">（2026-09-05 訂正：<strong>那條經驗法則本站後來解開了。</strong>
+       真正卡住的不是球場檔，是執行檔裡寫死的一塊 <strong>64 MB 記憶體池</strong> ——
+       中文字型光是展開成貼圖就吃掉 13.50 MB，把那塊池改成 128 MB 之後，
+       同樣的中文語系配同一顆大球場就進得去了，而「當機」那一邊還重現了兩次、當在同一個位址。
+       見<a href="../tutorials/fix-chinese/index.html">中文版配大球場就跳出</a>那一課。
+       那一課測的是<u>把中文語系檔與字型蓋在英文版上</u>；拿整份官方繁中版安裝去裝大球場，本站還沒實測。）</p>
+  </div>
+
+
+  <h2>字型檔脹了八倍</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th></th><th class="num">英文版</th><th class="num">繁中版</th></tr></thead>
+    <tbody>
+      <tr><td>檔案大小</td><td data-label="英文版" class="num">204,820</td><td data-label="繁中版" class="num"><strong>1,683,513</strong></td></tr>
+      <tr><td>裡面有幾個字型</td><td data-label="英文版" class="num">12</td><td data-label="繁中版" class="num">13</td></tr>
+      <tr class="hi"><td>最大的那個</td><td data-label="英文版" class="mono">au20b_en.ffn<br>57,617</td>
+          <td data-label="繁中版" class="mono">au20b_jp.ffn<br><strong>304,485</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>字型只多一個，檔案卻大了 8.2 倍。原因很直白：
+     <strong>英文只要幾十個字母，中文要幾千個字。</strong>
+     每個字都得有自己的點陣或輪廓資料。</p>
+  <p class="small">⚠️ <strong>「只多一個」講的是總數，不是內容。</strong>
+     英文版那 12 個全部叫 <code>○○_en.ffn</code>；繁中版裡它們<u>整組被換成 <code>○○_jp.ffn</code></u>，
+     12 個檔名一一對得上（<code>Tw24</code>、<code>au20b</code>、<code>dflt</code>、<code>frk12</code>、
+     <code>hrdbg</code>、<code>mini1</code>、<code>mini2</code>、<code>twcnb</code>、
+     <code>twc14</code>、<code>twc16</code>、<code>twc18</code>、<code>twn14</code>），
+     另外只留下一個沒換掉的 <code>dflt_en.ffn</code>。<strong>12 ＋ 1 ＝ 13</strong> ——
+     所以總數只多一個，<u>但真正多出來的中文字型有 12 個</u>。</p>
+  <p class="small">這也印證了<a href="loc-strings.html">文字表那頁</a>本來就寫著的一句話：
+     字型與編碼是中文化最容易出事的地方。翻譯做完了，字型裡沒有那個字，畫面上還是空的。</p>
+
+  <h2>翻了多少</h2>
+  <p>兩張表的字串編號是共用的，所以可以逐條配對，直接數翻譯覆蓋率：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>文字表</th><th class="num">共同編號</th><th class="num">翻成中文</th><th class="num">維持原樣</th>
+               <th class="num">改了，但沒有中文字</th></tr></thead>
+    <tbody>
+      <tr><td data-label="文字表">比賽中（<code>IG</code>）</td><td data-label="共同編號" class="num">1,584</td><td data-label="翻成中文" class="num">794</td><td data-label="維持原樣" class="num">782</td><td data-label="改了，但沒有中文字" class="num">8</td></tr>
+      <tr class="hi"><td data-label="文字表">選單（<code>FE</code>）</td><td data-label="共同編號" class="num">6,349</td><td data-label="翻成中文" class="num"><strong>4,634</strong></td><td data-label="維持原樣" class="num">1,698</td><td data-label="改了，但沒有中文字" class="num">17</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">後面三欄加起來剛好等於「共同編號」：<code>794 ＋ 782 ＋ 8 ＝ 1,584</code>、
+     <code>4,634 ＋ 1,698 ＋ 17 ＝ 6,349</code>。
+     最後那一欄是<strong>兩邊確實不一樣、但中文版那一格一個中文字都沒有</strong>的條目：
+     大多是半形標點換成全形（<code>(</code> → <code>（</code>、<code>:</code> → <code>：</code>）、
+     多一個空格，或是被引號包起來（<code>,</code> → <code>","</code>）。
+     只有兩條是真的換了內容：選單表編號 <code>10010</code> 從 <code>Generic 3</code> 變成
+     <code>Batista</code>、編號 <code>15505</code> 從 <code>2005</code> 變成 <code>2004</code>。
+     <u>本站原本這張表只有三欄，加起來各短了 8 條與 17 條，沒有交代去向</u> —— 這一欄是補上的。</p>
+  <p>「維持原樣」的絕大多數是<strong>數字與佔位符</strong>
+     （<code>4</code>、<code>10</code>、<code>&lt;some text&gt;</code> 這種），本來就沒有東西可以翻。</p>
+  <p>實際對照長這樣：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">編號</th><th>英文版</th><th>繁中版</th></tr></thead>
+    <tbody>
+      <tr><td data-label="編號" class="num">18159</td><td data-label="英文版" class="mono">Home Run</td><td data-label="繁中版">全壘打</td></tr>
+      <tr><td data-label="編號" class="num">14810</td><td data-label="英文版" class="mono">Double Play!</td><td data-label="繁中版">雙殺！</td></tr>
+      <tr><td data-label="編號" class="num">3103</td><td data-label="英文版" class="mono">Fielding Aid</td><td data-label="繁中版">守備協助</td></tr>
+      <tr><td data-label="編號" class="num">1443</td><td data-label="英文版" class="mono">Runner Diving Allowance</td><td data-label="繁中版">允許跑者撲壘</td></tr>
+      <tr><td data-label="編號" class="num">19734</td><td data-label="英文版" class="mono">a fractured finger</td><td data-label="繁中版">手指骨折</td></tr>
+      <tr><td data-label="編號" class="num">20281</td><td data-label="英文版" class="mono">Charge Mound</td><td data-label="繁中版">衝向投手丘</td></tr>
+      <tr class="hi"><td data-label="編號" class="num">18538</td><td data-label="英文版" class="mono">Let's play on All-Star level</td><td data-label="繁中版">讓我們玩明星級</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">最後那一條看得出是<u>逐字翻的</u>，不是照中文語感重寫。
+     這種痕跡在整份表裡不少，但本站沒有統計「有多少條是直譯」——
+     那需要人工判讀，不是量得出來的。</p>
+
+  <h2>社群的中文化，是拿 EA 這一份去改的</h2>
+  <p>本站手上有一份社群做的中文化模組（<code>IGENG.LOC</code> 與 <code>FEENG.LOC</code>，
+     用蓋掉英文的方式做，跟 EA 換槽位的做法不同）。
+     把它跟 EA 官方那一份<u>逐條比對同一個編號的翻譯</u>：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>哪一張表</th><th class="num">兩邊都翻成中文的</th><th class="num">翻得一模一樣</th><th class="num">比例</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="哪一張表">比賽中（<code>IG</code>）</td><td data-label="兩邊都翻成中文的" class="num">794</td><td data-label="翻得一模一樣" class="num">772</td><td data-label="比例" class="num"><strong>97.2%</strong></td></tr>
+      <tr class="hi"><td data-label="哪一張表">選單（<code>FE</code>）</td><td data-label="兩邊都翻成中文的" class="num">4,624</td><td data-label="翻得一模一樣" class="num">4,578</td><td data-label="比例" class="num"><strong>99.0%</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>所以社群不是從英文重新翻的 —— 是把 EA 的官方中文搬進 <code>ENG</code> 槽位。</strong></p>
+  <p class="small">這也解釋了為什麼那份模組能有這種完成度：
+     2005 年的官方繁中版早就把六千多條翻完了。</p>
+
+  <h3>不一樣的那 68 條，才是社群自己動的手</h3>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>差在哪</th><th class="num">條數</th><th>例子</th></tr></thead>
+    <tbody>
+      <tr><td data-label="差在哪">把年份從 2005 改成 2009</td><td data-label="條數" class="num">13</td>
+          <td data-label="例子">「找不到《美國職棒大聯盟<u>2005</u>》CD 2」→「…<u>2009</u>…」（那份模組的年份）</td></tr>
+      <tr class="hi"><td data-label="差在哪"><strong>把球種名稱補完整</strong></td><td data-label="條數" class="num">9</td>
+          <td data-label="例子">叉指球 → 叉指<u>速</u>球、四縫線球 → 四縫線<u>速</u>球
+              （英文原文是 4-Seam <u>Fastball</u>，EA 把「速球」漏掉了）</td></tr>
+      <tr class="hi"><td data-label="差在哪"><strong>把 EA 沒翻的英文縮寫翻掉</strong></td><td data-label="條數" class="num">16</td>
+          <td data-label="例子">EA「擊球率 vs <u>RHP</u>」→ 社群「擊球率<u>對右投</u>」</td></tr>
+      <tr><td data-label="差在哪">術語換講法</td><td data-label="條數" class="num">—</td>
+          <td data-label="例子">次打者 → 次棒、角色 → 位置、投球 → 投手</td></tr>
+      <tr class="hi"><td data-label="差在哪"><strong>訂正 EA 的錯字</strong></td><td data-label="條數" class="num">1</td><td data-label="例子">見下</td></tr>
+    </tbody>
+  </table></div>
+
+  <p class="small">「條數」是逐條算的：同一個字串編號在比賽中與選單兩張表各出現一次就算兩條，
+     所以那 68 條分佈在兩張表上（比賽中 22 條、選單 46 條）。</p>
+
+  <div class="card grass">
+    <p class="card-h">那個錯字</p>
+    <p>編號 6701 的英文是 <code>Rating</code>。</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th></th><th>編號 6701</th><th class="num">全檔用「評等」</th><th class="num">全檔用「平等」</th></tr></thead>
+      <tbody>
+        <tr><td>EA 官方繁中</td><td data-label="編號 6701"><strong>平等</strong></td><td data-label="全檔用「評等」" class="num">15 次</td><td data-label="全檔用「平等」" class="num">1 次</td></tr>
+        <tr class="hi"><td>社群中文化</td><td data-label="編號 6701"><strong>評等</strong></td><td data-label="全檔用「評等」" class="num">16 次</td><td data-label="全檔用「平等」" class="num">0 次</td></tr>
+      </tbody>
+    </table></div>
+    <p>EA 自己在其他 15 個地方都寫「評等」，只有這一條寫成「平等」。
+       <strong>社群把它改回來了。</strong></p>
+    <p class="small">「平等」跟「評等」在注音輸入法裡是同一個音。
+       這是本站在整份官方翻譯裡找到的<u>唯一一個</u>這類錯字。</p>
+  </div>
+
+  <p>把這幾類放在一起看，那 68 條差異不是隨機的：
+     <strong>13 條是換自己的年份，其餘大多是往「更像棒球」的方向調</strong> ——
+     補上「速球」、把 RHP 翻成右投、把「次打者」改成球評會講的「次棒」。</p>
+  <p class="small">⚠️ 本站沒有辦法確認那份社群模組的作者是誰、也沒有辦法確認他們是否知道
+     自己在改的是官方翻譯。量到的是「兩份檔案逐條比對的結果」。
+     <span class="badge wip">未解</span>
+     本站不提供那份模組，也不提供任何 <code>.LOC</code> 檔案。</p>
+
+
+  <h2>這件事訂正了本站原本的一個假設</h2>
+  <div class="card blue">
+    <p class="card-h">我們改過這一段</p>
+    <p><a href="loc-strings.html">文字表那頁</a>原本寫著
+       「檔名裡的 <code>ENG</code> 是語言代號，<u>中文化模組會換掉這兩個檔的內容</u>」。</p>
+    <p>那句話對<strong>社群</strong>的做法是準確的，但它讓人以為那是<u>唯一</u>的做法。
+       <strong>EA 自己不是這樣做的</strong> ——
+       它沒有覆蓋 <code>ENG</code> 那一對，而是另外放一對 <code>JPN</code>。</p>
+    <p>順帶訂正同一頁的另一句。原本寫「測試機上的社群中文化模組只換了選單那張表」——
+       那是錯的。測試機正在跑的兩張表<strong>一個中文字都沒有</strong>；
+       把選單那張改成 2023 的是<u>名冊模組</u>，不是中文化模組。
+       機器上另外留著一份中文化備份，那一份<u>兩張表都換了</u>。</p>
+    <p>教訓不變，只是主角換人：覆蓋式的做法要記得兩張都換，
+       而 EA 那種換槽位的做法，兩張是一起換的。</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">本站仍然不寫「怎麼自己做中文化」</p>
+    <p>這一頁講的是<strong>EA 當年怎麼做的</strong>，那是兩份官方發行版的格式比對。</p>
+    <p>但<a href="loc-strings.html">文字表那頁</a>列的兩塊技術缺口，<u>兩塊現在都讀得出來，只有一塊寫得回去</u>：
+       寫回 <code>.LOC</code> 的工具<u>後來做了</u>（<a href="../tutorials/fix-chinese/index.html">中文版配大球場就跳出</a>那一課的 <code>mvp_fix_loc.py</code>，<code>--apply</code> 才真的寫、有 <code>--restore</code>）；
+       字型檔的字符點陣也<u>讀得出來了</u>（見<a href="fonts.html">字型檔那頁</a>的 2026-09-05 訂正：字圖集與整張字元表都讀開了），
+       但本站沒有<strong>從零產生一張新的字圖集與一張新的字元表、再寫回去</strong>的辦法 ——
+       所以做不出新字型，也加不了原本沒有的字。
+       <strong>要「從零做一套中文」才需要把字型那塊也補齊;而本站的中文化教學是<u>搬官方現成的中文</u>,不必自己做字型,見<a href="../tutorials/make-chinese/index.html">把官方中文搬進英文版</a>。</strong><span class="badge wip">未解</span></p>
+    <p>本站也<strong>不散布任何遊戲檔案</strong>，包括這兩份安裝裡的任何一個檔。
+       這一頁只有結構、數字與對照，沒有可以拿去用的東西。</p>
+  </div>
+
+  <h2 id="community">社群的中文化，是踩在官方中文版上面的（2026-08-28 量的）</h2>
+  <p>本頁講的是 EA 自己出的繁體中文版。那社群那些「中文化模組」跟它是什麼關係？</p>
+  <p>本站手上有一個 2000 年代的社群合包，裡面同時帶了語系檔與字型檔。
+     把它的字型封裝檔跟官方中文版逐項比對雜湊值：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th></th><th class="num">大小</th><th class="num">項目數</th><th class="num">與官方中文版逐位元組相同</th></tr></thead>
+    <tbody>
+      <tr><td>剛安裝好的官方英文版</td><td data-label="大小" class="num">204,820</td><td data-label="項目數" class="num">12</td><td data-label="與官方中文版逐位元組相同" class="num">—</td></tr>
+      <tr class="hi"><td><strong>官方繁體中文版</strong></td><td data-label="大小" class="num">1,683,513</td><td data-label="項目數" class="num">13</td><td data-label="與官方中文版逐位元組相同" class="num">（基準）</td></tr>
+      <tr class="hi"><td><strong>社群中文化合包</strong></td><td data-label="大小" class="num">1,686,625</td><td data-label="項目數" class="num">13</td>
+          <td data-label="與官方中文版逐位元組相同" class="num"><strong>13 項裡有 12 項相同</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>只有一個字型檔不一樣</strong>，是 <code>hrdbg_jp.ffn</code>（合包 10,005 位元組、
+     官方繁中版 6,985）。其餘十二項 —— 本頁上面講的那 12 個 <code>○○_jp.ffn</code> 裡的 11 個，
+     加上那個沒被換掉的 <code>dflt_en.ffn</code> —— <u>跟 EA 出貨的那份逐位元組完全相同</u>。</p>
+  <p>所以那個合包不是自己做的中文化，是<strong>拿官方中文版的字型檔來用，只換掉其中一個</strong>。
+     它連語系檔也是走同一個槽位（檔名帶 <code>JPN</code>）。</p>
+
+  <div class="card grass">
+    <p class="card-h">這解釋了一件對玩家有用的事</p>
+    <p>本頁前面量到官方中文版的字型檔<u>比英文版脹大八倍</u>。
+       那個社群合包<strong>也是八倍</strong>（1,686,625 對 1,683,513，只差 3,112 個位元組）——
+       因為它裝的就是同一份東西。</p>
+    <p><strong>所以「裝中文化模組」跟「裝官方中文版」在字型這一塊，拿到的是同一批檔案。</strong>
+       如果你已經在用官方中文版，再裝那類合包，字型不會變得更好或更差。</p>
+    <p class="small">字型檔的命名也對得起來：英文版那 12 個是 <code>○○_en.ffn</code>，
+       中文版多出來的 12 個是 <code>○○_jp.ffn</code> ——
+       <u>照語言槽位命名，而中文佔的是日文那一格</u>，跟本頁上面講的一致。</p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> MVP 的中文化不是社群從零做的，2005 年 2 月 EA 自己出過官方繁體中文版，而社群那份中文化是把官方的翻譯搬進英文槽位。</li>
+    <li><strong>在地化只動了 7%</strong> 兩份安裝有 913 個路徑相同的檔案，只有 <strong>65 個</strong>大小不同，其中 60 個是載入畫面（畫面上的字是<u>畫進圖裡</u>的，整張圖要重做）。字型檔從 204,820 脹到 <strong>1,683,513</strong>，8.2 倍，因為英文只要幾十個字母、中文要幾千個字。</li>
+    <li><strong>中文佔的是日文那一格</strong> 繁中版<u>沒有</u> <code>IGENG.LOC</code> 與 <code>FEENG.LOC</code>，取而代之的是 <code>IGJPN.LOC</code> 與 <code>FEJPN.LOC</code>。把它解開來數：4,838 個漢字、0 個日文假名，裡面是繁體中文。連字型檔名都叫 <code>twcnb_jp.ffn</code>。<u>為什麼用日文槽位，本站不知道，也不猜。</u></li>
+    <li><strong>社群那份是踩在官方上面的</strong> 逐條比同一個編號的翻譯，比賽中 794 條有 772 條相同（97.2%）、選單 4,624 條有 4,578 條相同（99.0%）。不一樣的 68 條才是社群自己動的手：13 條把年份從 2005 改成 2009、9 條把「叉指球」補成「叉指<u>速</u>球」、16 條把 <code>RHP</code> 這類縮寫翻成「對右投」、1 條訂正 EA 把「評等」寫成「平等」的錯字。字型也是同一批：社群合包 13 個項目裡有 12 個跟官方逐位元組相同。</li>
+    <li><strong>繁中版是拆開來出貨的</strong> 英文版 1,191 個檔、繁中版 2,389 個。<code>anims.big</code> 與 <code>datafile.big</code> 在繁中版根本不存在，改成 730 個與 466 個未壓縮散檔（那 466 個裡含中文的是 <strong>0 個</strong>）。全遊戲 <code>.big</code> 因此英文版 224 個、繁中版 222 個。</li>
+    <li><strong>本站訂正：只比大小是不夠的</strong> 原本寫「其餘 848 個位元組一模一樣」，真的逐位元組比之後有 23 個大小相同而內容有差。追下去確定是<u>本站手上這份繁中版備份壞掉</u>（某個球衣貼圖解出 8 張格式代號 <code>0x45</code>，其中一張寬度是 0），不是 EA 的中文版有問題。同一輪也訂正了文字表那頁：「中文化模組會換掉 <code>ENG</code> 那兩個檔」只描述了社群的做法，不是唯一的做法。</li>
+    <li><strong>2008 年那條經驗法則後來解開了</strong> 班主任當年記著「中文版裝新球場一定會跳出，建議玩英文語系」。這一頁量到的是：球場檔兩邊是一樣的（87 個裡 83 個逐位元組相同），而<u>社群安裝程式要去改的那兩個封裝檔，在繁中版根本不存在</u>。<strong>跳出的真正原因</strong>是執行檔裡寫死的那塊 64 MB 記憶體池被中文字型展開的貼圖吃掉一大塊，改大就不再跳 —— 見<a href="../tutorials/fix-chinese/index.html">中文版配大球場就跳出</a>那一課。</li>
+    <li><strong>本站沒驗的</strong> 「拿整份官方繁中版安裝去裝大球場會不會跳出」本站還沒實測（<a href="../tutorials/fix-chinese/index.html">那一課</a>測的是把中文語系檔與字型蓋在英文版上），這一頁只是把兩件量到的事擺在一起。那 45 個損壞的位元組為什麼<u>全部落在 32 的倍數上、而且永遠是同一個位元</u>，仍然不知道。<code>mvp2005.exe</code> 兩版差 553 KB 差在哪、<code>minibat.big</code> 差在哪，本站沒有拆。寫回 <code>.LOC</code> 的工具<u>後來做了</u>,字型的字符點陣也<u>讀得出來了</u>;還沒解的是<strong>從零產生一張字圖集與一張字元表再寫回去</strong> —— 做不出新字型,也加不了原本沒有的字。但本站的中文化教學是<u>搬官方現成的中文</u>(繞過字型那塊),見<a href="../tutorials/make-chinese/index.html">把官方中文搬進英文版</a>。本站不散布任何遊戲檔案。</li>
+  </ul>
+
+<h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="loc-strings.html">文字表 .LOC</a> —— 三段式結構怎麼讀，編號怎麼對到文字</li>
+    <li><a href="fonts.html">字型檔</a> —— 為什麼中文字顯示不出來，問題通常在這裡</li>
+    <li><a href="../tutorials/whats-original/index.html">怎麼看出哪些檔還沒被動過</a> —— 這一頁的判斷方法</li>
+  </ul>
+
+  <footer>
+    <p>本頁所有數字都是把兩份未經改動的原版安裝現場打開量出來的：
+       檔案大小、修改時間、文字表條數、翻譯覆蓋率。標示為「未解」之處本站沒有拆開，不寫成定論。
+       「為什麼用日文槽位」本站不知道，也不猜。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

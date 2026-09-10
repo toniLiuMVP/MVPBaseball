@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/read-voice/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>拆開一個語音檔 — toni的MVP模組補習班</title>
+<meta name="description" content="播報語音的外殼、聲道怎麼擺、每 15 個位元組一組怎麼切，全部量給你看。附零相依腳本。也記下本站當時沒解開的那一格（後來解開了，見〈換掉遊戲的聲音〉），以及過程中一個差點推翻正確結論的假紅燈。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../../index.html">首頁</a>
+  <a class="item" href="../../start.html">新手基本功</a>
+  <a class="item" href="../../do.html">我想做什麼</a>
+  <a class="item" href="../../plan.html">課表</a>
+  <a class="item on" href="../index.html">教學</a>
+  <a class="item" href="../../7min/index.html">七分鐘</a>
+  <a class="item" href="../../reference/index.html">速查</a>
+  <a class="item" href="../../coach/index.html">棒球教練</a>
+  <a class="item" href="../../story/index.html">故事</a>
+  <a class="item" href="../../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="../index.html">教學</a> › 拆開一個語音檔</p>
+  <h1>拆開一個語音檔</h1>
+  <p class="lede">本站原本把「換播報語音」<strong>整條路</strong>標成做不到，理由是「音訊編碼沒解開」。
+     班主任一句話把這個判斷推翻了：<u>「播報語音是一定可以改的，我看外國模組十年前就做出來了。」</u>
+     他是對的 —— 而且錯的不只是結論，是<strong>「未解」被貼在整條路上，而不是真正卡住的那一格</strong>。
+     這一頁是重新去量的結果：外殼解開了，聲道怎麼擺解開了，切法解開了，
+     寫這一課的時候最後一格<strong>還沒</strong>——
+     <u>那一格 2026-08-29 也解開了</u>，見<a href="../make-voice/index.html">換掉遊戲的聲音</a>。
+     四件事分開講。</p>
+
+  <div class="grid">
+    <div class="card grass"><p class="card-h">難度</p><p>★★☆ 讀檔，不改檔</p></div>
+    <div class="card"><p class="card-h">時間</p><p>約 10 分鐘</p></div>
+    <div class="card amber"><p class="card-h">會改到遊戲嗎</p><p><strong>不會</strong>，這支腳本只讀不寫</p></div>
+  </div>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <div class="quickfix" id="quick">
+    <p class="card-h">⚡ 只想趕快做完？照這四步</p>
+    <ol>
+      <li>把腳本存到你的電腦：<a href="mvp_read_voice.py" download>mvp_read_voice.py</a>（706 行，零相依，只讀不寫）。</li>
+      <li>看看你的遊戲裡有哪些語音封裝檔。把引號裡換成你的遊戲資料夾，要指到<strong>下一層就是 <code>data</code> 的那一層</strong>。
+  <p class="small">Windows:</p>
+  <pre><code>python mvp_read_voice.py "你的遊戲資料夾" --list</code></pre>
+  <p class="small">Mac / Linux:</p>
+  <pre><code>python3 mvp_read_voice.py "你的遊戲資料夾" --list</code></pre></li>
+      <li>拆開單一一個語音檔，看它的切法。<u>剛安裝好的原版沒有散裝的 <code>.dat</code></u>，
+          直接指這個檔就行（播報語音全在裡面）。
+  <p class="small">Windows:</p>
+  <pre><code>python mvp_read_voice.py "你的遊戲資料夾\data\audio\cd\spch_pbp\pbpdat.big" --blocks</code></pre>
+  <p class="small">Mac / Linux:</p>
+  <pre><code>python3 mvp_read_voice.py "你的遊戲資料夾/data/audio/cd/spch_pbp/pbpdat.big" --blocks</code></pre></li>
+      <li>畫面印出「切法正確」就代表掃相位掃到了；在編碼 3 的 <code>GSTR</code> 檔上印出
+          「⚠️ 切法可能不對」，那是值得回報的東西。原版全部是編碼 2，
+          腳本會說「本站只解開了 GSTR 容器的編碼 3 的擺法」然後停手 —— 那是正常的。</li>
+    </ol>
+    <p class="tail">這支腳本不會產生 WAV，也不會寫入任何檔案。想知道為什麼，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+  </div>
+
+  <h2>先說清楚「未解」該貼在哪</h2>
+  <p>要換一段播報語音，你需要的是 <strong>產生一個遊戲吃得下去的檔</strong>。
+     你<strong>不</strong>需要「把 EA 錄的那段解碼出來」。這是兩件事，而本站原本把它們混成一件。</p>
+  <p>證據就在檔案裡：剛安裝好的原版，
+     <a href="../../reference/voice-header.html">語音檔頭</a>的編碼欄位
+     <strong>6,995 個檔全部是同一個值</strong>；
+     而社群做的語音包裡，絕大多數是<strong>另一個值</strong>。
+     兩種遊戲都吃 —— 那些包當年是真的裝來玩的。</p>
+  <div class="seen"><b>所以真正的那一格是</b>
+    <p>不是「EA 的編碼是什麼」，而是<strong>「怎麼做出一個遊戲接受的檔」</strong>。
+       社群二十年前就走通了第二條路。這一頁把外殼量清楚，是往那裡走的第一步。</p>
+  </div>
+
+  <h2>外殼：一串首尾相接的區塊</h2>
+  <p>語音檔不是「檔頭 + 資料」，是一串<strong>接龍</strong>：每一塊自己說自己多長，
+     讀完就跳到下一塊。</p>
+  <div class="tablewrap">
+  <table class="gloss">
+    <tr><td><code>SCHl</code></td><td>檔頭。裡面是一串標籤（編碼方式、聲道、取樣數…）</td></tr>
+    <tr><td><code>SCCl</code></td><td>計數</td></tr>
+    <tr><td><code>SCDl</code></td><td><strong>聲音資料</strong>。可以有很多塊，本頁下半段都在講它</td></tr>
+    <tr><td><code>SCEl</code></td><td>結束</td></tr>
+  </table>
+  </div>
+  <p>每塊開頭 4 個位元組是標記、接著 4 個位元組是長度。
+     檔頭裡的標籤是「標籤 + 長度 + 值」，但有三個標籤<strong>沒有長度也沒有值</strong>
+     —— 那三個是本站踩出來的，不照顧它們就會整串解錯位。</p>
+  <div class="card grass">
+    <p class="card-h">怎麼確定標籤真的讀對了</p>
+    <p>用一條很硬的檢查：<strong>標籤解析消耗掉的長度，必須對得上檔頭宣告的長度。</strong>
+       剛安裝好的原版 <strong>6,995 個語音檔，6,995 個對得上</strong>。</p>
+    <p class="small">⚠️ <strong>2026-09-05 訂正</strong>：這裡原本寫的是「差一個位元組都算失敗」，
+       那比本站實際的量法嚴格。腳本判定的是<u>差 0 或差 1 都算過</u>
+       （<code>tag_end in (hdr_len, hdr_len - 1)</code>，程式碼裡就留著這句註解）。
+       重跑那 6,995 個檔的分佈是：<strong>2,556 個分毫不差、4,439 個剛好差 1 個位元組</strong>，
+       沒有一個差更多。結論不變（沒有一個檔是解錯位的），但證據強度要照實寫。</p>
+  </div>
+
+  <h2>⭐ 聲音資料怎麼擺（本站走過最長的一段冤枉路）</h2>
+  <p>本站一開始按常識假設：立體聲嘛，左右交錯放。<strong>錯了。</strong></p>
+  <p>發現的方式很土：把每一段的開頭印出來看。
+     結果每一段都長這樣 —— <strong>固定 6 個 0，然後一個值</strong>：</p>
+  <pre><code>00 00 00 00 00 00 <span class="hl">14 a4</span> ee 00 00 00 ...
+00 00 00 00 00 00 <span class="hl">01 1e</span> 34 3d bc 15 ...
+00 00 00 00 00 00 <span class="hl">02 0e</span> 34 cb f3 55 ...</code></pre>
+  <p>那個值不是聲音。把它跟「剩下還有多少資料」比一下就懂了：</p>
+  <div class="tablewrap">
+  <table class="stack">
+    <thead><tr><th>那個值</th><th class="num">十進位</th><th class="num">剩下的資料</th><th>關係</th></tr></thead>
+    <tbody>
+      <tr><td data-label="那個值"><code>14 a4</code></td><td data-label="十進位" class="num">5,284</td><td data-label="剩下的資料" class="num">10,568</td><td data-label="關係">正好一半</td></tr>
+      <tr><td data-label="那個值"><code>01 1e</code></td><td data-label="十進位" class="num">286</td><td data-label="剩下的資料" class="num">572</td><td data-label="關係">正好一半</td></tr>
+      <tr><td data-label="那個值"><code>02 0e</code></td><td data-label="十進位" class="num">526</td><td data-label="剩下的資料" class="num">1,052</td><td data-label="關係">正好一半</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>它是<strong>右聲道的起點</strong>。所以每一塊聲音資料的擺法是：</p>
+  <pre><code>[4 bytes] 這一段的取樣數
+[4 bytes] 左聲道起點（永遠 0）
+[4 bytes] 右聲道起點
+[......]  <span class="hl">左聲道一整段</span>
+[......]  <span class="hl">右聲道一整段</span></code></pre>
+  <p><strong>兩個聲道各自連續，不是交錯的。</strong>
+     本站原本按交錯解，等於把兩個人的話剪碎之後交叉黏起來 —— 難怪出來是雜訊。</p>
+  <div class="card grass">
+    <p class="card-h">驗證</p>
+    <p>「右聲道起點 = 剩下資料的一半」這條，在社群語音包的
+       <strong>1,945 段裡 1,945 段成立，零例外</strong>。</p>
+    <p class="small">⚠️ <strong>2026-09-05 補母體</strong>：「1,945 段」當初是哪一批檔，
+       本站重跑時已經指認不出來（頁尾說「每一個數字都是實際跑出來的」，那就要說得出母體）。
+       用同一條規則重量一次<u>說得出母體的那批</u>：本站這台機器 <code>data/audio</code> 底下
+       <strong>321 個雙聲道檔、共 2,382 段，2,382 段全部成立，零例外</strong>。
+       規則本身站得住，缺的是母體標示。</p>
+  </div>
+
+  <h2>⭐ 一個聲道裡面：15 個位元組一組</h2>
+  <p>知道聲道各自連續之後，下一個問題是「一個聲道裡面怎麼切」。
+     這裡本站用了一個<strong>不必先解碼就能驗的辦法</strong>，值得學起來。</p>
+  <p>假設每 15 個位元組一組、第一個位元組是表頭，而表頭的高半位元組是「四組係數選一組」
+     —— 那它就只能是 0、1、2、3。於是：<strong>從第 0 個位元組開始切、從第 1 個開始切、
+     從第 2 個開始切…一路試到第 14 個，看哪一種切法讓「高半位元組 ≤ 3」的比例最高。</strong></p>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>從第幾個位元組開始切</th><th class="num">表頭高半位元組 ≤ 3 的比例</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td class="num">51.4%</td></tr>
+      <tr><td>1</td><td class="num">50.6%</td></tr>
+      <tr><td>2</td><td class="num">50.3%</td></tr>
+      <tr class="hi"><td><strong>3</strong></td><td class="num"><strong>97.7%</strong></td></tr>
+      <tr><td>4</td><td class="num">44.0%</td></tr>
+      <tr><td>5 – 14</td><td class="num">43.0% – 52.1%</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="small">⚠️ <strong>這張表是「一個檔的一段」的數字，不是全站統計</strong>
+     （2026-09-05 補上母體，同時訂正三格對不上的數字：第 0 格原本寫 44.0%、
+     第 2 格原本寫 50.6%、第 4 格原本寫 47.6%，5–14 的範圍原本寫 46.7%–52.7%。
+     為什麼會填成那樣，本站沒有查出來，只把重跑的數字換上去）。量的是社群語音包裡
+     <code>5826c.dat</code> 的第 1 段、聲道 0 —— 也就是下面「👉 自己跑一次」示範輸出的那一段。
+     <strong>換一段就要重掃</strong>：同一個檔的第 2 段贏家是第 0 格（100.0%），
+     把本站這台機器 <code>data/audio</code> 底下 2,382 段編碼 3 立體聲的左聲道全部彙總起來重算，
+     贏家也是第 0 格（92.5%）。所以「切在第 3 個位元組」是<u>這一段</u>的答案，不是通則。</p>
+  <p>切錯位置時大約 50%，那正是<strong>亂猜的水準</strong>（從整體分佈算出來的期望值是 50.9%）。
+     切對位置時 97.7%。差距這麼大，切法就不可能是猜的。</p>
+  <p>左右兩個聲道分開掃都給出 97.7%，但那<u>不算互相印證</u>。
+     <strong>2026-09-05 訂正</strong>：本頁原本寫「那是互相印證，不是同一個數字算兩次」——
+     這正好就是同一個數字算兩次。本站量到這台機器上編碼 3 的 2,382 段立體聲裡，
+     有 <strong>2,339 段（98.2%）左右聲道逐位元組完全相同</strong>（321 個立體聲檔裡有 310 個每一段都這樣），
+     上面那個範例檔的第 1 段也是其中之一。
+     真正獨立的第二條證據是下一節的<strong>統計不對稱</strong>。</p>
+  <div class="card">
+    <p class="card-h">順帶量到的：不是每一段都從第 0 個位元組開始</p>
+    <p>同一個檔的第 1 段前面有 3 個位元組的前置，第 2 段沒有。
+       所以掃相位不是「量一次記起來」，是<strong>每一段都要重新掃</strong>。
+       本站的腳本就是這樣做的。</p>
+  </div>
+
+  <h2>那些半位元組確實是 4-bit 差分編碼</h2>
+  <p>切法對了，還要確認「裡面裝的真的是聲音」。
+     把 442 萬個位元組的半位元組統計出來：</p>
+  <div class="tablewrap">
+  <table class="stack">
+    <thead><tr><th>半位元組的值</th><th class="num">0</th><th class="num">1</th><th class="num">2</th><th class="num">…</th><th class="num">7</th><th class="num">8</th><th class="num">…</th><th class="num">E</th><th class="num">F</th></tr></thead>
+    <tbody>
+      <tr><td data-label="半位元組的值">出現比例</td><td data-label="0" class="num">15.4%</td><td data-label="1" class="num">12.6%</td><td data-label="2" class="num">9.8%</td><td data-label="…" class="num">↘</td><td data-label="7" class="num">1.0%</td><td data-label="8" class="num">0.4%</td><td data-label="…" class="num">↗</td><td data-label="E" class="num">11.1%</td><td data-label="F" class="num">13.6%</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>把 8–F 讀成負數（−8 到 −1）之後，這個分佈是<strong>對稱的、以 0 為中心、往兩邊遞減</strong>
+     —— 也就是「這一個取樣跟上一個差多少」的長相，小差值多、大差值少。
+     位元組的熵是 <strong>6.5 bits</strong>（完全隨機或壓縮過的資料會是 8）。</p>
+  <div class="card grass">
+    <p class="card-h">還有一個很漂亮的旁證</p>
+    <p><strong>高</strong>半位元組在「2」的地方多了 5.2%（15.0%，而<strong>低</strong>半位元組同一格只有 9.8%）。
+       低半位元組沒有這個隆起。</p>
+    <p>那多出來的 5.2%，就是<strong>每 15 個位元組一個的表頭</strong>（1 ÷ 15 = 6.7%）——
+       它們的係數編號絕大多數是 2。換句話說：
+       <u>光看統計的不對稱，就能反推出「每 15 個位元組有一個特別的位元組」</u>，
+       而這跟掃相位是<strong>兩條互相獨立的證據</strong>。</p>
+  </div>
+
+  <h2>取樣率 48,000 Hz（推論，但三條證據互相對得上）</h2>
+  <p>多數語音檔<strong>沒有標</strong>取樣率。本站的判斷靠三件事：</p>
+  <ol>
+    <li>舊資料裡那批當年做語音用的來源錄音，<strong>那個資料夾裡 670 個檔，669 個是 48,000 Hz</strong>
+        （見<a href="../../reference/player-voice.html">播報員為什麼不唸新球員的名字</a>；
+        剩下那一個是 24 kHz 的 MP3，不是 PCM）。
+        <span class="small">腳本開頭寫的是「681 個來源 WAV 裡 680 個是 48,000 Hz」——
+        那是把舊資料<u>整個</u>底下的 <code>.wav</code> 都算進去的口徑，
+        兩個數字都是量出來的，差別在分母。</span></li>
+    <li>同一批資料裡 2008 年那篇教學，給的指令正好是「重混成立體聲、<strong>重取樣到 48000</strong>」。</li>
+    <li>那些來源錄音裡，<strong>188 個的取樣數跟語音檔精確相同</strong>，
+        名字也對得上。取樣數完全一樣 = 沒有重新取樣。</li>
+  </ol>
+  <div class="card grass">
+    <p class="card-h">第 3 條做了隨機對照</p>
+    <p>「188 個吻合」聽起來多，但要先問<strong>隨機會吻合幾個</strong>。
+       本站把語音檔的取樣數整體平移一個隨機量（分佈形狀不變、配對關係破壞）跑 200 次：
+       中位數吻合 <strong>4 個</strong>、第 95 百分位 <strong>22 個</strong>、最大 <strong>60 個</strong>。</p>
+    <p>實際的 188 高於 200 次對照的<strong>最大值</strong>。配對關係是真的，不是巧合。</p>
+  </div>
+  <p class="small">⚠️ 這一步仍是<strong>推論</strong>：直接量到的是「長度一樣」，不是「內容一樣」。
+     而且這只涵蓋那批社群檔 —— EA 原版沒有標取樣率，本站測不出來。</p>
+  <div class="card clay">
+    <p class="card-h">⚠️ 2026-09-05：這一格本站還沒定案</p>
+    <p>重跑時抓到一個矛盾：<strong>這批社群檔<u>自己標著</u>的取樣率不是 48,000 Hz。</strong>
+       本站這台機器 <code>data/audio</code> 底下編碼 3 的 8,767 個項目，
+       檔頭 <code>0x84</code> 那一欄的分佈是
+       <strong>22,050 Hz 有 7,841 個</strong>、44,100 Hz 241 個、24,000 Hz 148 個、
+       沒有標的 537 個 —— <u>標 48,000 Hz 的一個都沒有</u>。</p>
+    <p>「語音檔也是 48,000 Hz」跟「檔案自己標的取樣率」<strong>最多只能對一個</strong>。
+       本站沒有量出哪一個對（試過拿解出來的取樣跟來源錄音比包絡：
+       真配對 6 個平均 0.27、隨機對照平均 0.14 但最大值 0.54，那個指標分不開兩者），
+       所以兩邊都照原樣寫給你看，<strong>不替你選一邊</strong>。
+       腳本現在也只替 <code>GSTR</code> 容器的編碼 3 印「若是 48000 Hz 則為 X 秒」，
+       而且那一行後面接著「尚未定案」。</p>
+    <p class="small">上面那個標題「三條證據互相對得上」是寫這一課時的判斷。
+       三條證據彼此仍然對得上，<u>對不上的是檔案自己標的那一欄</u> ——
+       這一節留著不刪，但它現在是一個開放問題，不是結案。</p>
+  </div>
+
+  <h2>⭐ 155 個台灣球員的兩位播報員，是同一段錄音</h2>
+  <p>本站已經解開過 <code>a</code> / <code>c</code> / <code>d</code> 三個後綴的意思：
+     <code>a</code> 是球評唸姓、<code>d</code> 是主播唸姓、<code>c</code> 是主播唸全名
+     （<a href="../../reference/player-voice.html">那一頁</a>有完整推導）。
+     那麼 <code>a</code> 跟 <code>d</code> 應該是<strong>兩個人各唸一次</strong>，內容不同。</p>
+  <p>把台灣球員語音包的檔案逐位元組比對：</p>
+  <div class="tablewrap">
+  <table class="stack">
+    <thead><tr><th></th><th class="num">組數</th><th class="num">內容完全相同</th></tr></thead>
+    <tbody>
+      <tr><td>當年的<strong>來源錄音</strong>（英文姓氏）</td><td data-label="組數" class="num">185</td><td data-label="內容完全相同" class="num">0 組（0.0%）</td></tr>
+      <tr class="hi"><td>實際出貨的<strong>台灣球員語音包</strong></td><td data-label="組數" class="num">159</td><td data-label="內容完全相同" class="num"><strong>155 組（97.5%）</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>來源錄音那 185 組裡，<strong>184 組連檔案長度都不一樣</strong>（<code>anderson_a</code> 99,004 位元組、
+     <code>anderson_d</code> 127,704）—— 真的是兩段不同的錄音。
+     但輪到台灣球員，<strong>兩個槽位放的是同一段</strong>。</p>
+  <p class="small">2026-09-05 訂正：這一段原本寫「那 185 組，<u>連檔案長度都不一樣</u>」，
+     那是一句沒有例外的全稱句。重跑逐檔比大小，<strong>有 1 組長度相同</strong>
+     ——<code>Cruz</code> 的兩個檔各 115,956 位元組，<u>內容仍然不同</u>。
+     「185 組 0 組內容相同」這個結論沒變，是措辭要收。</p>
+  <div class="card">
+    <p class="card-h">為什麼會這樣（推論）</p>
+    <p>英文姓氏是播報員本人錄過的，兩位各有一份現成的。
+       但「田」「陽」「林威助」這些，<u>英文播報員從來沒唸過</u> ——
+       做模組的人得從英文播報裡剪出中文單字，一個字一個字拼出來。
+       <strong>拼一次就很費工，拼兩次沒有意義</strong>，於是同一段放進兩個槽位。</p>
+    <p class="small">這是推論，不是量到的。量到的是「155/159 相同」與「來源 185/185 不同」這兩個數字。</p>
+  </div>
+  <p>那 4 個例外也有意思：<strong>中村紀洋</strong>、<strong>陽建福</strong>、<strong>高政華</strong>、<strong>林威助</strong>。
+     其中<strong>高政華與陽建福</strong>那兩組<u>長度一模一樣、內容卻不同</u> —— 等長的兩段不同錄音
+     （陽建福的 <code>4165a</code> 與 <code>4165d</code> 各 4,096 位元組，其中 3,623 個位元組不一樣）。</p>
+  <p>回頭看，2008 年那篇教學裡有一句「<u>至於兩個誰是誰念的已記不清</u>」。
+     現在知道為什麼記不清了：<strong>對台灣球員來說，那兩個本來就一樣。</strong></p>
+
+  <h2>本站當時沒解開的：就這一格（<u>後來解開了</u>）</h2>
+  <p><strong>15 個位元組怎麼變回 28 個取樣的還原公式。</strong></p>
+  <p>試過的組合：位移基準 0–24、半位元組高低順序兩種、三張係數表、
+     兩種濾波器寫法、前置位元組長度 0–16 —— <strong>一千種以上</strong>。
+     拿有標準答案的配對去對，最好的相關係數只有 <strong>0.16</strong>，等於沒有。</p>
+  <p>切法對了、統計對了、長度迴歸對到 0.16%（每個取樣 1.0697 位元組，
+     理論值 1.0714），就差最後這一步。</p>
+
+  <div class="card grass">
+    <p class="card-h">⚠️ 2026-08-29：這一格解開了</p>
+    <p>這一節原本的標題是「❌ 本站沒解開的：就這一格」。<u>上面那段冤枉路留著不刪</u> ——
+       但那一格後來真的解開了，公式、量測與可以寫回去的腳本都在
+       <a href="../make-voice/index.html">換掉遊戲的聲音</a>。</p>
+    <p><strong>解開它的不是更聰明的組合，是一份標準答案。</strong>
+       免費的 <code>ffmpeg</code> 解得開遊戲的選單音樂，那就是一份可以<u>逐取樣比對</u>的對照組。
+       有了它把參數空間掃一遍，1,024 種組合裡只有一組給出 <strong>100.00%</strong>，
+       第二名 96.90%，第三名掉到 18.91% —— 不是勉強領先，是斷崖。</p>
+    <p class="small">那一千次為什麼怎麼掃都不會中，還有第二個原因：這個遊戲有兩種編碼器，
+       而那些嘗試是<u>拿編碼器 1 的參數去套編碼器 2 的資料</u>。
+       這一頁下面「一個差點推翻正確結論的假紅燈」講的是同一件事的另一面 ——
+       <strong>沒有標準答案的時候，一千次嘗試不會收斂，只會累積。</strong></p>
+  </div>
+  <div class="card amber">
+    <p class="card-h">但這一格不擋你換語音</p>
+    <p>社群的工具做得出遊戲吃得下去的檔，那條路二十年前就通了。
+       本站不重貼那些工具本體，<u>站上也沒有記下那些語音工具的名字</u>——
+       <a href="../community-tools/index.html">社群工具那一頁</a>收的是能力值、臉、介面、球衣那幾類，
+       沒有語音那一列。想自己動手做出遊戲吃得下去的檔，
+       用<a href="../make-voice/index.html">換掉遊戲的聲音</a>那一課的腳本。</p>
+  </div>
+
+  <h2>⭐ 這一課最值錢的部分：一個差點推翻正確結論的假紅燈</h2>
+  <p>過程中本站做了一件事：想確認「那批來源錄音真的是這些語音檔的原料嗎」。
+     做法是量<strong>每一組的殘差大小</strong>，跟原始錄音的<strong>音量起伏</strong>比對 ——
+     想法是「聲音大的地方，殘差應該也大」。</p>
+  <p>結果：相關 <strong>−0.009</strong>，比隨便抓別人的檔（+0.10）還低。
+     本站當下差點寫出「<u>取樣數吻合是巧合，那批錄音跟語音檔無關</u>」。</p>
+  <div class="card clay">
+    <p class="card-h">那個測法本身是錯的</p>
+    <p>差分編碼<strong>本來就會自動正規化</strong>：每一組都有自己的縮放倍率，
+       所以大聲小聲的地方，殘差都用滿整個範圍。
+       <strong>殘差不跟音量相關，才是正常的。</strong></p>
+    <p>換句話說，本站拿了一個<u>保證測不到訊號的指標</u>，
+       去對一個真實存在的關係下否定結論。差一點就發表了。</p>
+  </div>
+  <p>抓回來的方式是<strong>隨機對照</strong>：先不管波形，直接問「188 個吻合，隨機會有幾個」。
+     答案是最多 60 個。關係是真的 —— 測不到是<u>測法的問題</u>，不是關係的問題。</p>
+  <div class="card grass">
+    <p class="card-h">可以帶走的兩句話</p>
+    <p>一、<strong>「配對是真的」跟「我解得出來」是兩個獨立的問題。</strong>
+       本站一路上用「解得出波形」當成驗證配對的方法，把兩件事綁死了，繞了很久。</p>
+    <p>二、<strong>否定結論跟肯定結論一樣要驗。</strong>
+       而且要驗的第一件事不是資料，是<u>「我這個指標，在答案為真的情況下，會不會亮」</u>。</p>
+  </div>
+
+  <h2>👉 自己跑一次</h2>
+  <p><strong>步驟 1</strong>：把腳本存到你的電腦。</p>
+  <p><a href="mvp_read_voice.py" download>mvp_read_voice.py</a>（706 行，零相依，只讀不寫）</p>
+  <p><strong>步驟 2</strong>：看看你的遊戲裡有哪些語音封裝檔。把引號裡換成你的遊戲資料夾。</p>
+  <p class="small">Windows:</p>
+  <pre><code>python mvp_read_voice.py "<span class="hl">你的遊戲資料夾</span>" --list</code></pre>
+  <p class="small">Mac / Linux:</p>
+  <pre><code>python3 mvp_read_voice.py "<span class="hl">你的遊戲資料夾</span>" --list</code></pre>
+  <div class="seen"><b>你會看到</b>
+    <pre style="margin:8px 0 0"><code>  data/audio/cd/spch_pa/pnamedat.big        2106 個語音 · 編碼 2×2106
+  data/audio/cd/spch_pa/tnamedat.big          91 個語音 · 編碼 2×91
+  data/audio/cd/spch_pbp/pnamedat.big       4580 個語音 · 編碼 2×4580
+  data/audio/cd/spch_pbp/stdnmdat.big         94 個語音 · 編碼 2×94
+  data/audio/cd/spch_pbp/tnamedat.big        124 個語音 · 編碼 2×124</code></pre>
+    <p>「編碼 2」= EA 自己錄的。如果你裝過語音模組，會看到「編碼 3」。</p>
+    <p class="small">上面這五行是本站在<u>剛安裝好的原版</u>上跑出來的
+       （2026-09-05 訂正：這裡原本示範的兩行是
+       <code>spch_pbp/pnamehdr.big</code> 與 <code>spch_pa/pahdr.big</code>，
+       那兩行永遠不會出現 —— 前者裝的是 16 個位元組的檔頭不是聲音、
+       後者根本不是 <code>BIGF</code> 封裝檔）。
+       <strong>你裝過的模組不同，檔名與數字都會不一樣。</strong></p>
+  </div>
+  <div class="ifnot"><b>如果沒看到</b>
+    <ul>
+      <li>印出「沒有找到語音封裝檔」→ 你指到的可能是遊戲資料夾<u>裡面</u>的某一層。
+          要指的是<strong>下一層就是 <code>data</code> 的那一層</strong>。</li>
+      <li><strong>清單裡沒有播報語音</strong> → 那是正常的。<code>data/audio/cd/</code> 底下有
+          8 個 <code>.big</code>（<code>pbpdat</code>、<code>chantdat</code>、<code>padat</code>、
+          <code>rallydat</code>、<code>plchtdat</code>、<code>hsfxdat</code>、
+          <code>stdmdat</code>、<code>bdcstdat</code>）<u>本身就是一長串語音接在一起</u>，
+          不是封裝檔，所以 <code>--list</code> 不會列出它們。
+          播報語音就在最大的那個 <code>pbpdat.big</code>（約 202 MB）。
+          要看它們就<strong>把檔案本身指給腳本</strong>，也就是下面步驟 3 的做法。</li>
+      <li>印出 <code>python3</code> 找不到 → 你在 Windows 上，改用上面那塊
+          <strong>Windows</strong> 版的指令（開頭是 <code>python</code>）。</li>
+    </ul>
+  </div>
+  <p><strong>步驟 3</strong>：拆開單一一個語音檔，看它的切法。
+     <u>剛安裝好的原版沒有散裝的 <code>.dat</code></u>（語音全包在 <code>.big</code> 裡），
+     而這支腳本<strong>沒有取出功能</strong>，所以直接指上面說的那種
+     「本身就是一長串語音」的檔最快：</p>
+  <p class="small">Windows:</p>
+  <pre><code>python mvp_read_voice.py "<span class="hl">你的遊戲資料夾</span>\data\audio\cd\spch_pbp\pbpdat.big" --blocks</code></pre>
+  <p class="small">Mac / Linux:</p>
+  <pre><code>python3 mvp_read_voice.py "<span class="hl">你的遊戲資料夾</span>/data/audio/cd/spch_pbp/pbpdat.big" --blocks</code></pre>
+  <p class="small">2026-09-05 訂正：這一步原本寫的是
+     <code>python3 mvp_read_voice.py "某個語音檔.dat" --blocks</code>，
+     而讀者手上不會有任何 <code>.dat</code>（本站數過原版 <code>data/audio</code> 底下
+     82 個非 <code>.big</code> 的檔，<code>.dat</code> 是 0 個）。
+     散裝的 <code>.dat</code> 多半來自社群語音包，有的人才有。
+     要把某一段撈成 WAV 是<a href="../make-voice/index.html">換掉遊戲的聲音</a>那一課的
+     <code>mvp_audio.py --export</code>，不是這一支。</p>
+  <div class="seen"><b>你會看到</b>
+    <pre style="margin:8px 0 0"><code>  第 1 段  宣告 9604 取樣 · 10576 bytes · 每聲道 5284 bytes  ✅
+     聲道 0  起點 8      長度 5284   前置 3 bytes · 352 組 × 15 bytes
+             表頭高半位元組 ≤3 占 97.7%   切法正確</code></pre>
+    <p class="small">⚠️ 上面這段輸出來自<strong>社群語音包裡的一個雙聲道檔</strong>
+       （編碼 3、<code>GSTR</code> 容器）。<u>剛安裝好的原版全部是編碼 2</u>，
+       所以你在 <code>pbpdat.big</code> 上會看到外殼那幾行，
+       接著是一句「這個檔是編碼 2，本站只解開了 GSTR 容器的編碼 3 的擺法」然後停手 ——
+       那不是壞掉，是腳本刻意不硬套一套沒驗過的切法。</p>
+    <p>「切法正確」代表掃相位掃到了。如果印出「⚠️ 切法可能不對」，
+       那個檔的擺法跟本站量到的不一樣 ——
+       <strong>在編碼 3 的 <code>GSTR</code> 檔上，那是值得回報的東西</strong>
+       （本站量到這一類只有約 2.2% 會印這一行）。
+       別的編碼、以及 <code>PT</code> 容器的編碼 3，腳本根本不會走到這一步。</p>
+  </div>
+  <div class="card amber">
+    <p class="card-h">這支腳本不會產生 WAV（但不是因為做不到）</p>
+    <p>這一課是<strong>唯讀的解剖課</strong>，只負責讓你看懂檔案長什麼樣子。
+       要真的把語音變成 WAV、或把你自己錄的聲音塞回去，
+       去<a href="../make-voice/index.html">換掉遊戲的聲音</a>那一課 ——
+       那支工具兩個方向都做得到。</p>
+    <p class="small">⚠️ <strong>2026-08-29 訂正</strong>：這張卡片原本寫的是
+       「因為最後那一格沒解開，本站不提供會出雜訊的功能」。
+       那句話在寫下來的當天稍後就過期了 ——
+       <u>15 個位元組還原成 28 個取樣的公式已經解開</u>，
+       對照 ffmpeg 驗過 <strong>21,678,328 個取樣 0 個不同</strong>。
+       解開它的不是更聰明的組合，是找到一份標準答案。經過寫在那一課裡。</p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 語音檔的外殼、聲道怎麼擺、一個聲道裡怎麼切，本站都量開了；這一課寫的時候只剩「15 個位元組怎麼變回 28 個取樣」那一格沒解開，<strong>那一格 2026-08-29 也解開了</strong>，見<a href="../make-voice/index.html">換掉遊戲的聲音</a>。</li>
+    <li><strong>「未解」要貼對格子</strong> 要換語音，你需要的是<strong>做出一個遊戲吃得下去的檔</strong>，不是把 EA 錄的那段解碼出來。這是兩件事，社群二十年前就走通了第二條路。</li>
+    <li><strong>最容易踩的雷</strong> 兩個聲道<strong>各自連續，不是交錯的</strong>。按交錯解等於把兩個人的話剪碎之後交叉黏起來，難怪出來是雜訊，這是本頁走過最長的一段冤枉路。而且不是每一段都從第 0 個位元組開始（同一個檔第 1 段前面有 3 個位元組前置、第 2 段沒有），相位要<strong>每一段重新掃</strong>——本頁那張相位表是「一個檔的一段」的數字，不是通則。</li>
+    <li><strong>關鍵數字</strong> 剛安裝好的原版 6,995 個語音檔，標籤解析消耗的長度 6,995 個對得上（腳本允許 1 個位元組容差：2,556 個分毫不差、4,439 個差 1，沒有一個差更多）；「右聲道起點 = 剩下資料的一半」在社群語音包 1,945 段零例外，用本站這台機器 <code>data/audio</code> 底下 321 個雙聲道檔的 2,382 段重跑同樣零例外；掃相位在 <code>GSTR</code> 容器的編碼 3 上切對位置 97.7%、切錯只有約 50%（亂猜水準 50.9%）；位元組熵 6.5 bits。</li>
+    <li><strong>一個差點推翻正確結論的假紅燈</strong> 拿「殘差大小 vs 音量起伏」去驗配對，量到 −0.009，差點寫出「那批錄音跟語音檔無關」。差分編碼本來就會自動正規化，那個指標<strong>在答案為真時也不會亮</strong>。抓回來靠的是隨機對照：實際吻合 188 個，200 次對照的最大值只有 60 個。</li>
+    <li><strong>順手撿到的</strong> 台灣球員語音包 159 組裡有 <strong>155 組（97.5%）</strong>兩位播報員是同一段錄音，而當年的來源錄音 185 組是 0 組相同（其中 184 組連檔案長度都不一樣，唯一等長的 <code>Cruz</code> 內容仍然不同）。例外只有中村紀洋、陽建福、高政華、林威助四位。</li>
+    <li><strong>安全網</strong> 這一課「會改到遊戲嗎」的答案是<strong>不會</strong>，腳本只讀不寫、沒有任何寫檔呼叫，你可以自己搜一次確認。它不提供轉 WAV 的功能，是因為這一課是唯讀的解剖課；轉 WAV 與寫回去在<a href="../make-voice/index.html">換掉遊戲的聲音</a>那一課（原本寫的理由「那會產出雜訊」在 2026-08-29 就過期了）。</li>
+    <li><strong>本站沒驗的</strong> 這一課量到的是<u>外殼、聲道擺法、切法</u>，不含還原成聲音的那一步 —— 那一步在<a href="../make-voice/index.html">換掉遊戲的聲音</a>解開並驗證，本課自己沒有驗過任何一段還原出來的波形。另外「取樣率 48,000 Hz」<strong>還沒定案</strong>：那批檔自己標的是 22,050 Hz（8,767 個裡 7,841 個），跟 48,000 Hz 最多只能對一個，本站沒量出哪一個對。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../../reference/voice-header.html">語音檔頭的 16 個位元組</a>：外面那一層，檔頭跟聲音為什麼不住在一起。</li>
+    <li><a href="../../reference/player-voice.html">播報員為什麼不唸新球員的名字</a>：<code>a</code>/<code>c</code>/<code>d</code> 的完整推導，還有覆蓋率統計。</li>
+    <li><a href="../make-voice/index.html">換掉遊戲的聲音</a>：這一課卡住的那一格，在那裡解開了，而且寫得回去。</li>
+    <li><a href="../swap-chant/index.html">換應援曲</a>：音訊裡<strong>已經可以動</strong>的那一塊。</li>
+    <li><a href="../../reference/what-can-be-modded.html">什麼能改、什麼不能改</a>：全站的已解 / 未解總表。</li>
+  </ul>
+
+  <h2 id="how-it-works">這支腳本在做什麼</h2>
+  <p>一句話：<strong>把語音檔的外殼拆開，把量得出來的東西印給你看</strong>，全程唯讀。
+     流程分三層，一層比一層裡面。最外面是 <code>BIGF</code> 封裝檔，
+     <code>--list</code> 只走到這一層，列出每個封裝檔裡有幾段語音、分別用哪種編碼。
+     中間是單一語音檔的<strong>區塊鏈</strong>（<code>SCHl</code> 檔頭、
+     <code>SCCl</code> 計數、<code>SCDl</code> 聲音資料、<code>SCEl</code> 結束），
+     不加旗標就是走這一層。最裡面是聲音資料自己怎麼擺，
+     只有加了 <code>--blocks</code> 才會走進去。</p>
+  <p>三層各配一個<strong>會失敗的檢查</strong>，不是「看起來對」就算數：
+     檔頭那串標籤走完的位置要等於檔頭自己宣告的長度、
+     每個聲道扣掉起點表之後要一樣長、
+     切成 15 個位元組一組之後表頭的高半位元組要幾乎都 ≤ 3。
+     會失敗的檢查通過了才有意義，所以畫面上那幾個 ✅ 是量出來的，不是印出來好看的。</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>哪一段</th><th>做什麼</th><th>為什麼要有它</th></tr></thead>
+    <tbody>
+      <tr><td data-label="哪一段"><code>main()</code></td>
+          <td data-label="做什麼">收指令列參數，決定要跑 <code>--list</code>
+              還是看單一檔案，並把「讀不懂」與「找不到檔案」兩種狀況
+              各印成一句人話。</td>
+          <td data-label="為什麼要有它">這支只有三種用法，判斷集中在一個地方就講得完。
+              會拿它來看自己遊戲的人不需要一整片 traceback，
+              所以預期得到的兩種失敗都收成一句話，回傳 2。</td></tr>
+
+      <tr><td data-label="哪一段"><code>cmd_list()</code></td>
+          <td data-label="做什麼">掃資料夾底下的 <code>.big</code>，逐項認出哪些是語音，
+              統計每種編碼各有幾個。</td>
+          <td data-label="為什麼要有它">找不到 <code>data/audio</code> 就直接掃你給的那一層，
+              所以給錯一層、或給一個已經拆開的散裝資料夾，都不用重打指令。
+              個別項目讀不懂就跳過：一份概觀不該被一個壞項目卡住。</td></tr>
+
+      <tr class="hi"><td data-label="哪一段"><code>big_entries()</code></td>
+          <td data-label="做什麼">讀 <code>BIGF</code> 封裝檔的目錄，回「名稱、位移、大小」。
+              檔頭固定 16 個位元組，這支腳本只用<strong>項目數</strong>那一欄，
+              而那一欄是<strong>大端序</strong>。</td>
+          <td data-label="為什麼要有它">語音是包在封裝檔裡的，先有目錄才知道每一段從哪裡開始。
+              ⚠️ 這一層的大端序跟裡面區塊長度的<strong>小端序方向相反</strong>，
+              弄反不會當掉，只會安靜地讀出一堆天文數字。
+              ⚠️ <strong>2026-09-05 訂正</strong>：本頁原本寫「裡面的數字<u>全是</u>大端序」，
+              那句話太滿。重量兩份安裝的 24 個 <code>BIGF</code>：項目數那一欄 24 個全部照大端讀才走得完目錄，
+              但<u>檔案總大小那一欄 24 個裡有 22 個要照小端讀</u>才等於真正的大小。
+              目錄大小那一欄本站兩種都對不上，<strong>沒有定案，不替它下結論</strong>。</td></tr>
+
+      <tr><td data-label="哪一段"><code>walk_blocks()</code></td>
+          <td data-label="做什麼">沿著區塊鏈走一遍，回每一塊的位移、標記、長度，
+              以及「走到第幾個位元組」。長度是小端序，
+              而且<strong>含那 8 個位元組自己</strong>。</td>
+          <td data-label="為什麼要有它">長度小於 8 會讓位置停在原地變成無窮迴圈，
+              超過檔尾則是壞檔，兩種都在這裡擋掉。走到 <code>SCEl</code> 就收手，
+              因為它只負責讀「第一段」。
+              ⚠️ <strong>2026-09-05 訂正</strong>：這裡原本寫「因為它後面通常是封裝檔的補齊，
+              不是下一個語音」——<u>反了</u>。原版 <code>stdnmdat.big</code> 的 94 個項目裡有 85 個，
+              <code>SCEl</code> 後面還接著完整的語音；<code>pbpdat.big</code> 更是
+              15,391 段直接一段接一段。所以腳本現在會先數尾巴裡還有幾個
+              <code>SCHl</code> 開頭再下結論，而不是一律說「那是補齊」。</td></tr>
+
+      <tr><td data-label="哪一段"><code>parse_tags()</code></td>
+          <td data-label="做什麼">把檔頭那串「標籤 + 長度 + 值」讀成一張表。
+              值是<strong>大端序</strong>，<code>0xFF</code> 是整串的結束記號。</td>
+          <td data-label="為什麼要有它"><code>0xFC</code> / <code>0xFD</code> /
+              <code>0xFE</code> 這三個<u>只有標籤本身</u>，後面沒有長度也沒有值。
+              把它們當成一般標籤去讀會吃掉後面的位元組，整串從那裡開始錯位。</td></tr>
+
+      <tr><td data-label="哪一段"><code>parse_voice()</code></td>
+          <td data-label="做什麼">把上面幾支串起來，回一份描述：子格式、編碼、聲道、
+              取樣數，以及每一段聲音資料的原始位元組。</td>
+          <td data-label="為什麼要有它">標籤從第幾個位元組開始<u>要看子格式</u>：
+              <code>PT</code> 開頭的從第 12 個開始，其餘從第 16 個開始。
+              這一格算錯整串標籤全歪，而畫面上只會表現成一個 ❌。</td></tr>
+
+      <tr><td data-label="哪一段"><code>describe()</code></td>
+          <td data-label="做什麼">把檔頭印成人看得懂的樣子，同時做第一個硬驗證：
+              標籤走完的位置對不對得上檔頭宣告的長度。</td>
+          <td data-label="為什麼要有它">❌ 不等於壞檔。本站在自己這台機器的安裝上，
+              把 <code>data/audio</code> 底下每一個語音都量過一次：
+              編碼 1 與 2 的 7,724 個全部吻合，編碼 3（社群做的）的 8,767 個裡
+              有 2,586 個對不上。
+              ⚠️ <strong>這裡數的單位是「封裝檔項目」，一個項目算一個</strong>
+              （2026-09-05 補單位）—— <a href="../make-voice/index.html">換掉遊戲的聲音</a>
+              那一課對同一個資料夾寫的是「編碼器 3 共 8,909 段」，
+              它數的是 <code>SCHl</code> <u>段</u>，一個項目裡可以串好幾段，
+              而且連不是 <code>BIGF</code> 的那幾個檔也算進去。<strong>兩個數字都對，量的不是同一件事。</strong>
+              沒有標取樣率時只替 <strong><code>GSTR</code> 容器的編碼 3</strong> 換算秒數，
+              因為 48,000 Hz 那個推論<u>只涵蓋那一批，而且本站還沒定案</u>
+              （腳本第三節寫了矛盾在哪）。</td></tr>
+
+      <tr class="hi"><td data-label="哪一段"><code>split_channels()</code></td>
+          <td data-label="做什麼">用開頭的聲道起點表把一段切成每個聲道。
+              起點是大端序，而且是從<u>起點表之後</u>算起的。
+              ⚠️ 「大端序」這一格只在 <code>GSTR</code> 容器上驗過 ——
+              本站兩份安裝裡的多聲道項目 321 個剛好全部是 <code>GSTR</code> 的編碼 3，
+              別種容器的多聲道本站沒有樣本可以說。</td>
+          <td data-label="為什麼要有它">兩個聲道<strong>各自連續一整段，不是交錯的</strong>。
+              按交錯解等於把兩個人的話剪碎再交叉黏起來，
+              那是這一課走過最長的一段冤枉路。</td></tr>
+
+      <tr><td data-label="哪一段"><code>find_phase()</code></td>
+          <td data-label="做什麼">15 種起點全部試一遍，挑「表頭高半位元組 ≤ 3」
+              比例最高的那一個。</td>
+          <td data-label="為什麼要有它">同一個檔裡不是每一段都從第 0 個位元組開始，
+              所以每一段都要重新掃。切對本站量到 97.7%，
+              切錯只有大約 50%（亂猜的水準），差距大到不會是碰巧對上的。
+              ⚠️ 那個 97.7% 只在 <code>GSTR</code> 容器的編碼 3 上成立
+              （本站量到這一類的中位數 1.000）；<code>PT</code> 容器的編碼 3
+              本站量到中位數 0.478，就是亂猜的水準。</td></tr>
+
+      <tr><td data-label="哪一段"><code>show_blocks()</code></td>
+          <td data-label="做什麼"><code>--blocks</code> 才會跑：每一段切成聲道、
+              再切成 15 個位元組一組，把量到的數字攤開。</td>
+          <td data-label="為什麼要有它">遇到編碼 2 直接說「本站只解開了
+              <code>GSTR</code> 容器的編碼 3 的擺法」然後停手；
+              遇到<u>裝在 <code>PT</code> 容器裡的編碼 3</u> 也一樣停手（同一個理由）。
+              不硬套一套切法、印出一堆看起來很像真的數字。</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">它沒有 <code>--apply</code>、沒有備份、也沒有還原功能，
+     因為它從頭到尾沒有任何東西可以被改壞：開檔一律 <code>'rb'</code>，
+     全檔沒有一個 <code>open(..., 'w')</code>，你可以自己搜一次確認。
+     做不到的事寫在腳本開頭：不產生 WAV、也不把你的聲音寫回去
+     （那兩件事在<a href="../make-voice/index.html">換掉遊戲的聲音</a>那一課），
+     只認 <code>SCHl</code> 開頭的語音檔，
+     而聲音資料的切法<u>只在 <code>GSTR</code> 容器的編碼 3 上驗過</u>。</p>
+
+  <h2>完整原始碼</h2>
+  <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。
+     它<u>完全不會寫入任何檔案</u> —— 沒有任何寫檔呼叫，你可以自己搜一次確認。</p>
+  <details>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（706 行）</summary>
+<pre style="margin:10px 0 0">#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# ─────────────────────────────────────────────────────────
+#  法律與免責(每一支本站腳本都帶著這一段)
+#
+#  · 本工具與 Electronic Arts 無任何官方關聯,也未經其授權或背書。
+#    MVP Baseball 2005 為 Electronic Arts 之作品與商標。
+#  · 本工具為原創程式碼,**不含任何 EA 的程式碼或資產**。
+#  · 本工具不提供、不教學、也不包含任何規避技術保護措施的功能。
+#  · 使用者應僅對自己合法取得的遊戲副本使用本工具,並自行承擔風險。
+#    使用前請自行確認你與遊戲發行商之間的使用者授權合約(EULA)。
+#  · 本工具按「現狀」提供,不附任何明示或默示的擔保。
+#  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
+#  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
+#    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
+#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+# ─────────────────────────────────────────────────────────
+
+"""
+mvp_read_voice.py —— 讀懂 MVP Baseball 2005 的語音檔（唯讀，不會改任何東西）
+
+    列出遊戲裡的語音   python3 mvp_read_voice.py "&lt;遊戲資料夾&gt;" --list
+    看單一語音檔       python3 mvp_read_voice.py "&lt;某個 .dat&gt;"
+    看內部區塊切法     python3 mvp_read_voice.py "&lt;某個 .dat&gt;" --blocks
+
+⚠️ 這支腳本**不會**把語音變成 WAV —— 這一課只負責讀懂結構。
+   要匯出 WAV 或把你自己的聲音寫回去，用 make-voice 那一課的 mvp_audio.py。
+
+─────────────────────────────────────────────────────────
+ 這支在做什麼
+─────────────────────────────────────────────────────────
+一句話：把遊戲的語音檔拆開，把外殼裡量得出來的東西印給你看，全程唯讀。
+
+吃什麼（輸入）
+  · 遊戲資料夾 ＋ --list：往下找 data/audio，把每個 **BIGF** 封裝檔裡有幾段語音、
+    分別用哪種編碼列出來。找不到 data/audio 就直接掃你給的那一層，
+    所以散裝資料夾或單獨一個封裝檔也吃得下去。
+    ⚠️ 只認 BIGF 開頭的封裝檔。cd/ 底下那 8 個「本身就是一長串 SCHl」的 .big
+    （pbpdat / chantdat / padat / rallydat / plchtdat / hsfxdat / stdmdat /
+    bdcstdat）不會出現在 --list 的清單裡 —— 播報語音就在其中最大的那個
+    pbpdat.big。要看它們就把檔案本身指給這支腳本。
+  · 單一語音檔（.dat，或你從封裝檔裡撈出來的一段）：印那一個檔的檔頭。
+    ⚠️ 剛安裝好的原版**沒有散裝的 .dat**（本站數過原版 data/audio 底下 82 個
+    非 .big 的檔，.dat 是 0 個），語音全部包在 .big 裡；散裝的 .dat 多半來自
+    社群語音包。這支沒有取出功能，要把某一段撈成 WAV 是 make-voice 那一課的
+    mvp_audio.py --export；上面說的那 8 個 .big 則可以直接指給這支腳本。
+  · 再加 --blocks：連聲音資料內部怎麼切成聲道、怎麼切成 15 個位元組一組都印出來。
+
+吐什麼（輸出）
+  · 只有畫面上的文字。它不寫檔、不建資料夾、不產生 WAV。
+    整支腳本開檔一律是 'rb'，沒有任何 open(..., 'w')，你可以自己搜一次確認。
+  · 回傳值：讀得懂是 0；讀不懂、找不到檔案、或路徑給的是資料夾卻沒加 --list，
+    這三種都印一句人話然後回 2（不丟 traceback）。
+
+安全網
+  · 唯讀是它的預設，也是它唯一的模式：沒有 --apply、沒有備份、也沒有還原功能，
+    因為它從頭到尾沒有任何東西可以被改壞。
+  · 讀不懂就停下來（丟 DataError），不硬解：開頭不是 SCHl、區塊長度不合理，
+    這兩種會印一句人話然後結束（回傳 2）。--list 掃整包時則是跳過讀不懂的那一項，
+    --blocks 遇到某一段切不開也只會說那一段切不開，其餘照樣走完。
+  · 印出來的東西分「量到的」與「推論」：取樣率 48,000 Hz 是推論，
+    而且只涵蓋 GSTR 容器的編碼 3（社群做的那批裡的一種）。EA 原版、以及
+    PT 容器的編碼 3，本站都測不出來，所以不替它們換算秒數。
+    而且那個推論**本身也還沒定案**，第三節那個 ⚠️ 寫了矛盾在哪。
+
+做不到的事
+  · 不會把語音變成 WAV，也不會把你的聲音寫回去（那兩件事在 make-voice 那一課）。
+  · 只認 SCHl 開頭的語音檔。BIGF 封裝檔只列目錄，不解裡面的圖或別的資料。
+  · 聲音資料的切法只在 **GSTR 容器的編碼 3** 上驗過。遇到別的（編碼 1、編碼 2、
+    以及 PT 容器的編碼 3）只印外殼，--blocks 會直接說本站沒解開然後停手，
+    而不是套一套印出看起來像真的數字。
+
+─────────────────────────────────────────────────────────
+ 為什麼會有這一課
+─────────────────────────────────────────────────────────
+本站原本把「換播報語音」整條路標成做不到，理由是「音訊編碼沒解開」。
+**那是把「未解」貼在錯的格子。**社群二十年前就換成功了 ——
+他們需要的是「產生一個遊戲吃得下去的檔」，不是「把 EA 的解碼出來」。
+
+這一課是往那個方向的第一步：先確認我們真的讀得懂外殼。
+結果是外殼讀懂了，最後一格當時還沒 —— 那一格 2026-08-29 也解開了，見下面第四節。
+下面每個數字都可以自己重跑。
+
+─────────────────────────────────────────────────────────
+ 一、外殼（完全解開）
+─────────────────────────────────────────────────────────
+語音檔是 EA 的區塊鏈：
+
+    SCHl  檔頭 + 一串標籤
+    SCCl  計數
+    SCDl  聲音資料（可以有很多個）
+    SCEl  結束
+
+每個區塊 = 4 bytes 標記 + 4 bytes 長度（小端序）。
+剛安裝好的原版 6,995 個語音檔，區塊鏈 100% 完整。
+
+檔頭標籤是「標籤(1) + 長度(1) + 值」，但 0xFC/0xFD/0xFE 沒有長度也沒有值：
+
+  0x06  恆為 101（6,995 個全部一樣）
+  0x80  編碼方式    EA 原版 = 2 · 社群做的 = 3
+  0x82  聲道數（本站這台機器上，編碼 3 的 8,767 個裡 8,446 個是 1、321 個是 2；
+        下面第二節那套雙聲道擺法講的是那 321 個。編碼 1 與 2 全部是 1）
+  0x84  取樣率（分編碼差很多：剛安裝好的原版 6,995 個一個都沒標；本站這台機器上
+        編碼 2 的 7,271 個裡 207 個有標，編碼 3 的 8,767 個裡 8,230 個有標，
+        其中 7,841 個標 22,050 Hz）
+  0x85  取樣數
+  0xa0  恆為 4。但「只有 EA 原版有」是錯的：本站兩份安裝上量到 PT 容器的
+        15,283 個項目**全部**有這個標籤，GSTR 容器的 8,203 個裡只有 11 個有
+        —— 它比較像「PT 容器的記號」，不是「EA 原版的記號」。
+
+驗證方式很硬：**標籤解析消耗的長度必須等於檔頭宣告的長度** ——
+原版 6,995 個檔全部落在檔頭宣告長度的 1 個位元組容差內（程式第 459 行就是這樣判的：2,556 個剛好相等、4,439 個差 1）。
+
+─────────────────────────────────────────────────────────
+ 二、聲音資料怎麼擺（完全解開）
+─────────────────────────────────────────────────────────
+每個 SCDl 的內容是：
+
+    [4 bytes] 這一段的取樣數（位元組序看容器：PT 小端、GSTR 大端）
+    [4 bytes] 左聲道起點（永遠 0）
+    [4 bytes] 右聲道起點
+    [......]  左聲道一整段
+    [......]  右聲道一整段
+
+**兩個聲道不是交錯的，是各自連續一整段。**
+驗證：右聲道起點必須正好等於「剩下資料的一半」——
+社群檔在這台機器上 321 個雙聲道檔、2,382 段全部吻合（可以自己重跑）。
+
+（本站原本按「左 15 右 15 交錯」解，等於把兩邊剪碎後交叉黏起來。
+  這是這一課走過最大的一段冤枉路。）
+
+每個聲道裡面是 **15 個位元組一組**：1 個表頭 + 14 個資料位元組（= 28 個半位元組）。
+表頭的高半位元組是 0–3（四組係數之一）。驗證方式是**掃相位**：
+切在對的位置時「高半位元組 ≤ 3」占 **97.7%**，切錯位置時只有約 50%
+（= 亂猜的水準）。差距這麼大，切法就不可能是猜的。
+
+⚠️ **這一整節只在「GSTR 容器」的編碼 3 檔上成立**（2026-09-05 量到的分界）。
+   編碼 3 有兩種容器，行為完全相反：
+     · GSTR（本站這台機器 8,203 個）：掃相位中位數 1.000、98.0% 的聲道 &gt;0.9，
+       會印「⚠️ 切法可能不對」的只有 2.2% 的檔。上面那些數字講的就是這一批。
+     · PT（564 個）：掃相位中位數 0.478 —— 就是亂猜的水準，**100% 的檔都會印
+       「⚠️ 切法可能不對」**。而且算得出來根本擺不下：某一段宣告 1,728 個取樣，
+       照 15/28 需要 915 個位元組，那一段只有 668 個。
+   所以 PT 容器的編碼 3 是**另一種東西，本站沒有解開**，--blocks 對它直接說
+   自己沒解開，不套一套印出看起來像真的數字。
+
+資料半位元組的分佈也對得上 4-bit 差分編碼：對稱、峰在 0/1/2/E/F、
+谷在 7/8、位元組熵 6.5 bits（隨機資料會是 8）。
+
+段落長度的迴歸：**位元組 = 1.0697 × 取樣數 + 每段固定開銷**，
+而每聲道 15 bytes / 28 取樣 × 2 聲道 = 1.0714。差 0.16%。
+
+─────────────────────────────────────────────────────────
+ 三、取樣率 48,000 Hz（推論，證據夠強但不是直接量到）
+─────────────────────────────────────────────────────────
+大部分檔沒有標 0x84。舊資料裡有 681 個來源 WAV（當年錄語音的素材），
+其中 **680 個是 48,000 Hz**（剩下那一個是 24 kHz 的 MP3，不是 PCM）。
+這批裡有一部分的**取樣數跟語音檔精確相同**，
+名字也對得上（`Tien.wav` ↔ 田家安的 4518）。
+
+**做過隨機對照**：把語音檔的取樣數整體平移一個隨機量、跑 200 次，
+最多只吻合 60 個。實際 188 個高於 200 次對照的最大值 —— 配對是真的。
+
+取樣數完全相同 = 沒有重新取樣 → 語音檔也是 48,000 Hz。
+⚠️ 這一步是**推論**：直接的證據是「長度一樣」，不是「內容一樣」。
+
+⚠️ 這個結論只涵蓋**那一批社群檔**。EA 原版（編碼 2）沒有標 0x84，本站測不出來。
+
+⚠️ **這一格本站還沒定案（2026-09-05 重跑時抓到的矛盾）**：拿 680 個 48 kHz 來源
+   WAV 的每聲道取樣數去配語音檔，161 個 WAV 配到 195 個語音檔，而那 195 個裡
+   有 **96 個是編碼 3、而且自己標著 22,050 Hz**，只有 10 個沒有標。
+   「語音檔也是 48,000 Hz」跟「檔案自己標的取樣率」最多只能對一個。
+   本站沒有量出哪一個對（試過拿解出來的取樣跟來源 WAV 比包絡：真配對 6 個
+   平均 0.27、隨機對照平均 0.14 但最大值 0.54 —— 那個指標分不開兩者），
+   所以兩邊都照原樣印給你看，不替你選一邊。
+   另外，「大部分檔沒有標 0x84」這句話在編碼 3 上其實反過來：本站這台機器上
+   編碼 3 的 8,767 個裡 8,230 個有標，沒標的 537 個裡有 534 個是 **PT 容器**
+   —— 也就是第二節那個 ⚠️ 說「本站沒解開」的那一批。所以這支腳本現在只對
+   GSTR 容器的編碼 3 印那句「若是 48000 Hz 則為 X 秒」。
+
+─────────────────────────────────────────────────────────
+ 四、這一格後來解開了（2026-08-29 訂正）
+────────────────────────────────────
+**15 個位元組怎麼變回 28 個取樣的還原公式 —— 已經解開。**
+
+這一節原本寫「本站沒有解開的（就這一格）」：試過 1,000 種以上的參數組合
+（位移基準、半位元組順序、係數表、濾波器變體、前置長度），
+最好的相關係數只有 0.16。那段經過是真的，結論已經過期。
+
+解開它的不是更聰明的組合，是**找到一份標準答案** —— 免費的 ffmpeg
+解得開遊戲的選單音樂，於是「你錯了」終於有東西說得出口。
+對照驗證 21,678,328 個取樣 0 個不同，編碼寫回去再讀出來 98.1 dB。
+
+**這支腳本仍然只讀不寫、不產生 WAV**，那是分工不是做不到。
+要匯出 WAV 或把自己的聲音寫回去，用「換掉遊戲的聲音」那一課的
+mvp_audio.py（--export / --import）。
+
+MIT License · Copyright (c) 2026 toni · 無外部相依，Python 3.7 以上
+"""
+
+import argparse
+import os
+import struct
+import sys
+
+# 編碼 3 的一組 = 1 個表頭位元組 + 14 個資料位元組(= 28 個半位元組),
+# 還原出來是 28 個取樣。這兩個數字撐起後面的相位掃描與長度換算,
+# 改動它們等於改掉本站對這個格式的整套理解。
+BLOCK = 15          # 一組 15 個位元組
+PER_BLOCK = 28      # 還原成 28 個取樣
+
+
+class DataError(Exception):
+    """看不懂這個檔就丟這個。
+
+    單獨看一個檔時,main() 會把它印成一句人話(不丟一整片 traceback)。
+    --list 掃整包時反過來:讀不懂的那一項跳過就好,不要讓整份清單停下來。
+    """
+    pass
+
+
+# ─────────────────────────────────────────────────────────
+#  BIGF 封裝檔（只列目錄，不寫回）
+# ─────────────────────────────────────────────────────────
+
+def big_entries(raw):
+    """列出 BIGF 封裝檔的目錄,回傳 [(名稱, 位移, 大小)]。不是 BIGF 就回 None。
+
+    檔頭固定 16 個位元組:BIGF(4) + 檔案總大小(4) + 項目數(4) + 目錄大小(4),
+    ⚠️ **不是每一欄都同一個方向**,別照抄「數字全是大端序」那句話(舊版寫錯了):
+      · 項目數(raw[8:12])是**大端序** —— 這支只用這一欄,本站兩份安裝的 24 個
+        BIGF 檔照大端讀都走得完整份目錄。它跟裡面語音區塊的長度(小端序)方向相反,
+        這一格搞反不會當掉,只會安靜地讀出一堆天文數字。
+      · 檔案總大小(raw[4:8])多數是**小端序**:24 個裡 22 個照小端讀才等於
+        真正的檔案大小,只有 2 個是大端。
+      · 目錄大小(raw[12:16])本站沒有定案 —— 拿它跟「目錄實際結束的位置」比,
+        大端只對上 3 個、小端 0 個,所以這裡不替它下結論。
+    """
+    if raw[:4] != b'BIGF':
+        return None
+    count = struct.unpack('&gt;I', raw[8:12])[0]
+    # 目錄從第 16 個位元組開始,一項是「位移(4) + 大小(4) + 名稱」。
+    # 名稱沒有長度欄,是用一個 0x00 收尾,所以要往前找那個 0 才知道下一項在哪。
+    out, p = [], 16
+    for _ in range(count):
+        # 目錄被截斷時就停在這裡。項目數是檔案自己宣告的,不可以無條件相信。
+        if p + 8 &gt; len(raw):
+            break
+        off, size = struct.unpack('&gt;II', raw[p:p + 8])
+        p += 8
+        # 名稱是 0x00 收尾。找不到那個 0 就代表目錄在這裡被截斷了 —— 用 find 不用
+        # index:index 會丟 ValueError,而這裡在呼叫端的 try 之外,整份清單會當場停掉
+        # (檔頭那句「跳過讀不懂的那一項」就變成假的)。
+        e = raw.find(b'\x00', p)
+        if e &lt; 0:
+            break
+        # 名稱按 latin-1 解:這一層要的是「位元組原樣對上字元」,不是正確的文字,
+        # 用它才不會有任何位元組解不開而中途炸掉。
+        out.append((raw[p:e].decode('latin-1'), off, size))
+        p = e + 1
+    return out
+
+
+# ─────────────────────────────────────────────────────────
+#  SCHl 容器
+# ─────────────────────────────────────────────────────────
+
+# 這三個標籤只有標籤本身,後面沒有長度也沒有值。
+# 把它們當成「標籤 + 長度 + 值」去讀,會吃掉後面的位元組,整串標籤從這裡開始錯位。
+NOVALUE = (0xFC, 0xFD, 0xFE)
+# 0x80 這個標籤標的是編碼方式。三個值本站都遇得到,括號裡寫的是各自的解開進度。
+CODEC = {1: '音樂那種，每塊自帶起始狀態 —— 已解開，見 make-voice',
+         2: 'EA 原版用的 —— 已解開，見 make-voice 那一課',
+         3: '社群做的用的 —— GSTR 容器的那種已解開，見 make-voice 那一課'}
+
+
+def walk_blocks(b):
+    """沿著區塊鏈走一遍,回傳 [(位移, 標記, 長度)] 與「走到第幾個位元組」。
+
+    一個區塊 = 4 個位元組的標記(SCHl / SCCl / SCDl / SCEl)+ 4 個位元組的長度,
+    長度是**小端序**,而且**含這 8 個位元組自己**,所以下一塊的位移就是 i + n。
+    """
+    out, i = [], 0
+    while i + 8 &lt;= len(b):
+        tag = b[i:i + 4]
+        # 標記不是 SC 開頭就代表區塊鏈到此為止。這裡用 break 而不是丟錯,
+        # 因為呼叫端要靠回傳的位置去算「後面還剩多少不屬於區塊鏈的位元組」。
+        if tag[:2] != b'SC':
+            break
+        n = struct.unpack('&lt;I', b[i + 4:i + 8])[0]
+        # 兩種壞法一起擋:長度小於 8 會讓 i 停在原地變成無窮迴圈,
+        # 超過檔案尾則是壞檔或位元組序讀反了。硬走下去會讀到別人的資料。
+        if n &lt; 8 or i + n &gt; len(b):
+            raise DataError('第 %d 個位元組的區塊長度 %d 不合理' % (i, n))
+        out.append((i, tag.decode('latin-1'), n))
+        i += n
+        # SCEl 是結束標記。它後面**可能**是封裝檔的補齊,也可能是下一段語音:
+        # 原版 cd/spch_pbp/pbpdat.big 就是 15,391 段 SCHl 直接接在一起(本站走過
+        # 每一段,15,391 段都以 SCEl 收尾)。這支走到這裡就收手,只讀第一段 ——
+        # 所以呼叫端要拿回傳的位置去看「後面還剩什麼」,不要預設那是補齊。
+        if tag == b'SCEl':
+            break
+    return out, i
+
+
+def parse_tags(b, start, end):
+    """把檔頭裡那串標籤讀成 {標籤: 值},並回傳讀到第幾個位元組。
+
+    一筆是「標籤(1) + 長度(1) + 值(長度個位元組)」,值是**大端序**
+    (跟區塊長度的小端序相反)。0xFF 是整串的結束記號。
+    end 是檔頭自己宣告的長度:讀到那裡就停,不要越界讀進聲音資料。
+    回傳的位置是硬驗證用的,呼叫端會拿它跟宣告長度比對。
+    """
+    out, i = {}, start
+    while i &lt; end:
+        t = b[i]
+        if t == 0xFF:
+            i += 1
+            break
+        # 0xFC/0xFD/0xFE 沒有長度也沒有值,只往前走一格。
+        # 用 setdefault 是為了同一個標籤出現兩次時不覆蓋先讀到的那筆。
+        if t in NOVALUE:
+            out.setdefault(t, None)
+            i += 1
+            continue
+        # 長度欄或值被宣告的長度切掉 = 這個檔頭沒讀完就到底了。
+        # 這裡安靜停手,呼叫端會發現 tag_end 對不上 hdr_len,在畫面上打 ❌。
+        if i + 1 &gt;= end:
+            break
+        n = b[i + 1]
+        if i + 2 + n &gt; end:
+            break
+        out[t] = int.from_bytes(b[i + 2:i + 2 + n], 'big')
+        i += 2 + n
+    return out, i
+
+
+def parse_voice(b):
+    """回傳一個 dict 描述這個語音檔。看不懂就丟 DataError。
+
+    走法:先確認開頭是 SCHl,沿區塊鏈走一遍,再回頭讀第一塊(檔頭)裡的標籤。
+    ⚠️ 標籤從第幾個位元組開始要看子格式:第 8 到 11 個位元組是子格式標記,
+       PT 開頭的從第 12 個開始,其餘從第 16 個開始。這一格算錯,整串標籤全歪。
+    """
+    if b[:4] != b'SCHl':
+        raise DataError('開頭不是 SCHl，這不是語音檔')
+    blocks, consumed = walk_blocks(b)
+    # 第一塊一定是檔頭,它宣告的長度就是標籤那串可以讀到哪裡為止。
+    # 開頭是 SCHl 卻一個區塊都走不出來 = 檔案短到連 8 個位元組的區塊頭都放不下。
+    # 不擋的話下一行 blocks[0] 會丟 IndexError,使用者拿到的是一整片 traceback。
+    if not blocks:
+        raise DataError('只有 %d 個位元組，連一個完整的區塊都放不下' % len(b))
+    hdr_len = blocks[0][2]
+    sub = b[8:12]
+    tags, tag_end = parse_tags(b, 12 if sub[:2] == b'PT' else 16, hdr_len)
+
+    # 聲音資料可以拆成很多個 SCDl,一段接一段。
+    # 每個 SCDl 的 pos+8 到 pos+12 是這一段的取樣數,pos+12 之後才是內容。
+    # ⚠️ **那個取樣數的位元組序跟容器綁在一起**,不是固定的(這一格本站 2026-09-05
+    #    才補上,在那之前一律當大端讀,所以每一個 PT 容器的檔都讀出天文數字):
+    #      PT   容器 → 小端序
+    #      GSTR 容器 → 大端序
+    #    驗證法很硬:把一個檔每一段的取樣數加起來,應該等於檔頭 0x85 標的總數。
+    #    本站在兩份安裝上量了 23,486 個項目 —— 照容器選位元組序時全部相符,
+    #    照舊的「一律大端」則 PT 那 8,288 個沒有一個對得上。
+    #    (這條規則跟 make-voice 那一課 2026-08-30 量到的是同一條。)
+    # 這裡只收「取樣數 + 原始位元組」,怎麼切成聲道交給 split_channels,
+    # 因為那件事只在 GSTR 容器的編碼 3 上驗過,不該在這一層先套上去。
+    endian = '&gt;' if sub[:4] == b'GSTR' else '&lt;'
+    chunks = []
+    for pos, tag, n in blocks:
+        if tag == 'SCDl':
+            chunks.append((struct.unpack(endian + 'I', b[pos + 8:pos + 12])[0],
+                           b[pos + 12:pos + n]))
+
+    return {'sub': sub.decode('latin-1').rstrip('\x00'),
+            # 容器種類要一路帶到輸出:它決定位元組序,也決定下面那套
+            # 「15 個位元組一組」的擺法適不適用(只有 GSTR 適用)。
+            'gstr': sub[:4] == b'GSTR', 'endian': endian,
+            'hdr_len': hdr_len, 'tag_end': tag_end, 'tags': tags,
+            'blocks': [(t, n) for _, t, n in blocks], 'chunks': chunks,
+            'consumed': consumed, 'total': len(b),
+            'codec': tags.get(0x80), 'channels': tags.get(0x82, 1),
+            'samples': tags.get(0x85), 'rate': tags.get(0x84)}
+
+
+def split_channels(data, channels):
+    """用聲道起點表把一段切成每個聲道。回傳 [(起點, 位元組)]。
+
+    傳進來的 data 是 SCDl 扣掉開頭那 4 個位元組(取樣數)之後的部分。
+    它的開頭是每個聲道各 4 個位元組的起點(大端序),第一個永遠是 0,
+    而且起點是從「起點表之後」算起,所以真正的位置要再加上 4 × 聲道數。
+    ⚠️ 「大端序」這一格只在 **GSTR 容器**上驗過,而本站兩份安裝裡的多聲道項目
+       (321 個)剛好全部都是 GSTR 的編碼 3,所以另一種容器的多聲道長什麼樣子
+       本站沒有樣本可以說。呼叫端(show_blocks)也只讓 GSTR 的編碼 3 走到這裡。
+    **兩個聲道各自連續一整段,不是交錯的**。
+    按交錯解等於把兩個人的話剪碎再交叉黏起來,那是本站走過最長的一段冤枉路。
+    """
+    if channels &lt; 1:
+        raise DataError('聲道數 %s 不合理' % channels)
+    offs = [struct.unpack('&gt;I', data[4 * i:4 * i + 4])[0] for i in range(channels)]
+    base = 4 * channels
+    out = []
+    for c in range(channels):
+        # 下一個聲道的起點就是這個聲道的結尾;最後一個聲道沒有下一個,吃到資料尾。
+        s = base + offs[c]
+        e = base + offs[c + 1] if c + 1 &lt; channels else len(data)
+        out.append((s, data[s:e]))
+    return out
+
+
+def find_phase(body):
+    """掃相位：切在對的位置時，表頭高半位元組應該幾乎都 ≤ 3。
+
+    為什麼要掃:同一個檔裡不是每一段都從第 0 個位元組開始
+    (本站量到同一個檔第 1 段前面有 3 個位元組前置、第 2 段沒有),
+    所以每一段都要重新找 15 個位元組那一組的起點,不能沿用上一段的。
+    判準:表頭的高半位元組是 0 到 3(四組係數之一)。切對的位置本站量到 97.7%,
+    切錯只有大約 50%(= 亂猜的水準)。差距這麼大,就不會是碰巧對上的。
+    ⚠️ 那個 97.7% 只在 **GSTR 容器**的編碼 3 上成立(本站量到中位數 1.000);
+       PT 容器的編碼 3 中位數 0.478,就是亂猜的水準,所以 show_blocks 根本
+       不讓它走到這裡(見腳本開頭第二節那個 ⚠️)。
+    ⚠️ 回傳的分數是 **-1.0** 時代表「這個聲道連一組都放不下,量不出來」,
+       不是 -100%。呼叫端要先判 sc &lt; 0,直接乘 100 去印會出現負的百分比。
+    """
+    best, score = 0, -1.0
+    # 15 個位元組一組,所以起點只有 0 到 14 這 15 種可能,全部試一遍就是窮舉。
+    for ph in range(BLOCK):
+        # 終點是 len(body) - BLOCK + 1:最後一個**完整**的一組起點就是 len - 15,
+        # 而 range 的終點不含,所以要 +1。少了那個 +1 會漏掉最後一組 ——
+        # 本站量到 68,525 個編碼 3 聲道裡,有 8,497 個的百分比因此算錯、
+        # 545 個連相位都選錯,而且 show_blocks 印的「N 組」數的是含最後一組的,
+        # 兩個數字本來就對不起來。
+        idx = range(ph, len(body) - BLOCK + 1, BLOCK)
+        n = 0
+        ok = 0
+        for i in idx:
+            n += 1
+            if (body[i] &gt;&gt; 4) &lt;= 3:
+                ok += 1
+        if n and ok / float(n) &gt; score:
+            best, score = ph, ok / float(n)
+    return best, score
+
+
+# ─────────────────────────────────────────────────────────
+#  輸出
+# ─────────────────────────────────────────────────────────
+
+def describe(b, name):
+    """把一個語音檔的檔頭印成人看得懂的樣子,順便把解析結果回傳給 --blocks 用。"""
+    v = parse_voice(b)
+    # 硬驗證:標籤一路讀下來停的位置,要等於檔頭自己宣告的長度(留 1 個位元組容差)。
+    # 差得更多就打 ❌,代表這個檔的標籤沒有照本站理解的方式排。
+    # ⚠️ ❌ 不等於壞檔:本站在自己這台機器的安裝上,把 data/audio 底下每一個語音都量
+    #    過一次,編碼 1 與 2 的 7,724 個全部吻合,編碼 3(社群做的)的 8,767 個裡
+    #    有 2,586 個對不上。上面第一節那個「原版 6,995 個零例外」講的是原版,不含這批。
+    fit = '✅' if v['tag_end'] in (v['hdr_len'], v['hdr_len'] - 1) else '❌'
+    print('  %s' % name)
+    print('    子格式      %s' % v['sub'])
+    print('    檔頭        宣告 %d · 標籤解析到 %d  %s' % (v['hdr_len'], v['tag_end'], fit))
+    print('    編碼方式    %s → %s' % (v['codec'], CODEC.get(v['codec'], '本站沒見過這個值')))
+    # 編碼 3 有兩種容器,只有 GSTR 那種解開了。上面那句話對 PT 容器的檔會誤導,
+    # 所以這裡補一行說清楚 —— 「子格式」那一行印的就是它是哪一種。
+    if v['codec'] == 3 and not v['gstr']:
+        print('                ⚠️ 但你這個是 %s 容器，本站沒解開這一種'
+              % (v['sub'] or '（沒有標記）'))
+    print('    聲道        %d' % v['channels'])
+    print('    取樣數      %s' % (v['samples'] if v['samples'] else '（沒有標）'))
+    if v['rate']:
+        print('    取樣率      %d Hz（檔案自己標的）' % v['rate'])
+        if v['samples']:
+            print('    時長        %.2f 秒' % (v['samples'] / float(v['rate'])))
+    else:
+        print('    取樣率      （沒有標）')
+        # 48000 這個推論的來源是「社群做的那批(編碼 3)裡有一部分的取樣數跟
+        # 48 kHz 來源 WAV 精確相同」,而那一批是 **GSTR 容器**的。
+        # ⚠️ 2026-09-05 加的兩道限制:
+        #    (1) 只對 GSTR 的編碼 3 印 —— 沒標 0x84 的編碼 3 檔本站量到 537 個,
+        #        其中 534 個是 PT 容器,而 PT 容器的編碼 3 本站根本沒解開,
+        #        對它套 48 kHz 等於把一個沒驗過的假設套到別的東西上。
+        #    (2) 就算是 GSTR,這個推論本身也還沒定案(見開頭第三節那個 ⚠️:
+        #        配對到的檔多數自己標著 22,050 Hz),所以句子裡要寫明白。
+        if v['samples'] and v['codec'] == 3 and v['gstr']:
+            print('                若是 48000 Hz 則為 %.2f 秒'
+                  '（推論，尚未定案 —— 見腳本開頭第三節那個 ⚠️）'
+                  % (v['samples'] / 48000.0))
+        elif v['samples'] and v['codec'] == 3:
+            print('                本站沒解開 %s 容器的編碼 3，所以不換算秒數'
+                  % (v['sub'] or '（沒有標記）'))
+        elif v['samples']:
+            print('                本站測不出編碼 %s 的取樣率，所以不換算秒數' % v['codec'])
+    # 區塊多的時候不要整串印出來(本站在自己的安裝上遇過一個檔 54 塊),只給頭尾與總數,
+    # 但「其中幾塊是聲音資料」要留著:那個數字決定 --blocks 會印出幾段。
+    bl = v['blocks']
+    if len(bl) &lt;= 8:
+        print('    區塊        %s' % ', '.join('%s(%d)' % x for x in bl))
+    else:
+        nd = sum(1 for t, _ in bl if t == 'SCDl')
+        print('    區塊        %s, …, %s（共 %d 塊，其中 %d 塊是聲音資料）'
+              % (', '.join('%s(%d)' % x for x in bl[:3]),
+                 '%s(%d)' % bl[-1], len(bl), nd))
+    # 各段開頭那 4 個位元組 = 取樣數。位元組序照容器選(見 parse_voice 那一段)之後,
+    # 這個加總本站在兩份安裝的 23,486 個項目上都等於檔頭 0x85 標的總數 ——
+    # 所以現在每一種編碼都比得了,不再只比編碼 3。
+    # (舊版一律用大端讀,PT 容器的那 8,288 個會加出天文數字,所以當時只好不比。)
+    tot = sum(c for c, _ in v['chunks'])
+    if v['samples']:
+        print('    各段取樣加總 %d %s 標籤說的 %d'
+              % (tot, '=' if tot == v['samples'] else '≠', v['samples']))
+    if v['consumed'] != v['total']:
+        # ⚠️ 這段尾巴**不一定是補齊**,所以先數一下再下結論:
+        #    剛安裝好的原版 stdnmdat.big 的 94 項全部有尾巴,其中 85 項的尾巴裡
+        #    還接著完整的 SCHl 語音串(那 94 項的位移互不重疊,所以確實屬於同一項);
+        #    cd/spch_pbp/pbpdat.big 更極端 —— 15,391 段語音接在一起,這支只讀第一段,
+        #    剩下的 212,216,048 個位元組全落在這個「尾巴」裡。
+        tail = b[v['consumed']:v['total']]
+        more = tail.count(b'SCHl')
+        if more:
+            print('    區塊鏈之後還有 %d 個位元組，裡面還有 %d 個 SCHl 開頭'
+                  '（那是後面還沒讀的語音，不是補齊；這支只讀第一段）'
+                  % (len(tail), more))
+        else:
+            print('    區塊鏈之後還有 %d 個位元組（找不到別的 SCHl，'
+                  '看起來是封裝檔的補齊）' % len(tail))
+    return v
+
+
+def show_blocks(v):
+    """--blocks:把每一段切成聲道、再切成 15 個位元組一組,把量到的數字攤開。"""
+    print()
+    print('  ── 聲音資料怎麼擺 ──')
+    # 只有 **GSTR 容器的編碼 3** 這一套擺法本站驗過(社群語音包 1,945 段零例外;
+    # 2026-09-05 用這台機器全部 321 個雙聲道檔的 2,382 段重跑,也全部吻合)。
+    # 別的硬套同一套切法,印出來的數字會看起來很像真的,但沒有東西支持它。
+    if v['codec'] != 3:
+        print('  這個檔是編碼 %s，本站只解開了 GSTR 容器的編碼 3 的擺法。' % v['codec'])
+        return
+    # 編碼 3 有兩種容器,只有 GSTR 那種本站解開了。PT 容器的編碼 3(本站這台機器
+    # 564 個)掃相位中位數 0.478 = 亂猜的水準,100% 的檔都會印「⚠️ 切法可能不對」,
+    # 而且照 15/28 算出來的位元組數比實際有的還多(1,728 取樣要 915 bytes,只有 668)。
+    # 硬印出來的數字看起來很像真的,但沒有東西支持它 —— 跟上面擋掉別的編碼同一個理由。
+    if not v['gstr']:
+        print('  這個檔是編碼 3，但裝在 %s 容器裡（不是 GSTR）。' % (v['sub'] or '（沒有標記）'))
+        print('  本站解開的擺法只涵蓋 GSTR 那一種，所以這裡不套上去。')
+        print('  （量到的分界：本站這台機器 GSTR 8,203 個、掃相位中位數 1.000；')
+        print('    PT 564 個、中位數 0.478 —— 那就是亂猜的水準。）')
+        return
+    for n, (cnt, d) in enumerate(v['chunks'], 1):
+        try:
+            chans = split_channels(d, v['channels'])
+        except Exception as e:
+            print('  第 %d 段：切不開（%s）' % (n, e))
+            continue
+        # 這是這一格的硬驗證:扣掉起點表之後,每個聲道應該一樣長
+        # (兩聲道時就是「右聲道起點 = 剩下資料的一半」)。
+        # 對不上代表切法或聲道數讀錯了,所以印 ⚠️ 而不是安靜地繼續。
+        half = (len(d) - 4 * v['channels']) // v['channels']
+        mark = '✅' if all(len(x[1]) == half for x in chans) else '⚠️'
+        print('  第 %d 段  宣告 %d 取樣 · %d bytes · 每聲道 %d bytes  %s'
+              % (n, cnt, len(d), half, mark))
+        for c, (start, body) in enumerate(chans):
+            ph, sc = find_phase(body)
+            nb = max(0, (len(body) - ph) // BLOCK)
+            print('     聲道 %d  起點 %-6d 長度 %-6d 前置 %d bytes · %d 組 × 15 bytes'
+                  % (c, start, len(body), ph, nb))
+            # find_phase 用 -1.0 當「一組都放不下」的記號,直接乘 100 會印 -100.0%,
+            # 看起來像程式壞掉。真實資料碰不到(本站量到最短的聲道是 16 bytes),
+            # 但壞檔或別人的模組包會。
+            if sc &lt; 0:
+                print('             表頭高半位元組 ≤3   這個聲道只有 %d bytes，'
+                      '不到一組（15 bytes），量不出來' % len(body))
+            else:
+                print('             表頭高半位元組 ≤3 占 %.1f%%   %s'
+                      % (sc * 100, '切法正確' if sc &gt; 0.9 else
+                         ('大致正確' if sc &gt; 0.7 else '⚠️ 切法可能不對')))
+            # 把「照 15 → 28 換算出來的取樣數」跟「檔案自己宣告的」並排印,
+            # 兩個數字對不上就代表前置位元組或切法還有東西沒算進去。
+            print('             可還原 %d 取樣（宣告 %d）' % (nb * PER_BLOCK, cnt))
+    print()
+    print('  ⚠️ 到這裡為止都量得出來。15 bytes 還原成 28 個取樣的公式已於 2026-08-29 解開，\n        在「換掉遊戲的聲音」那一課；這支只讀不寫，不產生 WAV。')
+
+
+def cmd_list(root):
+    """--list:掃資料夾底下的 .big 封裝檔,列出每一個裡面有幾段語音、用哪種編碼。"""
+    # 語音住在 data/audio 底下。給錯一層不強迫你重打:找不到那一層就直接掃你給的
+    # 那一層,所以散裝資料夾、或已經拆出來的一堆檔,同樣列得出來。
+    base = os.path.join(root, 'data', 'audio')
+    if not os.path.isdir(base):
+        base = root
+    found = 0
+    for r, _, fs in os.walk(base):
+        for f in sorted(fs):
+            if not f.lower().endswith('.big'):
+                continue
+            p = os.path.join(r, f)
+            # 一次把整個封裝檔讀進記憶體:後面每一項就能拿目錄裡的位移直接切,
+            # 不必為了成千上萬項反覆 seek(本站量到一個封裝檔裡有 12,527 段語音)。
+            # 開檔是 'rb',全程唯讀。
+            with open(p, 'rb') as fh:
+                raw = fh.read()
+            items = big_entries(raw)
+            if not items:
+                continue
+            codecs = {}
+            n = 0
+            for _, o, s in items:
+                # 封裝檔裡不是每一項都是語音,所以逐項看開頭那 4 個位元組是不是 SCHl。
+                if raw[o:o + 4] != b'SCHl':
+                    continue
+                n += 1
+                try:
+                    v = parse_voice(raw[o:o + s])
+                except DataError:
+                    # 個別項目讀不懂不要讓整份清單停下來。這裡是概觀,
+                    # 想知道某一個檔為什麼讀不懂,單獨拿那個檔跑一次會印出原因。
+                    continue
+                codecs[v['codec']] = codecs.get(v['codec'], 0) + 1
+            if not n:
+                continue
+            found += 1
+            print('  %-40s %5d 個語音 · 編碼 %s'
+                  % (os.path.relpath(p, root), n,
+                     ', '.join('%s×%d' % (k, x) for k, x in sorted(codecs.items()))))
+    if not found:
+        print('  在這個資料夾底下沒有找到語音封裝檔。')
+        print('  請確認你指的是**遊戲安裝資料夾**（它的下一層才是 data）。')
+
+
+def main():
+    """命令列入口:決定要跑 --list 還是看單一檔案,並把讀不懂的狀況印成一句人話。"""
+    # Windows 上把輸出導到檔案或接管線(&gt; out.txt、| more、PowerShell 的 |)時,
+    # Python 會用系統語系(繁體中文是 cp950)寫 stdout,而 ✅ ❌ ⚠️ ─ 這些字元
+    # cp950 沒有 —— 不處理的話會在印到第三行時丟 UnicodeEncodeError、以 1 結束,
+    # 只留下半截檔案(本站用 PYTHONIOENCODING=cp950 重現過:31 bytes 就斷了)。
+    # 這裡不換編碼,只把「編不出來的那個字」換成問號,中文照舊。
+    # 直接看主控台的人不受影響(Python 3.6+ 在 Windows 主控台走 UTF-16 API)。
+    try:
+        sys.stdout.reconfigure(errors='replace')
+    except (AttributeError, ValueError):
+        pass
+    ap = argparse.ArgumentParser(
+        description='讀懂 MVP Baseball 2005 的語音檔（唯讀，不產生音訊）',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='\n這支腳本不會改你的遊戲，也不會產生任何檔案。\n')
+    ap.add_argument('path', help='遊戲資料夾（配 --list）或單一 .dat')
+    ap.add_argument('--list', action='store_true',
+                    help='列出 BIGF 封裝檔裡的語音（cd/ 底下那 8 個本身就是一長串 '
+                         'SCHl 的 .big 不在內，例如 pbpdat.big，那種要直接指檔案）')
+    ap.add_argument('--blocks', action='store_true', help='顯示聲音資料的內部切法')
+    args = ap.parse_args()
+
+    try:
+        if args.list:
+            cmd_list(args.path)
+            return 0
+        with open(args.path, 'rb') as f:
+            b = f.read()
+        v = describe(b, os.path.basename(args.path))
+        if args.blocks:
+            show_blocks(v)
+        return 0
+    # 兩種預期得到的失敗各印一句人話就好:一整片 traceback 對「只是想看看自己
+    # 遊戲檔」的人沒有任何用處。回傳 2 代表沒讀成功,別的錯誤仍然照常拋出來。
+    except DataError as e:
+        print('\n  停下來了：%s\n' % e)
+        return 2
+    except FileNotFoundError:
+        print('\n  找不到檔案：%s\n' % args.path)
+        return 2
+    # 路徑給了資料夾卻忘記加 --list 是很自然的失誤(頁面步驟 2 給資料夾、
+    # 步驟 3 給檔案)。不擋的話讀者拿到的是 IsADirectoryError 一整片 traceback。
+    except IsADirectoryError:
+        print('\n  這是一個資料夾，不是單一語音檔。要列出整包語音請加 --list：')
+        print('      python3 mvp_read_voice.py "%s" --list\n' % args.path)
+        return 2
+
+
+if __name__ == '__main__':
+    sys.exit(main())
+
+
+# ─────────────────────────────────────────────────────────
+#  MIT License
+#
+#  Copyright (c) 2026 toni
+#
+#  Permission is hereby granted, free of charge, to any person obtaining a copy
+#  of this software and associated documentation files (the "Software"), to deal
+#  in the Software without restriction, including without limitation the rights
+#  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#  copies of the Software, and to permit persons to whom the Software is
+#  furnished to do so, subject to the following conditions:
+#
+#  The above copyright notice and this permission notice shall be included in
+#  all copies or substantial portions of the Software.
+#
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#  THE SOFTWARE.
+# ─────────────────────────────────────────────────────────
+</pre>
+  </details>
+
+  <footer>
+    <p>本頁的每一個數字都是實際跑出來的：原版 6,995 個語音檔的標籤長度對得上
+       （容差 1 個位元組，分佈寫在文中）、
+       社群語音包 1,945 段的聲道起點（那批的母體本站已經指認不出來，
+       改用說得出母體的 321 個雙聲道檔、2,382 段重跑，同樣零例外）、
+       一個檔一段上掃相位的 97.7% 與其餘相位的約 50%、
+       442 萬個位元組的半位元組分佈、取樣數配對的 200 次隨機對照、
+       159 組 <code>a</code>/<code>d</code> 與 185 組來源錄音的逐位元組比對。
+       標「推論」的兩處（48,000 Hz、為什麼兩個槽位放同一段）已在文中寫明推的依據。
+       沒解開的那一格也寫明了試過什麼。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../../legal.html">法律與版權說明</a> ·
+       <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
+  </footer>
+</div>
+
+<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

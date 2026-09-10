@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/mount-disc/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>不用每次放光碟（而且是為了保護它） — toni的MVP模組補習班</title>
+<meta name="description" content="那張光碟已經二十一年了，每轉一次都在磨。而 2026 年很多機器根本沒有光碟機。本站把執行檔反組譯，查清楚遊戲到底為什麼要找光碟 —— 它找的是「哪一台磁碟機根目錄下有 data 資料夾」，那是找資料不是驗正版。所以掛載你自己那張碟的映像，沒有規避任何東西。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../../index.html">首頁</a>
+  <a class="item" href="../../start.html">新手基本功</a>
+  <a class="item" href="../../do.html">我想做什麼</a>
+  <a class="item" href="../../plan.html">課表</a>
+  <a class="item on" href="../index.html">教學</a>
+  <a class="item" href="../../7min/index.html">七分鐘</a>
+  <a class="item" href="../../reference/index.html">速查</a>
+  <a class="item" href="../../coach/index.html">棒球教練</a>
+  <a class="item" href="../../story/index.html">故事</a>
+  <a class="item" href="../../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="../index.html">教學</a> › 不用每次放光碟</p>
+  <h1>不用每次放光碟（而且是為了保護它）</h1>
+  <p class="lede">那張光碟已經<strong>二十一年</strong>了。每放進去轉一次，讀取頭就磨一次、
+     碟片就多一次受熱與受力。而且 2026 年很多機器<u>根本沒有光碟機</u>。
+     這一課先把「遊戲到底為什麼要找光碟」查清楚 ——
+     <strong>本站反組譯的結果是：它找的是資料，不是在驗你有沒有正版。</strong>
+     知道這件事之後，做法就很單純了。</p>
+
+  <div class="grid">
+    <div class="card"><p class="card-h">難度</p><p>★☆☆ 幾次點擊</p></div>
+    <div class="card"><p class="card-h">時間</p><p>做映像約 10 分鐘</p></div>
+    <div class="card"><p class="card-h">會不會動到遊戲</p><p><strong>完全不會</strong><br>
+        <span class="small">不改任何遊戲檔案，也不改執行檔。</span></p></div>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">先講界線，因為這一課最容易被誤會</p>
+    <p><strong>本站不教、也不會教任何規避防盜拷的做法。</strong>
+       這是<a href="../../legal.html">法律與版權說明</a>第 3 節的紅線。</p>
+    <p>這一課教的是<u>把你自己那張碟做成映像檔，然後掛起來</u>。
+       這件事之所以不是規避，是因為 ——
+       <strong>遊戲要找的東西根本不是「防拷特徵」，是一個叫 <code>data</code> 的資料夾。</strong>
+       下一節就是這個結論的證據。</p>
+    <p class="small">⚠️ 如果你遇到的是<u>真正的光碟保護錯誤訊息</u>（畫面上出現要求放入正確光碟的提示），
+       <strong>這一課幫不上忙，本站也不會幫</strong>。那是另一件事。</p>
+  </div>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <div class="quickfix" id="quick">
+    <p class="card-h">⚡ 只想趕快做完？照這五步</p>
+    <ol>
+      <li><strong>先確認你需不需要。</strong>把光碟拿出來，開遊戲玩一場完整的比賽。沒有任何抱怨就不用做這一課</li>
+      <li>把你自己那張碟做成映像檔。Windows 用一般的燒錄／映像軟體做 <code>.iso</code>；Mac 用內建的「磁碟工具程式」，或終端機<br>
+  <pre><code>hdiutil create -srcdevice /dev/disk4 -format UDTO ~/Desktop/mvp_cd2</code></pre></li>
+      <li>掛起來。Windows 對 <code>.iso</code> 按右鍵選「掛接」；Mac 直接按兩下，或<br>
+  <pre><code>hdiutil attach ~/Desktop/mvp_cd2.iso</code></pre></li>
+      <li>打開掛起來的那台磁碟機，確認<strong>最上層有一個 <code>data</code> 資料夾</strong>。沒有就白掛了</li>
+      <li>開遊戲，玩一場完整的比賽。這一步不能跳</li>
+    </ol>
+    <p class="tail"><code>/dev/disk4</code> 換成你自己的，用 <code>diskutil list</code> 查；
+       做出來的是 <code>.cdr</code>，改副檔名成 <code>.iso</code> 就能用。
+       想知道遊戲到底在找什麼（本站把那段反組譯出來了），往下讀；
+       只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+  </div>
+
+  <h2>遊戲為什麼要找光碟：查出來了</h2>
+  <p>執行檔裡有一段列舉磁碟機的程式（<code>0x00751700</code>）。把它反組譯出來：</p>
+<pre>00751707  mov  ebp, 1
+0075170C  mov  byte [esp+0x13], <span class="hl">0x41</span>          ← 從 'A' 開始
+00751711  call GetLogicalDrives              ← 有哪些磁碟機
+00751731  push "%c:\"                        ← 組成 "A:\" "B:\" …
+00751740  call GetDriveTypeA
+00751746  <span class="hl">cmp  eax, 5</span>                       ← <strong>5 = DRIVE_CDROM</strong>
+00751749  jne  下一台
+00751752  call 0x751630                      ← 檢查這台裡面有沒有它要的東西
+00751767  cmp  edi, 0x20                     ← 最多找 32 台</pre>
+  <p>關鍵在<strong>呼叫它的那一行</strong>：</p>
+<pre>00579C1B  push <span class="hl">0</span>                          ← 最後一個參數
+00579C1D  push 0x10c                         ← 收結果的緩衝區大小
+00579C26  push ecx                           ← 收結果的緩衝區
+00579C27  push <span class="hl">"data"</span>                       ← 要找的東西
+00579C32  call 0x751700                      ← 上面那支
+00579C3A  test al, al
+00579C3C  je   失敗
+00579C3E  mov  eax, [<span class="hl">"\database\"</span>]          ← 找到就從那裡讀</pre>
+  <div class="card grass">
+    <p class="card-h">所以它在做什麼</p>
+    <p><strong>「找一台光碟機，它的根目錄底下有 <code>data</code> 資料夾」</strong>，
+       找到就從 <code>\data\database\</code> 讀檔。</p>
+    <p>那支函式裡還有一條讀註冊表
+       <code>SOFTWARE\EA SPORTS\MVP Baseball 2005</code> 的
+       <code>Installed From</code>（<u>你當初從哪裡安裝的</u>）的退路 ——
+       但走不走這一條，由<strong>呼叫端推進去的最後一個參數</strong>決定。
+       上面 <code>0x00579C1B</code> 推的是 <code>0</code>，
+       所以三十二台都找不到就直接回傳失敗，<u>一個位元組的註冊表都沒讀</u>；
+       推 <code>1</code> 的是另一個呼叫端 <code>0x007517E0</code>，那一條才會去讀。</p>
+    <p><strong>這是「資料在哪」的查找，不是「你有沒有正版」的驗證。</strong>
+       它沒有讀任何防拷特徵、沒有檢查磁區、沒有比對序號 ——
+       它只是想讀檔案。</p>
+  </div>
+  <p class="small">⚠️ 本站的邊界：以上是<u>靜態反組譯</u>的結果。
+     本站沒有辦法量到「你的機器上實際會不會走到這一段」——
+     那取決於你當初怎麼安裝、有沒有選完整安裝。
+     所以第一步永遠是<strong>先試試看不掛載會不會有問題</strong>。</p>
+
+  <h2>👉 你要做的事</h2>
+  <p class="small"><strong>這一課的 Windows 部分全是滑鼠操作，沒有指令。</strong>
+     下面出現的 <code>hdiutil</code> 指令是給 Mac 的（而且 Mac 也可以完全用滑鼠做完）；
+     Windows 讀者直接看每一步裡粗體的 <strong>Windows</strong> 那一段。
+     頁尾也標了：映像與掛載本站只在 macOS 上驗過，<u>Windows 那一半是未驗的</u>。</p>
+
+  <div class="step">
+    <div class="step-n">0</div>
+    <div>
+      <div class="step-t">先確認你真的需要做這件事</div>
+      <p class="step-why">很多人的安裝是完整安裝，遊戲根本不會去找光碟。<u>不需要就別做。</u></p>
+      <p>把光碟拿出來（或不要掛任何東西），開遊戲玩一場完整的比賽。
+         <strong>沒有任何抱怨 → 你不需要這一課。</strong></p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">1</div>
+    <div>
+      <div class="step-t">把你自己那張碟做成映像檔</div>
+      <p class="step-why">映像檔就是一整張碟的複本。做好之後，碟片就可以收起來不再動它。</p>
+      <p><strong>Windows</strong>：用任何一般的燒錄／映像軟體做 <code>.iso</code> 即可
+         （例如 ImgBurn、CDBurnerXP，或你原本就有的那一套）。</p>
+      <p><strong>Mac</strong>：內建的「磁碟工具程式」就能做 ——
+         左邊選那張光碟 → 上方<u>檔案 → 新增映像檔 → 來自「（光碟名稱）」的映像檔</u>。
+         或用終端機：</p>
+<pre><code>hdiutil create -srcdevice /dev/disk4 -format UDTO ~/Desktop/mvp_cd2</code></pre>
+      <p class="small">（<code>/dev/disk4</code> 換成你自己的，用 <code>diskutil list</code> 查。
+         做出來的是 <code>.cdr</code>，改副檔名成 <code>.iso</code> 就能用。）</p>
+      <div class="ifnot"><b>做映像失敗、或做出來的比原碟小很多？</b>
+        <p>那多半代表這張碟上有防拷處理過的磁區，一般工具讀不過去。</p>
+        <p><strong>本站到此為止。</strong>本站不教任何為了讓映像通過防拷檢查而做的特殊處理 ——
+           那就是<a href="../../legal.html">法律頁</a>第 3 節說的紅線。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">2</div>
+    <div>
+      <div class="step-t">把映像掛起來，讓它看起來像一台光碟機</div>
+      <p><strong>Windows 10 / 11</strong>：<u>對 <code>.iso</code> 按右鍵 → 「掛接」</u>。
+         系統內建，不用裝任何東西。</p>
+      <p class="step-why">如果你的映像是 <code>.mdf</code> / <code>.mds</code> / <code>.bin</code>
+         這類非 <code>.iso</code> 格式，Windows 內建的掛接不吃，
+         需要一個虛擬光碟機工具（社群當年常用的是 <strong>WinCDEmu</strong>，
+         開放原始碼、驅動程式有微軟簽章）。本站不代為連結，請自行搜尋官方頁面下載。</p>
+      <p><strong>Mac</strong>：<u>直接對 <code>.iso</code> 按兩下</u>就掛起來了。或：</p>
+<pre><code>hdiutil attach ~/Desktop/mvp_cd2.iso</code></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">3</div>
+    <div>
+      <div class="step-t">確認掛起來的那一台「根目錄下有 data」</div>
+      <p class="step-why">這是上面那段程式碼真正在找的東西。<u>沒有 <code>data</code> 就白掛了。</u></p>
+      <p>打開掛起來的那台磁碟機看一眼，最上層應該要有一個 <code>data</code> 資料夾。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">4</div>
+    <div>
+      <div class="step-t">開遊戲，玩一場完整的比賽</div>
+      <p><strong>這一步不能跳。</strong>本站驗得到「映像掛起來了」，驗不到「遊戲滿意了」。</p>
+    </div>
+  </div>
+
+  <h2>✅ 成功標準</h2>
+  <ul>
+    <li>光碟<u>留在盒子裡</u>，遊戲照常開、照常玩完一場</li>
+    <li>掛起來那台的根目錄看得到 <code>data</code></li>
+  </ul>
+
+  <h2>❌ 出錯處理</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>看到什麼</th><th>怎麼做</th></tr></thead>
+    <tbody>
+      <tr><td>掛起來了但遊戲還是抱怨</td>
+          <td>先確認那台的根目錄有 <code>data</code>。沒有的話你掛的可能是 CD1 而遊戲要 CD2（或反過來）</td></tr>
+      <tr><td>出現要求放入正確光碟的訊息</td>
+          <td><strong>那是防拷檢查，不是這一課處理的東西。</strong>本站幫不上忙</td></tr>
+      <tr><td>做映像時卡住／失敗</td>
+          <td>那張碟可能有防拷磁區。本站到此為止（理由見上面）</td></tr>
+      <tr><td>Windows 掛不起來 <code>.mdf</code></td>
+          <td>內建掛接只吃 <code>.iso</code>。需要虛擬光碟機工具</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="report">
+    <p class="card-h">📋 回報格式</p>
+<pre style="margin:0"><code>作業系統：Windows 11 / Windows 10 / macOS ___
+不掛載會不會有問題：會 / 不會（不會的話你不需要這一課）
+映像做得出來嗎：可以 / 失敗
+掛起來那台根目錄有沒有 data：有 / 沒有
+遊戲能不能玩完一場：可以 / 不行，訊息是 ___</code></pre>
+  </div>
+
+  <h2>順帶一提：為什麼這件事值得做</h2>
+  <p>光碟不是永久的。燒錄片的染料層會隨時間與濕熱劣化，
+     壓製碟的鋁反射層也會氧化 —— 這件事有個名字叫「碟腐」。
+     二十一年前那張碟現在還讀得出來，<u>不代表明年還讀得出來</u>。</p>
+  <p><strong>做一份映像，等於把那張碟的內容搬到一個不會自己壞掉的地方。</strong>
+     而且做完之後碟片就可以收起來不再受力受熱 —— 你保護的是原件本身。</p>
+  <p class="small">本站對「該不該做備份」沒有立場要給誰添麻煩：
+     這裡講的自始至終是<u>你自己的碟、你自己的備份、你自己的機器</u>。
+     本站不提供任何遊戲檔案，也不會告訴你去哪裡拿別人的。</p>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 遊戲要找的不是防拷特徵，是<strong>「哪一台光碟機的根目錄底下有 <code>data</code> 資料夾」</strong>，那是找資料不是驗正版，所以掛你自己那張碟的映像沒有規避任何東西。</li>
+    <li><strong>證據長什麼樣</strong> <code>0x00751700</code> 那段從 <code>'A'</code> 開始列舉磁碟機，<code>GetDriveTypeA</code> 比對 <code>5</code>（<code>DRIVE_CDROM</code>），最多找 32 台；而呼叫它的那一行 <code>0x00579C27</code> 推進去的字串就是 <code>"data"</code>，找到就從 <code>\data\database\</code> 讀檔。<strong>沒有</strong>讀防拷特徵、<strong>沒有</strong>檢查磁區、<strong>沒有</strong>比對序號。</li>
+    <li><strong>32 台都找不到，這一條路不會去讀註冊表</strong> 那支函式裡確實有一條讀註冊表 <code>SOFTWARE\EA SPORTS\MVP Baseball 2005</code> 的 <code>Installed From</code>（你當初從哪裡安裝的）的退路，但走不走由呼叫端推進去的最後一個參數決定：這一課引的那條路（<code>0x00579C1B</code>）推的是 <code>0</code>，找不到就直接回傳失敗；推 <code>1</code> 的是另一個呼叫端 <code>0x007517E0</code>。</li>
+    <li><strong>先確認你需不需要</strong> 很多人的安裝是完整安裝，遊戲根本不會去找光碟。第 0 步就是把光碟拿出來玩完一場，<strong>沒有任何抱怨就不需要這一課</strong>。</li>
+    <li><strong>最容易踩的雷</strong> 掛起來那台的根目錄沒有 <code>data</code> 就白掛了，也可能是你掛成 CD1 而遊戲要 CD2（或反過來）。另外 Windows 內建的掛接<strong>只吃 <code>.iso</code></strong>，<code>.mdf</code> / <code>.mds</code> / <code>.bin</code> 要虛擬光碟機工具。</li>
+    <li><strong>紅線在哪</strong> 畫面出現要求放入正確光碟的訊息，那是防拷檢查，不是這一課處理的東西；映像做不出來、或做出來比原碟小很多，那多半是這張碟有防拷處理過的磁區。<strong>兩種本站都到此為止</strong>，不教任何為了讓映像通過防拷檢查而做的特殊處理。</li>
+    <li><strong>不會動到遊戲，而且值得做</strong> 這一課<strong>不改任何遊戲檔案，也不改執行檔</strong>。而光碟不是永久的，燒錄片的染料層會隨時間與濕熱劣化、壓製碟（你手上那張原版就是）的鋁反射層會氧化，這件事有個名字叫「碟腐」。做一份映像等於把內容搬到一個不會自己壞掉的地方，碟片也可以收起來不再受力受熱。</li>
+    <li><strong>本站沒驗的</strong> 以上對執行檔行為的描述<strong>全部來自靜態反組譯</strong>，本站量不到「你的機器上實際會不會走到這一段」，那取決於你當初怎麼安裝。而且映像與掛載的步驟本站<strong>只在 macOS 上驗過</strong>，Windows 那一半是依系統內建功能寫的，標記為<strong>未驗</strong>，這一段還沒在 Windows 上實測。</li>
+  </ul>
+
+  <footer>
+    <p>本頁對執行檔行為的描述來自靜態反組譯（<code>0x00751700</code> 的磁碟機列舉、
+       <code>0x00579C27</code> 推入的 <code>"data"</code>、以及那條由呼叫端最後一個參數
+       決定要不要讀 <code>Installed From</code> 的分支）。
+       <u>本站沒有量到「你的機器上會不會走到這一段」</u>，所以第 0 步是先確認你需不需要。
+       映像與掛載的步驟本站在 macOS 上驗過；Windows 的部分是依系統內建功能寫的，
+       <span class="badge wip">未驗</span> 這一段還沒在 Windows 上實測。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../../legal.html">法律與版權說明</a> ·
+       <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

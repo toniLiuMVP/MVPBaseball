@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/how-we-measured.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>本站怎麼量的 — toni的MVP模組補習班</title>
+<meta name="description" content="本站每個數字都寫著「量到的」。這一頁給出量測對象的指紋(檔數/大小/SHA-256)、名詞的精確定義、以及讓你自己重跑一次的腳本。附零相依的指紋工具,三十秒就能確認你手上那份跟本站量的是不是同一份。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 本站怎麼量的</p>
+  <h1>本站怎麼量的</h1>
+  <p class="lede">本站每一個數字後面都寫著「量到的」。但「量到的」有一個前提：
+     <strong>你要知道我量的是哪一份檔案。</strong>
+     同一個檔名在不同的模組包裡，數字可以差 <u>2,200 倍</u> ——
+     這不是誇飾，是本站真的踩過的坑。
+     這一頁給出量測對象的指紋、名詞的精確定義、以及讓你自己重跑一次的工具。</p>
+
+  <div class="card clay">
+    <p class="card-h">這一頁為什麼存在</p>
+    <p>一位讀者走查本站之後說：<u>「這是唯一讓我沒辦法把這站當引用來源的原因。」</u></p>
+    <p>他說得對。一個站宣稱自己每個數字都是實測的，卻沒有說清楚
+       「<strong>實測的對象是什麼</strong>」，那讀者就只能選擇相信或不信，
+       <u>沒有第三條路</u>。這一頁就是那第三條路。</p>
+  </div>
+
+  <h2>一、量測對象的指紋</h2>
+  <p>下面每一份都給了<strong>清單雜湊</strong>：把資料夾裡每個檔的
+     「相對路徑 + 大小」排序後接成一整串，算一次 SHA-256。
+     <u>它一樣，就代表檔案結構與大小完全相同</u>；不讀內容，所以幾 GB 也只要幾秒。</p>
+
+  <h3>四份沒有疊過模組的安裝</h3>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>哪一份</th><th class="num">檔數</th><th class="num">總大小</th><th>清單雜湊（前 32 碼）</th></tr></thead>
+    <tbody>
+      <tr><td data-label="哪一份">英文版（光碟安裝，沒裝任何模組）</td><td data-label="檔數" class="num">1,191</td>
+          <td data-label="總大小" class="num">1,428,284,982</td><td data-label="清單雜湊（前 32 碼）" class="mono">e2d35cdeb94fffbc1ec6530ced82dd75</td></tr>
+      <tr><td data-label="哪一份">官方繁體中文版（同上）</td><td data-label="檔數" class="num">2,389</td>
+          <td data-label="總大小" class="num">1,441,798,039</td><td data-label="清單雜湊（前 32 碼）" class="mono">b57ad51e87966ef90b2e0449a9ba0ea3</td></tr>
+      <tr><td data-label="哪一份">官方繁體中文版 ＋ 三個官方更新檔（<a href="patches-tc.html">更新檔那一頁</a>的比對對象）</td><td data-label="檔數" class="num">2,393</td>
+          <td data-label="總大小" class="num">1,466,715,410</td><td data-label="清單雜湊（前 32 碼）" class="mono">6750301cc87bb9c1d138c8362e4a92b5</td></tr>
+      <tr><td data-label="哪一份"><code>PK</code> 版（站上多頁拿它當第四份對照）</td><td data-label="檔數" class="num">2,400</td>
+          <td data-label="總大小" class="num">2,370,358,703</td><td data-label="清單雜湊（前 32 碼）" class="mono">5b93cb229d822e157ebe65e061207271</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">⚠️ 英文版那 1,191 個檔裡有一個 <code>filelist.txt</code> 的日期是 <strong>2015 年</strong>，
+     顯然不是安裝程式產生的。所以「安裝產物」算起來是 1,190 個。
+     站上兩個數字都出現過，<u>差別在算不算那一個</u>。</p>
+  <p class="small">⚠️ 第三份那 <strong>2,393</strong> 個檔<u>不代表更新檔多裝了四個檔</u>：
+     多出來的四個是留在資料夾裡的 <code>MVP2005PATCH1/2/3_TC.EXE</code>
+     與一顆備份用的 <code>mvp2005 - 全新未更新.exe</code>，不是更新裝出來的
+     —— <a href="patches-tc.html">更新檔那一頁</a>比對的是兩邊共同的那 <strong>2,389</strong> 個檔。
+     後兩份的指紋是 <strong>2026-09-05</strong> 補量的，其餘幾張表是 2026-08-29。</p>
+
+  <h3>錨點檔的 SHA-256</h3>
+  <p>清單雜湊只看結構。<strong>要確認內容一樣，看下面這幾個錨點檔。</strong></p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>檔案</th><th class="num">大小</th><th>英文版</th><th>中文版</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="檔案"><code>data/frontend/ingame.big</code></td><td data-label="大小" class="num">167,682</td>
+          <td data-label="英文版" class="mono">4eb178d0…</td><td data-label="中文版" class="mono"><strong>4eb178d0…</strong></td></tr>
+      <tr class="hi"><td data-label="檔案"><code>data/frontend/frontend.big</code></td><td data-label="大小" class="num">679,518</td>
+          <td data-label="英文版" class="mono">cce9441c…</td><td data-label="中文版" class="mono"><strong>cce9441c…</strong></td></tr>
+      <tr class="hi"><td data-label="檔案"><code>data/database/attrib.dat</code></td><td data-label="大小" class="num">751,835</td>
+          <td data-label="英文版" class="mono">41c81d6f…</td><td data-label="中文版" class="mono"><strong>41c81d6f…</strong></td></tr>
+      <tr><td data-label="檔案"><code>mvp2005.exe</code></td><td data-label="大小" class="num">6,972,001 / 7,525,175</td>
+          <td data-label="英文版" class="mono">69afdb32…</td><td data-label="中文版" class="mono">6416fb29…</td></tr>
+      <tr><td data-label="檔案"><code>data/fonts/fonts.big</code></td><td data-label="大小" class="num">204,820 / 1,683,513</td>
+          <td data-label="英文版" class="mono">ef282444…</td><td data-label="中文版" class="mono">a5c92f50…</td></tr>
+      <tr><td data-label="檔案"><code>data/models.big</code></td><td data-label="大小" class="num">172,992,803（<u>兩邊一樣</u>）</td>
+          <td data-label="英文版" class="mono">ae2ee4d1…</td><td data-label="中文版" class="mono">ae2f6ab6…</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>前三個逐位元組相同。</strong>也就是說官方中文版跟英文版的
+     介面版面檔與球員資料庫<u>是同一份檔案</u>，差異只在執行檔、字型、與模型包。
+     <code>models.big</code> 特別有意思：<strong>大小一模一樣、內容不同</strong>。</p>
+
+  <h3>本站測試機（站上大部分「模組疊出來會怎樣」的數字來自這裡）</h3>
+  <div class="tablewrap"><table>
+    <tbody>
+      <tr><td>檔數</td><td class="num">4,987</td></tr>
+      <tr><td>總大小</td><td class="num">7,049,143,869 bytes（6.56 GB）</td></tr>
+      <tr><td>清單雜湊</td><td class="mono">eb468f2b4ff0417ff1faa1daea0aafd1…</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">⚠️ 這一份是<u>活的</u> —— 班主任會繼續在上面裝東西、做實驗。
+     所以它的清單雜湊<strong>會變</strong>，上面那個是 2026-08-29 的。
+     引用本站關於「測試機」的數字時，請當成<u>某一個時間點的快照</u>，
+     不是可以永遠對得上的基準。<strong>上面那四份沒有疊過模組的安裝才是穩定基準。</strong></p>
+
+  <h3>四包球場（「超過 10MB 會當機」那一課的資料來源）</h3>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>哪一包</th><th class="num">檔數</th><th class="num">總大小</th><th>清單雜湊（前 32 碼）</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="哪一包">剛安裝好的原版</td><td data-label="檔數" class="num">88</td>
+          <td data-label="總大小" class="num">296,846,196</td><td data-label="清單雜湊（前 32 碼）" class="mono">f9836a6f759f0dd77f0ce7ee1ca3d65b</td></tr>
+      <tr class="hi"><td data-label="哪一包">標「不超過 10MB」的安全包</td><td data-label="檔數" class="num">88</td>
+          <td data-label="總大小" class="num">296,846,196</td><td data-label="清單雜湊（前 32 碼）" class="mono"><strong>f9836a6f759f0dd77f0ce7ee1ca3d65b</strong></td></tr>
+      <tr><td data-label="哪一包">標「10MB」的那包</td><td data-label="檔數" class="num">83</td>
+          <td data-label="總大小" class="num">485,185,254</td><td data-label="清單雜湊（前 32 碼）" class="mono">357de03b5815b2f1c2b060db11b4b75d</td></tr>
+      <tr><td data-label="哪一包">2023 年那包（<u>清理前</u>）</td><td data-label="檔數" class="num">88</td>
+          <td data-label="總大小" class="num">679,016,185</td><td data-label="清單雜湊（前 32 碼）" class="mono">17e72b25e407d35e499b11fb3139e650</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>前兩包的清單雜湊完全相同。</strong>
+     那就是<a href="../tutorials/shrink-big/index.html">清孤兒那一課</a>說的
+     「二十年前標成『安全』的那包，其實根本就是原廠檔」——
+     原本要靠 87 個檔逐一比對雜湊才證得出來，<u>現在一行就夠</u>。</p>
+
+  <h2>二、名詞的精確定義</h2>
+  <p>本站踩過的坑幾乎都不是算錯，是<strong>同一個詞用了兩種定義</strong>。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>詞</th><th>本站的定義</th><th>常見的另一種算法</th></tr></thead>
+    <tbody>
+      <tr><td data-label="詞"><a href="bigf.html#orphan-def">孤兒資料</a></td>
+          <td data-label="本站的定義"><code>總長 − 檔頭 16 − 目錄長 − 目錄指到的長度</code></td>
+          <td data-label="常見的另一種算法">不減目錄長度（會多算檔頭與目錄那幾百到幾萬個位元組）</td></tr>
+      <tr><td data-label="詞">每像素位元組</td>
+          <td data-label="本站的定義"><code>像素資料的位元組數 ÷ (寬 × 高)</code>，<u>不含檔頭與調色盤</u></td>
+          <td data-label="常見的另一種算法">把整筆記錄除以像素數（小圖會嚴重高估）</td></tr>
+      <tr><td data-label="詞">字型「解開後總量」</td>
+          <td data-label="本站的定義">把 <code>fonts.big</code> 裡每個 <code>.ffn</code> QFS 解壓後的長度加總</td>
+          <td data-label="常見的另一種算法">直接看 <code>fonts.big</code> 的檔案大小（那是壓縮後的）</td></tr>
+      <tr><td data-label="詞">球場「大小」</td>
+          <td data-label="本站的定義"><code>.big</code> 檔在磁碟上的位元組數</td>
+          <td data-label="常見的另一種算法">解開後的內容大小</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">兩種算法在<u>大檔上差不多</u>，在小檔上差很多。
+     本站量到「原版 <code>ingame.big</code> 孤兒 0.04%」，換成另一種算法是 0.88% ——
+     <strong>差 21 倍（1,471 bytes 對 71 bytes），而檔案是同一個。</strong></p>
+
+  <h2>三、自己量一次</h2>
+  <p>下面這支腳本量你那份資料夾的時候<u>完全不會修改任何檔案</u>，只讀。
+     （整支唯一會寫檔的是它自己的自我測試 <code>--selftest</code>，
+     寫的是它在系統暫存資料夾裡造的假資料，跑完就刪掉。）</p>
+
+  <div class="step">
+    <div class="step-n">1</div>
+    <div>
+      <div class="step-t">下載腳本，放到桌面，切到桌面</div>
+      <p><a href="mvp_fingerprint.py" download>mvp_fingerprint.py</a>（599 行，零相依）</p>
+<pre><code>cd %USERPROFILE%\Desktop</code></pre>
+<pre><code>cd ~/Desktop</code></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">2</div>
+    <div>
+      <div class="step-t">量你自己那一份</div>
+<pre><code>python mvp_fingerprint.py </code></pre>
+<pre><code>python3 mvp_fingerprint.py </code></pre>
+      <p><span class="sk">a</span>上面那行<strong>最後空一格就停住</strong>。<br>
+         <span class="sk">b</span>把遊戲資料夾拖進終端機視窗（<u>裡面有 <code>data</code> 的那一層</u>）。<br>
+         <span class="sk">c</span>按 Enter。</p>
+      <p class="small">輸出的<strong>第一行只印資料夾的名稱</strong>，不印完整路徑
+         （會是 <code>MVP Baseball 2005</code> 這種，不是
+         <code>C:\Users\〔你的名字〕\…</code> 或 <code>/Users/〔你的名字〕/…</code>）；
+         讀不到的項目也一律折成相對路徑。<u>所以這份預設輸出可以直接貼出來，
+         不必自己塗掉帳號名稱</u>。
+         真的要看完整路徑，就在指令後面加 <code>--show-full-paths</code> ——
+         但<strong>那一份輸出就不要直接公開</strong>。
+         <a href="../about.html">關於</a>那一頁有同一張提醒卡，
+         本站其他腳本的輸出仍然會帶著完整路徑。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">3</div>
+    <div>
+      <div class="step-t">跟上面的表比對</div>
+      <p><strong>清單雜湊一樣</strong> → 你我量的是同一份，本站的數字對你直接成立。<br>
+         <strong>只有錨點雜湊一樣</strong> → 那幾個檔一樣，其他不一定。<br>
+         <strong>都不一樣</strong> → <u>先看輸出裡有沒有一段
+         「⚠️ 有 N 個檔案或資料夾讀不到」</u>。有的話，那份指紋是不完整的，
+         不一樣不代表你裝了模組，而是有東西沒被算進去（結束碼會是 <code>1</code>）。
+         沒有那段警告，那就是<u>正常的</u>，你裝了模組。
+         本站關於「剛安裝好的原版」的數字仍然成立，
+         關於「測試機」的數字則要當成別人機器上的一個例子。</p>
+      <p class="small">要貼出來給人比對的話，<u>清單雜湊那一串就夠了</u>，錨點雜湊是輔助。
+         如果你跑的是加了 <code>--show-full-paths</code> 的那一份，
+         記得先把印著完整路徑的那幾行刪掉再貼。</p>
+    </div>
+  </div>
+
+  <h2>四、環境</h2>
+  <div class="tablewrap"><table>
+    <tbody>
+      <tr><td>作業系統</td><td>macOS 26.5.2（站上的腳本零外部套件、沒有綁平台的寫法，Windows 上應該也跑得動，但<u>還沒有逐支在 Windows 上實跑過</u>）</td></tr>
+      <tr><td>Python</td><td>3.9.6（站上腳本檔頭標的要求是 <strong>3.7 以上</strong>，<code>mvp_skip_intro.py</code> 自己那道版本檢查寫的是 3.6 以上；零外部套件）</td></tr>
+      <tr><td>遊戲執行環境</td><td>Wine（<code>wine-8.0.1 (CrossOverFOSS 23.7.1)</code>）與 Windows 兩邊都有實測，頁面上會標明是哪一邊</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>本站所有下載腳本都不依賴任何外部套件</strong>，
+     也不需要安裝任何東西 —— 這是刻意的：
+     <u>一個要先裝五個套件才能重現的量測，等於不能重現。</u></p>
+
+  <h2>五、本站量不到的東西</h2>
+  <p>寫清楚做不到的部分，跟寫清楚做得到的一樣重要：</p>
+  <ul>
+    <li><strong>執行時的記憶體用量。</strong>本站量得到檔案，量不到遊戲跑起來以後的狀態。
+        凡是講「遊戲執行時會怎樣」的段落，都是從程式碼推的，頁面上會標明。</li>
+    <li><strong>「遊戲讀不讀得動」。</strong>本站驗得到「檔案結構是對的」，
+        驗不到「遊戲不會因為別的原因不吃」。所以每一課的最後一步都是<u>你自己進遊戲看一次</u>。</li>
+    <li><strong>別人機器上的行為。</strong>顯示卡、驅動、作業系統版本都會影響。
+        本站的實測是<u>一台機器上的結果</u>，不是全稱句。</li>
+    <li><strong>已經不存在的東西。</strong>2008-2009 那些論壇多半關站了。
+        凡是講當年的事，靠的是班主任的資料夾與部落格封存，兩者都有標明。</li>
+  </ul>
+
+  <h2 id="how-it-works">這支腳本在做什麼</h2>
+  <p>沒讀過程式碼也沒關係，這一段把它的流程講完。</p>
+  <p>它做兩件事，粗的一件很快，細的一件很慢。<strong>粗的是清單雜湊</strong>：
+     把資料夾裡每個檔的「相對路徑 + 大小」排好、接成一整串，算一次 SHA-256。
+     它完全不讀內容，所以幾 GB 也只要幾秒；代價是
+     <u>「內容改了而大小剛好沒變」它看不出來</u>。
+     <strong>細的是錨點</strong>：挑六個幾乎每一份都有、而且模組會動到的檔，
+     逐位元組各算一次 SHA-256。兩層合起來，就是這一頁上面那幾張表的來源。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>哪一段</th><th>做什麼</th><th>為什麼要有它</th></tr></thead>
+    <tbody>
+      <tr><td data-label="哪一段"><code>ANCHORS</code> 與 <code>SKIP_NAMES</code></td>
+          <td data-label="做什麼">前者是六個錨點檔的清單，後者是要忽略的作業系統垃圾檔
+              （<code>.DS_Store</code>、<code>Thumbs.db</code>、<code>desktop.ini</code>）。</td>
+          <td data-label="為什麼要有它">那些垃圾檔有沒有出現跟遊戲無關，
+              算進去會讓兩份其實一模一樣的安裝算出不同的指紋。
+              錨點少一個不算錯，腳本會標「沒有這個檔」照樣往下跑，
+              因為「只裝了部分內容」本身也是一種指紋。</td></tr>
+      <tr><td data-label="哪一段"><code>walk()</code></td>
+          <td data-label="做什麼">走遍資料夾，回傳兩份東西：一份「相對路徑 + 大小」的清單，
+              以及一份<u>讀不到的路徑</u>。跳過 <code>.</code> 開頭的資料夾與檔案，也跳過符號連結。</td>
+          <td data-label="為什麼要有它">符號連結指到的東西可能在這個資料夾外面，
+              而它自己的大小是連結的大小，拿來當內容的指紋沒有意義。
+              讀不到的檔案與資料夾（多半是權限不足）不會被默默丟掉：
+              它們會被記下來，最後一起印出來，並讓結束碼變成 <code>1</code> ——
+              因為少算一個檔，清單雜湊就整個不一樣，而畫面上看起來完全正常。
+              （斷掉的符號連結走不到這一段，上面那道 <code>islink</code> 先擋掉了。）</td></tr>
+      <tr><td data-label="哪一段"><code>walk()</code> 的統一斜線與排序</td>
+          <td data-label="做什麼">把路徑分隔符一律換成斜線，最後再把整份清單排序。</td>
+          <td data-label="為什麼要有它">這兩道是整支腳本能跨平台比對的關鍵。
+              Windows 用反斜線、Mac 與 Linux 用斜線；<code>os.walk</code> 走檔案的順序
+              又跟檔案系統有關。少任何一道，同一份資料夾在兩台機器上就會算出兩個不同的雜湊，
+              而那正是這支腳本唯一要避免的事。</td></tr>
+      <tr><td data-label="哪一段"><code>sha256_file()</code></td>
+          <td data-label="做什麼">用唯讀的二進位模式開檔，一次讀 1 MB，逐塊餵進 SHA-256。</td>
+          <td data-label="為什麼要有它">錨點裡的 <code>data/models.big</code>，
+              剛安裝好的原版就有 172,992,803 個位元組，一次讀完要吃掉同樣多的記憶體。
+              二進位模式也是必要的：文字模式會在 Windows 上把
+              <code>0x0D 0x0A</code> 併成 <code>0x0A</code>，
+              算出來的就不是檔案真正的內容了。</td></tr>
+      <tr><td data-label="哪一段"><code>main()</code> 算清單雜湊那幾行</td>
+          <td data-label="做什麼">每個檔一行「相對路徑 空格 大小」，
+              用換行接成一整串，再算一次 SHA-256，印出完整 64 個十六進位字元。</td>
+          <td data-label="為什麼要有它">編碼寫死 UTF-8，因為中文檔名在不同平台的預設編碼不一樣，
+              不寫死就會發生「換一台電腦算出不同的值」。
+              多一個檔、少一個檔、任何一個檔的大小變了，這個值就整個不一樣。</td></tr>
+      <tr><td data-label="哪一段"><code>main()</code> 的錨點迴圈</td>
+          <td data-label="做什麼">六個錨點逐一算 SHA-256，
+              印出前 32 個十六進位字元與檔案大小；一個都沒找到就提醒你路徑可能指錯層。
+              某個錨點檔在、卻打不開時標「（讀不到，跳過）」繼續跑，其餘五個照樣印出來；
+              錨點檔本身是符號連結時標「（是符號連結，跳過）」不算它 ——
+              跟 <code>walk()</code> 同一個理由，它指到的檔可能在這個資料夾外面。</td>
+          <td data-label="為什麼要有它">清單雜湊只看結構，要確認內容一樣得靠這一段。
+              印前 32 碼是為了一行放得下，拿來比對兩份安裝夠用，
+              <u>不足以拿去做任何安全性主張</u>。
+              六個全都找不到，最常見的原因是路徑已經指進 <code>data</code> 裡面了。</td></tr>
+      <tr><td data-label="哪一段"><code>--all</code> 那一段</td>
+          <td data-label="做什麼">每個檔都算一次 SHA-256，每行印前 16 碼、大小與路徑。
+              讀不到的檔會印一行「（讀不到，跳過）」佔位，清單本身仍然是完整的。</td>
+          <td data-label="為什麼要有它">預設不做，因為它會把每個檔完整讀過一遍，
+              幾 GB 的資料夾要跑很久。它的用途是兩台機器各存一份輸出，
+              自己拿去逐行比對，找出差在哪一個檔；
+              這支腳本自己不會產生差異清單。</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">這一支沒有備份也沒有還原功能，因為<u>量指紋的時候只用唯讀模式開檔，沒有任何一處寫入</u>；
+     整支唯一會寫檔的是 <code>--selftest</code>，寫的是它在系統暫存資料夾裡造的假資料，跑完一定刪掉。
+     結束碼有四種：<code>0</code> 是跑完了；<code>1</code> 是跑完了、但有檔案或資料夾讀不到，
+     <u>這份指紋不完整，不要拿去比對</u>；<code>2</code> 是給的路徑不是資料夾（<u>沒給路徑</u>或參數本身給錯也是 <code>2</code>）；
+     <code>130</code> 是你自己按了 Ctrl-C —— 它只讀不寫，中途停掉，你的檔案一個位元組都不會動到。</p>
+
+  <h2>完整原始碼</h2>
+  <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。
+     <u>量指紋那條路上沒有任何寫檔呼叫</u>；整支唯一的三處都在 <code>--selftest</code> 裡面，
+     寫的是它在系統暫存資料夾裡造的假資料。你可以自己搜一次 <code>open(</code> 確認。</p>
+  <details>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（599 行）</summary>
+<pre style="margin:10px 0 0">#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# ─────────────────────────────────────────────────────────
+#  法律與免責(每一支本站腳本都帶著這一段)
+#
+#  · 本工具與 Electronic Arts 無任何官方關聯,也未經其授權或背書。
+#    MVP Baseball 2005 為 Electronic Arts 之作品與商標。
+#  · 本工具為原創程式碼,**不含任何 EA 的程式碼或資產**。
+#  · 本工具不提供、不教學、也不包含任何規避技術保護措施的功能。
+#  · 使用者應僅對自己合法取得的遊戲副本使用本工具,並自行承擔風險。
+#    使用前請自行確認你與遊戲發行商之間的使用者授權合約(EULA)。
+#  · 本工具按「現狀」提供,不附任何明示或默示的擔保。
+#  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
+#  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
+#    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
+#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+# ─────────────────────────────────────────────────────────
+
+"""mvp_fingerprint.py — 幫一份遊戲資料夾算「指紋」,用來確認你我量的是同一份東西
+
+本站每一個數字都寫著「量到的」。但「量到的」有一個前提:
+**你要知道我量的是哪一份檔案。**同一個檔名在不同的模組包裡可以差 2,200 倍(測試機 ingame.big 孤兒 92.590% 對原版 0.04234%,比值 2,187)。
+
+這支腳本產生一份可以貼出來比對的指紋:
+
+    · 檔數與總位元組數
+    · 清單雜湊 —— 把「相對路徑 + 大小」排序後整串算一次 SHA-256
+      (只看結構與大小,不讀內容,所以幾 GB 也很快)
+    · 錨點檔的 SHA-256 —— 幾個關鍵檔案逐位元組的雜湊
+
+清單雜湊一樣 = 檔案結構與大小完全相同。
+錨點雜湊也一樣 = 那幾個檔的內容也逐位元組相同。
+
+用法:
+    python mvp_fingerprint.py "&lt;遊戲資料夾&gt;"
+    python mvp_fingerprint.py "&lt;資料夾&gt;" --all      # 每個檔都算 SHA-256(慢)
+    python mvp_fingerprint.py "&lt;資料夾&gt;" --show-full-paths   # 連完整路徑一起印
+    python mvp_fingerprint.py --selftest            # 自我測試,不需要遊戲
+
+量指紋的時候不會修改任何檔案。唯一會寫檔的是 --selftest:
+它在系統的暫存資料夾裡造一份自己的假資料來測,跑完就刪掉,不會碰到你的遊戲。
+
+── 輸入 ─────────────────────────────────────────────
+  一個路徑,指到「裡面有 data 資料夾」的那一層。
+  指錯層不會報錯,但六個錨點會一個都找不到,腳本會提醒你這件事。
+  加 --all 就每個檔都算一次 SHA-256,幾 GB 的資料夾要跑很久。
+  加 --show-full-paths 才會印出完整路徑;預設不印,理由見下面「輸出」。
+
+── 輸出 ─────────────────────────────────────────────
+  只印到畫面,不產生任何檔案:
+    · 資料夾的**名稱**、檔數、總位元組數(順便換算成 GB)
+    · 清單雜湊,完整 64 個十六進位字元
+    · 六個錨點檔各自的 SHA-256 前 32 碼與大小
+    · 加了 --all 才有的逐檔清單(每個檔印雜湊前 16 碼)
+    · 有東西讀不到時,會印出一段警告與那些路徑(見下面的結束碼 1)
+  這份輸出是拿來貼給別人比對的,所以預設**不印完整路徑**:
+  完整路徑裡常常有你的 Windows 使用者名稱、Mac 帳號名稱或磁碟布局。
+  資料夾只印最後一層的名稱,讀不到的項目只印相對於它的路徑;
+  真的要完整路徑再加 --show-full-paths —— 那份輸出就不要直接公開。
+  結束碼:0 = 跑完了,
+         1 = 跑完了,但有檔案或資料夾讀不到,這份指紋不完整,不要拿去比對,
+         2 = 給的路徑不是資料夾(參數本身給錯、或是根本沒給,也是 2;
+             在 python3 -O 底下跑 --selftest 也是 2 —— 見下面「安全網在哪」),
+       130 = 你自己按了 Ctrl-C。它只讀不寫,所以中途停掉什麼都不會少。
+
+── 安全網在哪 ───────────────────────────────────────
+  量指紋的那條路上只開檔案來讀,而且是唯讀的二進位模式('rb'):
+  沒有寫入、沒有刪除、沒有搬移,也不連網。
+  整支腳本裡唯一寫檔的地方在 selftest() 裡面,那是 --selftest 專用的:
+  它用 tempfile 在系統暫存資料夾造一份自己的假遊戲資料夾,測完自己刪掉。
+  --selftest 在 python3 -O 底下會直接拒跑(結束碼 2):那個旗標會把 assert
+  整段拿掉,而且不會傳給自我測試另開的那幾個程序,所以在 -O 底下看到的綠燈,
+  量的不是你這一次跑的條件。
+  你給的那個路徑,不管加什麼旗標都只會被讀。
+  錨點檔如果是符號連結會直接跳過不讀:它可能指到這個資料夾外面的東西,
+  把外面那個檔的雜湊印出來既沒有意義,也可能洩漏不相干的資訊。
+  這跟上面清單雜湊跳過所有符號連結是同一個理由。
+  它的用途正是「動手之前留下一份可以回頭比對的紀錄」,所以本身不動任何東西。
+
+── 做不到的事 ───────────────────────────────────────
+  · 清單雜湊看不出「內容改了而大小沒變」。那正是還要算錨點檔逐位元組雜湊的原因。
+  · 錨點雜湊只涵蓋那六個檔,其他檔一樣不一樣它不知道。要全部就得加 --all。
+  · 兩份指紋不一樣時,它自己不會告訴你差在哪一個檔。要找出那一個,
+    得兩邊都加 --all 各存一份輸出,再自己拿去比對。
+  · 印出來的錨點雜湊只有前 32 個十六進位字元(前 16 個位元組)。
+    那足夠拿來比對兩份安裝,不足以拿去做任何安全性主張。
+  · 遮蔽只管本站這一支印出來的東西。你自己在終端機裡打的那一行指令
+    仍然含完整路徑,截圖或複製整個視窗時會一起帶出去,那不是它擋得掉的。
+
+MIT License · Copyright (c) 2026 toni · 無外部相依,Python 3.7 以上
+"""
+
+import argparse
+import hashlib
+import os
+import sys
+
+# 錨點:挑「幾乎每一份都有、而且模組會動到」的檔。
+# 少一個不算錯,腳本會標「沒有這個檔」。
+ANCHORS = [
+    'mvp2005.exe',
+    'data/frontend/ingame.big',
+    'data/frontend/frontend.big',
+    'data/database/attrib.dat',
+    'data/fonts/fonts.big',
+    'data/models.big',
+]
+
+# 作業系統自己產生的檔。它們有沒有出現跟遊戲無關,
+# 算進去會讓兩份其實一模一樣的安裝算出不同的指紋。
+SKIP_NAMES = {'.DS_Store', 'Thumbs.db', 'desktop.ini'}
+
+# --selftest 的餌 6 會自己再開一個程序來驗「-O 底下要拒跑」。
+# 這個環境變數是那個子程序身上的記號,用途只有一個:別再往下開一層。
+# 平常跑的時候不會有人設它,所以對讀者完全沒有影響。
+NESTED_ENV = 'MVP_FINGERPRINT_NESTED_SELFTEST'
+
+
+def walk(root):
+    """回傳 (清單, 讀不到的路徑)。清單是 [(相對路徑, 大小), ...],已排序。
+
+    跳過三類東西:作業系統自己產生的垃圾檔、所有以點開頭的檔案與資料夾、
+    以及所有符號連結。這三類都不進雜湊,所以兩份只差在這些東西的資料夾,
+    算出來的指紋會完全相同。
+
+    第二個回傳值是「想看卻看不到」的路徑(權限不足,或是掃描途中檔案不見了)。
+    這種東西不可以默默丟掉:少算一個檔,清單雜湊就整個不一樣,
+    而這支腳本唯一的用途正是拿那個雜湊來比對。呼叫端負責把它印出來。
+
+    底下每一道處理都是為了同一件事:讓兩台不同的電腦掃同一份資料夾時,
+    產生的清單要逐字相同。差一個字,雜湊就完全不一樣,比對就失去意義。
+    """
+    out = []
+    bad = []
+
+    def note(err):
+        # os.walk 預設把「進不去這個資料夾」整個吞掉,連錯誤都不丟出來。
+        # 給了 onerror 才收得到 —— 否則整個子樹會無聲無息地從清單裡消失,
+        # 而畫面上算出來的雜湊看起來完全正常。
+        bad.append(getattr(err, 'filename', None) or str(err))
+
+    for d, dirs, fs in os.walk(root, onerror=note):
+        # 就地改寫 dirs 才會讓 os.walk 不要走進去,指派給別的名字沒有用。
+        dirs[:] = [x for x in dirs if not x.startswith('.')]
+        for f in fs:
+            if f in SKIP_NAMES or f.startswith('.'):
+                continue
+            p = os.path.join(d, f)
+            # 符號連結跳過:它指到的東西可能在這個資料夾外面,
+            # 而它自己的大小是連結的大小,拿來當內容的指紋沒有意義。
+            if os.path.islink(p):
+                continue
+            try:
+                # 把路徑分隔符統一成斜線。Windows 用反斜線,Mac 與 Linux 用斜線,
+                # 不統一的話同一份資料夾在兩台機器上會算出兩個不同的雜湊。
+                # 這一行是這支腳本能跨平台比對的關鍵。
+                out.append((os.path.relpath(p, root).replace(os.sep, '/'),
+                            os.path.getsize(p)))
+            except OSError:
+                # 讀不到大小(權限不足,或是掃描途中被刪掉、被搬走)就記下來,
+                # 最後一起講。斷掉的符號連結不會走到這裡,上面 islink 就擋掉了。
+                # 不可以靜靜跳過:那會算出一個看起來正常、其實少了東西的雜湊。
+                bad.append(p)
+    # 一定要排序:os.walk 走檔案的順序跟檔案系統有關,
+    # 不排序的話同一份資料夾在兩台機器上一樣會算出不同的雜湊。
+    out.sort()
+    bad.sort()
+    return out, bad
+
+
+def sha256_file(p, chunk=1 &lt;&lt; 20):
+    """逐位元組算一個檔的 SHA-256。1 &lt;&lt; 20 = 1048576,也就是一次讀 1 MB。"""
+    h = hashlib.sha256()
+    # 'rb' 是二進位唯讀模式。不能用文字模式:那會在 Windows 上
+    # 把 0x0D 0x0A 併成 0x0A,算出來的就不是檔案真正的內容了。
+    with open(p, 'rb') as f:
+        # 分塊讀是為了 models.big 這種上百 MB 的檔:
+        # 一次讀完要吃掉跟檔案一樣多的記憶體,分塊讀只佔 1 MB。
+        while True:
+            b = f.read(chunk)
+            if not b:
+                break
+            h.update(b)
+    return h.hexdigest()
+
+
+def show(p, root, full):
+    """把一個路徑變成「可以貼出來」的樣子:預設只留相對於 root 的那一段。
+
+    這支腳本的輸出本來就是要貼給別人比對的,而完整路徑常常含
+    Windows 使用者名稱、Mac 帳號名稱、外接碟的名字。那些跟指紋無關。
+
+    full=True(--show-full-paths)才原樣印出。
+    算不出相對路徑,或算出來會跑到 root 外面(以 .. 開頭、或 Windows 上
+    根本是另一顆磁碟機所以 relpath 直接丟 ValueError),就整個遮掉 ——
+    寧可少講,也不要在自己也不確定的情況下把一段路徑印出去。
+    os.walk 的 onerror 偶爾會給一段錯誤訊息而不是路徑,那種也走這一條。
+    """
+    if full:
+        return p
+    try:
+        rel = os.path.relpath(p, root)
+    except (ValueError, TypeError):
+        rel = None
+    if rel and not os.path.isabs(rel) and \
+            rel != os.pardir and not rel.startswith(os.pardir + os.sep):
+        return rel.replace(os.sep, '/')
+    return '(不在這個資料夾底下,已遮蔽;加 --show-full-paths 才會印出來)'
+
+
+def selftest():
+    """--selftest:自己造一份假的遊戲資料夾來測,完全不碰你的遊戲。
+
+    這支腳本唯讀,所以測的是另外兩件事:
+      · 遮蔽真的有遮到 —— 預設輸出裡不可以出現完整路徑
+      · 唯讀真的是唯讀 —— 跑完之後那份資料夾要一個位元組都沒變
+
+    十六道檢查,其中十二道是餌(故意做一件「防線壞掉就會被印出來」的事):
+      餌 1(1 道)把資料夾放在一層叫 ZZ_pretend_username 的路徑底下,
+            預設輸出裡出現那個字就是漏了。
+      餌 2(2 道)反向:加了 --show-full-paths 就**必須**印得出完整路徑,
+            資料夾那一行與讀不到的清單兩邊都要。少了這一組,
+            「整行根本沒印」或「遮蔽永遠生效」也會讓餌 1 通過。
+      餌 3(3 道)種一個讀不到的子資料夾,它的路徑同樣要被遮成相對路徑,
+            而且結束碼要是 1(不完整的指紋不可以看起來像正常的)。
+      餌 4(2 道)把錨點 mvp2005.exe 做成指到資料夾外面的符號連結,
+            外面那個檔的雜湊不可以出現在輸出裡。
+      餌 5(2 道)直接餵一個資料夾外面的路徑給 show(),它要整段遮掉;
+            加了旗標則要原樣印出來。這一條在正常的資料夾上碰不到,
+            所以只能這樣驗。
+      餌 6(2 道)在 python3 -O 底下跑一次 --selftest,它必須拒跑(結束碼 2)
+            而且說清楚為什麼。守門被拆掉的話,-O 那一次會一路綠燈跑完,
+            這兩道就會紅。(這一次本身就是上一層開的那個子程序時,
+            這一組會照實說是略過 —— 不然會一層開一層停不下來。)
+    另外四道是一般斷言:資料夾名稱有印出來(擋住餌 1 假通過)、
+    加旗標不會改到結束碼、遮蔽沒有動到清單雜湊本身、
+    跑完之後那份資料夾一個位元組都沒變。
+    做不出「讀不到的資料夾」的機器(以系統管理員身分跑、或 Windows)
+    會少掉餌 3 那一組 4 道,畫面上會照實說是略過,不會假裝測過。
+
+    測試自己是另開一個 Python 程序跑真的命令列,不是呼叫內部函式 ——
+    要驗的就是「讀者打那一行下去看到什麼」。
+    """
+    # -O 會把 assert 整段拿掉。這一支的判斷句不是用 assert 寫的(是下面那個
+    # need()),但守門照樣要有:-O 不會傳給自我測試另開的那幾個程序
+    # (這台機器上量過:父程序 sys.flags.optimize 是 1,子程序是 0),
+    # 所以 -O 底下跑出來的綠燈,量的不是讀者這一次跑的條件。
+    if sys.flags.optimize:
+        print('  --selftest 不能在 python3 -O 底下跑:-O 會把 assert 整段拿掉,'
+              '而且它不會傳給自我測試另開的那幾個程序 —— '
+              '量到的不是你這一次跑的條件,綠燈不算數。請拿掉 -O 再跑一次。')
+        return 2
+
+    import shutil
+    import subprocess
+    import tempfile
+
+    script = os.path.abspath(__file__)
+    if not os.path.isfile(script):
+        print('  自我測試要用到腳本檔本身,但找不到:%s' % script)
+        return 1
+
+    def cli(*extra):
+        """跑一次真的命令列,回傳 (結束碼, 畫面上的字)。"""
+        pr = subprocess.Popen([sys.executable, script] + list(extra),
+                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        raw = pr.communicate()[0]
+        return pr.returncode, raw.decode('utf-8', 'replace')
+
+    def cli_opt(*extra):
+        """同上,但加 -O 跑。專門用來驗「-O 底下要拒跑」那一道守門。
+
+        順手放一個環境變數告訴子程序「你是我開的,不要再往下開一層」。
+        守門正常的時候子程序第一行就停住了,根本用不到這個煞車;
+        它是給「哪天有人把守門拿掉」那種情況用的 —— 沒有它,
+        那一次會一層開一層停不下來。
+        """
+        child_env = dict(os.environ)
+        child_env[NESTED_ENV] = '1'
+        pr = subprocess.Popen([sys.executable, '-O', script] + list(extra),
+                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                              env=child_env)
+        raw = pr.communicate()[0]
+        return pr.returncode, raw.decode('utf-8', 'replace')
+
+    def snapshot(d):
+        """(相對路徑, 大小, 內容雜湊) 的清單,用來證明跑完什麼都沒變。"""
+        got, _bad = walk(d)
+        return [(rel, sz, sha256_file(os.path.join(d, rel)))
+                for rel, sz in got]
+
+    base = tempfile.mkdtemp(prefix='mvp_fingerprint_selftest_')
+    canary = 'ZZ_pretend_username'          # 餌 1:假裝這是使用者名稱那一層
+    locked = None
+    try:
+        root = os.path.join(base, canary, 'MVP Baseball 2005')
+        os.makedirs(os.path.join(root, 'data', 'database'))
+        with open(os.path.join(root, 'data', 'database', 'attrib.dat'), 'wb') as f:
+            f.write(b'attrib' * 8)
+
+        # 餌 4:資料夾外面的一個檔,拿錨點的檔名做成符號連結指過去。
+        outside = os.path.join(base, 'outside_not_the_game.bin')
+        with open(outside, 'wb') as f:
+            f.write(b'this file is outside the game folder' * 4)
+        secret = sha256_file(outside)[:32]
+        os.symlink(outside, os.path.join(root, 'mvp2005.exe'))
+
+        # 餌 3:一個進不去的子資料夾。有些系統(以系統管理員身分跑、
+        # 或是 Windows)做不出這種東西,那一道就照實說「這台機器上做不出來」,
+        # 不要假裝測過。
+        locked = os.path.join(root, 'data', 'locked')
+        os.makedirs(locked)
+        with open(os.path.join(locked, 'inside.bin'), 'wb') as f:
+            f.write(b'x' * 4)
+        os.chmod(locked, 0)
+        try:
+            os.listdir(locked)
+            blocked = False
+        except OSError:
+            blocked = True
+
+        before = snapshot(root)
+
+        rc, out = cli(root)
+        rc_full, out_full = cli(root, '--show-full-paths')
+
+        fails = []
+        skips = []
+        done = [0, 0]        # [總道數, 其中是餌的道數]
+
+        def need(ok, why, bait=True):
+            """記一道檢查。ok 是假的就把理由收起來,最後一起印。
+
+            bait=True 代表這一道是「防線壞掉就會亮」的餌;
+            bait=False 是一般斷言(用來擋住餌自己失效而沒人發現)。
+            """
+            done[0] += 1
+            if bait:
+                done[1] += 1
+            if not ok:
+                fails.append(why)
+
+        # 餌 1:完整路徑不可以出現在預設輸出裡
+        need(canary not in out and base not in out,
+             '餌 1:預設輸出裡出現了完整路徑')
+        # 資料夾名稱要印得出來 —— 不然餌 1 會因為「整行根本沒印」而假通過
+        need('MVP Baseball 2005' in out,
+             '預設輸出裡連資料夾名稱都沒有', bait=False)
+        # 餌 2(反向):加了旗標就**必須**印得出完整路徑,兩個地方都要。
+        # 只看「資料夾」那一行,不要拿整段輸出去比對(理由見 _line)。
+        need((_line(out_full, '資料夾') or '').find(os.path.abspath(root)) &gt;= 0,
+             '餌 2:加了 --show-full-paths 還是印不出資料夾的完整路徑')
+        # 餌 3:讀不到的項目也要遮蔽,而且結束碼要是 1
+        if blocked:
+            need('data/locked' in out, '餌 3:讀不到的項目沒有印出相對路徑')
+            need(canary not in out, '餌 3:讀不到的項目把完整路徑漏出去了')
+            need(rc == 1, '餌 3:有東西讀不到,結束碼卻是 %s(應該是 1)' % rc)
+            need((_line(out_full, 'locked') or '')
+                 .find(os.path.abspath(locked)) &gt;= 0,
+                 '餌 2:加了 --show-full-paths,讀不到的項目還是被遮著')
+        else:
+            skips.append('餌 3 那一組 4 道(這台機器做不出「讀不到的資料夾」)')
+        # 餌 4:符號連結錨點要跳過,外面那個檔的雜湊不可以出現
+        need('是符號連結' in out, '餌 4:符號連結錨點沒有被標成跳過')
+        need(secret not in out, '餌 4:把資料夾外面那個檔的雜湊印出來了')
+        # 餌 5:資料夾外面的路徑要整段遮掉,不是印出來。
+        # 這一條在正常的資料夾上碰不到(所以上面那幾道測不到它),
+        # 直接餵一個外面的路徑給 show() 才驗得到。
+        outsider = os.path.abspath(os.path.join(base, 'not_under_root'))
+        need(os.path.abspath(root) not in show(outsider, root, False)
+             and outsider not in show(outsider, root, False),
+             '餌 5:資料夾外面的路徑沒有被遮掉')
+        need(show(outsider, root, True) == outsider,
+             '餌 5 反向:加了 --show-full-paths,外面的路徑也該原樣印出來')
+        # 餌 6:在 python3 -O 底下跑 --selftest 要拒跑。守門拆掉的話
+        # 那一次會一路綠燈跑完(結束碼 0),這兩道就會紅。
+        if os.environ.get(NESTED_ENV):
+            skips.append('餌 6 那一組 2 道(這一次是上一層開的,不再往下開)')
+        else:
+            rc_opt, out_opt = cli_opt('--selftest')
+            need(rc_opt == 2,
+                 '餌 6:python3 -O 底下跑 --selftest,結束碼是 %s'
+                 '(應該是 2,要拒跑)' % rc_opt)
+            need('-O' in out_opt,
+                 '餌 6:python3 -O 底下拒跑了,卻沒有說清楚為什麼')
+        # 遮蔽只動顯示,不可以動到結束碼,也不可以動到算出來的值
+        need(rc == rc_full,
+             '加了 --show-full-paths 之後結束碼變了', bait=False)
+        need(_line(out, '清單雜湊') is not None
+             and _line(out, '清單雜湊') == _line(out_full, '清單雜湊'),
+             '遮蔽改到了清單雜湊本身', bait=False)
+        # 唯讀:跑完之後那份資料夾一個位元組都沒變
+        need(snapshot(root) == before,
+             '跑完之後資料夾的內容變了 —— 它應該只讀不寫', bait=False)
+
+        for line in fails:
+            print('  ❌ %s' % line)
+        for line in skips:
+            print('  ⚠️ 略過 %s' % line)
+        if fails:
+            print('自我測試:%d 道沒過(共 %d 道)' % (len(fails), done[0]))
+            return 1
+        print('自我測試:全部通過(%d 道檢查,其中 %d 道是餌%s)'
+              % (done[0], done[1],
+                 '' if not skips else ';另有 %d 組在這台機器上做不出來,'
+                 '上面標了' % len(skips)))
+        return 0
+    finally:
+        # 收尾:先把權限改回來,不然自己造的那個資料夾刪不掉。
+        if locked and os.path.isdir(locked):
+            try:
+                os.chmod(locked, 0o700)
+            except OSError:
+                pass
+        shutil.rmtree(base, ignore_errors=True)
+
+
+def _line(out, key):
+    """從輸出裡撈含某個字的第一行。自我測試專用。
+
+    要一整行、不能用整段輸出去搜:2026-09-05 這一支就被這件事騙過 ——
+    「資料夾那一行印了完整路徑嗎」拿整段輸出去比對,
+    結果比中的是下面「讀不到的清單」裡那個更長的路徑,
+    防線已經被拆掉了,測試還是綠的。
+    """
+    for line in out.splitlines():
+        if key in line:
+            return line.strip()
+    return None
+
+
+def main():
+    """算完指紋印出來:資料夾摘要、清單雜湊、錨點雜湊,以及選配的逐檔清單。"""
+    ap = argparse.ArgumentParser(
+        description='幫一份遊戲資料夾算指紋,用來確認大家量的是同一份',
+        epilog='量指紋時只讀不寫;--selftest 只在系統暫存資料夾造自己的假資料。')
+    ap.add_argument('path', nargs='?', help='要量的資料夾')
+    ap.add_argument('--all', action='store_true',
+                    help='每個檔都算 SHA-256（很慢,通常不需要）')
+    ap.add_argument('--show-full-paths', action='store_true',
+                    help='連完整路徑一起印（預設只印資料夾名稱與相對路徑）')
+    ap.add_argument('--selftest', action='store_true',
+                    help='自我測試（不需要遊戲資料夾,不會碰到你的檔案）')
+    args = ap.parse_args()
+
+    if args.selftest:
+        return selftest()
+
+    root = args.path
+    if root is None:
+        # 少給路徑跟給錯路徑一樣算「參數有錯」,argparse 自己也是用 2。
+        ap.error('請給一個資料夾路徑（或用 --selftest 自我測試）')
+    if not os.path.isdir(root):
+        # 這裡回 2 不是 1:argparse 自己在參數有錯時用的也是 2,
+        # 這樣「參數給錯了」跟「跑完但結果不如預期」在批次檔裡分得開。
+        print('\n  找不到資料夾:%s\n' % root)
+        return 2
+
+    files, unreadable = walk(root)
+    total = sum(sz for _, sz in files)
+
+    # 清單雜湊:每個檔一行「相對路徑 空格 大小」,用換行接成一整串,再算一次 SHA-256。
+    # 只看結構與大小,完全不讀內容,所以幾 GB 的資料夾也只要幾秒。
+    # 多一個檔、少一個檔、任何一個檔的大小變了,這個值就整個不一樣;
+    # 但「內容改了而大小剛好沒變」它看不出來,那要靠底下的錨點雜湊。
+    # 編碼明寫 UTF-8:中文檔名要先轉成位元組才算得了雜湊,
+    # 寫出來是為了讓讀的人不必去查預設值是什麼。
+    lines = ('%s %d' % (rel, sz) for rel, sz in files)
+    manifest = hashlib.sha256('\n'.join(lines).encode('utf-8')).hexdigest()
+
+    print()
+    if args.show_full_paths:
+        print('  資料夾   %s' % os.path.abspath(root))
+    else:
+        # 完整路徑裡常常有帳號名稱,而這份輸出的用途正是貼給別人看。
+        # 只印最後一層:比對指紋用不到上面那幾層。
+        full_root = os.path.abspath(root)
+        print('  資料夾   %s' % (os.path.basename(full_root) or full_root))
+        print('           ↑ 只印名稱。完整路徑可能含你的帳號名稱,'
+              '要的話加 --show-full-paths。')
+    print('  檔數     %s' % '{:,}'.format(len(files)))
+    # 1073741824 = 1024 的三次方。這裡的 GB 是 2 的次方那一種,
+    # 不是 10 的九次方那一種,兩種算出來的數字不一樣。
+    print('  總大小   %s bytes（%.2f GB）' % ('{:,}'.format(total), total / 1073741824.0))
+    print('  清單雜湊 %s' % manifest)
+    print('           ↑ 路徑與大小排序後的 SHA-256。一樣 = 結構與大小完全相同。')
+    if unreadable:
+        # 這一段是整支腳本最重要的安全網。讀不到的東西沒有進上面那個雜湊,
+        # 所以算出來的值跟「全部都讀得到」時不會一樣 —— 而它看起來完全正常。
+        # 不印出來的話,讀者會把權限問題誤判成「我裝了模組」。
+        print()
+        print('  ⚠️ 有 %s 個檔案或資料夾讀不到(多半是權限不足):'
+              % '{:,}'.format(len(unreadable)))
+        for p in unreadable[:10]:
+            print('       %s' % show(p, root, args.show_full_paths))
+        if len(unreadable) &gt; 10:
+            print('       ...(還有 %s 個沒列出來)'
+                  % '{:,}'.format(len(unreadable) - 10))
+        print('     它們沒有算進上面的清單雜湊。這份指紋是不完整的,不要拿去比對。')
+    print()
+    print('  錨點檔的 SHA-256:')
+    found = 0
+    for rel in ANCHORS:
+        # ANCHORS 裡一律寫斜線。這裡拆開再用本機的分隔符接回去,
+        # 同一份清單在 Windows 上才找得到檔。
+        p = os.path.join(root, *rel.split('/'))
+        # 符號連結直接跳過,理由跟 walk() 裡那一段一樣:它可能指到這個
+        # 資料夾外面,把外面那個檔的雜湊印出來既不是這份安裝的指紋,
+        # 也等於把不相干的東西寫進一份要貼出來的輸出裡。
+        # 要用 islink 不能用 exists:斷掉的符號連結 exists 是 False。
+        if os.path.islink(p):
+            print('    %-30s（是符號連結,跳過）' % rel)
+            continue
+        if not os.path.isfile(p):
+            # 少一個錨點不算錯,照樣往下跑:有人只裝了部分內容,那也是一種指紋。
+            print('    %-30s（沒有這個檔）' % rel)
+            continue
+        try:
+            # 只印前 32 個十六進位字元(等於前 16 個位元組)。
+            # 拿來比對兩份安裝夠用,而且一行放得下。
+            digest = sha256_file(p)[:32]
+            size = os.path.getsize(p)
+        except OSError:
+            # 檔在,但打不開(權限不足、外接碟中途拔掉)。沒攔的話這裡會丟出
+            # 一整段 Python 錯誤訊息就結束 —— 對這一站的讀者來說那太嚇人了。
+            print('    %-30s（讀不到,跳過）' % rel)
+            unreadable.append(p)
+            continue
+        print('    %-30s %s  %s bytes' % (rel, digest, '{:,}'.format(size)))
+        found += 1
+    # 六個全都沒找到,幾乎一定是路徑指錯層(最常見的是已經指進 data 裡面了)。
+    # 這種時候上面那個清單雜湊算出來仍然是有效的,但它量的不是一份遊戲安裝。
+    if not found:
+        print('    一個錨點都沒找到 —— 路徑是不是指錯了?'
+              '要指到「裡面有 data 資料夾」的那一層。')
+    print()
+
+    # --all 會把每個檔都完整讀過一遍,幾 GB 的資料夾要跑很久,所以預設不做。
+    # 它的用途是:兩台機器各存一份輸出,自己拿去逐行比對,找出差在哪一個檔。
+    if args.all:
+        print('  逐檔 SHA-256（%s 個）:' % '{:,}'.format(len(files)))
+        for rel, sz in files:
+            # rel 已經是斜線形式,而 Windows 的 os.path.join 也吃斜線,直接接得起來。
+            p = os.path.join(root, rel)
+            try:
+                # 前 16 碼夠用來逐行掃過去,找出不一樣的那一列。
+                digest = sha256_file(p)[:16]
+            except OSError:
+                # 走到這裡代表「大小讀得到、內容讀不到」。原本沒攔,整支腳本
+                # 會在半截的清單上中斷,而前面已經印出來的部分看起來是好的。
+                print('    %-16s  %-11s %s  （讀不到,跳過）' % ('-' * 16, sz, rel))
+                unreadable.append(p)
+                continue
+            print('    %s  %-11s %s' % (digest, sz, rel))
+        print()
+
+    if unreadable:
+        # 有東西讀不到 = 這份指紋不完整。結束碼跟「順利跑完」分開,
+        # 批次檔跟後面的步驟才有辦法發現這件事,而不是拿一個錯的雜湊去比對。
+        return 1
+    return 0
+
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        # 中途按 Ctrl-C。這支從頭到尾只開檔案來讀,所以這句話是說得死的:
+        # 什麼都沒有動到。但還是要印出來 —— 不然畫面上只會留下一整段
+        # Python 的錯誤訊息,對這一站的讀者來說那看起來像「我把東西弄壞了」。
+        # 結束碼 130 是慣例(128 加上 SIGINT 的 2),跟「順利跑完」分得開。
+        print('\n  中斷了。這支只讀不寫,你的檔案一個位元組都沒有動到。')
+        sys.exit(130)
+
+
+# ─────────────────────────────────────────────────────────
+#  MIT License
+#
+#  Copyright (c) 2026 toni
+#
+#  Permission is hereby granted, free of charge, to any person obtaining a copy
+#  of this software and associated documentation files (the "Software"), to deal
+#  in the Software without restriction, including without limitation the rights
+#  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#  copies of the Software, and to permit persons to whom the Software is
+#  furnished to do so, subject to the following conditions:
+#
+#  The above copyright notice and this permission notice shall be included in
+#  all copies or substantial portions of the Software.
+#
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#  THE SOFTWARE.
+# ─────────────────────────────────────────────────────────
+</pre>
+  </details>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 本站每個數字都寫「量到的」，這一頁補上那句話的前提，給出量測對象的指紋、名詞的精確定義、以及讓你自己重跑一次的零相依腳本，讓讀者除了信與不信之外有第三條路。</li>
+    <li><strong>指紋怎麼算</strong> 把資料夾裡每個檔的「相對路徑加大小」排序後接成一整串，算一次 SHA-256，這叫清單雜湊。它一樣就代表檔案結構與大小完全相同；因為不讀內容，幾 GB 也只要幾秒。</li>
+    <li><strong>量測對象的數字</strong> 英文版原版 1,191 個檔、1,428,284,982 bytes；官方繁體中文版原版 2,389 個檔、1,441,798,039 bytes；中文版套完三個官方更新檔那一份 2,393 個檔、1,466,715,410 bytes；<code>PK</code> 版 2,400 個檔、2,370,358,703 bytes；本站測試機 4,987 個檔、7,049,143,869 bytes（6.56 GB）。</li>
+    <li><strong>中英文版的介面與名單是同一份檔</strong> <code>ingame.big</code>、<code>frontend.big</code>、<code>attrib.dat</code> 三個錨點逐位元組相同，差異只在執行檔、字型與模型包。<code>models.big</code> 最有意思：大小一模一樣 172,992,803，內容卻不同。</li>
+    <li><strong>一行就結案的一件事</strong> 四包球場裡，「剛安裝好的原版」與二十年前標「不超過 10MB」的安全包，清單雜湊完全相同（都是 88 個檔、296,846,196 bytes）。那包所謂的安全包根本就是原廠檔，這件事原本要靠 87 個檔逐一比對雜湊才證得出來。</li>
+    <li><strong>踩過的坑幾乎都不是算錯，是定義不同</strong> 同一個 <code>ingame.big</code>，孤兒資料換一種算法就從 0.04%（71 bytes）變成 0.88%（1,471 bytes），差 21 倍；同一個檔名在不同模組包裡數字可以差 2,200 倍。所以本頁把孤兒資料、每像素位元組、字型解開後總量、球場大小這四個詞的算式寫死。</li>
+    <li><strong>你自己量得到</strong> <code>mvp_fingerprint.py</code> 零外部套件、Python 3.7 以上、<u>量指紋那條路上沒有任何寫檔呼叫</u>（整支唯一的三處都在 <code>--selftest</code> 裡，寫的是系統暫存資料夾裡的假資料），原始碼整份貼在頁面上。量測環境是 macOS 26.5.2、Python 3.9.6，遊戲則在 Wine（<code>wine-8.0.1 (CrossOverFOSS 23.7.1)</code>）與 Windows 兩邊都實測過。要先裝五個套件才能重現的量測，等於不能重現。</li>
+    <li><strong>本站沒驗的</strong> 量不到執行時的記憶體用量（凡是講「遊戲跑起來會怎樣」的都是從程式碼推的）、量不到「遊戲讀不讀得動」、量不到別人機器上的行為，也量不到已經關站的那些論壇。測試機那份指紋是<u>活的</u>會一直變，只有那四份沒有疊過模組的安裝與四包球場是穩定基準；英文版那 1,191 個檔裡有一個日期是 2015 年的 <code>filelist.txt</code>，站上 1,191 與 1,190 兩個數字都出現過，差別在算不算它。</li>
+  </ul>
+
+  <footer>
+    <p>本頁的指紋全部是用
+       <a href="mvp_fingerprint.py" download>mvp_fingerprint.py</a>
+       產生的（前兩份原版、測試機與四包球場是 2026-08-29，
+       中文版套完更新檔與 <code>PK</code> 版那兩份是 2026-09-05 補量）。
+       <u>測試機那一份會隨時間改變</u>，
+       剛安裝好的原版與四包球場的指紋則是穩定的。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

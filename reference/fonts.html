@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/fonts.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>字型檔 .ffn — toni的MVP模組補習班</title>
+<meta name="description" content="遊戲的 12 個點陣字型:兩種檔頭代號、四個內容完全相同的檔案,以及一個把「孤兒資料是怎麼產生的」完整證明出來的例子。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 字型檔 .ffn</p>
+  <h1>字型檔 .ffn</h1>
+  <p class="lede">遊戲畫面上的每一個字都來自 <code>data/fonts/fonts.big</code> 裡的 12 個點陣字型。
+     這頁除了講格式，還會用這個檔<strong>把「孤兒資料到底怎麼產生的」完整證明一次</strong> ——
+     它剛好留下了一組算得清清楚楚的證據。</p>
+
+  <div class="card clay">
+    <p class="card-h">這一份被改過</p>
+    <p>本站測試機的 <code>fonts.big</code> 檔案日期是 <strong>2022 年 11 月</strong>，
+       不是 2005 年的原廠狀態（判斷方法見<a href="models.html">模型那頁</a>）。</p>
+    <p>所以這頁描述的是<strong>「這個檔案現在長什麼樣」</strong>。
+       這反而讓它成為很好的教材 —— 因為改動的痕跡都還在裡面。</p>
+  </div>
+
+  <h2>先看規模</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>項目</th><th class="num">數字</th><th>備註</th></tr></thead>
+    <tbody>
+      <tr><td data-label="項目">檔案大小</td><td data-label="數字" class="num">397,327 bytes</td><td data-label="備註">388 KB。以封裝檔來說算小的，但不是最小</td></tr>
+      <tr><td data-label="項目">字型數</td><td data-label="數字" class="num">12 個</td><td data-label="備註">全部是 <code>.ffn</code></td></tr>
+      <tr class="hi"><td data-label="項目">目錄涵蓋率</td><td data-label="數字" class="num">37.0%</td>
+          <td data-label="備註">剩下 250,411 bytes 沒被指向 —— <strong>這頁後半會解釋那是什麼</strong></td></tr>
+      <tr><td data-label="項目">解壓後合計</td><td data-label="數字" class="num">777,520 bytes</td><td data-label="備註">759 KB</td></tr>
+      <tr class="hi"><td data-label="項目">不重複的內容</td><td data-label="數字" class="num">9 種</td><td data-label="備註"><strong>12 個檔只有 9 種內容</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">上面每個數字都是把 <code>fonts.big</code> 現場解開數出來的，不是引用他人資料。</p>
+
+  <h2>兩種檔頭代號，大小寫不一樣</h2>
+  <p>把 12 個字型解開後看開頭四個位元組，只有兩種：</p>
+<pre><code>46 4E 54 46   =  FNTF
+46 6E 74 46   =  FntF      <span class="cm">← 中間兩個字母是小寫</span></code></pre>
+  <div class="card grass">
+    <p class="card-h">大小寫跟「有沒有壓縮」完全對應</p>
+    <div class="tablewrap" style="margin-top:10px"><table class="stack">
+      <thead><tr><th class="mono">代號</th><th class="num">檔數</th><th>外層是否 QFS 壓縮</th></tr></thead>
+      <tbody>
+        <tr><td data-label="代號" class="mono">FNTF</td><td data-label="檔數" class="num">5</td><td data-label="外層是否 QFS 壓縮"><strong>全部沒壓縮</strong></td></tr>
+        <tr class="hi"><td data-label="代號" class="mono">FntF</td><td data-label="檔數" class="num">7</td><td data-label="外層是否 QFS 壓縮"><strong>全部有壓縮</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p style="margin-top:10px"><strong>12 個檔零例外。</strong>
+       所以看到 <code>FntF</code> 就知道它外面包了一層 QFS，看到 <code>FNTF</code> 就是直接讀。</p>
+  </div>
+  <p>檔頭第 9-10 個位元組也跟著分群：<code>FntF</code> 那七個<strong>全部是 414</strong>，
+     <code>FNTF</code> 那五個是 317 到 366 之間。
+     <span class="badge wip">推測</span> 看起來像是格式版本號，但本站沒有證實。</p>
+
+  <h2>檔頭自己寫著檔案多大</h2>
+  <p>第 5 到 8 個位元組是一個數字，跟解開後的實際長度比對：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">字型</th><th class="mono">代號</th><th class="num">解壓後大小</th><th class="num">檔頭宣告</th><th>結果</th></tr></thead>
+    <tbody>
+      <tr><td data-label="字型" class="mono">Tw24_en.ffn</td><td data-label="代號" class="mono">FNTF</td><td data-label="解壓後大小" class="num">4,048</td><td data-label="檔頭宣告" class="num">4,048</td><td data-label="結果"><span class="badge ok">相符</span></td></tr>
+      <tr><td data-label="字型" class="mono">frk12_en.ffn</td><td data-label="代號" class="mono">FNTF</td><td data-label="解壓後大小" class="num">17,104</td><td data-label="檔頭宣告" class="num">17,104</td><td data-label="結果"><span class="badge ok">相符</span></td></tr>
+      <tr><td data-label="字型" class="mono">au20b_en.ffn</td><td data-label="代號" class="mono">FNTF</td><td data-label="解壓後大小" class="num">18,000</td><td data-label="檔頭宣告" class="num">18,000</td><td data-label="結果"><span class="badge ok">相符</span></td></tr>
+      <tr><td data-label="字型" class="mono">twcnb_en.ffn</td><td data-label="代號" class="mono">FNTF</td><td data-label="解壓後大小" class="num">14,928</td><td data-label="檔頭宣告" class="num">14,928</td><td data-label="結果"><span class="badge ok">相符</span></td></tr>
+      <tr class="hi"><td data-label="字型" class="mono">hrdbg_en.ffn</td><td data-label="代號" class="mono">FntF</td><td data-label="解壓後大小" class="num">72,544</td><td data-label="檔頭宣告" class="num">72,544</td><td data-label="結果"><span class="badge ok">相符</span></td></tr>
+      <tr><td data-label="字型" class="mono">mini1_en.ffn</td><td data-label="代號" class="mono">FntF</td><td data-label="解壓後大小" class="num">133,216</td><td data-label="檔頭宣告" class="num">133,216</td><td data-label="結果"><span class="badge ok">相符</span></td></tr>
+      <tr><td data-label="字型" class="mono">mini2_en.ffn</td><td data-label="代號" class="mono">FntF</td><td data-label="解壓後大小" class="num">264,288</td><td data-label="檔頭宣告" class="num">264,288</td><td data-label="結果"><span class="badge ok">相符</span></td></tr>
+      <tr><td data-label="字型" class="mono">twc14 / 16 / 18</td><td data-label="代號" class="mono">FntF</td><td data-label="解壓後大小" class="num">各 72,544</td><td data-label="檔頭宣告" class="num">各 72,544</td><td data-label="結果"><span class="badge ok">相符</span></td></tr>
+      <tr><td data-label="字型" class="mono">dflt_en.ffn</td><td data-label="代號" class="mono">FNTF</td><td data-label="解壓後大小" class="num">14,608</td><td data-label="檔頭宣告" class="num">13,520</td><td data-label="結果"><span class="badge wip">差 1,088</span></td></tr>
+      <tr><td data-label="字型" class="mono">twn14_en.ffn</td><td data-label="代號" class="mono">FntF</td><td data-label="解壓後大小" class="num">21,152</td><td data-label="檔頭宣告" class="num">20,064</td><td data-label="結果"><span class="badge wip">差 1,088</span></td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>12 個裡有 10 個完全相符。</strong>剩下兩個各多出 <strong>1,088 個位元組</strong> ——
+     <span class="badge wip">部分已解</span> 兩個差距一模一樣，不像隨機出錯。本站後來把那 1,088 個位元組打開看，得到三件事：</p>
+    <div class="tablewrap" style="margin:8px 0"><table>
+      <tbody>
+        <tr><td>它<strong>不是填充</strong></td>
+            <td>開頭是 <code>ff ff ff 04</code>、<code>ff ff ff 05</code>、<code>ff ff ff 06</code>…
+                這種<u>規律遞增的結構</u>，不是一片 0</td></tr>
+        <tr class="hi"><td>其中一個帶著標記</td>
+            <td class="mono"><strong>EAGL64</strong><br>
+                <span class="small">EAGL 是 EA 的圖形函式庫，
+                <a href="anims.html">動畫那頁</a>也出現過</span></td></tr>
+        <tr class="hi"><td>兩個尾巴<strong>不一樣</strong></td>
+            <td>逐位元組比對 <strong>90.8% 不同</strong> ——
+                所以不是同一塊資料被複製兩份</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>還是不知道它是什麼</strong>，但至少知道它<u>不是垃圾</u>：
+       是兩塊各自不同、有結構的資料，接在宣告的長度後面。
+       <span class="badge wip">仍未解</span></p>
+  <p class="small">跟 <a href="portrait.html">FSH 圖片</a>與<a href="audio.html">音訊索引</a>一樣，
+     這是又一個「格式自己帶著驗算方法」的例子。</p>
+
+  <h2>12 個檔，只有 9 種內容</h2>
+  <div class="card amber">
+    <p class="card-h">四個檔的內容完全相同</p>
+<pre style="margin:8px 0"><code>hrdbg_en.ffn
+twc14_en.ffn      ← 這四個解開後
+twc16_en.ffn         位元組完全一樣
+twc18_en.ffn</code></pre>
+    <p>都是 72,544 bytes，內容一個位元組不差。
+       名字看起來是 14、16、18 三種不同字級，實際上裝的是同一份東西。</p>
+    <p><span class="badge wip">推測</span> 這是替換字型時常見的做法：
+       為了讓所有地方都顯示同一套字，把同一個字型檔複製到好幾個名字上。
+       但本站無法確認是誰、什麼時候做的。</p>
+  </div>
+
+  <h2 id="orphan">孤兒資料是怎麼產生的：一個算得清楚的例子</h2>
+  <p>前面說這個檔有 <strong>250,411 bytes</strong> 沒被目錄指向。
+     其中有三段<strong>大小完全相同</strong>：</p>
+<pre><code>[189,700 → 252,239)   62,539 bytes
+[262,244 → 324,783)   62,539 bytes
+[334,788 → 397,327)   62,539 bytes</code></pre>
+  <p>三段一模一樣大，這不會是巧合。看看它們前面各接著什麼：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">目錄指向的項目</th><th class="num">佔用</th><th class="num">後面接著的空隙</th><th class="num">兩者相加</th></tr></thead>
+    <tbody>
+      <tr><td data-label="目錄指向的項目" class="mono">twc14_en.ffn</td><td data-label="佔用" class="num">10,005</td><td data-label="後面接著的空隙" class="num">62,539</td><td data-label="兩者相加" class="num">72,544</td></tr>
+      <tr><td data-label="目錄指向的項目" class="mono">twc16_en.ffn</td><td data-label="佔用" class="num">10,005</td><td data-label="後面接著的空隙" class="num">62,539</td><td data-label="兩者相加" class="num">72,544</td></tr>
+      <tr><td data-label="目錄指向的項目" class="mono">twc18_en.ffn</td><td data-label="佔用" class="num">10,005</td><td data-label="後面接著的空隙" class="num">62,539</td><td data-label="兩者相加" class="num">72,544</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>72,544 正好是這三個字型解壓後的大小。</strong></p>
+
+  <div class="card grass">
+    <p class="card-h">決定性的一步</p>
+    <p>如果推論成立 ——「原本這裡放的是未壓縮的 72,544 bytes，
+       後來被壓縮成 10,005 bytes 蓋在前面」—— 那麼<strong>那段空隙應該恰好等於
+       解壓後資料的第 10,005 個位元組之後的部分</strong>。</p>
+    <p>本站直接比對：<strong>三段全部逐位元組相同，62,539 bytes 一個不差。</strong></p>
+  </div>
+
+  <p>所以整件事的經過是這樣：</p>
+<pre><code>原本            [────────── 未壓縮字型 72,544 bytes ──────────]
+
+改過之後        [壓縮版 10,005][──── 原本資料的後半段 62,539 bytes ────]
+                 ↑
+                 目錄現在只指到這裡,後面那段沒人認領</code></pre>
+
+  <div class="card blue">
+    <p class="card-h">這就是「孤兒資料」的真面目</p>
+    <p>不是垃圾，也不是損壞。<strong>是舊資料沒被覆蓋掉的那一部分。</strong></p>
+    <p>改檔的人把新版本寫進原本的位置、更新目錄的長度，
+       但<strong>沒有（也不需要）把後面清乾淨</strong>。
+       檔案於是一層一層留下痕跡。</p>
+    <p>比賽介面檔 <code>ingame.big</code> 也有同樣的現象，規模更大 ——
+       <u>本站測試機那一份</u>有 92.6% 是這種資料（剛安裝好的原版只有 0.04%），故事見
+       <a href="../story/orphan-data/index.html">一個檔案裡的地層</a>。</p>
+  </div>
+
+  <h2 id="chinese">中文字型走的是「日文」那個槽位</h2>
+  <p>原版 12 個字型的檔名<u>全部</u>以 <code>_en</code> 結尾。
+     本站另外打開一份 2023 年的中文懶人包，同一個封裝檔長這樣：</p>
+  <p class="small">⚠️ <strong>這張表跟上面那張不要直接對數字</strong>，兩件事都不一樣：
+     上面那張量的是<u>本站測試機那份 2022 年被改過的 <code>fonts.big</code></u>，欄位是<strong>解壓後大小</strong>；
+     這張量的是<u>剛安裝好的原版</u>與中文包，欄位是<strong>封裝檔內佔用</strong>。
+     所以同一個檔名在兩張表會出現兩個數字（<code>Tw24_en.ffn</code> 上面 4,048、這裡 5,751；
+     <code>au20b_en.ffn</code> 上面 18,000、這裡 57,617）——
+     <u>差的不只是口徑，連檔案本身都被換過了</u>，那正是本頁開頭「這一份被改過」在講的事。
+     同理，〈先看規模〉那個「解壓後合計 777,520」也是測試機那份，跟這一節的 204,523 不同口徑。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">原版</th><th class="num">封裝檔內佔用</th>
+               <th class="mono">中文包</th><th class="num">封裝檔內佔用</th><th class="num">倍數</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="原版" class="mono">twcnb_en.ffn</td><td data-label="封裝檔內佔用" class="num">14,525</td>
+          <td data-label="中文包" class="mono">twcnb_<strong>jp</strong>.ffn</td><td data-label="封裝檔內佔用" class="num">180,079</td><td data-label="倍數" class="num">12×</td></tr>
+      <tr class="hi"><td data-label="原版" class="mono">au20b_en.ffn</td><td data-label="封裝檔內佔用" class="num">57,617</td>
+          <td data-label="中文包" class="mono">au20b_<strong>jp</strong>.ffn</td><td data-label="封裝檔內佔用" class="num">304,485</td><td data-label="倍數" class="num">5×</td></tr>
+      <tr><td data-label="原版" class="mono">Tw24_en.ffn</td><td data-label="封裝檔內佔用" class="num">5,751</td>
+          <td data-label="中文包" class="mono">Tw24_<strong>jp</strong>.ffn</td><td data-label="封裝檔內佔用" class="num">140,882</td><td data-label="倍數" class="num">24×</td></tr>
+      <tr><td data-label="原版" class="mono">frk12_en.ffn</td><td data-label="封裝檔內佔用" class="num">27,618</td>
+          <td data-label="中文包" class="mono">frk12_<strong>jp</strong>.ffn</td><td data-label="封裝檔內佔用" class="num">140,882</td><td data-label="倍數" class="num">5×</td></tr>
+      <tr class="lo"><td data-label="原版" class="mono">dflt_en.ffn</td><td data-label="封裝檔內佔用" class="num">5,815</td>
+          <td data-label="中文包" class="mono">dflt_en.ffn（沒改，而且<u>另外多一個</u> <code>dflt_jp.ffn</code>）</td>
+          <td data-label="封裝檔內佔用" class="num">5,815</td><td data-label="倍數" class="num">1×</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tablewrap"><table>
+    <tbody>
+      <tr><td>原版</td><td class="num">12 個字型</td><td class="num">204,523 bytes</td><td>全部 <code>_en</code></td></tr>
+      <tr class="hi"><td>中文包</td><td class="num"><strong>13 個</strong></td><td class="num"><strong>1,683,191 bytes</strong></td>
+          <td>12 個 <code>_jp</code> ＋ 留著原本的 <code>dflt_en</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card grass">
+    <p class="card-h">這跟另一頁的發現是同一招</p>
+    <p><a href="official-chinese.html">EA 官方繁體中文版</a>那一頁量到：
+       官方的中文<u>不是覆蓋英文</u>，而是<strong>放進日文的槽位</strong>
+       （<code>IGJPN.LOC</code>／<code>FEJPN.LOC</code>）。</p>
+    <p>字型這裡是<u>一模一樣的做法</u>：中文字型檔名結尾是 <code>jp</code>。
+       <strong>兩件事互相印證 —— 這個遊戲要顯示中文，走的是它原本給日文的那條路。</strong></p>
+    <p class="small">為什麼是日文槽位？合理的猜想是「日文本來就要顯示漢字，
+       那條路上的字型與編碼處理現成可用」。
+       <u>但這是推想，檔案裡沒有寫。</u><span class="badge wip">推測</span></p>
+    <p><span class="badge ok">2026-08-28 補上實測</span>
+       「只能借現成語系的位子」這件事，現在有<u>執行檔層</u>的證據了。
+       組字型檔名的那段程式（<code>0x004FE860</code>）是
+       「名字表[編號] ＋ <u>語系後綴</u> ＋ <code>.ffn</code>」，
+       而語系後綴來自 <code>0x004FE9BC</code> 的一張跳表，<strong>只有四種</strong>：</p>
+<pre>case 0、1 → "_en"    case 2 → "_sp"
+case 3、4 → "_jp"    case 5 → "_es"</pre>
+    <p><strong>裡面沒有中文。</strong>所以不管是官方版走 <code>_jp</code>、
+       還是社群包蓋掉 <code>_en</code>，都<u>不是偏好，是只有這幾個位子可以借</u>。
+       這一頁原本是從檔名推出這件事的，兩邊互相印證。</p>
+    <p>⚠️ 另外要注意<strong>社群的中文包不只一份，動的槽位也不一樣</strong>，
+       所以不同頁的字型總量對不起來是正常的：</p>
+    <div class="tablewrap" style="margin:8px 0"><table class="stack">
+      <thead><tr><th>哪一份</th><th>檔名結尾</th><th class="num">幾個</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="哪一份"><strong>EA 官方繁體中文版</strong>（本節這張表量的就是它）
+            <br><span class="small">⚠️ 2026-08-30 訂正：這一列原本被拆成兩列
+            （「2023 年的中文懶人包」與「EA 官方繁體中文版」各一列，一列寫組成、
+            一列只寫 13）。<u>那是同一個檔</u> —— 本機那份 2023 中文懶人包裡的
+            <code>fonts.big</code> 跟剛安裝好的官方繁中版<strong>逐位元組相同</strong>：
+            兩份都是 1,683,513 個位元組、13 個項目，SHA-256 前 12 碼同為
+            <code class="mono">a5c92f50616f</code>。也就是說那個懶人包<u>直接沿用 EA 出貨的字型檔</u>，
+            一個位元組都沒改。</span></td>
+            <td data-label="檔名結尾"><code>_jp</code></td><td data-label="幾個" class="num">12 個 <code>_jp</code> ＋ 留著 <code>dflt_en</code> ＝ 13</td></tr>
+        <tr><td data-label="哪一份">走 <code>_jp</code> 的社群合包（<u>另一份</u>，不是上面那個）</td>
+            <td data-label="檔名結尾"><code>_jp</code></td><td data-label="幾個" class="num">13（<a href="official-chinese.html#community">其中 12 項</a>
+            跟 EA 出貨那份逐位元組相同，只有 <code>hrdbg_jp.ffn</code> 不一樣）</td></tr>
+        <tr><td data-label="哪一份"><a href="../tutorials/fix-chinese/index.html">中文版配大球場就跳出</a>那一課量的那份社群包</td>
+            <td data-label="檔名結尾"><code>_en</code></td><td data-label="幾個" class="num">12（直接蓋掉英文字型）</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small">上表第二列那份合包，<a href="official-chinese.html#community">官方繁中版那一頁</a>
+       量到它 13 個項目裡有 <strong>12 個跟 EA 出貨那份逐位元組相同</strong>
+       —— 它是拿官方的字型來用，不是自己做的。
+       <br>本機能拿到的 <code>fonts.big</code> 全部量過一輪，去掉內容重複的一共<u>七種</u>。
+       走 <code>_jp</code> 的有<strong>兩種</strong>：上表第一列那份（1,683,513）與上表第二列
+       那份合包（1,686,625），兩者只差一個 <code>hrdbg_jp.ffn</code>。
+       其餘<strong>五種</strong>都是 12 個 <code>_en</code> 的路線（英文原版 204,820／
+       2009 台灣模組 1,279,340／測試機現況 397,327／Taiwan_English_1X 420,650／
+       另一份 2007 年的轉播畫面模組 351,434）。</p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">所以你的遊戲能不能顯示中文，看檔名跟大小就知道</p>
+    <p>打開 <code>data\fonts\fonts.big</code>，看裡面的檔名結尾<u>與合計大小</u>：</p>
+    <div class="tablewrap"><table>
+      <tbody>
+        <tr><td>全部是 <code>_en</code>，合計約 200 KB</td><td><strong>沒裝中文字型</strong></td></tr>
+        <tr class="hi"><td>出現 <code>_jp</code>，合計超過 1 MB</td><td><strong>裝過中文字型了</strong></td></tr>
+        <tr class="hi"><td>全部是 <code>_en</code>，但合計遠超過 200 KB（例如 1.2 MB）</td>
+            <td><strong>也裝過中文字型了</strong> —— 那是<u>直接蓋掉英文槽位</u>的社群包
+            （<a href="../tutorials/fix-chinese/index.html">中文版配大球場就跳出</a>那一課量的那份就是），
+            <strong>檔名分不出來，要看大小</strong></td></tr>
+      </tbody>
+    </table></div>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data\fonts\fonts.big --entries</code></pre>
+    <p class="small">工具在<a href="../tutorials/fel-toolkit/index.html">介面萬用工具</a>那一課。
+       更完整的說明在
+       <a href="../tutorials/whats-original/index.html">怎麼看出哪些檔還沒被動過</a>。</p>
+  </div>
+
+  <h2>能改到什麼程度</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>你可能想做的事</th><th>現況</th></tr></thead>
+    <tbody>
+      <tr><td>知道遊戲用了哪些字型、多大</td>
+          <td><span class="badge ok">完全可改</span> 檔頭讀得懂，本頁的表就是這樣來的</td></tr>
+      <tr><td>把某個字型換成另一個現有的</td>
+          <td><span class="badge lv">可以替換</span> 四個檔內容相同就是這樣做出來的</td></tr>
+      <tr><td>自己做一個新字型</td>
+          <td><span class="badge wip">未解</span> 字圖集與字元表<u>讀得出來</u>（見下面的訂正），
+              但本站沒有<strong>從零產生一份、再寫回去</strong>的辦法</td></tr>
+      <tr><td>加入原本沒有的字（例如中文字）</td>
+          <td><span class="badge wip">未解</span> 同上，而且字圖集與字元表要<u>一起</u>改</td></tr>
+    </tbody>
+  </table></div>
+  <div class="card clay">
+    <p class="card-h">誠實邊界</p>
+    <p>本站解出的是<strong>容器層</strong>：有幾個字型、各多大、壓縮與否、檔頭前 10 個位元組怎麼讀。</p>
+    <p>⚠️ <strong>2026-09-05 訂正：字符本身後來解開了。</strong>
+       這裡原本寫「字符本身長什麼樣、怎麼對應到文字編碼，本站沒有解讀」，那句已經不成立：
+       <a href="pixel-formats.html">圖片的像素怎麼排</a>那頁量到 <code>au20b_en.ffn</code> 裡有一張
+       格式 <code>0x79</code>、256×128、每個像素半個位元組的字圖集，後面接著一張 16 筆的
+       <code>0x2A</code> 調色盤；<a href="../tutorials/fix-chinese/index.html">中文版配大球場就跳出</a>
+       那一課把中文字型的字圖集（<code>0x79</code>、1024×512）與<u>整張字元表</u>讀了出來，
+       數到字型提供 <strong>1,529 個字</strong>，拿去跟中文語系檔用到的 1,536 個字對帳。</p>
+    <p><strong>仍然沒解的是「從零產生一張新的字圖集與一張新的字元表、再寫回去」</strong>
+       —— 所以這頁能幫你判斷與替換，不能幫你造字。</p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 遊戲畫面上每個字都來自 <code>data/fonts/fonts.big</code> 裡的 12 個點陣字型，本站把<strong>容器層</strong>全部解開（幾個、多大、壓縮與否、檔頭前 10 個位元組怎麼讀）；字圖集與字元表在另外兩頁也讀出來了，但沒有從零產生一份再寫回去的辦法，所以這頁能幫你判斷與替換，不能幫你造字。</li>
+    <li><strong>大小寫代號就是壓縮開關</strong> 解開後開頭四個位元組只有兩種，<code>FNTF</code> 5 個<u>全部沒壓縮</u>、<code>FntF</code> 7 個<u>全部有 QFS 壓縮</u>，12 個檔零例外。檔頭第 5 到 8 個位元組自己宣告長度，12 個裡 10 個完全相符。</li>
+    <li><strong>決定性的那一步</strong> 這個檔 397,327 個位元組裡有 <strong>250,411</strong> 沒被目錄指向，其中三段<u>大小完全相同</u>都是 62,539，而它們前面各接著 <code>twc14</code>／<code>twc16</code>／<code>twc18</code> 佔用的 10,005，<code>10,005 ＋ 62,539 ＝ 72,544</code> 正好是解壓後的大小。本站直接比對：三段<strong>逐位元組相同，62,539 個位元組一個不差</strong>。孤兒資料不是垃圾也不是損壞，<u>是舊資料沒被覆蓋掉的那一部分</u>。</li>
+    <li><strong>12 個檔只有 9 種內容</strong> <code>hrdbg_en</code>、<code>twc14_en</code>、<code>twc16_en</code>、<code>twc18_en</code> 四個都是 72,544 個位元組、內容一個位元組不差。名字看起來是 14／16／18 三種字級，裝的其實是同一份東西。</li>
+    <li><strong>那兩個「多 1,088 個位元組」的檔，打開看過了</strong> <code>dflt_en</code> 與 <code>twn14_en</code> 各比檔頭宣告多 1,088。那段<u>不是填充</u>（開頭是 <code>ff ff ff 04</code>、<code>ff ff ff 05</code> 這種規律遞增），其中一個帶著 <code>EAGL64</code> 標記，而兩個尾巴逐位元組比對 <strong>90.8% 不同</strong>，所以也不是同一塊資料複製兩份。從「沒解讀」進步到「知道它不是垃圾」。</li>
+    <li><strong>中文走的是日文那個槽位</strong> 原版 12 個字型檔名<u>全部</u>以 <code>_en</code> 結尾，2023 年的中文包是 12 個 <code>_jp</code> ＋ 留著原本的 <code>dflt_en</code>，總量從 204,523 個位元組變成 1,683,191。2026-08-28 補上執行檔層證據：組檔名的那段程式（<code>0x004FE860</code>）取的語系後綴來自 <code>0x004FE9BC</code> 的跳表，<strong>只有 <code>_en</code>／<code>_sp</code>／<code>_jp</code>／<code>_es</code> 四種，裡面沒有中文</strong>，所以不是偏好，是只有這幾個位子可以借。</li>
+    <li><strong>看檔名跟大小就知道你的遊戲能不能顯示中文</strong> 打開 <code>data\fonts\fonts.big</code>，全部是 <code>_en</code>、合計約 200 KB ＝ 沒裝中文字型；出現 <code>_jp</code>、合計超過 1 MB ＝ 裝過了；<u>全部是 <code>_en</code> 卻遠超過 200 KB（例如 1.2 MB）也是裝過了</u> —— 那種包直接蓋掉英文槽位，檔名分不出來，要看大小。<u>另外社群的中文包不只一份、動的槽位也不一樣</u>（本頁表裡這份是 12 個 <code>_jp</code> ＋ 留著 <code>dflt_en</code>，〈中文版配大球場就跳出〉那一課量的那份是 12 個 <code>_en</code> 直接蓋掉英文），所以不同頁的字型總量對不起來是正常的。</li>
+    <li><strong>本站沒驗的</strong> 字圖集與字元表<u>讀得出來</u>（見本頁「誠實邊界」的 2026-09-05 訂正），但本站沒有<strong>從零產生一份、再寫回去</strong>的辦法，所以做不出新字型、也加不了原本沒有的字；那 1,088 個位元組到底是什麼<u>仍未解</u>；檔頭第 9 到 10 個位元組「看起來像版本號」是推測；四個檔內容相同是誰、什麼時候做的無法確認；「為什麼借日文槽位」是推想，檔案裡沒有寫。還有一件事要記得：<u>這份 <code>fonts.big</code> 檔案日期是 2022 年 11 月，不是 2005 年的原廠狀態</u>，本頁描述的是它現在長什麼樣。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../story/orphan-data/index.html">一個檔案裡的地層</a> —— 同樣的現象，在一個大 6.7 倍的檔案上</li>
+    <li><a href="bigf.html">BIGF 封裝格式</a> —— 為什麼改檔要用「接到檔尾」</li>
+    <li><a href="fel.html">FEL 版面語法</a> —— 版面檔用 <code>LF:</code> 指定要載入哪個字型</li>
+  </ul>
+
+  <footer>
+    <p>本頁的數字以現場解開 <code>fonts.big</code> 全 12 個字型量測所得為主，
+       引用其他頁的（<code>ingame.big</code> 的孤兒比例、字圖集與字元表那幾個）都標了出處；
+       標示為「推測」「未確認」之處未經證實，本站不寫成定論。
+       本頁描述的是測試機上這份（2022 年被改過的）檔案。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

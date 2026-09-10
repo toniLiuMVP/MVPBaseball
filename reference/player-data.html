@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/player-data.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>球員資料檔 attrib.dat / pitcher.dat — toni的MVP模組補習班</title>
+<meta name="description" content="MVP Baseball 2005 球員資料檔的真相：它其實是 CSV、每格帶索引前綴，而且大部分能力值不是你想的那樣。改之前先看哪些欄位會被你改壞。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 球員資料</p>
+  <h1>球員資料檔的真相</h1>
+  <p class="lede">想改球員能力的人最多，踩坑的也最多。這頁講三件事：
+     這些檔案<strong>其實是純文字</strong>、每一格有個<strong>會害你取錯值的前綴</strong>、
+     以及<strong>大部分「能力值」根本不是 0-99 的能力值</strong>。</p>
+
+    <div class="card blue" style="margin-top:14px">
+    <p class="card-h">先說清楚這頁的數字是從哪一份遊戲量的</p>
+    <p>本頁的項目數、檔案數、覆蓋率，量的是<strong>一台裝過台灣模組的遊戲</strong>。
+       <u>剛安裝好的原版數字小很多</u> —— 例如臉皮 504 對 894、大頭照 1,487 對 6,638、
+       語音號碼 1,673 對 4,343。</p>
+    <p><strong>格式與結構的部分兩邊一樣</strong>，那是遊戲程式決定的；
+       會變的是「有幾個」。完整對照見
+       <a href="original-vs-modded.html">原版與這台機器差在哪</a>。</p>
+  </div>
+<div class="card clay">
+    <p class="card-h">先講結論：這一頁講的 <code>attrib.dat</code> 與 <code>pitcher.dat</code> 裡，只有兩個欄位可以安全寫入 0-99 的數值</p>
+    <p><code>speed</code>（跑壘速度）和 <code>fastball_control</code>（快速球控球）。
+       這兩個檔裡其他你以為是「力量」「選球」「三振能力」的欄位，<strong>格式跟你想的不一樣</strong>，
+       硬寫進去會破壞資料。下面有實測數據。</p>
+    <p class="small">⚠️ 「力量」另有一個真的是 0-99 的欄位，但<strong>不在這兩個檔裡</strong> ——
+       在 <code>rhattrib.dat</code>／<code>lhattrib.dat</code> 的 <code>lrattrib_power</code>
+       （本站測試機實測值域 0–98、平均 25.9），連同 <code>pitcher.dat</code> 的
+       <code>pitchattrib_stamina</code>（0–92、平均 45.8），做法見
+       <a href="../tutorials/stats-to-ratings/index.html">成績換算成能力值那一課</a>。
+       下面那張表判 ❌ 的「力量」，指的是 <code>attrib.dat</code> 第 42 欄
+       <code>playerattrib_starpower</code>（0-4 星級），兩者不要混。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">⚠️ 這頁的數字量自本站測試機，你的會不一樣</p>
+    <p>本站測試機的 <code>attrib.dat</code> 檔案日期是 <strong>2026 年 8 月</strong>、
+       <code>pitcher.dat</code> 是 <strong>2023 年 5 月</strong> ——
+       <u>都被模組換過</u>，裝的是一份混了大聯盟與台灣球員的名單。
+       （2026-09-05 訂正：這裡原本寫 <code>attrib.dat</code> 是 2026 年 4 月。
+       檔案日期現在量到的是 2026-08-29；內容沒有變過 ——
+       本站 2026-04-14 那份快照裡的 <code>attrib.dat</code> 與現役這一份 sha256 相同，
+       只是後來的操作換掉了時間戳。）</p>
+    <p>所以像「3,247 位球員」「某某球員的識別碼是多少」這種<strong>跟名單內容有關的數字，
+       你自己跑會得到別的結果</strong>。</p>
+    <p>不會變的是<strong>格式</strong>：欄位有幾個、每一格怎麼寫、資料怎麼分隔 ——
+       那是遊戲程式決定的，換名單也不會變。<br>
+       ⚠️ <strong>但「哪一欄是什麼」會變。</strong>本站實測 46 個欄位裡有 <strong>27 個</strong>
+       在剛安裝好的原版與社群名冊之間位置不同（<code>skin_tone</code> 從第 12 欄搬到第 38 欄，
+       中間的欄位各前移一格；<code>audioid</code> 原版第 17、社群名冊第 16）。
+       兩份剛安裝好的原版（英文與中文）彼此完全相同，所以分界是<u>原版 vs 社群名冊</u>，不是語言。
+       <strong>永遠不要記欄號，要在執行時從表頭找欄位名</strong> —— 本站的腳本都是這樣做的。
+       這頁講的規則對你成立，數字與欄號不一定。</p>
+    <p class="small">同樣的道理本站在<a href="fonts.html">字型</a>、
+       <a href="audio.html">音訊</a>、<a href="anims.html">動畫</a>那幾頁也標過。</p>
+  </div>
+
+  <h2>一、它們其實是 CSV</h2>
+  <p>檔名叫 <code>.dat</code>，很容易以為是二進位。用十六進位工具看開頭：</p>
+<pre><code>30 20 66 69 72 73 74 5f    <span class="cm">→ 解讀成文字就是「0 first_」</span></code></pre>
+  <p>這是<strong>自帶欄位名稱的 CSV 文字檔</strong>。位置在 <code>data\database\</code>：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>檔案</th><th>內容</th><th class="num">具名欄位</th></tr></thead>
+    <tbody>
+      <tr><td data-label="檔案" class="mono">attrib.dat</td><td data-label="內容">打者屬性：身體、裝備、薪水、少數能力</td><td data-label="具名欄位" class="num">46</td></tr>
+      <tr><td data-label="檔案" class="mono">pitcher.dat</td><td data-label="內容">投手球種設計：體力、球種、控球、球速</td><td data-label="具名欄位" class="num">29</td></tr>
+      <tr><td data-label="檔案" class="mono">bstats.dat</td><td data-label="內容">打擊統計（出賽、得分、盜壘…），不是能力值</td><td data-label="具名欄位" class="num">—</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">欄位數是實際數過的：header 列除了具名欄位外，結尾還有一個 <code>;</code> 終止格子。
+     有些文件寫 47 / 30，是把那個 <code>;</code> 也算進去了。</p>
+
+  <h2>二、⚠ 每一格都帶索引前綴</h2>
+  <p>這是最容易讓人取錯值的地方。一列資料長這樣：</p>
+<pre><code>0f58f3c1b,0 Default,1 Default,2 51,...,<span class="hl">22 5</span>,...,42 0,...,45 11689,;
+    ↑     ↑
+  列 ID   每一格的內容是「索引 空格 實際值」</code></pre>
+  <p>所以「速度 = 5」這一格，實際內容是字串 <code>"22 5"</code>，不是 <code>"5"</code>。</p>
+  <div class="card clay">
+    <p class="card-h">兩個連帶的陷阱</p>
+    <p><strong>1.</strong> 資料列的格子數比 header <strong>多一個</strong>，因為行首多了列 ID。
+       直接 <code>split(',')[22]</code> 會拿到<strong>錯位一格</strong>的內容。</p>
+    <p><strong>2.</strong> 拿到 <code>"22 5"</code> 之後還要再切一次空格才是真正的值 <code>5</code>。</p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">另外還有一個 attrib.dat.csv</p>
+    <p>同資料夾裡有個 <code>attrib.dat.csv</code>。它<strong>不是比較好讀的那一份</strong>：
+       每一格的寫法跟 <code>attrib.dat</code> 一模一樣（一樣有索引前綴、一樣沒有引號），
+       差別只有表頭多一格 <code>hex</code>、行尾多一個逗號。而<strong>遊戲執行時讀的是
+       <code>attrib.dat</code></strong> —— 只改 <code>.csv</code> 遊戲讀不到，白改。</p>
+    <p class="small">⚠️ 更要緊的是：本站測試機上的那一份是<strong>另一份舊名冊</strong>，
+       不是同一份資料的另一種寫法 —— 3,167 列對 <code>attrib.dat</code> 的 3,247 列，
+       其中 <u>2,278 列連姓名都是空的</u>，兩邊的姓名只有 126 個對得上，檔案日期停在 2017 年。
+       拿它查球員，查到的會是過期或空白的值。（這是本站這台機器的狀況，你那份不一定一樣。）</p>
+  </div>
+
+  <h2>三、大部分「能力值」不是 0-99</h2>
+  <p>如果你想把球員真實數據換算成遊戲能力，會發現 EA 根本<strong>沒有做一套 0-99 的綜合能力值</strong>。
+     常見的六種能力對到遊戲欄位，情況各不相同：</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>你想改的</th><th>對應欄位</th><th>類型</th><th>可以寫嗎</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="你想改的">跑壘速度</td><td data-label="對應欄位" class="mono">attrib.dat[22] speed</td><td data-label="類型">直接對應</td><td data-label="可以寫嗎">✅ <strong>可以</strong></td></tr>
+      <tr class="hi"><td data-label="你想改的">控球</td><td data-label="對應欄位" class="mono">pitcher.dat[6] fastball_control</td><td data-label="類型">範圍相容</td><td data-label="可以寫嗎">✅ <strong>可以</strong></td></tr>
+      <tr><td data-label="你想改的">力量</td><td data-label="對應欄位" class="mono">rhattrib.dat／lhattrib.dat[3] lrattrib_power<br><span class="small">（不是 attrib.dat[42] starpower，那是 0-4 星級）</span></td><td data-label="類型">0-99 尺度（測試機實測 0–98、平均 25.9）</td><td data-label="可以寫嗎">✅ 但<strong>不在本頁這兩個檔裡</strong>，見<a href="../tutorials/stats-to-ratings/index.html">成績換算那一課</a></td></tr>
+      <tr><td data-label="你想改的">選球</td><td data-label="對應欄位" class="mono">attrib.dat[18] platediscipline</td><td data-label="類型">小級數 0-13</td><td data-label="可以寫嗎">❌ 格式不相容</td></tr>
+      <tr><td data-label="你想改的">三振能力</td><td data-label="對應欄位" class="mono">pitcher.dat[7] fastball_velocity</td><td data-label="類型">球速 mph</td><td data-label="可以寫嗎">❌ 語意不同</td></tr>
+      <tr><td data-label="你想改的">打擊率 / 投手總評</td><td data-label="對應欄位">—</td><td data-label="類型">遊戲內部計算</td><td data-label="可以寫嗎">❌ 沒有對應欄位</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>實測數值分佈（這是判斷依據）</h3>
+  <p>把真實檔案裡每個欄位的數值分佈跑出來，就知道它們是什麼尺度：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>欄位</th><th class="num">最大值</th><th class="num">平均</th><th>代表什麼</th></tr></thead>
+    <tbody>
+      <tr><td data-label="欄位" class="mono">starpower</td><td data-label="最大值" class="num">4</td><td data-label="平均" class="num">—</td><td data-label="代表什麼">0-4 的星級，不是 0-99</td></tr>
+      <tr><td data-label="欄位" class="mono">platediscipline</td><td data-label="最大值" class="num">13</td><td data-label="平均" class="num">—</td><td data-label="代表什麼">0-13 的小級數</td></tr>
+      <tr><td data-label="欄位" class="mono">fastball_velocity</td><td data-label="最大值" class="num">—</td><td data-label="平均" class="num">88.6</td><td data-label="代表什麼">球速（英里/小時），是物理量</td></tr>
+      <tr class="hi"><td data-label="欄位" class="mono">fastball_control</td><td data-label="最大值" class="num">98</td><td data-label="平均" class="num">47</td><td data-label="代表什麼">範圍與 0-99 相容</td></tr>
+    </tbody>
+  </table></div>
+
+  <p><strong>把 0-99 的數字寫進 0-4 的欄位會怎樣？</strong>
+     這兩者的<strong>格式不相容</strong> —— 欄位預期的是 0 到 4，你給它 85，
+     遊戲怎麼處理超出範圍的值沒有人實測過，但可以確定的是<strong>原本的星級資訊會被破壞</strong>。</p>
+  <p><code>fastball_velocity</code> 更微妙：它實測 0 到 100、其中 96.7% 落在 80 到 99
+     （另有 25 列是 0，那是沒有快速球的野手列），碰巧跟 0-99 重疊，
+     所以寫進去不會「超出範圍」，但那個欄位的意思是<strong>球速幾英里</strong>，
+     不是「三振能力有多強」。寫 95 進去，你改的是球速不是三振能力。</p>
+
+  <div class="card grass">
+    <p class="card-h">判斷一個欄位能不能寫，兩個門檻</p>
+    <p><strong>最大值 ≤ 20</strong> → 這是壓縮尺度（星級、小級數），別寫 0-99 進去。</p>
+    <p><strong>平均值 ≥ 70</strong> → 可能是物理量（球速平均 88.6、體重平均 102.2），語意跟能力值不同。</p>
+    <p>兩個都不中，才有機會安全寫入。</p>
+    <p class="small">⚠️ <strong>這兩道門檻抓不到身高。</strong>身高也是物理量，但它存的是
+       <u>英吋減 48</u>，整欄平均只有 25.3（本站測試機；剛安裝好的原版 25.4）、最大值 35 ——
+       兩道門檻都不會亮，照這兩道走會把它誤判成「有機會安全寫入」。
+       想動身高請先看<a href="player-fields.html#height">球員資料檔全欄位清單</a>。</p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">誠實邊界：範圍相容不等於語意正確</p>
+    <p>上面的驗證只證明「寫進去不會超出範圍」，<strong>不代表遊戲真的把那個數字當成該項能力用</strong>。
+       真正的對齊需要實際玩遊戲觀察。本站標「可以寫」的欄位，意思是
+       <strong>格式安全</strong>，不是<strong>效果保證</strong>。</p>
+  </div>
+
+  <h2>四、已識別的欄位</h2>
+  <p class="small">下面是本站最早識別出來的十來欄。
+     <strong>完整的 46 欄 + 29 欄清單(含實測值域)見
+     <a href="player-fields.html">球員資料檔全欄位清單</a>。</strong></p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">索引</th><th>欄位名</th><th>檔案</th><th>說明</th></tr></thead>
+    <tbody>
+      <tr><td data-label="索引" class="num mono">0 / 1</td><td data-label="欄位名" class="mono">first_name / last_name</td><td data-label="檔案" class="mono">attrib.dat</td><td data-label="說明">姓名</td></tr>
+      <tr><td data-label="索引" class="num mono">18</td><td data-label="欄位名" class="mono">platediscipline</td><td data-label="檔案" class="mono">attrib.dat</td><td data-label="說明">選球，0-13</td></tr>
+      <tr class="hi"><td data-label="索引" class="num mono">22</td><td data-label="欄位名" class="mono">speed</td><td data-label="檔案" class="mono">attrib.dat</td><td data-label="說明"><strong>跑壘速度，可安全寫入</strong></td></tr>
+      <tr><td data-label="索引" class="num mono">28</td><td data-label="欄位名" class="mono">battingstance</td><td data-label="檔案" class="mono">attrib.dat</td><td data-label="說明">打擊姿勢（外觀）</td></tr>
+      <tr><td data-label="索引" class="num mono">42</td><td data-label="欄位名" class="mono">starpower</td><td data-label="檔案" class="mono">attrib.dat</td><td data-label="說明">明星等級，0-4</td></tr>
+      <tr><td data-label="索引" class="num mono">2</td><td data-label="欄位名" class="mono">stamina</td><td data-label="檔案" class="mono">pitcher.dat</td><td data-label="說明">投球體力</td></tr>
+      <tr class="hi"><td data-label="索引" class="num mono">6</td><td data-label="欄位名" class="mono">fastball_control</td><td data-label="檔案" class="mono">pitcher.dat</td><td data-label="說明"><strong>快速球控球，範圍相容</strong></td></tr>
+      <tr><td data-label="索引" class="num mono">7</td><td data-label="欄位名" class="mono">fastball_velocity</td><td data-label="檔案" class="mono">pitcher.dat</td><td data-label="說明">快速球球速（mph）</td></tr>
+      <tr><td data-label="索引" class="num mono">18 / 22</td><td data-label="欄位名" class="mono">pitch4_type / pitch4_velocity</td><td data-label="檔案" class="mono">pitcher.dat</td><td data-label="說明">第四球種的種類與球速</td></tr>
+      <tr><td data-label="索引" class="num mono">28</td><td data-label="欄位名" class="mono">pitcher_delivery</td><td data-label="檔案" class="mono">pitcher.dat</td><td data-label="說明">投球姿勢（外觀）</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>五、改之前的紀律</h2>
+  <ul class="tick">
+    <li><strong>先備份</strong> —— <code>attrib.dat</code> 一壞，整份名單的球員屬性就沒了。</li>
+    <li><strong>改 <code>attrib.dat</code> 本體</strong>，不是 <code>.csv</code>。</li>
+    <li><strong>取值記得處理索引前綴</strong>，不然你會改到隔壁欄位。</li>
+    <li><strong>只動確認過的欄位</strong>，看不懂的欄位不要碰。</li>
+    <li><strong>一次改一項，進遊戲確認</strong>，不要一次改五個欄位再一起測。</li>
+  </ul>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> <code>attrib.dat</code> 與 <code>pitcher.dat</code> 其實是自帶欄位名稱的純文字 CSV，但每一格都有會害你取錯值的索引前綴，而且<strong>大部分「能力值」根本不是 0-99 的能力值</strong>。</li>
+    <li><strong>這兩個檔裡只有兩個欄位可以安全寫入 0-99</strong> <code>attrib.dat</code> 的 <code>speed</code>（跑壘速度）與 <code>pitcher.dat</code> 的 <code>fastball_control</code>（快速球控球，實測最大 98、平均 47）。這兩個檔裡其他你以為是力量、選球、三振能力的欄位，硬寫進去會破壞資料。⚠️ 但「力量」另有一個真的是 0-99 的欄位不在這兩個檔裡 —— <code>rhattrib.dat</code>／<code>lhattrib.dat</code> 的 <code>lrattrib_power</code>（實測 0–98），做法見<a href="../tutorials/stats-to-ratings/index.html">成績換算成能力值那一課</a>。</li>
+    <li><strong>最容易取錯值的地方</strong> 每一格的內容是「索引 空格 實際值」，速度 5 那一格存的是字串 <code>"22 5"</code>。而且資料列的格子數比 header <strong>多一個</strong>（行首多了列 ID），直接 <code>split(',')[22]</code> 會<u>錯位一格</u>；拿到 <code>"22 5"</code> 之後還要再切一次空格才是真正的值。</li>
+    <li><strong>判斷一個欄位能不能寫，兩個門檻</strong> <strong>最大值 ≤ 20</strong> 是壓縮尺度（<code>starpower</code> 0-4 星級、<code>platediscipline</code> 0-13 小級數），別寫 0-99 進去；<strong>平均值 ≥ 70</strong> 可能是物理量（<code>fastball_velocity</code> 平均 88.6，那是球速英里數，寫 95 進去你改的是球速不是三振能力）。兩個都不中才有機會安全寫入。</li>
+    <li><strong>這一頁自己加的但書：欄號會變</strong> 格式不變，但「哪一欄是什麼」會變。46 個欄位裡有 <strong>27 個</strong>在剛安裝好的原版與社群名冊之間位置不同（<code>skin_tone</code> 從第 12 欄搬到第 38 欄、<code>audioid</code> 原版第 17 社群第 16）。兩份原版（英文與中文）彼此完全相同，所以分界是<u>原版 vs 社群名冊</u>，不是語言。<strong>永遠不要記欄號，要在執行時從表頭找欄位名。</strong></li>
+    <li><strong>這頁的數字量自哪一份</strong> 測試機的 <code>attrib.dat</code> 是 2026 年 8 月（內容自 2026-04-14 的快照以來逐位元組沒變過，只是時間戳被後來的操作換掉）、<code>pitcher.dat</code> 是 2023 年 5 月，都被模組換過。<u>剛安裝好的原版數字小很多</u>：臉皮 504 對 894、大頭照 1,487 對 6,638、語音號碼 1,673 對 4,343。跟名單內容有關的數字你自己跑會不一樣。</li>
+    <li><strong>兩個會白忙一場的坑</strong> 同資料夾裡的 <code>attrib.dat.csv</code> 寫法跟 <code>attrib.dat</code> 一模一樣（不是比較好讀的那一份），而且本站測試機上的那一份是<strong>另一份舊名冊</strong>（3,167 列、2,278 列沒有姓名、停在 2017 年）；<strong>遊戲執行時讀的是 <code>attrib.dat</code></strong>，只改 <code>.csv</code> 遊戲讀不到。另外有些文件把欄位數寫成 47／30，那是把 header 結尾那個 <code>;</code> 終止格子也算了進去，本站數的是 46／29 個具名欄位。</li>
+    <li><strong>本站沒驗的</strong> 標「可以寫」只代表<strong>格式安全</strong>，<u>不代表遊戲真的把那個數字當成該項能力用</u>，真正的對齊需要實際玩遊戲觀察，本站不做效果保證。把 0-99 寫進 0-4 的欄位遊戲會怎麼處理超出範圍的值，<strong>沒有人實測過</strong>，能確定的只有原本的星級資訊會被破壞。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="index.html">速查總覽</a> —— 其他格式的說明</li>
+    <li><a href="../tutorials/change-schedule-year/index.html">換賽程年份</a> —— 同樣是改 CSV，但風險低得多，適合先練手</li>
+    <li><a href="../tutorials/edit-speed/index.html">實戰：改球員速度</a> —— 本頁在 <code>attrib.dat</code>／<code>pitcher.dat</code> 裡標「可以寫」的兩欄之一，動手版</li>
+  </ul>
+
+  <footer>
+    <p>本頁的欄位數、索引、數值分佈皆取自實際檔案量測；標註「格式不相容」之處為格式層面的判斷，
+       遊戲內實際行為未經實測，本頁不做效果保證。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

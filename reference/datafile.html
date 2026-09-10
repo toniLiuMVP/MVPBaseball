@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/datafile.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>總設定檔 datafile — toni的MVP模組補習班</title>
+<meta name="description" content="MVP Baseball 2005 的 datafile.txt：4.2 MB 純文字、21,548 行、EA 自己把欄位名稱寫在檔案裡。攝影機、音量、打擊物理全在這一個檔。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 總設定檔</p>
+  <h1>總設定檔 <code>datafile</code></h1>
+  <p class="lede">遊戲的攝影機在哪裡、每一種聲音多大聲、打擊的物理參數是多少 ——
+     全部寫在<strong>同一個純文字檔</strong>裡，而且
+     <strong>EA 把每一個欄位的名字也一起寫在裡面</strong>。
+     4.2 MB、21,548 行，本站全部解析完，<u>沒有一行讀不懂</u>。</p>
+
+  <div class="card blue">
+    <p class="card-h">這一頁的數字量自哪一份遊戲</p>
+    <p>剛安裝好、沒有裝過任何模組的<strong>原版英文版</strong>。
+       你自己的遊戲如果裝過模組，數字可能不一樣 ——
+       怎麼確認你手上那份被動過什麼，看<a href="../tutorials/whats-original/index.html">怎麼看出哪些檔還沒被動過</a>那一課。</p>
+  </div>
+
+  <h2>先看規模</h2>
+  <div class="tablewrap"><table>
+    <tbody>
+      <tr><td><code>data\datafile\datafile.big</code> 的大小</td><td class="num">2,857,593 bytes</td></tr>
+      <tr><td>裡面有幾個項目</td><td class="num">460</td></tr>
+      <tr class="hi"><td>全部解開之後合計</td><td class="num">14,095,446 bytes</td></tr>
+      <tr class="hi"><td>其中最大的 <code>datafile.txt</code></td><td class="num">4,392,183 bytes</td></tr>
+      <tr><td><code>datafile.txt</code> 有幾行</td><td class="num">21,548</td></tr>
+    </tbody>
+  </table></div>
+  <p>460 個項目<strong>全部是 QFS 壓縮的純文字</strong>。解開之後總量是原檔的 4.9 倍
+     —— 純文字壓得很好，這也是為什麼一個 2.8 MB 的檔裝得下 14 MB 的設定。</p>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data\datafile\datafile.big --entries</code></pre>
+  <p class="small">會列出 460 個項目與每個項目解開後是什麼。工具在<a href="../tutorials/fel-toolkit/index.html">介面萬用工具</a>那一課。</p>
+
+  <h2 id="format">一行長什麼樣</h2>
+<pre><code><span class="hl">0x830b955c</span> <span class="nu">108</span>&lt;BattingView7LeftHi&gt;;0 0;1 0;2 0;3 0;4 1;5 0;6 1;7 ;8 ;9 ;10 ;11 None;12 ;13 away_dugout_01;14 0;<span class="hl">15 945.000;16 83.000;17 840.000</span>;…
+   ↑識別碼      ↑這個數字      ↑這筆記錄的名字      ↑ 編號 值;編號 值;編號 值 …</code></pre>
+
+  <div class="card grass">
+    <p class="card-h">中間那個數字不是型別編號，是<u>欄位數量</u></p>
+    <p>一開始很容易把它當成「記錄型別」。
+       但把 21,548 行全部檢查一遍：<strong>那個數字永遠等於這一行有幾個欄位</strong>。</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>檢查</th><th class="num">結果</th></tr></thead>
+      <tbody>
+        <tr><td>解析得出來的行</td><td class="num">21,548 / 21,548</td></tr>
+        <tr class="hi"><td>那個數字 ≠ 欄位數的行</td><td class="num"><strong>0</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p class="small">⚠ 一個容易踩的坑：識別碼<u>不是固定長度</u>。
+       原版裡 5 位到 8 位十六進位都有（8 位 20,144 行、7 位 1,320、6 位 79、5 位 5）。
+       本站第一次寫解析器時把它寫死成 8 位，結果 1,404 行對不上，
+       差點寫成「有 1,404 行是未知格式」。<u>是解析器錯，不是檔案怪。</u></p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">⚠️ 改這個檔之前：它用 LF 換行，不是 CRLF</p>
+    <p>本站在<a href="fel.html">版面檔那頁</a>反覆警告「<code>.fel</code> 全部是 CRLF，
+       編輯器統一成 LF 會壞檔」。<strong>這個檔正好相反。</strong></p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th></th><th class="num">行數／個數</th><th>換行符號</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td><code>datafile.txt</code>（英文版與中文版都量了）</td>
+            <td data-label="行數／個數" class="num">21,548 行</td><td data-label="換行符號"><strong>LF，CRLF 0 個</strong></td></tr>
+        <tr><td><code>data/datafile/</code> 底下全部 <code>.txt</code></td>
+            <td data-label="行數／個數" class="num">466 個</td><td data-label="換行符號"><strong>LF 460 個，CRLF 0 個</strong><br>
+            <span class="small">另外 6 個是 <u>0 bytes 的空檔</u>，一個換行位元組都沒有：<code>a004day.txt</code>、<code>memoday.txt</code>、<code>memonite.txt</code>、<code>script_ar_spec_catch_01/02/03.txt</code></span></td></tr>
+        <tr><td>（對照）全遊戲 <code>.fel</code> 版面檔</td>
+            <td data-label="行數／個數" class="num">329 個</td><td data-label="換行符號">CRLF 329 個，LF 0 個</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>同樣是純文字，跟動作庫裡那 244 個 <code>.axt</code> 也不一樣</strong>
+       （那裡是 CRLF 200 個、LF 44 個）。
+       規則是<u>看檔案家族，不是看副檔名</u>。</p>
+    <p class="small">⚠️ 那 244 個的副檔名是 <code>.axt</code> 不是 <code>.txt</code>，
+       而且它們不是散在 <code>data/anims/</code> 底下 ——
+       那個資料夾裡<u>只有 <code>anims.big</code> 一個檔</u>，244 個 <code>.axt</code> 全在它<strong>裡面</strong>。
+       照著「<code>data/anims/</code> 底下的 <code>.txt</code>」去找是找不到檔案的，
+       要先解開封裝檔，見<a href="anims.html">動作庫 anims</a>那頁。</p>
+    <p>實務上：用會保留原始換行的編輯器，關掉「存檔時自動補檔尾換行」，
+       改完<strong>確認檔案長度只差你預期的那幾個位元組</strong>。
+       本站的工具是逐格取代、不重寫整行，所以不會動到換行符號。</p>
+    <p class="small">另外一件量的時候要小心的事：封裝檔裡那 460 個 <code>.txt</code>
+       <strong>全部是 QFS 壓縮的</strong>。不解壓就數換行符號，數到的是壓縮位元組，
+       會得到完全錯誤的答案。</p>
+  </div>
+
+  <h2 id="header">表頭行：EA 自己把欄位名字寫在檔案裡</h2>
+  <p>有些行的第三個位置不是 <code>&lt;名字&gt;</code>，而是另一個數字。那種行是<strong>欄位名稱表</strong>：</p>
+<pre><code>0xf64fbeb3 <span class="nu">6</span> 1;5 PipSlideMotion;2 ShapeTexY1;4 ShapeTexY2;1 ShapeTexX1;3 ShapeTexX2;0 RunnerIconSize;
+              ↑6 個欄位   ↑ 編號 名字;編號 名字 … （順序是亂的，要照編號對）</code></pre>
+  <p>這跟<a href="database.html">名冊檔</a>是同一套設計：<strong>檔案自己說明自己</strong>。
+     原版的 <code>datafile.txt</code> 有 <strong>123 行</strong>這種表頭。</p>
+
+  <div class="card amber">
+    <p class="card-h">但「欄位數一樣就是同一種東西」是錯的</p>
+    <p>123 行表頭只涵蓋 <strong>43 種</strong>不同的欄位數 —— 代表有重複。
+       檢查那些重複的表頭內容是否一致：</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>同一個欄位數的多張表</th><th class="num">幾種欄位數</th></tr></thead>
+      <tbody>
+        <tr><td>內容完全一致</td><td class="num">28</td></tr>
+        <tr class="hi"><td>內容不一致</td><td class="num"><strong>15</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p>不一致的全部集中在<strong>小記錄</strong>：欄位數 1、2、3、4、5、6、7、8、10、11、12、14、24、48、54。
+       光是「1 個欄位」就有 22 張表、15 種不同內容。</p>
+    <p>這很合理 —— 只有一個欄位的東西當然會撞在一起。
+       <strong>所以欄位數可以拿來對名稱表，但不能拿來判斷「這是什麼」。</strong></p>
+  </div>
+
+  <p>欄位數<u>唯一對應一張表</u>的有 28 種：
+     0、9、13、17、18、19、25、28、31、32、40、45、51、59、63、68、70、73、76、86、88、101、116、127、128、174、233、381。
+     這些查名稱表是安全的，涵蓋 <strong>7,085 / 21,425</strong> 筆資料行（33.1%）。<br>（2026-09-05 訂正：這裡原本寫 21,184 / 21,425、98.9% —— 那是「欄位數查得到<u>任何</u>表頭」的覆蓋率，把上面那 15 種會撞的也算了進去，而資料行的大宗正好落在那 15 種身上，所以它<u>不是</u>安全率。）</p>
+
+  <h2 id="camera">攝影機：兩張名稱表，一張管打擊、一張管守備</h2>
+  <div class="card clay">
+    <p class="card-h">⚠️ 本站 2026-08-28 訂正了這一節</p>
+    <p>這裡原本寫「整份檔裡<u>只有一筆</u>攝影機記錄帶名稱表（欄位數 116 那種）」。
+       <strong>那是錯的。有兩張。</strong></p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>名稱表</th><th class="num">欄位數</th><th>管到哪些攝影機</th></tr></thead>
+      <tbody>
+        <tr><td data-label="名稱表">第 7,940 行<br>兩種版本相同</td><td data-label="欄位數" class="num">116</td><td data-label="管到哪些攝影機"><strong>32 台</strong> <code>BattingView*</code></td></tr>
+        <tr class="hi"><td data-label="名稱表">英文版（封裝的 <code>datafile.big</code>）第 <strong>8,516</strong> 行<br>中文版（散裝的 <code>datafile.txt</code>）第 <strong>9,216</strong> 行</td><td data-label="欄位數" class="num">128</td>
+            <td data-label="管到哪些攝影機"><strong>7 台</strong> <code>FieldingView1</code>–<code>6</code> 與 <code>HeadViewer</code></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>規則是位置：一張表管它後面那一段，到下一張表為止。</strong>
+       用這條規則跑一次，32 台全落在打擊表、7 台全落在守備表，<u>零例外</u>。</p>
+    <p><strong>⚠️ 表頭在第幾行、每個欄位是幾號，兩者都跟著版本跑。</strong>
+       本站量了 9 份有攝影機記錄的總設定檔，6 份是封裝的 <code>datafile.big</code>
+       （含剛安裝好的原版英文版）、3 份是散裝的 <code>datafile.txt</code>
+       （含剛安裝好的官方中文版），<u>行號與編號組內完全一致，兩組之間整個重排過</u>。</p>
+    <p>兩張表彼此的編號也完全不同。同一個 <code>;53</code>
+       在打擊表兩版都叫 <code>FOV</code>；在守備表，
+       英文版那張叫 <code>Pitch</code>、中文版那張叫 <code>VerticalFraming</code>。
+       守備視角<u>沒有絕對的 X/Y/Z</u>，它記的是位移
+       （<code>OffsetX</code>／<code>OffsetY</code>／<code>OffsetZ</code>，
+       英文版是 <code>;19/;20/;21</code>、中文版是 <code>;13/;14/;15</code>）。</p>
+    <p class="small">諷刺的是，答案一直在這一頁上：
+       上面那份「唯一對應一張表」的欄位數清單裡就有 128，
+       <strong>只是沒有人把它跟攝影機連起來</strong>。
+       這個疏漏讓<a href="../tutorials/change-camera/index.html">改視角那一課</a>的工具
+       對 7 台攝影機顯示錯的欄位名，而且會寫壞檔案 —— 已修好，該頁有完整說明。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">⚠️ 下面這些編號是<u>官方英文版</u>的，中文版不一樣</p>
+    <p>兩個版本的<strong>名字完全一樣</strong>（打擊 116 個、守備 128 個，一個不多一個不少），
+       <strong>攝影機也完全一樣</strong>（39 台，名稱集合相同）。
+       但<u>編號整個重排過</u>：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th></th><th class="num">欄位名個數</th><th class="num">兩版編號相同的</th></tr></thead>
+      <tbody>
+        <tr><td>打擊表</td><td data-label="欄位名個數" class="num">116</td><td data-label="兩版編號相同的" class="num">35 個（30%）</td></tr>
+        <tr class="hi"><td>守備表</td><td data-label="欄位名個數" class="num">128</td><td data-label="兩版編號相同的" class="num"><strong>0 個（0%）</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>守備那張表，兩個版本沒有一個欄位的編號是一樣的。</strong></p>
+    <p>這正是名稱表為什麼要存在 —— <u>遊戲讀的是表，不是寫死的編號</u>。
+       也是本站在<a href="player-fields.html">球員欄位</a>那頁講過的同一件事的最強版本：
+       <strong>不要記欄號，去讀表頭。</strong>
+       任何寫死編號的工具，換一個版本就會靜靜地寫錯地方。</p>
+  </div>
+
+  <p>打擊那張表把 116 個欄位全部命名了（下表編號為官方英文版）：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">編號</th><th class="mono">名字</th><th>意思</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="編號" class="num">15 / 16 / 17</td><td data-label="名字" class="mono">X / Y / Z</td><td data-label="意思"><strong>攝影機的位置</strong></td></tr>
+      <tr class="hi"><td data-label="編號" class="num">53</td><td data-label="名字" class="mono">FOV</td><td data-label="意思"><strong>視野角度</strong>（數字越小畫面越窄、看起來越「拉近」）</td></tr>
+      <tr><td data-label="編號" class="num">41 / 42 / 43</td><td data-label="名字" class="mono">Pitch / Heading / Roll</td><td data-label="意思">俯仰／左右／傾斜</td></tr>
+      <tr><td data-label="編號" class="num">11 / 13</td><td data-label="名字" class="mono">LocationObject / LocMarkerName</td><td data-label="意思">位置掛在哪個東西上、掛在哪個標記點</td></tr>
+      <tr><td data-label="編號" class="num">23 / 25</td><td data-label="名字" class="mono">Target / TargetObject</td><td data-label="意思">鏡頭看向哪裡</td></tr>
+      <tr class="hi"><td data-label="編號" class="num">0 / 1 / 3</td><td data-label="名字" class="mono">HideCatcher / HideCatcherLegs / HideNet</td><td data-label="意思"><strong>把捕手、捕手的腿、護網藏起來</strong></td></tr>
+      <tr><td data-label="編號" class="num">82</td><td data-label="名字" class="mono">LetterBox</td><td data-label="意思">上下黑邊</td></tr>
+      <tr><td data-label="編號" class="num">75 / 76</td><td data-label="名字" class="mono">DepthOfField / NearClipPlane</td><td data-label="意思">景深、近端裁切面</td></tr>
+      <tr class="hi"><td data-label="編號" class="num">108 / 109</td><td data-label="名字" class="mono">Handheld / HandheldJitter</td><td data-label="意思"><strong>手持鏡頭的晃動</strong></td></tr>
+      <tr><td data-label="編號" class="num">110–115</td><td data-label="名字" class="mono">JitterPitch… / JitterHeading…</td><td data-label="意思">晃動的幅度、頻率、隨機量</td></tr>
+      <tr><td data-label="編號" class="num">6</td><td data-label="名字" class="mono">Fog</td><td data-label="意思">霧</td></tr>
+      <tr><td data-label="編號" class="num">47–51</td><td data-label="名字" class="mono">Damping / PitchDamp / HeadDamp / RollDamp / FOVDamp</td><td data-label="意思">各種阻尼（鏡頭跟隨的柔順程度）</td></tr>
+      <tr><td data-label="編號" class="num">99–107</td><td data-label="名字" class="mono">Spline…</td><td data-label="意思">沿著曲線運鏡的一整組參數</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">上表是 116 個裡挑出來比較看得懂的。完整清單自己跑一次就有 ——
+     方法在<a href="#howto">最後一節</a>。</p>
+
+  <div class="card grass">
+    <p class="card-h">這張表可以拿去讀<u>同一張表管到的</u>其他攝影機</p>
+    <p>名字裡有 <code>View</code> 的攝影機記錄共 <strong>39 筆</strong>，
+       分佈在 11 種不同的欄位數（87、97、103、104、105、107、108、110、111、113、116），
+       <strong>真的有 116 欄的只有 4 筆</strong>。</p>
+    <p class="small">⚠️ 名稱表<u>不是靠欄位數配對的</u>，是靠位置：
+       往前最近的那一張，管到下一張出現為止（見上面那張訂正卡）。
+       所以「這 11 種欄位數裡只有 116 找得到同號的表頭」是真的，
+       但由此推出「39 筆共用同一張表」就錯了：管守備那 7 台的是 128 欄那張，
+       而這 39 筆裡<u>沒有任何一筆</u>是 128 欄。</p>
+    <p>下面這張表是<strong>訂正之前</strong>做的，拿 116 的表去讀全部 39 筆，
+       在剛安裝好的<u>原版英文版</u> <code>datafile.big</code> 上量到的：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th class="mono">用這個編號去讀</th><th>期望</th><th class="num">39 筆裡符合</th></tr></thead>
+      <tbody>
+        <tr><td data-label="用這個編號去讀" class="mono">15 / 16 / 17（X Y Z）</td><td data-label="期望">數字</td><td data-label="39 筆裡符合" class="num">39</td></tr>
+        <tr><td data-label="用這個編號去讀" class="mono">53（FOV）</td><td data-label="期望">數字</td><td data-label="39 筆裡符合" class="num">39</td></tr>
+        <tr><td data-label="用這個編號去讀" class="mono">41 / 42（Pitch Heading）</td><td data-label="期望">數字</td><td data-label="39 筆裡符合" class="num">39</td></tr>
+        <tr class="hi"><td data-label="用這個編號去讀" class="mono">0 / 3（HideCatcher HideNet）</td><td data-label="期望"><strong>只能是 0 或 1</strong></td><td data-label="39 筆裡符合" class="num"><strong>39</strong></td></tr>
+        <tr class="hi"><td data-label="用這個編號去讀" class="mono">13（LocMarkerName）</td><td data-label="期望"><strong>不是數字的名稱</strong></td><td data-label="39 筆裡符合" class="num"><strong>39</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>39 / 39，九項全中。</strong>這正是本站當年把 7 台守備視角一起讀錯
+       還不自知的原因：在原版英文版上它真的全中。</p>
+    <p><strong>同一套檢查搬到官方中文版那份散裝的 <code>datafile.txt</code></strong>
+       （用它自己那張 116 欄名稱表，去讀它自己的 39 筆），
+       <strong>九項裡就有五項掉下來</strong>：<code>X</code>、<code>Y</code>、
+       <code>LocMarkerName</code> 掉到 <strong>32 / 39</strong>，
+       不符的正好是 <code>FieldingView1</code>–<code>6</code> 與 <code>HeadViewer</code>；
+       <code>FOV</code> 與 <code>HideCatcher</code> 掉到 <strong>38 / 39</strong>，
+       不符的是 <code>HeadViewer</code>；只有 <code>Z</code>、<code>Pitch</code>、
+       <code>Heading</code>、<code>HideNet</code> 還是 <strong>39 / 39</strong>。</p>
+    <p><u>同一份設定檔的兩個版本，一個全中、一個掉五項</u>，
+       這件事本身就說明「39 筆共用同一張表」不是量到的事實。</p>
+    <div class="card blue" style="margin-top:10px">
+      <p class="card-h">本站另外做了一次證偽測試</p>
+      <p>「九項全中」聽起來很強，但要小心：<u>如果隨便位移幾格也照樣全中，那這個測試就沒有鑑別力</u>。
+         所以本站把整張名稱表<strong>刻意位移 −8 到 +8 格</strong>，每一格都重跑那九項：</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th class="num">位移</th><th class="num">九項裡全中幾項</th></tr></thead>
+        <tbody>
+          <tr class="hi"><td class="num"><strong>0（不位移）</strong></td><td class="num"><strong>9</strong></td></tr>
+          <tr><td class="num">+1</td><td class="num">6</td></tr>
+          <tr><td class="num">−1 / +2</td><td class="num">3</td></tr>
+          <tr><td class="num">其餘 13 種位移</td><td class="num">2 或更少</td></tr>
+        </tbody>
+      </table></div>
+      <p><strong>只有不位移那一格是滿分。</strong>但 +1 拿到 6 分，
+         代表這九項測試<u>沒有本站原本以為的那麼嚴</u> ——
+         隔壁那一欄剛好也是數字的機率不低。</p>
+      <p class="small">所以本站把這條標成<strong>推論</strong>而不是「量到的」，
+         而且把上面這張表也放出來，讓你自己判斷證據夠不夠。
+         <span class="badge wip">推論</span></p>
+    </div>
+    <p class="small">⚠️ 本站在別的地方犯過一模一樣的錯：
+       用「數量剛好對得上」去推「編號 → 名稱」的對應，結果整段結論反過來。
+       那次的完整訂正在<a href="player-codes.html#stance">代號對照那一頁</a>。
+       <u>會被同一種錯咬兩次，是因為它每次都長得很像好證據。</u></p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">本站做了一個失敗的對照組，說出來比較誠實</p>
+    <p>為了測「這張表是不是隨便套都會過」，本站找了欄位數 ≥87、
+       但名字裡沒有 <code>View</code> 的 73 筆當對照組，結果九項裡有四項不符
+       —— 看起來測試有鑑別力。</p>
+    <p><strong>然後去看那 73 筆叫什麼名字，發現它們大多也是攝影機</strong>：
+       <code>batterintro_01_cam01_left.StartCam</code>、<code>batterreplay_right_foul.Cam1</code>、
+       <code>PostHitCam</code>、<code>UserReplayHighFirst</code>……
+       對照組根本不是對照組。</p>
+    <p>換一個判準（X／Y／Z／FOV／Pitch／Heading／Roll 七欄全是數字）去掃全部 21,425 筆，
+       命中 <strong>223 筆</strong>，但裡面混著 <code>skillbase</code>、<code>fintweak</code>、
+       <code>FECreateAPlayer</code> 這些明顯不是攝影機的東西
+       —— <u>這個判準會誤判，所以本站不拿 223 當「攝影機總數」</u>。</p>
+    <p><strong>結論只寫到能站得住的地方</strong>：名字裡有 <code>View</code> 的有 39 筆，
+       整個攝影機家族比 39 大很多，確切數字<span class="badge wip">未定</span>。</p>
+  </div>
+
+  <h3>選單上那些名字，在檔案裡找得到</h3>
+  <p>遊戲的語系檔裡有一串攝影機名稱，跟 <code>datafile.txt</code> 裡的記錄名對得起來：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>遊戲選單顯示</th><th class="mono">datafile.txt 裡的記錄名</th></tr></thead>
+    <tbody>
+      <tr><td>Center Field Camera</td><td class="mono">UserReplayCF</td></tr>
+      <tr><td>Left Field Camera</td><td class="mono">UserReplayLF</td></tr>
+      <tr><td>Right Field Camera</td><td class="mono">UserReplayRF</td></tr>
+      <tr><td>High First / High Home / High Third Camera</td><td class="mono">UserReplayHighFirst / …HighHome / …HighThird</td></tr>
+      <tr><td>Low First / Low Home / Low Third Camera</td><td class="mono">UserReplayLowFirst / …LowHome / …LowThird</td></tr>
+      <tr><td>Mid First / Mid Third Camera</td><td class="mono">UserReplayMidFirst / …MidThird</td></tr>
+      <tr class="lo"><td>Batter Pitcher Camera · Hitter's Eye Camera</td><td class="mono">找不到對應的 UserReplay 記錄</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">11 個選單名稱對上 11 筆記錄，一對一。剩下兩個沒有對應的，
+     本站<u>不硬配</u>。<span class="badge wip">那兩個對到哪裡未解</span></p>
+
+  <h3 id="fmg">還有一台叫 <code>FieldingMiniGame</code> 的攝影機</h3>
+  <p>它的名字裡沒有 <code>View</code>，所以不在上面那 39 筆裡，
+     但它確實是一筆攝影機記錄。整份 <code>datafile.txt</code> 裡<strong>只出現一次</strong>，
+     兩個版本都在<strong>第 8,010 行</strong>，欄位數 115：</p>
+<pre><code>0x5d51ae <span class="nu">115</span>&lt;FieldingMiniGame&gt;;…;<span class="hl">11 Home Plate</span>;…
+  ;<span class="hl">15 -454.000;16 288.500;17 -454.000</span>;…;<span class="hl">25 FieldingGameWall</span>;…</code></pre>
+  <p>上面是<u>官方英文版</u>的編號，照本頁那張 116 欄的表讀：
+     <code>11</code> 是 <code>LocationObject</code>（本壘板）、
+     <code>15/16/17</code> 是 X／Y／Z、
+     <code>25</code> 是 <code>TargetObject</code>。
+     它落在第 8,010 行，往前最近的一張名稱表正是第 7,940 行那張打擊表 ——
+     <u>照「一張表管到下一張表為止」這條規則，管它的就是那張</u>。
+     中文版的同一行內容一樣，但編號一如既往重排過：
+     <code>13 Home Plate</code>、座標在 <code>;16 / ;17 / ;18</code>、
+     <code>25 FieldingGameWall</code>。</p>
+  <p>它瞄準的 <code>FieldingGameWall</code> 在整份檔裡也只出現這一次。
+     混音表裡那組 <code>FMG</code>（<code>FMGVolume</code>、<code>FMGMusicVol%</code>）
+     在玩家看得到的地方都找不到出處，而這筆記錄的名字剛好是
+     <code>FieldingMiniGame</code> —— <strong>名字對得起來，但本站沒有在遊戲裡看到過這個小遊戲</strong>。
+     完整的追查在<a href="audio.html">音訊那一頁</a>，混音表那一組在<a href="#audio">下一節</a>。
+     <span class="badge wip">名字對得上，實際存不存在未驗</span></p>
+
+  <h3>有兩座球場自己覆寫了守備視角（三個項目）</h3>
+  <p><code>FieldingView2</code> 這個視角，除了 <code>datafile.txt</code> 定義了一次之外，
+     還有三個項目各自定義了一次：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th class="mono">項目</th><th>是哪座球場</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td class="mono">metrdome.txt</td><td>室內巨蛋</td></tr>
+      <tr class="hi"><td class="mono">shibday.txt · shibnite.txt</td><td>一座 1900 年代的老球場，日間與夜間各一份</td></tr>
+    </tbody>
+  </table></div>
+  <p>460 個項目裡<strong>只有這三個</strong>覆寫視角。兩座都是形狀特殊的球場
+     —— 一座有屋頂、一座很老。<span class="badge wip">為什麼是這兩座，本站沒有答案</span></p>
+
+  <h2 id="audio">音量：127 軌，每一軌都有名字</h2>
+  <p>另一筆記錄（欄位數 127）是整個遊戲的混音表。它的記錄名叫 <code>test</code>，
+     但內容一點都不像測試用的：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>這一群</th><th class="mono">欄位名（節選）</th></tr></thead>
+    <tbody>
+      <tr><td>總量</td><td class="mono">Volume · MasterVolume · PBPVolume%（播報）· PAVolume%（場內廣播）</td></tr>
+      <tr class="hi"><td><strong>群眾</strong></td><td class="mono">CrowdLowStreamVol% · CrowdHighStreamVol% · ApplauseVol% · CheerVol% · BooVol% · OhVol% · TensionVol% · AnticipationVol%</td></tr>
+      <tr class="hi"><td><strong>群眾反應之間的「過渡」</strong></td><td class="mono">OhBooVol% · BooAfterOh% · OhCheer% · CheerAfterOh% · OhApplause% · AplsAfterOh%</td></tr>
+      <tr><td>球場動作</td><td class="mono">BatSwingVol% · BatBreakVol%（球棒斷掉）· SlideVol% · HelmetHitVol% · FoulPoleVol%</td></tr>
+      <tr><td>氣氛</td><td class="mono">HecklesVol%（噓聲叫囂）· VendorsVol%（小販）· OrganRallyVol%（管風琴）· BatDittyVol%（打者出場曲）</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card grass">
+    <p class="card-h">群眾不是只會歡呼，它有「情緒過渡」的混音</p>
+    <p>注意上表第三列。<code>OhBooVol%</code>、<code>BooAfterOh%</code>、
+       <code>CheerAfterOh%</code>、<code>AplsAfterOh%</code> ——
+       這些是<strong>「喔……」之後接噓聲</strong>、<strong>「喔……」之後接歡呼</strong>
+       這種<u>兩段情緒之間</u>的音量。</p>
+    <p>球快要出牆時全場「喔——」，然後被接殺變成噓聲、或飛出去變成歡呼。
+       這個轉折在 2005 年就是<strong>一個獨立的可調參數</strong>。</p>
+  </div>
+
+  <h3>裡面藏著三個小遊戲的音效</h3>
+  <p>同一張表裡有四組前綴：<code>BMG</code>、<code>PMG</code>、<code>FMG</code>、<code>HRS</code>。
+     其中三個在遊戲文字裡找得到對應：<u>Batting Mini Game</u>、<u>Pitching Mini Game</u>、
+     <u>Home Run Showdown</u>。
+     <strong><code>FMG</code> 找不到</strong> —— 詳情在
+     <a href="audio.html">音訊那一頁</a>，那是一個只存在於程式內部的小遊戲。
+     它們的音效名字很有畫面：</p>
+<pre><code><span class="hl">Lawnmower1Vol%  Lawnmower2Vol%  Lawnmower3Vol%  LawnmowerImpactVol%</span>
+<span class="hl">TrampolineVol%  ChainlinkFenceVol%</span>
+WoodImpactVol%  MetalImpactVol%  GridHitVol%  BlocksHitVol%</code></pre>
+  <p>遊戲的文字檔裡也有對應的計分項目：
+     <u>Lawnmowers Hit</u>（打中幾台除草機）、<u>Vehicles Hit</u>、
+     <u>Moving Ramps Hit</u>、<u>Stationary Ramps Hit</u>、<u>Vortices Hit</u>、
+     <u>Fielder Fences Hit</u>、<u>Ball Bounces Over The Wall</u>。</p>
+
+  <div class="card blue">
+    <p class="card-h">跟另一個檔對得起來</p>
+    <p><a href="anims.html#wholegame">整個遊戲的 3,503 個 ELF</a> 那一節提到，
+       全遊戲只有 <code>data\misc\miscmod.big</code> 裡的 14 個模型是完整的。
+       那 14 個叫：</p>
+<pre><code>aple.o  bern.o  bli1.o  bli2.o  <span class="hl">lawn.o</span>  moon.o  obj1.o
+obj2.o  obj3.o  obj4.o  pla1.o  pla2.o  roof.o  <span class="hl">tran.o</span></code></pre>
+    <p><code>lawn</code> 旁邊有 <code>Lawnmower1/2/3Vol%</code>，
+       <code>tran</code> 旁邊有 <code>TrampolineVol%</code>。</p>
+    <p><strong>本站量到的是這兩件事各自成立，以及名字很接近。</strong>
+       「<code>lawn.o</code> 就是除草機的模型」是<u>合理的推測</u>，
+       但本站<u>沒有把模型畫出來看過</u>，所以不寫成定論。
+       <span class="badge wip">推測</span></p>
+  </div>
+
+  <h2 id="lighting">燈光：PC 版裡裝著三台主機的設定</h2>
+  <p>檔案裡有<strong>四筆</strong>燈光記錄，名字直接說了它們是給誰的：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">記錄名</th><th class="num">欄位數</th><th class="num">空白</th>
+               <th class="num">值是 0</th><th class="num">有實際值</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="記錄名" class="mono">pclighting</td><td data-label="欄位數" class="num"><strong>381</strong></td>
+          <td data-label="空白" class="num">77</td><td data-label="值是 0" class="num">185</td><td data-label="有實際值" class="num"><strong>119</strong></td></tr>
+      <tr><td data-label="記錄名" class="mono">xboxlighting</td><td data-label="欄位數" class="num">348</td><td data-label="空白" class="num">74</td><td data-label="值是 0" class="num">188</td><td data-label="有實際值" class="num">86</td></tr>
+      <tr><td data-label="記錄名" class="mono">ps2lighting</td><td data-label="欄位數" class="num">348</td><td data-label="空白" class="num">74</td><td data-label="值是 0" class="num">185</td><td data-label="有實際值" class="num">89</td></tr>
+      <tr><td data-label="記錄名" class="mono">gclighting</td><td data-label="欄位數" class="num">348</td><td data-label="空白" class="num">74</td><td data-label="值是 0" class="num">184</td><td data-label="有實際值" class="num">90</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">每一座球場<u>用哪一組</u>光源，記在別的地方 ——
+     見<a href="stadium.html">球場檔那一頁</a>（87 個球場封裝檔、58 座場地、16 種光源組）。</p>
+  <p>這是<u>PC 版</u>的遊戲檔。裡面卻裝著 Xbox、PS2、GameCube 三台主機的燈光設定，
+     而且<strong>不是空殼</strong> —— 每一份都有 86 到 90 個欄位填了實際的值。</p>
+  <p>三個主機版彼此也不一樣：Xbox 跟 PS2 差 11 欄、Xbox 跟 GameCube 差 4 欄、
+     PS2 跟 GameCube 差 15 欄。<strong>每一台都是分開調過的。</strong></p>
+
+  <div class="card grass">
+    <p class="card-h">PC 版多出來的 33 個欄位，全部是同一件事</p>
+    <p>把 <code>pclighting</code> 的欄位編號跟主機版一比，PC 多出 <strong>33 個</strong>。
+       用名稱表把它們讀出來，<u>全部集中在三個地方</u>：</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>地點</th><th>每個地點有什麼</th><th class="num">欄位數</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td><strong>牛棚</strong> <code>Bullpen_</code></td>
+            <td rowspan="3">3 盞方向光，各有<u>方向、俯仰、顏色</u>；<br>再加環境光的強度與顏色</td>
+            <td class="num" rowspan="3">3 × 3 ＋ 2<br>＝ 每個地點 11</td></tr>
+        <tr class="hi"><td><strong>左側休息區</strong> <code>DugoutL_</code></td></tr>
+        <tr class="hi"><td><strong>右側休息區</strong> <code>DugoutR_</code></td></tr>
+        <tr><td colspan="2"><strong>合計</strong></td><td class="num"><strong>3 × 11 ＝ 33</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p>算式剛好對上，一個不多一個不少。
+       換句話說：<strong>PC 版會單獨打亮牛棚跟兩側休息區，主機版不會。</strong></p>
+    <p class="small">這是<u>從欄位名稱與數量讀出來的</u>。
+       至於實際畫面上差多少，本站沒有主機版可以比對。
+       <span class="badge wip">視覺差異未驗</span></p>
+  </div>
+
+  <h2 id="howto">自己看一遍</h2>
+  <p>不用寫解析器也能看。<code>datafile.txt</code> 解出來就是純文字，
+     用任何編輯器搜尋 <code>BattingView</code> 或 <code>Lawnmower</code> 就找得到。</p>
+  <div class="step">
+    <div class="step-n">1</div>
+    <div>
+      <p>先把 <code>datafile.big</code> 裡有什麼列出來：</p>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data\datafile\datafile.big --entries</code></pre>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">2</div>
+    <div>
+      <p>找到 <code>datafile.txt</code> 那一列，確認它顯示 <code>QFS → 純文字</code>。</p>
+      <p class="small">它是 460 個裡最大的一個，解開之後 4.2 MB 左右（4,392,183 bytes，本站的 MB 一律是 ÷1,048,576 那一種）。</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">3</div>
+    <div>
+      <p>解出來之後搜 <code>&lt;BattingView1RightLow&gt;</code>，
+         對照本頁的欄位編號表看那一行的 <code>;15</code>、<code>;16</code>、<code>;17</code>。</p>
+    </div>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">⚠️ 本站沒有驗的事</p>
+    <p>這一頁講的全部是<strong>「檔案裡寫了什麼」</strong>。
+       至於<u>改了之後遊戲會有什麼反應</u>，本站<strong>一次都沒有實機試過</strong>。</p>
+    <p>所以這頁<u>不是教學</u>，沒有步驟、沒有成功標準。
+       想動手改視角，走
+       <a href="../tutorials/change-camera/index.html"><strong>改視角那一課</strong></a>
+       —— 那裡有預覽、自動備份、一行還原，以及「出錯了怎麼辦」的對照表。</p>
+    <p class="small">完全沒改過遊戲檔的人，建議先從
+       <a href="../tutorials/edit-speed/index.html">改跑壘速度</a>那種
+       「只動純文字、附還原腳本」的開始。</p>
+    <p>要動的話，寫回封裝檔的規矩看 <a href="bigf.html#append">BIGF 封裝格式</a>
+       ——<strong>接到檔尾，改目錄 8 個位元組與檔頭 4 個位元組</strong>，
+       而且<u>動手之前先備份</u>。</p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 攝影機、音量、燈光、打擊物理全部寫在同一個純文字檔裡，而且 EA 把每個欄位的名字也一起寫進檔案，所以規矩只有一條：<u>不要記欄號，去讀表頭</u>。</li>
+    <li><strong>規模</strong> <code>datafile.big</code> 是 2,857,593 bytes、460 個項目，全部是 QFS 壓縮的純文字，解開之後合計 14,095,446 bytes（4.9 倍）。其中最大的 <code>datafile.txt</code> 有 4,392,183 bytes、21,548 行，本站全部解析完，沒有一行讀不懂。</li>
+    <li><strong>一行怎麼讀，以及一個很好踩的坑</strong> 識別碼後面那個數字<u>不是型別編號，是這一行的欄位數量</u>，21,548 行零例外。但識別碼<strong>不是固定長度</strong>（8 位 20,144 行、7 位 1,320、6 位 79、5 位 5），本站第一版解析器把它寫死成 8 位，1,404 行對不上，差點寫成「有 1,404 行是未知格式」。是解析器錯，不是檔案怪。</li>
+    <li><strong>換行符號跟版面檔正好相反</strong> <code>datafile.txt</code> 用 LF、CRLF 0 個，<code>data/datafile/</code> 底下 466 個 <code>.txt</code> 有 460 個是 LF、CRLF 0 個（剩下 6 個是 0 bytes 的空檔，連一個換行位元組都沒有）；對照之下 329 個 <code>.fel</code> 版面檔全是 CRLF，<code>anims.big</code> <u>裡面</u>那 244 個 <code>.axt</code>（副檔名不是 <code>.txt</code>，也不是散在 <code>data/anims/</code> 底下）又是 CRLF 200 / LF 44。規則是<u>看檔案家族，不是看副檔名</u>。另外那 460 個項目都是壓縮的，不解壓就數換行會數到壓縮位元組。</li>
+    <li><strong>本站 2026-08-28 訂正的一段</strong> 這裡原本寫「整份檔裡只有一筆攝影機記錄帶名稱表」，<strong>那是錯的，有兩張</strong>。116 欄那張管 32 台 <code>BattingView*</code>，128 欄那張管 <code>FieldingView1</code> 到 <code>6</code> 與 <code>HeadViewer</code> 共 7 台，規則是位置，一張表管到下一張表為止，跑一次零例外。表頭在第幾行跟著版本跑：打擊表兩版都在第 7,940 行，守備表在英文版（封裝的 <code>datafile.big</code>）是第 8,516 行、在中文版（散裝的 <code>datafile.txt</code>）是第 9,216 行。這個疏漏讓改視角那一課的工具對 7 台攝影機顯示錯的欄位名、而且會寫壞檔，已修好。諷刺的是 128 一直就列在本頁「唯一對應一張表」的清單裡，只是沒有人把它跟攝影機連起來。另外還有一筆名字裡沒有 <code>View</code> 的攝影機 <code>FieldingMiniGame</code>（兩版都在第 8,010 行、欄位數 115、全檔只出現一次），由 116 欄那張打擊表管，它瞄準的 <code>FieldingGameWall</code> 同樣只出現一次。</li>
+    <li><strong>最容易誤讀的地方</strong> 官方英文版與中文版的<u>欄位名字完全一樣、攝影機也完全一樣（39 台）</u>，但編號整個重排過。打擊表 116 個名字只有 35 個編號相同（30%），<strong>守備表 128 個裡相同的是 0 個</strong>。同一個 <code>;53</code> 在打擊表兩版都叫 <code>FOV</code>；在守備表，英文版那張叫 <code>Pitch</code>、中文版那張叫 <code>VerticalFraming</code>。任何寫死編號的工具，換一個版本就會靜靜地寫錯地方。順帶一提，「欄位數一樣就是同一種東西」也是錯的：123 行表頭只涵蓋 43 種欄位數，其中 15 種內容彼此不一致。</li>
+    <li><strong>PC 版裡裝著三台主機的燈光</strong> 四筆燈光記錄中 <code>pclighting</code> 有 381 欄、119 欄填了實際值，Xbox / PS2 / GameCube 各 348 欄、86 到 90 欄有值，而且三台彼此也不一樣，每一台都是分開調過的。PC 多出來的 <strong>33 欄</strong>全部集中在牛棚與左右兩側休息區：每個地點 3 盞方向光各 3 欄，再加環境光 2 欄，3 × 11 剛好 33。</li>
+    <li><strong>本站沒驗的</strong> 這一頁講的全部是「檔案裡寫了什麼」，<u>改了之後遊戲會有什麼反應，本站一次都沒有實機試過</u>，所以這頁不是教學，沒有步驟也沒有成功標準。另外還掛著這些：拿 116 那張表去讀全部 39 筆「九項全中」，那是在剛安裝好的原版英文版上量的（同一套檢查搬到官方中文版就有五項掉下來，見上面），而且刻意位移 +1 也拿得到 6 分，鑑別力沒有本站原本以為的強，所以只標成推論；攝影機家族的確切總數未定（換判準掃到 223 筆，裡面混著 <code>skillbase</code>、<code>fintweak</code> 這些明顯不是攝影機的東西）；選單上的 Batter Pitcher Camera 與 Hitter's Eye Camera 對到哪筆記錄未解；為什麼只有那三個球場項目覆寫守備視角沒有答案；<code>lawn.o</code> 是不是除草機模型只是推測，本站沒把模型畫出來看過；<code>FieldingMiniGame</code> 這台攝影機與混音表那組 <code>FMG</code> 名字對得上，但本站沒有在遊戲裡看到過這個守備小遊戲；PC 版多打亮牛棚與休息區的實際視覺差異，本站沒有主機版可以比對。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="bigf.html">BIGF 封裝格式</a> —— <code>datafile.big</code> 也是這個格式</li>
+    <li><a href="qfs.html">QFS / RefPack 壓縮</a> —— 460 個項目全部包著這一層</li>
+    <li><a href="database.html">名冊檔總覽</a> —— 同樣是「檔案自己說明自己」的設計</li>
+    <li><a href="anims.html#wholegame">動作庫與全遊戲的 ELF</a> —— <code>miscmod.big</code> 那 14 個檔在這裡</li>
+    <li><a href="../tutorials/backup/index.html">備份與還原</a> —— 動任何檔之前先看這一課</li>
+  </ul>
+
+  <footer>
+    <p>本頁所有數據皆取自實際解開的檔案內容，非推測。標著「推測」的地方是本站明講的例外。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

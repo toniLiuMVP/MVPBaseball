@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/report.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>回報與下架 — toni的MVP模組補習班</title>
+<meta name="description" content="教學寫錯了、腳本壞了、數字不對怎麼回報；以及權利人要求下架的所有管道。三條管道，其中一條不需要任何帳號，另一條完全不必經過本站維護者。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="index.html">首頁</a>
+  <a class="item" href="start.html">新手基本功</a>
+  <a class="item" href="do.html">我想做什麼</a>
+  <a class="item" href="plan.html">課表</a>
+  <a class="item" href="tutorials/index.html">教學</a>
+  <a class="item" href="7min/index.html">七分鐘</a>
+  <a class="item" href="reference/index.html">速查</a>
+  <a class="item" href="coach/index.html">棒球教練</a>
+  <a class="item" href="story/index.html">故事</a>
+  <a class="item" href="about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px">回報與下架</p>
+  <h1>回報與下架</h1>
+  <p class="lede">這一頁是本站管道資訊的<strong>單一來源</strong>。
+     站上其他地方（包含每一支腳本的檔頭）都指向這裡，
+     管道有任何變動<u>一律以這一頁為準</u>；<a href="legal.html">法律頁</a>第 10 節那張下架表
+     由檢查器 <code>selftest_channels.py</code> 盯著跟這裡一致，
+     不會出現「這頁寫這個、那頁寫那個」。</p>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法看<a href="tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <div class="quickfix" id="quick">
+    <p class="card-h">⚡ 你是哪一種？</p>
+    <ol>
+      <li><strong>教學照做卡住了 / 數字對不上 / 腳本壞了</strong>
+          → 看下面<a href="#bug">「回報一個問題」</a>。
+          兩條管道，其中一條不用開任何帳號。</li>
+      <li><strong>你是權利人，要求本站移除內容</strong>
+          → 看下面<a href="#takedown">「下架管道」</a>。
+          <u>三條管道，而且其中一條完全不必經過本站維護者</u>。</li>
+    </ol>
+  </div>
+
+  <h2 id="bug">回報一個問題</h2>
+  <p>回報之前，先做一件事會讓事情快很多：<strong>動手的教學裡，約一半最後附有「回報範本」</strong>
+     （有些頁面叫「📋 回報格式」或「📋 卡住的話，照這個格式回報」），把它複製下來填一填。
+     裡面問的東西（你的系統、你跑了哪一行、看到什麼輸出）就是判斷問題所需要的全部資訊。
+     沒有那些資訊，來回問三次也解不掉；<u>那一課沒有附範本的話，照括號裡那三項自己寫一遍就夠了</u>。</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>管道</th><th>要不要帳號</th><th>適合什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi">
+        <td data-label="管道"><a href="https://tonimvp.blogspot.com" rel="noopener">toni的MVP</a> 的留言區</td>
+        <td data-label="要不要帳號"><strong>不用</strong></td>
+        <td data-label="適合什麼">不想開帳號、或只是想問一句。這個站從 2008 年就在了</td></tr>
+      <tr>
+        <td data-label="管道"><a href="https://github.com/toniLiuMVP/MVPBaseball/issues" rel="noopener">GitHub Issues</a></td>
+        <td data-label="要不要帳號">要（免費）</td>
+        <td data-label="適合什麼">要貼一大段輸出、要來回追蹤的問題</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card clay">
+    <p class="card-h">⚠️ 貼回報之前，先看一眼路徑</p>
+    <p>腳本的輸出常常帶著<strong>你電腦上的完整路徑</strong>，而那裡面通常有你的使用者名稱。
+       例如檢查安裝的那一支，第一行就是把你打進去的路徑原樣印出來：</p>
+<pre>遊戲資料夾  C:\Users\<span class="hl">〔你的名字〕</span>\Games\MVP Baseball 2005</pre>
+    <p><strong>貼到公開的地方之前，把那一段改成 <code>XXX</code>。</strong>
+       本站需要的是後面的檔名、數字與雜湊值，<u>不需要知道你叫什麼</u>。</p>
+    <p class="small">指紋那一支（<code>mvp_fingerprint.py</code>）已經<u>預設只印資料夾名稱</u>，
+       要完整路徑得自己加 <code>--show-full-paths</code> ——
+       但它是特例，其他腳本照你打的原樣印。</p>
+  </div>
+
+  <h2 id="takedown">下架管道（Takedown）</h2>
+  <p>若您是權利人並認為本站任何內容侵權，
+     <strong>不需要先跟維護者聯絡</strong>，以下任何一條管道都可以。
+     本站不會要求您先證明什麼。</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>管道</th><th>要不要帳號</th><th>要不要經過本站維護者</th><th>說明</th></tr></thead>
+    <tbody>
+      <tr class="hi">
+        <td data-label="管道"><strong>GitHub 的下架流程</strong></td>
+        <td data-label="要不要帳號">依 GitHub 規定</td>
+        <td data-label="要不要經過本站維護者"><strong>不必</strong></td>
+        <td data-label="說明">本站是 GitHub Pages 靜態頁。權利人可以直接走
+            GitHub 自己的下架流程，<u>完全不必經過本站維護者，也不必等他回應</u>。
+            這是本站唯一一條「維護者失聯也照樣有效」的管道。官方說明：<a href="https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy" rel="noopener nofollow">GitHub DMCA Takedown Policy</a></td></tr>
+      <tr>
+        <td data-label="管道"><a href="https://github.com/toniLiuMVP/MVPBaseball/issues" rel="noopener">GitHub Issues</a></td>
+        <td data-label="要不要帳號">要（免費）</td>
+        <td data-label="要不要經過本站維護者">要</td>
+        <td data-label="說明">公開的討論串，處理過程所有人看得到</td></tr>
+      <tr>
+        <td data-label="管道"><a href="https://tonimvp.blogspot.com" rel="noopener">toni的MVP</a> 的留言區</td>
+        <td data-label="要不要帳號">不用</td>
+        <td data-label="要不要經過本站維護者">要</td>
+        <td data-label="說明">不想開 GitHub 帳號時走這條。留言可能需要審核，
+            所以不是最快的一條</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card blue">
+    <p class="card-h">📋 成立之後會發生什麼</p>
+    <p>整個站是<strong>靜態頁</strong>，刪掉一個檔就沒了 ——
+       個別頁面或整站可以在幾分鐘內下線，不需要跑任何流程。
+       本站也<u>不會要求您先證明權利歸屬</u>再處理。</p>
+    <p><strong>本站的承諾</strong>（與<a href="legal.html#takedown">法律頁第 10 節</a>同一份）：</p>
+    <ul>
+      <li>收到通知後<strong>先下架、再討論</strong> —— 不會要求您先證明什麼。</li>
+      <li>目標在<strong>七日內</strong>回應。若維護者無法回應，
+          上表第一條（直接向 GitHub 提出）不經過他也一樣有效。</li>
+      <li>下架的內容會記在<a href="changelog.html">更新紀錄</a>，
+          寫明「下架了什麼、為什麼」，但<u>不會寫出通知人是誰</u>。</li>
+    </ul>
+    <p>本站的自我約束寫在<a href="legal.html">法律與版權說明</a>：
+       不散布遊戲本體、不教規避防盜拷、教的是修改你自己那一份。</p>
+  </div>
+
+  <h2>為什麼有這一頁</h2>
+  <p>2026-08-29 之前，站上有 <strong>42 個地方</strong>各自寫死同一個 GitHub 網址
+     （23 個頁面、19 支腳本的檔頭註解）。那有兩個問題：</p>
+  <ul>
+    <li><strong>管道一改要改 42 個地方</strong>，而且沒有任何東西在保證它們一致。</li>
+    <li><strong>而它們確實已經分岔了</strong>：<a href="about.html">關於</a>那一頁的聯絡表
+       列了兩條（留言區＋GitHub Issues），而<a href="legal.html">法律頁</a>的下架表
+       原本<u>沒有留言區那一條</u> —— 也就是「不用開帳號」這個唯一的無門檻管道，
+       只寫在其中一頁上。2026-08-29 已經補齊並對齊。</li>
+  </ul>
+  <p>現在全部指向這一頁。以後管道有任何變動，改這裡就好。</p>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 回報問題與要求下架的所有管道都在這一頁，站上其他地方都指向這裡。</li>
+    <li><strong>不想開帳號</strong> 走 <a href="https://tonimvp.blogspot.com" rel="noopener">toni的MVP</a> 的留言區，回報與下架都收。</li>
+    <li><strong>權利人最強的一條</strong> 直接向 GitHub 提出 ——
+        不必經過本站維護者，也不必等他回應。</li>
+    <li><strong>成立之後</strong> 靜態頁刪掉一個檔就沒了，幾分鐘內可以下線，不會要求您先證明什麼；
+        目標七日內回應，下架紀錄不會寫出通知人是誰。</li>
+    <li><strong>本站沒驗的</strong> GitHub 那兩條管道本站都還沒有實際走過一次，
+        沒辦法告訴您送出之後多久會有回應；留言區那條是從 2008 年就在用的。</li>
+  </ul>
+
+  <footer>
+    <p>這一頁是站上管道資訊的<strong>單一來源</strong>。
+       每一支腳本的檔頭都印著這一頁的網址，而不是各自寫死管道。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="legal.html">法律與版權說明</a> ·
+       <a href="changelog.html">更新紀錄</a> · <a href="index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

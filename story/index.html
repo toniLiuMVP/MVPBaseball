@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/story/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>故事 — toni的MVP模組補習班</title>
+<meta name="description" content="逆向這款 2005 年的遊戲時，挖到的不只是格式。開發現場的時間戳、設計取捨、台灣模組社群的痕跡。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item" href="../reference/index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item on" href="index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="eyebrow" style="margin-top:36px">故事</p>
+  <h1>檔案裡不只有資料</h1>
+  <p class="lede">拆一款二十年前的遊戲，除了格式與數值，
+     還會挖到當初沒人打算給玩家看的東西：開發者電腦上的資料夾路徑、
+     每個檔案編譯完成的那一秒、以及一整套刻意的設計取捨。</p>
+
+  <div class="lesson">
+    <span class="t"><a href="build-2004/index.html">平安夜凌晨的兩次建置</a></span>
+    <span class="d">243 個動畫封包的時間戳，還原 2004 年那個團隊做完這款遊戲<strong>動畫</strong>的最後幾小時。
+       順便發現遊戲裡有 125 個專屬動作庫（102 個掛著球員名字）—— 包括鈴木一朗那個著名的擺動。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="orphan-data/index.html">一個檔案裡的地層</a></span>
+    <span class="d"><u>本站測試機</u>那份遊戲介面檔有 92.6% 的內容目錄根本不指向（剛安裝好的原版只有 0.04%）。那不是垃圾 ——
+       是同一批畫面的其他版本，還讀得出來，<strong>其中一份跟現在用的那份逐位元組完全相同</strong>。
+       其中一個畫面在同一個檔裡有三份。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="hidden-website/index.html">遊戲裡藏著一整個網站</a></span>
+    <span class="d">519 個檔案是一整套 2005 年的社群網站 —— 俱樂部、錦標賽、排行榜。
+       記事本就打得開，而開發者忘了收乾淨的東西還留在裡面：
+       <strong>一個拼錯三次的字，跟一個永遠翻不出人話的錯誤訊息</strong>。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="community-voices/index.html">EA 沒錄的名字，台灣人自己錄了</a></span>
+    <span class="d">遊戲的播報員唸不出台灣球員的名字，因為 EA 沒錄。
+      但這台機器的遊戲資料夾旁邊，躺著 <strong>23 個資料夾、69 個語音檔</strong> ——
+      2005 到 2009 年，台灣的模組玩家自己做的。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="hidden-legends/index.html">名單裡藏著 61 個名人堂球員</a></span>
+    <span class="d">球員資料檔第 44 欄叫 <code>hidden</code>。把值是 1 的挑出來 ——
+       <strong>Babe Ruth、Ty Cobb、Cy Young、Jackie Robinson、Satchel Paige</strong>，
+       61 個人，落在四支特別球隊的其中三支 —— 而那四支共用一組沒有別人在用的聯盟編號。
+       而且三個互不相干的檔案，同時把這群人特別對待。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="stance-choices/index.html">王建民用的是 Smoltz 的投球姿勢</a></span>
+    <span class="d">2009 年社群逐人寫下「誰用誰的姿勢」，還附了理由。
+       十七年後打開那份名冊：<strong>十條逐一比對，十條全中</strong>。
+       教學裡那個「填一個整數」的動作，當年是有人看著比賽影片決定的。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="2008-roster/index.html">2008 年那份名單裡的每一個人</a></span>
+    <span class="d">33 位旅美球員的臉皮編號、大頭照編號、當時在哪一隊、那張臉是誰做的，
+       一人一行。<strong>十八年後打開遊戲檔案，編號幾乎全部還在。</strong>
+       同一批資料裡還有中職六隊的 <code>.met</code> 檔。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="fourteen-years/index.html">十四年後打開自己的模組資料夾</a></span>
+    <span class="d">2004 年的第一個 <code>.psd</code>、2006 年那 4,392 個檔的高峰、
+       <strong>一個字一個字錄下來的中文播報</strong>、
+       以及 2007 年台灣之光把釀酒人整隊換掉的那一刻。全部從檔案本身量出來，不靠回憶。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="mvpmods-2026/index.html">二十年的樞紐關掉了</a></span>
+    <span class="d">2026 年，MVP Baseball 模組社群二十多年的主要樞紐因為<strong>災難性的伺服器故障</strong>永久下線。
+       如果你玩過任何一個這款遊戲的模組，那東西幾乎一定經過那個站。
+       而據二手來源，<u>網路檔案館從來沒有存過那個論壇</u> ——
+       消失的不只是檔案，是二十年的討論：誰在哪一年發現了什麼、哪個格式當年是怎麼解開的。
+       <strong>如果你硬碟裡有十幾年前下載的東西，那些檔案的性質已經變了。</strong>
+       本頁明確標示哪些是直接引用、哪些是本站讀不到原始頁面的二手資訊。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="tool-lineage/index.html">這些工具不是為棒球寫的</a></span>
+    <span class="d">改棒球遊戲用的那批工具，最底層那幾支來自賽車、足球、籃球、冰球社群。
+      證據都在檔案裡：說明書的第一行、執行檔內的版權字串與產品名。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="seniors/index.html">名冊以外，都是前輩做的</a></span>
+    <span class="d">2026 年 8 月 30 日班主任來訂正一句話：<u>「我必須正名，當年我做的都是台灣之光名冊，
+       因為絕大部分的球員名冊外的東西，都是前輩做的，我只是整合。」</u>
+       證據是他自己 2008 到 2023 年那 37 篇部落格原文 ——
+       <strong>其中七篇的標題就叫「好東西分享」，每一篇都把作者名寫在標題上</strong>。
+       陰性對照更乾淨：十五年、37 篇，全文找「我做」「自己做」「自製」，<u>零命中</u>。
+       這一頁把那些前輩與工具作者一個一個列出來，每一條附他當年的原話。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="people-2009/index.html">2009 年那份名冊是誰做的</a></span>
+    <span class="d">當年說明書留下一張表，一格一格寫著每位球員的臉是誰做的。把它整理出來：shojah 做了 10 位、黃衫男子 8 位、小豪前輩 4 位，小雪靈做隊徽與球衣轉檔。也記下「臉是搶來的」——要給新球員一張臉就得從某個既有球員身上拿走，八次都有紀錄。
+       順便訂正本站自己寫錯過的事：那從來不是中職名冊。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="my-collection/index.html">二十六個資料夾，為什麼留著</a></span>
+    <span class="d">二十六個資料夾，最早 2007 年、最晚 2009 年。
+       十七年後拿去對名單：<strong>十八個編號還在用，八個不在</strong>。
+       其中一個沒有署名，<u>而且連留著它的人也不知道是誰做的</u>。
+       這頁跟站上其他頁最大的差別是<strong>有人</strong>：為什麼收、為什麼停、為什麼又回來。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="taiwan-modders/index.html">2008 年，一群人在論壇上把台灣球員裝進遊戲</a></span>
+    <span class="d">同一批二十六個資料夾，這次只看名字後面那幾個字：<strong>三個個人 ID、三個集體作品包</strong>，
+       一個論壇、一種「有人喊就有人做」的請求文化。
+       還有一個當年沒人寫出來的技術限制 —— 這台測試機的臉皮號碼只有 894 個、2009 年那份名冊指派掉 896 個（真的有檔 890 個），
+       <u>所以「把某某的臉皮編號給予之」不是風格，是沒有辦法</u>。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="toni-2009/index.html">當年那兩份說明書，一句一句拿今天的檔案對過</a></span>
+    <span class="d">2008-2009 那份台灣模組留下兩份 Big5 說明書。解開之後拿今天的原版逐條對：
+       <strong>八條裡三條吻合、三條對不上</strong>（有兩個名字當年寫反了，另兩條的編號原版沒有）——
+       也包括<strong>當年為什麼非得「搶」別人的臉皮號碼</strong>。</span>
+    <span class="badge ok">✓ 可讀</span>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">這一區的寫法</p>
+    <p>故事頁一樣遵守本站的規矩：<strong>檔案裡有的才寫，推測一定標明</strong>。
+       時間戳能說明什麼時候編譯，不能說明當時有沒有人坐在電腦前 —— 這種界線會講清楚。</p>
+  </div>
+
+  <footer>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯。</p>
+    <p><a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

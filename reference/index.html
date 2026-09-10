@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>格式速查 — toni的MVP模組補習班</title>
+<meta name="description" content="MVP Baseball 2005 遊戲檔案格式速查總覽：封裝、壓縮、介面版面、球員資料、動畫、音訊。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="eyebrow" style="margin-top:36px">格式速查</p>
+  <h1>遊戲檔案是怎麼組成的</h1>
+  <p class="lede">想自己動手改、或寫自己的工具，先從這裡認識檔案格式。
+     每一頁的數字都是從實際檔案量出來的，沒有推測。</p>
+
+  <div class="card amber">
+    <p class="card-h">遊戲檔案的三層結構</p>
+    <p>絕大多數遊戲資源都遵守同一個模式，搞懂這三層，其他就是細節：</p>
+    <p style="margin-top:8px"><strong>1. 封裝</strong> —— 幾百個檔案裝進一個 <code>.big</code>（全遊戲共 224 個）<br>
+       <strong>2. 壓縮</strong> —— 取出來的項目常常還包一層 QFS<br>
+       <strong>3. 內容</strong> —— 解開後往往是<strong>純文字</strong>：版面腳本、CSV 賽程、球員資料</p>
+  </div>
+
+  <h2>先看這兩個</h2>
+  <div class="lesson">
+    <span class="t"><a href="what-can-be-modded.html">什麼改得動、什麼還不行</a></span>
+    <span class="d">誠實版現況表：哪些已完全解開、哪些只解一半、哪些短期不會有解。<strong>省得往死路鑽</strong>。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="file-map.html">遊戲檔案地圖</a></span>
+    <span class="d">224 個封裝檔在哪、裝什麼。<strong>從「我想改什麼」反查到檔案</strong>，含目前還改不了的誠實邊界。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <div class="lesson">
+    <span class="t"><a href="source-traces.html">執行檔裡剩下的原始碼痕跡</a></span>
+    <span class="d">零售執行檔留著 <strong>68 條 EA 的原始碼路徑</strong>與緊貼著它們的內部名稱表：
+       守備任務 50 格、受傷分類 27 種、投打節奏四種對局各一組、連線是延遲鎖步。
+       <strong>不用字串鄰接，用指標陣列去驗</strong>；48 條主張裡 29 條被自己人打掉。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="tools-archive.html">二十年工具清冊</a></span>
+    <span class="d">2005-2010 社群留下的 88 個工具的盤點與分類清冊。<strong>本站教你「讀」的格式，這裡有人做出了「寫」</strong>；
+       含 EA 原廠的音訊編碼器，以及<u>一條本站自己撤回的 60Hz 說法</u>。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <h2>基礎：每個修改都會用到</h2>
+  <div class="lesson">
+    <span class="t"><a href="how-we-measured.html">本站怎麼量的</a></span>
+    <span class="d">本站每個數字都寫著「量到的」，但那要先知道<u>量的是哪一份檔案</u> ——
+       同一個檔名在不同模組包裡可以差 <strong>2,200 倍</strong>。這一頁給出量測對象的
+       指紋（檔數／大小／SHA-256）、名詞的精確定義（同一個詞用兩種算法是本站踩過最多次的坑）、
+       以及一支<u>三十秒就能確認你我量的是不是同一份</u>的腳本。
+       也寫清楚<strong>本站量不到什麼</strong>。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="bigf.html">BIGF 封裝格式</a></span>
+    <span class="d">16 bytes 檔頭、目錄結構、<strong>mixed endian 陷阱</strong>，以及絕不能整包重新打包的原因。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="qfs.html">QFS / RefPack 壓縮</a></span>
+    <span class="d">怎麼辨識、四種指令編碼，以及<strong>不用寫壓縮器就能合法壓回去</strong>的技巧。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <h2>介面</h2>
+  <div class="lesson">
+    <span class="t"><a href="fel.html">FEL 版面語法</a></span>
+    <span class="d">選單、HUD、轉場全是純文字版面腳本。看懂就能改遊戲裡幾乎所有介面。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="ingame-files.html">ingame.big 47 個版面檔對照</a></span>
+    <span class="d">想改哪一塊畫面，先從這張表找到對的檔案。
+       <strong>可以直接搜尋</strong> —— 打「好壞球」「暫停」「重播」都找得到。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="fel-archives.html">版面檔裝在哪些封裝檔</a></span>
+    <span class="d">全遊戲 <strong>332 個版面檔、141,767 行、2,044 個畫面</strong>，
+       分在六個封裝檔裡。附一個叫 .big 但其實不是封裝檔的例子。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="hud-map.html">介面座標圖</a></span>
+    <span class="d">把版面檔裡的座標畫成圖，一眼看出哪個東西在畫面哪裡。
+       附「座標是絕對值」的一萬八千個元素實測證據。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <h2>資料</h2>
+  <div class="lesson">
+    <span class="t"><a href="player-numbers.html">兩套球員編號</a></span>
+    <span class="d">每位球員同時掛兩個無關的號碼：四位數決定大頭照與播報語音，
+       <code>c###</code> 決定臉皮。而<u>本站測試機</u>的臉皮檔<strong>只有 894 個</strong>（原版 504 個），
+       901 以上一個都不存在。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="dynasty-save.html">王朝存檔長什麼樣</a></span>
+    <span class="d">30 個存檔全部剛好 2,239,688 個位元組。沒有加密、沒有壓縮，
+       而且<strong>任兩個球隊的存檔有 98.9% 到 99.85% 相同</strong>
+       （30 個存檔、435 組<u>全部比過</u>）。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="team-limit.html">為什麼你加不了新球隊</a></span>
+    <span class="d">因為球隊名字不是資料，<strong>是欄位名</strong> ——
+       而那張表頭清單一字不差地也存在主程式裡。附七個停在 2004 年的化石欄位名。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="player-voice.html">播報員為什麼不唸新球員的名字</a></span>
+    <span class="d">因為那是 2005 年錄好的音，不是合成的。
+       EA 原廠錄了 <strong>1,673 個號碼</strong>的名字；本站測試機的語音庫有 4,343 個，
+       多的是模組加的。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="voice-header.html">語音檔頭的 16 個位元組</a></span>
+    <span class="d">2008 年那篇社群教學說「用 WinHex 在第 2、3 欄填編號」。
+       本站把兩份原版的 <strong>6,995 個檔頭</strong>全部量過，把每一格是什麼弄清楚了
+       —— 順便發現<strong>那句話差了一格</strong>。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="player-fields.html">球員資料檔全欄位清單</a></span>
+    <span class="d">46 欄 + 29 欄逐欄列出，含實測值域。
+       <strong>順便解開身高與生日兩個編碼很怪的欄位</strong>（身高 +48 = 英吋）。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="player-codes.html">球員代號對照表</a></span>
+    <span class="d">守位、球種、走場音樂那些數字代表什麼。
+       <strong>只寫能用遊戲自己的檔案佐證的</strong>，佐證不了的照實說。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="player-data.html">球員資料檔 attrib / pitcher</a></span>
+    <span class="d"><strong>改能力前必讀</strong>：它其實是 CSV、每格帶索引前綴，而且大部分「能力值」不是 0-99。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="datafile.html">總設定檔 datafile</a></span>
+    <span class="d">攝影機在哪、每種聲音多大聲、打擊物理參數 —— 全在<strong>同一個 4.4 MB 純文字檔</strong>，
+       而且 EA 把攝影機欄位的名字也寫在裡面 —— <strong>兩張表，一張管打擊 116 欄、一張管守備 128 欄</strong>。
+       21,548 行全部解析完，沒有一行讀不懂。⭐ 兩個語言版本的欄位<u>名字一樣、編號整個重排</u>，
+       守備那張表<strong>零個編號相同</strong>。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="database.html">資料檔總覽 database</a></span>
+    <span class="d">23 個檔裡有 <strong>19 個是純文字</strong>，而且表頭自己會說明每一欄是什麼。
+       哪種資料放在哪個檔，一次看完。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t">賽程 schedule.big</span>
+    <span class="d">9 個賽程表、CSV 格式與換年度原理 —— 目前寫在<a href="../tutorials/change-schedule-year/index.html">賽程教學</a>的「原理」一節。</span>
+    <span class="badge ok">✓ 見教學</span>
+  </div>
+
+  <h2>場景與聲音</h2>
+  <div class="lesson">
+    <span class="t"><a href="stadium.html">球場檔 stadium</a></span>
+    <span class="d">剛安裝好的原版 87 個球場檔<strong>每一個都剛好 88 項</strong>
+       （本站測試機那份被模組動過，<code>propday</code> 與 <code>propnite</code> 各多一項）。
+       含日夜版本的真實差異與高風險警告。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="audio.html">播報與音訊系統</a></span>
+    <span class="d">佔 737 MB 的最大一區。<strong>索引檔是純文字，可以自己加總驗算</strong>；
+       這裡的 <code>.big</code> 其實有三種格式。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <h2>球員的長相</h2>
+  <div class="lesson">
+    <span class="t"><a href="pixel-formats.html">圖片的像素怎麼排</a></span>
+    <span class="d">大頭照與臉皮的像素編碼解開了，<strong>拿計算機就能驗</strong>。
+       附一個「本站抓到自己工具寫錯兩格」的實例。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="portrait.html">大頭照 portrait.big</a></span>
+    <span class="d">7,544 個項目、7,542 張圖片（另外 2 個是 1 個位元組的殘項）。
+       <strong>兩種格式為什麼都剛好 64 KB</strong>，
+       以及 EA 藏在每一張圖裡的一句話。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="models.html">模型與臉皮 models.big</a></span>
+    <span class="d">全遊戲最大的檔（本站測試機 535.9 MB，原版 165.0 MB）。
+       臉皮的統一規格 —— 原版 504 張零例外，
+       以及<strong>怎麼判斷你手上這份是不是原版</strong>。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <div class="lesson">
+    <span class="t"><a href="anims.html">動畫 anims.big</a></span>
+    <span class="d">243 個動作庫。<strong>一半是純文字，另一半是標準目標檔</strong> ——
+       接起來就能用現成工具讀。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <div class="lesson">
+    <span class="t"><a href="loc-strings.html">文字表 .LOC</a></span>
+    <span class="d">遊戲本體畫面上的文字都在這兩個檔裡（內建網站另有一套，見該頁）。格式完全解開 ——
+       <strong>不用開遊戲就能看到每個元素寫什麼字</strong>。含 EA 忘了拿掉的開發用字串。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="official-chinese.html">EA 自己的繁體中文版是怎麼做的</a></span>
+    <span class="d">2005 年 2 月 EA 出過官方繁中版。跟英文版逐檔比對：
+      <strong>913 個共同檔案只有 65 個不同</strong>，中文被放進<u>日文的槽位</u>，字型檔脹大八倍。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="original-vs-modded.html">原版與這台機器差在哪</a></span>
+    <span class="d">本站的數字大多是從一台裝過台灣模組的機器量的。拿原版逐項對照：
+      <strong>臉皮 504 對 894、大頭照 1,487 對 6,638、語音號碼 1,673 對 4,343</strong>。
+      編號<strong>只能用來排除，不能用來認定</strong> ——
+      三種資源的原廠上限各不相同（臉皮 <code>c606</code>、大頭照 <code>5043</code>、語音 <code>5032</code>）。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <div class="lesson">
+    <span class="t"><a href="patches.html">官方更新檔動了哪些檔</a></span>
+    <span class="d">EA 為<strong>英文版</strong>出過四個官方更新檔（1、2、3、5，<u>沒有 4</u>）。逐一量出它們會覆蓋哪些路徑：
+       <strong>四個加起來只碰 19 個檔</strong>，而且球場、球衣、模型、大頭照、動作、音訊、介面版面
+       <strong>一個都沒碰過</strong>。所以順序是<u>先更新再裝名冊模組</u> ——
+       反過來會被蓋掉。附一個小發現：每一版都要換的那張圖是授權聲明畫面，
+       同尺寸的 60 張載入畫面全部走 DXT1，只有它是 32 位元無壓縮 ——
+       為什麼只有這一張不壓縮，該頁標為未解。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="patches-tc.html">官方繁中版的三個更新檔改了什麼</a></span>
+    <span class="d">官方繁體中文版另有三個更新檔。這一頁不是掃安裝程式裡的清單，是
+       <strong>拿沒更新過的安裝跟三個都裝完的安裝，2,389 個檔逐位元組比對</strong>：
+       <strong>只有 19 個檔變了</strong>，沒有新增也沒有刪檔，整套 1.4 GB 淨長 6,930 個位元組。
+       它是 2005 年開季名單更新，<u>不是相容性修正</u>。⚠️ 這個 19 跟上面那個 19
+       <strong>湊巧同數，不是同一組檔</strong>。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="fonts.html">字型檔 .ffn</a></span>
+    <span class="d">12 個點陣字型、兩種檔頭代號，以及一個
+       <strong>把「孤兒資料怎麼產生的」完整證明出來</strong>的例子。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <h2>陸續補齊中</h2>
+  <div class="lesson">
+    <span class="t"><a href="player-codes.html">遊戲內部代號對照</a></span>
+    <span class="d">原本因「缺原廠出處」暫緩。<strong>改用遊戲自己的檔案佐證之後解封</strong> ——
+       能佐證的照登，佐證不了的照實說。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">一個五秒鐘的判斷技巧</p>
+    <p>拿到不認識的檔案，先用十六進位工具看前幾個位元組：</p>
+    <p style="margin-top:6px"><code>BIGF</code> → 封裝檔　·　<code>10 FB</code> → QFS 壓縮　·
+       <code>7F 45 4C 46</code> → ELF（動畫/模型）　·　<strong>看得懂的英數字</strong> → 純文字，直接改</p>
+    <p style="margin-top:6px">副檔名會騙人 —— 這遊戲裡叫 <code>.dat</code> 的檔案，好幾個其實是 CSV 文字。</p>
+  </div>
+
+  <footer>
+    <p>本區所有數據皆取自實際解開的檔案內容，非推測；未經實測的部分會明確標示。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

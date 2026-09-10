@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/story/hidden-website/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>遊戲裡藏著一整個網站 — toni的MVP模組補習班</title>
+<meta name="description" content="你的遊戲資料夾裡有 519 個檔案是一整套 2005 年的社群網站：俱樂部、錦標賽、排行榜。記事本就打得開，而它要連的伺服器早就不在了。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../../index.html">首頁</a>
+  <a class="item" href="../../start.html">新手基本功</a>
+  <a class="item" href="../../do.html">我想做什麼</a>
+  <a class="item" href="../../plan.html">課表</a>
+  <a class="item" href="../../tutorials/index.html">教學</a>
+  <a class="item" href="../../7min/index.html">七分鐘</a>
+  <a class="item" href="../../reference/index.html">速查</a>
+  <a class="item" href="../../coach/index.html">棒球教練</a>
+  <a class="item on" href="../index.html">故事</a>
+  <a class="item" href="../../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="../index.html">故事</a> › 遊戲裡藏著一整個網站</p>
+  <h1>遊戲裡藏著一整個網站</h1>
+  <p class="lede">你的遊戲資料夾裡有一個叫 <code>easo</code> 的資料夾，<strong>519 個檔案</strong>。
+     那不是「一些網頁」，是<u>一整套 2005 年的社群網站</u> ——
+     註冊、好友、俱樂部、錦標賽、排行榜、線上配對。
+     它跟著光碟一起裝進你的硬碟，而它要連的伺服器早就不在了。</p>
+
+  <div class="card grass">
+    <p class="card-h">這是全站門檻最低的一次探索</p>
+    <p>不用解壓縮、不用十六進位、不用任何工具。
+       <strong>裡面 127 個 <code>.html</code> 和 11 個 <code>.js</code>，記事本直接打得開。</strong></p>
+    <p>想跟著做，就從<a href="../../tutorials/controller-config/index.html">暖身課</a>那套心法開始：
+       <u>先備份、只看不改</u>。這一課連改都不用改。</p>
+  </div>
+
+  <h2>它有多大</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">副檔名</th><th class="num">檔數</th><th>是什麼</th></tr></thead>
+    <tbody>
+      <tr><td data-label="副檔名" class="mono">.jpg</td><td data-label="檔數" class="num">261</td><td data-label="是什麼">背景圖、頭像卡</td></tr>
+      <tr class="hi"><td data-label="副檔名" class="mono">.swf</td><td data-label="檔數" class="num">115</td><td data-label="是什麼"><strong>Flash</strong> —— 一整層已經死掉的技術</td></tr>
+      <tr class="hi"><td data-label="副檔名" class="mono">.html</td><td data-label="檔數" class="num">127</td><td data-label="是什麼">網頁。<u>記事本打得開</u></td></tr>
+      <tr class="hi"><td data-label="副檔名" class="mono">.js</td><td data-label="檔數" class="num">11</td><td data-label="是什麼">JavaScript。<u>也打得開，而且沒有壓縮過</u></td></tr>
+      <tr><td data-label="副檔名" class="mono">.xml</td><td data-label="檔數" class="num">2</td><td data-label="是什麼">文字表</td></tr>
+      <tr><td data-label="副檔名" class="mono">.txt / .png</td><td data-label="檔數" class="num">3</td><td data-label="是什麼">其他</td></tr>
+      <tr><td data-label="副檔名"><strong>合計</strong></td><td data-label="檔數" class="num"><strong>519</strong></td><td data-label="是什麼">約 10.8 MB</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>它叫什麼名字</h2>
+  <p><code>easo</code> 是縮寫。這個資料夾自己說出了全名 ——
+     打開 <code>data\easo\mvp\help\about1.html</code>，第五行就寫著：</p>
+<pre><code>EA SPORTS(tm) Online</code></pre>
+  <p>不是這款棒球專用的。「common」開頭的四個資料夾是 <strong>EA 所有運動遊戲共用的同一套殼</strong>，
+     棒球只是把自己的內容塞進去。</p>
+
+  <h2 id="season">⚠️ 一個很容易上當的搜尋</h2>
+  <p>想確認「遊戲主程式真的會去開這個資料夾」，直覺是去主程式裡搜 <code>EASO</code>。</p>
+  <p>本站這樣做，撈到 <strong>22 個</strong>片段，看起來證據充分。<u>但那是假的。</u></p>
+  <div class="card clay">
+    <p class="card-h"><code>SEASON</code> 這個字裡面就含有 <code>EASO</code></p>
+    <p><code>S-EASO-N</code>。棒球遊戲裡「賽季」這個字出現幾百次，
+       每一次都會被當成 <code>EASO</code> 撈進來。</p>
+    <p>把含 <code>SEASON</code> 的片段排掉之後，<strong>22 個只剩下 4 個</strong>：</p>
+<pre style="margin:8px 0 0"><code>DISC_EASO
+POSTEASO
+EASO_ADVANCE
+IMVPEASOInterfaceWWW</code></pre>
+    <p style="margin-top:8px">這四個才是真的。<strong>證據從 22 個縮到 4 個，但這 4 個是真的。</strong></p>
+  </div>
+  <p>這是本站反覆遇到的同一件事：
+     <a href="../../reference/player-codes.html">搜尋器會丟掉單字母</a>、
+     <a href="../../reference/player-numbers.html"><code>grep</code> 對二進位檔會靜默失效</a>、
+     現在是<u>關鍵字被包在別的字裡</u>。
+     <strong>搜出一堆命中，跟搜出正確答案，是兩件事。</strong></p>
+
+  <h2>當年它能做什麼</h2>
+  <p>說明頁有 <strong>26 個主題</strong>，光看標題就是一張完整的功能表。
+     下表照分類把篇數列出來，<u>「主題」那一欄是舉例不是全部</u> ——
+     標了「等」的四列，本站沒有把該分類的每一篇都列進來（22 個列在下面，另外 4 個沒有）：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>分類</th><th class="num">篇數</th><th>主題</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="分類">俱樂部</td><td data-label="篇數" class="num">6</td>
+          <td data-label="主題">建立、尋找、我的俱樂部、設定、管理成員<u>等</u></td></tr>
+      <tr class="hi"><td data-label="分類">錦標賽</td><td data-label="篇數" class="num">5</td>
+          <td data-label="主題">建立、大廳、我的賽事、歷史紀錄<u>等</u></td></tr>
+      <tr><td data-label="分類">制度</td><td data-label="篇數" class="num">6</td><td data-label="主題">評等、等級、代幣、排名賽、會員選單<u>等</u></td></tr>
+      <tr><td data-label="分類">線上配對</td><td data-label="篇數" class="num">3</td><td data-label="主題">配對大廳、建立對戰<u>等</u></td></tr>
+      <tr><td data-label="分類">個人</td><td data-label="篇數" class="num">3</td><td data-label="主題">生涯、數據、設定</td></tr>
+      <tr><td data-label="分類">其他</td><td data-label="篇數" class="num">3</td><td data-label="主題">首頁、排行榜、即時通</td></tr>
+    </tbody>
+  </table></div>
+  <p>Flash 檔裡還能撈出 <strong>48 個伺服器端點名稱</strong>。光看名字就知道規模：</p>
+<pre><code>create_club        join_club          leave_club
+recruit_member     ban_member         unban_member
+transfer_commissioner    accept_commissioner
+edit_club_logo     edit_club_news     get_cvc_leaderboard</code></pre>
+  <p><strong>會長可以轉讓、可以封鎖會員、可以改俱樂部新聞、還有俱樂部對俱樂部的排行榜。</strong>
+     這是 2005 年，一款單機棒球遊戲的隨附品。</p>
+  <p class="small">上面列出來的那些是<u>不含主機位址的相對路徑</u>（同一批 Flash 檔裡另外還有十幾條帶主機名的舊網址，本站不列），而且對應的伺服器早就不存在。
+     這裡列出來是為了說明當年的功能，不是可以連的東西。</p>
+
+  <h2>開發者忘了收乾淨的東西</h2>
+  <p>11 個 JavaScript 檔共 1,826 行。把所有會跳出訊息框的那行找出來，一共 <strong>78 行</strong>：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>狀態</th><th class="num">行數</th></tr></thead>
+    <tbody>
+      <tr><td>被註解掉了</td><td class="num">31</td></tr>
+      <tr><td>被偵錯開關擋住（開關是關的）</td><td class="num">40</td></tr>
+      <tr class="hi"><td><strong>沒被擋，玩家真的會看到</strong></td><td class="num"><strong>7</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">計法：<code>alert</code> 跟左括號之間<u>允許有空白</u>。這頁上線時只搜了 <code>alert(</code>，少掉 <code>patcher.js</code> 裡 5 行寫成 <code>alert (</code> 的 —— 那 5 行全部是被註解掉的，所以 73 應為 78、26 應為 31，下面兩列不受影響。31 + 40 + 7 = 78。</p>
+  <p>那七行是這些：</p>
+<pre><code>alert("iamge too large")
+alert("iamge too large")
+alert("not an image")
+alert("SERVER_ERROR_10016")
+alert("iamge file too large")
+alert("no game api available")
+alert("FAKEGAME")</code></pre>
+
+  <div class="card amber">
+    <p class="card-h">一、<code>iamge</code> 是 <code>image</code> 拼錯了</p>
+    <p>而且<strong>錯了三次</strong>。這是玩家上傳俱樂部隊徽、檔案太大的時候，真的會跳出來的字。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">二、一個永遠翻不出人話的錯誤訊息</p>
+    <p><code>SERVER_ERROR_10016</code> 是代號，不是句子 —— 正常應該去文字表換成人看得懂的話。</p>
+    <p>去查 <code>data\easo\mvp\main\MVP_lt_en.xml</code> 這張英文字串表：裡面有 <strong>32 個</strong> <code>SERVER_ERROR</code> 代號 ——
+       31 個編號從 10000 排到 10213，另外一個是 <code>SERVER_ERROR_-1</code>（工作階段逾時）。</p>
+    <p><strong>偏偏沒有 10016。</strong></p>
+    <p>所以玩家看到的就是 <code>SERVER_ERROR_10016</code> 這串字本身。
+       這個錯誤從出貨那天起，就沒有翻譯可以對。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">三、<code>FAKEGAME</code></p>
+    <p>它在 <code>mvp/main/easoAPI.js</code> 的<strong>第 6 行</strong> —— 檔案最開頭。</p>
+    <p>看起來是開發時用來測試「網頁跟遊戲主程式接不接得上」的假訊號。
+       <span class="badge wip">推測</span> 本站沒有解出它實際什麼時候會跳。</p>
+  </div>
+
+  <h2>為什麼這些東西還在</h2>
+  <p>這一整套東西<u>現在完全沒有用</u> —— 伺服器不在了，Flash 也早就被瀏覽器全面停用。
+     但它還躺在每一份安裝裡，佔著 10.8 MB。</p>
+  <div class="card blue">
+    <p class="card-h">跟本站其他頁講的是同一件事</p>
+    <p><a href="../orphan-data/index.html">介面檔裡有目錄根本不指向的資料</a>（本站測試機那份 <code>ingame.big</code> 是 92.6%，剛安裝好的原版只有 0.04% —— 那 92.6% 是後來一次次改檔疊出來的，不是遊戲的性質）、
+       <a href="../../reference/player-voice.html">語音庫有一批號碼沒有人在用</a>（本站測試機七成，剛安裝好的原版三成）、
+       <a href="../../reference/team-limit.html">球隊欄位名還停在 2004 年</a>。</p>
+    <p><strong>遊戲從來不刪東西。</strong>它只是不再指向那些東西。
+       所以二十年後打開，那些東西都還在原地。</p>
+  </div>
+
+  <h2>你可以自己去看</h2>
+  <p>這一課不需要任何工具，也不會動到任何檔案。三個起點：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th class="mono">打開這個檔</th><th>你會看到</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">data\easo\mvp\help\about1.html</td><td>它自己說出全名</td></tr>
+      <tr class="hi"><td class="mono">data\easo\commonJS\logoUpload.js</td>
+          <td><strong>三個 <code>iamge</code> 拼錯</strong>，就在檔案中段</td></tr>
+      <tr><td class="mono">data\easo\mvp\main\easoAPI.js</td><td>第 6 行的 <code>FAKEGAME</code></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">用記事本開就好。<strong>看完直接關掉，不要存檔</strong> ——
+     記事本可能會偷偷改掉換行符。</p>
+
+  <h2>本站沒有解出的部分</h2>
+  <div class="card clay">
+    <p class="card-h">四件事</p>
+    <p style="margin-top:6px">
+       一、<strong>115 個 Flash 檔的畫面長什麼樣，本站沒有還原。</strong>
+       只從裡面撈出了文字。<span class="badge wip">未解</span><br>
+       二、<code>FAKEGAME</code> 實際在什麼情況下會跳。<span class="badge wip">推測</span><br>
+       三、那 48 個端點回傳什麼格式、當年實際怎麼運作。<span class="badge wip">未解</span><br>
+       四、<strong>本站沒有、也不會嘗試連線任何伺服器。</strong>
+       這頁全部是讀本機檔案讀出來的。</p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 你的遊戲資料夾裡那個叫 <code>easo</code> 的資料夾，是一整套 2005 年的社群網站，跟著光碟裝進你的硬碟，而它要連的伺服器早就不在了。</li>
+    <li><strong>它有多大</strong> 519 個檔案、約 10.8 MB。其中 127 個 <code>.html</code> 和 11 個 <code>.js</code> 記事本直接打得開而且沒有壓縮過，261 個 <code>.jpg</code>，還有 115 個 Flash，那是一整層已經死掉的技術。它的全名寫在 <code>data\easo\mvp\help\about1.html</code> 第五行：<code>EA SPORTS(tm) Online</code>，是 EA 所有運動遊戲共用的同一套殼。</li>
+    <li><strong>最容易上當的一次搜尋</strong> 想證明主程式真的會開這個資料夾，直覺是去搜 <code>EASO</code>，撈到 22 個看起來證據充分。但 <code>S-EASO-N</code> 這個字裡面就含有 <code>EASO</code>，棒球遊戲裡「賽季」出現幾百次。排掉之後 22 個只剩 4 個，而<u>那 4 個才是真的</u>。搜出一堆命中，跟搜出正確答案，是兩件事。</li>
+    <li><strong>本站訂正了自己的計數</strong> 統計會跳訊息框的行數時，這頁上線時只搜了 <code>alert(</code>，漏掉 <code>patcher.js</code> 裡 5 行寫成 <code>alert (</code>（中間有空白）的。所以總數 73 應為 78、被註解掉的 26 應為 31，31 + 40 + 7 = 78，另外兩列不受影響。</li>
+    <li><strong>開發者忘了收乾淨的三樣東西</strong> <code>iamge</code> 這個拼錯的字出現三次，玩家上傳俱樂部隊徽太大時真的會跳出來；<code>SERVER_ERROR_10016</code> 這個代號在 <code>data\easo\mvp\main\MVP_lt_en.xml</code> 這張字串表裡查不到，那張表有 32 個代號（31 個編號從 10000 排到 10213，另外一個是 <code>SERVER_ERROR_-1</code>），偏偏沒有 10016，所以這個錯誤從出貨那天起就沒有翻譯可以對；<code>FAKEGAME</code> 就寫在 <code>mvp/main/easoAPI.js</code> 第 6 行。</li>
+    <li><strong>當年它能做什麼</strong> 說明頁 26 個主題，俱樂部、錦標賽、評等與代幣、線上配對、排行榜都有；Flash 檔裡還撈得出 48 個伺服器端點名稱，會長可以轉讓、可以封鎖會員、可以改俱樂部新聞，還有俱樂部對俱樂部的排行榜。這是 2005 年，一款單機棒球遊戲的隨附品。</li>
+    <li><strong>為什麼二十年後還在</strong> 跟本站其他頁講的是同一件事，介面檔裡有目錄根本不指向的資料（本站測試機那份是 92.6%，剛安裝好的原版只有 0.04%）、語音庫有一批號碼沒人用（本站測試機七成、原版三成）、球隊欄位名還停在 2004 年。<strong>遊戲從來不刪東西，它只是不再指向那些東西。</strong>這一課門檻最低，用記事本打開，看完直接關掉不要存檔。</li>
+    <li><strong>本站沒驗的</strong> 115 個 Flash 檔的畫面長什麼樣沒有還原，只從裡面撈出文字；<code>FAKEGAME</code> 實際在什麼情況下會跳是推測；那 48 個端點回傳什麼格式、當年實際怎麼運作未解。<u>本站沒有、也不會嘗試連線任何伺服器，這頁全部是讀本機檔案讀出來的。</u></li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../orphan-data/index.html">一個檔案裡的地層</a> —— 「不刪只是不指向」的另一個例子</li>
+    <li><a href="../build-2004/index.html">平安夜凌晨的兩次建置</a> —— 開發現場留下的另一種痕跡</li>
+    <li><a href="../../tutorials/controller-config/index.html">暖身課</a> —— 用同一套心法打開第一個遊戲檔案</li>
+    <li><a href="../../reference/file-map.html">遊戲檔案地圖</a> —— <code>easo</code> 以外還有什麼</li>
+  </ul>
+
+  <footer>
+    <p>本頁的檔案數、行數、命中數皆為現場掃描 <code>data\easo\</code> 與遊戲主程式量測所得；
+       全程唯讀，未修改任何檔案，也未連線任何伺服器。
+       文中引用之少量字串僅為說明之用。標示為「推測」「未解」之處未經證實。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../../legal.html">法律與版權說明</a> ·
+       <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

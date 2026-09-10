@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/uniforms/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>球衣模組：安裝與製作入門 — toni的MVP模組補習班</title>
+<meta name="description" content="球衣佔 models.big 的 82.6%，是這個檔裡最大的一塊。這頁量出球衣檔怎麼命名、放在哪個封裝檔、一支球隊最少需要幾個檔，以及 1X 與 2X 實際差在哪。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../../index.html">首頁</a>
+  <a class="item" href="../../start.html">新手基本功</a>
+  <a class="item" href="../../do.html">我想做什麼</a>
+  <a class="item" href="../../plan.html">課表</a>
+  <a class="item on" href="../index.html">教學</a>
+  <a class="item" href="../../7min/index.html">七分鐘</a>
+  <a class="item" href="../../reference/index.html">速查</a>
+  <a class="item" href="../../coach/index.html">棒球教練</a>
+  <a class="item" href="../../story/index.html">故事</a>
+  <a class="item" href="../../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="../index.html">教學</a> › 球衣模組：安裝與製作入門</p>
+  <h1>球衣模組：安裝與製作入門</h1>
+  <p class="lede">首頁一直寫著「換球衣」，但球衣到底是哪幾個檔、住在哪裡、檔名為什麼長那樣，
+     站上從來沒有一頁講清楚。這頁把它量出來，
+     包括一個量之前沒想到的結果：
+     <strong>球衣佔 <code>models.big</code> 的 82.6%</strong>，
+     是這個檔裡最大的一塊，也是球員臉皮的五倍多。</p>
+
+    <div class="card blue" style="margin-top:14px">
+    <p class="card-h">先說清楚這頁的數字是從哪一份遊戲量的</p>
+    <p>本頁的項目數、檔案數、覆蓋率，量的是<strong>一台裝過台灣模組的遊戲</strong>。
+       <u>剛安裝好的原版數字小很多</u> —— 例如臉皮 504 對 894、大頭照 1,487 對 6,638、
+       語音號碼 1,673 對 4,343。</p>
+    <p><strong>格式與結構的部分兩邊一樣</strong>，那是遊戲程式決定的；
+       會變的是「有幾個」。完整對照見
+       <a href="../../reference/original-vs-modded.html">原版與這台機器差在哪</a>。</p>
+  </div>
+<div class="grid">
+    <div class="card"><p class="card-h">難度</p><p>★★☆ 要動封裝檔</p></div>
+    <div class="card"><p class="card-h">時間</p><p>讀完約 10 分鐘</p></div>
+    <div class="card"><p class="card-h">這頁給你的</p><p>檔名規則 + 一支唯讀腳本</p></div>
+    <div class="card"><p class="card-h">可以還原嗎</p><p><strong>可以，動到哪個先備份哪個</strong></p></div>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">先講署名：這頁裡的球衣不是 toni 做的</p>
+    <p>這頁拿來當範例的，是 2009 年那份台灣模組包。裡面的東西各有作者，
+       下面幾條全部照當年說明檔的原文寫，本站沒有加自己的判斷：</p>
+    <ul class="plain">
+      <li><strong>中華隊 2X 球衣</strong>：當年一位模組作者 <strong>tony7494550</strong> 製作的經典賽中華隊球衣。</li>
+      <li><strong>中華隊 1X 球衣</strong>：<strong>小雪靈</strong>從上面那份 2X 轉成 1X。</li>
+      <li><strong>台灣之光隊與日本夢幻隊的隊徽</strong>、<strong>LOC 語系檔</strong>、
+          <strong>大都會新球場的名稱更新</strong>：都是<strong>小雪靈</strong>做的。</li>
+      <li><strong>台灣之光模組</strong>本身：出自<strong>小豪前輩</strong>。</li>
+    </ul>
+    <p>上面列的是當年文件裡留下的圈內代號，本站不連結任何個人身分、不公開聯絡方式、
+       不轉載任何一個檔案，說明檔裡的網址也一律不列。</p>
+  </div>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <div class="quickfix" id="quick">
+    <p class="card-h">⚡ 只想趕快做完？照這四步</p>
+    <ol>
+      <li>要<strong>真的把球衣寫進封裝檔</strong>的話，這一課只講規則、不帶你動手，直接去<a href="../install-uniform/index.html">把一套球衣裝進遊戲</a>那一課，那裡有腳本會自動分類、先清點再安裝、寫完逐位元組複驗，一行還原。</li>
+      <li>只想知道自己這台有哪些球衣檔，把本頁「自己在自己的遊戲上看一遍」那段程式存成 <code>list_uniform.py</code>。它全程唯讀，不會碰到你的遊戲檔，需要 Python 3。</li>
+      <li>跑它，第一個參數是遊戲資料夾，第二個是球隊編號（就是 <code>team.dat</code> 欄位 6 的美術編號減 1，不確定就從 0 開始試）<br>
+  <pre><code>python list_uniform.py "你的遊戲資料夾" 5</code></pre></li>
+      <li>照印出來的清單數：一支球隊是五種檔散在三個封裝檔裡，<code>u###x.fsh</code>、<code>f###x.fsh</code>、<code>###.fsh</code>、<code>###x.fsh</code>、<code>l###.fsh</code>，改一隊時這幾種要一起換，別漏掉。</li>
+    </ol>
+    <p class="tail">印出 0 個怎麼辦、字母為什麼會跳號、1X 跟 2X 差在哪，往下讀；只想複習跳到<a href="#recap">📌 重點整理</a>。</p>
+  </div>
+
+  <h2>先看一件事：球衣是 models.big 裡最大的一塊</h2>
+  <p>把 <code>models.big</code> 的 4,211 個項目全部列出來、照檔名分類加總，得到的結果跟直覺差很多。
+     大家都知道那個檔裝著球員的臉，可是臉只佔一成五：</p>
+
+  <figure class="figbox">
+  <div class="figscroll">
+<svg class="barchart" viewBox="-4 -4 716 190" role="img" aria-label="models.big 內容組成長條圖：球衣 442.7 MB 佔 82.6%，臉皮 79.9 MB 佔 14.9%，背號字模 6.9 MB 佔 1.3%，其餘 6.3 MB 佔 1.2%">
+<text x="110" y="25.68" class="bl">球衣 u###</text>
+<rect x="118" y="8" width="446.0" height="26" class="bar"><title>u###x.fsh：595 個項目 · 464,156,581 bytes</title></rect>
+<text x="571.0" y="25.68" class="bv">442.7 MB · 82.6%</text>
+<text x="110" y="61.68" class="bl">臉皮 c###</text>
+<rect x="118" y="44" width="80.5" height="26" class="bar"><title>c###.fsh / .ord / .orl：2,682 個項目 · 83,770,100 bytes</title></rect>
+<text x="205.5" y="61.68" class="bv">79.9 MB · 14.9%</text>
+<text x="110" y="97.68" class="bl">背號字模 f###</text>
+<rect x="118" y="80" width="7.0" height="26" class="bar"><title>f###x.fsh：646 個項目 · 7,235,036 bytes</title></rect>
+<text x="132.0" y="97.68" class="bv">6.9 MB · 1.3%</text>
+<text x="110" y="133.68" class="bl">其餘</text>
+<rect x="118" y="116" width="6.4" height="26" class="bar"><title>其餘 288 個項目 · 6,656,273 bytes</title></rect>
+<text x="131.4" y="133.68" class="bv">6.3 MB · 1.2%</text>
+<line x1="118" y1="4" x2="118" y2="150" class="ax"/>
+<text x="118" y="170" class="bn">合計 4,211 個項目 · 561,817,990 bytes</text>
+</svg>
+  </div>
+  <figcaption><b>資料來源</b>：把 <code>data\models.big</code> 的目錄整份讀出來，
+     依檔名開頭分成四類加總。大小取目錄登記的長度（壓縮後），不是解開後的大小。
+     百分比是各類佔那 4,211 個項目總和的比例。
+     那 4,211 筆加起來是 <strong>561,817,990</strong> bytes，
+     再加上檔頭與目錄的 73,322 bytes，剛好等於整個檔的
+     <strong>561,891,312</strong> bytes（535.9 MB）。
+     <code>models.big</code> 是 <code>data</code> 底下最大的單一檔案，
+     第二大的是 <code>frontend\portrait.big</code>，265,883,417 bytes。
+     臉皮那 2,682 個項目是 894 張臉，每張各三個檔（<code>.fsh</code>、<code>.ord</code>、<code>.orl</code>）。</figcaption>
+  </figure>
+
+  <div class="card grass">
+    <p class="card-h">所以「換球衣」跟「換臉」不是同一個等級的工作</p>
+    <p><a href="../swap-face/index.html">換臉那課</a>只要改一個純文字檔就好。
+       換球衣<strong>一定要動 <code>models.big</code></strong>，
+       464,156,581 bytes 的球衣資料全在那裡面。
+       球衣檔不能直接丟進資料夾，一定得寫進封裝檔；本站手上這份 2009 模組的說明檔，
+       也是要使用者用一支安裝程式把壓縮檔裝進去。</p>
+  </div>
+
+  <h2>五個檔家族：命名對照表</h2>
+  <p>一套球衣不是一個檔，是散在<strong>三個封裝檔</strong>裡的五種檔案。
+     下表每一欄的數量都是把那三個封裝檔的目錄列出來數的：</p>
+
+  <div class="tablewrap"><table>
+    <thead><tr><th>檔名樣式</th><th>住在哪個封裝檔</th><th class="num">量到幾個</th><th>裡面裝什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td class="mono">u###x.fsh</td><td class="mono">models.big</td><td class="num">595</td>
+          <td><strong>球衣本體</strong>。一個檔裡 28 張貼圖<br>
+              <span class="small">595 個檔<strong>全部都是 28 張，而且用同一組 28 個四字代號，零例外</strong>。
+              剛安裝好的原版是 <strong>433 個檔</strong>，同樣 28 張、
+              <u>解壓後全部剛好 732,592 個位元組</u> —— 見下方</span></td></tr>
+      <tr class="hi"><td class="mono">f###x.fsh</td><td class="mono">models.big</td><td class="num">646</td>
+          <td><strong>背號與姓名字模</strong>。一個檔裡 36 張貼圖：<code>zig0</code> 到 <code>zig9</code> 十個數字，加二十六個字母<br>
+              <span class="small">646 個檔<strong>全部都是 36 張，零例外</strong>；其中 598 個字母代號是大寫、48 個是小寫</span></td></tr>
+      <tr><td class="mono">###.fsh</td><td class="mono">frontend\uniforms.big</td><td class="num">124</td>
+          <td>選球衣畫面的<strong>預覽圖</strong>。一個有預覽圖的球隊一個檔<br>
+              <span class="small">量到的 768 張預覽貼圖<strong>全部都是 128×128</strong>；
+              一個檔裝 1 到 15 張不等，張數不一定等於那隊實際有幾套球衣</span></td></tr>
+      <tr><td class="mono">###x.fsh</td><td class="mono">frontend\uniforms.big</td><td class="num">568</td>
+          <td><strong>佔位檔</strong>。目錄裡登記 76 到 88 個位元組，解開後只有一張 1×1 的貼圖</td></tr>
+      <tr><td class="mono">l###.fsh</td><td class="mono">frontend\logos.big</td><td class="num">126</td>
+          <td><strong>隊徽</strong>。126 個球隊隊徽<strong>每個都是 7 張貼圖</strong>，一隊一個<br>
+              <span class="small">目錄裡另外還有 6 筆 <code>l994</code> 到 <code>l999</code>，不對應球隊，見下方說明</span></td></tr>
+      <tr><td colspan="4" class="small">
+          ⭐ <strong>2026-08-28 補</strong>：那 7 張子圖的<u>名字固定、順序不固定</u>。
+          剛安裝好的原版 132 個隊徽檔用了 <strong>36 種不同的排列</strong>
+          （最常見的一種佔 61 個）；<strong>126 個球隊隊徽的字母集合完全一致</strong>
+          （都是 <code>a d e g i j l</code>；另外 4 個不對應球隊的
+          <code>l994</code>、<code>l997</code>、<code>l998</code>、<code>l999</code> 少一個 <code>l</code>），
+          而每個檔裡的隊號後綴 <strong>132/132 都一致</strong>。
+          <u>跟球衣是同一條規律</u>：<strong>照名字找子圖，不要照位置找。</strong>
+      </td></tr>
+    </tbody>
+  </table></div>
+
+  <p><code>###</code> 是球隊編號（三位數，補零），<code>x</code> 是那一套球衣的代號字母。
+     預覽圖 <code>###.fsh</code> 只有 <code>000</code> 到 <code>123</code> 且不跳號，
+     名冊最後兩格（<code>124</code>、<code>125</code>）<strong>有球衣檔但沒有預覽圖</strong>。</p>
+  <p class="small">三個封裝檔的目錄還有幾筆不屬於上面五種：
+     <code>uniforms.big</code> 的 694 筆裡，除了 124 + 568 之外還有兩筆同樣叫 <code>a022.fsh</code>、
+     長度各 1 個位元組的項目；<code>logos.big</code> 的 132 筆裡，除了
+     <code>l000</code> 到 <code>l125</code> 之外還有 <code>l994</code> 到 <code>l999</code> 六筆，
+     不對應任何球隊，而且其中四筆（<code>l994</code>、<code>l997</code>、<code>l998</code>、<code>l999</code>）
+     只有 6 張貼圖。這幾筆是做什麼用的，本站沒有查出來。</p>
+
+  <div class="card amber">
+    <p class="card-h">那 568 個佔位檔真的只是佔位</p>
+    <p>568 個全部解開來看：<strong>每一個都只有一張 1×1 的貼圖</strong>，
+       566 個解開後是 112 個位元組，另外兩個（<code>017d.fsh</code>、<code>024e.fsh</code>）是 116 個。</p>
+    <p>再抽 <code>000a</code>、<code>001a</code>、<code>012b</code>、<code>123a</code> 四個逐位元組比對：
+       那 112 個位元組裡<strong>只有兩處不一樣（offset 16-19 與 100-103），存的都是 <code>000a</code>、<code>123a</code> 這種四字代號</strong>。換句話說，除了「我是哪一隊的哪一套」這個代號本身，它們<u>不帶任何其他內容</u>。</p>
+    <p>當年那支社群安裝程式（TiT）的說明檔裡也自己寫著：它會替你自動產生要放進
+       <code>uniforms.big</code> 的這種小佔位檔。兩邊講的是同一件事，只是一邊用說的、一邊用量的。</p>
+  </div>
+
+  
+  <div class="card grass">
+    <p class="card-h">2026-08-28 補：剛安裝好的原版是什麼樣子</p>
+    <p>上面那些數字量的是<u>這台裝過台灣模組的機器</u>。
+       後來拿到剛安裝好、沒動過的官方英文版與官方繁體中文版，同樣的量法再跑一次
+       ——<strong>兩份原版逐項完全相同</strong>：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th><code>uniforms.big</code></th><th class="num">剛安裝好的原版</th><th class="num">這台機器</th><th class="num">差</th></tr></thead>
+      <tbody>
+        <tr><td data-label="uniforms.big">目錄總筆數</td><td data-label="剛安裝好的原版" class="num">557</td><td data-label="這台機器" class="num">694</td><td data-label="差" class="num">+137</td></tr>
+        <tr><td data-label="uniforms.big">預覽圖 <code>###.fsh</code></td><td data-label="剛安裝好的原版" class="num">124</td><td data-label="這台機器" class="num">124</td><td data-label="差" class="num">一樣</td></tr>
+        <tr class="hi"><td data-label="uniforms.big">球衣槽 <code>###x.fsh</code></td><td data-label="剛安裝好的原版" class="num"><strong>431</strong></td><td data-label="這台機器" class="num"><strong>568</strong></td><td data-label="差" class="num"><strong>+137</strong></td></tr>
+        <tr><td data-label="uniforms.big">兩筆 1 個位元組的 <code>a022.fsh</code></td><td data-label="剛安裝好的原版" class="num">2</td><td data-label="這台機器" class="num">2</td><td data-label="差" class="num">一樣</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>多出來的 137 筆全部是球衣槽，預覽圖一張都沒多。</strong>
+       這跟本頁前面說的對得起來：預覽圖只有 <code>000</code> 到 <code>123</code>，
+       是名冊給的球隊數，不會因為多做幾套球衣而變多。</p>
+    <p>還有一件<u>只有拿原版對照才看得出來</u>的事 —— <strong>槽位用的字母不一樣</strong>：</p>
+    <div class="tablewrap"><table>
+      <tbody>
+        <tr><td>剛安裝好的原版</td><td><code>a b c d g h i j k l m n o p</code></td><td>14 個字母，<strong>沒有 e、f</strong></td></tr>
+        <tr class="hi"><td>這台機器</td><td><code>a b c d e f g h i j l m n o</code></td><td>14 個字母，<strong>沒有 k、p</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p>兩邊都是 14 個字母，但<u>不是同一組</u>。
+       所以「字母代表第幾套球衣」這件事，<strong>在不同的名冊底下對應到的槽位並不一樣</strong> ——
+       這跟本站在<a href="../../reference/player-fields.html">球員欄位</a>反覆講的
+       「不要記欄號，欄號會因名冊而異」是同一件事。</p>
+    <p class="small">佔位檔的內容在原版也確認過了：431 個裡有 422 個解開後是 112 個位元組，
+       另外 9 個比較長（球隊 <code>013</code> 的七個是 304、<code>069</code> 的兩個是 240）——
+       但<strong>那 9 個裡面一樣只有一張 1×1 的貼圖</strong>，多出來的位元組幾乎全是零。
+       本頁原本那句「每一個都只有一張 1×1」<u>在原版也成立</u>。</p>
+  </div>
+
+<h2>編號從哪裡來</h2>
+  <p>球隊編號不是自己編的，它來自球隊名冊 <code>data\database\team.dat</code> 裡
+     <strong>欄位編號 6 的 <code>team_artid</code></strong>（美術編號）。
+     那份名冊 126 列，欄位編號 0 到 54，<code>team_artid</code> 那一欄是 1 到 126 連號、一隊一個。
+     而檔名用的編號是：</p>
+
+<pre><code>team.dat 欄位 6 team_artid = <span class="nu">6</span>
+                             └─ 減 1 ─→ 檔名編號 <span class="hl">005</span>
+                                         u005a.fsh · f005a.fsh · 005.fsh · l005.fsh</code></pre>
+
+  <p>「差一格」這件事很容易寫錯，所以本站找了幾條互相獨立的證據：</p>
+
+  <div class="tablewrap"><table>
+    <thead><tr><th style="width:34%">怎麼驗的</th><th>量到什麼</th></tr></thead>
+    <tbody>
+      <tr><td>數量對得上</td><td><code>team.dat</code> 126 列，美術編號 1 到 126；<code>models.big</code> 的
+          <code>u###a.fsh</code> 剛好 <strong>126 個，000 到 125 一個不缺</strong></td></tr>
+      <tr class="hi"><td><strong>隊徽的規格自己分了組</strong></td>
+          <td>把 <code>logos.big</code> 的 126 個球隊隊徽全部解開，照每張貼圖的（代號、寬、高）分群，
+              有 <strong>30 個用比較大的規格</strong>
+              （<code>a</code> 是 192×128、<code>l</code> 是 192×96、<code>i</code> 是 92×92），
+              而這 30 個<strong>正好就是 <code>l000</code> 到 <code>l029</code></strong>，
+              對應美術編號 1 到 30。<br>
+              <span class="small">剩下 96 個裡，86 個共用另一組較小的尺寸，
+              另外 10 個（030、031、040、058、092、093、094、112、122、123）各有各的</span></td></tr>
+      <tr class="hi"><td><strong>2009 那份模組自己證明了一次</strong></td>
+          <td>當年那份名冊裡，日本夢幻隊的美術編號是 <strong>123</strong>、台灣之光隊是 <strong>124</strong>；
+              而模組包裡日本那組檔案叫 <code>u122a</code>、台灣那組叫 <code>u123a</code>。
+              <strong>兩邊都剛好差一格</strong></td></tr>
+      <tr><td>四種檔案共用同一套編號</td><td>球衣、背號字模、預覽圖、隊徽用的是同一個三位數。
+          改一支球隊時這四種檔要一起換，編號不能各寫各的</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card blue">
+    <p class="card-h">這條在速查區原本標著「推測」</p>
+    <p><a href="../../reference/team-limit.html">為什麼你加不了新球隊</a>那頁本來寫
+       「它剛好等於隊徽編號 +1，本站沒有驗過」。上面第二、第三條把「差一格」這個對應關係驗起來了。</p>
+    <p>但要說清楚<strong>還沒驗到的是哪一半</strong>：
+       <span class="badge wip">未確認</span> <strong>遊戲程式是不是真的讀那一欄去抓檔案</strong>，
+       那要讀執行碼才知道，本站不做這件事。</p>
+  </div>
+
+  <h2>那個字母 x 是什麼</h2>
+  <p>字母就是「這一隊的第幾套球衣」。本站測試機這份 <code>models.big</code> 裡實際出現過的字母是
+     <code>a</code> 到 <code>o</code>，其中<strong>沒有 <code>k</code></strong>。
+     它也<strong>不是照順序長出來的</strong>。看一個實例就懂：
+     編號 005 這一格（在本站測試機的名冊裡是克里夫蘭）有七套球衣：</p>
+
+<pre><code>u005a  u005b  u005d  u005e  u005f  u005n  u005o
+              <span class="cm">↑ 有 d,但沒有 c</span></code></pre>
+
+  <p>所以字母是<strong>固定的欄位編號</strong>，不是流水號。
+     哪一個字母對應哪一套球衣，<strong>本站沒有驗出來</strong>，這頁不猜。
+     目前只有兩條可以寫下來的觀察：</p>
+
+  <ul class="plain">
+    <li>各字母的數量差很多：<code>a</code> 有 <strong>126</strong> 個（每一隊都有）、
+        <code>b</code> 有 <strong>122</strong> 個，之後遞減：
+        <code>c</code> 86、<code>d</code> 77、<code>e</code> 50、<code>f</code> 33、<code>g</code> 11、
+        <code>h</code> 7、<code>i</code> 1、<code>j</code> 1、<code>l</code> 5、<code>m</code> 8、
+        <code>n</code> 33、<code>o</code> 35。</li>
+    <li>語系檔 <code>FEENG.LOC</code> 從字串編號 20050 起是一串連續的球衣名稱：
+        <code>Home</code>、<code>Road</code>、<code>Alternate Home</code>、<code>Alternate Road</code>、
+        <code>Alternate Home 2</code>、<code>Alternate Road 2</code>，
+        接下來是一長串帶年份的復古球衣（<code>1986 Home</code>、<code>1921 Home</code> 這種）。
+        <span class="badge wip">未確認</span> 這串名稱跟檔名字母之間有沒有對應關係，本站沒有驗過。</li>
+  </ul>
+
+  <p>每支球隊有幾套球衣，差距很大：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">球衣套數</th><th class="num">幾支球隊</th><th>備註</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="球衣套數" class="num">1</td><td data-label="幾支球隊" class="num">4</td>
+          <td data-label="備註">檔名編號 122 到 125，也就是名冊最後四格。
+              這四格寫什麼名字<u>要看你裝的是哪一份名冊</u>：剛安裝好的原版是
+              MVP Legends、MVP Heroes（見<a href="../../story/hidden-legends/index.html">名單裡藏著 61 個名人堂球員</a>），
+              本站測試機這份被模組改成 AL Future Stars、NL Future Stars；
+              另外兩格三份都一樣，是代號 <code>EAA</code>、<code>EAB</code> 的兩隊</td></tr>
+      <tr><td data-label="球衣套數" class="num">2</td><td data-label="幾支球隊" class="num">31</td><td data-label="備註">只有 <code>a</code>、<code>b</code> 兩套</td></tr>
+      <tr><td data-label="球衣套數" class="num">3</td><td data-label="幾支球隊" class="num">10</td><td data-label="備註"></td></tr>
+      <tr><td data-label="球衣套數" class="num">4</td><td data-label="幾支球隊" class="num">17</td><td data-label="備註"></td></tr>
+      <tr><td data-label="球衣套數" class="num">5</td><td data-label="幾支球隊" class="num">15</td><td data-label="備註"></td></tr>
+      <tr><td data-label="球衣套數" class="num">6</td><td data-label="幾支球隊" class="num">15</td><td data-label="備註"></td></tr>
+      <tr><td data-label="球衣套數" class="num">7</td><td data-label="幾支球隊" class="num">13</td><td data-label="備註"></td></tr>
+      <tr><td data-label="球衣套數" class="num">8</td><td data-label="幾支球隊" class="num">17</td><td data-label="備註"></td></tr>
+      <tr><td data-label="球衣套數" class="num">9</td><td data-label="幾支球隊" class="num">1</td><td data-label="備註"></td></tr>
+      <tr><td data-label="球衣套數" class="num">10</td><td data-label="幾支球隊" class="num">3</td><td data-label="備註">最多的三隊</td></tr>
+      <tr><td data-label="球衣套數" class="num"><strong>合計</strong></td><td data-label="幾支球隊" class="num"><strong>126</strong></td><td data-label="備註"></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>自己在自己的遊戲上看一遍</h2>
+  <p>上面的數字是本站測試機量的，<strong>你的遊戲一定不一樣</strong>（裝過的模組不同，球衣數就不同）。
+     這支腳本只讀不寫，跑一次就知道你手上那份長什麼樣。</p>
+
+  <div class="step">
+    <div class="step-n">1</div>
+    <div>
+      <div class="step-t">把下面這段存成 <code>list_uniform.py</code></div>
+      <p class="step-why">它只做一件事：把三個封裝檔的目錄讀出來，挑出屬於某一隊的項目印出來。
+         全程唯讀，不會碰到你的遊戲檔。需要 Python 3。</p>
+<pre><code>import struct, sys, os, re
+
+def toc(path):
+    f = open(path, 'rb')
+    if f.read(4) != b'BIGF':
+        return []
+    f.seek(8)
+    count = struct.unpack('&gt;I', f.read(4))[0]
+    f.seek(16)
+    out = []
+    for _ in range(count):
+        off, size = struct.unpack('&gt;II', f.read(8))
+        name = b''
+        while True:
+            ch = f.read(1)
+            if ch in (b'\x00', b''):
+                break
+            name += ch
+        out.append((name.decode('latin1'), size))
+    return out
+
+game = sys.argv[1]
+num = '%03d' % int(sys.argv[2])
+want = re.compile(r'^[ufl]?%s[a-z]?\.fsh$' % num)
+for rel in ('models.big', 'frontend/uniforms.big', 'frontend/logos.big'):
+    path = os.path.join(game, 'data', *rel.split('/'))
+    hit = sorted(x for x in toc(path) if want.match(x[0]))
+    print('== %s  %d 個' % (rel, len(hit)))
+    for name, size in hit:
+        print('   %-12s %10d bytes' % (name, size))</code></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">2</div>
+    <div>
+      <div class="step-t">跑它，第一個參數是遊戲資料夾，第二個是球隊編號</div>
+      <p class="step-why">球隊編號就是上一節那個「美術編號減一」。不確定的話從 0 開始試。</p>
+<pre><code>python list_uniform.py "<span class="hl">你的遊戲資料夾</span>" 5</code></pre>
+      <div class="seen"><b>本站測試機跑出來長這樣</b>
+<pre style="margin:8px 0 0"><code>== models.big  14 個
+   f005a.fsh          7653 bytes
+   f005b.fsh         12734 bytes
+   f005d.fsh          7835 bytes
+   ...
+   u005a.fsh        870978 bytes
+   u005b.fsh        787961 bytes
+   ...
+== frontend/uniforms.big  8 個
+   005.fsh          556715 bytes
+   005a.fsh             77 bytes
+   ...
+== frontend/logos.big  1 個
+   l005.fsh          14123 bytes</code></pre>
+      </div>
+      <div class="ifnot"><b>如果印出 0 個</b>
+        <ul>
+          <li>路徑指錯了，給的資料夾底下要有一個 <code>data</code> 子資料夾</li>
+          <li>那一格球隊本來就沒有球衣，換個編號再試</li>
+          <li>三行都是 0 個，通常是 <code>data</code> 底下的檔案被搬過位置</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h2>一支球隊會有幾個檔</h2>
+  <p>把編號 123 那一格拿來跑同一支腳本，結果是五個檔：</p>
+
+<pre><code>models.big              u123a.fsh   <span class="cm">球衣本體</span>
+                        f123a.fsh   <span class="cm">背號與姓名字模</span>
+frontend\uniforms.big   123.fsh     <span class="cm">選球衣畫面的預覽圖</span>
+                        123a.fsh    <span class="cm">佔位檔</span>
+frontend\logos.big      l123.fsh    <span class="cm">隊徽</span></code></pre>
+
+  <p>2009 那份模組給的是<strong>兩套</strong>（<code>a</code> 與 <code>b</code>），所以一支球隊八個檔：
+     <code>u123a</code>、<code>u123b</code>、<code>f123a</code>、<code>f123b</code>、
+     <code>123.fsh</code>、<code>123a.fsh</code>、<code>123b.fsh</code>、<code>l123.fsh</code>。</p>
+
+  <div class="card clay">
+    <p class="card-h">最容易漏掉的是 f### 那個檔</p>
+    <p>本站量過 595 個 <code>u###x.fsh</code> 的 28 個代號，
+       <strong>裡面沒有任何一張是數字或字母</strong>。
+       數字與姓名的字母是 <code>f###x.fsh</code> 裡那 36 張貼圖，跟球衣本體不在同一個檔裡。
+       這兩個檔在檔案結構上是分開的兩份資料，改一隊時建議一起換。</p>
+    <p>至於只換其中一個、遊戲畫面會變成什麼樣子，<strong>本站沒有實際跑過，不下結論</strong>。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">原廠出貨的球衣規格（2026-08-28 量的）</p>
+    <p>剛安裝好的官方英文版 <code>models.big</code> 裡有 <strong>433 個</strong>球衣本體檔：</p>
+    <ul class="plain">
+      <li>每個檔<strong>28 張貼圖，433/433 零例外</strong></li>
+      <li>解壓後的大小<strong>全部剛好 732,592 個位元組</strong>，分毫不差</li>
+      <li>「貼圖名稱 ＋ 像素格式 ＋ 尺寸」的組合<strong>只有一種</strong></li>
+      <li>會變的只有<u>子圖在檔案裡排第幾</u> —— 8 種排列，其中一種佔 425 個</li>
+    </ul>
+    <p><strong>所以本頁下面那張 1X 尺寸表，在原版也成立</strong>：
+       <code>jerf/jerk/jers/jert</code> 128×128、<code>lega</code>–<code>legd</code> 128×256、
+       <code>shoe</code> 128×64 —— 全部對得上。</p>
+    <p class="small">另外一個原本沒寫的：那 28 張<strong>一張 DXT 都沒有</strong>，
+       全是 16 位元，其中 5 張（<code>hhlm</code>、<code>llod</code>、<code>msk1</code>、
+       <code>msk3</code>、<code>lace</code>）用帶透明度的 4444 格式。
+       完整清單在<a href="../../reference/models.html#uniform-spec">模型那頁</a>。</p>
+    <p class="small">⭐ 順序會變這件事對寫腳本的人很重要：
+       <u>要照名字找貼圖，不能照位置找</u>。隊徽那邊也是同一個現象。</p>
+  </div>
+
+  <h2>1X 與 2X 到底差在哪</h2>
+  <p>模組界從以前就用「1X 球衣 / 2X 球衣」這種講法，但幾乎沒人說清楚差在哪。
+     這次把 2009 那份包裡兩個版本的同一個檔解開，一張貼圖一張貼圖比對，答案很乾淨：
+     <strong>張數一樣都是 28 張，只有其中幾張的邊長剛好變成兩倍</strong>。
+     這一包裡的四個球衣檔，量到有變的每一張都是寬與高同時乘二，沒有一張是別的倍數。</p>
+
+  <p>以中華隊那件 <code>u123a.fsh</code> 為例，28 張裡有 9 張放大：</p>
+
+  <div class="tablewrap"><table>
+    <thead><tr><th class="mono">貼圖代號</th><th class="num">張數</th><th class="num">1X</th><th class="num">2X</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td class="mono">jerf jerk jers jert</td><td class="num">4</td><td class="num">128×128</td><td class="num">256×256</td></tr>
+      <tr class="hi"><td class="mono">lega legb legc legd</td><td class="num">4</td><td class="num">128×256</td><td class="num">256×512</td></tr>
+      <tr class="hi"><td class="mono">shoe</td><td class="num">1</td><td class="num">128×64</td><td class="num">256×128</td></tr>
+      <tr><td>其餘 19 個代號</td><td class="num">19</td><td class="num" colspan="2">兩版尺寸完全相同</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>同一包裡另外三件放大的張數不一樣：<code>u123b</code> 除了上面九張，
+     還多放大了 <code>chst</code>、<code>hhlm</code>、<code>merf</code>、<code>shn1</code>
+     （128×128 變 256×256）與 <code>hat</code>、<code>hlm1</code>、<code>slvl</code>、<code>slvr</code>
+     （128×64 變 256×128），合計 17 張；日本那兩件則是各 14 張。
+     <strong>是一張一張決定要不要放大的，不是整包等比例縮放。</strong></p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>量的東西</th><th class="num">1X</th><th class="num">2X</th><th class="num">倍數</th></tr></thead>
+    <tbody>
+      <tr><td data-label="量的東西" class="mono">u123a.fsh 解開後</td><td data-label="1X" class="num">732,600</td><td data-label="2X" class="num">1,961,392</td><td data-label="倍數" class="num">2.68×</td></tr>
+      <tr><td data-label="量的東西" class="mono">u123b.fsh 解開後</td><td data-label="1X" class="num">887,288</td><td data-label="2X" class="num">2,705,904</td><td data-label="倍數" class="num">3.05×</td></tr>
+      <tr class="hi"><td data-label="量的東西"><strong>兩隊八個檔解開後合計</strong></td><td data-label="1X" class="num">3,618,544</td>
+          <td data-label="2X" class="num">9,713,344</td><td data-label="倍數" class="num"><strong>2.68×</strong></td></tr>
+      <tr><td data-label="量的東西" class="mono">f123a.fsh 解開後</td><td data-label="1X" class="num">71,928</td><td data-label="2X" class="num">71,920</td><td data-label="倍數" class="num">1.00×</td></tr>
+      <tr><td data-label="量的東西">整包壓縮檔（英文版）</td><td data-label="1X" class="num">980,095</td><td data-label="2X" class="num">1,770,512</td><td data-label="倍數" class="num">1.81×</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">「解開後」一律指 QFS 解壓後的實際位元組數。</p>
+
+  <div class="card grass">
+    <p class="card-h">背號字模完全不受 1X / 2X 影響</p>
+    <p>四個字模檔（<code>f122a</code>、<code>f122b</code>、<code>f123a</code>、<code>f123b</code>）
+       兩個版本解開後都是 36 張貼圖，<strong>36 張的尺寸一張都沒有變</strong>。
+       所以「換成 2X」動的是球衣本體，數字與字母那個檔沒有跟著放大。</p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">1X 那組尺寸在這台機器上很少見</p>
+    <p>把本站測試機 <code>models.big</code> 裡 595 個球衣檔全部解開、照 28 張貼圖的尺寸分群，
+       總共只出現 <strong>8 種組合</strong>。其中<strong>跟模組 1X 完全一樣的只有 4 個檔</strong>：
+       <code>u051b</code>、<code>u110b</code>、<code>u124a</code>、<code>u125a</code>。
+       剩下 591 個用的都是比較大的組合。</p>
+    <p><span class="badge wip">未確認</span> 這份 <code>models.big</code>
+       是<a href="../../reference/models.html">社群重新打包過的版本</a>，
+       上面這個分佈反映的是這台機器上裝過什麼，
+       <strong>不能拿它推論 EA 原始出貨時是什麼規格</strong>。</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">⚠ 「2X 就是把貼圖放大兩倍」是錯的</p>
+    <p>把這一包裡<strong>八組能對照的球衣檔</strong>全部量過之後，
+       這個看起來很像規則的講法站不住：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th class="mono">檔案</th><th class="num">貼圖張數</th><th class="num">2X 版放大了幾張</th></tr></thead>
+      <tbody>
+        <tr><td data-label="檔案" class="mono">f122a · f122b · f123a · f123b</td><td data-label="貼圖張數" class="num">36</td><td data-label="2X 版放大了幾張" class="num"><strong>0</strong></td></tr>
+        <tr><td data-label="檔案" class="mono">u123a（中華隊）</td><td data-label="貼圖張數" class="num">28</td><td data-label="2X 版放大了幾張" class="num">9</td></tr>
+        <tr><td data-label="檔案" class="mono">u122a · u122b（日本隊）</td><td data-label="貼圖張數" class="num">28</td><td data-label="2X 版放大了幾張" class="num">14</td></tr>
+        <tr class="hi"><td data-label="檔案" class="mono">u123b（中華隊）</td><td data-label="貼圖張數" class="num">28</td><td data-label="2X 版放大了幾張" class="num"><strong>17</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>四個球衣本體檔放大的張數都不一樣</strong>（9、14、14、17 張）。
+       四個檔<u>共通</u>的只有 9 張 —— <code>jerf</code>、<code>jerk</code>、<code>jers</code>、<code>jert</code>、
+       <code>lega</code>–<code>legd</code>、<code>shoe</code>，其餘是<u>逐檔決定的</u>。
+       所以 2X 不是一條套用在全部球衣上的規則。至少在這一包裡是這樣。</p>
+    <p class="small">⚠️ <strong>2026-09-05 訂正</strong>：本頁原本寫「沒有任何一張貼圖是在每一個檔裡都被放大的（交集是 0）」，
+       那句是錯的。那個 0 是把四個背號字模檔一起算進去才得到的 ——
+       字模檔的 36 個代號（<code>A___</code>–<code>Z___</code>、<code>zig0</code>–<code>zig9</code>）
+       跟球衣本體的 28 個一個都不重疊，<u>那個交集在結論是真是假的時候都會是 0</u>。
+       只看四個球衣本體檔，交集是上面那 9 張。</p>
+    <p class="small">這件事本站差一點寫錯。只量中華隊那一個檔，會很自然地寫成
+       「2X 會放大這 9 張貼圖」—— 讀起來像規則，其實那 9 張只是四個檔<u>共通</u>的最小集合，
+       別的檔還會多放大幾張。多量一個日本隊的檔才發現對不上。</p>
+  </div>
+
+  <figure class="figbox">
+    <div class="figscroll" style="text-align:center">
+      <img src="jersey-1x-2x.png" alt="同一件中華隊球衣胸前標誌的局部，左邊取自 1X 版、右邊取自 2X 版，Chinese Taipei 那行小字在 1X 版糊成一團，在 2X 版清楚可辨"
+           width="484" height="244" style="max-width:100%;height:auto">
+    </div>
+    <figcaption><b>左邊取自 1X 版、右邊取自 2X 版</b>，同一件球衣 <code>jerf</code> 貼圖上
+      <b>胸前標誌那一小塊</b>。這是這一課唯一需要用圖說明的地方：
+      <code>Chinese Taipei</code> 那行小字在 1X 版糊成一團，在 2X 版清楚可讀。
+      <br>兩邊各只取整張貼圖的 <b>6.2%</b>（1X 是 32×32、2X 是 64×64），
+      放大到同樣大小並排。沒有調整顏色，只做整數倍最近鄰放大，
+      所以你看到的方塊就是原本的像素。
+      <br><b>這件球衣不是本站做的</b>：2X 版由 <b>tony7494550</b> 製作，
+      1X 版由 <b>小雪靈</b> 從 2X 轉出。本站只截取說明技術差異所需的最小範圍，
+      <u>不提供這些檔案的下載，也不呈現完整的貼圖</u>，著作權歸原作者。
+      原作者提出即立即移除。</figcaption>
+  </figure>
+
+  <h2>2009 年那句建議，跟今天量到的數字</h2>
+  <p>那份模組的說明檔裡有一句第一手經驗，值得原樣留著：</p>
+
+<pre><code>因為中文語系及2X球衣檔皆較耗資源，很容易出問題及當機跳出，建議玩英文語系及1X球衣檔的MVP。</code></pre>
+
+  <p><strong>那是 2009 年、在 2009 年的機器上的說法</strong>，不是現在的結論。
+     本站今天量到的是這兩件事：</p>
+
+  <ul class="tick">
+    <li><strong>2X 的檔案確實比較大</strong>：同樣兩支球隊的八個檔，
+        解開後從 3,618,544 變成 9,713,344 個位元組，多出 <strong>6,094,800</strong> 個。</li>
+    <li><strong>中文版變大的是字型檔</strong>：中文版的 <code>fonts.big</code>
+        是 <strong>1,279,340</strong> 個位元組，英文版是 <strong>420,650</strong>，
+        兩邊都裝 12 個 <code>.ffn</code>。中文版裡有六個字型檔各佔 18.39 萬個位元組左右，
+        英文版對應的那六個是 1.0 萬到 2.8 萬。</li>
+  </ul>
+
+  <div class="card amber">
+    <p class="card-h">反過來，語系檔比英文版還小</p>
+    <p>中文版的 <code>FEENG.LOC</code> 是 219,421 個位元組、6,436 條字串；
+       英文版是 415,840 個位元組、6,352 條。
+       <strong>中文版的位元組數只有英文版的 53%，條數反而多 84 條。</strong></p>
+    <p>也就是說，這一包裡「中文比英文大」的部分全部集中在字型檔，語系檔本身是變小的。
+       <span class="badge wip">未確認</span> 當年那句「中文語系較耗資源」指的是不是這件事，本站不知道。</p>
+  </div>
+
+  <p>另外，MVP 2005 的記憶體上限是真的存在的，跟球場包一起爆掉的情形見
+     <a href="../crash-diagnosis/index.html">遊戲當掉了怎麼辦</a>那課。</p>
+
+  <h2>那份 2009 模組包長什麼樣</h2>
+  <p>整包解開只有四個資料夾，每個資料夾就是一種組合：</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>變體</th><th>語系</th><th>球衣</th><th class="num">壓縮檔大小</th></tr></thead>
+    <tbody>
+      <tr><td data-label="變體" class="mono">Taiwan_English_1X</td><td data-label="語系">英文</td><td data-label="球衣">1X</td><td data-label="壓縮檔大小" class="num">980,095</td></tr>
+      <tr><td data-label="變體" class="mono">Taiwan_Chinese_1X</td><td data-label="語系">中文</td><td data-label="球衣">1X</td><td data-label="壓縮檔大小" class="num">1,107,418</td></tr>
+      <tr><td data-label="變體" class="mono">Taiwan_English_2X</td><td data-label="語系">英文</td><td data-label="球衣">2X</td><td data-label="壓縮檔大小" class="num">1,770,512</td></tr>
+      <tr><td data-label="變體" class="mono">Taiwan_Chinese_2X</td><td data-label="語系">中文</td><td data-label="球衣">2X</td><td data-label="壓縮檔大小" class="num">1,896,246</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>四個變體<strong>每個都是 20 個檔</strong>，結構完全一樣：</p>
+
+<pre><code>Uniforms1X/  或  Uniforms2X/
+    Taiwan/    u123a.fsh  u123b.fsh  f123a.fsh  f123b.fsh
+    Japan/     u122a.fsh  u122b.fsh  f122a.fsh  f122b.fsh
+Uniforms_Menu/
+    Taiwan/    123.fsh  123a.fsh  123b.fsh
+    Japan/     122.fsh  122a.fsh  122b.fsh
+Logos/
+    Taiwan/    l123.fsh
+    Japan/     l122.fsh
+Chinese_LOC/  或  English_LOC/
+    FEENG.LOC  IGENG.LOC
+Fonts/
+    fonts.big
+Readme.txt</code></pre>
+
+  <div class="card grass">
+    <p class="card-h">四份逐檔取雜湊比對，20 個檔分成三種行為</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th class="num">幾個檔</th><th>是哪些</th><th>四份之間</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="幾個檔" class="num">8</td><td data-label="是哪些">兩個隊徽 + 六個選單預覽與佔位檔</td><td data-label="四份之間"><strong>四份完全相同</strong></td></tr>
+        <tr><td data-label="幾個檔" class="num">3</td><td data-label="是哪些"><code>FEENG.LOC</code>、<code>IGENG.LOC</code>、<code>fonts.big</code></td>
+            <td data-label="四份之間">只跟語言有關，同語言的 1X 與 2X 位元組相同</td></tr>
+        <tr><td data-label="幾個檔" class="num">9</td><td data-label="是哪些">八個球衣與字模檔 + <code>Readme.txt</code></td>
+            <td data-label="四份之間">只跟 1X / 2X 有關，同版本的中文與英文位元組相同</td></tr>
+      </tbody>
+    </table></div>
+    <p>所以「中文 1X」跟「英文 1X」的差別只有三個檔，
+       而說明檔要使用者<strong>從四包裡擇一安裝</strong>。
+       至於當年為什麼是四包不是兩包，說明檔沒有寫，本站不猜。</p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">這台機器上留著一份一模一樣的檔案</p>
+    <p>遊戲資料夾旁邊有一個備份資料夾，名字寫著是中文版 1X 球衣的備份。
+       把裡面的 <code>FEENG.LOC</code>、<code>IGENG.LOC</code>、<code>fonts.big</code>
+       跟模組包裡的中文 1X 版取 MD5 比對，<strong>三個檔的雜湊完全相同</strong>。
+       兩邊的檔案日期也一樣：兩個語系檔是 2009 年 4 月，字型檔是 2008 年 5 月。</p>
+  </div>
+
+  <h2>怎麼把球衣裝進去</h2>
+  <div class="card amber">
+      <p class="card-h">這一節是規則。想直接動手的話有另一課</p>
+      <p>下面寫的是<strong>寫回封裝檔要遵守什麼</strong>，
+         不是「照著點五下就裝好了」。
+         <span class="badge ok">✓ 可用</span> 要照著做的話，<a href="../install-uniform/index.html">把一套球衣裝進遊戲</a>那一課有腳本，會自動分類、先清點再安裝、寫完逐位元組複驗，一行還原。</p>
+    <p>想先動手改一個小東西再回來看這一節，
+       建議從<a href="../edit-speed/index.html">改跑壘速度</a>那一課開始
+       —— 那一課只動一個純文字檔，而且附還原腳本。</p>
+  </div>
+  <p>三個封裝檔，三種放法，但寫回去的規矩只有一條。</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th style="width:30%">要放的檔</th><th>放進去的地方</th><th>備份哪個檔</th></tr></thead>
+    <tbody>
+      <tr><td data-label="要放的檔" class="mono">u###x.fsh · f###x.fsh</td><td data-label="放進去的地方" class="mono">data\models.big</td>
+          <td data-label="備份哪個檔">整個 <code>models.big</code>（本站這台疊過模組的測試機是 535.9 MB，剛安裝好的原版只有 165.0 MB，備份很慢，但一定要）</td></tr>
+      <tr><td data-label="要放的檔" class="mono">###.fsh · ###x.fsh</td><td data-label="放進去的地方" class="mono">data\frontend\uniforms.big</td>
+          <td data-label="備份哪個檔"><code>uniforms.big</code></td></tr>
+      <tr><td data-label="要放的檔" class="mono">l###.fsh</td><td data-label="放進去的地方" class="mono">data\frontend\logos.big</td><td data-label="備份哪個檔"><code>logos.big</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card clay">
+    <p class="card-h">寫回封裝檔只有一條鐵律：接到檔尾</p>
+    <p>把新資料<strong>接到 <code>.big</code> 的最後面</strong>，然後改<strong>兩個</strong>地方：
+       目錄裡那一項的位置與長度（8 個位元組），<strong>以及檔頭的檔案總大小（4 個位元組）</strong>。
+       <u>漏掉檔頭那 4 個位元組是最常見的壞檔原因</u>。</p>
+    <p>而且檔頭那一欄的位元組順序<strong>不是固定的</strong>，而且它不是檔名或檔案大小的性質，
+       是看你手上這一份被誰重新打包過。本站以 BIGF 檔頭認過四份沒有疊模組的安裝：
+       剛安裝好的原版英文版 207 個封裝檔、剛安裝好的原版繁體中文版 205 個、
+       PK 版 205 個、打過中文更新檔的那一份 205 個，
+       這四份<strong>全部是 little-endian，一個 big-endian 都沒有</strong>，
+       連那四份裡最大的 <code>models.big</code>（172,992,803 個位元組）也是。
+       big-endian 只出現在本站測試機那份疊過模組的 <code>data</code> 資料夾：
+       384 個封裝檔裡有 10 個，落在 7 個檔名上，而這一課的主角 <code>models.big</code>
+       在測試機上正好是其中一個（它已經從 172,992,803 變成 561,891,312 個位元組）。
+       所以不要照檔名記，<strong>寫回去之前先讀一次，原檔用哪一種就用哪一種。</strong>
+       完整寫法見 <a href="../../reference/bigf.html">BIGF 封裝格式</a>。</p>
+    <p class="small">另外要注意：「不要讀出全部再重新打包」這條，
+       理由在 <code>uniforms.big</code> 與 <code>logos.big</code> 上成立（它們有目錄沒登記的位元組），
+       但在 <code>models.big</code> 上<u>不成立</u> —— 它目錄外的位元組是 0。
+       即使如此，接到檔尾仍然是比較安全的做法，因為你不必重算整份目錄。</p>
+    <p>這三個檔差多少，本站量過。把每一項的位置與長度攤開來看，
+       目錄<strong>沒有</strong>蓋到的位元組是：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>封裝檔</th><th class="num">檔案大小</th><th class="num">目錄外的位元組</th><th class="num">佔比</th></tr></thead>
+      <tbody>
+        <tr><td data-label="封裝檔" class="mono">models.big</td><td data-label="檔案大小" class="num">561,891,312</td><td data-label="目錄外的位元組" class="num">0</td><td data-label="佔比" class="num">0%</td></tr>
+        <tr class="hi"><td data-label="封裝檔" class="mono">uniforms.big</td><td data-label="檔案大小" class="num">37,682,083</td><td data-label="目錄外的位元組" class="num">9,465,878</td><td data-label="佔比" class="num">25.1%</td></tr>
+        <tr class="hi"><td data-label="封裝檔" class="mono">logos.big</td><td data-label="檔案大小" class="num">2,451,310</td><td data-label="目錄外的位元組" class="num">1,126,314</td><td data-label="佔比" class="num">45.9%</td></tr>
+      </tbody>
+    </table></div>
+    <p>那些位元組是什麼，本站沒有查出來。但重新打包會把它們丟掉，所以規矩還是接到檔尾。
+       檔案會因此變大，這是對的，不是出錯。</p>
+  </div>
+
+  <ul class="tick">
+    <li>球衣檔是 <a href="../../reference/qfs.html">QFS 壓縮</a>的 FSH 圖檔，
+        解開後開頭四碼是 <code>SHPI</code>（595 個檔全部如此），
+        像素格式見<a href="../../reference/pixel-formats.html">圖片的像素怎麼排</a>。</li>
+    <li>一隊要換的是三個封裝檔裡的五種檔案，換之前先照上一節的清單對一遍，別漏掉某一個。</li>
+    <li>出問題就把備份蓋回去。三個檔各自獨立，可以一次只還原一個。</li>
+  </ul>
+
+  <div class="card amber">
+    <p class="card-h">關於社群的安裝工具</p>
+    <p>當年這類模組是靠社群寫的安裝程式裝的。本站手上這份 2009 模組的說明檔指名要用
+       <strong>TiT</strong> 這支工具，直接選壓縮檔安裝，不必自己解壓縮。
+       TiT 自己的說明檔（2008 年版）寫著三件跟這課有關的事：
+       它是 Windows 的 <code>.exe</code>、它安裝時會備份被蓋掉的原檔、
+       它會自動產生要放進 <code>uniforms.big</code> 的小佔位檔。
+       同一份說明檔還寫著，裝副檔名為 <code>.TiT</code> 的檔案時，
+       它會連到當年的社群伺服器對一次檔案完整性，所以那種情況需要網路。</p>
+    <p>本站<strong>只提工具的名字與用途，不提供、不轉載、不放下載連結</strong>，
+       它的著作權歸原作者。</p>
+    <p class="card-h" style="margin-top:12px">為什麼一定要用那支工具（2026-08-28 量的）</p>
+    <p>本站手上有一個副檔名是 <code>.TiT</code> 的 2010 年球衣包。看它的開頭幾個位元組：</p>
+    <div class="tablewrap"><table>
+      <tbody>
+        <tr><td>檔頭</td><td class="mono">37 7A BC AF 27 1C</td><td><strong>那是 7-Zip 的識別碼</strong></td></tr>
+        <tr class="hi"><td>壓縮方式</td><td class="mono">LZMA + 7zAES</td><td><strong>內容是加密的</strong></td></tr>
+        <tr><td>檔名清單</td><td colspan="2">不用密碼就列得出來 —— 376 個檔、4 個資料夾</td></tr>
+        <tr class="hi"><td>檔案內容</td><td colspan="2"><strong>沒有密碼解不出來</strong>（376 個全部失敗）</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>所以 <code>.TiT</code> 就是換了副檔名的 7-Zip 檔，而且內容上了鎖。</strong>
+       這解釋了為什麼那份說明檔要你用它自己的安裝程式 ——
+       <u>不是格式特殊，是內容加密</u>。</p>
+    <p class="small">順帶一個對得上的細節：那包裡列出來的
+       <code>1x/u031a.fsh</code> 是 <strong>732,592 個位元組</strong> ——
+       跟剛安裝好的原版球衣<u>分毫不差</u>。做那包的人是照原廠規格做的。</p>
+  </div>
+
+  <h2>自己做球衣，先知道這幾件事</h2>
+  <ol class="plain">
+    <li><strong>拿現成的檔當模板，不要從零開始。</strong>
+        595 個球衣檔用的<u>是同一組 28 個代號</u>，零例外 —— 但<strong>排列順序有五種</strong>（244／216／94／39／2 個檔各一種，<u>這台機器</u>；
+        剛安裝好的原版是 433 個檔、<strong>8 種</strong>排列，其中一種佔 425 個 ——
+        兩台的種類數不一樣，正好說明<u>順序不是規格的一部分</u>）。所以可以照抄代號清單，<u>不能假設順序一樣</u>。
+        最省事的做法是解開一個現有的 <code>u###a.fsh</code>，只換掉裡面的圖，不要增減張數。</li>
+    <li><strong>1X 和 2X 選一個，不要混。</strong>
+        兩者的張數與代號完全相同，差別只在部分貼圖的邊長。
+        同一支球隊兩套一大一小，資料量會差到兩三倍。</li>
+    <li><strong>背號字模 <code>f###x.fsh</code> 要跟著做。</strong>
+        10 個數字 + 26 個字母，共 36 張。</li>
+    <li><strong>選球衣畫面的預覽圖要自己補。</strong>
+        <code>###.fsh</code> 裡每一張預覽貼圖都是 128×128；
+        <code>###x.fsh</code> 佔位檔的內容除了內嵌代號以外都一樣。</li>
+    <li><strong>隊徽是另一個檔、另一套規格。</strong>
+        <code>l###.fsh</code> 裡有 7 張貼圖。2009 那份台灣隊徽用的規格
+        （<code>a</code> 128×128、<code>l</code> 128×64、<code>g</code> 與 <code>i</code> 64×64、
+        <code>j</code> 64×32、<code>d</code> 與 <code>e</code> 8×32）
+        跟 <code>logos.big</code> 裡最多球隊共用的那 <strong>86 個</strong>隊徽<strong>完全一致</strong>，
+        抄那個規格最保險。</li>
+    <li><strong>只能換，不能加。</strong>
+        球隊數量鎖在 126，要放中職球隊就得整支蓋掉某一支既有球隊。原因見
+        <a href="../../reference/team-limit.html">為什麼你加不了新球隊</a>。</li>
+  </ol>
+
+  <h2>這頁不能告訴你什麼</h2>
+  <ul class="cross">
+    <li><strong>本站沒有真的換過一套球衣進遊戲跑給你看。</strong>
+        這頁量的是檔案結構與規格，「照這樣做就會成功」本站還沒有自己驗證過，
+        任何關於遊戲畫面會怎樣的說法這頁都不寫。
+        <span class="badge wip">未驗證</span></li>
+    <li><strong>哪個字母對應哪一套球衣，沒有解出來。</strong>
+        只知道 <code>a</code> 是每一隊都有，<code>b</code> 則是 122 隊有。</li>
+    <li><strong>28 個代號分別對應身上哪個部位，本站沒有把貼圖畫出來對過，所以這頁不寫。</strong>
+        代號看起來像英文縮寫，但沒有對過就是沒有對過。</li>
+    <li><strong>怎麼把改好的圖壓縮回 FSH，本站沒有做。</strong>
+        解開的那一半已經解決，壓回去那一半跟<a href="../../reference/models.html">臉皮那頁</a>卡在同一個地方。</li>
+    <li><strong>遊戲程式怎麼決定要載哪一個檔，沒有讀執行碼。</strong>
+        這頁能證明的是檔名編號與名冊欄位的對應關係，不是遊戲的讀取行為。</li>
+    <li><strong>沒有提供任何球衣檔或工具。</strong>本站不散布遊戲檔案，也不轉載第三方工具。</li>
+  </ul>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 一套球衣不是一個檔，是散在三個封裝檔裡的五種檔案；而球衣佔 <code>models.big</code> 的 82.6%，是這個檔裡最大的一塊，臉皮只有 14.9%。</li>
+    <li><strong>五個檔家族</strong> <code>u###x.fsh</code> 球衣本體（一個檔 28 張貼圖）、<code>f###x.fsh</code> 背號與姓名字模（36 張，10 個數字加 26 個字母）、<code>###.fsh</code> 選單預覽圖（每張都是 128×128）、<code>###x.fsh</code> 佔位檔（解開只有一張 1×1）、<code>l###.fsh</code> 隊徽（每個都是 7 張）。</li>
+    <li><strong>編號差一格</strong> 檔名編號＝<code>team.dat</code> 欄位 6 的 <code>team_artid</code> 減 1。真正把它驗起來的是兩條：隊徽用大規格的那 30 個正好是 <code>l000</code> 到 <code>l029</code>、2009 模組裡美術編號 123 與 124 對到 <code>u122a</code> 與 <code>u123a</code>；另外 126 列名冊對上 <code>u###a.fsh</code> 剛好 126 個一個不缺，是數量對得上。</li>
+    <li><strong>寫腳本的人最該記住這條</strong> 照名字找子圖，不要照位置找。595 個球衣檔用的是同一組 28 個代號零例外，但排列順序這台機器有 5 種、剛安裝好的原版是 8 種（其中一種佔 425 個）；隊徽也一樣，原版 132 個檔用了 36 種排列，而 126 個球隊隊徽的字母集合完全一致（都是 <code>a d e g i j l</code>；另外 4 個不對應球隊的 <code>l994</code>、<code>l997</code>、<code>l998</code>、<code>l999</code> 少一個 <code>l</code>）。種類數兩台不同，正好說明順序不是規格的一部分。</li>
+    <li><strong>1X 與 2X 不是整包放大</strong> 兩版都是 28 張，只有部分貼圖寬高同時乘二。<code>u123a</code> 放大 9 張、日本那兩件各 14 張、<code>u123b</code> 17 張，<strong>四個檔共通的只有 9 張</strong>（<code>jerf jerk jers jert</code>、<code>lega</code>–<code>legd</code>、<code>shoe</code>），多出來的是逐檔決定的；四個背號字模檔則一張都沒放大。八個檔解開後從 3,618,544 變成 9,713,344 個位元組。</li>
+    <li><strong>最容易踩的雷是壞檔</strong> 寫回 <code>.big</code> 只有一條鐵律，接到檔尾，然後改兩個地方，目錄裡那一項的位置與長度 8 個位元組，<strong>以及檔頭的檔案總大小 4 個位元組</strong>，漏掉檔頭是最常見的壞檔原因。而且檔頭那一欄的位元組順序不固定，也不是檔名的性質：四份沒疊過模組的安裝（原版英文版 207 個封裝檔、原版繁體中文版 205 個、PK 版 205 個、打過中文更新檔的那一份 205 個）一個 big-endian 都沒有，連原版的 <code>models.big</code> 也是 little-endian；測試機那份疊過模組的 384 個封裝檔裡才有 10 個 big-endian，這一課的主角 <code>models.big</code> 是其中之一。寫回去之前先讀一次。</li>
+    <li><strong>安全網與那道牆</strong> 動手前先備份<strong>這一次真的會動到</strong>的封裝檔，最多三個、不一定是三個（球衣包裡沒有隊徽檔的話，<code>logos.big</code> 從頭到尾不會被碰）；其中 <code>models.big</code> 最大，本站這台疊過模組的測試機是 535.9 MB、剛安裝好的原版只有 165.0 MB，備份很慢但一定要；三個檔各自獨立，可以一次只還原一個。另外球隊數量鎖在 126，只能換不能加，要放中職球隊就得整支蓋掉某一支既有球隊。</li>
+    <li><strong>本站沒驗的</strong> 本站沒有真的換一套球衣進遊戲跑給你看，這頁量的是檔案結構與規格，任何關於遊戲畫面會怎樣的說法都不寫；哪個字母對應哪一套球衣沒解出來；28 個代號對應身上哪個部位沒把貼圖畫出來對過；怎麼把改好的圖壓縮回 FSH 沒有做；遊戲程式怎麼決定要載哪一個檔沒有讀執行碼。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../../reference/bigf.html">BIGF 封裝格式</a>：動任何 <code>.big</code> 之前必看的那條鐵律</li>
+    <li><a href="../../reference/models.html">模型與臉皮 models.big</a>：球衣就住在這個檔裡，另外 14.9% 是臉</li>
+    <li><a href="../../reference/team-limit.html">為什麼你加不了新球隊</a>：球隊編號 126 這道牆在哪一層</li>
+    <li><a href="../swap-face/index.html">幫球員換一張臉</a>：同一個檔，但那課完全不用動它</li>
+    <li><a href="../../story/toni-2009/index.html">當年那兩份說明書，一句一句拿今天的檔案對過</a>：同一份 2009 模組的另一半故事</li>
+  </ul>
+
+  <footer>
+    <p>本頁所有數字皆為現場打開 <code>data\models.big</code>、<code>data\frontend\uniforms.big</code>、
+       <code>data\frontend\logos.big</code>、<code>data\database\team.dat</code>
+       與 2009 年那份模組包量測所得；標示為「未確認」「未驗證」之處未經證實，本站不寫成定論。
+       檔案數量與大小取自本站測試機，你的遊戲會不一樣。</p>
+    <p>球衣本身不是本站製作，製作者署名見本頁開頭。
+       本教學只修改你自己電腦裡的檔案，不散布任何遊戲檔案，也不轉載任何第三方工具。本文採 CC BY 4.0 授權（<strong>站內的點陣圖片、社群模組與第三方工具不在此授權範圍</strong>，詳見<a href="../../legal.html">法律頁</a>）。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../../legal.html">法律與版權說明</a> ·
+       <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

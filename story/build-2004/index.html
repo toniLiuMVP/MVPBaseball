@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/story/build-2004/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>平安夜凌晨的兩次建置 — toni的MVP模組補習班</title>
+<meta name="description" content="遊戲檔案裡留著 2004 年開發現場的時間戳與資料夾路徑。從 243 個動畫封包，可以還原 EA 團隊做完這款遊戲動畫的最後幾小時。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../../index.html">首頁</a>
+  <a class="item" href="../../start.html">新手基本功</a>
+  <a class="item" href="../../do.html">我想做什麼</a>
+  <a class="item" href="../../plan.html">課表</a>
+  <a class="item" href="../../tutorials/index.html">教學</a>
+  <a class="item" href="../../7min/index.html">七分鐘</a>
+  <a class="item" href="../../reference/index.html">速查</a>
+  <a class="item" href="../../coach/index.html">棒球教練</a>
+  <a class="item" href="../../story/index.html">故事</a>
+  <a class="item" href="../../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="eyebrow" style="margin-top:36px">故事</p>
+  <h1>平安夜凌晨的<br>兩次建置</h1>
+  <p class="lede">逆向遊戲檔案時，偶爾會挖到不是資料的東西 ——
+     開發者電腦上的資料夾路徑、每個檔案編譯完成的那一秒。
+     把 <code>anims.big</code> 裡 243 個封包的時間戳排起來，
+     可以看見 2004 年那個團隊做完這款遊戲<strong>動畫</strong>的最後幾小時（遊戲本體的執行檔要到將近一個月後才編譯完成，見下方訂正）。</p>
+
+  <h2>先說這些資料哪來的</h2>
+  <p>遊戲的動畫全部裝在一個 <code>anims.big</code> 裡，解開有 <strong>730 個子檔</strong>。
+     其中 244 個副檔名是 <code>.axt</code> —— 打開一看，是純文字的<strong>編譯清單</strong>：</p>
+  <p class="small">為什麼是 244 而不是 243：<strong>243 個封包各帶一份自己的編譯清單，
+     另外還有一個叫 <code>Banklist.axt</code> 的總表</strong>（只有 42 個位元組，
+     列著 5 個庫名），它不屬於任何一個封包。所以下文講封包時是 243，
+     講 <code>.axt</code> 檔時是 244。詳見<a href="../../reference/anims.html#extra">動作庫那頁</a>。</p>
+<pre><code>[Version 0.03]
+	1103890691	Dec 24 2004 04:18:11
+
+[Bank]
+	CLOSE_UP
+
+[Directory]
+	D:/mvp2004/artwork/anims
+
+[Files] 84
+	u_readyidle          1103876064	Dec 24 2004 00:14:24
+	sb_strike04          1103875954	Dec 24 2004 00:12:34
+	sb_strike03          1103875954	Dec 24 2004 00:12:34
+	...</code></pre>
+  <p>這是 EA 的動畫工具在打包時自動寫進去的：這個封包叫什麼、來源資料夾在哪、
+     裡面有幾個動畫、每個動畫是什麼時候編譯的。<strong>它從 2004 年一直躺在遊戲檔案裡到現在。</strong></p>
+
+  <h2>那台電腦上的資料夾</h2>
+  <div class="card amber">
+    <p class="card-h">243 個封包，全部指向同一個路徑</p>
+    <p style="font-family:'IBM Plex Mono',monospace;font-size:1.05rem;margin:10px 0"><strong>D:/mvp2004/artwork/anims</strong></p>
+    <p>某個人的 D 槽，一個叫 <code>mvp2004</code> 的專案資料夾，底下的 artwork/anims。
+       這就是這款遊戲所有動畫的來源。</p>
+  </div>
+  <p class="small">順帶一提：資料夾叫 <code>mvp2004</code>，但遊戲叫 MVP Baseball <strong>2005</strong> ——
+     體育遊戲通常以發售季命名，開發期則落在前一年。</p>
+
+  <h2>兩個階段，中間隔了四小時</h2>
+  <p>把所有時間戳排出來，會看到很清楚的兩段：</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>階段</th><th>時間（當地）</th><th class="num">數量</th><th class="num">耗時</th></tr></thead>
+    <tbody>
+      <tr><td data-label="階段"><strong>編譯個別動畫</strong></td><td data-label="時間（當地）" class="mono">12/24 00:05:50 → 00:14:26</td><td data-label="數量" class="num">2,024 個</td><td data-label="耗時" class="num">8 分 36 秒</td></tr>
+      <tr><td data-label="階段">（間隔）</td><td data-label="時間（當地）" class="mono">約 4 小時</td><td data-label="數量" class="num">—</td><td data-label="耗時" class="num">—</td></tr>
+      <tr class="hi"><td data-label="階段"><strong>打包成封包</strong></td><td data-label="時間（當地）" class="mono">12/24 04:17:57 → 04:20:33</td><td data-label="數量" class="num">243 個</td><td data-label="耗時" class="num">2 分 36 秒</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>2,024 個動畫在<strong>八分半鐘</strong>內全部編譯完，然後隔了大約四小時，
+     243 個封包在<strong>兩分半鐘</strong>內打包完成 —— 平均每秒 1.56 個。</p>
+
+  <div class="card blue">
+    <p class="card-h">時區是怎麼知道的</p>
+    <p>檔案裡同時記錄了兩種時間：Unix 時間戳 <code>1103890691</code>，
+       和人類看的 <code>Dec 24 2004 04:18:11</code>。
+       前者換算成世界標準時間是 12:18:11，兩者<strong>正好差 8 小時</strong> ——
+       所以那台電腦設定在 UTC-8，也就是北美西岸時區。</p>
+    <p>本頁列出的時間都是那台電腦上顯示的當地時間。</p>
+  </div>
+
+  <h2>那天凌晨零點五分</h2>
+  <p>這批動畫的編譯時間，是<strong>12 月 24 日的凌晨零點五分到零點十四分</strong>。</p>
+  <p>那是平安夜的凌晨。四小時後、清晨四點多，最後一次打包完成。</p>
+  <div class="card clay">
+    <p class="card-h">這裡要誠實：時間戳只說明「什麼時候編譯」</p>
+    <p>它<strong>不能證明</strong>當時有人坐在電腦前。編譯完全可以是排程自動執行的，
+       建置伺服器在凌晨跑批次是業界常態。</p>
+    <p>「有人熬夜趕在假期前收工」是一個很容易冒出來的想像，
+       但檔案裡沒有任何東西能證實它。本站只陳述時間戳說了什麼。</p>
+  </div>
+
+  <h2>封包裡有什麼</h2>
+  <p>243 個封包不是平均分配的。最大的一個裝了超過一半的動畫：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>封包</th><th class="num">動畫數</th><th>用途 <span class="badge wip">看名字推測</span></th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="封包" class="mono">DEF_BANK</td><td data-label="動畫數" class="num">1,052</td><td data-label="用途 看名字推測">共用動畫庫，佔全部的 <strong>52%</strong></td></tr>
+      <tr><td data-label="封包" class="mono">CLOSE_UP</td><td data-label="動畫數" class="num">84</td><td data-label="用途 看名字推測">特寫鏡頭</td></tr>
+      <tr><td data-label="封包" class="mono">MIDDLE</td><td data-label="動畫數" class="num">50</td><td data-label="用途 看名字推測">中距離鏡頭</td></tr>
+      <tr><td data-label="封包" class="mono">FACIAL</td><td data-label="動畫數" class="num">48</td><td data-label="用途 看名字推測">表情。裡面有 <code>fa_upset_idle01</code> ~ <code>06</code>：六種不爽的待機表情</td></tr>
+      <tr><td data-label="封包" class="mono">HANDBANK</td><td data-label="動畫數" class="num">16</td><td data-label="用途 看名字推測">手部動作</td></tr>
+      <tr><td data-label="封包" class="mono">SIGB____</td><td data-label="動畫數" class="num">66 個封包</td><td data-label="用途 看名字推測">打擊姿勢庫。多數是某一位打者的專屬動作，也有幾個裝的是共用擺動</td></tr>
+      <tr><td data-label="封包" class="mono">SIGP____</td><td data-label="動畫數" class="num">59 個封包</td><td data-label="用途 看名字推測">投球姿勢庫。多數是某一位投手的專屬動作，也有幾個裝的是通用投法</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>SIGB 是什麼？打開一個就知道了</h3>
+  <p>編號 <code>SIGB0014</code> 這個封包裡有 15 個動畫，名字是這樣的：</p>
+<pre><code>b_ichirotobpreswing      <span class="cm">← 進入預備動作</span>
+b_ichirowiggle           <span class="cm">← 那個著名的擺動</span>
+b_ichiroswinglos         <span class="cm">← 揮棒(低外角)</span>
+b_ichiroswinglis         <span class="cm">← 揮棒(低內角)</span>
+b_ichirotostance         <span class="cm">← 回到打擊姿勢</span></code></pre>
+  <p>是<strong>鈴木一朗</strong>。EA 給了他一整組專屬動畫 ——
+     從進打擊區、招牌擺動、到不同球路的揮棒軌跡。</p>
+  <p>而這樣的封包有 <strong>66 個</strong>（打擊姿勢庫）加 <strong>59 個</strong>（投球姿勢庫），
+     合計 <strong>125 個專屬動作庫</strong>。把這 125 個庫的動作檔名全部列出來看，
+     通篇掛著球員名字的是 <strong>102 個</strong>；另外 23 個裝的是通用姿勢與投法。
+     也就是說，這款 2005 年的遊戲裡，有 <strong>102 位球員擁有自己的動作</strong>，不是共用同一套動畫。</p>
+  <p class="small"><span class="badge wip">訂正</span><strong>2026-09-06</strong>：本頁原本在這裡寫的是
+     「125 位球員擁有自己的動作」，那是把<u>庫的個數</u>當成<u>球員人數</u>。
+     125 是 <code>SIGB</code> 66 ＋ <code>SIGP</code> 59 的庫數，其中 23 個庫裡一個球員名字都沒有 ——
+     <code>SIGB0000</code>–<code>SIGB0006</code> 是共用的打擊擺動、<code>SIGP0000</code>–<code>SIGP0009</code>
+     是投法通稱（高壓、側投、下勾這類），再加 <code>cooperstown01</code>–<code>03</code> 的泛用填充打擊、投球各一組。
+     細節見<a href="../../reference/anims.html">動作封包那頁</a>。</p>
+
+  <div class="card grass">
+    <p class="card-h">一個設計取捨，藏在數字裡</p>
+    <p>共用庫 <code>DEF_BANK</code> 佔了 52%，剩下的近半分散在 125 個專屬動作庫（其中 102 個掛著球員名字）
+       —— 這是刻意的<strong>個性化</strong>投資：絕大多數球員用共用動作，但明星球員值得單獨做。</p>
+    <p>有趣的是，同一款遊戲的<strong>臉部材質</strong>走的是完全相反的路線：
+       剛安裝好的原版 <code>models.big</code> 裡 <strong>504 個球員臉皮完全同規格</strong> ——
+       504 張全部是同一種<a href="../../reference/pixel-formats.html">像素格式</a>（<code>0x78</code> 128×256）、
+       全部帶同一個內部標記，<strong>零例外</strong>（本站三份剛安裝好的原版都量過，三份結果一樣）。</p>
+    <p class="small"><span class="badge wip">訂正</span><strong>2026-09-05</strong>：本頁原本在這裡寫的是
+       「894 個球員臉皮，890 個用同一種像素格式、893 個帶同一個內部標記」，
+       還加了一句「本頁上線時寫『沒有一個例外』，那是錯的」。<u>這兩句都要收回</u> ——
+       894 / 890 / 893 量的是<a href="../../reference/original-vs-modded.html">本站測試機那份裝過模組的 <code>models.big</code></a>，
+       那 4 個與 1 個「例外」反而才是 EA 出貨時用的規格，是後來被換掉的，不是 EA 留下的
+       （是誰換的本站沒有查出來，見<a href="../../reference/models.html">模型與臉皮那頁</a>）。
+       對 EA 出貨的遊戲來說，「沒有一個例外」是成立的。</p>
+    <p>動作要有辨識度，材質要能互換 —— 同一個團隊，在不同的地方做了相反的決定。</p>
+  </div>
+
+  <h2>⚠️ 那不是遊戲的最後一次建置 —— 本站 2026-08-28 訂正</h2>
+  <div class="card clay">
+    <p class="card-h">這一頁原本叫「平安夜凌晨的最後一次編譯」</p>
+    <p>那個標題把讀者帶錯方向。這一頁講的是<u>動畫檔</u>的建置，
+       而它從頭到尾<strong>沒有量過遊戲本體</strong>。</p>
+    <p>後來去讀執行檔自己的建置時間戳（PE 檔頭裡有一格記著編譯當下的時間）：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>發生了什麼</th><th>時間（世界標準時間）</th><th class="num">距上一步</th></tr></thead>
+      <tbody>
+        <tr><td data-label="發生了什麼">2,024 個動畫編譯完成</td><td data-label="時間（世界標準時間）">2004-12-24 08:14</td><td data-label="距上一步" class="num">—</td></tr>
+        <tr><td data-label="發生了什麼">243 個動畫封包打包完成</td><td data-label="時間（世界標準時間）">2004-12-24 12:20</td><td data-label="距上一步" class="num">4 小時</td></tr>
+        <tr class="hi"><td data-label="發生了什麼"><strong>官方英文版 <code>mvp2005.exe</code> 編譯完成</strong></td>
+            <td data-label="時間（世界標準時間）"><strong>2005-01-22 00:50</strong></td><td data-label="距上一步" class="num"><strong>28.5 天</strong></td></tr>
+        <tr class="hi"><td data-label="發生了什麼"><strong>官方繁體中文版 <code>mvp2005.exe</code> 編譯完成</strong></td>
+            <td data-label="時間（世界標準時間）"><strong>2005-02-16 13:04</strong></td><td data-label="距上一步" class="num"><strong>25.5 天</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>平安夜那天結束的是動畫，不是遊戲。</strong>
+       遊戲本體又過了將近一個月才編譯，繁體中文版再晚了 25.5 天 ——
+       中文版的執行檔<u>比英文版晚了 25.5 天</u>（2005-01-22 00:50 → 2005-02-16 13:04）。
+       從平安夜那次動畫打包（12-24 12:20）起算的話是 54 天。</p>
+    <p class="small">怎麼確定這個時間戳可信：把兩份安裝目錄裡所有的執行檔與程式庫都讀一遍，
+       九個檔的時間戳<strong>全部落在 2002 到 2005 之間、而且順序合理</strong>
+       （安裝程式最早，主程式最晚）。如果那一格是隨機或被清空的，就不會排出這種次序。
+       中文版的主程式也比英文版大 553 KB —— 跟
+       <a href="../../reference/official-chinese.html">官方中文版那頁</a>量到的字型與介面差異對得起來。</p>
+    <p class="small">⭐ 這條錯誤的形狀值得記：<u>頁面裡的每一個數字都是對的</u>，
+       錯的是標題替那些數字加上了一個沒有量過的結論。
+       <strong>「最後一次」是一個全稱宣稱</strong> ——
+       要成立就得證明沒有更晚的，而這一頁從來沒有去找過。</p>
+  </div>
+
+  <h2>還有一個小東西：換行符號是混的</h2>
+  <p>那 243 個封包檔全部在 2 分 36 秒內產出，看起來是同一支工具跑完的一批。
+     但打開來看換行符號：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>換行符號</th><th class="num">數量</th><th>意思</th></tr></thead>
+    <tbody>
+      <tr><td data-label="換行符號"><code>CRLF</code>（歸位 + 換行）</td><td data-label="數量" class="num">200</td><td data-label="意思">Windows 慣例</td></tr>
+      <tr class="hi"><td data-label="換行符號"><code>LF</code>（只有換行）</td><td data-label="數量" class="num"><strong>44</strong></td><td data-label="意思">Unix / Mac 慣例</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">這張表數的是 <strong>244 個 <code>.axt</code></strong>，比封包數多一個 ——
+     多的就是上面那個 <code>Banklist.axt</code>（它是 CRLF）。
+     只算 243 個封包自己的清單檔的話是 <strong>CRLF 199、LF 44</strong>。</p>
+  <p>兩組的時間戳<strong>互相交錯</strong>（LF 那組落在 12:18:50–12:20:32，
+     CRLF 那組 12:17:57–12:20:33），所以<u>不是先跑一批再跑另一批</u>。</p>
+  <p><span class="badge wip">未解</span> 為什麼同一次批次裡會混兩種換行符號，本站沒有答案。
+     一個沒有證據的猜想是：打包工具把來源檔的內容原樣抄過去，
+     而來源檔來自不同人的機器。<strong>本站沒有量到任何東西支持這個猜想，所以只寫到這裡。</strong></p>
+  <p class="small">這件事對改檔的人有實際意義：本站在
+     <a href="../../reference/fel.html">版面檔那頁</a>反覆警告「<code>.fel</code> 全部是 CRLF，
+     編輯器統一成 LF 會讓檔案壞掉」。動畫封包<u>不適用那條警告</u> ——
+     它本來就兩種都有。<strong>「這個遊戲的文字檔都用 CRLF」是錯的。</strong></p>
+
+  <h2>為什麼這些東西還在</h2>
+  <p>這些時間戳和路徑對玩遊戲毫無用處。它們留在檔案裡，
+     單純因為那是打包工具的預設輸出，而<strong>沒有人特地把它清掉</strong>。</p>
+  <p>二十年後，它讓我們能還原那天凌晨發生的事：
+     兩千多個動畫在八分半鐘內編譯完成，四小時後打包 —— 而遊戲本體的執行檔要再過 28.5 天（2005-01-22）才編譯完成。</p>
+  <p class="small">如果你想自己看：這些資料在 <code>data\anims\anims.big</code> 裡的 <code>.axt</code> 檔。
+     打開方法見 <a href="../../reference/bigf.html">BIGF 格式</a>，
+     判斷檔案類型見 <a href="../../tutorials/read-file-headers/index.html">五秒看穿一個檔案</a>。</p>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> <code>anims.big</code> 裡 243 個動畫封包留著 2004 年開發現場的資料夾路徑與逐檔編譯時間戳，二十年後還能把那個團隊做完動畫的最後幾小時排出來。</li>
+    <li><strong>那幾小時的數字</strong> 2,024 個動畫在 12 月 24 日 00:05:50 到 00:14:26 之間編譯完，只花 8 分 36 秒；隔了約四小時，243 個封包在 04:17:57 到 04:20:33 打包完成，2 分 36 秒，平均每秒 1.56 個。時區是從檔案裡同時記著的 Unix 時間戳與人類可讀時間正好差 8 小時推出來的，那台電腦設在 UTC-8。</li>
+    <li><strong>那台電腦上的資料夾</strong> 243 個封包全部指向 <code>D:/mvp2004/artwork/anims</code>。資料夾叫 <code>mvp2004</code> 而遊戲叫 2005，是因為體育遊戲通常以發售季命名，開發期落在前一年。</li>
+    <li><strong>102 位球員有自己的動作</strong> 共用庫 <code>DEF_BANK</code> 一個封包就裝了 1,052 個動畫、佔全部的 52%，剩下近半分散在 66 個打擊姿勢庫與 59 個投球姿勢庫，合計 125 個；其中 102 個庫的動作檔名掛著球員名字，另外 23 個裝的是通用姿勢與投法（<u>2026-09-06 訂正</u>：原本寫「125 位球員有自己的動作」，那是把庫的個數當成球員人數）。打開 <code>SIGB0014</code> 看到的是鈴木一朗，從進打擊區、招牌擺動到不同球路的揮棒軌跡都有。</li>
+    <li><strong>同一個團隊做了相反的決定</strong> 動作走個性化，臉部材質走可互換：剛安裝好的原版 <code>models.big</code> 裡 504 個球員臉皮，504 張全部是同一種像素格式、同一個內部標記，零例外（三份剛安裝好的原版都量過）。<u>2026-09-05 訂正</u>：本頁原本引用的 894 / 890 / 893 量的是<u>本站測試機那份裝過模組的</u> <code>models.big</code>，那份裡的 4 個與 1 個「例外」才是 EA 出貨時用的規格，是後來被換掉的，不是 EA 留下的。</li>
+    <li><strong>最大的一次訂正（2026-08-28）</strong> 這一頁原本叫「平安夜凌晨的最後一次編譯」，但它從頭到尾<strong>沒有量過遊戲本體</strong>。去讀執行檔自己的建置時間戳才發現，官方英文版 <code>mvp2005.exe</code> 是 2005-01-22 才編譯完（動畫打包完之後 28.5 天），官方繁體中文版又晚了 25.5 天。<u>頁面裡每一個數字都是對的，錯的是標題替那些數字加上了一個沒有量過的結論</u>，而「最後一次」是全稱宣稱，要成立就得證明沒有更晚的。</li>
+    <li><strong>換行符號是混的</strong> 243 個封包自己的編譯清單檔是同一次批次、2 分 36 秒內產出的；連同不屬於任何封包的 <code>Banklist.axt</code> 一起數的 244 個 <code>.axt</code> 裡，有 200 個用 CRLF、44 個用 LF（只算 243 個封包的話是 CRLF 199、LF 44），兩組時間戳互相交錯，所以不是先跑一批再跑另一批。這件事對改檔的人有實際意義：本站在版面檔那頁反覆警告「<code>.fel</code> 全部是 CRLF，編輯器統一成 LF 會讓檔案壞掉」，<strong>動畫封包不適用那條警告</strong>，「這個遊戲的文字檔都用 CRLF」是錯的。</li>
+    <li><strong>本站沒驗的</strong> 時間戳只說明「什麼時候編譯」，<u>不能證明當時有人坐在電腦前</u>，建置伺服器在凌晨跑批次是業界常態，「有人熬夜趕在假期前收工」很容易想像，但檔案裡沒有任何東西能證實；封包的用途是看名字推測的；為什麼同一次批次會混兩種換行符號未解，那個「來源檔來自不同人的機器」的猜想本站沒有量到任何東西支持。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../../tutorials/read-file-headers/index.html">五秒看穿一個檔案</a> —— 自己去挖挖看還有什麼</li>
+    <li><a href="../../reference/file-map.html">遊戲檔案地圖</a> —— 224 個封裝檔分別裝什麼</li>
+  </ul>
+
+  <footer>
+    <p>本頁的時間戳、路徑、封包數量、動畫名稱、臉皮規格統計皆直接取自遊戲檔案內容；
+       標示為「推測」之處未經證實，本站不寫成定論。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../../legal.html">法律與版權說明</a> ·
+       <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

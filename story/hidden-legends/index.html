@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/story/hidden-legends/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>名單裡藏著 61 個名人堂球員 — toni的MVP模組補習班</title>
+<meta name="description" content="MVP Baseball 2005 的球員名冊裡有一欄叫 hidden。把它打開來看：61 個人，全部是名人堂，落在四支特別球隊的其中三支，而那四支共用一組沒有別人在用的聯盟／分區編號 10 / 25。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../../index.html">首頁</a>
+  <a class="item" href="../../start.html">新手基本功</a>
+  <a class="item" href="../../do.html">我想做什麼</a>
+  <a class="item" href="../../plan.html">課表</a>
+  <a class="item" href="../../tutorials/index.html">教學</a>
+  <a class="item" href="../../7min/index.html">七分鐘</a>
+  <a class="item" href="../../reference/index.html">速查</a>
+  <a class="item" href="../../coach/index.html">棒球教練</a>
+  <a class="item on" href="../index.html">故事</a>
+  <a class="item" href="../../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="../index.html">故事</a> › 藏著的 61 個名人堂</p>
+  <h1>名單裡藏著 61 個名人堂球員</h1>
+  <p class="lede">球員資料檔有 46 個欄位。第 44 欄叫 <code>playerattrib_hidden</code>，
+     值只有 0 跟 1。把值是 1 的挑出來，得到 <strong>61 個人</strong> ——
+     Babe Ruth、Ty Cobb、Cy Young、Jackie Robinson、Satchel Paige、Mickey Mantle、Nolan Ryan。
+     他們一直在你的硬碟裡。</p>
+
+  <div class="card blue">
+    <p class="card-h">這一頁是怎麼量出來的</p>
+    <p>打開<u>剛安裝好的原版</u>的 <code>data\database\attrib.dat</code>，
+       那是<a href="../../reference/database.html">純文字檔</a>，
+       第一行就寫著每一欄叫什麼。找第 44 欄，把值是 <code>1</code> 的列數出來。</p>
+    <p class="small">2,921 位球員裡有 61 位。<u>不用工具，記事本搜尋就能自己驗一遍</u> ——
+       在剛安裝好的原版 <code>attrib.dat</code> 裡搜 <code>44 1</code>（中間一個空格），
+       本站量到剛好 61 次；搜 <code>44 0</code> 是 2,860 次，兩個加起來正好是 2,921。
+       想直接看到命中次數，用會統計次數的文字編輯器比較快。</p>
+  </div>
+
+  <h2>他們被編在四支球隊裡的其中三支，而那四支共用一組沒有別人在用的聯盟／分區編號</h2>
+  <p>球隊資料檔 <code>team.dat</code> 有 126 支球隊，每支都有聯盟與分區編號。
+     大聯盟的 30 支、小聯盟那些，各自有自己的編號。
+     而下面這四支，用的是<strong>同一組沒有別人在用的編號</strong>：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">編號</th><th>球隊</th><th class="num">聯盟／分區</th>
+               <th class="num">25 人裡隱藏的</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="編號" class="num">123</td><td data-label="球隊"><strong>MVP Legends</strong></td><td data-label="聯盟／分區" class="num">10 / 25</td><td data-label="25 人裡隱藏的" class="num"><strong>25</strong></td></tr>
+      <tr class="hi"><td data-label="編號" class="num">124</td><td data-label="球隊"><strong>MVP Heroes</strong></td><td data-label="聯盟／分區" class="num">10 / 25</td><td data-label="25 人裡隱藏的" class="num"><strong>25</strong></td></tr>
+      <tr><td data-label="編號" class="num">125</td><td data-label="球隊">Burnaby Argonauts</td><td data-label="聯盟／分區" class="num">10 / 25</td><td data-label="25 人裡隱藏的" class="num">0</td></tr>
+      <tr class="hi"><td data-label="編號" class="num">126</td><td data-label="球隊">Burnaby Chimaera</td><td data-label="聯盟／分區" class="num">10 / 25</td><td data-label="25 人裡隱藏的" class="num"><strong>11</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>25 ＋ 25 ＋ 11 ＝ <strong>61</strong>。一個不多一個不少。</p>
+
+  <h2>MVP Legends —— 25 人</h2>
+  <div class="tablewrap"><table role="presentation"><tbody>
+      <tr><td>Babe Ruth</td><td>Bob Feller</td><td>Bob Lemon</td></tr>
+      <tr><td>Cy Young</td><td>Early Wynn</td><td>Eddie Mathews</td></tr>
+      <tr><td>Hal Newhouser</td><td>Honus Wagner</td><td>Hoyt Wilhelm</td></tr>
+      <tr><td>Jackie Robinson</td><td>Jimmie Foxx</td><td>Larry Doby</td></tr>
+      <tr><td>Lou Gehrig</td><td>Mickey Mantle</td><td>Pee Wee Reese</td></tr>
+      <tr><td>Phil Rizzuto</td><td>Ralph Kiner</td><td>Richie Ashburn</td></tr>
+      <tr><td>Robin Roberts</td><td>Roy Campanella</td><td>Satchel Paige</td></tr>
+      <tr><td>Ty Cobb</td><td>Walter Johnson</td><td>Warren Spahn</td></tr>
+      <tr><td>Yogi Berra</td><td></td><td></td></tr>
+  </tbody></table></div>
+
+  <h2>MVP Heroes —— 25 人</h2>
+  <div class="tablewrap"><table role="presentation"><tbody>
+      <tr><td>Al Kaline</td><td>Bob Gibson</td><td>Brooks Robinson</td></tr>
+      <tr><td>Carlton Fisk</td><td>Dennis Eckersley</td><td>Ferguson Jenkins</td></tr>
+      <tr><td>Gaylord Perry</td><td>Harmon Killebrew</td><td>Jim Palmer</td></tr>
+      <tr><td>Joe Morgan</td><td>Johnny Bench</td><td>Juan Marichal</td></tr>
+      <tr><td>Lou Brock</td><td>Luis Aparicio</td><td>Mike Schmidt</td></tr>
+      <tr><td>Nolan Ryan</td><td>Orlando Cepeda</td><td>Phil Niekro</td></tr>
+      <tr><td>Reggie Jackson</td><td>Robin Yount</td><td>Rod Carew</td></tr>
+      <tr><td>Rollie Fingers</td><td>Tom Seaver</td><td>Willie McCovey</td></tr>
+      <tr><td>Willie Stargell</td><td></td><td></td></tr>
+  </tbody></table></div>
+
+  <h2>Burnaby Chimaera —— 25 人裡有 11 個</h2>
+  <p>這一支跟上面兩支不一樣：<strong>它是混的</strong>。
+     25 人裡 11 個是隱藏的名人堂，另外 14 個是 2004 年的現役球員。</p>
+  <div class="tablewrap"><table role="presentation"><tbody>
+      <tr><td>Billy Williams</td><td>Bobby Doerr</td><td>Buck Leonard</td></tr>
+      <tr><td>Catfish Hunter</td><td>Enos Slaughter</td><td>George Kell</td></tr>
+      <tr><td>Jim Bunning</td><td>Lou Boudreau</td><td>Monte Irvin</td></tr>
+      <tr><td>Red Schoendienst</td><td>Rick Ferrell</td><td></td></tr>
+  </tbody></table></div>
+  <p class="small">另一支 <code>Burnaby Argonauts</code> 則<u>一個隱藏球員都沒有</u>，
+     25 人全部是現役。</p>
+
+  <div class="card clay">
+    <p class="card-h">Burnaby 這個名字</p>
+    <p><strong>本站量到的</strong>：126 支球隊裡有兩支叫 Burnaby，
+       編號 125 與 126，緊接在兩支 MVP 傳奇隊後面，四支共用一組沒有別人用的聯盟／分區編號。</p>
+    <p class="small">一個站外的背景知識（<u>不是本站量到的</u>）：
+       Burnaby 是加拿大卑詩省的一個城市，做這款遊戲的工作室在那裡。
+       本站把它寫在這裡當脈絡，<strong>不主張這兩支就是開發團隊自己的隊伍</strong>
+       —— 檔案裡沒有寫。<span class="badge wip">未解</span></p>
+  </div>
+
+  <h2>三條完全不同的線索，指向同一群人</h2>
+  <p>這 61 個人不只是名冊上多一個標記。本站在<u>另外兩個地方</u>各自量到過一群傳奇球員，
+     這次一比對：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>本站在哪裡量到的</th><th>那一群有幾人</th><th class="num">在這 61 人裡的</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="本站在哪裡量到的"><a href="../../reference/audio.html#chants">有專屬應援曲的傳奇球員</a>
+          <span class="small">（音訊索引檔）</span></td><td data-label="那一群有幾人">13</td><td data-label="在這 61 人裡的" class="num"><strong>13 / 13</strong></td></tr>
+      <tr class="hi"><td data-label="本站在哪裡量到的"><a href="../../reference/player-codes.html#stance">有專屬打擊姿勢的傳奇球員</a>
+          <span class="small">（語系檔的姿勢名稱表）</span></td><td data-label="那一群有幾人">8</td><td data-label="在這 61 人裡的" class="num"><strong>8 / 8</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>三份資料來自三個完全不同的檔案 —— 球員名冊、音訊索引、介面文字表 ——
+     <strong>彼此對得起來，一個例外都沒有。</strong></p>
+  <div class="card grass">
+    <p class="card-h">這件事為什麼重要</p>
+    <p>單獨看，「第 44 欄是 1」只是一個數字。
+       但當三個互不相干的檔案<u>同時把同一群人特別對待</u>，
+       那就不是巧合了：<strong>EA 在做這款遊戲的時候，
+       確實把這 61 個人當成一個獨立的群體在處理</strong> ——
+       給他們自己的球隊、自己的打擊姿勢、自己的應援聲。</p>
+    <p class="small">本站一直在講「一條證據不夠」。這一頁是它的正面例子：
+       三條各自都不算強的線索，交叉起來就很難反駁了。</p>
+  </div>
+
+  <h2>本站沒有驗的事</h2>
+  <div class="card clay">
+    <p class="card-h">三件</p>
+    <p style="margin-top:6px">
+       一、<strong>怎麼在遊戲裡把他們叫出來，本站沒有試過。</strong>
+       遊戲的文字檔 <code>FEENG.LOC</code> 裡含 <code>unlock</code>（不分大小寫）的字串有 <strong>13 條</strong>，
+       其中兩條分別點名 Legends 與 Heroes 這兩隊，寫著要先把那一隊的 25 位球員全部解鎖 ——
+       <u>那是介面文字表對「每隊 25 人」的又一次印證</u>。
+       但本站<u>沒有實機驗證任何解鎖方式</u>。<span class="badge wip">未實機驗證</span><br>
+       二、<strong>把第 44 欄改成 0 會發生什麼，沒試。</strong>
+       那一欄看起來就是「要不要藏起來」，但本站沒有動它、也沒有進遊戲看。
+       <span class="badge wip">未驗</span><br>
+       三、<strong>為什麼 Chimaera 是混的、Argonauts 一個都沒有</strong>，
+       檔案裡沒有寫。<span class="badge wip">未解</span></p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 球員資料檔第 44 欄 <code>playerattrib_hidden</code> 值只有 0 跟 1，把值是 1 的挑出來，剛安裝好的原版 2,921 位球員裡有 <strong>61 個人</strong>，全部是名人堂：Babe Ruth、Ty Cobb、Cy Young、Jackie Robinson、Satchel Paige、Mickey Mantle、Nolan Ryan 都在裡面。</li>
+    <li><strong>不用工具就能自己驗一遍</strong> <code>attrib.dat</code> 是純文字檔，第一行就寫著每一欄叫什麼，找第 44 欄、把值是 <code>1</code> 的列數出來就好，記事本搜尋就能做：搜 <code>44 1</code> 是 61 次、搜 <code>44 0</code> 是 2,860 次，加起來正好 2,921。</li>
+    <li><strong>四支球隊，25 ＋ 25 ＋ 11 ＝ 61</strong> 編號 123 的 MVP Legends 25 人全隱藏、124 的 MVP Heroes 25 人全隱藏、126 的 Burnaby Chimaera 是<u>混的</u>（25 人裡 11 個隱藏、14 個是 2004 年的現役球員），125 的 Burnaby Argonauts 一個都沒有。四支共用<strong>同一組沒有別人在用的聯盟／分區編號 10 / 25</strong>。</li>
+    <li><strong>三條互不相干的線索指向同一群人</strong> 有專屬應援曲的傳奇球員 13 位，<strong>13 / 13</strong> 都在這 61 人裡；有專屬打擊姿勢的 8 位，<strong>8 / 8</strong> 也都在。三份資料來自球員名冊、音訊索引、介面文字表三個完全不同的檔案，彼此對得起來、一個例外都沒有。單獨看「第 44 欄是 1」只是一個數字，三個檔案同時把同一群人特別對待，就很難用巧合解釋。</li>
+    <li><strong>這一頁刻意分清楚了哪句是量到的</strong> 本站量到的是「126 支球隊裡有兩支叫 Burnaby、編號 125 與 126、緊接在兩支 MVP 傳奇隊後面」。至於 Burnaby 是加拿大卑詩省一個城市、做這款遊戲的工作室在那裡，那是<u>站外的背景知識不是本站量到的</u>，寫出來當脈絡，<strong>不主張這兩支就是開發團隊自己的隊伍</strong>，因為檔案裡沒有寫。</li>
+    <li><strong>本站沒驗的</strong> 怎麼在遊戲裡把他們叫出來<u>沒有試過</u>，遊戲的文字檔 <code>FEENG.LOC</code> 裡含 <code>unlock</code>（不分大小寫）的字串有 <strong>13 條</strong>，其中兩條點名 Legends 與 Heroes 兩隊、寫著要先把那一隊的 25 位球員全部解鎖（介面文字表對「每隊 25 人」的又一次印證），但本站沒有實機驗證任何解鎖方式；把第 44 欄改成 0 會發生什麼，沒動也沒進遊戲看；為什麼 Chimaera 是混的、Argonauts 一個都沒有，檔案裡沒有寫。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../../reference/database.html">資料檔總覽</a> —— 這一頁用到的兩個檔都在那裡</li>
+    <li><a href="../../reference/player-codes.html#stance">姿勢編號的完整名稱表</a> —— 那 8 個專屬姿勢在這裡</li>
+    <li><a href="../../reference/audio.html#chants">應援曲</a> —— 那 13 個專屬應援在這裡</li>
+    <li><a href="../stance-choices/index.html">王建民用的是 Smoltz 的投球姿勢</a> —— 同一批資料的另一面</li>
+  </ul>
+
+  <footer>
+    <p>本頁所有名單與數字皆為直接讀取<u>剛安裝好的原版</u>資料檔所得，非推測。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../../legal.html">法律與版權說明</a> ·
+       <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

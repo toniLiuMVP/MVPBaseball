@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/player-voice.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>播報員為什麼不唸新球員的名字 — toni的MVP模組補習班</title>
+<meta name="description" content="因為那些名字是 2005 年錄好的音,不是合成的。EA 原廠錄了 1,673 個號碼的名字(本站測試機的語音庫有 4,343 個,多的是模組加的),而你的新球員不在裡面。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 播報員為什麼不唸新球員的名字</p>
+  <h1>播報員為什麼不唸新球員的名字</h1>
+  <p class="lede">你把台灣球員加進名單，打擊、守備、大頭照都好了，
+     但播報員永遠不唸他的名字。<strong>這不是設定沒開，是那個名字根本不存在。</strong>
+     遊戲裡的球員名字是 <u>2005 年錄好的音</u>，不是合成出來的。</p>
+
+  <div class="card amber">
+    <p class="card-h">⚠️ 這頁的數字量自本站測試機，你的會不一樣</p>
+    <p>本站測試機的 <code>attrib.dat</code> 與 <code>pitcher.dat</code>
+       <u>都被模組換過</u>，裝的是一份混了大聯盟與台灣球員的名單
+       （<code>pitcher.dat</code> 的檔案日期還停在 <strong>2023 年 5 月</strong>；
+       <code>attrib.dat</code> <strong>跟剛安裝好的原版不是同一份</strong>，
+       而且<u>內容自本站 2026-04-14 那份快照以來一個位元組都沒變過</u>（sha256 相同）。
+       2026-09-05 訂正：這裡原本拿它的檔案日期當佐證，
+       但那個時間戳後來被別的操作換掉了 —— <strong>檔案日期會變，內容沒有</strong>，
+       所以本站不再用日期指認這份名單）。</p>
+    <p>所以像「3,247 位球員」「某某球員的識別碼是多少」這種<strong>跟名單內容有關的數字，
+       你自己跑會得到別的結果</strong>。</p>
+    <p>不會變的是<strong>格式</strong>：欄位有幾個、每一格怎麼寫、資料怎麼分隔 ——
+       那是遊戲程式決定的，換名單也不會變。<br>
+       ⚠️ <strong>但「哪一欄是什麼」會變。</strong>本站實測 46 個欄位裡有 <strong>27 個</strong>
+       在剛安裝好的原版與社群名冊之間位置不同（<code>skin_tone</code> 從第 12 欄搬到第 38 欄，
+       中間的欄位各前移一格；<code>audioid</code> 原版第 17、社群名冊第 16）。
+       兩份剛安裝好的原版（英文與中文）彼此完全相同，所以分界是<u>原版 vs 社群名冊</u>，不是語言。
+       <strong>永遠不要記欄號，要在執行時從表頭找欄位名</strong> —— 本站的腳本都是這樣做的。
+       這頁講的規則對你成立，數字與欄號不一定。</p>
+    <p class="small">同樣的道理本站在<a href="fonts.html">字型</a>、
+       <a href="audio.html">音訊</a>、<a href="anims.html">動畫</a>那幾頁也標過。</p>
+  </div>
+
+  <h2>先看那條線：一個號碼餵三個檔名</h2>
+  <p><a href="player-numbers.html">兩套球員編號</a>那頁證明了：球員資料檔的
+     <code>playerattrib_audioid</code> 存的四位數，同時決定大頭照與播報語音。
+     語音那一半長這樣：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>倉庫</th><th class="mono">檔名</th><th>幾個</th><th>裝什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="倉庫" class="mono">audio\cd\spch_pbp\<br>pnamedat.big</td>
+          <td data-label="檔名" class="mono">6107a.dat<br>6107c.dat<br>6107d.dat</td>
+          <td data-label="幾個" class="num">12,528 項</td>
+          <td data-label="裝什麼"><strong>播報員唸這個人的名字</strong><br>
+              <span class="small">三種後綴：a 有 4,091 個、c 有 4,121 個、d 有 4,313 個，合計 12,525；另有 3 筆例外 —— <code>5165.dat</code> 與 <code>5826.dat</code> 沒有後綴，以及一個 <code>3632.wav</code>。三者相加才是 12,528。</span></td></tr>
+      <tr><td data-label="倉庫" class="mono">audio\cd\spch_pa\<br>pnamedat.big</td><td data-label="檔名" class="mono">6107.dat</td>
+          <td data-label="幾個" class="num">3,658 項</td><td data-label="裝什麼">另一組，幾乎都是單檔沒有後綴<br><span class="small">3,658 項裡只有 <code>8810</code> 那組有 a／c／d 三個</span></td></tr>
+      <tr><td data-label="倉庫" class="mono">audio\spch_pbp\<br>pnamehdr.big</td><td data-label="檔名" class="mono">6107a.hdr</td>
+          <td data-label="幾個" class="num">12,459 項</td><td data-label="裝什麼">上面那些語音的檔頭</td></tr>
+    </tbody>
+  </table></div>
+  <h2 id="suffix">a / c / d 是什麼：解開了</h2>
+  <p>答案寫在 <code>data\audio\spch_pbp\spch_pbp.txt</code> 裡。那個檔按類別分組，
+     組名長這樣：<code>pnm_cc_full:0004</code>。把四個類別的編號集合抓出來，
+     跟實際的檔案後綴<u>逐一比對集合</u>：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>後綴</th><th>類別名</th><th>意思</th><th class="num">編號數</th><th>集合比對</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="後綴" class="mono">a</td><td data-label="類別名" class="mono">pnm_cc_sur</td><td data-label="意思"><strong>球評</strong>唸<strong>姓氏</strong></td>
+          <td data-label="編號數" class="num">1,462</td><td data-label="集合比對"><strong>完全相同</strong></td></tr>
+      <tr class="hi"><td data-label="後綴" class="mono">c</td><td data-label="類別名" class="mono">pnm_pbp_full</td><td data-label="意思"><strong>主播</strong>唸<strong>全名</strong></td>
+          <td data-label="編號數" class="num">1,486</td><td data-label="集合比對"><strong>完全相同</strong></td></tr>
+      <tr class="hi"><td data-label="後綴" class="mono">d</td><td data-label="類別名" class="mono">pnm_pbp_sur</td><td data-label="意思"><strong>主播</strong>唸<strong>姓氏</strong></td>
+          <td data-label="編號數" class="num">1,632</td><td data-label="集合比對"><strong>完全相同</strong></td></tr>
+      <tr><td data-label="後綴" class="mono">（沒有）</td><td data-label="類別名" class="mono">pnm_cc_full</td><td data-label="意思">球評唸全名</td>
+          <td data-label="編號數" class="num">142</td><td data-label="集合比對">沒有自己的檔案，142 個編號<u>全部落在 c 裡面</u></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">數字量自<strong>剛安裝好的英文版原版</strong>。
+     上面規模表那組（a 4,091 / c 4,121 / d 4,313）量的是本站測試機那份社群名冊，兩組不能混用。</p>
+
+  <div class="card grass">
+    <p class="card-h">為什麼這個對應可以寫成「解開了」而不是「推測」</p>
+    <p><strong>一、是集合相同，不是數量吻合。</strong>三組各自兩個方向零落差 ——
+       類別裡的每個編號都有對應檔案，每個檔案的編號也都在類別裡。
+       數量剛好相等只能算巧合的溫床；集合完全相同不可能是巧合。</p>
+    <p><strong>二、音檔長度獨立佐證。</strong>唸全名的 <code>c</code> 中位數 <strong>6,912</strong> 位元組，
+       唸姓氏的 <code>a</code> 與 <code>d</code> 都是 <strong>4,352</strong> ——
+       <u>c 比另外兩個長約 60%，而兩個唸姓氏的中位數完全相同（平均數也只差 1.3%）</u>。
+       這是從完全不同的角度（檔案大小）得到同一個結論。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">不要寫成「一個人有三段語音」</p>
+    <p>它其實是<strong>兩個人 × 兩種稱呼</strong>：主播與球評各自可以唸全名或姓氏，
+       造句時擇一。而且四格裡只有三格有檔案 —— 球評唸全名那一格<u>共用主播的</u>。</p>
+    <p>三種齊全的也只佔 <strong>75.0%</strong>：1,673 個有語音的編號裡，
+       1,255 個三種都有、397 個只有兩種、21 個只有一種。
+       所以「每位球員都有三段」是錯的。</p>
+  </div>
+
+
+  <div class="card grass">
+    <p class="card-h">⭐ 一份 2008 年的工作資料夾，從另一個方向印證了同一件事</p>
+    <p>上面那個答案是從遊戲自己的文字檔讀出來的。
+       本站後來在一批二十年前的舊資料裡，翻到一個台灣玩家做語音模組時留下的素材夾 ——
+       <strong>670 個切好的音檔</strong>。他當年<u>並不知道 a / c / d 各代表什麼</u>
+       （同一批資料裡的 2008 年教學明說「至於兩個誰是誰念的已記不清」），
+       但他把素材整理成這樣：</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>檔名形式</th><th class="num">數量</th><th>內容是什麼</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td><code>○○_a</code></td><td class="num">186</td><td rowspan="2"><strong>姓氏</strong>（Allen、Anderson、Beltran、Berkman…）</td></tr>
+        <tr class="hi"><td><code>○○_d</code></td><td class="num">186</td></tr>
+        <tr><td>沒有後綴</td><td class="num">296</td><td><strong>名字</strong>（Aaron、Adam、Alan、Alberto…）與中文單字</td></tr>
+        <tr><td><code>○○_c</code></td><td class="num">2</td><td>全名</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong><code>_a</code> 與 <code>_d</code> 的字根有 185 個完全配對</strong>
+       （只有兩個落單）。也就是說：<u>同一個姓，他一定收兩份</u>；而名字只收一份。</p>
+    <p class="small">上表的後綴是把底線與連字號兩種寫法一起算的：那 186 個 <code>○○_a</code>
+       裡有 14 個其實寫成 <code>○○-a</code>，186 個 <code>○○_d</code> 裡有 13 個寫成 <code>○○-d</code>。
+       只認底線的話會少算。</p>
+    <p>那正是 <code>a</code> 與 <code>d</code> 的意思 ——
+       <strong>同一個姓氏、兩位播報員各唸一次</strong>。
+       他沒有讀過格式文件，只是照著聽感把素材分類，
+       <u>分出來的結構跟遊戲內部的編碼一模一樣</u>。</p>
+    <p class="small">另外兩個對得上的細節：那 670 個檔<strong>有 669 個是 48,000 Hz、
+       立體聲、16 位元的 PCM</strong>，
+       而同一批資料裡 2008 年那篇教學給的指令正好是「重混成立體聲、重取樣到 48000」——
+       <u>規格對得起來，證明這個資料夾就是照那套流程做的</u>。
+       唯一的例外是一個 24,000 Hz 的 MP3，顯然是別的來源。
+       中文那 68 個是單字（張、強、彬、德、宗男…）——
+       <strong>從英文播報員唸過的音裡剪出來，用來拼台灣球員的名字。</strong></p>
+    <p class="small">本站不重貼那批音檔，也不提供下載。這裡記的是
+       <u>一個外部證據怎麼獨立支持了本站從檔案裡讀出來的結論</u>。</p>
+  </div>
+
+  <h2 id="ad-same">⭐ 但輪到台灣球員，那兩位播報員是同一段錄音</h2>
+  <p>上面說 <code>a</code> 與 <code>d</code> 是「兩位播報員各唸一次」。
+     那是<strong>格式的意思</strong>，也確實是英文姓氏的做法。
+     可是把實際出貨的台灣球員語音包逐位元組比對，結果是這樣：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th></th><th class="num">組數</th><th class="num"><code>a</code> 與 <code>d</code> 內容完全相同</th></tr></thead>
+    <tbody>
+      <tr><td>當年的<strong>來源錄音</strong>（英文姓氏）</td><td data-label="組數" class="num">185</td><td data-label="a 與 d 內容完全相同" class="num">0 組（0.0%）</td></tr>
+      <tr class="hi"><td>實際出貨的<strong>台灣球員語音包</strong></td><td data-label="組數" class="num">159</td><td data-label="a 與 d 內容完全相同" class="num"><strong>155 組（97.5%）</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>來源錄音那 185 組裡，<strong>184 組連檔案長度都不一樣</strong>
+     （<code>anderson_a</code> 是 99,004 個位元組、<code>anderson_d</code> 是 127,704）
+     —— 真的是兩段不同的錄音。<u>唯一長度相同的是 <code>Cruz</code></u>，
+     兩個檔各 115,956 個位元組，但<strong>內容仍然不同</strong>，
+     所以「內容完全相同」那一欄還是 0 組。
+     但台灣球員那邊，<strong>兩個槽位放的是同一段</strong>。</p>
+  <p><strong>為什麼（推論）</strong>：英文姓氏播報員本人錄過，兩位各有現成的一份。
+     但「田」「陽」「林威助」<u>英文播報員從來沒唸過</u> ——
+     做模組的人得從播報裡剪出中文單字一個一個拼。
+     <strong>拼一次就很費工，拼兩次沒有意義。</strong></p>
+  <p>四個例外是 <strong>中村紀洋</strong>、<strong>陽建福</strong>、<strong>高政華</strong>、<strong>林威助</strong>，
+     其中高政華與陽建福那兩組<u>長度一模一樣、內容卻不同</u>。</p>
+  <div class="card grass">
+    <p class="card-h">這替上面那句「已記不清」補上了答案</p>
+    <p>2008 年那篇教學說「<u>至於兩個誰是誰念的已記不清</u>」。
+       現在知道為什麼記不清了 —— <strong>對台灣球員來說，那兩個本來就一樣。</strong></p>
+    <p class="small">量法與完整過程見<a href="../tutorials/read-voice/index.html">拆開一個語音檔</a>。</p>
+  </div>
+
+  <h2>名單這邊：3,247 個人，只用了 1,835 個號碼</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>量到的</th><th class="num">數字</th></tr></thead>
+    <tbody>
+      <tr><td>名單裡的球員</td><td class="num">3,247</td></tr>
+      <tr><td><code>audioid</code> 是 0 的</td><td class="num">43</td></tr>
+      <tr><td>其餘用到的<strong>不重複</strong>號碼</td><td class="num">1,835</td></tr>
+      <tr class="hi"><td>被多人共用的號碼</td><td class="num">22 個</td></tr>
+      <tr class="hi"><td>其中一個號碼被幾個人共用</td><td class="num"><strong>1,337 人</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>一個號碼被一千三百多人共用，這件事很奇怪 —— 除非那個號碼的意思是「沒有」。</p>
+  <div class="card blue">
+    <p class="card-h">我們改過這一段：這是名冊作者的做法，不是 EA 的設計</p>
+    <p>上面那張表量的是<a href="original-vs-modded.html">本站測試機那份台灣名冊</a>。拿<u>剛安裝好的原版</u>重跑同一套統計，結果完全不一樣：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th></th><th class="num">非零 audioid</th><th class="num">不重複</th><th class="num">被共用的號碼</th></tr></thead>
+      <tbody>
+        <tr><td>本站測試機（台灣名冊）</td><td data-label="非零 audioid" class="num">3,204</td><td data-label="不重複" class="num">1,835</td><td data-label="被共用的號碼" class="num">22 個</td></tr>
+        <tr class="hi"><td><strong>剛安裝好的原版</strong></td><td data-label="非零 audioid" class="num">1,300</td><td data-label="不重複" class="num"><strong>1,300</strong></td><td data-label="被共用的號碼" class="num"><strong>0 個</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>EA 的設計是「要嘛 0，要嘛獨一無二」。</strong>原版名冊裡 1,300 個非零 audioid 全部只有一個人用，零共用；而且 <code>audioid = 1</code> 與 <code>= 2</code> <u>從頭到尾一次都沒出現過</u>（原版的號碼範圍是 3 到 2665）。沒有語音的球員，EA 直接填 0 —— 原版有 1,621 位。</p>
+      <p class="small">⚠️ 但<strong>反過來不成立</strong>：填了號碼不代表真的有錄音。
+         原版那 1,300 個非零號碼拿去比對播報語音庫，
+         <strong>有 118 個（9.1%）一個檔案都沒有</strong>，
+         a／c／d 三件齊全的只有 998 個（76.8%）。
+         所以「填 0 = 沒語音」是對的，「非 0 = 有語音」是錯的
+         —— 這是 EA 自己出貨的名冊就有的狀況。
+         （本站測試機更明顯：1,835 個號碼裡 589 個沒有任何檔案。）</p>
+    <p>所以下面那一整節講的「<code>2</code> 是不唸的哨兵值」，<strong>是台灣名冊作者自己定的慣例</strong>，不是遊戲原本的設計。</p>
+    <p class="small">對你來說結論沒變：如果你裝的是台灣名冊，你的名冊就是這樣運作的。但那不是 EA 的做法。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h"><code>audioid = 2</code> 就是「不唸」</p>
+    <p>去語音庫裡找 <code>0002a.dat</code>、<code>0002c.dat</code>、<code>0002d.dat</code>
+         （倉庫裡的檔名補零到四位）：<strong>一個都不存在。</strong></p>
+    <p>所以那 1,337 個人指向的是一個<u>沒有錄音的號碼</u>。
+       加上 <code>audioid = 0</code> 的 43 人，
+       <strong>至少 1,380 位球員從一開始就不會被唸名字。</strong></p>
+    <p class="small"><code>audioid = 1</code>（12 人）<strong>不是同樣情形</strong>：
+         <code>0001a.dat</code>、<code>0001c.dat</code>、<code>0001d.dat</code> 三個<u>都存在</u>，
+         <code>0001.fsh</code> 也在大頭照倉庫裡。所以 1 跟 2 在檔案層面是兩回事。
+         <strong>為什麼會有 12 個人共用同一組錄音，本站沒有查出來。</strong><span class="badge wip">未解</span></p>
+  </div>
+
+  <h2>反過來看：語音庫有七成的名字沒人在用</h2>
+  <p>這才是真正的答案。把語音庫裡出現過的四位數號碼全部列出來，
+     再看名單裡有沒有人用：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>量到的</th><th class="num">數字</th></tr></thead>
+    <tbody>
+      <tr><td>語音庫裡的不重複號碼<br><span class="small">本站測試機。EA 原廠是 1,673 個</span></td><td class="num">4,343</td></tr>
+      <tr class="hi"><td><strong>名單裡沒有任何人在用的</strong><br><span class="small">本站測試機。EA 原廠是 491 個 = <strong>29.3%</strong></span></td><td class="num"><strong>3,097</strong><br><span class="small">= 71.3%</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="card blue">
+    <p class="card-h">遊戲裡躺著三千多個沒人認領的名字</p>
+    <p class="small">先講清楚：這個 71.3% 是<u>本站測試機</u>的數字。原版的無人使用率是 <strong>29.3%</strong>（1,673 個號碼裡 491 個沒人用）——差距來自模組把語音庫加大了 2.6 倍，而名冊用到的號碼沒有跟著等比增加。</p>
+     <p>不過兩邊都有相當比例沒人用，而這代表語音庫是<strong>照 2005 年那份名單錄的</strong>。
+       那時候的球員大多已經不在現在這份名單裡了，
+       他們的名字錄音<u>還留在檔案裡，只是沒有人指向它</u>。</p>
+    <p>這跟<a href="../story/orphan-data/index.html">介面檔裡的孤兒資料</a>是同一種現象：
+       <strong>遊戲從來不刪東西，只是不再指向它。</strong></p>
+  </div>
+
+  <h2>所以「為什麼不唸我的球員」</h2>
+  <div class="card clay">
+    <p class="card-h">因為那是錄音，不是合成</p>
+    <p>播報員的每一個名字都是<strong>真人錄下來的一段聲音檔</strong>。
+       <strong>EA 原廠錄了 1,673 個號碼份的名字</strong>
+       （本站測試機的語音庫有 4,343 個，<u>多出來的 2,670 個是<strong>淨值</strong></u>：
+       模組加了 2,681 個號碼，也拿掉了 11 個。
+       詳見<a href="original-vs-modded.html">原版與這台機器的對照</a>）。</p>
+    <p><strong>你新增的球員不在裡面。</strong>EA 沒有錄過他的名字，
+       所以照原樣設定，播報員唸不出來。</p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">我們改過這一段</p>
+    <p>這頁上線時，這裡寫的是「<u>沒有人</u>錄過他的名字，所以<u>無論你怎麼設定</u>，
+       播報員都唸不出來」。</p>
+    <p><strong>後半句太滿了。</strong>EA 沒錄是對的，但「沒有人錄過」不成立 ——
+       2008 到 2009 年，台灣的模組玩家自己做了 23 個人的語音檔，
+       就放在這台機器的遊戲資料夾旁邊。詳見
+       <a href="../story/community-voices/index.html">EA 沒錄的名字，台灣人自己錄了</a>。</p>
+  </div>
+
+  <p>所以你有兩條路。<strong>簡單的那條</strong>：把 <code>audioid</code> 改成一個已經有錄音的號碼 ——
+     但那樣播報員會唸出<u>那個號碼原本的人的名字</u>，不是你的球員。</p>
+  <p><strong>難的那條</strong>：自己做一個語音檔放進去。當年有人做到了。
+     本站已經量出外層容器怎麼組成（檔名、號碼、<code>a</code>／<code>c</code>／<code>d</code> 三組、
+     16 位元組的檔頭）。</p>
+
+  <div class="card grass">
+    <p class="card-h">⚠️ 2026-08-29 訂正：這一段原本寫「所以本站不寫這個教學」</p>
+    <p>原本的理由是「<u>最裡面那層聲音是怎麼編碼的，本站沒有解開</u>，所以本站不寫這個教學」。
+       <strong>那一格後來解開了</strong> —— 「15 個位元組怎麼變回 28 個取樣」的公式已經寫出來，
+       本站有一支<u>純 Python、零相依</u>的腳本可以把聲音匯出成 WAV、也把 WAV 編回去，
+       見<a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>。</p>
+    <p><strong>但先別把那一課直接套到這一頁講的檔案上。</strong>本站拿那支腳本對兩個語音庫實際跑過：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>語音庫</th><th>檔頭報的編碼器</th><th class="num">段數</th><th>隨機抽 200 段</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="語音庫" class="mono">cd\spch_pbp\pnamedat.big</td>
+            <td data-label="檔頭報的編碼器"><strong>3</strong>（<code>GSTR</code> 容器）</td><td data-label="段數" class="num">12,572</td>
+            <td data-label="隨機抽 200 段">完整解出 <strong>0</strong> 段、只解出一部分 9 段、解不出 191 段</td></tr>
+        <tr><td data-label="語音庫" class="mono">cd\spch_pa\pnamedat.big</td>
+            <td data-label="檔頭報的編碼器">2</td><td data-label="段數" class="num">3,683</td>
+            <td data-label="隨機抽 200 段">完整解出 <strong>0</strong> 段、只解出一部分 13 段、解不出 187 段</td></tr>
+      </tbody>
+    </table></div>
+    <p>對照組：應援曲那個 <code>cd\chants\chantdat.big</code> 也是編碼器 2，103 段裡有 <strong>40 段</strong>
+       解得完整、也寫得回去。所以卡住的<u>不是取樣的數學</u>，是<strong>容器層還有分支</strong>。</p>
+    <p><strong>⚠️ 2026-08-30 補：那一支分支後來解開了。</strong>上面那張表是修好之前量的。
+       真正卡住的是讀取樣數時的位元組序（<code>GSTR</code> 容器裡的數字要用大端讀），不是編碼器。
+       同一支腳本現在對 <code>cd\spch_pbp\pnamedat.big</code> 裡的 7,092 段編碼器 3
+       解得出 <strong>6,674</strong> 段，見<a href="../tutorials/make-voice/index.html#endian">換掉遊戲的聲音</a>。</p>
+    <p><strong>所以現在的說法是</strong>：編碼那一層解開了、容器那一支分支也解開了、都有教學了，
+       但要換掉<u>播報員唸的球員名字</u>還缺一件事：<strong>錄音本身</strong>
+       （新球員的名字沒有人唸過，那不是解格式能解決的）。
+       另外那個語音庫裡還有 418 段編碼器 3 目前解不出來。</p>
+  </div>
+
+  <h2>整份名單的覆蓋率</h2>
+  <div class="card blue">
+    <p class="card-h">我們改過這一段</p>
+    <p>這張表原本寫「三樣都沒有 <strong>62.8%</strong>」。<strong>那是錯的，而且差了兩倍以上。</strong></p>
+    <p>原因是查表的時候<u>沒有補零</u>。這三個倉庫裡的檔名<strong>一律補零到四位數</strong>
+       （<code>0216.fsh</code>），而名單裡的號碼<strong>不補零</strong>（<code>216</code>）。
+       直接拿號碼去查，1000 以下的球員<strong>全部</strong>會被判成「沒有」。</p>
+    <p>實測：<code>216.fsh</code> 在 <code>portrait.big</code> 裡<u>不存在</u>，
+       <code>0216.fsh</code> 存在。那個倉庫裡 6,638 個純數字檔名，<strong>位數全部是 4</strong>，沒有例外。</p>
+    <p class="small">這正好呼應<a href="../tutorials/edit-stance/index.html">換打擊姿勢</a>那課講過的
+       <code>%04d</code>。同一個坑，本站自己又踩了一次。</p>
+  </div>
+
+  <p>補零之後重查。先講分母：<code>audioid</code> 不是 0 的有 3,204 位，
+     但其中 <strong>1,337 位共用 <code>audioid = 2</code></strong>（上面已經證明那個號碼就是「不唸」），
+     另有 12 位共用 <code>audioid = 1</code>。
+     把這兩個哨兵值排除，<strong>真正指向一個具體號碼的是 1,855 位</strong>：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>有沒有</th><th class="num">人數</th><th class="num">佔 1,855</th></tr></thead>
+    <tbody>
+      <tr><td data-label="有沒有">有大頭照</td><td data-label="人數" class="num">1,586</td><td data-label="佔 1,855" class="num">85.5%</td></tr>
+      <tr class="hi"><td data-label="有沒有"><strong>有完整的三件套播報語音</strong></td><td data-label="人數" class="num">1,200</td><td data-label="佔 1,855" class="num"><strong>64.7%</strong></td></tr>
+      <tr><td data-label="有沒有">有另一組的語音</td><td data-label="人數" class="num">932</td><td data-label="佔 1,855" class="num">50.2%</td></tr>
+      <tr><td data-label="有沒有">三樣都有</td><td data-label="人數" class="num">847</td><td data-label="佔 1,855" class="num">45.7%</td></tr>
+      <tr class="hi"><td data-label="有沒有"><strong>三樣都沒有</strong></td><td data-label="人數" class="num"><strong>220</strong></td><td data-label="佔 1,855" class="num"><strong>11.9%</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">「另一組」指的是 <code>spch_pa</code> 那個倉庫。
+     它跟播報那組不一樣：<strong>一個號碼只有一個檔</strong>（<code>0216.dat</code>），
+     不是 <code>a</code>／<code>c</code>／<code>d</code> 三件套。</p>
+  <p>換個角度看：<strong>號碼只有自己一個人用的球員有 1,813 位</strong>
+     （真的有專屬號碼的那群），其中 <strong>1,188 位（65.5%）</strong>有完整播報語音。
+     <u>剩下三分之一的人，有專屬號碼但沒有對應的錄音。</u></p>
+
+  <h2>本站訂正了自己一句話</h2>
+  <div class="card amber">
+    <p class="card-h">原本寫「語音索引的資料結構還沒逆向出來」</p>
+    <p><a href="what-can-be-modded.html">什麼改得動</a>那頁原本把球員專屬語音列為未解，
+       理由寫「語音索引的資料結構還沒逆向出來」。</p>
+    <p><strong>那句話比實際情況悲觀。</strong>
+       「哪一位球員用哪一個號碼、那個號碼對到哪幾個檔案」這一層<u>是解得開的</u>，
+       上面整頁量到的都是這一層。</p>
+    <p><strong>真正解不開的是更裡面一層</strong> ——
+       那些 <code>.dat</code> 檔<u>本身的聲音編碼</u>。</p>
+    <p class="small">⚠️ 這張卡寫的時候後面還接著一句「所以結論不變（做不出新語音），但理由必須改對」。
+       <strong>2026-08-29 之後那句也要改了</strong>：編碼那一層解開了（見上面那張綠卡與
+       <a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>），
+       剩下的是容器的那一支分支與錄音來源。</p>
+  </div>
+
+  <h2>這頁不能告訴你什麼</h2>
+  <div class="card blue">
+    <p class="card-h">四件未解</p>
+    <p style="margin-top:6px">
+       一、<code>a</code>／<code>c</code>／<code>d</code> 三者<u>數量為什麼不一樣</u>（4,091 / 4,121 / 4,313）。
+       （<strong>各是什麼已經解開了</strong>，見上面〈<a href="#suffix">a / c / d 是什麼：解開了</a>〉。）<span class="badge wip">未解</span><br>
+       二、<code>audioid</code> 的 0、1、2 三個「沒有語音」的值之間差在哪。<span class="badge wip">未解</span><br>
+       三、<code>.dat</code> 裡面的聲音編碼<u>已經解開了</u>（見<a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>）；
+       這頁講的 <code>pnamedat.big</code> 用的容器分支（編碼器 3）<u>也在 2026-08-30 解開了</u>，
+       7,092 段裡解得出 6,674 段，剩下 418 段解不出。<span class="badge ok">已解開</span><br>
+       四、把 <code>audioid</code> 改成別人的號碼，遊戲是不是真的會唸出那個人的名字 ——
+       <strong>本站沒有實機驗過</strong>，這是從檔名對應推論的。<span class="badge wip">未驗</span></p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 播報員不唸你新加的球員，不是設定沒開，是那個名字<u>根本不存在</u>，遊戲裡的球員名字是 2005 年真人錄好的音、不是合成的，而 <strong>EA 原廠只錄了 1,673 個號碼份</strong>。</li>
+    <li><strong><code>a</code>／<code>c</code>／<code>d</code> 解開了</strong> 答案寫在 <code>spch_pbp.txt</code> 裡，<code>a</code> 是球評唸姓氏（1,462）、<code>c</code> 是主播唸全名（1,486）、<code>d</code> 是主播唸姓氏（1,632），三組<strong>集合完全相同</strong>而不只是數量吻合；音檔長度獨立佐證：唸全名的 <code>c</code> 中位數 6,912 個位元組，兩個唸姓氏的都是 4,352。<u>不要寫成「一個人有三段語音」</u>，它是兩個人 × 兩種稱呼，四格只有三格有檔（球評唸全名那 142 個共用主播的），而三種齊全的只佔 75.0%。</li>
+    <li><strong>但輪到台灣球員，那兩位播報員是同一段錄音</strong> 當年的來源錄音 185 組<u>沒有一組</u> <code>a</code> 與 <code>d</code> 相同（0.0%，其中 184 組連檔案長度都不一樣，唯一長度相同的 <code>Cruz</code> 內容也不同），實際出貨的台灣球員語音包 159 組卻有 <strong>155 組（97.5%）</strong>逐位元組完全一樣，例外只有中村紀洋、陽建福、高政華、林威助。這也替 2008 年那篇教學說的「至於兩個誰是誰念的已記不清」補上了答案。</li>
+    <li><strong>訂正一：4,343 是這台機器的數字</strong>。EA 錄的是 1,673，多的 2,670 是淨值（模組加 2,681、拿掉 11）。順帶一提<u>語音庫有一大半的名字沒人在用</u>：這台 4,343 個號碼裡 3,097 個（71.3%）名單裡沒人指向，原版是 491 個（29.3%）。</li>
+    <li><strong>訂正二：<code>audioid = 2</code> 是台灣名冊作者的慣例，不是 EA 的設計</strong>。這台有 1,337 人共用 2、22 個號碼被共用；<u>剛安裝好的原版</u>則是 1,300 個非零 audioid <strong>全部獨一無二、零共用</strong>，而且 1 與 2 從頭到尾一次都沒出現過。沒有語音的球員 EA 直接填 0。<strong>但反過來不成立</strong> 原版那 1,300 個非零號碼裡有 118 個（9.1%）一個檔案都沒有，所以「填 0 ＝ 沒語音」對，「非 0 ＝ 有語音」錯。</li>
+    <li><strong>訂正三：那個 62.8% 是本站沒補零算錯的</strong>。三個倉庫的檔名<u>一律補零到四位</u>（<code>0216.fsh</code>），名單裡的號碼<u>不補零</u>（<code>216</code>），直接拿去查會讓 1000 以下的球員全部被判成「沒有」。補零重算，排掉 1 與 2 兩個哨兵值後真正指向具體號碼的是 1,855 位，<strong>三樣都沒有的是 220 位（11.9%）</strong>，差了兩倍以上。</li>
+    <li><strong>訂正四：兩句話講得太滿</strong>。原本寫「<u>沒有人</u>錄過他的名字，無論你怎麼設定都唸不出來」，EA 沒錄是對的，但 2008 到 2009 年台灣模組玩家自己做了 23 個人的語音；另一頁原本把這件事列為未解、理由寫「語音索引的資料結構還沒逆向出來」，<strong>那也太悲觀</strong>，「誰用哪個號碼、號碼對到哪幾個檔」這一層是解得開的，真正解不開的是更裡面一層。</li>
+    <li><strong>本站沒驗的</strong> <code>.dat</code> 裡面<u>聲音怎麼編碼</u>已於 2026-08-29 解開（見<a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>），但這頁講的 <code>pnamedat.big</code> 用的容器分支（編碼器 3）也已於 2026-08-30 解開（7,092 段裡解得出 6,674 段，那組「抽 200 段完整解出 0 段」是修好之前量的），所以「做自己的球員語音」現在只缺錄音來源；<code>a</code>／<code>c</code>／<code>d</code> 三者數量為什麼不一樣沒答案；<code>audioid</code> 的 0、1、2 差在哪、以及為什麼有 12 個人共用 <code>audioid = 1</code>（那組檔案是存在的）都沒查出來；最重要的是<strong>把 <code>audioid</code> 改成別人的號碼、遊戲是不是真的會唸出那個人的名字，本站沒有實機驗過</strong>，那是從檔名對應推論的。還有，這頁的名單類數字量自測試機（<code>attrib.dat</code> 被模組換過，跟原版不是同一份，內容自 2026-04-14 那份快照以來沒變、sha256 相同，但檔案日期被後來的操作換掉了），<u>而且欄位順序會變，46 欄裡有 27 欄兩份名冊對不上，永遠不要記欄號</u>。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="voice-header.html">語音檔頭的 16 個位元組</a> —— 那些 <code>.hdr</code> 裡面到底寫了什麼</li>
+      <li><a href="player-numbers.html">兩套球員編號</a> —— <code>audioid</code> 的另一半用途</li>
+    <li><a href="audio.html">播報音訊系統</a> —— 整個音訊區的結構</li>
+    <li><a href="what-can-be-modded.html">什麼改得動</a> —— 全站的可改／不可改總表</li>
+    <li><a href="../story/orphan-data/index.html">一個檔案裡的地層</a> —— 「不刪只是不指向」的另一個例子</li>
+  </ul>
+
+  <footer>
+    <p>本頁的項目數、號碼數、覆蓋率皆為現場打開 <code>data\database\attrib.dat</code>
+       與 <code>data\audio\</code> 底下的 <code>pnamedat.big</code>、<code>pnamehdr.big</code> 量測所得。
+       標示為「未解」「未驗」之處本站尚未解讀或尚未實機確認。
+       本站不提供任何語音檔案。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

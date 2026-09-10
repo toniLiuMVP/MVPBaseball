@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/7min/computer.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>七分鐘從電腦小白到可以修改模組 — toni的MVP模組補習班</title>
+<meta name="description" content="完全不會電腦也能跟著做：開命令列、認路徑、拖資料夾、跑腳本、還原。Windows 與 Mac 並列。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item on" href="index.html">七分鐘</a>
+  <a class="item" href="../reference/index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">七分鐘</a> › 電腦課</p>
+  <h1>七分鐘從電腦小白到可以修改模組</h1>
+  <p class="lede">這一堂沒有任何前置。<strong>如果你看到「打開命令提示字元」就卡住，這一堂就是為你寫的。</strong>七分鐘之後，本站每一課的指令你都跑得動。</p>
+  <div class="card">
+    <p class="card-h">⏱ 七分鐘怎麼分配</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>做什麼</th><th class="num">分鐘</th></tr></thead>
+      <tbody>
+        <tr><td>打開命令列</td><td class="num">1</td></tr>
+        <tr><td>學會「路徑」是什麼</td><td class="num">2</td></tr>
+        <tr><td>學會用拖的</td><td class="num">1</td></tr>
+        <tr><td>裝 Python</td><td class="num">2</td></tr>
+        <tr><td>跑第一個指令</td><td class="num">1</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <h2>前置</h2>
+  <ul>
+    <li>一台電腦</li>
+    <li>沒了</li>
+  </ul>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法看<a href="../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <h2>👉 你要做的事</h2>
+
+  <div class="step">
+    <div class="step-n">1</div>
+    <div>
+      <p><strong>打開命令列。</strong></p>
+      <ul><li><strong>Windows</strong>：按 <kbd>Win</kbd>，打「cmd」，按 Enter</li><li><strong>Mac</strong>：按 <kbd>Cmd</kbd>+<kbd>空白鍵</kbd>，打「終端機」，按 Enter</li></ul><p>會跳出一個黑黑的視窗，裡面有一行字跟一個游標。<strong>它就是在等你打字。</strong>打錯不會壞掉，按 Enter 才會執行。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">2</div>
+    <div>
+      <p><strong>搞懂「路徑」。</strong></p>
+      <div class="card"><p class="card-h">一句話</p><p>路徑就是<strong>一個檔案或資料夾的完整住址</strong>。本站的指令裡寫「〔你的遊戲資料夾〕」的地方，你要換成自己電腦上那個住址。</p></div><p>住址長這樣：</p><pre><code>C:\Program Files (x86)\EA SPORTS\MVP Baseball 2005</code></pre><pre><code>/Users/〔你的名字〕/Games/MVP Baseball 2005</code></pre><p><strong>有空白的路徑一定要用引號包起來</strong>，不然電腦會以為是兩個東西。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">3</div>
+    <div>
+      <p><strong>不要用打的，用拖的。</strong></p>
+      <p>這是最重要的一招：<strong>把資料夾直接拖進那個黑視窗</strong>，路徑會自己打出來，一個字都不會錯。</p><p>先打 <code>cd</code> 再打一個空白，然後把遊戲資料夾拖進去，按 Enter。你現在就「站在」那個資料夾裡了。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">4</div>
+    <div>
+      <p><strong>裝 Python(本站的腳本都是用它跑的)。</strong></p>
+      <ul><li><strong>Windows</strong>：到 <a href="https://www.python.org/downloads/" rel="nofollow">python.org</a> 下載安裝。<u>安裝時第一頁那個「Add Python to PATH」一定要打勾</u> —— 沒勾的話指令會找不到它</li><li><strong>Mac</strong>：通常已經有了。沒有的話一樣去 python.org 下載</li></ul><p>裝完確認：</p>
+      <p class="small">Windows:</p>
+<pre><code>python --version</code></pre>
+      <p class="small">Mac / Linux:</p>
+<pre><code>python3 --version</code></pre>
+      <p>印出版本號就成功了，<strong>第二個數字要 7 以上</strong>（<code>Python 3.7</code>、<code>3.9</code>、<code>3.12</code> 都行）。印出的是 <code>Python 2.7.x</code> 代表版本太舊：Windows 改打 <code>py -3 --version</code>（<code>py</code> 只有 Windows 有）、Mac 改打 <code>python3 --version</code> 試試，哪一個印出 3.x 就用哪一個。<strong>Windows 打 <code>python</code>、Mac 打 <code>python3</code></strong> ——本站大多數課的指令兩種都會給你；<u>只給 <code>python3</code> 的那幾課</u>（例如<a href="exe.html">七分鐘調好你的執行檔</a>），Windows 上請自己把開頭的 <code>python3</code> 換成 <code>python</code>。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">5</div>
+    <div>
+      <p><strong>跑第一個真的有用的指令：檢查你的備份。</strong></p>
+      <p>下載 <a href="../tutorials/backup/mvp_check_backup.py" download>mvp_check_backup.py</a> 放到桌面，然後：</p>
+      <p class="small">Windows:</p>
+<pre><code>cd %USERPROFILE%\Desktop</code></pre>
+      <p class="small">Mac / Linux:</p>
+<pre><code>cd ~/Desktop</code></pre>
+      <p class="small">Windows:</p>
+<pre><code>python mvp_check_backup.py &quot;〔你的遊戲資料夾〕&quot;</code></pre>
+      <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_check_backup.py &quot;〔你的遊戲資料夾〕&quot;</code></pre>
+      <p>它只會看、不會改。<strong>這就是你的第一次成功。</strong></p>
+    </div>
+  </div>
+
+  <h2>✅ 怎麼知道成功了</h2>
+  <ul>
+    <li>黑視窗打得開</li>
+    <li><code>--version</code> 印得出 <strong>3.7 以上</strong>的 Python 版本</li>
+    <li>備份檢查腳本跑得出結果</li>
+  </ul>
+
+  <h2>❌ 出錯處理</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>症狀</th><th>怎麼辦</th></tr></thead>
+    <tbody>
+      <tr><td>說找不到 <code>python</code></td><td>Windows 上八成是安裝時沒勾「Add Python to PATH」。重新安裝並勾起來</td></tr>
+      <tr><td>印出的是 <code>Python 2.7.x</code></td><td>版本太舊。Windows 改打 <code>py -3 --version</code>（<code>py</code> 只有 Windows 有），Mac 改打 <code>python3 --version</code>；哪一個印出 3.x，就把本站指令開頭的 <code>python</code> 換成它</td></tr>
+      <tr><td>說找不到檔案</td><td>路徑打錯了。<strong>用拖的</strong>，不要用打的</td></tr>
+      <tr><td>路徑有空白就出錯</td><td>整個路徑用雙引號包起來</td></tr>
+      <tr><td>視窗一閃就關掉</td><td>不要雙擊 <code>.py</code> 檔。要先開命令列，再在裡面打指令</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card red">
+    <p class="card-h">⚠️ 這一課到哪裡為止</p>
+    <p>本站所有會改你檔案的腳本，都遵守同一組規矩：<strong>批次模式不加 <code>--apply</code> 就只是預覽（少數腳本另有互動模式，那時要自己打 <code>y</code> 才會寫）、第一次寫入前會自動備份、而且都有 <code>--restore</code> 可以還原</strong>。</p><p>所以放心亂試。<u>先預覽、看清楚、再決定</u> —— 這就是全部。</p>
+  </div>
+
+
+  <h2>想弄懂為什麼</h2>
+  <ul class="plain">
+    <li><a href="../start.html">新手基本功</a> —— 更完整的入門</li>
+    <li><a href="../tutorials/backup/index.html">備份與還原 SOP</a> —— 動任何東西之前</li>
+    <li><a href="../tutorials/read-file-headers/index.html">五秒看穿一個檔案</a></li>
+  </ul>
+
+  <footer>
+    <p>本頁是「下課七分鐘」系列，只講一件事怎麼做完。
+       原理、量測過程與本站驗到哪裡為止，寫在上面連過去的完整課程裡。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

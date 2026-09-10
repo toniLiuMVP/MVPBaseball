@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/source-traces.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>執行檔裡剩下的原始碼痕跡 — toni的MVP模組補習班</title>
+<meta name="description" content="MVP Baseball 2005 的零售執行檔裡留著 68 條原始碼路徑（EA 自己的 64 條），以及緊貼著它們的內部名稱表。本頁用指標陣列而不是字串鄰接去驗，並老實列出 48 條主張裡被打掉的 29 條。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 執行檔裡剩下的原始碼痕跡</p>
+  <h1>執行檔裡剩下的原始碼痕跡</h1>
+  <p class="lede">這個遊戲的零售執行檔裡，留著 <strong>68 條原始碼檔案路徑</strong>
+     （EA 自己的 64 條，微軟 C 執行期函式庫 4 條），
+     其中 62 條長成 <code>e:\mvp2005pc\source\common\…</code> 的樣子。
+     而真正有價值的不是那些路徑，是<strong>緊貼著它們的一整排內部名稱表</strong> ——
+     那是這個遊戲的內部構造，用它自己的詞彙寫的。</p>
+
+  <div class="card">
+    <p class="card-h">為什麼原始碼路徑會留在出貨的程式裡</p>
+    <p>C 和 C++ 有一個叫 <code>__FILE__</code> 的東西，編譯時會被換成<strong>當前檔案的完整路徑</strong>。
+       它最常見的用途是斷言：「這裡不該發生的事發生了，出事的是哪一個檔、哪一行」。</p>
+    <p>斷言訊息要印路徑，路徑就得存進二進位檔。<strong>於是每留下一條路徑，
+       旁邊就有一句 EA 工程師寫給自己看的話。</strong></p>
+  </div>
+
+  <h2>整個遊戲的架構，用檔案數量說話</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>子系統</th><th class="num">檔數</th><th>裡面是什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="子系統"><code>ai/</code></td><td data-label="檔數" class="num">22</td>
+          <td data-label="裡面是什麼">打者、投手、野手、跑者、球員本體的判斷邏輯</td></tr>
+      <tr class="hi"><td data-label="子系統"><code>geomlib/</code></td><td data-label="檔數" class="num">21</td>
+          <td data-label="裡面是什麼">幾何碰撞：圓錐、方盒、射線、球體、網格、骨架，以及它們兩兩相交的測試</td></tr>
+      <tr><td data-label="子系統"><code>script/</code></td><td data-label="檔數" class="num">8</td>
+          <td data-label="裡面是什麼">播放腳本：<code>simtoendofplay</code>、<code>teleportactor</code>、<code>gosubrandom</code></td></tr>
+      <tr><td data-label="子系統"><code>frontend/</code></td><td data-label="檔數" class="num">5</td><td data-label="裡面是什麼">介面與疊層</td></tr>
+      <tr><td data-label="子系統"><code>assetmanager/</code> <code>database/</code> <code>controller/</code>
+              <code>comm/</code> <code>main/</code> <code>interfaces/</code></td>
+          <td data-label="檔數" class="num">各 1</td><td data-label="裡面是什麼">資產、資料表、手把、連線、進入點、投打介面</td></tr>
+      <tr><td data-label="子系統"><code>libraries/gamelib/</code></td><td data-label="檔數" class="num">2</td>
+          <td data-label="裡面是什麼">離線表管理員與路徑清單，那是跨專案共用的函式庫</td></tr>
+      <tr><td data-label="子系統" class="small">（編譯器自己的）</td><td data-label="檔數" class="num">4</td>
+          <td data-label="裡面是什麼"><code>f:\vs70builds\3077\vc\crtbld\</code> —— 微軟 C 執行期函式庫的原始碼</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>AI 跟幾何碰撞加起來佔了 63%。</strong>一個 2005 年的棒球遊戲，
+     大半的工程量花在「電腦球員要做什麼」跟「兩個東西有沒有碰到」。</p>
+
+  <h2>⭐ 方法：從「字串挨在一起」升級到「指標真的指過去」</h2>
+  <p>這一頁最重要的不是任何一條結論，是驗證方式的轉變。</p>
+
+  <div class="card red">
+    <p class="card-h">舊方法為什麼不夠</p>
+    <p>看到一排名字連在一起、數量又剛好對得上某個東西，很容易就寫成「這是一張表」。
+       <strong>但字串挨在一起只證明編譯器把它們放在一起，不證明它們屬於同一張表。</strong></p>
+    <p>本站把「數量剛好對得上」列為<u>最弱的一級證據</u>，正是為了防這個。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">新方法：去找那張表本身</p>
+    <p>C 語言把「編號 → 名字」做成一個<strong>指標陣列</strong>：一格一個位址，每個位址指向一條字串。
+       那個陣列是真的存在於檔案裡的資料，不是推論。</p>
+    <p>做法（<u>不反組譯，只讀資料</u>）：</p>
+    <ol>
+      <li>解 PE 檔頭，把字串的檔案偏移換算成程式執行時的位址</li>
+      <li>全檔掃描，找哪些四位元組剛好等於那些位址</li>
+      <li>如果它們連續排在一起、前後被別的東西夾住 —— <strong>那就是那張表，而且格數是數出來的</strong></li>
+    </ol>
+    <p>用這個方法，好幾條原本只能標「合理但沒證實」的發現，
+       變成<strong>格數、順序、起點全部量得出來</strong>。</p>
+  </div>
+
+  <h2>量出來的內部構造</h2>
+
+  <h3>守備員的行為是一張 50 格的任務表</h3>
+  <p>指標陣列在檔案偏移 <code>0x4FDB30</code>，<strong>50 格</strong>，
+     順序正好是字串區塊的完全倒序，前後被浮點常數夾住，
+     而那 50 條字串在整支執行檔裡<u>各自只被引用一次</u>。</p>
+  <p>第 0 格是 <code>Not In Use</code>，第 1 格是 <code>Manual</code>，
+     最後 8 格全部以 <code>UserControl</code> 開頭。
+     而這一區後方 156 個位元組是 <code>fieldergamecannon.cpp</code>，再往後兩千個位元組之內，
+     同一段字串池裡依序排著 <code>fielderuser.cpp</code>（+432）/
+     <code>liveplaytasksuser.cpp</code>（+1716）/ <code>liveplaytasks.cpp</code>（+2080）——
+     <strong><code>liveplaytasks</code> 對上 Task，而 <code>user</code> 版自成一個檔，
+     反過來佐證那 8 格是玩家操控時才跑的。</strong>
+     <span class="small">（2026-09-05 訂正：原本把 156 這個距離寫成落在後面那三個檔上，
+     實際落點是 <code>fieldergamecannon.cpp</code>；距離都是從最後一條字串
+     <code>Not In Use</code> 的起點數起。三個檔同在一段字串池這件事不受影響。）</span></p>
+  <p>內容看得出顆粒度：接球分成六種（一般、撞牆、撞牆跳躍、接傳球、接不到的球…），
+     傳球有 <code>ThrowToTarget</code> / <code>ThrowToFielder</code> / <code>DelayedThrow</code> /
+     <code>FakeRundownThrow</code>，中繼有 <code>GotoCutoffPosition</code> /
+     <code>ConsiderCutThrow</code>，還有 <code>LookRunnerBack</code> /
+     <code>HoldThePlay</code> / <code>GiveUpBase</code> 這種<strong>「刻意不做事」也是一項任務</strong>。</p>
+  <p class="small">⚠️ 一開始還寫了「<code>CatchAThrow</code> 跟 <code>CatchAThrowNew</code> 並存，
+     代表舊程式碼沒刪、兩套同時活著」——<strong>覆驗把這句退回成猜測</strong>：
+     列舉裡有兩個名字不等於有兩條活的程式碼，<code>New</code> 也可能只是別名。
+     旁邊那張疑似派送表是 48 格不是 50 格，兩種對齊方式都說得通，
+     <u>覆驗者拒絕挑「讀起來比較順」的那一種</u>。</p>
+
+  <h3>受傷有 27 種，而且每一種都綁一個具體的比賽動作</h3>
+  <p>指標陣列在 <code>0x4fe7a8</code>，<strong>28 格</strong>：第 0 到 26 格是分類，
+     第 27 格是計數哨兵 <code>NUM_INJURY_CATEGORIES</code>。
+     <strong>在兩份未改動過的執行檔上重現，同樣 27 條、同樣偏移</strong>，排除模組污染。</p>
+  <p>它不是抽象的傷病資料庫，是「傷是怎麼來的」清單：被界外球打到、被觸身球打到
+     （再細分頭、左右大腿、左右前臂、左右上臂、軀幹八種）、
+     投手被強襲球打到（再細分頭、腳、腿、手、臂、軀幹六種）、撞牆接球、飛撲接球、
+     靠近休息區、靠近全壘打牆、本壘觸殺、雙殺傳球、投手體力、
+     <strong>頭部先滑壘與腳先滑壘分開計</strong>，以及 <code>INJURY_BATTER_PITCHER_BRAWL</code>。</p>
+  <p>兩件事因此成立：<strong>受傷是事件驅動的，不是隨機骰</strong>——每種傷都得先有對應動作發生；
+     而<strong>清場衝突在引擎裡是會產生後果的完整事件</strong>，不只是動畫。</p>
+
+  <h3>投打之間的節奏，四種對局各調一組</h3>
+  <p>四組 × 五個參數。組名是 <code>UserUser_Pitching_Batting</code>、
+     <code>UserCPU_</code>、<code>CPUUser_</code>、<code>CPUCPU_</code>，
+     而每組五個成員的前綴剛好是 <code>UU</code> / <code>UC</code> / <code>CU</code> / <code>CC</code> ——
+     <strong>前綴縮寫對上組名全稱，是名字對名字。</strong></p>
+  <p>五個成員是：<code>RunnerIncreasesLead</code>、<code>NewBatter_WithRunners</code>、
+     <code>NewBatter_NoRunners</code>、<code>SameBatter_WithRunners</code>、
+     <code>SameBatter_NoRunners</code>。也就是說，<strong>停頓長度會依「換不換打者」
+     和「壘上有沒有人」再細分</strong>。</p>
+  <p>共用的範圍字串 <code>0, 5, 0.01</code> 在整支執行檔只出現一次，
+     卻<strong>被引用整整 20 次</strong>（4 組 × 5 個），每次都固定落在對應參數名引用的前 9 個位元組。
+     結構是量到的，不是鄰接推的。</p>
+  <p class="small">⚠️ <strong>「單位是秒」是猜的，而且很可能不對。</strong>
+     二進位裡沒有任何字串寫 time 或 delay，
+     而真實投球間隔是 15 到 20 秒，0 到 5 不可能是完整間隔 ——
+     頂多是附加延遲或倍率。</p>
+
+  <h3>連線對戰：交換的是搖桿輸入，抓包的是 CRC</h3>
+  <p>除錯訊息把列舉前綴直接印出來：<code>(%d) kTPGameComm_ReadPadInfoWait - client</code> /
+     <code>- server</code>，<strong>名字對名字</strong>。
+     旁邊的除錯旋鈕叫 <code>Input Exchange Ticks</code> 與 <code>Max Pad Skew</code> ——
+     那正是延遲鎖步用來吸收延遲的兩個概念：提前幾個 tick 交換輸入、允許雙方偏移多少。</p>
+  <p>連線角色寫成 <code>I'm the HOST!!</code> / <code>I'm the GUEST!!</code>，
+     除錯選單裡甚至有一顆 <strong><code>Create Desync</code></strong>（故意製造不同步）
+     跟一顆 <code>Force recovery</code>。</p>
+  <p>而這功能<strong>真的有出貨</strong>：<code>HOSTLAN</code>、<code>EASPORTSONLINE</code>、
+     <code>NETWORKGAMES</code>、<code>cFENetworkStatus</code> 都在，
+     殺掉了「這只是主機版殘留程式碼」這個平凡解釋。
+     鄰居也全是網路項目：語音的連線／斷線／開關麥克風、假斷線、主客端磁碟錯誤。</p>
+  <div class="card amber">
+    <p class="card-h">⚠️ 覆驗砍掉的四句話</p>
+    <ul>
+      <li><strong>「傳的不是比賽狀態，是按鍵」講太絕。</strong>同一台狀態機裡就有
+          <code>WriteBackEnd</code> / <code>ReadBackEnd</code>，而 BackEnd 有
+          <code>ingamedata\backend.cpp</code> 佐證是賽中資料庫（名單／打線／成績）。
+          <u>握手階段確實在傳資料。</u></li>
+      <li><strong>那串箭頭不是執行順序</strong>，只是列舉的宣告序。
+          而且兩個字串池從第六項就分岔，只有前五項互相印證。</li>
+      <li><code>local: %d rem: %d</code> 解讀成「本地與遠端搖桿快取索引」是猜的：
+          整支執行檔 <code>remote</code> 一次都沒出現，<code>rem</code> 也可能是 remaining。</li>
+      <li>「這解釋了為什麼連線對戰對名單一致性極度敏感」<strong>零證據，已整句刪除</strong>——
+          而且 BackEnd 交換這一步剛好反過來削弱它。</li>
+    </ul>
+  </div>
+
+  <h3>資產管理員用一個直線符號同時表達兩件事</h3>
+  <p>執行檔裡有一條寫死的 <code>models.big|c%03d.%s</code>，還有一條通用樣板 <code>%s|%s</code>。
+     <strong><code>|</code> 左邊是磁碟上的路徑（可以有目錄），右邊是封裝檔內部的成員名。</strong></p>
+  <p>這解釋了為什麼 <code>%s.ord</code> 跟 <code>%s/%s.ord</code> 會同時存在：
+     <u>帶斜線的是給散裝檔用的，不帶斜線的是要放到 <code>|</code> 右邊的</u>。</p>
+  <p>驗證：把這台測試機 <code>data</code> 資料夾底下每一個封裝檔（開頭是 <code>BIGF</code> 的 383 個）
+     的目錄表全部列出來，共 <strong>71,081 筆</strong>，
+     <strong>含路徑分隔符號的是 0 筆</strong> —— 跟「<code>|</code> 右邊是扁平名字」一致。
+     而 <code>models.big</code> 的 4,211 筆裡有 2,682 筆是 <code>c001.fsh/.ord/.orl</code> 這種三件套，
+     左邊檔名對上右邊成員名。</p>
+  <p class="small">⚠️ <strong>這個「0 筆」只成立在第一層。</strong>
+     下面「資產是以庫為單位整批載入卸載的」那一節挖開的第二層裡，
+     <code>initstay.big</code> 的 34 個成員與 <code>initpurge.big</code> 的 11 個成員
+     <u>全部帶斜線</u>（<code>models/bat.o</code>、<code>models/textures/cglv.fsh</code>…），
+     合計 45 個反例。所以只能說「本站量到的第一層目錄項目沒有分隔符號」，
+     不能說「<code>|</code> 右邊永遠是扁平名字」。</p>
+  <p class="small">（2026-09-05 訂正：這一段原本寫 71,105 筆，而同一頁後面那張卡又寫 387 個封裝檔、
+     71,202 個項目 —— 兩個口徑互不相容，而且兩個都重跑不出來。現在統一成當下量得到的值：
+     這台測試機 <code>data</code> 底下 383 個 <code>BIGF</code> 封裝檔、71,081 筆目錄項目。
+     這是這台機器的數字，資料夾裡多放一份備份就會變；定性結論不受影響。）</p>
+
+  <h3>資產是以「庫」為單位整批載入卸載的</h3>
+<pre><code>____________________ LOADING BANK %s ____________________
+____________________ UN-LOADING BANK %s ____________________
+banklist</code></pre>
+  <p>而磁碟上剛好有兩個名字對得上這個概念的檔：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>外層</th><th>裡面唯一那一項</th><th class="num">大小</th><th>怎麼讀</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="外層"><code>initstaz.big</code></td><td data-label="裡面唯一那一項"><code>initstay.big</code></td>
+          <td data-label="大小" class="num">1,212,663</td><td data-label="怎麼讀">init + <strong>stay</strong>（留著不卸載）</td></tr>
+      <tr class="hi"><td data-label="外層"><code>initprgz.big</code></td><td data-label="裡面唯一那一項"><code>initpurge.big</code></td>
+          <td data-label="大小" class="num">106,971</td><td data-label="怎麼讀">init + <strong>purge</strong>（可以清掉）</td></tr>
+    </tbody>
+  </table></div>
+  <p>外層是封裝檔的殼，<strong>裡面只裝一個同名但拼完整、而且壓縮過的封裝檔</strong>。
+     所以結尾那個 <code>z</code> 就是「壓縮過」。
+     <strong>內層檔名把外層的縮寫展開了</strong> —— 這是名字對名字，不是猜的。</p>
+  <p>解開 <code>initstay.big</code> 有 34 項，全是最基本、永遠要在的東西：
+     球、球棒、斷棒、影子、碰撞身體、三種細節等級的頭與身體、
+     手套（<code>fglv</code> 野手、<code>cglv</code> 捕手）、球棒與皮膚貼圖。
+     <code>initpurge.big</code> 11 項，全是可替換的模型外殼。</p>
+  <div class="card">
+    <p class="card-h">順便解開一個社群工具的謎</p>
+    <p>一份社群工具（<code>glovebatUTILITY</code>，壓縮檔裡的說明檔標 2005-05-06）的說明書
+       說手套貼圖在 <code>inistay.big</code> 裡。
+       <strong>這台機器上沒有那個檔</strong>，而且把 <code>data</code> 底下 383 個封裝檔、
+       71,081 個項目掃過，<code>fglv</code> 與 <code>cglv</code> 都是 0 筆。</p>
+    <p>真相是<strong>檔名少打了一個字母，而且它們藏在第二層</strong>：
+       實際的檔名叫 <code>initstaz.big</code>，要先解開外層才看得到裡面壓縮著的 <code>initstay.big</code>。
+       <u>只掃一層的話，那 34 個檔案在統計上等於不存在。</u></p>
+  </div>
+
+  <h3>三個球員被寫死在執行檔裡</h3>
+  <p>在 <code>initstay.big</code> 的 34 項裡，有四張貼圖是<strong>指名道姓</strong>的：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>檔名</th><th>是什麼</th></tr></thead>
+    <tbody>
+      <tr><td><code>models/textures/gagnegoggleslens.fsh</code></td><td>護目鏡的<strong>鏡片</strong></td></tr>
+      <tr><td><code>models/textures/gagnegogglesframe.fsh</code></td><td>護目鏡的<strong>鏡框</strong>（分成兩張）</td></tr>
+      <tr><td><code>models/textures/johndamonhair.fsh</code></td><td>某位球員的頭髮</td></tr>
+      <tr><td><code>models/textures/mannyramirezhair.fsh</code></td><td>某位球員的頭髮</td></tr>
+    </tbody>
+  </table></div>
+  <p>其他球員的外觀全部走通用系統（<a href="models.html">臉皮</a>、
+     <a href="player-codes.html">代號</a>），<strong>只有這三個人的特徵被單獨做成資產、
+     而且放進「永遠不卸載」那一庫</strong>。</p>
+
+  <h3>難度是主客各一份</h3>
+  <p><code>fesubscreendifficulty.cpp</code> 附近有四條元素路徑，兩兩成對，
+     主隊一組、客隊一組，各自帶自己的隊徽節點與 <code>DIFFICULTY</code> 節點。</p>
+  <p>覆驗用了一個<u>完全不碰執行檔</u>的第二證據：直接去讀版面檔
+     <code>fes_teamselect.fel</code>，裡面 <code>GG:HOMEDIFFICULTY</code> 與
+     <code>GG:AWAYDIFFICULTY</code> 各自內含一份四選項選單，
+     對應到文字表的四個字串（新秀／職業／全明星／MVP）。</p>
+  <p class="small">路徑寫法也順帶印證本站對 <a href="fel.html">版面檔</a>的解讀：
+     <code>SG</code> 是子畫面群組、<code>GR</code> 是群組、<code>ANIM…</code> 是動畫節點，層級用斜線串起來。</p>
+
+  <h3>王朝模式的「氣勢」是一整張可調表</h3>
+  <p><code>MinMomentum</code> / <code>MaxMomentum</code> / <code>InitialMomentum</code>，
+     加上六個對稱參數：<strong>親自打、模擬中途介入、整場模擬</strong>三種贏法各有自己的氣勢影響值，
+     輸也各有一份。</p>
+  <p>那三分法正是王朝模式解決一場比賽的三條路，<strong>各自對氣勢的影響是分開調的</strong>。
+     表裡還有曲線與分級查表的開關。</p>
+  <p class="small">覆驗把證據從「執行檔字串排列」升級到<strong>總設定檔裡一筆真實記錄</strong>：
+     名稱表與數值表相鄰兩行，對起來就拿到原廠實際數值。</p>
+
+  <h3>自訂球場改圍牆高度，真的會換掉碰撞面</h3>
+  <p>把 87 個球場的碰撞檔全部掃過，<strong>1,368 個群組裡帶標籤的 62 個
+     全部集中在兩個檔</strong>（每檔 31 個：<code>Seat</code> 15、<code>Scoreboard</code> 8、
+     <code>Restaurant</code> 4、<code>WallHeight</code> 4），
+     而那兩個檔是同一座球場的日、夜兩版 —— 正好就是可自訂的那一座。
+     <span class="small">（2026-09-05 訂正：原本寫「只有兩個用了標籤」，那個「兩個」數的是檔案不是群組，
+     跟前半句的單位對不起來；帶標籤的群組是 62 個。結論不變。）</span></p>
+  <p>那座球場的碰撞檔裡，<code>WallHeight,0</code> 到 <code>WallHeight,3</code>
+     各有自己的三角形；擋球面那一份也是四組各自獨立。
+     <strong>四種圍牆高度不是換模型而已，碰撞幾何是四份。</strong>
+     實務意義：<u>自訂球場改圍牆高度會改變全壘打判定</u>，不是視覺效果。</p>
+  <p class="small">⚠️ 覆驗說：結論可以留，但原本舉的那個理由其實是最弱的一條，已換成上面這個寫法。</p>
+
+  <h2>老實說：48 條主張，29 條被自己人打掉</h2>
+  <p>這一輪把整份執行檔分六個區塊逐一開採，每一條發現都另外跑一輪
+     <strong>專門去推翻它</strong>，同時回頭查站上既有的頁面是不是早就寫過。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>結果</th><th class="num">條數</th><th>意思</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="結果">站得住且是新的</td><td data-label="條數" class="num">13</td><td data-label="意思">寫在上面</td></tr>
+      <tr><td data-label="結果"><strong>被推翻</strong></td><td data-label="條數" class="num"><strong>29</strong></td><td data-label="意思">約六成</td></tr>
+      <tr><td data-label="結果">站上早就寫過</td><td data-label="條數" class="num">6</td><td data-label="意思">包括編譯器版本、動畫三件套、資產編號樣板</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card red">
+    <p class="card-h">最值得記的一條「差一點」</p>
+    <p>有一條主張寫「一個腳本 63 個欄位、<strong>剛好 13 條演員軌</strong>」，
+       而資料檔表頭寫的就是 <code>63 13</code>。看起來完美。</p>
+    <p>覆驗去量了 <code>datafile.big</code> 的 460 個成員：帶著這型（63 欄位）表頭的有
+       <strong>325 個檔</strong>，<strong>那個 13 是「這個檔裡這型記錄有幾筆」</strong>，
+       跨檔取值 1 到 93，<strong>325／325 精準吻合</strong>。而演員軌永遠是 13。
+       <strong>兩個 13 毫無關係。</strong>
+       <span class="small">（2026-09-05 訂正：原本寫「量了 437 個檔、419／437 精準吻合」，
+       這兩個數字重跑不出來，也說不清當時掃的是哪一批檔；現在換成寫得出範圍、
+       重跑得出來的值。「跨檔取值 1 到 93」與整段結論不變。）</span></p>
+    <p>13 條演員軌本身是對的 —— 但靠的是 <code>Actor1</code> 到 <code>Actor13</code>
+       這些<u>名字</u>，不是那個數字。<strong>這正是本站列為最弱一級的「數量剛好對得上」。</strong></p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">另外三個方法論等級的教訓</p>
+    <ul>
+      <li><strong><code>strings</code> 會把相鄰的二進位位元組黏進字串開頭。</strong>
+          有一條名字被讀成 <code>D2OUTFLYBALL</code>，實際的名字是 <code>2OUTFLYBALL</code>（兩出局高飛球）——
+          那個 <code>D</code> 是前面一個浮點常數的位元組。同樣的錯讓兩個偏移量各多算一位元組。</li>
+      <li><strong>純文字搜尋看不進壓縮過的資料。</strong>
+          有一條差點寫成「這些是遊戲根本不讀的孤兒資料」，因為在目錄表裡 0 命中 ——
+          實際上那 460 個項目<u>全部是壓縮的</u>。</li>
+      <li><strong>名字表沒人引用，不等於功能不存在。</strong>
+          跑者 AI 那五張名字表在零售版裡沒有任何一個指標指向它們（對照組：
+          隔壁的浮點常數區有 109 次引用，證明搜法有效）。
+          所以「引擎保留了瞬移跑者的能力」只能降級成「保留了這個名字」。</li>
+    </ul>
+  </div>
+
+  <h2>這一頁不能告訴你什麼</h2>
+  <ul>
+    <li><strong>本站不反組譯。</strong>以上全部是讀資料段得到的：字串、指標陣列、
+        以及它們跟磁碟上檔案的對應。凡是需要看程式碼才能確定的，一律標成推論或猜測。</li>
+    <li><strong>「某條路徑屬於某個 .cpp」多半是鄰接推論。</strong>
+        編譯器把字串放在一起不代表它們屬於同一個模組，
+        只有在名字本身能互相印證時（<code>liveplaytasks</code> 對上 Task）才算錨點。</li>
+    <li><strong>這些表都是唯讀知識，不是修改教學。</strong>
+        本站沒有提供改動它們的工具，也沒有驗證過改了會怎樣。</li>
+  </ul>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 零售執行檔裡留著 68 條原始碼路徑（EA 自己的 64 條，微軟 C 執行期函式庫 4 條），但真正有價值的不是路徑，是緊貼著它們的內部名稱表，那是這個遊戲的構造用它自己的詞彙寫的。</li>
+    <li><strong>用檔案數量看架構</strong> <code>ai/</code> 22 個、<code>geomlib/</code> 21 個，兩者加起來佔 63%。一個 2005 年的棒球遊戲，大半工程量花在「電腦球員要做什麼」跟「兩個東西有沒有碰到」。</li>
+    <li><strong>這頁最重要的不是結論，是方法換了</strong> 從「字串挨在一起」升級到「指標真的指過去」。C 語言把編號對名字做成指標陣列，那是真的存在於檔案裡的資料，格數是數出來的。全程不反組譯，只讀資料段。</li>
+    <li><strong>量出來的兩張表</strong> 守備員的行為是 <code>0x4FDB30</code> 的 50 格任務表，最後 8 格全部以 <code>UserControl</code> 開頭，往後兩千個位元組之內同一段字串池裡就排著 <code>fielderuser.cpp</code> 與 <code>liveplaytasksuser.cpp</code>，名字對上名字。受傷是 <code>0x4fe7a8</code> 的 28 格（27 種分類加一個計數哨兵），在兩份未改動過的執行檔上重現。每一種傷都綁一個具體動作，所以<u>受傷是事件驅動的，不是隨機骰</u>。</li>
+    <li><strong>三個球員被寫死在執行檔裡</strong> Gagne 護目鏡的鏡片與鏡框、Damon 的頭髮、Manny Ramirez 的頭髮，四張貼圖被單獨做成資產，還放進「永遠不卸載」那一庫。另外自訂球場改圍牆高度真的會換掉碰撞面：87 個球場 1,368 個群組裡，帶標籤的 62 個全部集中在兩個檔，正好是可自訂的那一座的日夜兩版，四種高度是四份碰撞幾何，所以那不是視覺效果，會改變全壘打判定。</li>
+    <li><strong>48 條主張，29 條被自己人打掉</strong> 約六成，站得住且是新的只有 13 條。最值得記的一條「差一點」是資料檔表頭寫著 <code>63 13</code>、腳本剛好 13 條演員軌，看起來完美，覆驗去量 <code>datafile.big</code> 裡帶這型表頭的 325 個檔才發現那個 13 是「這個檔裡這型記錄有幾筆」，跨檔取值 1 到 93、325／325 精準吻合。<strong>兩個 13 毫無關係。</strong></li>
+    <li><strong>「搜不到」不等於「不存在」</strong> 一份 2005 年的社群工具說手套貼圖在 <code>inistay.big</code>，這台機器把 <code>data</code> 底下 383 個封裝檔、71,081 個項目掃過都是 0 筆。真相是檔名少打一個字母，而且它藏在第二層：<code>initstaz.big</code> 裡壓縮著 <code>initstay.big</code>，只掃一層那 34 個檔在統計上等於不存在。同一類的還有「純文字搜尋看不進壓縮資料」跟「<code>strings</code> 會把前面的位元組黏進字串開頭」（<code>D2OUTFLYBALL</code> 其實是 <code>2OUTFLYBALL</code>）。</li>
+    <li><strong>本站沒驗的</strong> 投打節奏那五個參數「單位是秒」是猜的，而且很可能不對，二進位裡沒有任何字串寫 time 或 delay。跑者 AI 那五張名字表在零售版沒有任何指標指向，所以「引擎保留了瞬移跑者的能力」只能降級成「保留了這個名字」。「某條路徑屬於某個 .cpp」多半是鄰接推論。<u>本站不反組譯，這些表都是唯讀知識，沒有提供改動的工具，也沒有驗證過改了會怎樣。</u></li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="tools-archive.html">二十年工具清冊</a> —— 社群那一半的故事</li>
+    <li><a href="datafile.html">總設定檔 datafile</a> —— 氣勢那張表的數值住在這裡</li>
+    <li><a href="fel.html">FEL 版面語法</a> —— 難度那條路徑怎麼讀</li>
+    <li><a href="../tutorials/unpack-big/index.html">封裝檔可以拆成散裝嗎</a> ——
+        <code>|</code> 那個符號正好回答了這一課的問題</li>
+    <li><a href="how-we-measured.html">本站怎麼量的</a></li>
+  </ul>
+
+  <footer>
+    <p>本頁的檔案路徑、偏移量、指標陣列格數、封裝檔項目統計，皆為在本站測試機的執行檔與遊戲資料上
+       實際掃描所得，並由獨立的覆驗流程逐條重跑。48 條原始主張中 29 條未通過覆驗、未列入本頁；
+       通過的 13 條中，覆驗指出的每一處訂正與降級都已寫在文中。<strong>本站不反組譯。</strong></p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

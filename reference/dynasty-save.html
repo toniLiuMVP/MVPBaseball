@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/dynasty-save.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>王朝存檔長什麼樣 — toni的MVP模組補習班</title>
+<meta name="description" content="每個王朝存檔都剛好 2,239,688 個位元組,一個不多一個不少。沒有加密、沒有壓縮,檔名與球隊名都是明文,零位元組佔 34.7%。30 個存檔兩兩全比 435 組之後發現它們分成兩群,群內後半相同、跨群不相同 —— 本站原本只比一組就寫成通則,已訂正。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 王朝存檔長什麼樣</p>
+  <h1>王朝存檔長什麼樣</h1>
+  <p class="lede">王朝模式的存檔是 <code>.sav</code> 檔。這頁講它的<strong>外形</strong> ——
+     大小、有沒有加密、哪一段會變哪一段不會。
+     <u>本站沒有解出裡面的欄位</u>，但光是外形就已經看得出不少事。</p>
+
+  <div class="card blue">
+    <p class="card-h">這頁最好驗</p>
+    <p>下面第一個數字，<strong>你用檔案總管看一眼就能自己確認</strong> ——
+       不用工具、不用命令列。</p>
+  </div>
+
+  <h2>每個存檔都剛好一樣大</h2>
+  <p>本站手上有 <strong>30 個</strong>王朝存檔（大聯盟 30 支球隊各一個）。
+     把它們的檔案大小列出來：</p>
+<pre><code>2,239,688 bytes  ×30</code></pre>
+  <p><strong>三十個檔，一種大小，一個位元組都沒差。</strong></p>
+  <div class="card grass">
+    <p class="card-h">這代表它是固定長度的格式</p>
+    <p>不管你玩到第幾個球季、簽了幾個自由球員、傷兵名單多長，
+       <u>檔案大小永遠一樣</u>。</p>
+    <p>意思是每一格資料都有固定的位置 —— 沒有用到的欄位就填 0，
+       不會讓檔案縮小。這種格式<strong>比較好改</strong>，
+       因為第 N 個位元組永遠代表同一件事。</p>
+  </div>
+  <p class="small">檔名格式也一致：<code>&lt;球隊&gt;_Franchise.sav</code>，30 個全部符合。</p>
+
+  <h2>沒有加密，也沒有壓縮</h2>
+  <p>判斷一個檔有沒有被加密或壓縮，有一個很簡單的量法：<strong>看它的位元組有多「亂」</strong>。</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>檔案類型</th><th class="num">亂度</th></tr></thead>
+    <tbody>
+      <tr><td>加密過的 ／ 壓縮過的</td><td class="num">接近 <strong>8.0</strong></td></tr>
+      <tr class="hi"><td><strong>這個存檔實測</strong></td><td class="num"><strong>3.51</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>3.51 離 8.0 很遠。而且直接證據更明顯 ——
+     <strong>打開就看得到字</strong>：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>量到的</th><th class="num">結果</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td>可讀字串（六個字以上）</td><td class="num"><strong>4,338 個</strong></td></tr>
+      <tr class="hi"><td>第一個可讀字串</td><td class="mono"><strong>ANGELS_Franchise.sav</strong></td></tr>
+      <tr><td>也找得到</td><td class="mono">Angels ／ Los Angeles</td></tr>
+      <tr><td><code>0x00</code> 佔全檔</td><td class="num">34.7%</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>存檔把自己的名字寫在裡面</strong>（30 個裡有 28 個跟磁碟上的檔名一字不差；
+     CINCINNATI 裡面寫的是 <code>CINCINATI_Franchise.sav</code>、
+     OAKLAND 裡面寫的是 <code>OAKLANDS_Franchise.sav</code> ——
+     它記的是當年存檔時打的名字，不是磁碟上的檔名）。球隊名、城市名也都是明文。</p>
+
+  <h2 id="diff">不同球隊的存檔有多像</h2>
+  <div class="card blue">
+    <p class="card-h">我們改過這一段</p>
+    <p>這一節原本只比對了<strong>一組</strong>存檔（ANGELS 對 ARIZONA），
+       卻寫成「後半 100 萬個位元組，<u>三十個存檔一模一樣</u>」。</p>
+    <p><strong>那是從一組樣本推出來的全稱句，而且不成立。</strong>
+       把 30 個存檔的 <strong>435 組全部比一次</strong>之後：
+       位移 1,200,000 之後仍有差異的有 <strong>104 組</strong>，
+       全部組別裡最晚的差異落在位移 <strong>1,254,095</strong>。</p>
+    <p>更麻煩的是，站上剛好挑到 435 組裡<u>最不利的取樣</u>：
+       ANGELS 與 ARIZONA 正好同屬下面講的那個小群，兩者後半確實相同。</p>
+  </div>
+
+  <p>先看站上原本比的那一組（ANGELS 對 ARIZONA）：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>量到的</th><th class="num">這一組</th><th class="num">30 檔兩兩全比 435 組</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="量到的">不一樣的位元組</td>
+          <td data-label="這一組" class="num"><strong>19,393</strong><br><span class="small">= 0.87%</span></td>
+          <td data-label="30 檔兩兩全比 435 組" class="num">3,331 ～ 24,533<br><span class="small">= 0.15% ～ 1.10%</span></td></tr>
+      <tr class="hi"><td data-label="量到的">差異最早出現在</td><td data-label="這一組" class="num">位移 0</td><td data-label="30 檔兩兩全比 435 組" class="num">位移 0</td></tr>
+      <tr class="hi"><td data-label="量到的">差異最晚出現在</td><td data-label="這一組" class="num">位移 1,188,087</td>
+          <td data-label="30 檔兩兩全比 435 組" class="num"><strong>位移 1,254,095</strong></td></tr>
+      <tr><td data-label="量到的">位移 120 萬之後</td><td data-label="這一組" class="num">這一組完全相同</td>
+          <td data-label="30 檔兩兩全比 435 組" class="num"><strong>435 組裡有 104 組不同</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>ANGELS 對 ARIZONA 的差異幾乎全部擠在<strong>前 50 萬個位元組</strong>裡
+     （19,393 個裡有 19,388 個）；30 檔聯集則是 80.4%（26,123 個裡有 20,996 個）。
+     下面右邊那欄是把 30 個檔全部攤開，<u>任何一個位移上只要有任兩檔不同就算一個</u>：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>位移範圍</th><th class="num">ANGELS 對 ARIZONA</th><th class="num">30 檔聯集</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="位移範圍" class="mono">0 – 10 萬</td><td data-label="ANGELS 對 ARIZONA" class="num">4,984</td><td data-label="30 檔聯集" class="num">5,311</td></tr>
+      <tr class="hi"><td data-label="位移範圍" class="mono">10 – 20 萬</td><td data-label="ANGELS 對 ARIZONA" class="num"><strong>12,854</strong></td><td data-label="30 檔聯集" class="num"><strong>13,606</strong></td></tr>
+      <tr><td data-label="位移範圍" class="mono">20 – 30 萬</td><td data-label="ANGELS 對 ARIZONA" class="num">1,139</td><td data-label="30 檔聯集" class="num">1,507</td></tr>
+      <tr><td data-label="位移範圍" class="mono">30 – 40 萬</td><td data-label="ANGELS 對 ARIZONA" class="num">393</td><td data-label="30 檔聯集" class="num">529</td></tr>
+      <tr><td data-label="位移範圍" class="mono">40 – 50 萬</td><td data-label="ANGELS 對 ARIZONA" class="num">18</td><td data-label="30 檔聯集" class="num">43</td></tr>
+      <tr><td data-label="位移範圍" class="mono">50 萬 – 110 萬</td><td data-label="ANGELS 對 ARIZONA" class="num">0</td><td data-label="30 檔聯集" class="num">160</td></tr>
+      <tr><td data-label="位移範圍" class="mono">110 – 120 萬</td><td data-label="ANGELS 對 ARIZONA" class="num">5</td><td data-label="30 檔聯集" class="num">947</td></tr>
+      <tr class="hi"><td data-label="位移範圍" class="mono">120 萬以後</td><td data-label="ANGELS 對 ARIZONA" class="num">0</td><td data-label="30 檔聯集" class="num"><strong>4,020</strong></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card grass">
+    <p class="card-h">一手發現：30 個存檔的後半分成兩群，而且群內完全相同</p>
+    <p>用位移 1,200,000 之後的內容做指紋，30 個存檔<strong>只分成兩群</strong>：</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th class="num">幾個</th><th>是哪些</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td class="num"><strong>4</strong></td>
+            <td class="mono">ANGELS · ARIZONA · ATLANTA · BALTIMORE</td></tr>
+        <tr><td class="num">26</td><td>其餘全部</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>群內完全相同，群間不同。</strong>
+       104 = 4 × 26，正好是兩群之間的全部配對數。</p>
+    <p><strong>為什麼會這樣分，本站不知道，也不猜。</strong>
+       只記錄量到的分群。</p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">所以這個檔看起來分成兩半</p>
+    <p><strong>前半（約 50 萬位元組）</strong>：跟「你選哪一隊」有關的東西。<br>
+       <strong>後半</strong>：差異變得很少，但<u>不是沒有</u> ——
+       30 個存檔在這一段有兩種版本。</p>
+    <p><span class="badge wip">推測</span>
+       後半<u>可能</u>是球員名單、賽程這類比較共通的東西。
+       <strong>本站沒有解出欄位，所以這只是從差異分佈推的。</strong></p>
+  </div>
+
+  <h2>2006 年是怎麼改賽程的</h2>
+  <p>本站有一課教<a href="../tutorials/change-schedule-year/index.html">把整季賽程搬到任何年份</a>，
+     做法是<u>改資料檔</u>。</p>
+  <p>而 2006 年社群的做法完全不一樣 —— 那個工具的說明檔寫著：</p>
+  <div class="seen"><b>它需要</b>
+    <p style="margin:8px 0 0">遊戲要<strong>先開著</strong>。說明檔沒提，
+       但工具資料夾裡還留著一個只有一行的設定檔，裡面就是一個數字。</p>
+  </div>
+  <div class="card blue">
+    <p class="card-h">那個數字是記憶體位址</p>
+    <p>也就是說：<strong>它改的是「遊戲正在跑的那份資料」，不是硬碟上的檔案。</strong></p>
+    <p>改完之後要照它說的「存到一個新的存檔格，再讀回來」——
+       這樣改動才會落到 <code>.sav</code> 裡。</p>
+    <p class="small">二十年前的做法跟現在的做法，解的是同一個問題，
+       路徑完全不同。那個工具是第三方作品，<strong>本站不提供也不轉載</strong>。</p>
+  </div>
+
+  <h2 id="types">王朝不是唯一一種存檔（2026-08-28 補）</h2>
+  <p>本頁量的是<u>王朝模式</u>的存檔。本站後來拿到一批同一台機器上的其他存檔，
+     發現遊戲一共存五種，而<strong>每一種都有自己的固定大小</strong>：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>存檔種類</th><th class="num">每個檔的大小</th><th>裝什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="存檔種類">王朝模式（本頁上面量的）</td><td data-label="每個檔的大小" class="num"><strong>2,239,688</strong></td><td data-label="裝什麼">整個王朝的進度</td></tr>
+      <tr class="hi"><td data-label="存檔種類">老闆模式</td><td data-label="每個檔的大小" class="num"><strong>2,319,560</strong></td><td data-label="裝什麼">另一種長期模式</td></tr>
+      <tr><td data-label="存檔種類">名單</td><td data-label="每個檔的大小" class="num">937,160</td><td data-label="裝什麼">一份可以單獨存取的名單</td></tr>
+      <tr><td data-label="存檔種類">玩家檔案</td><td data-label="每個檔的大小" class="num">2,248</td><td data-label="裝什麼">個人設定</td></tr>
+      <tr><td data-label="存檔種類">遊戲選項</td><td data-label="每個檔的大小" class="num">1,224</td><td data-label="裝什麼">音量、難度那些</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>五種各自固定，一個位元組都不差。</strong>
+     這跟本頁上面講的是同一個設計：<u>存檔是定長的格子，不是寫多少存多少</u>。</p>
+
+  <div class="card grass">
+    <p class="card-h">玩家檔案幾乎整份是空白表格</p>
+    <p>兩個不同的玩家檔案（各 2,248 個位元組）逐位元組比：
+       <strong>只有 6 個位元組不一樣，而且全部集中在開頭</strong> —— 99.73% 相同。</p>
+    <p>換句話說，那個檔<u>幾乎整份是固定的範本</u>，
+       真正屬於你的只有開頭那一小段（名字）。
+       <strong>2,248 個位元組裡，有 2,242 個對誰都一樣。</strong></p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">大檔裡有大片「不會變」的區域</p>
+    <p>把兩個老闆模式的存檔切成 20 段逐段比：</p>
+    <div class="tablewrap"><table>
+      <tbody>
+        <tr><td>第 1–12 段</td><td>每段有 6,830 到 110,210 個位元組不同</td><td>真正在變的資料</td></tr>
+        <tr><td>第 13 段</td><td class="num">只差 502 個位元組</td>
+            <td>資料寫到位移 1,392,238 就停了</td></tr>
+        <tr class="hi"><td><strong>第 14–20 段（約後三分之一）</strong></td><td class="num"><strong>完全相同</strong></td>
+            <td>而且<u>不是空白</u>（那一段幾乎沒有 0）</td></tr>
+      </tbody>
+    </table></div>
+    <p>所以那不是「保留空間」，是<strong>一塊兩份存檔都一樣的密實資料</strong> ——
+       比較像是遊戲把某份參考表整個複製進每一個存檔。
+       <span class="badge ok">已解</span> 那是什麼，<strong>2026-08-29 解出來了</strong> —— 它是<u>填充</u>，不是資料。細節與位元組樣本在下面<a href="#fill">「存檔的最後一大段不是資料，是填充」</a>那一節。</p>
+    <p class="small">名單存檔則相反：它有大片<u>整段都是 0</u> 的區域
+       （20 段裡有 6 段幾乎全零）——那才是真正的保留空位。
+       <strong>兩種「相同」是不一樣的東西，切段來看才分得出來。</strong></p>
+  </div>
+
+  <h2 id="fill">⭐ 2026-08-29：存檔的最後一大段不是資料，是填充標記</h2>
+  <p>本站上一輪量到「老闆模式存檔的後三分之一，兩份完全相同但不是空的」，
+     當時標成未解。<strong>現在解開了，而且答案適用於全部五種存檔。</strong></p>
+
+  <div class="card grass">
+    <p class="card-h">那一段只有兩種位元組值</p>
+<pre><code>55 bb 55 bb 55 bb 55 bb 55 bb 55 bb 55 bb 55 bb
+55 bb 55 bb 55 bb 55 bb 55 bb 55 bb 55 bb 55 bb</code></pre>
+    <p>老闆模式其中一份那 927,322 個位元組裡，<code>0x55</code> 出現 463,661 次、
+       <code>0xBB</code> 出現 463,661 次 —— <strong>剛好一半一半，完美規律</strong>。</p>
+    <p>那不是空的（不是 0），也不是資料。<strong>它是填充標記</strong> ——
+       跟微軟編譯器用 <code>0xCD</code> 標「未初始化記憶體」是同一類東西。</p>
+  </div>
+
+  <h3>五種存檔全部都有，而且比例差很多</h3>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>存檔種類</th><th class="num">檔案大小</th><th class="num">真正寫了</th>
+               <th class="num">填充（位元組）</th><th class="num">填充佔比</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="存檔種類">王朝</td><td data-label="檔案大小" class="num">2,239,688</td><td data-label="真正寫了" class="num">1,254,142</td>
+          <td data-label="填充（位元組）" class="num">985,546</td><td data-label="填充佔比" class="num"><strong>44.0%</strong></td></tr>
+      <tr class="hi"><td data-label="存檔種類">老闆模式</td><td data-label="檔案大小" class="num">2,319,560</td>
+          <td data-label="真正寫了" class="num">1,332,980 ／ 1,392,238</td><td data-label="填充（位元組）" class="num">986,580 ／ 927,322</td>
+          <td data-label="填充佔比" class="num"><strong>40–43%</strong></td></tr>
+      <tr><td data-label="存檔種類">名單</td><td data-label="檔案大小" class="num">937,160</td><td data-label="真正寫了" class="num">935,772–936,222</td>
+          <td data-label="填充（位元組）" class="num">938–1,388</td><td data-label="填充佔比" class="num">0.1%</td></tr>
+      <tr><td data-label="存檔種類">玩家檔案</td><td data-label="檔案大小" class="num">2,248</td><td data-label="真正寫了" class="num">1,892</td>
+          <td data-label="填充（位元組）" class="num">356</td><td data-label="填充佔比" class="num">15.8%</td></tr>
+      <tr><td data-label="存檔種類">遊戲選項</td><td data-label="檔案大小" class="num">1,224</td><td data-label="真正寫了" class="num">976</td>
+          <td data-label="填充（位元組）" class="num">248</td><td data-label="填充佔比" class="num">20.3%</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card">
+    <p class="card-h">兩件事因此說得通了</p>
+    <p><strong>一、為什麼每種存檔都剛好一樣大。</strong>因為它是<u>固定大小的緩衝區</u>，
+       整塊先填成 <code>55 BB</code>，寫多少算多少，剩下的原樣留著。</p>
+    <p><strong>二、為什麼「兩份完全相同但不是空的」。</strong>
+       那一段兩份當然相同 —— 兩份都沒寫到那裡。</p>
+    <p>⭐ 而比例本身也在說話：<strong>名單存檔用掉 99.9% 的空間，王朝存檔空著 44%</strong>。
+       名單是塞滿的，王朝留了很大的餘裕。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">一個容易誤讀的細節</p>
+    <p>兩份老闆模式存檔的<strong>資料段長度不一樣</strong>（1,332,980 與 1,392,238）——
+       所以那不是一條固定的分界線，是<u>寫到哪算哪</u>。</p>
+    <p>相對地，遊戲目錄裡 30 個王朝存檔的資料段長度<strong>完全相同</strong>，
+       因為它們是同一個設定的全新存檔，還沒開始玩。</p>
+  </div>
+
+  <p class="small">量法說明：從檔尾往前找連續的 <code>55 BB</code>。
+     驗過這個樣式<u>不會在資料段裡大量出現</u> ——
+     老闆模式那份除了 927,322 位元組的尾段之外，
+     檔案中間最長的一段只有 <strong>24 個位元組</strong>（純粹巧合），
+     名單與玩家檔案的資料段裡也找得到這個樣式（名單 603–606 處、玩家檔案 123 處），
+     但<strong>最長只有 8 與 12 個位元組</strong>。所以尾段的長度是可信的。</p>
+
+
+<h2>這頁不能告訴你什麼</h2>
+  <div class="card clay">
+    <p class="card-h">本站沒有解出存檔的欄位</p>
+    <p>知道「多大、沒加密、哪一段會變」，
+       但<strong>不知道第 N 個位元組代表什麼</strong>。<span class="badge wip">未解</span></p>
+    <p>所以<u>本站沒有、也不會提供改存檔的教學或工具</u> ——
+       在不知道欄位的情況下改存檔，等於亂猜。</p>
+    <p><strong>如果你要自己試：先複製一份存檔到別的資料夾。</strong>
+       存檔壞掉是整個王朝重來。</p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 王朝存檔沒有加密也沒有壓縮，每一個都剛好 2,239,688 個位元組，外形量得很清楚，但本站沒有解出裡面任何一個欄位。</li>
+    <li><strong>你自己就能確認的數字</strong> 30 個王朝存檔全部 2,239,688 個位元組，一個不多一個不少，檔案總管看一眼就知道。亂度只有 3.51（加密或壓縮過的會接近 8.0），檔案裡有 4,338 個可讀字串，第一個是 <code>ANGELS_Franchise.sav</code>：<u>存檔把自己的名字寫在裡面</u>（30 個裡有 28 個跟磁碟上的檔名一字不差）。</li>
+    <li><strong>本站訂正了自己一句話</strong> 這頁原本寫「後半 100 萬個位元組，三十個存檔一模一樣」，那是只比了 ANGELS 對 ARIZONA 一組就推出的全稱句，而且不成立。把 435 組全部比一次之後，位移 1,200,000 之後仍有差異的有 104 組，最晚的差異落在位移 1,254,095，而站上剛好挑到最不利的那一組取樣。</li>
+    <li><strong>後半只分成兩群</strong> 4 個（ANGELS、ARIZONA、ATLANTA、BALTIMORE）對其餘 26 個，群內完全相同、群間不同，104 正好等於 4 × 26。<u>為什麼這樣分，本站不知道，也不猜。</u></li>
+    <li><strong>五種存檔各自固定大小</strong> 王朝 2,239,688、老闆模式 2,319,560、名單 937,160、玩家檔案 2,248、遊戲選項 1,224。其中玩家檔案兩份只差 6 個位元組，2,248 個裡有 2,242 個對誰都一樣。</li>
+    <li><strong>2026-08-29 解開了「後三分之一」</strong> 那一段既不是空的也不是資料，是 <code>55 BB</code> 反覆排列的填充標記，老闆模式其中一份那一段裡 <code>0x55</code> 與 <code>0xBB</code> 各出現 463,661 次，剛好一半一半。所以王朝存檔空著 44.0%，名單存檔只空 0.1%。</li>
+    <li><strong>最容易誤讀的兩件事</strong> 一、兩份老闆模式存檔的資料段長度不一樣（1,332,980 與 1,392,238），所以那不是固定的分界線，是寫到哪算哪。二、「兩份相同」有兩種：填充區是兩份都沒寫到那裡，名單存檔那種整段是 0 的才是真正的保留空位。</li>
+    <li><strong>本站沒驗的</strong> 本站不知道第 N 個位元組代表什麼，欄位整組未解；「後半可能是球員名單、賽程」只是從差異分佈推的推測；兩群怎麼分也沒有解釋。所以本站沒有、也不會提供改存檔的教學或工具，真要自己試就先複製一份到別的資料夾。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../tutorials/change-schedule-year/index.html">把整季賽程搬到任何年份</a> —— 改資料檔的做法</li>
+    <li><a href="database.html">資料檔總覽</a> —— 賽程檔在哪</li>
+    <li><a href="../tutorials/read-file-headers/index.html">用檔案開頭判斷格式</a> —— 另一種五秒看穿檔案的方法</li>
+    <li><a href="team-limit.html">為什麼你加不了新球隊</a> —— 三十這個數字從哪來</li>
+  </ul>
+
+  <footer>
+    <p>本頁的檔案大小、字串數、亂度、差異分佈為現場打開 30 個王朝 <code>.sav</code> 量測所得；
+       <a href="#types">五種存檔的大小</a>與<a href="#fill">填充比例</a>另外打開了
+       老闆模式、名單、玩家檔案、遊戲選項的存檔量測；
+       全程唯讀。存檔內部欄位本站尚未解讀，標示為「推測」之處未經證實。
+       文中提到的第三方工具僅描述其運作方式，本站不提供也不轉載。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

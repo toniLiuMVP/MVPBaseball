@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/portrait.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>大頭照 portrait.big — toni的MVP模組補習班</title>
+<meta name="description" content="MVP Baseball 2005 的球員大頭照：7,544 個 FSH 項目（其中 7,542 張是圖）、兩種像素格式為什麼都剛好 64 KB、以及 EA 藏在每一張圖裡的一句話。所有數字現場量測。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 大頭照 portrait.big</p>
+  <h1>大頭照 portrait.big</h1>
+  <p class="lede">名單畫面上每位球員的那張照片，全部裝在一個 253.6 MB 的封裝檔裡。
+     它用的圖片格式叫 <strong>FSH</strong>，是 EA 自家的容器 ——
+     結構單純到<strong>可以用加法驗證你有沒有讀懂</strong>。</p>
+
+    <div class="card blue" style="margin-top:14px">
+    <p class="card-h">先說清楚這頁的數字是從哪一份遊戲量的</p>
+    <p>本頁的項目數、檔案數、覆蓋率，量的是<strong>一台裝過台灣模組的遊戲</strong>。
+       <u>剛安裝好的原版數字小很多</u> —— 例如臉皮 504 對 894、大頭照 1,487 對 6,638、
+       語音號碼 1,673 對 4,343。</p>
+    <p><strong>容器結構兩邊一樣</strong>（BIGF 目錄、QFS 壓縮、SHPI、後面那 96 個位元組的附掛區塊），
+       那是遊戲程式決定的；會變的是「有幾個」，<u>還有像素格式</u> ——
+       剛安裝好的原版 2,391 張圖<strong>全部是 <code>0x7D</code>（ARGB32）128×128</strong>，
+       這台機器的 7,544 個項目裡則有 5,250 張是 <code>0x61</code>（DXT3）256×256。完整對照見
+       <a href="original-vs-modded.html">原版與這台機器差在哪</a>。</p>
+  </div>
+<h2>先看規模</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>項目</th><th class="num">數字</th><th>備註</th></tr></thead>
+    <tbody>
+      <tr><td data-label="項目">檔案大小</td><td data-label="數字" class="num">253.6 MB</td><td data-label="備註"><code>data/frontend/portrait.big</code></td></tr>
+      <tr class="hi"><td data-label="項目">目錄項目數</td><td data-label="數字" class="num">7,544 筆</td><td data-label="備註">檔名全部是 <code>.fsh</code>；其中 2 筆只有 1 個位元組不是圖，真正的圖是 7,542 張</td></tr>
+      <tr><td data-label="項目">目錄涵蓋率</td><td data-label="數字" class="num">100.0%</td>
+          <td data-label="備註">孤兒 <strong>0 bytes</strong>。<strong>跟 <a href="fel.html">ingame.big</a> 的 7.4% 完全不同</strong></td></tr>
+      <tr><td data-label="項目">壓縮</td><td data-label="數字" class="num">7,542 個</td><td data-label="備註">除了 2 個異常項，其餘全部是 QFS</td></tr>
+      <tr><td data-label="項目">每張圖的解壓後大小</td><td data-label="數字" class="num">65,680 bytes</td><td data-label="備註">絕大多數一模一樣，原因見下</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">⚠️ 2026-09-05 訂正：孤兒那一格原本寫「只有 0.1 MB」。
+     那 128,266 bytes <u>就是檔頭 16 加上目錄 128,250</u> —— <strong>目錄本身不是孤兒</strong>。
+     照<a href="bigf.html#orphan-def">本站統一的定義</a>算，
+     這台機器的 <code>portrait.big</code> 孤兒是 <strong>0 bytes，一個位元組都沒有</strong>。
+     跟<a href="models.html">臉皮</a>那頁 2026-08-28 訂正的是同一件事，本頁當時漏掉了。</p>
+  <p class="small">上面每個數字都是把 <code>portrait.big</code> 現場解開數出來的，不是引用他人資料。</p>
+
+  <h2>FSH 檔頭：16 bytes，看得懂</h2>
+  <p>把任何一張大頭照解壓後，開頭長這樣：</p>
+<pre><code>53 48 50 49  90 00 01 00  01 00 00 00  47 33 35 37
+│            │            │            └ 目錄代號 "G357"
+│            │            └───────────── 這個檔裡有幾張圖 = 1
+│            └────────────────────────── 整個檔多大 = 65,680
+└─────────────────────────────────────── "SHPI"</code></pre>
+
+  <div class="card grass">
+    <p class="card-h">又一個可以自己驗算的格式</p>
+    <p>第 5 到 8 個位元組寫的「整個檔多大」，跟你手上這個檔的<strong>實際長度</strong>應該完全相同。</p>
+    <p>本站把 7,542 張全部算過：<strong>7,538 張完全相符</strong>。
+       剩下 4 張多出 4 或 8 個位元組（<code>1907</code>、<code>5566</code>、<code>5816</code>、<code>5826</code>），
+       是檔尾補齊用的。</p>
+    <p>跟<a href="audio.html">音訊索引的加總法</a>一樣：<strong>對不上就是你哪裡讀錯了</strong>。</p>
+  </div>
+
+  <h2>兩種格式，大小卻一模一樣</h2>
+  <p>檔頭後面接著影像記錄，開頭一個位元組是格式代號。7,542 張圖只用到兩種：</p>
+  <div class="card blue">
+    <p class="card-h">我們改過這一段：原版只用一種</p>
+    <p>下面這張表量的是本站測試機。拿<u>剛安裝好的原版</u>重量：
+       <strong>1,487 張大頭照 100% 都是 <code>0x7D</code> 128×128，一張 <code>0x61</code> 都沒有。</strong></p>
+    <p>也就是說下面表格裡那 5,250 張 <code>0x61</code> 256×256，
+       <u>用的是 EA 在這個倉庫裡沒有用過的格式與尺寸</u>。
+       <strong>是誰換的、什麼時候換的，本站不知道。</strong><span class="badge wip">未解</span></p>
+    <p class="small">同一件事也發生在<a href="models.html">臉皮</a>那邊，方向一樣。
+       完整對照見<a href="original-vs-modded.html">原版與這台機器差在哪</a>。</p>
+  </div>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">代號</th><th class="num">張數</th><th class="num">尺寸</th><th class="num">像素資料</th><th class="num">每個像素</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="代號" class="mono">0x61</td><td data-label="張數" class="num">5,250</td><td data-label="尺寸" class="num">256 × 256</td>
+          <td data-label="像素資料" class="num">65,536 bytes</td><td data-label="每個像素" class="num">1 byte</td></tr>
+      <tr class="hi"><td data-label="代號" class="mono">0x7D</td><td data-label="張數" class="num">2,292</td><td data-label="尺寸" class="num">128 × 128</td>
+          <td data-label="像素資料" class="num">65,536 bytes</td><td data-label="每個像素" class="num">4 bytes</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card amber">
+    <p class="card-h">兩邊都剛好 65,536 bytes</p>
+    <p>這不是巧合可以解釋的數字。同樣一塊 <strong>64 KB</strong>：</p>
+    <p style="margin-top:8px">
+       想要<strong>四倍解析度</strong>（256×256）→ 每個像素只能用 1 個位元組<br>
+       想要<strong>完整色彩</strong>（4 個位元組 = 紅綠藍加透明度）→ 解析度只能到 128×128</p>
+    <p>而且代號與尺寸<strong>完全一一對應</strong>：5,250 張 <code>0x61</code> 全部是 256×256，
+       2,292 張 <code>0x7D</code> 全部是 128×128，<strong>沒有任何一張交叉</strong>。</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">這裡要誠實</p>
+    <p><code>0x61</code> 那 5,250 張<strong>一個位元組只能表示 256 種顏色</strong>，
+       照理說檔案裡要附一份調色盤。但本站把整個檔翻過，<strong>找不到調色盤</strong>。</p>
+    <p>「1 個位元組一個像素、又不需要調色盤」這件事，
+       跟顯示卡用的<strong>區塊壓縮貼圖</strong>格式的行為一致。
+       <span class="badge ok">已解</span> <code>0x61</code> 的像素編碼<strong>已經解開</strong>了 —— 每 4×4 像素一個 16 位元組的區塊，前 8 個位元組是透明度。算式與驗證見<a href="pixel-formats.html">圖片的像素怎麼排</a>。</p>
+    <p>能確定的是：想自己寫轉檔工具的話，<code>0x7D</code>（128×128、每像素 4 bytes）
+       是<strong>唯一一個結構已經完全清楚</strong>的格式。</p>
+  </div>
+
+  <h2>EA 在每一張圖裡留了一句話</h2>
+  <p>影像資料結束後，每個檔案還剩 96 個位元組。SHPI 目錄<strong>沒有登記</strong>這一段，
+     但它確實存在，而且內容是可以讀的文字：</p>
+<pre><code>69 50 00 00 40 00 10 00 ...
+EAGL64 metal bin attachment for runtime texture management</code></pre>
+  <div class="tablewrap"><table>
+    <thead><tr><th>檢查</th><th class="num">結果</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td><code>portrait.big</code> 裡含這段文字的檔案</td><td class="num">7,539 / 7,542</td></tr>
+      <tr class="hi"><td><code>models.big</code> 裡含這段文字的檔案</td><td class="num">2,332 / 2,332</td></tr>
+    </tbody>
+  </table></div>
+  <p>兩個封裝檔、將近一萬個圖片檔，<strong>只有三個例外</strong>。</p>
+  <div class="card grass">
+    <p class="card-h">⭐ 2026-08-28：那 96 個位元組不是「沒人登記的殘料」，是格式的正規第二段</p>
+    <p>本站原本只寫「目錄沒有登記這一段」。那句話字面上對（SHPI 目錄確實只登記圖片），
+       但容易讓人以為它是垃圾資料。<strong>它其實是 FSH 格式規定的附掛區塊，
+       而且是圖片記錄<u>自己的長度欄位</u>指過去的。</strong></p>
+    <p>順著那個長度欄位一路走，剛安裝好的原版 <code>portrait.big</code> 2,391 張圖：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>鏈</th><th class="num">張數</th><th class="num">圖片之後合計</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="鏈"><code>0x7D</code> 圖片 → <code>0x69</code> 附掛文字 80 bytes → <code>0x70</code> 結束</td>
+            <td data-label="張數" class="num"><strong>2,389</strong></td><td data-label="圖片之後合計" class="num">80 + 16 = <strong>96</strong></td></tr>
+        <tr><td data-label="鏈">同上，中間多一塊 <code>0x7C</code> 256 bytes</td><td data-label="張數" class="num">2</td><td data-label="圖片之後合計" class="num">352</td></tr>
+      </tbody>
+    </table></div>
+    <p><code>0x69</code> 那 80 個位元組就是上面那句 <code>EAGL64 …</code>；
+       <code>0x70</code> 是一個長度為 0 的結束標記，佔 16 個位元組的表頭。
+       <strong>80 + 16 = 96</strong>，正好是本站原本量到的數字。</p>
+    <p>這些代號在一份 2002 年的 FSH 工具說明書裡有名字：
+       <code>0x6F</code> 與 <code>0x69</code>／<code>0x70</code> 是附掛文字、
+       <code>0x2A</code> 是 32 位元調色盤（見
+       <a href="pixel-formats.html#pal">圖片的像素怎麼排</a>，
+       本站就是靠這條把 <code>0x7B</code> 的調色盤找出來的）。</p>
+    <p class="small"><span class="badge wip">未解</span>
+       那 2 張多出來的 <code>0x7C</code>（256 bytes，<code>portrait.big</code> 裡只有 <code>2653.fsh</code> 與 <code>2663.fsh</code>）
+       不在那份說明書的清單裡，內容看起來是一串 32 位元整數。本站不知道那是什麼。</p>
+    <p class="small">⚠️ 上面那個「只有」<u>只算 <code>portrait.big</code> 裡面</u>。
+       <code>0x7C</code> 不是這個封裝檔專有的：<code>data\igshapes\igcrsr.fsh</code> 也帶著一塊，
+       但長度是 <strong>576</strong> 不是 256。三份剛安裝好的原版與本站測試機量到的鏈完全一樣：
+       <code>0x7D</code> → <code>0x69</code>（80）→ <code>0x7C</code>（576）→ <code>0x70</code>（16）。
+       同一個資料夾裡那份 <code>igcrsr.fsh.bak</code> 則是 <code>0x7D</code> → <code>0x7C</code> → <code>0x70</code>，
+       <u>少了 <code>0x69</code> 那塊</u> —— 這也順便證明了下面那句：兩塊是各自獨立的東西。</p>
+    <p class="small">⚠️ <a href="pixel-formats.html#x7c">像素怎麼排</a>那頁一度把這條筆記整條撤回，
+       說「代號其實是 <code>0x69</code>、長度 80、而且每張圖都有」。<strong>撤回錯了，那頁已經改回來。</strong>
+       <code>0x69</code>／80 bytes 確實每張都有，但它跟 <code>0x7C</code> 是兩塊不同的東西：
+       2026-08-29 拿<u>三份剛安裝好的原版</u>（英文版、中文版、PK 版）逐項走過附掛鏈，
+       各 2,391 張圖都是 2,389 張沒有、只有 <code>2653.fsh</code> 與 <code>2663.fsh</code> 這 2 張有，三份完全一致。
+       那頁掃不到是因為量的是<u>測試機</u>，測試機上這兩張已經被換過（檔案大小與 md5 都跟原版不同），
+       換進去的那一份沒有帶著 <code>0x7C</code>。</p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">我們改過這一段：那三個例外是怎麼回事</p>
+    <p>這頁上線時這裡寫的是「<u>沒有一個例外</u>」，數字寫成 7,542 / 7,542。
+       重新解過一次，實際是 <strong>7,539 / 7,542</strong>。</p>
+    <p>不含那句話的三個是 <code>4174.fsh</code>、<code>4215.fsh</code>、<code>4901.fsh</code>，
+       它們寫的是 <code>EAGL64 <strong>mel</strong> bin attachment for runtime texture management</code>
+       —— <code>metal</code> 少了 <code>ta</code> 兩個字母。</p>
+    <p><strong>光看長度抓不出來。</strong>少掉的兩個字母後面補了一組 CRLF（<code>0D 0A</code>），
+       所以那一段仍然是 96 個位元組、整個檔仍然是 65,680 個位元組。
+       這也是為什麼原本沒被發現。</p>
+    <p><strong>後來查出來這不是 EA 的錯字。</strong>那三個檔在<a href="../tutorials/whats-original/index.html">剛安裝好的原版</a>裡<u>根本不存在</u> ——原版整套安裝的 <strong>6,392</strong> 個帶這句話的圖檔，<strong>全部是 <code>metal</code>，一個 <code>mel</code> 都沒有</strong>。</p>
+      <p class="small">⚠️ 2026-08-25 訂正：這個數字原本寫 6,370，少算了 22 個。
+         原因是本站當時的掃描<u>只走封裝檔裡面</u>，
+         漏掉 <strong>22 個沒有裝進封裝檔、自己就是圖檔</strong>的檔案。
+         （2026-09-05 訂正：這裡原本把那 22 個全寫成 <code>data\misc\textures\</code> 底下的，
+         實際是那個資料夾 <strong>18 個</strong>、<code>data\igshapes\</code> 底下 <strong>3 個</strong>，
+         再加上 <code>data\frontend\feonlyln.big</code> —— 它名字叫 <code>.big</code>，
+         裡面卻不是封裝檔而是一張 <code>SHPI</code> 圖片。合計 22 個，總數 6,392 不變。）
+         結論不受影響（那些也全部是 <code>metal</code>），但「整套安裝」這四個字當時沒做到。</p>
+    <p class="small">對照組：同一套查法在原版裡查得到 <code>2118.fsh</code>、<code>0502.fsh</code>、<code>a2653.fsh</code>，所以不是查法失靈。三份原版安裝(英文、官方繁中、光碟那份)的 <code>portrait.big</code> 逐位元組完全相同，三份都沒有這三個檔。</p>
+    <p class="small"><strong>是哪一次改動造成的，本站不知道。</strong>那組 CRLF 的來由同樣沒有證據。<span class="badge wip">未解</span></p>
+    <p class="small">站上原本把 <code>SSH</code>／<code>TTX</code> 也當成 EA 的錯字，<a href="fel.html">那兩個同樣被原版推翻了</a>。目前確認是 EA 自己留下的只剩 <code>iamge</code>。</p>
+  </div>
+  <p><code>EAGL</code> 這個代號不只出現在圖片裡。實測 <code>anims.big</code>（動畫檔）
+     內含 <strong>486 處</strong> <code>EAGL</code> 字樣，其中包括
+     <code>EAGL_TOOLLIB_VERSION</code> 這種一看就是工具鏈版本記號的字串。
+     <span class="badge wip">推測</span> 看起來是 EA 內部一整套繪圖／工具函式庫的名字，
+     但本站沒有查證它的正式全名。</p>
+
+  <div class="card blue">
+    <p class="card-h">還有一句更好玩的</p>
+    <p>FSH 檔頭往後數幾個位元組，藏著 <code>Buy ERTS</code> 這四個字。
+       <strong>7,542 張大頭照，每一張都有。</strong></p>
+    <p><code>ERTS</code> 是 Electronic Arts 當年在那斯達克的股票代號。
+       <span class="badge wip">推測</span> 這看起來是工程師留的玩笑，但本站沒有查證出處。</p>
+  </div>
+
+  <h2>檔名怎麼對到球員</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">命名型態</th><th class="num">數量</th><th>說明</th><th>證據</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="命名型態" class="mono">0000.fsh ～ 9999.fsh</td><td data-label="數量" class="num">6,638</td><td data-label="說明">四位數編號</td>
+          <td data-label="證據"><span class="badge ok">已解</span> 對到<a href="player-numbers.html">球員資料檔的 <code>playerattrib_audioid</code></a></td></tr>
+      <tr><td data-label="命名型態" class="mono">st00.fsh ～ st63.fsh</td><td data-label="數量" class="num">64</td><td data-label="說明">另一組序列</td>
+          <td data-label="證據"><span class="badge wip">未確認</span> 全部是 128×128</td></tr>
+      <tr><td data-label="命名型態" class="mono">aada.fsh 這類四個字母</td><td data-label="數量" class="num">840</td><td data-label="說明">四個小寫字母的編碼</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 從 <code>aada</code> 到 <code>ogdh</code>；
+              <span class="badge ok">已解</span> 見<a href="#grid">下方「840 這個數字不是巧合」</a></td></tr>
+      <tr><td data-label="命名型態" class="mono">a2653.fsh</td><td data-label="數量" class="num">2</td><td data-label="說明">頭尾各一的 1 位元組項目（原版 17 個封裝檔都有）</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 見下方「一個異常項」</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">6,638 ＋ 840 ＋ 64 ＋ 2 ＝ <strong>7,544</strong>，正好是全部項目，沒有漏掉的類型。</p>
+
+  <div class="card grass">
+    <p class="card-h">想換某一位球員的照片：現在做得到了</p>
+    <p><strong>「哪個編號屬於哪位球員」已經解開了。</strong>
+       球員資料檔的 <code>playerattrib_audioid</code> 就是這個四位數（本站測試機排在第 16 欄，剛安裝好的原版是第 17 欄，<a href="player-fields.html#col-shift">欄號會因名冊而異</a>），
+       同一個號碼同時決定大頭照與播報語音，
+       詳見<a href="player-numbers.html">兩套球員編號</a>。</p>
+    <p><span class="badge ok">✓ 補上了</span>
+       本頁原本寫著「真正卡住的不是哪個編號，是<u>把圖壓縮回區塊格式那一半沒有做</u>」。
+       那一半<strong>做完了</strong>：作法是把解碼的每一步倒過來寫，
+       再拿遊戲裡現成的 20 張圖解出來、壓回去、跟原圖比對，
+       看得見的像素中位數 <strong>99.32%</strong> 完全相同，透明度<strong>零誤差</strong>。
+       逐步流程見<a href="../tutorials/swap-portrait/index.html">換球員大頭照</a>那一課。</p>
+    <p class="small">⚠️ 本頁上線時寫「本站沒有解出編號與球員的對應關係」，
+       那是<strong>後來被推翻的</strong>。舊說法保留在這裡當紀錄 ——
+       這一頁前後被自己推翻兩次，兩次都保留原文。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">我們查過但走不通的一條路</p>
+    <p><a href="database.html">球員資料檔</a> <code>attrib.dat</code> 有一欄叫
+       <code>playerattrib_photo</code>（本站測試機第 17 欄，原版第 18 欄），名字看起來就是答案。</p>
+    <p>實測後<strong>不是</strong>：本站測試機上它<u>只有 0、1、2 三種值</u>
+       （198 / 2,908 / 141 位球員），是旗標不是編號，
+       對不到 <code>portrait.big</code> 那 6,638 個四位數檔名。</p>
+    <p>不過同一張表裡的<strong><code>playerattrib_face</code> 這一欄是通的</strong> ——
+       它指向 3D 臉皮，命中率 99.9%，詳見<a href="models.html">模型與臉皮那頁</a>。
+       而 <code>playerattrib_audioid</code> 指向大頭照與播報語音（<a href="player-numbers.html">兩套球員編號</a>）。<strong>兩條線現在都通了。</strong></p>
+  </div>
+
+  <h2>那個「異常項」其實是 EA 的封裝慣例</h2>
+  <p>掃描時發現 <code>a2653.fsh</code> 這個名字在目錄裡<strong>出現兩次</strong>，
+     而且兩筆的資料長度都只有 <strong>1 個位元組</strong> —— 不可能是一張圖。</p>
+  <div class="card blue">
+    <p class="card-h">我們改過這一段</p>
+    <p>這裡原本把它當成「這份檔案被動過」的痕跡。
+       <strong>拿剛安裝好的原版一掃，它是 EA 自己的做法。</strong></p>
+      <p>原版整套安裝的封裝檔裡有 <strong>17 個</strong>是同樣的結構，
+       而且下面四個條件全部成立、零例外：</p>
+      <p class="small">⚠️ 2026-08-25 訂正：原本寫「224 個封裝檔」。<code>data\</code> 底下副檔名是 <code>.big</code> 的檔確實有 224 個，但<strong>其中只有 207 個真的是 BIGF 封裝檔</strong>（8 個開頭是 <code>SCHl</code> 音訊容器、1 個是 <code>SHPI</code> 圖片、8 個沒有可辨識的開頭）。這 17 個是從那 207 個裡數出來的。</p>
+    <ul class="tick">
+      <li>同一個名字在目錄裡出現<strong>剛好兩次</strong></li>
+      <li>兩筆的長度都<strong>不超過 3 個位元組</strong></li>
+      <li>第一筆是目錄裡 <u>offset 最小</u>的那一項</li>
+      <li>第二筆的 <u>offset ＋ 長度剛好等於整個檔案的長度</u></li>
+    </ul>
+    <p>換句話說，這兩筆<strong>把資料區從頭尾夾起來</strong>。那 17 個檔是
+       <code>awards</code>、<code>bkgnds</code>、<code>bpattrac</code>、<code>bpitems</code>、
+       <code>bppromos</code>、<code>bpsetup</code>、<code>bpticket</code>、<code>bpupgrad</code>、
+       <code>bpvendor</code>、<code>coopplyr</code>、<code>coopstad</code>、<code>coopteam</code>、
+       <code>coopunis</code>、<code>fields</code>、<code>portrait</code>、<code>stadiums</code>、
+       <code>uniforms</code>。</p>
+    <p class="small"><strong>它是做什麼用的，本站不知道。</strong>
+       只記錄這個結構在原版就存在，而且在 17 個檔裡形狀完全一致。<span class="badge wip">未解</span></p>
+  </div>
+  <p><a href="bigf.html">「絕不整包重新打包」</a>那條鐵律<u>仍然成立</u>，但理由要換一個：
+     <strong>不是因為檔案裡有可疑的殘留，而是因為你不知道自己會弄掉什麼</strong> ——
+     像這種夾在頭尾的 1 位元組項目，重新打包很容易就跟著不見。</p>
+
+  
+  <h2 id="erts">每一張圖裡都藏著同一句話</h2>
+  <p>把任何一張大頭照解開，看它的檔頭：</p>
+<pre><code><span class="cm">2118.fsh 解開後的前 32 個位元組</span>
+偏移  0   <span class="hl">SHPI</span>          ← 這是一個圖片倉庫
+偏移  4   檔案長度
+偏移  8   圖片數（1）
+偏移 12   <span class="nu">G357</span>          ← 目錄代號
+偏移 16   目錄：一張圖 8 個位元組
+偏移 24   <span class="hl">Buy ERTS</span>      ← 這裡
+偏移 32   第一張圖的資料</code></pre>
+  <p>目錄結束在偏移 24，第一張圖從偏移 32 開始。
+     中間那 <strong>8 個位元組</strong>，剛好就是 <code>Buy ERTS</code> 這八個字元。</p>
+  <div class="card grass">
+    <p class="card-h">剛安裝好的原版 2,391 張，一張不差</p>
+    <p>本站把<u>剛安裝好的原版</u> <code>portrait.big</code> 裡全部 2,391 個圖片倉庫解開，
+       逐一檢查目錄與第一張圖之間那段空隙（本頁開頭那台裝過模組的機器是 7,542 個，同樣一個例外都沒有）：</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>空隙的內容</th><th class="num">幾次</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td class="mono">Buy ERTS</td><td class="num"><strong>2,391</strong></td></tr>
+        <tr><td>其他任何東西</td><td class="num">0</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small">量法：解開每一個項目 → 確認開頭是 <code>SHPI</code> →
+       目錄結束位置 = 16 + 圖片數 × 8 → 跟第一張圖的偏移之間那一段，整段取出來比。</p>
+  </div>
+
+  <h3>它不是只有大頭照才有</h3>
+  <p class="small">⚠️ 下面這張表量的是<u>剛安裝好的原版</u>（英文版），不是本頁開頭那台裝過模組的機器。
+     同一套數法在測試機上是 <code>portrait.big</code> 7,542、<code>models.big</code> 1,061、
+     <code>logos.big</code> 154、<code>feonly.big</code> 12、<code>igonly.big</code> 6、<code>fonts.big</code> 8；
+     只有 <code>initstaz.big</code>、<code>ingame.big</code>、<code>frontend.big</code> 這三個跟原版一樣。</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th class="mono">封裝檔</th><th class="num">出現次數</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td class="mono">frontend\portrait.big</td><td class="num">2,391</td></tr>
+      <tr><td class="mono">models.big</td><td class="num">671</td></tr>
+      <tr><td class="mono">frontend\logos.big</td><td class="num">128</td></tr>
+      <tr><td class="mono">frontend\feonly.big</td><td class="num">8</td></tr>
+      <tr><td class="mono">frontend\igonly.big</td><td class="num">3</td></tr>
+      <tr><td class="mono">fonts\fonts.big</td><td class="num">2</td></tr>
+      <tr><td class="mono">initstaz.big</td><td class="num">2</td></tr>
+      <tr><td class="mono">frontend\ingame.big</td><td class="num">0</td></tr>
+      <tr><td class="mono">frontend\frontend.big</td><td class="num">0</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">⚠️ 這是<u>直接在封裝檔上數字串</u>的結果，所以只數得到<strong>沒有壓縮的那些</strong>。
+     原版 <code>models.big</code> 的 2,671 個項目全部是 QFS 壓縮的（測試機那份是 4,211 個，一樣全部壓縮），
+     那 671 次是壓縮後恰好還看得見的殘影，<u>不是「models.big 只有 671 張圖有」</u>。
+     要精確的數字得逐一解壓 —— 本站只在 <code>portrait.big</code> 做了這件事。
+     <span class="badge wip">未做</span></p>
+
+  <div class="card clay">
+    <p class="card-h">那句話是什麼意思</p>
+    <p><strong>本站量得到的只有「那八個位元組就是這串字」。</strong>
+       它為什麼在那裡、是誰放的、是不是刻意的，檔案裡沒有寫。
+       <span class="badge wip">未解</span></p>
+    <p class="small">一個站外的背景知識（<u>不是本站量到的</u>）：
+       <code>ERTS</code> 是 Electronic Arts 當年在那斯達克的股票代號。
+       本站把這件事寫在這裡當脈絡，但<strong>不主張那句話的用途</strong>
+       —— 它可能是簽名、可能是對齊用的填充剛好被填了字、也可能是別的。</p>
+    <p>能確定的是：那八個位元組在<u>每一張大頭照裡</u>，
+       躺在你硬碟上超過二十年了。</p>
+  </div>
+
+  <h2 id="grid">840 這個數字不是巧合</h2>
+  <p>那 840 個四字母檔名（<code>aada.fsh</code> 到 <code>ogdh.fsh</code>）
+     <strong>不是隨便取的，是一張完整的網格。</strong></p>
+  <p>把每一位的字母集合列出來：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>第幾碼</th><th class="mono">用到哪些字母</th><th class="num">幾種</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="第幾碼">第 1 碼</td><td data-label="用到哪些字母" class="mono">a b c d e f g h i j k l m n o</td><td data-label="幾種" class="num"><strong>15</strong></td></tr>
+      <tr class="hi"><td data-label="第幾碼">第 2 碼</td><td data-label="用到哪些字母" class="mono">a b c d e f g</td><td data-label="幾種" class="num"><strong>7</strong></td></tr>
+      <tr><td data-label="第幾碼">第 3 碼</td><td data-label="用到哪些字母" class="mono">d</td><td data-label="幾種" class="num">1<br><span class="small">固定不變</span></td></tr>
+      <tr class="hi"><td data-label="第幾碼">第 4 碼</td><td data-label="用到哪些字母" class="mono">a b c d e f g h</td><td data-label="幾種" class="num"><strong>8</strong></td></tr>
+    </tbody>
+  </table></div>
+<pre><code>15 × 7 × 1 × 8 = 840</code></pre>
+  <p>把所有可能的組合列出來跟實際檔名比對：
+     <strong>缺 0 個、多 0 個、重複 0 個。</strong>
+     而且<u>每一個首字母底下剛好 56 個檔</u>，一個不差。</p>
+
+  <div class="card grass">
+    <p class="card-h">三個軸各是什麼</p>
+    <p>拿這三個數字去對<a href="player-fields.html">球員資料檔的欄位</a>：</p>
+    <div class="tablewrap" style="margin:8px 0"><table class="stack">
+      <thead><tr><th>這一碼</th><th class="num">幾種</th><th>對到哪一欄</th><th class="num">那一欄幾種</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="這一碼">第 1 碼</td><td data-label="幾種" class="num">15</td>
+            <td data-label="對到哪一欄"><strong><a href="player-numbers.html#wall">罐頭臉</a></strong>（901–915）</td>
+            <td data-label="那一欄幾種" class="num"><strong>15</strong> ✅</td></tr>
+        <tr><td data-label="這一碼">第 2 碼</td><td data-label="幾種" class="num">7</td><td data-label="對到哪一欄">髮色</td>
+            <td data-label="那一欄幾種" class="num">宣告 7 種<br><span class="small">實際用到 6 種</span></td></tr>
+        <tr class="hi"><td data-label="這一碼">第 4 碼</td><td data-label="幾種" class="num">8</td><td data-label="對到哪一欄"><strong>鬍子</strong></td>
+            <td data-label="那一欄幾種" class="num"><strong>8</strong> ✅</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>三個軸全部精準對上。</strong></p>
+    <p class="small">⚠️ 2026-08-26 訂正：這裡原本寫「兩個軸精準對上，第三個對上『宣告的種類數』但不是『實際用到的』」。
+       那是拿<u>本站測試機</u>量的 —— 台灣名冊只用到 6 種髮色。
+       <strong>剛安裝好的原版把 7 種都用滿了（0 到 6）</strong>，所以第 2 碼跟髮色是完全對上的。</p>
+    <p>所以這 840 張是<u>拼出來的通用大頭照</u> ——
+       沒有專屬照片的球員，遊戲用「罐頭臉 × 髮色 × 鬍子」組出一個檔名去拿圖。</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">原本三件還沒解，現在剩兩件</p>
+    <p style="margin-top:6px">
+       一、<strong>第 3 碼為什麼固定是 <code>d</code></strong>，本站不知道。
+       它看起來是一個「只有一種選項」的軸。<span class="badge wip">未解</span><br>
+       二、<strong>「第 1 碼的 <code>a</code> 就是 901」這個對應順序是推測</strong>。
+       種類數對得上，但本站沒有解圖比對確認順序。<span class="badge wip">推測</span><br>
+       三、<s>髮色是 7 還是 6</s> ——
+       <strong>2026-08-26 解開了</strong>：原版的髮色實際用滿 7 種，跟檔名軸一致。
+       原本會看到 6 種，是因為量的是台灣名冊。<span class="badge ok">已解</span></p>
+  </div>
+<h2 id="dependency">模組有先後順序：一批 2010 年的大頭照包實測</h2>
+  <p>裝模組的人常以為每個模組都是獨立的 ——
+     <strong>不是。</strong>本站手上有一批 2010 年的社群大頭照包，
+     一支球隊一包，可以用來把這件事量出來。</p>
+  <div class="tablewrap"><table>
+    <tbody>
+      <tr><td>可以解開的包數</td><td class="num">17（另一包<a href="../tutorials/crash-diagnosis/index.html#incomplete">沒下載完</a>）</td></tr>
+      <tr><td>合計不重複的大頭照編號</td><td class="num"><strong>885 個</strong></td></tr>
+      <tr class="hi"><td>136 組兩兩比較裡，編號有重疊的</td><td class="num"><strong>只有 1 組</strong>（9 個編號）</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>幾乎不重疊，代表它們設計上就是要一起裝的。</strong>但關鍵在下一張表：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>那 885 個編號，在哪裡有格子</th><th class="num">遊戲裡的編號總數</th>
+               <th class="num">最大編號</th><th class="num">885 個裡有幾個</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="那 885 個編號，在哪裡有格子"><strong>剛安裝好的原版</strong></td><td data-label="遊戲裡的編號總數" class="num">1,487</td><td data-label="最大編號" class="num">5043</td>
+          <td data-label="885 個裡有幾個" class="num"><strong>249（28.1%）</strong></td></tr>
+      <tr class="hi"><td data-label="那 885 個編號，在哪裡有格子"><strong>裝過台灣名冊模組的機器</strong></td><td data-label="遊戲裡的編號總數" class="num">6,638</td><td data-label="最大編號" class="num">9999</td>
+          <td data-label="885 個裡有幾個" class="num"><strong>777（87.8%）</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>在剛安裝好的遊戲上，這批包有七成的圖沒有地方可以放。</strong>
+     原版的編號只落在 0、1、2、5 這四個千位段，最大 5043；
+     而這批包的編號散在 0 到 9 千段，<u>其中 470 個直接超過原版的最大編號</u>。</p>
+
+  <div class="card amber">
+    <p class="card-h">這代表什麼</p>
+    <p><strong>那批大頭照包預設你已經裝了一個把 <code>portrait.big</code> 撐大的名冊模組。</strong>
+       它們是<u>接在別人後面</u>的，不是獨立的。</p>
+    <p>當年沒有人會寫「先裝 A 再裝 B」，因為在那個社群裡<u>大家本來就都裝了同一套底</u>。
+       二十年後單獨拿一包來裝的人，看到的會是「圖沒出現」或「裝了沒反應」，
+       <strong>而那不是包壞了，是缺了它依賴的東西</strong>。</p>
+    <p class="small">怎麼自己判斷：把包裡的檔名（四位數字）跟你遊戲裡
+       <code>portrait.big</code> 的目錄比一遍。<u>對不上的比例太高，就是順序不對</u>。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">這條規則可以推廣</p>
+    <p>大頭照只是最好量的例子。<strong>同樣的依賴關係也存在於臉皮、球衣、語音</strong> ——
+       任何「照編號放進既有封裝檔」的模組，都預設那個編號已經有格子。</p>
+    <p>本站在<a href="models.html">臉皮</a>那頁量過同一件事的另一面：
+       原版只有 504 張臉皮（這台機器是 894 張），而社群名冊指到的編號遠遠超過那個範圍。
+       <u>兩邊是同一個現象</u>。</p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 名單畫面上每位球員的照片全裝在 253.6 MB 的 <code>portrait.big</code> 裡，用的是 EA 自家的 FSH 格式，結構單純到<u>可以用加法驗證你有沒有讀懂</u>。</li>
+    <li><strong>規模，還有那個巧妙的 64 KB</strong> 7,544 個項目、目錄涵蓋率 100%（孤兒 0 bytes），每張解壓後宣告的大小都是 65,680 bytes（實際長度 7,538 張分毫不差，4 張因檔尾補齊多出 4 或 8 個位元組）。兩種格式的像素資料都剛好 65,536 bytes：<code>0x61</code> 是 256 × 256 每像素 1 byte（5,250 張），<code>0x7D</code> 是 128 × 128 每像素 4 bytes（2,292 張），代號與尺寸完全一一對應，沒有任何一張交叉。</li>
+    <li><strong>但原版只用一種</strong> 剛安裝好的原版 1,487 張大頭照 100% 都是 <code>0x7D</code> 128 × 128，<u>一張 <code>0x61</code> 都沒有</u>。也就是說測試機上那 5,250 張，用的是 EA 在這個倉庫裡從沒用過的格式與尺寸。</li>
+    <li><strong>藏在每張圖裡的兩段字</strong> 檔頭與第一張圖之間那 8 個位元組是 <code>Buy ERTS</code>，逐一檢查剛安裝好的原版 2,391 個圖片倉庫零例外（這台機器那 7,542 個同樣零例外）；圖片資料後面那 96 個位元組寫著 <code>EAGL64 metal bin attachment for runtime texture management</code>。後者 2026-08-28 查清楚不是沒人登記的殘料，而是 FSH 規定的附掛區塊，由圖片記錄自己的長度欄位指過去：<code>0x69</code> 的 80 bytes 加上 <code>0x70</code> 結束標記的 16 bytes，正好 96。</li>
+    <li><strong>840 個四字母檔名是一張完整網格</strong> 第 1 碼 15 種、第 2 碼 7 種、第 3 碼固定、第 4 碼 8 種，15 × 7 × 1 × 8 = 840，缺 0 個、多 0 個、重複 0 個，每個首字母底下剛好 56 個。三個軸分別對到罐頭臉 15 種、髮色 7 種、鬍子 8 種，所以這些是沒有專屬照片的球員<u>拼出來的通用大頭照</u>。</li>
+    <li><strong>這一頁被自己推翻好幾次，原文全部保留</strong> 上線時寫「含那句話的沒有一個例外，7,542／7,542」，實際是 7,539／7,542，那三個檔寫成 <code>mel</code> 而且後面補了一組 CRLF，長度一模一樣所以光看長度抓不出來；上線時寫「本站沒有解出編號與球員的對應關係」，後來被推翻，那就是 <code>playerattrib_audioid</code>，而且連把圖壓回去的那一半都做完了，可見像素中位數 99.32% 完全相同、透明度零誤差；髮色原本寫「宣告 7 種實際只用 6 種」，那是量台灣名冊，原版把 7 種用滿；<code>a2653.fsh</code> 那個異常項原本當成「這份檔被動過」的痕跡，其實是 EA 自己的封裝慣例。另有兩處口徑訂正：帶那句話的原版圖檔 6,370 改成 6,392（漏掉 22 個沒進封裝檔、自己就是圖檔的檔案：<code>data\misc\textures\</code> 18 個、<code>data\igshapes\</code> 3 個，再加上名字叫 <code>.big</code> 其實是一張圖的 <code>feonlyln.big</code>），「224 個封裝檔」改成 207 個真的是 BIGF。</li>
+    <li><strong>模組是有先後順序的</strong> 一批 2010 年的社群大頭照包 17 包、885 個不重複編號，兩兩比較 136 組只有 1 組重疊，設計上就是要一起裝。但那 885 個編號在剛安裝好的原版只有 249 個（28.1%）有格子，在裝過台灣名冊的機器上是 777 個（87.8%），其中 470 個直接超過原版最大編號 5043。<strong>單獨拿一包來裝看到「沒反應」，多半不是包壞了，是缺了它依賴的底。</strong></li>
+    <li><strong>本站沒驗的</strong> <code>0x61</code> 那批是誰換的、什麼時候換的未解；那三個 <code>mel</code> 出自哪一次改動、那組 CRLF 哪裡來的都沒有證據；<code>portrait.big</code> 裡多出來的 2 張 <code>0x7C</code>（256 bytes，三份剛安裝好的原版都是同樣那兩張）不在說明書清單裡，不知道是什麼，<code>data\igshapes\igcrsr.fsh</code> 那塊 <code>0x7C</code> 長 576 同樣不知道是什麼；把資料區頭尾夾起來的那兩筆 1 位元組項目做什麼用不知道；<code>st00</code> 到 <code>st63</code> 那 64 張未確認；四字母第 3 碼為什麼固定不知道，「第 1 碼的 a 就是 901」只是推測；<code>Buy ERTS</code> 與 <code>EAGL</code> 的用途和正式全名本站不主張；<code>models.big</code> 那 671 次只是壓縮後看得見的殘影，精確數字未做。</li>
+  </ul>
+
+<h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="models.html">模型與臉皮 models.big</a> —— 894 張 3D 臉皮，用的是同一套 FSH</li>
+    <li><a href="qfs.html">QFS 壓縮</a> —— 每一張 FSH 外面包的那一層</li>
+    <li><a href="bigf.html">BIGF 封裝格式</a> —— 怎麼安全地把圖放回去</li>
+  </ul>
+
+  <footer>
+    <p>本頁與 <code>portrait.big</code> 有關的數字皆為現場解開全部 FSH 量測所得（7,544 個項目，扣掉 2 個只有 1 個位元組的異常項是 7,542）；
+       其餘數字（<code>models.big</code>、<code>anims.big</code>、<code>attrib.dat</code>、2010 年的社群大頭照包、整套原版安裝）各自標在原處；
+       標示為「推測」「未確認」之處未經證實，本站不寫成定論。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

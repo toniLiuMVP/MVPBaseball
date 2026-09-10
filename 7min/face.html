@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/7min/face.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>七分鐘學會製作臉皮並匯入遊戲 — toni的MVP模組補習班</title>
+<meta name="description" content="七分鐘幫球員換一張球場上的臉。先用現成的換，再學做新的。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item on" href="index.html">七分鐘</a>
+  <a class="item" href="../reference/index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">七分鐘</a> › 做臉皮</p>
+  <h1>七分鐘學會製作臉皮並匯入遊戲</h1>
+  <p class="lede">大頭照是資料頁上那張<strong>平面照片</strong>;臉皮是<strong>球場上那顆 3D 頭</strong>。兩個是不同的東西、不同的檔案。七分鐘先學最快的做法：<u>把球員指去用另一張現成的臉</u>。</p>
+  <div class="card">
+    <p class="card-h">⏱ 七分鐘怎麼分配</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>做什麼</th><th class="num">分鐘</th></tr></thead>
+      <tbody>
+        <tr><td>搞清楚臉皮跟大頭照的差別</td><td class="num">1</td></tr>
+        <tr><td>查球員現在用哪張</td><td class="num">1</td></tr>
+        <tr><td>挑一張要換的</td><td class="num">2</td></tr>
+        <tr><td>預覽並寫入</td><td class="num">2</td></tr>
+        <tr><td>進遊戲確認</td><td class="num">1</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <h2>前置</h2>
+  <ul>
+    <li>已安裝的 MVP Baseball 2005</li>
+    <li>Python 3.7 以上</li>
+    <li>下載 <a href="../tutorials/swap-face/mvp_swap_face.py" download>mvp_swap_face.py</a></li>
+  </ul>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法看<a href="../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <h2>👉 你要做的事</h2>
+
+  <div class="step">
+    <div class="step-n">1</div>
+    <div>
+      <p><strong>先查這位球員現在用哪一張臉。</strong></p>
+      <p class="small">⚠️ <strong>名冊裡是英文拼法</strong>，打中文查不到。這裡用<strong>陳金鋒</strong>當例子 —— 他在原版遊戲裡就叫 <code>Chin-Feng Chen</code>，2005 年他真的在道奇隊（不過<u>遊戲的原版名冊把他放在小聯盟的 <code>Las Vegas 51s</code></u>，不在道奇的大聯盟名單裡）。<u>剛安裝好的原版裡他用的是通用臉</u>（<code>face=906</code>），EA 沒有給他專屬臉 —— 本站測試機上他之所以有一張 <code>c607</code>，是社群模組後來加上去的。<strong>EA 給他的專屬品是大頭照，不是臉皮</strong>：原版 <code>portrait.big</code> 裡的 <code>1598.fsh</code>。曹錦輝是 <code>Chin-Hui Tsao</code>。<br>（王建民 2005 年才上大聯盟，<u>沒趕上這款遊戲</u>，所以查不到他。）</p>
+<p class="small">Windows:</p>
+<pre><code>python mvp_swap_face.py &quot;〔你的遊戲資料夾〕&quot; --find Chin-Feng</code></pre>
+      <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_swap_face.py &quot;〔你的遊戲資料夾〕&quot; --find Chin-Feng</code></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">2</div>
+    <div>
+      <p><strong>決定要換成哪一號。</strong></p>
+      <p>遊戲裡本來就有好幾百張臉。最省事的做法是找一位<strong>長相接近</strong>的球員，查出他的臉皮編號，直接拿來用。</p>
+      <p class="small">⚠️ <strong>編號一定要是你這份 <code>models.big</code> 裡真的有的。</strong>
+         1 到 900 的專屬臉編號如果不在裡面，這支腳本加了 <code>--apply</code> 會<u>直接停手不寫入</u>，
+         不是印個警告就放行；連 <code>models.big</code> 都讀不到的時候也一樣擋。
+         本站在兩份剛安裝好的原版上量到 <strong>504 張</strong>臉皮
+         （英文版與中文版，<code>models.big</code> 都是 172,992,803 位元組），全部落在
+         <code>c001</code> 到 <code>c606</code>；測試機那份裝過模組的（561,891,312 位元組）是
+         <strong>894 張</strong>，<code>c607</code> 到 <code>c900</code> 就占了 294 張。
+         抄一位現有球員的編號比較保險，但也不是保證：測試機那份名冊裡就有 1 位球員
+         指著 <code>models.big</code> 沒有的 <code>c219</code>。要確定，先跑一次不加任何選項的總覽，
+         它會把「指向不存在臉皮」的人列出來。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">3</div>
+    <div>
+      <p><strong>預覽，然後寫入。</strong></p>
+      <p class="small">Windows:</p>
+<pre><code>python mvp_swap_face.py &quot;〔你的遊戲資料夾〕&quot; --set Chin-Feng 773</code></pre>
+      <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_swap_face.py &quot;〔你的遊戲資料夾〕&quot; --set Chin-Feng 773</code></pre>
+      <p>確認之後加 <code>--apply</code>。</p>
+      <p class="small">⚠️ 上面那個 <code>773</code> 只是示範用的數字。
+         <u>剛安裝好的原版裡沒有 <code>c773</code></u>（本站量到的 504 張臉全部落在
+         <code>c001</code> 到 <code>c606</code>），照抄再加 <code>--apply</code> 會被腳本擋下來，
+         <code>attrib.dat</code> 一個位元組都不會被寫到。請換成上一步查到的、你這份遊戲裡確實存在的編號。</p>
+    </div>
+  </div>
+
+  <h2>✅ 怎麼知道成功了</h2>
+  <ul>
+    <li><code>--find</code> 顯示的編號變成新的</li>
+    <li>進遊戲看球員在球場上的臉</li>
+  </ul>
+
+  <h2>❌ 出錯處理</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>症狀</th><th>怎麼辦</th></tr></thead>
+    <tbody>
+      <tr><td>臉沒變</td><td>有些畫面會快取。退出遊戲重開再看</td></tr>
+      <tr><td>腳本說「<code>models.big</code> 裡沒有 cXXX 這張臉」</td><td>那個編號在你這份 <code>models.big</code> 裡不存在。加了 <code>--apply</code> 也<strong>不會寫入</strong>，檔案沒被動過、也不會產生備份，不必還原。改挑一個存在的編號</td></tr>
+      <tr><td>腳本說「找不到 <code>models.big</code>」</td><td>路徑指錯了（要指<strong>遊戲安裝資料夾</strong>，它的下一層才是 <code>data</code>）。這時候換 1 到 900 的專屬臉又加了 <code>--apply</code>，腳本一樣會停手不寫入。路徑指對再跑一次</td></tr>
+      <tr><td>變成沒有臉 / 破圖</td><td><code>--restore</code> 還原，換一個編號。這不會是「專屬臉編號不存在」造成的：1 到 900 不在 <code>models.big</code> 裡時，腳本在寫入前就擋掉了。剩下的可能是填了 901 以上的通用臉編號、或填了 <code>0</code>（本站沒有逐號驗過它們在遊戲裡各長什麼樣）</td></tr>
+      <tr><td>想做一張全新的</td><td>那要用另一支腳本，見下面的完整課程</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card red">
+    <p class="card-h">⚠️ 這一課到哪裡為止</p>
+    <p>七分鐘只夠「換成現成的」。<strong>從一張照片做出全新的 3D 臉皮</strong>是另一件事：要處理 DXT1 壓縮、要對齊 UV。本站有完整的一課跟一支腳本在做這件事，但那不是七分鐘的量。</p>
+  </div>
+
+
+  <h2>想弄懂為什麼</h2>
+  <ul class="plain">
+    <li><a href="../tutorials/swap-face/index.html">幫球員換一張臉</a> —— 完整版</li>
+    <li><a href="../tutorials/new-face/index.html">做一張新的球員臉皮</a> —— 從零開始那條路</li>
+    <li><a href="../reference/models.html">模型與臉皮 models.big</a></li>
+  </ul>
+
+  <footer>
+    <p>本頁是「下課七分鐘」系列，只講一件事怎麼做完。
+       原理、量測過程與本站驗到哪裡為止，寫在上面連過去的完整課程裡。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

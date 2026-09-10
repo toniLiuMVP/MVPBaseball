@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/story/orphan-data/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>一個檔案裡的地層 — toni的MVP模組補習班</title>
+<meta name="description" content="本站測試機那份遊戲介面檔有 92.6% 的內容目錄根本不指向。那不是垃圾，是同一批畫面的其他版本，還讀得出來 —— 其中一份跟現在用的那份逐位元組完全相同。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../../index.html">首頁</a>
+  <a class="item" href="../../start.html">新手基本功</a>
+  <a class="item" href="../../do.html">我想做什麼</a>
+  <a class="item" href="../../plan.html">課表</a>
+  <a class="item" href="../../tutorials/index.html">教學</a>
+  <a class="item" href="../../7min/index.html">七分鐘</a>
+  <a class="item" href="../../reference/index.html">速查</a>
+  <a class="item" href="../../coach/index.html">棒球教練</a>
+  <a class="item on" href="../index.html">故事</a>
+  <a class="item" href="../../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="../index.html">故事</a> › 一個檔案裡的地層</p>
+  <h1>一個檔案裡的地層</h1>
+  <p class="lede"><u>本站測試機</u>那份遊戲比賽畫面的介面檔有 2.5 MB。裡面<strong>只有 7.4% 是遊戲真正在用的</strong>。
+     另外 92.6% 沒有任何東西指向它 —— 但它就躺在那裡，而且<strong>還讀得出來</strong>。</p>
+
+  <h2>先說這些資料哪來的</h2>
+  <p>本頁前半的數字都來自把 <code>data/frontend/ingame.big</code> 直接打開量測。
+     方法很簡單：讀出目錄記載的 47 個項目各佔哪一段位元組，
+     剩下沒被任何項目蓋到的區間，就是這頁在講的東西。</p>
+  <p class="small">後面「拿原版一比」那張表另外量了 <code>models.big</code>、<code>portrait.big</code>
+     與剛安裝好的原版；「三代名字」那一節掃的是全部 332 個版面檔與 <code>credits.tsv</code>。</p>
+
+  <h2>目錄只指到十三分之一</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>項目</th><th class="num">數字</th></tr></thead>
+    <tbody>
+      <tr><td>檔案大小</td><td class="num">2,665,562 bytes</td></tr>
+      <tr><td>目錄裡的項目數</td><td class="num">47 個</td></tr>
+      <tr><td>這 47 項合計佔用</td><td class="num">195,999 bytes</td></tr>
+      <tr class="hi"><td><strong>沒被指向的部分</strong></td><td class="num">2,468,068 bytes（92.59%）</td></tr>
+      <tr><td>分成幾段</td><td class="num">24 段</td></tr>
+      <tr><td>最大的一段</td><td class="num">1,731,119 bytes</td></tr>
+    </tbody>
+  </table></div>
+  <p>最大那一段有 1.7 MB，<strong>一個檔案裡有一塊比整個有效內容大八倍的區域，
+     沒有任何東西指向它</strong>。</p>
+
+  <h2>那 2.5 MB 是什麼</h2>
+  <p>先看位元組本身怎麼分佈：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">位元組</th><th class="num">佔比</th><th>是什麼</th></tr></thead>
+    <tbody>
+      <tr><td data-label="位元組" class="mono">0x00</td><td data-label="佔比" class="num">36.2%</td><td data-label="是什麼">零</td></tr>
+      <tr><td data-label="位元組" class="mono">0xFF</td><td data-label="佔比" class="num">22.4%</td><td data-label="是什麼">全 1</td></tr>
+      <tr class="hi"><td data-label="位元組" class="mono">0x2C</td><td data-label="佔比" class="num">8.1%</td><td data-label="是什麼"><strong>逗號</strong></td></tr>
+      <tr class="hi"><td data-label="位元組" class="mono">0x30 / 0x31</td><td data-label="佔比" class="num">8.3%</td><td data-label="是什麼"><strong>數字 0 與 1</strong></td></tr>
+    </tbody>
+  </table></div>
+  <div class="card grass">
+    <p class="card-h">逗號跟數字這麼多，代表裡面有純文字</p>
+    <p>整段區域的<strong>亂度是 3.85</strong>（滿分 8 代表完全隨機或已壓縮），
+       <strong>34.1% 是可以直接列印的字元</strong>。</p>
+    <p>壓縮過的資料不會長這樣。這裡面有<strong>沒有壓縮的東西</strong>。</p>
+  </div>
+
+  <h2>讀得出來的那 690 KB</h2>
+  <p>把連續超過 400 個可讀字元的片段全部抓出來，篩掉不像版面檔的：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>結果</th><th class="num">數字</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td>未壓縮的版面檔文字區塊</td><td class="num">13 個</td></tr>
+      <tr class="hi"><td>合計</td><td class="num">690,059 bytes</td></tr>
+      <tr><td>佔那片區域</td><td class="num">27.9%</td></tr>
+      <tr><td>裡面的畫面代號</td><td class="num">143 種</td></tr>
+    </tbody>
+  </table></div>
+  <p>這是關鍵差異：<strong>遊戲現在真正在用的 47 個項目是壓縮過的，
+     而躺在那裡的這些是沒壓縮的純文字。</strong>不需要任何工具，記事本打開就能讀。</p>
+
+  <h2>八個區塊，對得上現在的八個檔</h2>
+  <p>用「畫面代號重疊」把每個未壓縮區塊對到現行的檔案，八個對得起來。</p>
+  <p>但<strong>一個區塊常常不只裝一個版面檔</strong>。版面檔以行首的 <code>END:</code> 收尾，
+     照這條界線切回去，第 354,045 個位元組那一塊其實是四個完整的版面檔接在一起
+     （<code>fes_ingametuning.fel</code> 764 行、<code>fes_ingameroster.fel</code> 993 行、
+     <code>fes_ingamepausemenu.fel</code> 667 行、
+     <code>fes_ingamerosterpitcheroptions.fel</code> 207 行）再加一段尾巴。
+     所以下表把「整塊」與「切出來那個檔」分開列：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">對應的現行檔案</th><th class="num">那一塊的行數</th><th class="num">切出來那個檔的行數</th><th class="num">現行的行數</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="對應的現行檔案" class="mono">fes_ingamepausemenu.fel</td><td data-label="那一塊的行數" class="num">2,698</td><td data-label="切出來那個檔的行數" class="num">667</td><td data-label="現行的行數" class="num">667</td></tr>
+      <tr class="hi"><td data-label="對應的現行檔案" class="mono">fes_hudleft.fel</td><td data-label="那一塊的行數" class="num">2,395</td><td data-label="切出來那個檔的行數" class="num">1,890<br><span class="small">開頭被截掉</span></td><td data-label="現行的行數" class="num">1,175</td></tr>
+      <tr><td data-label="對應的現行檔案" class="mono">fes_ingamepausemenu.fel</td><td data-label="那一塊的行數" class="num">1,044</td><td data-label="切出來那個檔的行數" class="num">667</td><td data-label="現行的行數" class="num">667</td></tr>
+      <tr><td data-label="對應的現行檔案" class="mono">fes_ingameendofgamemenu.fel</td><td data-label="那一塊的行數" class="num">522</td><td data-label="切出來那個檔的行數" class="num">478</td><td data-label="現行的行數" class="num">478</td></tr>
+      <tr><td data-label="對應的現行檔案" class="mono">fes_ingameoverlay.fel</td><td data-label="那一塊的行數" class="num">484</td><td data-label="切出來那個檔的行數" class="num">231<br><span class="small">開頭被截掉</span></td><td data-label="現行的行數" class="num">290</td></tr>
+      <tr><td data-label="對應的現行檔案" class="mono">fes_ingamepitcherinfo.fel</td><td data-label="那一塊的行數" class="num">434</td><td data-label="切出來那個檔的行數" class="num">394</td><td data-label="現行的行數" class="num">394</td></tr>
+      <tr><td data-label="對應的現行檔案" class="mono">fes_ingamepitchersinbullpen.fel</td><td data-label="那一塊的行數" class="num">373</td><td data-label="切出來那個檔的行數" class="num">205</td><td data-label="現行的行數" class="num">205</td></tr>
+      <tr><td data-label="對應的現行檔案" class="mono">fes_ingamerosterbatteroptions.fel</td><td data-label="那一塊的行數" class="num">303</td><td data-label="切出來那個檔的行數" class="num">151</td><td data-label="現行的行數" class="num">151</td></tr>
+    </tbody>
+  </table></div>
+  <div class="card amber">
+    <p class="card-h">訂正：不是「八個全部都比現在長」</p>
+    <p>本站原本在這裡寫「八個全部都比現在長，沒有一個例外」，還舉了
+       「暫停選單那個少了兩千行、左側 HUD 少了一千兩百行」當例子。
+       <strong>（2026-09-05 訂正：那一欄量的是整塊區域，不是單一版面檔。）</strong></p>
+    <p>切回單一版面檔之後，<strong>八列裡有六列跟現行的一樣長</strong>：
+       兩份暫停選單都是 667 行、結束選單 478 對 478、投手資訊 394 對 394、
+       牛棚投手 205 對 205、打者選項 151 對 151。其中第 800,617 個位元組那份暫停選單
+       跟現行檔案<strong>逐位元組完全相同</strong>（45,025 個位元組）。</p>
+    <p>真的比較長的只有左側 HUD —— 它讀得出來的部分就有 1,890 行，對現行的 1,175 行。
+       而比賽畫面疊層那一份讀得出來的反而比現行短，因為那一塊的開頭被截掉了；
+       <span class="badge wip">未確認</span>本站沒有辦法從這個檔判斷它原本多長。</p>
+  </div>
+
+  <h2>同一個畫面，三份複本</h2>
+  <p>注意上表出現了兩次的 <code>fes_ingamepausemenu.fel</code>。
+     這個檔案<strong>在同一個封裝檔裡有三份</strong>：</p>
+<pre><code>667 行  ← 躺在檔案第 354,045 個位元組（有 63 行跟現行的不一樣）
+667 行  ← 躺在檔案第 800,617 個位元組（跟現行的逐位元組完全相同）
+667 行  ← 目錄指向的，遊戲現在用的這份</code></pre>
+  <p>三份都完整、都讀得出來、都是同一個暫停選單，連行數都一樣。
+     <strong>（2026-09-05 訂正：本站原本在這裡寫「三份不同版本」，行數寫成 2,698／1,044／667。
+     前兩個是整塊區域的行數；第二份既然跟現行的逐位元組相同，
+     實際上是<u>三份複本、兩個版本</u>。）</strong></p>
+
+  <div class="card clay">
+    <p class="card-h">但哪一份最早？看不出來</p>
+    <p>直覺會說「越後面越新」，因為這種封裝檔的更新方式就是<strong>把新資料接到檔尾</strong>。
+       照這個邏輯，遊戲現在用的那份應該排在最後面。</p>
+    <p><strong>但實測不支持這個推論。</strong>遊戲現在用的那份在第
+       <strong>233,987</strong> 個位元組 —— <strong>比另外兩份都前面</strong>。
+       如果純粹是往後追加，它不可能排在最前面。</p>
+    <p>所以這個檔案<strong>被整理過至少一次</strong>，不是單純的一路追加。
+       至於誰改的、什麼時候改的、三份的先後順序，
+       <span class="badge wip">未確認</span>本站沒有辦法從檔案本身判斷。</p>
+  </div>
+
+  <h2>一個佐證：資料的位置很不平均</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>現行的 47 個項目</th><th class="num">數量</th></tr></thead>
+    <tbody>
+      <tr><td>位於檔案前 800 KB 之內</td><td class="num">46 個</td></tr>
+      <tr class="hi"><td>位於第 2,531,736 個位元組（幾乎在檔尾）</td><td class="num">1 個</td></tr>
+    </tbody>
+  </table></div>
+  <p>那個孤零零跑到檔尾的是 <code>fes_ingamesettings.fel</code>。
+     它跟其他 46 個之間隔著 1.7 MB 沒人指向的資料。</p>
+  <p><span class="badge wip">推測</span> 看起來像是：某次有人把絕大部分內容重新寫進檔案前段，
+     之後又有人單獨改了設定畫面、把它接到檔尾。
+     這個解釋跟位置分佈一致，但本站沒有證據，不寫成定論。</p>
+
+  <h2>什麼都沒有消失</h2>
+  <p>本站上線時曾在<a href="../../reference/bigf.html">封裝格式那頁</a>寫過
+     「那片區域撈得出 156 種<strong>舊版</strong>畫面代號」。重新量測後：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>檢查</th><th class="num">實測</th></tr></thead>
+    <tbody>
+      <tr><td>那 13 個讀得出來的區塊裡的畫面代號</td><td class="num">143 種</td></tr>
+      <tr class="hi"><td>其中<strong>現行版本沒有</strong>的</td><td class="num">0 種</td></tr>
+      <tr class="hi"><td>現行版本<strong>額外多出</strong>的</td><td class="num">253 種</td></tr>
+    </tbody>
+  </table></div>
+  <p>換句話說：<strong>那片區域裡的每一個畫面，現在都還在。
+     而現行版本比它多了 253 個。</strong>沒有任何畫面在改版過程中消失 ——
+     真正不對的是「<strong>舊版</strong>」這兩個字。</p>
+  <p class="small">156 這個數字本身量得出來，它是把<u>整片沒被指向的位元組</u>一起掃的結果：
+     多出來的 13 個只出現在讀不成整段文字的地方，其中 3 個還是被壓縮資料切壞的名字。
+     只看讀得出整段文字的那 13 個區塊是 143 種。
+     <strong>（2026-09-05 訂正：本站原本在這裡寫 134 種與「多出 262 種」，
+     重新量測是 143 種與 253 種。）</strong></p>
+  <p class="small">最明顯的例子是左側 HUD：那片區域裡有 <code>HUDLEFT1</code> 到
+     <code>HUDLEFT25</code> 共 25 個，現行版本有這 25 個<strong>再加上一個基本的
+     <code>HUDLEFT</code></strong>，總共 26 個。是多了一個，不是少了。</p>
+
+  <h2>為什麼這些東西還在</h2>
+  <p>因為<strong>刪掉它們沒有好處，而且有風險</strong>。</p>
+  <p>這種封裝檔的安全改法是：把新資料接到檔尾，只更新目錄裡那幾個位元組，
+     <strong>原本的資料一個位元組都不動</strong>。
+     舊資料就這樣一層一層留下來。</p>
+  <div class="card blue">
+    <p class="card-h">這也是本站一直強調那條鐵律的理由</p>
+    <p>如果你用「把所有項目讀出來、重新打包一次」的方式存檔，
+       這 2.5 MB 會在一瞬間變成 198 KB。<strong>47 個項目一個不少、檢查也全過、
+       沒有任何錯誤訊息</strong> —— 你只會覺得檔案變小了、真好。</p>
+    <p>問題是你不知道那些被丟掉的東西裡有沒有還被誰用到。
+       詳見 <a href="../../reference/bigf.html">BIGF 封裝格式</a>的三條鐵律。</p>
+  </div>
+
+  <h2>拿原版一比，發現這件事有三種狀態不是兩種</h2>
+  <p>上面那 92.6% 是<u>本站測試機</u>的 <code>ingame.big</code>。
+     把剛安裝好的原版、以及同一台機器上的其他封裝檔一起量，圖像完全不一樣：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th></th><th class="mono">封裝檔</th><th class="num">整份大小</th><th class="num">目錄指不到的</th><th class="num">佔比</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="3">剛安裝好的原版</td><td class="mono">models.big</td>
+          <td class="num">172,992,803</td><td class="num">4,005</td><td class="num">0.002%</td></tr>
+      <tr><td class="mono">portrait.big</td><td class="num">109,291,217</td><td class="num">3,563</td><td class="num">0.003%</td></tr>
+      <tr><td class="mono">ingame.big</td><td class="num">167,682</td><td class="num"><strong>71</strong></td><td class="num">0.04%</td></tr>
+      <tr class="hi"><td rowspan="3">本站測試機</td><td class="mono">models.big</td>
+          <td class="num">561,891,312</td><td class="num"><strong>0</strong></td><td class="num">0%</td></tr>
+      <tr class="hi"><td class="mono">portrait.big</td><td class="num">265,883,417</td><td class="num"><strong>0</strong></td><td class="num">0%</td></tr>
+      <tr class="hi"><td class="mono">ingame.big</td><td class="num">2,665,562</td>
+          <td class="num"><strong>2,468,068</strong></td><td class="num"><strong>92.6%</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">「指不到的」＝ 整份大小 − 目錄指到的所有項目 − 目錄本身佔的位元組。</p>
+
+  <div class="card grass">
+    <p class="card-h">三種狀態，而且每一種都在講一件事</p>
+    <ul>
+      <li><strong>EA 出貨的檔：碎片很小但不是零</strong>（幾 KB，佔比千分之幾）。
+          那大概是對齊或打包工具留下的填充，<u>不是歷史地層</u>。</li>
+      <li><strong>被工具重新打包過的檔：剛好 0</strong>。
+          這台的 <code>models.big</code> 與 <code>portrait.big</code> 一個位元組都不浪費
+          —— 那正是「全部讀出來、重新打包一次」的特徵。</li>
+      <li><strong>被 append 模式改過的檔：越積越多</strong>。
+          這台的 <code>ingame.big</code> 92.6%，就是一層一層接上去的結果。</li>
+    </ul>
+    <p><strong>所以那 92.6% 不是這個格式的性質，是「有人用 append 模式改過很多次」的痕跡。</strong></p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">那條鐵律的理由要換一個說法</p>
+    <p>本站一直說「存回 <code>.big</code> 一律用 append 模式」，
+       理由寫的是「不然 2.5 MB 會變成 198 KB」。</p>
+    <p>但這張表顯示：<u>這台的 <code>models.big</code> 早就被重新打包過了</u>（碎片剛好 0），
+       而它<strong>好好的</strong> —— 894 張臉皮全部讀得出來，遊戲也在跑。</p>
+    <p>所以正確的理由不是「重新打包一定會壞」，而是：</p>
+    <p style="padding-left:14px;border-left:3px solid var(--rule)">
+       <strong>你不知道手上這一份被誰疊過什麼。</strong>
+       重新打包會把「目錄沒指到、但可能還有人用」的東西一次丟掉，
+       而你沒有辦法事先知道有沒有。</p>
+    <p class="small">append 模式的代價只是檔案變大；重新打包的代價是不可逆。
+       兩邊的風險不對稱，所以選 append。</p>
+  </div>
+
+
+  <h2 id="threegen">同一款遊戲裡的三代名字</h2>
+  <p>上面講的是「被目錄丟掉的舊版畫面」。還有一種更直接的地層 ——
+     <strong>畫面元素的名字本身。</strong></p>
+  <p>這款遊戲叫 <u>MVP Baseball 2005</u>。但把所有<a href="../../reference/fel.html">版面檔</a>
+     翻一遍，會找到這些元素名：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">元素名</th><th class="num">幾個</th>
+      <th class="mono">它載入的圖</th><th>顯示開關</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="元素名" class="mono">MVP2003</td><td data-label="幾個" class="num">8</td>
+          <td data-label="它載入的圖" class="mono">mvp3</td><td data-label="顯示開關">全部是 <strong>1</strong></td></tr>
+      <tr><td data-label="元素名" class="mono">MVP2003</td><td data-label="幾個" class="num">3</td>
+          <td data-label="它載入的圖" class="mono">tp00／tp11／tp20<br><span class="small">轉場用的圖</span></td><td data-label="顯示開關">1</td></tr>
+      <tr><td data-label="元素名" class="mono">MVP2003LOGO</td><td data-label="幾個" class="num">3</td><td data-label="它載入的圖" class="mono">tp10／tp20</td><td data-label="顯示開關">1</td></tr>
+      <tr class="hi"><td data-label="元素名" class="mono">MVP2004</td><td data-label="幾個" class="num">3</td>
+          <td data-label="它載入的圖" class="mono"><strong>mvp5</strong></td><td data-label="顯示開關">1</td></tr>
+    </tbody>
+  </table></div>
+  <p>一共 <strong>17 個元素</strong>，散在 10 個版面檔裡，
+     <strong>而且十七個的顯示開關全部都是 1</strong> —— 它們是活的，不是被關掉的殘骸。</p>
+
+  <div class="card grass">
+    <p class="card-h">最後一列是整段的重點</p>
+    <p>名字叫 <code>MVP2004</code> 的那三個元素，載入的圖是 <code><strong>mvp5</strong></code>。</p>
+    <p><strong>圖換成 2005 的了，名字還停在 2004。</strong></p>
+    <p>而叫 <code>MVP2003</code> 的那八個，圖也還是 <code>mvp3</code> ——
+       <u>那一批連圖都沒換過。</u></p>
+    <p>所以這不是「忘了刪」，是<strong>三次改版留下的三層</strong>：
+       2003 那層原封不動、2004 那層換了圖沒換名、2005 那層是新的。</p>
+  </div>
+
+  <p>這件事在<a href="../../reference/team-limit.html#fossil">球隊那邊也發生過</a>：
+     球隊檔的欄位名還寫著 <code>team_vs_mon</code>（一支 2005 年就搬家的球隊），
+     但資料早就更新到 2023 年。</p>
+  <div class="card blue">
+    <p class="card-h">一條貫穿全站的規律</p>
+    <p><strong>資料會被更新，名字不會。</strong></p>
+    <p>因為名字是<u>程式拿來對照的東西</u> —— 改了名字，程式就找不到了。
+       所以名字會一直停在它被建立的那一年，
+       變成檔案裡最誠實的一種時間戳。</p>
+  </div>
+
+  <p class="small">順帶一提：遊戲資料夾裡那個工作人員名單檔，
+     第一行寫的是 <code># MVP2004 Credits</code>。</p>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> <u>本站測試機</u>那份比賽介面檔 <code>ingame.big</code> 有 2.5 MB，<u>只有 7.4% 是遊戲真正在用的</u>，另外 92.6% 沒有任何東西指向，但那不是垃圾，是同一批畫面的<strong>其他版本</strong>，而且沒有壓縮，記事本打開就能讀。</li>
+    <li><strong>關鍵數字</strong> 檔案 2,665,562 個位元組、目錄 47 項合計 195,999、沒被指向的 <strong>2,468,068（92.59%）</strong>分成 24 段，最大一段 1,731,119，<u>比整個有效內容還大八倍</u>。那片區域的亂度是 3.85（滿分 8 代表隨機或已壓縮）、34.1% 是可列印字元，撈得出 <strong>13 個未壓縮的版面檔文字區塊、合計 690,059 個位元組</strong>。</li>
+    <li><strong>八個對得起來的區塊</strong> 一塊常常不只裝一個版面檔（版面檔以行首 <code>END:</code> 收尾）。切回單一檔之後<u>八列裡有六列跟現行的一樣長</u>：兩份暫停選單都是 667 行、結束選單 478、投手資訊 394、牛棚投手 205、打者選項 151，其中第 800,617 個位元組那份暫停選單跟現行檔案<strong>逐位元組完全相同</strong>；真的比較長的只有左側 HUD（讀得出來就有 1,890 行對 1,175 行）。<strong>（2026-09-05 訂正：本站原本寫「八個全部都比現在長」，那一欄量的是整塊區域不是單一版面檔。）</strong>同一個暫停選單在同一個封裝檔裡有三份，而「越後面越新」不成立：遊戲現在用的那份躺在第 <strong>233,987</strong> 個位元組，<strong>比另外兩份都前面</strong>，所以這個檔至少被整理過一次，不是單純一路往後追加。</li>
+    <li><strong>訂正一：什麼都沒有消失</strong>。本站原本寫「那片區域撈得出 156 種<u>舊版</u>畫面代號」，錯的是「舊版」兩個字。讀得出整段文字的那 13 個區塊實測是 <strong>143 種</strong>（156 是把整片沒被指向的位元組一起掃的結果），其中現行版本沒有的是 <strong>0 種</strong>，現行版本反而額外多出 <strong>253 種</strong>。最明顯的是左側 HUD：那片區域有 <code>HUDLEFT1</code> 到 <code>HUDLEFT25</code> 共 25 個，現行版本是這 25 個再加上一個基本的 <code>HUDLEFT</code>，<u>是多了一個，不是少了</u>。</li>
+    <li><strong>訂正二：那條鐵律的理由換過說法</strong>。本站原本說「不然 2.5 MB 會變成 198 KB」，但這台的 <code>models.big</code> 早就被重新打包過（碎片剛好 0），<strong>而它好好的</strong>，894 張臉皮全部讀得出來、遊戲也在跑。正確的理由是：<u>你不知道手上這一份被誰疊過什麼</u>，重新打包會把「目錄沒指到、但可能還有人用」的東西一次丟掉，而你沒辦法事先知道有沒有。append 的代價只是檔案變大，重新打包的代價是不可逆，<strong>兩邊風險不對稱</strong>。</li>
+    <li><strong>92.6% 不是這個格式的性質，是三種狀態裡的一種</strong> EA 出貨的檔碎片很小但不是零（原版 <code>models.big</code> 0.002%、<code>portrait.big</code> 0.003%、<code>ingame.big</code> 只有 71 個位元組 ＝ 0.04%）；被工具重新打包過的<u>剛好 0</u>；被 append 模式改過的才會越積越多。所以站上看到任何一個孤兒數字，都要先問<strong>量的是哪一份</strong>。</li>
+    <li><strong>同一款遊戲裡的三代名字</strong> 版面檔裡找得到 <code>MVP2003</code>、<code>MVP2003LOGO</code>、<code>MVP2004</code> 共 <strong>17 個元素</strong>，散在 10 個版面檔裡，<u>顯示開關全部是 1</u>，它們是活的不是被關掉的殘骸。重點在最後一列：叫 <code>MVP2004</code> 的那三個，載入的圖已經是 <code>mvp5</code>，<strong>圖換成 2005 的了，名字還停在 2004</strong>。<u>資料會被更新，名字不會</u>，因為名字是程式拿來對照的東西，改了就找不到了。</li>
+    <li><strong>本站沒驗的</strong> 暫停選單那三份<u>誰先誰後、誰改的、什麼時候改的</u>，本站沒有辦法從檔案本身判斷。那個孤零零跑到第 2,531,736 個位元組、跟其他 46 個隔著 1.7 MB 的 <code>fes_ingamesettings.fel</code>，「某次有人把大部分內容重寫進前段、之後又有人單獨改了設定畫面接到檔尾」這個解釋<strong>跟位置分佈一致，但本站沒有證據，不寫成定論</strong>。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../build-2004/index.html">平安夜凌晨的兩次建置</a> —— 另一批被留在檔案裡的時間痕跡</li>
+    <li><a href="../../reference/bigf.html">BIGF 封裝格式</a> —— 為什麼不能整包重新打包</li>
+    <li><a href="../../reference/fel.html">FEL 版面語法</a> —— 那些讀得出來的文字在講什麼</li>
+  </ul>
+
+  <footer>
+    <p>本頁數字皆為現場打開檔案量測所得（前半是 <code>ingame.big</code>，
+       另有 <code>models.big</code>、<code>portrait.big</code>、剛安裝好的原版與 <code>credits.tsv</code>）；
+       標示為「推測」「未確認」之處未經證實，本站不寫成定論。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../../legal.html">法律與版權說明</a> ·
+       <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-Dk9Fw9kBmLqYZflx14LKI99r/2w+RqsUrHOj1hJnky8='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/ingame-files.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>ingame.big 47 個版面檔對照 — toni的MVP模組補習班</title>
+<meta name="description" content="MVP Baseball 2005 比賽中畫面(HUD、選單、轉場)全部 47 個版面檔的功能對照表。想改哪塊畫面，先從這裡找到對的檔案。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › ingame.big 47 個版面檔對照</p>
+  <h1>ingame.big 47 個版面檔對照</h1>
+  <p class="lede">比賽中你看到的每一塊畫面 —— HUD、暫停選單、技術統計、轉場動畫 —— 都對應
+     <code>data\frontend\ingame.big</code> 裡的一個 <code>.fel</code>。想改哪塊，先從這張表找到檔案，
+     再用 <a href="fel.html">FEL 語法速查</a>看懂內容。「行數」是解壓後的腳本行數，可當複雜度參考。</p>
+
+  <div class="card amber" id="searchbox">
+    <p class="card-h">直接搜尋這 47 個檔</p>
+    <p>打檔名、畫面代號、或你想改的東西（例如 <code>好壞球</code>、<code>暫停</code>、<code>重播</code>）。
+       表格會即時篩選。</p>
+    <label for="q" class="sr-only">搜尋版面檔</label>
+    <input id="q" type="search" autocomplete="off" spellcheck="false"
+           placeholder="例如：HUD、暫停、重播、hudleft、BOXSCORE"
+           style="width:100%;box-sizing:border-box;margin-top:10px;padding:11px 13px;
+                  font:inherit;font-size:1rem;border:1.5px solid var(--line);
+                  border-radius:7px;background:var(--card);color:var(--text)">
+    <p id="qcount" class="small" style="margin-top:9px" aria-live="polite">共 47 個版面檔</p>
+  </div>
+
+  <h2>轉播 HUD（比賽進行中常駐）</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>檔名</th><th class="mono">內部名稱</th><th>負責的畫面</th><th class="num">行數</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="檔名" class="mono">fes_ingameinfobar<br><span class="badge wip">原版無此檔</span></td><td data-label="內部名稱" class="mono">PITCHERINFO</td><td data-label="負責的畫面">主資訊條、壘包鑽石圖、<strong>跑壘者速度數值</strong>（<a href="../tutorials/hide-runner-speed/index.html">有教學</a>）</td><td data-label="行數" class="num">951</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_hudleft</td><td data-label="內部名稱" class="mono">HUDLEFT</td><td data-label="負責的畫面">HUD 左置版：好壞球、出局、局數、投手體力、球種紀錄、子母畫面重播</td><td data-label="行數" class="num">1175</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_hudright</td><td data-label="內部名稱" class="mono">HUDRIGHT</td><td data-label="負責的畫面">同上的右置版，元件幾乎一致</td><td data-label="行數" class="num">1342</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingameoverlay</td><td data-label="內部名稱" class="mono">INGAMEOVERLAY</td><td data-label="負責的畫面">疊加層：球速、擊球距離、傳接接力、中繼守備、抗議表</td><td data-label="行數" class="num">290</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingamegamestatus</td><td data-label="內部名稱" class="mono">GAMESTATUS</td><td data-label="負責的畫面">比賽狀態小條</td><td data-label="行數" class="num">117</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_navbar</td><td data-label="內部名稱" class="mono">NAVBAR</td><td data-label="負責的畫面">底部按鍵提示列，依平台切換</td><td data-label="行數" class="num">256</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>資訊卡與統計</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>檔名</th><th class="mono">內部名稱</th><th>負責的畫面</th><th class="num">行數</th></tr></thead>
+    <tbody>
+      <tr><td data-label="檔名" class="mono">fes_playerinfobar</td><td data-label="內部名稱" class="mono">PLAYERINFOBAR</td><td data-label="負責的畫面">球員資訊卡：耐久、速度、盜壘、跑壘、守備、範圍、臂力、傳準八項</td><td data-label="行數" class="num">923</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_playerinfobar2</td><td data-label="內部名稱" class="mono">PLAYERINFOBAR</td><td data-label="負責的畫面">同上第二種版面</td><td data-label="行數" class="num">947</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_playergrp</td><td data-label="內部名稱" class="mono">JUMBOBIO</td><td data-label="負責的畫面">球場大螢幕球員簡介</td><td data-label="行數" class="num">570</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingamepitcherinfo</td><td data-label="內部名稱" class="mono">PITCHERINFO</td><td data-label="負責的畫面">投手資訊卡，含大頭照</td><td data-label="行數" class="num">394</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingamepitchersinbullpen</td><td data-label="內部名稱" class="mono">PITCHERINBULL</td><td data-label="負責的畫面">牛棚待命投手，雙大頭照版面</td><td data-label="行數" class="num">205</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingamedueup</td><td data-label="內部名稱" class="mono">DUEUP</td><td data-label="負責的畫面">下三棒預告</td><td data-label="行數" class="num">386</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingameteamsmatchup</td><td data-label="內部名稱" class="mono">TEAMSMATCHUP</td><td data-label="負責的畫面">兩隊對戰開場，含隊徽</td><td data-label="行數" class="num">226</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingameboxscore</td><td data-label="內部名稱" class="mono">INGAMEBOXSCORE</td><td data-label="負責的畫面">完整技術統計表，含逐局分數</td><td data-label="行數" class="num">734</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingameboxscore2<br><span class="badge wip">原版無此檔</span></td><td data-label="內部名稱" class="mono">INGAMEBOXSCORE</td><td data-label="負責的畫面">技術統計精簡版</td><td data-label="行數" class="num">220</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingamestandings</td><td data-label="內部名稱" class="mono">IGSTANDINGS</td><td data-label="負責的畫面">戰績排名表</td><td data-label="行數" class="num">148</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingamebattinglineup</td><td data-label="內部名稱" class="mono">BATTINGLINEUP</td><td data-label="負責的畫面">打擊棒次表</td><td data-label="行數" class="num">565</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_pitchereffect</td><td data-label="內部名稱" class="mono">PITCHEREFFECT</td><td data-label="負責的畫面">投手反應特效</td><td data-label="行數" class="num">25</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>選單與設定</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>檔名</th><th class="mono">內部名稱</th><th>負責的畫面</th><th class="num">行數</th></tr></thead>
+    <tbody>
+      <tr><td data-label="檔名" class="mono">fes_ingamepausemenu</td><td data-label="內部名稱" class="mono">PAUSEMENU</td><td data-label="負責的畫面">暫停主選單，含風向與記分格</td><td data-label="行數" class="num">667</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingamepauseinfo</td><td data-label="內部名稱" class="mono">IGPAUSEINFO</td><td data-label="負責的畫面">暫停時的比賽資訊面板</td><td data-label="行數" class="num">226</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingamepauseinfo1<br><span class="badge wip">原版無此檔</span></td><td data-label="內部名稱" class="mono">IGPAUSEINFO</td><td data-label="負責的畫面">同上另一版面</td><td data-label="行數" class="num">228</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingameoptionmenu</td><td data-label="內部名稱" class="mono">INGAMEGMOPTMENU</td><td data-label="負責的畫面">比賽選項選單，PC 版另有一組</td><td data-label="行數" class="num">364</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingamesettings</td><td data-label="內部名稱" class="mono">INGAMESETTINGS</td><td data-label="負責的畫面">設定：音效、控制器、PC 顯示、畫面、玩法。<strong>全包最大檔</strong></td><td data-label="行數" class="num">2074</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingameroster</td><td data-label="內部名稱" class="mono">INGAMEROSTER</td><td data-label="負責的畫面">陣容管理：換投、代打、守備調動、雙重更換、牛棚熱身</td><td data-label="行數" class="num">993</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingamerosteroptions</td><td data-label="內部名稱" class="mono">IGROSTEROPT</td><td data-label="負責的畫面">陣容操作小選單</td><td data-label="行數" class="num">151</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingamerosterbatteroptions</td><td data-label="內部名稱" class="mono">IGROSTERBOPT</td><td data-label="負責的畫面">打者專用操作小選單</td><td data-label="行數" class="num">151</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingamerosterpitcheroptions</td><td data-label="內部名稱" class="mono">IGROSTERPOPT</td><td data-label="負責的畫面">投手專用操作小選單</td><td data-label="行數" class="num">207</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_quickmenuleft</td><td data-label="內部名稱" class="mono">QUICKMENULEFT</td><td data-label="負責的畫面">快捷選單左置版：內外野佈陣、牛棚、休息區、棒次</td><td data-label="行數" class="num">820</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_quickmenuright</td><td data-label="內部名稱" class="mono">QUICKMENURIGHT</td><td data-label="負責的畫面">同上右置版</td><td data-label="行數" class="num">821</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_defensivepositions</td><td data-label="內部名稱" class="mono">DEFENSIVEPOS</td><td data-label="負責的畫面">守備位置調整，九個守位與外野整體</td><td data-label="行數" class="num">376</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingamebullpen</td><td data-label="內部名稱" class="mono">BULLPEN</td><td data-label="負責的畫面">牛棚畫面導覽列</td><td data-label="行數" class="num">433</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingametuning</td><td data-label="內部名稱" class="mono">INGAMETUNING</td><td data-label="負責的畫面">比賽微調：風向與各項參數</td><td data-label="行數" class="num">764</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingametuningselect</td><td data-label="內部名稱" class="mono">INGAMETUNINGSEL</td><td data-label="負責的畫面">微調項目挑選</td><td data-label="行數" class="num">178</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingamecontrolmenu</td><td data-label="內部名稱" class="mono">INGAMECTRLRMENU</td><td data-label="負責的畫面">控制器選擇，含手把圖與拔除提示</td><td data-label="行數" class="num">438</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingamecontrolcfg</td><td data-label="內部名稱" class="mono">INGAMECTRLRCFG</td><td data-label="負責的畫面">按鍵設定，逐鍵配置</td><td data-label="行數" class="num">1097</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingameendofgamemenu</td><td data-label="內部名稱" class="mono">INGAMEENDOFGAME</td><td data-label="負責的畫面">比賽結束選單，含終場記分板</td><td data-label="行數" class="num">478</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingamereplay</td><td data-label="內部名稱" class="mono">INGAMEREPLAY</td><td data-label="負責的畫面">重播控制列，含自由視角開關</td><td data-label="行數" class="num">203</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>轉場與系統</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>檔名</th><th class="mono">內部名稱</th><th>負責的畫面</th><th class="num">行數</th></tr></thead>
+    <tbody>
+      <tr><td data-label="檔名" class="mono">fes_tran_replayenter</td><td data-label="內部名稱" class="mono">REPLAYENTER</td><td data-label="負責的畫面">進入重播的轉場，十條擦除線與隊色漸層</td><td data-label="行數" class="num">654</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_tran_replayexit</td><td data-label="內部名稱" class="mono">REPLAYEXIT</td><td data-label="負責的畫面">離開重播的轉場</td><td data-label="行數" class="num">418</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_tran_whiteflash</td><td data-label="內部名稱" class="mono">WHITEFLASH</td><td data-label="負責的畫面">白閃轉場，最短的動畫檔</td><td data-label="行數" class="num">23</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingamechat</td><td data-label="內部名稱" class="mono">INGAMECHAT</td><td data-label="負責的畫面">連線對戰聊天視窗</td><td data-label="行數" class="num">722</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_ingamekeyboard</td><td data-label="內部名稱" class="mono">IGKEYBOARD</td><td data-label="負責的畫面">螢幕虛擬鍵盤</td><td data-label="行數" class="num">355</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_networkstatus</td><td data-label="內部名稱" class="mono">NETWORKSTATUS</td><td data-label="負責的畫面">連線狀態、語音、斷線通知、計時器</td><td data-label="行數" class="num">108</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_popup</td><td data-label="內部名稱" class="mono">POPUP</td><td data-label="負責的畫面">通用彈出視窗</td><td data-label="行數" class="num">52</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_pccheck</td><td data-label="內部名稱" class="mono">PCCHECK</td><td data-label="負責的畫面">PC 版光碟與網路檢查，含離開確認</td><td data-label="行數" class="num">30</td></tr>
+      <tr><td data-label="檔名" class="mono">fes_unpluggedcontroller</td><td data-label="內部名稱" class="mono">UNPLUGGEDCTRL</td><td data-label="負責的畫面">控制器被拔除的警告，有版面內容的檔裡最小的一個（<code>alib_ingamelogos</code> 只有 3 行，但它沒有版面內容）</td><td data-label="行數" class="num">8</td></tr>
+      <tr><td data-label="檔名" class="mono">alib_ingamelogos</td><td data-label="內部名稱" class="mono">—</td><td data-label="負責的畫面">資源宣告存根。整個檔只有三行：<code>VR:69</code>、<code>TS:CROPLOGOS,</code>、<code>END:</code>，沒有版面內容。（<code>TS:</code> 的用途未確認，見 <a href="fel.html">FEL 速查</a>）</td><td data-label="行數" class="num">3</td></tr>
+    </tbody>
+  </table></div>
+
+
+  <h2>想改的東西 → 元素叫什麼</h2>
+  <p>上面四張表告訴你「在哪個檔」，這張表再往下一層：<strong>那一行叫什麼名字</strong>。
+     名稱一律是英文，用 <a href="../tutorials/fel-toolkit/index.html">FEL 萬用工具</a>的
+     <code>--find</code> 就能在你自己那份 <code>ingame.big</code> 裡把它們全部列出來。</p>
+
+  <div class="tablewrap" id="lookup"><table class="stack">
+    <thead><tr><th>你想改的東西</th><th>先看哪個檔</th><th>找什麼</th></tr></thead>
+    <tbody>
+      <tr><td data-label="你想改的東西">投球球速顯示</td><td data-label="先看哪個檔" class="mono">fes_ingameoverlay</td>
+          <td data-label="找什麼"><code>TX:PITCHSPEED</code> 與 <code>TX:PITCHSPEED1</code></td></tr>
+      <tr><td data-label="你想改的東西">擊球飛行距離</td><td data-label="先看哪個檔" class="mono">fes_ingameoverlay</td>
+          <td data-label="找什麼"><code>GR:HITDISTANCE</code> 群組</td></tr>
+      <tr><td data-label="你想改的東西">下一棒打者資訊</td><td data-label="先看哪個檔" class="mono">fes_hudleft / fes_hudright</td>
+          <td data-label="找什麼"><code>SG:NEXT</code> 群組內的 <code>TX:RATING</code> 與 <code>TX:TITLE</code></td></tr>
+      <tr><td data-label="你想改的東西">打者能力圖示</td><td data-label="先看哪個檔" class="mono">fes_hudleft / fes_hudright</td>
+          <td data-label="找什麼"><code>GR:BATTERATTRIBGRP</code> 底下的 <code>SL:ATTRIBICON1</code> 與 <code>SL:ATTRIBICON2</code></td></tr>
+      <tr><td data-label="你想改的東西">好壞球數、出局數</td><td data-label="先看哪個檔" class="mono">fes_hudleft / fes_hudright</td>
+          <td data-label="找什麼"><code>GR:COUNT</code>、<code>GR:OUTS</code>、<code>TX:BALLS</code></td></tr>
+      <tr><td data-label="你想改的東西">投手體力條</td><td data-label="先看哪個檔" class="mono">fes_hudleft / fes_hudright</td>
+          <td data-label="找什麼"><code>GR:STAMINA</code>、<code>GG:STAMINABLINK</code></td></tr>
+      <tr><td data-label="你想改的東西">球員八項能力數值</td><td data-label="先看哪個檔" class="mono">fes_playerinfobar /<br>fes_playerinfobar2</td>
+          <td data-label="找什麼"><code>TX:SPEED</code>、<code>TX:STEALING</code>、<code>TX:BASERUN</code> 等</td></tr>
+      <tr><td data-label="你想改的東西">重播轉場動畫</td><td data-label="先看哪個檔" class="mono">fes_tran_replayenter /<br>fes_tran_replayexit</td>
+          <td data-label="找什麼"><code>GR:WIPELINE1</code> 到 <code>GR:WIPELINE10</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card clay">
+    <p class="card-h">找到名字之後，先數一遍有幾份</p>
+    <p>同一個名稱<strong>在同一個檔案裡常常不只一份</strong>，因為每個畫面版本各自把它重畫一次：
+       <code>GR:COUNT</code> 在 <code>fes_hudleft.fel</code> 裡有 <strong>10 行</strong>，
+       <code>GR:OUTS</code> 也是 <strong>10 行</strong>。只改到最上面那一行，其他畫面照舊。</p>
+    <p>但不是每個都這樣 —— <code>TX:PITCHSPEED</code> 與 <code>GR:HITDISTANCE</code> 在
+       <code>fes_ingameoverlay.fel</code> 裡就<strong>各只有一行</strong>。
+       所以動手前先用 <code>--find</code> 看它列出幾筆，不要憑印象。
+       為什麼會這樣，見 <a href="fel.html">FEL 語法速查</a>的「同一個東西會出現很多次」。</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">找到檔案之後，動手前的三條紀律</p>
+    <p><strong>1 · 一次只改一個地方。</strong>改完就進遊戲確認，不要一次改五處再一起測，
+       出事會找不到是哪一個造成的。備份檔只有一份，第二次動手前先把上一次的成果另存，
+       否則還原會退回更早的版本（見<a href="../start.html">新手基本功</a>的備份觀念）。</p>
+    <p><strong>2 · 要關單一元素，改它自己那一行，不要關父群組。</strong>
+       <code>GR:</code>、<code>GG:</code>、<code>SG:</code> 開頭的都是群組，
+       它們的開關會被遊戲程式在執行時覆寫 —— <code>GR:HOMEPLATE</code> 明明寫著關，
+       遊戲裡照樣看得到本壘資訊。改元素自己那一行才穩定有效。</p>
+    <p><strong>3 · 存回 <code>.big</code> 一律接到檔尾，絕不整包重新打包。</strong>
+       新資料接在檔案最後面，只改目錄 8 個位元組與檔頭 4 個位元組，原始資料區一個位元組都不動。
+       重新打包會把目錄不指向的內容整批丟掉，而且<strong>不會有任何錯誤訊息</strong>。</p>
+    <p class="small">第 2、3 條就是 <a href="fel.html">FEL 語法速查</a>〈三條鐵律〉的其中兩條，
+       那頁還有第三條（<code>.fel</code> 的 CRLF 換行不能被編輯器改掉）與完整實測數字；
+       接到檔尾的位元組級寫法見 <a href="bigf.html#append">BIGF 的 append 鐵律</a>。</p>
+  </div>
+
+
+  <div class="card blue">
+    <p class="card-h">版本說明</p>
+    <p>本表數據取自<strong>這台機器上</strong>一份 2023 年整理的 <code>ingame.big</code>。拿剛安裝好的原版對照，<strong>原版只有 44 個版面檔</strong>：本表的 <code>fes_ingameinfobar</code>、<code>fes_ingameboxscore2</code>、<code>fes_ingamepauseinfo1</code> 三列<u>在原版不存在</u>，是後來被加進去的。另有 4 個檔行數不同（<code>fes_hudright</code> 原版 1338、<code>fes_ingamedueup</code> 302、<code>fes_navbar</code> 252、<code>fes_ingamepitcherinfo</code> 395），其餘 40 個檔名與行數完全一致。<br><strong>所以：檔名與畫面的對應關係大致可用，但不要當成「原版一定有」。</strong>
+     改東西前記得先讀 <a href="fel.html">FEL 速查的三條鐵律</a>。</p>
+  </div>
+
+<script>
+// 純前端即時篩選,不連任何伺服器。關掉 JavaScript 的話整張表照常顯示。
+(function () {
+  var q = document.getElementById('q');
+  var count = document.getElementById('qcount');
+  if (!q) return;
+  var rows = [];
+  // 反查索引(#lookup)不是版面檔清單,不參與篩選,也不算進「共 47 個」。
+  // 代價：只出現在索引裡的詞(例如 PITCHSPEED)會回報「找不到」,但索引本身仍留在畫面上。
+  Array.prototype.forEach.call(document.querySelectorAll('tbody tr'), function (tr) {
+    if (tr.closest && tr.closest('#lookup')) return;
+    rows.push({ el: tr, text: tr.textContent.toLowerCase() });
+  });
+  // 每個「區塊」= 一個 h2 加上它後面那張表
+  var blocks = [];
+  Array.prototype.forEach.call(document.querySelectorAll('h2'), function (h) {
+    var wrap = h.nextElementSibling;
+    while (wrap && wrap.className.indexOf('tablewrap') < 0) wrap = wrap.nextElementSibling;
+    if (wrap) blocks.push({ head: h, wrap: wrap });
+  });
+
+  function apply() {
+    var term = q.value.trim().toLowerCase();
+    var shown = 0;
+    rows.forEach(function (r) {
+      var hit = !term || r.text.indexOf(term) >= 0;
+      r.el.style.display = hit ? '' : 'none';
+      if (hit) shown++;
+    });
+    blocks.forEach(function (b) {
+      var any = Array.prototype.some.call(
+        b.wrap.querySelectorAll('tbody tr'),
+        function (tr) { return tr.style.display !== 'none'; });
+      b.head.style.display = any ? '' : 'none';
+      b.wrap.style.display = any ? '' : 'none';
+    });
+    count.textContent = term
+      ? (shown ? '找到 ' + shown + ' 個版面檔' : '找不到「' + q.value.trim() + '」—— 試試短一點的關鍵字')
+      : '共 ' + rows.length + ' 個版面檔';
+  }
+  q.addEventListener('input', apply);
+  q.addEventListener('search', apply);
+  apply();
+})();
+</script>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 比賽中你看到的每一塊畫面都對應 <code>data\frontend\ingame.big</code> 裡的一個 <code>.fel</code>，這頁把 47 個檔分成轉播 HUD、資訊卡與統計、選單與設定、轉場與系統四類，想改哪塊先從這裡找到對的檔案。</li>
+    <li><strong>複雜度差很多</strong> 最大的是 <code>fes_ingamesettings</code>（2074 行，音效、控制器、PC 顯示、畫面、玩法全包），有版面內容的檔裡最小的是 <code>fes_unpluggedcontroller</code>（8 行）。<code>alib_ingamelogos</code> 整個檔只有三行，沒有版面內容。</li>
+    <li><strong>版本說明要先看</strong> 本表量的是這台機器上一份 2023 年整理的 <code>ingame.big</code>，<u>剛安裝好的原版只有 44 個版面檔</u>。<code>fes_ingameinfobar</code>、<code>fes_ingameboxscore2</code>、<code>fes_ingamepauseinfo1</code> 三個在原版不存在，另有 4 個檔行數不同（<code>fes_hudright</code> 原版 1338、<code>fes_ingamedueup</code> 302、<code>fes_navbar</code> 252、<code>fes_ingamepitcherinfo</code> 395），其餘 40 個完全一致。</li>
+    <li><strong>最容易誤讀的地方</strong> 同一個名稱在同一個檔裡常常不只一份。<code>GR:COUNT</code> 與 <code>GR:OUTS</code> 在 <code>fes_hudleft.fel</code> 裡各有 10 行，只改最上面那一行其他畫面照舊；但 <code>TX:PITCHSPEED</code> 與 <code>GR:HITDISTANCE</code> 在 <code>fes_ingameoverlay.fel</code> 裡就各只有一行。動手前先用 <code>--find</code> 看它列出幾筆，不要憑印象。</li>
+    <li><strong>不要關父群組</strong> <code>GR:</code>、<code>GG:</code>、<code>SG:</code> 開頭的都是群組，開關會被遊戲程式在執行時覆寫，<code>GR:HOMEPLATE</code> 明明寫著關，遊戲裡照樣看得到。要關單一元素就改它自己那一行。</li>
+    <li><strong>存回去只能接到檔尾</strong> 新資料接在檔案最後面，只改目錄 8 個位元組與檔頭 4 個位元組，原始資料區一個位元組都不動。整包重新打包會把目錄不指向的內容整批丟掉，<strong>而且不會有任何錯誤訊息</strong>。另外一次只改一個地方，改完就進遊戲確認。</li>
+    <li><strong>搜尋框是純前端</strong> 打的字不會送到任何地方，關掉 JavaScript 整張表照常顯示。反查索引那張表不參與篩選，所以只出現在索引裡的詞（例如 <code>PITCHSPEED</code>）會回報找不到。</li>
+    <li><strong>本站沒驗的</strong> <code>alib_ingamelogos</code> 裡 <code>TS:</code> 這個指令的用途未確認。而且整張表量的是這台機器那一份，檔名與畫面的對應關係大致可用，<u>但不要當成「原版一定有」</u>。</li>
+  </ul>
+
+  <footer>
+    <p>本頁所有數據皆取自實際解開的檔案內容，非推測。
+       搜尋是純前端功能，不會把你打的字送到任何地方。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

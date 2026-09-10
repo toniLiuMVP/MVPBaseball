@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/backup/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>備份與還原 SOP — toni的MVP模組補習班</title>
+<meta name="description" content="最常被動到的四個遊戲檔，加上暖身課請你打開的 controller.cfg，合計 3.87 MB，備份幾秒鐘就好。另外二十課還會寫到 models.big、datafile.big、mvp2005.exe、logos.big、開場動畫這些檔，本頁逐課列出。該備份哪些、放哪裡、怎麼確認備份與還原成功，附一支檢查腳本（檢查你的遊戲資料夾時全程唯讀）。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../../index.html">首頁</a>
+  <a class="item" href="../../start.html">新手基本功</a>
+  <a class="item" href="../../do.html">我想做什麼</a>
+  <a class="item" href="../../plan.html">課表</a>
+  <a class="item on" href="../index.html">教學</a>
+  <a class="item" href="../../7min/index.html">七分鐘</a>
+  <a class="item" href="../../reference/index.html">速查</a>
+  <a class="item" href="../../coach/index.html">棒球教練</a>
+  <a class="item" href="../../story/index.html">故事</a>
+  <a class="item" href="../../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="../index.html">教學</a> › 備份與還原 SOP</p>
+  <h1>備份與還原 SOP</h1>
+  <p class="lede">本站三個承諾的第二條是「一定先教你備份」。這頁把那句話展開成一份可以照著做的流程。
+     先講一個量出來的結論：<strong>最常被動到的那四個遊戲檔</strong>，加上暖身課請你打開的 <code>controller.cfg</code>，一共<strong>五個</strong>，
+     合計 4,058,641 個位元組（3.87 MB），大約是遊戲 <code>data</code> 資料夾的五百分之一，備份它們比你想像的快很多。
+     <strong>但那五個不是全部。</strong>本站有 <strong>39 課</strong>，其中 30 課會寫進遊戲檔（2026-09-05 數的）；
+     核心五檔涵蓋其中 10 課，另外 20 課動的是別的檔（<code>models.big</code>、<code>datafile.big</code>、
+     <code>mvp2005.exe</code>、<code>logos.big</code>、開場動畫 …）。第二節有<u>逐課的完整清單</u>，上到哪一課就照那一列多備份哪一個檔。</p>
+
+  <div class="grid">
+    <div class="card"><p class="card-h">難度</p><p>★☆☆ 只是複製貼上</p></div>
+    <div class="card"><p class="card-h">時間</p><p>第一次約 10 分鐘</p></div>
+    <div class="card"><p class="card-h">要裝 Python 嗎</p><p>備份不用。<strong>只有檢查腳本要</strong></p></div>
+  </div>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法就是你正在看的這一頁，往下讀就是。</p>
+  </div>
+
+  <div class="quickfix" id="quick">
+    <p class="card-h">⚡ 只想趕快做完？照這四步</p>
+    <ol>
+      <li>在桌面建一個<strong>帶日期</strong>的備份資料夾，裡面先開好兩層子資料夾。<br>
+  <strong>Windows</strong>
+  <pre><code>mkdir "%USERPROFILE%\Desktop\MVP-backup-20260825\data\database"
+  mkdir "%USERPROFILE%\Desktop\MVP-backup-20260825\data\frontend"</code></pre>
+  <strong>Mac</strong>
+  <pre><code>mkdir -p ~/Desktop/MVP-backup-20260825/data/database ~/Desktop/MVP-backup-20260825/data/frontend</code></pre></li>
+      <li>把五個檔複製進去，合計只有 3.87 MB。<br>
+  <strong>Windows</strong>
+  <pre><code>copy "你的遊戲資料夾\controller.cfg" "%USERPROFILE%\Desktop\MVP-backup-20260825\"
+  copy "你的遊戲資料夾\data\database\attrib.dat" "%USERPROFILE%\Desktop\MVP-backup-20260825\data\database\"
+  copy "你的遊戲資料夾\data\database\pitcher.dat" "%USERPROFILE%\Desktop\MVP-backup-20260825\data\database\"
+  copy "你的遊戲資料夾\data\database\schedule.big" "%USERPROFILE%\Desktop\MVP-backup-20260825\data\database\"
+  copy "你的遊戲資料夾\data\frontend\ingame.big" "%USERPROFILE%\Desktop\MVP-backup-20260825\data\frontend\"</code></pre>
+  <strong>Mac</strong>
+  <pre><code>cd "你的遊戲資料夾"
+  cp controller.cfg ~/Desktop/MVP-backup-20260825/
+  cp data/database/attrib.dat data/database/pitcher.dat data/database/schedule.big ~/Desktop/MVP-backup-20260825/data/database/
+  cp data/frontend/ingame.big ~/Desktop/MVP-backup-20260825/data/frontend/</code></pre></li>
+      <li>下載這頁的檢查腳本、<strong>拖到桌面</strong>，把遊戲資料夾跟備份資料夾一起交給它，五行都要顯示「內容一致」。<br>
+  <strong>Windows</strong>
+  <pre><code>python mvp_check_backup.py "你的遊戲資料夾" "%USERPROFILE%\Desktop\MVP-backup-20260825"</code></pre>
+  <strong>Mac</strong>
+  <pre><code>python3 mvp_check_backup.py "你的遊戲資料夾" ~/Desktop/MVP-backup-20260825</code></pre></li>
+      <li>要還原：先試那一課工具的 <code>--restore</code>，不行就把備份複製回去覆蓋（<strong>先把遊戲關掉</strong>）。以還原 <code>ingame.big</code> 為例，其他檔同理換路徑。<br>
+  <strong>Windows</strong>
+  <pre><code>copy /Y "%USERPROFILE%\Desktop\MVP-backup-20260825\data\frontend\ingame.big" "你的遊戲資料夾\data\frontend\"</code></pre>
+  <strong>Mac</strong>
+  <pre><code>cp ~/Desktop/MVP-backup-20260825/data/frontend/ingame.big "你的遊戲資料夾"/data/frontend/</code></pre></li>
+    </ol>
+    <p class="tail">指令裡的 <code>你的遊戲資料夾</code> 整段換成你自己的路徑，日期換成你今天的。
+       <strong>這五個檔只涵蓋 10 課</strong>：要上改視角、中文版修正、裝球衣、換臉皮、換大頭照、
+       換開機畫面、換聲音、球場瘦身、關掉開場動畫、改主選單文字、換球隊隊徽、改執行檔這些課，還要多備份別的檔，
+       清單在<a href="#others">下面第二節的第二張表</a>。
+       想知道為什麼是這五個、為什麼工具自己那份備份只夠退一步，往下讀；
+       只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+  </div>
+
+  <h2>一 · 為什麼要備份</h2>
+  <p>附腳本的那幾課都會自動幫你備份，這是真的。但那份自動備份<strong>不是你的備份</strong>：
+     它是「一鍵還原」的燃料，只夠退回一步，而且就躺在原檔旁邊，
+     跟原檔一起被刪、一起被搬走，也可能被下一個模組蓋掉。</p>
+
+  <div class="card clay">
+    <p class="card-h">工具的備份只夠退一步</p>
+    <p>本站二十六支會改檔的腳本，每一支都只在<u>第一次</u> <code>--apply</code> 時建立備份，
+       之後再改幾次都不覆蓋它。二十六支的原始碼裡是同一個寫法：備份檔已經存在就跳過
+       （「封裝檔可以拆成散裝嗎」那一支是把原檔改名，備份名被佔住就停手，效果一樣）。
+       這個設計是對的，它保住了你動手之前的那一份。<strong>但它只有一份</strong>，
+       而且如果你先後跑過兩支動同一個檔的工具，會出現兩份內容不同的備份，
+       哪一份比較舊，肉眼看不出來。這頁後面會教你怎麼分辨。</p>
+  </div>
+
+  <h3>還有一個理由：封裝檔改一次就長大</h3>
+  <p>本站會寫 <code>.big</code> 封裝檔的腳本（換賽程年份、關掉跑壘者速度數值、介面萬用工具、
+     改記分板的顏色、換球隊隊徽、換大頭照、換開機畫面、做一張新的球員臉皮、把一套球衣裝進遊戲、一整包模組自動歸位），
+     寫法都是<strong>把新資料接在檔案最後面</strong>，再把目錄改成指向新位置
+     （原因見 <a href="../../reference/bigf.html">BIGF 封裝格式</a>）。
+     舊資料一個位元組都沒動，還躺在裡面。所以改一次，檔案就大一次。
+     <b>唯一的例外是<a href="../shrink-big/index.html">球場超過 10MB 就當機</a>那一課</b>：
+     那一支反過來把目錄沒指到的位元組清掉，所以它會讓檔案<u>變小</u>。
+     （2026-09-05 訂正：這裡原本寫「本站三支會寫 <code>.big</code> 的腳本」，
+     那是 2026-08-25 盤點時的數字，後來加的幾課同樣寫封裝檔。）</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>檔案</th><th>怎麼寫入</th><th class="num">改前</th><th class="num">改一次之後</th><th class="num">差</th></tr></thead>
+    <tbody>
+      <tr><td data-label="檔案" class="mono">attrib.dat</td><td data-label="怎麼寫入">純文字，整份重寫</td>
+          <td data-label="改前" class="num">840,643</td><td data-label="改一次之後" class="num">840,643</td><td data-label="差" class="num">0</td></tr>
+      <tr><td data-label="檔案" class="mono">ingame.big</td><td data-label="怎麼寫入">封裝檔，接檔尾</td>
+          <td data-label="改前" class="num">2,665,562</td><td data-label="改一次之後" class="num">2,750,503</td><td data-label="差" class="num">+84,941</td></tr>
+      <tr class="hi"><td data-label="檔案" class="mono">schedule.big</td><td data-label="怎麼寫入">封裝檔，接檔尾</td>
+          <td data-label="改前" class="num">130,514</td><td data-label="改一次之後" class="num">651,825</td><td data-label="差" class="num">+521,311</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">單位都是位元組，全部在沙盒複本上實際跑過一次量到的。
+     <code>attrib.dat</code> 那一列改動的是一位球員的跑壘速度，
+     檔案大小完全沒變，用 <code>cmp -l</code> 逐位元組比對，整份檔案<strong>只有 1 個位元組不同</strong>。</p>
+
+  <div class="card amber">
+    <p class="card-h">同一支工具連跑三次，檔案會長三次</p>
+    <p>拿還沒動過的 <code>schedule.big</code> 連續換三次年份，每一次都固定多 521,311 個位元組：</p>
+<pre style="margin:8px 0 0"><code>還沒動過      130,514 bytes
+換成 2030    651,825 bytes   <span class="cm">(+521,311)</span>
+換成 2040  1,173,136 bytes   <span class="cm">(+521,311)</span>
+換成 2050  1,694,447 bytes   <span class="cm">(+521,311)</span></code></pre>
+    <p style="margin-top:8px">三次寫入後，工具自己的複驗每次都通過，它印出來的是
+       「項目數 9 個(原本 9 個)」「改寫日期 18,267 個」「未對齊日期 0 個」。
+       <u>但這只驗到工具這一關，本站沒有真的開遊戲跑完一個球季</u>，
+       所以「疊三次還能不能玩」這件事，這頁不給答案。</p>
+    <p>可以確定的是檔案<strong>只會長不會縮</strong>。要讓它回到原本的大小，
+       就是把備份蓋回去，而那份備份從頭到尾都停在 130,514。</p>
+  </div>
+
+  <h2>二 · 備份哪些</h2>
+  <p>下面兩張表不是挑出來的。作法是把教學資料夾裡的每一頁讀完，
+     再把 30 支腳本裡真正會寫入的那幾行（<code>open(…, 'wb')</code>、<code>os.replace</code>、
+     <code>shutil.copy2</code>）一行一行找出來對照 ——
+     30 支裡有 <strong>26 支會寫遊戲檔</strong>，另外 4 支（本頁的檢查腳本、
+     <code>mvp_check_setup.py</code>、<code>mvp_read_voice.py</code>、<code>mvp_check_original.py</code>）不寫任何遊戲檔。</p>
+  <p class="small"><b>本頁清單最後盤點日期：2026-09-05</b>，當時是 39 課 40 個頁面。
+     <u>新增課程的人請回來更新這兩張表</u>，不然這頁會變成一份過期的安全網 ——
+     這正是 2026-08-29 那次稽核抓到的問題：清單停在 10 課，而站上已經 29 課；
+     2026-09-05 又抓到一次，那一次少了 10 課（其中三課動的正是核心五個檔）。
+     要自己數現在有幾課，在專案根目錄跑
+     <code>ls -1d site/tutorials/*/ | wc -l</code>。</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>教學</th><th class="mono">會寫入的遊戲檔</th><th class="mono">工具留下的備份檔名</th></tr></thead>
+    <tbody>
+      <tr><td data-label="教學"><a href="../controller-config/index.html">暖身課：打開一個遊戲的檔案</a></td>
+          <td data-label="會寫入的遊戲檔"><strong>不寫</strong>（只請你用記事本打開 <code class="mono">controller.cfg</code> 來看）</td>
+          <td data-label="工具留下的備份檔名">沒有工具，你自己複製到桌面</td></tr>
+      <tr><td data-label="教學"><a href="../crash-diagnosis/index.html">遊戲當掉了怎麼辦</a></td>
+          <td data-label="會寫入的遊戲檔"><strong>不寫任何檔</strong></td><td data-label="工具留下的備份檔名">—</td></tr>
+      <tr><td data-label="教學"><a href="../read-file-headers/index.html">五秒看穿一個檔案</a></td>
+          <td data-label="會寫入的遊戲檔"><strong>不寫任何檔</strong></td><td data-label="工具留下的備份檔名">—</td></tr>
+      <tr><td data-label="教學"><a href="../change-schedule-year/index.html">把賽程換到任何年份</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\database\schedule.big</td><td data-label="工具留下的備份檔名" class="mono">schedule.big.bak</td></tr>
+      <tr><td data-label="教學"><a href="../hide-runner-speed/index.html">關掉跑壘者速度數值</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\frontend\ingame.big</td><td data-label="工具留下的備份檔名" class="mono">ingame.big.bak</td></tr>
+      <tr class="hi"><td data-label="教學"><a href="../hide-runner-speed/manual.html">同一課的手動改法</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\frontend\ingame.big</td>
+          <td data-label="工具留下的備份檔名"><strong>沒有腳本</strong>，那一課的步驟 1 要你自己複製一份
+              <code class="mono">ingame.big.bak</code></td></tr>
+      <tr><td data-label="教學"><a href="../fel-recipes/index.html">介面實例集</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\frontend\ingame.big</td><td data-label="工具留下的備份檔名" class="mono">ingame.big.feltoolbak</td></tr>
+      <tr><td data-label="教學"><a href="../fel-toolkit/index.html">介面萬用工具 fel_toolkit</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\frontend\ingame.big</td><td data-label="工具留下的備份檔名" class="mono">ingame.big.feltoolbak</td></tr>
+      <tr><td data-label="教學"><a href="../edit-stance/index.html">換打擊姿勢與投球姿勢</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\database\attrib.dat<br>data\database\pitcher.dat</td>
+          <td data-label="工具留下的備份檔名" class="mono">attrib.dat.bak<br>pitcher.dat.bak</td></tr>
+      <tr><td data-label="教學"><a href="../edit-speed/index.html">修改球員跑壘速度</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\database\attrib.dat</td><td data-label="工具留下的備份檔名" class="mono">attrib.dat.speedbak</td></tr>
+      <tr><td data-label="教學"><a href="../swap-face/index.html">幫球員換一張臉</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\database\attrib.dat</td><td data-label="工具留下的備份檔名" class="mono">attrib.dat.facebak</td></tr>
+      <tr><td data-label="教學"><a href="../make-a-player/index.html">把一位球員改成你想要的球員</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\database\attrib.dat</td><td data-label="工具留下的備份檔名" class="mono">attrib.dat.playerbak</td></tr>
+      <tr><td data-label="教學"><a href="../stats-to-ratings/index.html">把真實成績換算成遊戲裡的能力值</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\database\attrib.dat<br>data\database\pitcher.dat</td>
+          <td data-label="工具留下的備份檔名" class="mono">attrib.dat.ratingsbak<br>pitcher.dat.ratingsbak<br>rhattrib.dat.ratingsbak<br>lhattrib.dat.ratingsbak</td></tr>
+      <tr><td data-label="教學"><a href="../hud-color/index.html">改記分板的顏色</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\frontend\ingame.big</td><td data-label="工具留下的備份檔名" class="mono">ingame.big.hudcolorbak</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">Mac 上路徑分隔符是 <code>/</code> 不是 <code>\</code>，檔案位置一樣。
+     「換打擊姿勢與投球姿勢」那一課動哪一個檔，看你改的是打擊還是投球。
+     「幫球員換一張臉」那一課會<u>讀</u> 535.9 MB 的 <code>models.big</code>，
+     但只是讀目錄看有哪些臉皮，<strong>從頭到尾不寫它</strong>，所以它不在備份名單上。</p>
+
+  <p class="small">「同一課的手動改法」那一頁，教你把 <code>ingame.big.bak</code> 放在原檔<u>旁邊</u>，
+     因為那正好是 <code>mvp_hide_runner_speed.py --restore</code> 會去找的檔名。
+     這跟下一節第一條規則（備份不要留在遊戲資料夾裡）並不衝突，
+     它只是說明<strong>那一份是工具用的，不是你的備份</strong>，你還是要另外複製一份到外面。</p>
+
+  <p>教學資料夾裡目前有 <strong>39 課</strong>，其中一課（關掉跑壘者速度數值）另外附了一頁手動改法，
+     合起來 40 個頁面。<strong>會寫進遊戲檔的是其中 31 個頁面（30 課加那一頁）。</strong></p>
+
+  <p>上面那張表涵蓋的是其中 11 個頁面（10 課加那一頁手動改法），它們<strong>加起來只動四個檔</strong>：
+     <code>attrib.dat</code> 被 5 課動到，<code>ingame.big</code> 被 4 課加上那一頁手動改法動到，
+     <code>pitcher.dat</code> 被 2 課動到，<code>schedule.big</code> 1 課。
+     再加上暖身課請你打開的 <code>controller.cfg</code>，就是這頁那五個檔。</p>
+
+  <div class="card clay">
+    <p class="card-h" id="others">⚠ 剩下那 20 課動的是<u>別的</u>檔 —— 只備份五個檔擋不住它們</p>
+    <p>五個檔的清單能用，前提是你只上上面那張表裡的課。
+       只要你上了下面這張表裡的任何一課，<strong>五個檔的備份就接不住你</strong>：
+       它動的檔根本不在那五個裡面，第四節的檢查腳本也不會去看它。
+       <u>上到哪一課，就照那一列多備份哪一個檔</u>，作法跟第三節完全一樣，只是換路徑。</p>
+  </div>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>教學</th><th class="mono">會寫入的遊戲檔</th><th class="mono">工具留下的備份檔名</th></tr></thead>
+    <tbody>
+      <tr><td data-label="教學"><a href="../change-camera/index.html">把打擊視角調成你喜歡的角度</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\datafile\datafile.big<br>（官方中文版是散裝的 data\datafile\datafile.txt）</td>
+          <td data-label="工具留下的備份檔名" class="mono">datafile.big.datafilebak<br>datafile.txt.datafilebak</td></tr>
+      <tr><td data-label="教學"><a href="../fel-toolkit/index.html">介面萬用工具</a>的 <code>--camera</code> 那一組指令</td>
+          <td data-label="會寫入的遊戲檔" class="mono">同上（跟上一列是同一支腳本）</td>
+          <td data-label="工具留下的備份檔名" class="mono">.datafilebak</td></tr>
+      <tr class="hi"><td data-label="教學"><a href="../fix-chinese/index.html">中文版配大球場就跳出</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">mvp2005.exe<br>data\fonts\fonts.big<br>data\FEENG.LOC · data\IGENG.LOC</td>
+          <td data-label="工具留下的備份檔名" class="mono">mvp2005.exe.modernizebak<br>fonts.big.fontbak<br>FEENG.LOC.locbak · IGENG.LOC.locbak</td></tr>
+      <tr><td data-label="教學"><a href="../run-in-2026/index.html">2026 年的電腦怎麼跑得起 2005 年的遊戲</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">mvp2005.exe</td><td data-label="工具留下的備份檔名" class="mono">mvp2005.exe.modernizebak</td></tr>
+      <tr><td data-label="教學"><a href="../shrink-big/index.html">球場超過 10MB 就當機</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\stadium\ 底下你指定的那個 .big</td>
+          <td data-label="工具留下的備份檔名" class="mono">（那個檔名）.shrinkbak</td></tr>
+      <tr><td data-label="教學"><a href="../install-uniform/index.html">把一套球衣裝進遊戲</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\models.big<br>data\frontend\uniforms.big<br>data\frontend\logos.big</td>
+          <td data-label="工具留下的備份檔名" class="mono">models.big.unibak<br>uniforms.big.unibak<br>logos.big.unibak</td></tr>
+      <tr class="hi"><td data-label="教學"><a href="../uniforms/index.html">球衣模組：安裝與製作入門</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">同上三個檔</td>
+          <td data-label="工具留下的備份檔名"><strong>沒有本站腳本</strong>，那一課用的是社群的 Windows 工具，
+              備份要<u>你自己複製</u>（<code>models.big</code> 有 535.9 MB，會等很久）</td></tr>
+      <tr><td data-label="教學"><a href="../new-face/index.html">做一張新的球員臉皮</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\models.big</td><td data-label="工具留下的備份檔名" class="mono">models.big.facetexbak</td></tr>
+      <tr><td data-label="教學"><a href="../swap-portrait/index.html">換球員大頭照</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\frontend\portrait.big</td><td data-label="工具留下的備份檔名" class="mono">portrait.big.portraitbak</td></tr>
+      <tr><td data-label="教學"><a href="../swap-splash/index.html">換掉開機畫面</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\frontend\splash.big<br>data\frontend\sushared.big<br>data\frontend\suonly.big</td>
+          <td data-label="工具留下的備份檔名" class="mono">（各自的檔名）.screenbak</td></tr>
+      <tr><td data-label="教學"><a href="../swap-chant/index.html">把應援曲指給別的球員</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\audio\chants\spch_cht.txt</td><td data-label="工具留下的備份檔名" class="mono">spch_cht.txt.chantbak</td></tr>
+      <tr><td data-label="教學"><a href="../make-voice/index.html">換掉遊戲的聲音</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">你指定的那個聲音檔</td><td data-label="工具留下的備份檔名" class="mono">（那個檔名）.audiobak</td></tr>
+      <tr class="hi"><td data-label="教學"><a href="../unpack-big/index.html">封裝檔可以拆成散裝嗎</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">你指定的那個 .big</td>
+          <td data-label="工具留下的備份檔名">這一支不一樣：它<strong>把原本的 .big 改名</strong>成
+              <code class="mono">（那個檔名）.unpackbak</code>，再把裡面的東西解成散裝檔。
+              原檔名那個位置會空掉，不是多一份備份</td></tr>
+      <tr class="hi"><td data-label="教學"><a href="../auto-install/index.html">一整包模組自動歸位</a></td>
+          <td data-label="會寫入的遊戲檔">看那包模組裡有什麼，<strong>可能是遊戲資料夾裡任何一個同名檔</strong>，事先列不完</td>
+          <td data-label="工具留下的備份檔名" class="mono">（被動到的檔名）.autobak</td></tr>
+      <tr><td data-label="教學"><a href="../exe-tuning/index.html">執行檔上的六個旋鈕</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">mvp2005.exe</td><td data-label="工具留下的備份檔名" class="mono">mvp2005.exe.exepebak</td></tr>
+      <tr class="hi"><td data-label="教學"><a href="../skip-intro/index.html">關掉開場動畫</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\frontend\movies\ 底下的 .vp6 影片</td>
+          <td data-label="工具留下的備份檔名" class="mono">（那個檔名）.introbak<br>
+              <span class="small">影片檔很大，這一課的備份不在核心五個檔旁邊，
+              第四節的檢查腳本看不到它</span></td></tr>
+      <tr><td data-label="教學"><a href="../menu-text/index.html">改主選單的文字</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\FEENG.LOC · data\IGENG.LOC</td>
+          <td data-label="工具留下的備份檔名" class="mono">FEENG.LOC.menutextbak<br>IGENG.LOC.menutextbak</td></tr>
+      <tr><td data-label="教學"><a href="../team-logo/index.html">換球隊隊徽</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\frontend\logos.big</td><td data-label="工具留下的備份檔名" class="mono">logos.big.logobak</td></tr>
+      <tr><td data-label="教學"><a href="../make-chinese/index.html">把官方中文版的中文搬進英文版</a></td>
+          <td data-label="會寫入的遊戲檔" class="mono">data\FEENG.LOC · data\IGENG.LOC<br>data\fonts\fonts.big<br>mvp2005.exe</td>
+          <td data-label="工具留下的備份檔名" class="mono">FEENG.LOC.locbak · IGENG.LOC.locbak<br>fonts.big.fontbak<br>mvp2005.exe.modernizebak</td></tr>
+      <tr class="hi"><td data-label="教學"><a href="../pack-a-mod/index.html">把你改好的東西打包成一包</a></td>
+          <td data-label="會寫入的遊戲檔">打包本身不寫。<strong>用它安裝別人的模組時</strong>，
+              跟上一列一樣可能是遊戲資料夾裡任何一個同名檔</td>
+          <td data-label="工具留下的備份檔名" class="mono">（被動到的檔名）.packbak</td></tr>
+      <tr class="hi"><td data-label="教學"><a href="../yearly-update/index.html">一次更新整個年度</a></td>
+          <td data-label="會寫入的遊戲檔">這一課不自己寫檔，它是<strong>照順序帶你跑上面那些課</strong>，
+              所以動到的檔就是你跑過的那幾課動的檔</td>
+          <td data-label="工具留下的備份檔名">各課自己那一種</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">剩下的 6 課完全不寫任何檔，本頁不必為它們備份：本頁自己、
+     <a href="../community-tools/index.html">社群工具怎麼分工</a>、
+     <a href="../mount-disc/index.html">不用每次放光碟</a>、
+     <a href="../play-on-mac/index.html">在 Mac 上玩 MVP 2005</a>、
+     <a href="../read-voice/index.html">拆開一個語音檔</a>、
+     <a href="../whats-original/index.html">怎麼看出哪些檔還沒被動過</a>。
+     加上第一張表裡那 3 課唯讀的（暖身課、遊戲當掉了怎麼辦、五秒看穿一個檔案），
+     39 課裡唯讀的一共 9 課。</p>
+
+  <div class="card blue">
+    <p class="card-h">為什麼不寫入的 <code>controller.cfg</code> 也要備份</p>
+    <p>暖身課的成功標準寫得很明白：「你用記事本打開了原檔，<u>而且沒有存檔</u>」。
+       課程本身不要你寫入。但那一課的出錯處理裡，有一條就是
+       <strong>「不小心存檔了，遊戲怪怪的」</strong>。
+       只要一個檔會被你用記事本打開，它就有被存壞的機會，所以一起備份。</p>
+  </div>
+
+  <figure class="figbox">
+  <div class="figscroll">
+<svg class="barchart" viewBox="-4 -4 648 222" role="img" aria-label="五個要備份的檔案大小長條圖：ingame.big 2.54 MB 最大，controller.cfg 10.9 KB 小到幾乎畫不出來，五個合計 3.87 MB">
+<text x="142" y="25.68" class="bl">ingame.big</text>
+<rect x="150" y="8" width="400.0" height="26" class="bar"><title>data\frontend\ingame.big：2,665,562 bytes · 比賽中的介面 · 4 課加上一頁手動改法會寫它</title></rect>
+<text x="557.0" y="25.68" class="bv">2.54 MB</text>
+<text x="142" y="61.68" class="bl">attrib.dat</text>
+<rect x="150" y="44" width="126.2" height="26" class="bar"><title>data\database\attrib.dat：840,643 bytes · 球員資料 · 5 課會寫它</title></rect>
+<text x="283.2" y="61.68" class="bv">820.9 KB</text>
+<text x="142" y="97.68" class="bl">schedule.big</text>
+<rect x="150" y="80" width="40.7" height="26" class="bar"><title>data\database\schedule.big：271,273 bytes · 賽程表 · 1 課會寫它</title></rect>
+<text x="197.7" y="97.68" class="bv">264.9 KB</text>
+<text x="142" y="133.68" class="bl">pitcher.dat</text>
+<rect x="150" y="116" width="40.5" height="26" class="bar"><title>data\database\pitcher.dat：269,986 bytes · 投手資料 · 2 課會寫它</title></rect>
+<text x="197.5" y="133.68" class="bv">263.7 KB</text>
+<text x="142" y="169.68" class="bl">controller.cfg</text>
+<rect x="150" y="152" width="2.0" height="26" class="bar"><title>controller.cfg：11,177 bytes · 手把與鍵盤設定 · 暖身課只請你打開它，不寫入</title></rect>
+<text x="159.0" y="169.68" class="bv">10.9 KB</text>
+<line x1="150" y1="4" x2="150" y2="182" class="ax"/>
+<text x="150" y="202" class="bn">合計 4,058,641 bytes（3.87 MB）</text>
+</svg>
+  </div>
+  <figcaption><b>資料來源</b>：在一份實際裝好、也裝過中文模組的遊戲資料夾裡，對這五個檔各量一次大小。
+     <code>controller.cfg</code> 只有 11,177 個位元組，跟 <code>ingame.big</code> 差 238 倍，
+     所以它那一條在圖上幾乎畫不出來（<b>那一條有拉到最小可見寬度</b>，照同一把尺量應該只有 1.7 個像素，不是圖上的 2 個）。這正是重點：<strong>五個檔的份量差很多，但加起來還是很小</strong>。
+     換過球員名冊或賽程之後這些數字會變，量級一樣，都是幾 MB 而不是幾百 MB。
+     <b>為什麼 <code>schedule.big</code> 這裡是 264.9 KB，第一節卻說 130,514 bytes</b>：
+     量測用的這台，這個檔在本站量它<u>之前</u>就已經比原始的大了。130,514 是它旁邊那份
+     <code>schedule.big.bak</code> 的大小，也就是還沒動過的樣子。
+     兩個數字都是真的，只是取自不同時間點。
+     （2026-09-05 訂正：這裡原本寫「賽程已經換過年份，檔案早就長大了」。
+     本站的換年份工具每跑一次固定多 521,311 個位元組，而這台的 271,273 比 130,514
+     只多 140,759，<u>不在那條序列上的任何一格</u> —— 所以它變大的原因不是本站這支工具，
+     本站沒有量到它到底是被什麼改的。）</figcaption>
+  </figure>
+
+  <div class="card grass">
+    <p class="card-h">五個檔 = 遊戲資料的五百分之一</p>
+    <p>同一台上量到的對照：<code>data</code> 資料夾整個算下來是
+       <strong>2,847,001,431 bytes（2.65 GB）、1,000 個檔</strong>。
+       其中有一個是使用者自己留的球場備份子資料夾，佔 679,016,185 bytes（648 MB）、88 個檔；
+       把它扣掉，<code>data</code> 還有 <strong>2,167,985,246 bytes（2.02 GB）、912 個檔</strong>。</p>
+    <p>要備份的那五個檔裡，有四個在 <code>data</code> 底下（<code>controller.cfg</code> 在遊戲根目錄，另外算），這四個佔扣掉之後的 <strong>0.19%</strong>（約 1/534）；
+       連那個備份夾一起算則是 0.14%（約 1/701）。
+       這頁採用比較保守的 0.19%，不拿使用者自己的備份夾把比例灌得更好看。</p>
+    <p>換個講法更有感：光是 <code>models.big</code> 一個檔
+       （561,891,312 bytes，535.9 MB），就是這五個檔加起來的 <strong>138 倍</strong>。
+       備份整個遊戲要等很久又佔空間，備份這五個檔<u>幾秒鐘就好</u>。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">那如果我裝了別人做的模組呢</p>
+    <p>那就<strong>不只這五個檔</strong>。這張表涵蓋的是「你照本站教學自己改」的範圍。
+       別人做的模組可能換掉球衣、球場、大頭照、語音，動到的檔案完全是另一批，
+       <u>本站沒有實際量過任何一個社群模組動到哪些檔</u>。
+       裝第三方模組之前，最保險的做法是把<u>整個</u> <code>data</code> 資料夾複製一份，
+       慢歸慢，但那是你唯一的退路。</p>
+  </div>
+
+  <h2>三 · 備份放哪</h2>
+  <p>三條規則，順序不能換：</p>
+  <ul class="tick">
+    <li><strong>不要放在遊戲資料夾裡面。</strong>放裡面的備份，會在你下次整理資料夾、
+        重裝遊戲、或解壓縮某個模組時被一起處理掉。
+        <a href="../controller-config/index.html">暖身課</a>教你把備份拖到桌面，就是這個道理。</li>
+    <li><strong>保留原本的資料夾結構。</strong>把 <code>attrib.dat</code> 跟 <code>ingame.big</code>
+        平放在同一層，之後你會忘記哪個該放回 <code>database</code>、哪個該放回 <code>frontend</code>。</li>
+    <li><strong>資料夾名字寫日期。</strong>你會做第二份、第三份。沒有日期，
+        三個月後你分不出哪一份是「還沒裝模組之前」的。</li>
+  </ul>
+
+  <div class="step">
+    <div class="step-n">1</div>
+    <div>
+      <div class="step-t">在桌面建一個帶日期的備份資料夾</div>
+      <p class="step-why">名字用英數字、不要用中文，等一下的指令碰到中文資料夾名比較容易出錯。</p>
+      <div class="substep">
+        <p><span class="sk">W</span><strong>Windows</strong>：在桌面空白處按右鍵 → 新增 → 資料夾，
+           命名為 <code>MVP-backup-20260825</code>（日期換成今天）。</p>
+        <p><span class="sk">M</span><strong>Mac</strong>：在桌面空白處按右鍵（或按住 <span class="key">Control</span> 點一下）
+           → 新增檔案夾，同樣命名。</p>
+      </div>
+      <p>再在裡面建兩層子資料夾：<code>data\database</code> 和 <code>data\frontend</code>。
+         用指令一次建好比較快：</p>
+      <p class="small"><strong>Windows</strong>（貼到命令提示字元）</p>
+<pre><code>mkdir "%USERPROFILE%\Desktop\MVP-backup-20260825\data\database"
+mkdir "%USERPROFILE%\Desktop\MVP-backup-20260825\data\frontend"</code></pre>
+      <p class="small"><strong>Mac</strong>（貼到終端機）</p>
+<pre><code>mkdir -p ~/Desktop/MVP-backup-20260825/data/database ~/Desktop/MVP-backup-20260825/data/frontend</code></pre>
+      <div class="ifnot"><b>如果那兩行報錯</b>
+        <p>用滑鼠建也一樣：進備份資料夾建一個 <code>data</code>，
+           進 <code>data</code> 再建 <code>database</code> 和 <code>frontend</code>。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">2</div>
+    <div>
+      <div class="step-t">把五個檔複製進去</div>
+      <p class="step-why">滑鼠複製貼上也完全可以。下面的指令只是比較不會漏檔。</p>
+      <p class="small"><strong>Windows</strong>：把指令裡的
+         <code>你的遊戲資料夾</code> 整段換成你自己的路徑（用拖曳取得，見<a href="../../start.html">第 0 課操作二</a>）</p>
+<pre><code>copy "<span class="hl">你的遊戲資料夾</span>\controller.cfg" "%USERPROFILE%\Desktop\MVP-backup-20260825\"
+copy "<span class="hl">你的遊戲資料夾</span>\data\database\attrib.dat" "%USERPROFILE%\Desktop\MVP-backup-20260825\data\database\"
+copy "<span class="hl">你的遊戲資料夾</span>\data\database\pitcher.dat" "%USERPROFILE%\Desktop\MVP-backup-20260825\data\database\"
+copy "<span class="hl">你的遊戲資料夾</span>\data\database\schedule.big" "%USERPROFILE%\Desktop\MVP-backup-20260825\data\database\"
+copy "<span class="hl">你的遊戲資料夾</span>\data\frontend\ingame.big" "%USERPROFILE%\Desktop\MVP-backup-20260825\data\frontend\"</code></pre>
+      <p class="small"><strong>Mac</strong></p>
+<pre><code>cd "<span class="hl">你的遊戲資料夾</span>"
+cp controller.cfg ~/Desktop/MVP-backup-20260825/
+cp data/database/attrib.dat data/database/pitcher.dat data/database/schedule.big ~/Desktop/MVP-backup-20260825/data/database/
+cp data/frontend/ingame.big ~/Desktop/MVP-backup-20260825/data/frontend/</code></pre>
+      <div class="seen"><b>你會看到</b>
+        <p>Mac 什麼都不印，<strong>沒有訊息就是成功</strong>，這是它的習慣。
+           Windows 每一行會回一句表示複製了 1 個檔案的訊息，共五句
+           （確切用字看你的 Windows 版本，本站沒有逐版本比對過）。</p>
+      </div>
+      <div class="ifnot"><b>如果沒看到</b>
+        <ul>
+          <li>Windows 印「<code>系統找不到指定的路徑</code>」→ 路徑打錯，或是引號漏了。
+              路徑裡有空格（例如 <code>Program Files</code>）時，前後一定要各有一個半形雙引號。</li>
+          <li>Mac 印 <code>No such file or directory</code> → 同上，先確認 <code>cd</code> 那一行有沒有成功。</li>
+          <li>印「<code>拒絕存取</code>」/ <code>Permission denied</code> → 遊戲裝在
+              <code>C:\Program Files</code> 底下，改用<u>系統管理員身分</u>開命令提示字元再試一次。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h2>四 · 怎麼確認備份成功</h2>
+  <p>「複製過去了」跟「複製對了」是兩件事。下面這支腳本會把兩件事一次講清楚：
+     該備份的檔在不在、多大、什麼時候改的、有沒有備份、你的備份跟現在的檔一不一樣。</p>
+
+  <div class="btnrow">
+    <a class="btn" href="mvp_check_backup.py" download>⬇ 下載檢查腳本 mvp_check_backup.py</a>
+  </div>
+  <div class="card amber">
+    <p class="card-h">按了下載之後，檔案跑到哪裡去了？</p>
+    <p><strong>瀏覽器多半不會問你要存哪裡</strong>，它會直接放進「下載」資料夾。
+       開檔案總管（Mac 用 Finder）左邊點「<u>下載</u>」，找到那個 <code>.py</code>，
+       <strong>拖到桌面</strong>再往下做。</p>
+    <p class="small">沒做這一步的話，後面 <code>cd</code> 到桌面再執行，
+       畫面會出現 <code>can't open file</code> —— 那不是你打錯。</p>
+  </div>
+
+  <p class="small">933 行、零相依、<strong>檢查你的遊戲資料夾與備份資料夾時全程唯讀，不會在裡面建立、修改或刪除任何檔案</strong>、附完整原始碼。
+     唯一會寫檔的是它的自我測試（<code>--selftest</code>）：那些檔建在系統暫存資料夾裡，跑完自己刪掉，不碰你的遊戲。
+     掃到一半想停就按 <code>Ctrl-C</code>：它會回一句「已中止」再停（結束碼 <code>130</code>），你的遊戲資料夾與備份資料夾一個位元組都沒有動到。
+     掃描途中外接碟斷線、檔案被防毒鎖住這一類，它也會講一句人看得懂的話（結束碼 <code>2</code>），不會丟一串 Python 錯誤訊息給你自己猜。
+     需要 Python 3.7 以上（見<a href="../../start.html">第 0 課</a>）。腳本採 MIT 授權（本站教學文字另採 CC BY 4.0）。</p>
+
+  <div class="step">
+    <div class="step-n">1</div>
+    <div>
+      <div class="step-t">只看遊戲資料夾</div>
+      <p class="step-why">先確認該備份的五個檔都在、以及遊戲資料夾裡目前有哪些工具留下的備份。</p>
+<pre><code>python mvp_check_backup.py "<span class="hl">你的遊戲資料夾</span>"</code></pre>
+      <p class="small">Mac 上把 <code>python</code> 換成 <code>python3</code>。</p>
+      <div class="seen"><b>你會看到</b>
+<pre style="margin:8px 0 0"><code>【1】本站教學會動到的檔案
+  ✅ data/database/attrib.dat         820.9 KB  2026-04-29 07:51  球員資料
+  ✅ data/database/pitcher.dat        263.7 KB  2023-05-23 06:31  投手資料
+  ✅ data/database/schedule.big       264.9 KB  2026-05-10 18:25  賽程表
+  ✅ data/frontend/ingame.big           2.5 MB  2023-02-21 10:49  比賽中的介面
+  ✅ controller.cfg                    10.9 KB  2026-04-13 12:42  手把與鍵盤設定
+
+  這 5 個檔合計 3.9 MB(4,058,641 bytes)。
+  把它們複製到別的地方,只涵蓋上面列出的那幾課動的檔。
+  ⚠️ 本站還有別的課動的是別的檔(models.big / datafile.big / mvp2005.exe /
+     portrait.big / uniforms.big / fonts.big / .LOC / 語音檔 …),
+     那些不在上面的清單裡。整包備份才是完整的做法,見「備份與還原 SOP」。</code></pre>
+        <p class="small">日期那一欄是<u>那台電腦上的</u>檔案修改時間，跟你的不會一樣。</p>
+      </div>
+      <div class="ifnot"><b>如果沒看到</b>
+        <ul>
+          <li>五個全部標 <code>✗ (不存在)</code>，最後印「一個都找不到」→ 你選錯資料夾了。
+              正確的那一層<strong>同時看得到 <code>data</code> 資料夾和 <code>mvp2005.exe</code></strong>。</li>
+          <li>只有 <code>controller.cfg</code> 不存在 → 其他四個檔照樣備份得起來。
+              <u>這個檔什麼時候會被建立、刪掉之後會不會自己長回來，本站都沒有實測過</u>，
+              所以有的話還是備一份比較保險。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">2</div>
+    <div>
+      <div class="step-t">把你剛做的備份資料夾也交給它比對</div>
+      <p class="step-why">這一步才是真正在驗「備份對不對」：它會逐個位元組比，不是只看檔名跟大小。</p>
+      <p class="small"><strong>Windows</strong></p>
+<pre><code>python mvp_check_backup.py "<span class="hl">你的遊戲資料夾</span>" "%USERPROFILE%\Desktop\MVP-backup-20260825"</code></pre>
+      <p class="small"><strong>Mac</strong></p>
+<pre><code>python3 mvp_check_backup.py "<span class="hl">你的遊戲資料夾</span>" ~/Desktop/MVP-backup-20260825</code></pre>
+      <div class="seen"><b>你會看到（剛備份完，五個都該是「內容一致」）</b>
+<pre style="margin:8px 0 0"><code>【3】外部備份資料夾
+  ✅ data/database/attrib.dat         820.9 KB  2026-08-25 09:14  內容一致
+  ✅ data/database/pitcher.dat        263.7 KB  2026-08-25 09:14  內容一致
+  ✅ data/database/schedule.big       264.9 KB  2026-08-25 09:14  內容一致
+  ✅ data/frontend/ingame.big           2.5 MB  2026-08-25 09:14  內容一致
+  ✅ controller.cfg                    10.9 KB  2026-08-25 09:14  內容一致
+
+  備份資料夾涵蓋全部 5 個檔案。</code></pre>
+        <p class="small">要看的是「內容一致」這五個字，還有大小要跟遊戲資料夾裡那五個完全相同。
+           時間欄長什麼樣，要看你用什麼方式複製：上面這份是在 Mac 上用 <code>cp</code> 跑出來的，
+           所以五行都是複製當下的時間。</p>
+      </div>
+      <div class="ifnot"><b>如果沒看到</b>
+        <ul>
+          <li>某一行寫 <code>備份資料夾裡沒有</code> → 那個檔漏複製了，回上一節補做。</li>
+          <li>某一行寫 <code>內容不同(你改過了)</code> → 你在備份<u>之後</u>又改過那個檔。
+              如果你想備份的是「還沒改之前」的狀態，這份備份已經來不及了。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">⚠ 四種「看起來有備份，其實沒有」——【2】【3】會直接指名</p>
+    <p>這四句話出現在畫面上的時候，那一行<strong>不是綠勾的意思</strong>：</p>
+    <ul>
+      <li><code>它就是正本本身,不是另一份</code>（【2】）／
+          <code>這就是遊戲裡的那個檔本身,不是備份</code>（【3】）→
+          那份「備份」跟正本是<u>同一個檔</u>：符號連結、硬連結，
+          或是你把遊戲資料夾自己當成第二個參數。
+          改正本的那一刻它跟著被改，逐位元組比對必然說「一樣」，
+          而<strong>那個綠勾會害你放心去改檔</strong>。</li>
+      <li><code>是一個指不到東西的連結,救不了你</code> → 名字在，指到的東西不在。
+          一個救不了你的名字擺在那裡，比沒有更危險，所以它被指名講出來，
+          而不是從畫面上消失成「沒有備份」。</li>
+      <li><code>讀不出來(權限不足或檔案有問題)</code> → 是<u>打不開</u>，不是內容不同。
+          兩者不可以混為一談：「內容不同」代表你改過了，
+          「讀不出來」代表這一份根本還沒驗到。</li>
+      <li><code>這個備份資料夾在遊戲資料夾裡面</code> → 就是第三節第一條規則說的那件事：
+          遊戲整包被刪掉或重灌時，備份會跟著一起消失。
+          這一條只提醒，不改變上面每一行的判斷。</li>
+    </ul>
+    <p class="small">前三種只要出現一次，【3】那一段就<strong>不會</strong>印
+       「<code>備份資料夾涵蓋全部 N 個檔案</code>」——
+       那一行要一個檔都不缺、沒有指回正本的、也沒有讀不出來的，才印得出來。</p>
+  </div>
+
+  <div class="card">
+    <p class="card-h">想先確認這支腳本自己沒壞？</p>
+    <p>它內建一組自我測試，會自己造出上面那幾種情形，看該亮的字有沒有亮。
+       <strong>這一段不碰你的遊戲資料夾</strong>：測試檔全部建在系統暫存資料夾裡，跑完自己刪掉。</p>
+<pre><code>python3 mvp_check_backup.py --selftest</code></pre>
+    <p class="small">Windows 上把 <code>python3</code> 換成 <code>python</code>。</p>
+    <div class="seen"><b>你會看到（本站實跑）</b>
+<pre style="margin:8px 0 0"><code>自我測試(在系統暫存資料夾裡跑,不碰你的遊戲資料夾)
+   ✅ 陰性對照:乾淨的資料夾 + 真的另一份備份 = 沒有紅字
+   ✅ 餌一:指回正本的「備份」被指名,真的複本仍然說一樣
+   ✅ 餌二:指不到東西的備份會被指名,不會被當成沒有備份
+   ✅ 餌三:讀不出來的備份照實說,沒被講成內容不同,報告也沒斷
+   ✅ 餌四:備份資料夾在遊戲資料夾裡面會被提醒
+   ✅ 餌五:遊戲資料夾自己當備份時不會出現「涵蓋全部」
+   ✅ 餌六:目標檔是壞掉的連結時不會說成「還沒玩過遊戲」
+   ✅ 餌七:外部備份讀不出來時不說成內容不同,也不說涵蓋全部
+   ✅ 餌八(陽性對照):真的有兩份內容不同的備份時要講出來
+   ✅ 餌八(陰性對照):兩份一模一樣就不可以說成不同
+   ✅ 餌八:讀不出來的那一份不會被算成「內容不同的備份」
+   ✅ 餌九:檔案在報告中途消失時,四段報告照樣印得完
+   ✅ 餌十:外部備份完整時,結論不會說「你也還沒有任何備份」
+   ✅ 餌十一(陰性對照):沒有中斷也沒有出錯時,cli() 照樣回 0
+   ✅ 餌十一:掃描途中按 Ctrl-C 會講一句中文並以 130 收工,不噴 traceback
+   ✅ 餌十二:掃描途中讀取出錯會講一句中文並以 2 收工,不噴 traceback
+   ✅ 自我測試全部通過</code></pre>
+    </div>
+    <p class="small">十六道檢查全綠時回傳值是 <code>0</code>，任何一道沒過是 <code>1</code>；
+       在 <code>python3 -O</code> 底下它會拒跑，結束碼 <code>2</code>（<code>-O</code> 會把 <code>assert</code> 整段拿掉，
+       「測試沒跑」跟「測試沒過」是兩回事，不混在同一個數字裡）。
+       它驗的是<u>腳本自己</u>，不會告訴你你的備份好不好 —— 那是上面兩步的事。</p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">不想裝 Python 也可以確認</p>
+    <p>用檔案總管 / Finder <strong>看檔案大小的數字對不對</strong>，
+       就能擋掉「漏複製」跟「複製到一半中斷」這兩種最常見的失敗：
+       備份資料夾裡那五個檔的大小，要跟遊戲資料夾裡那五個<u>一模一樣</u>，
+       不是「差不多」而是<strong>連個位數都要相同</strong>。
+       Windows 在檔案上按右鍵 → 內容，看「大小」那一行的括號內數字；
+       Mac 按 <span class="key">⌘ Cmd</span> + <span class="key">I</span> 看「大小」。</p>
+    <p>這招看不出「內容不同但大小剛好一樣」的情況。本站量到一個現成的例子：
+       <code>attrib.dat</code> 改一位球員的跑壘速度之後，
+       840,643 還是 840,643，只有 1 個位元組不同。那種情況才需要腳本。</p>
+  </div>
+
+  <h2>五 · 怎麼還原</h2>
+  <p>有兩條路。<strong>先試第一條，不行再走第二條。</strong></p>
+
+  <h3>路線 A：用該課工具的 --restore（快，但只退一步）</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th style="width:30%">你跑過哪一課</th><th>還原指令</th></tr></thead>
+    <tbody>
+      <tr><td><a href="../change-schedule-year/index.html">把賽程換到任何年份</a></td>
+          <td class="mono">python mvp_shift_schedule_year.py "…\data\database\schedule.big" --restore</td></tr>
+      <tr><td><a href="../hide-runner-speed/index.html">關掉跑壘者速度數值</a></td>
+          <td class="mono">python mvp_hide_runner_speed.py "…\data\frontend\ingame.big" --restore</td></tr>
+      <tr><td><a href="../fel-recipes/index.html">介面實例集</a> ·
+              <a href="../fel-toolkit/index.html">介面萬用工具</a></td>
+          <td class="mono">python mvp_fel_toolkit.py "你的遊戲資料夾" --restore</td></tr>
+      <tr><td><a href="../edit-speed/index.html">修改球員跑壘速度</a></td>
+          <td class="mono">python mvp_edit_speed.py "你的遊戲資料夾" --restore</td></tr>
+      <tr><td><a href="../swap-face/index.html">幫球員換一張臉</a></td>
+          <td class="mono">python mvp_swap_face.py "你的遊戲資料夾" --restore</td></tr>
+      <tr><td><a href="../edit-stance/index.html">換打擊姿勢與投球姿勢</a></td>
+          <td class="mono">python mvp_edit_stance.py "你的遊戲資料夾" --restore</td></tr>
+      <tr class="hi"><td><a href="../hide-runner-speed/manual.html">同一課的手動改法</a></td>
+          <td>沒有腳本。把你自己複製的 <code>ingame.big.bak</code> 改名回
+              <code>ingame.big</code> 蓋回去。
+              這個檔名剛好就是 <code>mvp_hide_runner_speed.py --restore</code> 會去找的那一個，
+              所以你手上如果有 Python，那道指令也吃得動它</td></tr>
+      <tr class="hi"><td><a href="../controller-config/index.html">暖身課 controller.cfg</a></td>
+          <td>沒有腳本。把桌面那份複製回去覆蓋，
+              或進遊戲 → 設定 → 手把設定 → 選「還原預設」</td></tr>
+      <tr><td><a href="../change-camera/index.html">把打擊視角調成你喜歡的角度</a></td>
+          <td class="mono">python mvp_fel_toolkit.py "你的遊戲資料夾" --big data\datafile\datafile.big --restore-datafile</td></tr>
+      <tr><td><a href="../fix-chinese/index.html">中文版配大球場就跳出</a><br>
+              （三支工具各還原各的）</td>
+          <td class="mono">python mvp_modernize.py "…\mvp2005.exe" --restore<br>
+              python mvp_font_swap.py "你的遊戲資料夾" --restore<br>
+              python mvp_fix_loc.py "你的遊戲資料夾" --restore</td></tr>
+      <tr><td><a href="../run-in-2026/index.html">2026 年的電腦怎麼跑得起 2005 年的遊戲</a></td>
+          <td class="mono">python mvp_modernize.py "…\mvp2005.exe" --restore</td></tr>
+      <tr><td><a href="../shrink-big/index.html">球場超過 10MB 就當機</a></td>
+          <td class="mono">python mvp_shrink_big.py "…\data\stadium\那個檔.big" --restore</td></tr>
+      <tr><td><a href="../install-uniform/index.html">把一套球衣裝進遊戲</a></td>
+          <td class="mono">python mvp_install_uniform.py "你的遊戲資料夾" --restore</td></tr>
+      <tr><td><a href="../new-face/index.html">做一張新的球員臉皮</a></td>
+          <td class="mono">python mvp_new_face.py "你的遊戲資料夾" --restore</td></tr>
+      <tr><td><a href="../swap-portrait/index.html">換球員大頭照</a></td>
+          <td class="mono">python mvp_swap_portrait.py "你的遊戲資料夾" --restore</td></tr>
+      <tr><td><a href="../swap-splash/index.html">換掉開機畫面</a></td>
+          <td class="mono">python mvp_swap_screen.py "你的遊戲資料夾" --restore</td></tr>
+      <tr><td><a href="../swap-chant/index.html">把應援曲指給別的球員</a></td>
+          <td class="mono">python mvp_swap_chant.py "你的遊戲資料夾" --restore</td></tr>
+      <tr><td><a href="../make-voice/index.html">換掉遊戲的聲音</a></td>
+          <td class="mono">python mvp_audio.py "…\那個聲音檔" --restore</td></tr>
+      <tr><td><a href="../unpack-big/index.html">封裝檔可以拆成散裝嗎</a></td>
+          <td class="mono">python mvp_unpack_big.py "…\那個檔.big" --restore</td></tr>
+      <tr><td><a href="../auto-install/index.html">一整包模組自動歸位</a></td>
+          <td class="mono">python mvp_autoinstall.py "你的遊戲資料夾" --restore</td></tr>
+      <tr><td><a href="../make-a-player/index.html">把一位球員改成你想要的球員</a></td>
+          <td class="mono">python mvp_player.py "你的遊戲資料夾" --restore</td></tr>
+      <tr class="hi"><td><a href="../stats-to-ratings/index.html">把真實成績換算成遊戲裡的能力值</a></td>
+          <td class="mono">python mvp_ratings.py --restore-write "你的遊戲資料夾"
+              <span class="small">（這一支的還原參數叫 <code>--restore-write</code>，而且資料夾放在參數後面）</span></td></tr>
+      <tr><td><a href="../hud-color/index.html">改記分板的顏色</a></td>
+          <td class="mono">python mvp_hud_color.py "你的遊戲資料夾" --restore</td></tr>
+      <tr><td><a href="../menu-text/index.html">改主選單的文字</a></td>
+          <td class="mono">python mvp_menu_text.py "你的遊戲資料夾" --restore</td></tr>
+      <tr><td><a href="../team-logo/index.html">換球隊隊徽</a></td>
+          <td class="mono">python mvp_team_logo.py "你的遊戲資料夾" --restore</td></tr>
+      <tr><td><a href="../skip-intro/index.html">關掉開場動畫</a></td>
+          <td class="mono">python mvp_skip_intro.py "你的遊戲資料夾" --restore</td></tr>
+      <tr><td><a href="../exe-tuning/index.html">執行檔上的六個旋鈕</a></td>
+          <td class="mono">python mvp_exe_pe.py "…\mvp2005.exe" --restore</td></tr>
+      <tr><td><a href="../make-chinese/index.html">把官方中文版的中文搬進英文版</a><br>
+              （三支工具各還原各的）</td>
+          <td class="mono">python mvp_fix_loc.py "你的遊戲資料夾" --restore<br>
+              python mvp_font_swap.py "你的遊戲資料夾" --restore<br>
+              python mvp_modernize.py "…\mvp2005.exe" --restore</td></tr>
+      <tr><td><a href="../pack-a-mod/index.html">把你改好的東西打包成一包</a>
+              （用它<u>安裝</u>別人的模組之後）</td>
+          <td class="mono">python mvp_pack.py "你的遊戲資料夾" --restore</td></tr>
+      <tr class="hi"><td><a href="../yearly-update/index.html">一次更新整個年度</a></td>
+          <td>沒有自己的工具。它帶你跑的是上面那些課，
+              所以要還原就<strong>照你跑過的那幾課，各自跑各自的 <code>--restore</code></strong>；
+              一次退乾淨還是路線 B</td></tr>
+      <tr class="hi"><td><a href="../uniforms/index.html">球衣模組：安裝與製作入門</a></td>
+          <td>沒有本站腳本（那一課用社群的 Windows 工具）。
+              只能把你自己複製的 <code>models.big</code> / <code>uniforms.big</code> /
+              <code>logos.big</code> 蓋回去，也就是路線 B</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">有的工具吃的是「檔案路徑」（換賽程年份、關掉跑壘者速度數值、
+     <code>mvp_modernize.py</code>、<code>mvp_exe_pe.py</code>、<code>mvp_shrink_big.py</code>、
+     <code>mvp_unpack_big.py</code>、<code>mvp_audio.py</code>），有的吃的是「遊戲資料夾」，這不是筆誤，照表上抄就好。
+     Mac 上把 <code>python</code> 換成 <code>python3</code>。
+     <code>--restore</code> 是拿第一次建立的那份備份蓋回去，所以會把該課做過的<u>所有</u>修改一次收回去，
+     不是只收最後一次。</p>
+
+  <div class="card clay">
+    <p class="card-h">⚠ 跑過兩支動同一個檔的工具？先看清楚哪一份比較舊</p>
+    <p>本站二十六支會寫遊戲檔的腳本一共留下<strong>二十五種</strong>備份副檔名
+       （2026-09-05 在 <code>site/tutorials/</code> 底下數的：30 支腳本裡有 4 支不寫遊戲檔，
+       剩下 26 支各自留備份，多一課會寫檔的教學通常就多一種。
+       這 26 支裡有一支是打包工具自己。
+       <a href="../pack-a-mod/index.html">打包那一課</a>數的是同一批二十六支、同樣是 25 種，
+       只是它接著把「扣掉打包工具自己留的 <code>.packbak</code> 之後的 <strong>24 種</strong>」
+       單獨提出來講，因為那才是它的 <code>--scan</code> 要掃的、<u>別的課</u>留下的痕跡
+       （<code>mvp_pack.py</code> 自己那份 <code>BAK_SUFFIXES</code> 就是 24 項）。
+       <u>兩邊都對，只是清單口徑不同</u>。
+       <u>這個數字每加一課就會變</u>，要知道現在是幾種，跑
+       <code>.tools/site-check/selftest_backup_suffixes.py</code> 最準）：
+       <code>.bak</code> / <code>.speedbak</code> / <code>.facebak</code> / <code>.feltoolbak</code> /
+       <code>.datafilebak</code> / <code>.facetexbak</code> / <code>.unibak</code> / <code>.portraitbak</code> /
+       <code>.screenbak</code> / <code>.chantbak</code> / <code>.audiobak</code> / <code>.locbak</code> /
+       <code>.fontbak</code> / <code>.modernizebak</code> / <code>.shrinkbak</code> / <code>.unpackbak</code> /
+       <code>.autobak</code> / <code>.playerbak</code> / <code>.ratingsbak</code> / <code>.hudcolorbak</code> /
+       <code>.logobak</code> / <code>.menutextbak</code> / <code>.exepebak</code> / <code>.introbak</code> /
+       <code>.packbak</code>。
+       其中<strong>三支都用 <code>.bak</code></strong>（換賽程年份、關掉跑壘者速度數值、換打擊姿勢與投球姿勢），
+       但它們動的是不同的檔，所以還是不會互相覆蓋 —— 也因此看備份要連檔名一起看，不能只看副檔名。
+       好處是備份不會被蓋掉，
+       <strong>代價是同一個檔可能同時存在兩三份內容不同的備份</strong>。</p>
+        <p class="small">✅ <strong>下一節的檢查腳本這二十五種全部認得</strong>（原始碼裡的
+       <code>BAK_SUFFIXES</code> 就是同一份清單：2026-09-05 在
+       <code>site/tutorials/backup/mvp_check_backup.py</code> 上數到 25 個項目；
+       守門的是 <code>.tools/site-check/selftest_backup_suffixes.py</code>，
+       它把兩邊對一次，跑起來是綠的。<strong>不過它守得住的是這二十五種裡的二十三種</strong>：
+       2026-09-05 讀它的原始碼，它掃 <code>site/tutorials/</code> 時會跳過
+       <code>pack-a-mod</code>、<code>backup</code> 與 <code>crash-diagnosis</code> 這三課
+       （那幾份清單自己住的地方），
+       而且它認副檔名的樣式要求點後面至少一個字母才接 <code>bak</code>，
+       通用的 <code>.bak</code> 因此從頭到尾配不到。所以 <code>.bak</code> 與
+       <code>.packbak</code> 哪天從清單裡掉了它還是綠的，那兩種要自己看）。
+       <span class="small">（2026-09-05 訂正：這裡原本寫「跟每一支腳本字面寫出的備份副檔名<u>一個不多、一個不少</u>」。
+       那種全稱保證放兩天就會過期 —— 2026-09-04「關掉開場動畫」那一課上線，
+       它留的 <code>.introbak</code> 當天就不在清單裡，守門腳本因此報紅；
+       2026-09-05 補進清單才恢復綠燈。所以這頁改成叫你自己跑守門腳本。）</span>
+       <strong>但「認得」不等於「掃得到」</strong>：那支腳本只看核心五個檔旁邊有沒有備份，
+       所以留在 <code>mvp2005.exe</code> 旁邊的 <code>.exepebak</code>（改執行檔那一課留的）
+       與 <code>.modernizebak</code>（2026 年怎麼跑得起來那一課留的），
+       還有留在 <code>movies</code> 資料夾影片旁邊的 <code>.introbak</code>（關掉開場動畫那一課留的），
+       都不會出現在它的【2】那一段，
+       那幾份備份的先後順序要<u>自己看檔案的修改時間</u>排。</p>
+    <p>實測：拿一份 <code>attrib.dat</code>，先跑「修改球員跑壘速度」，再跑「幫球員換一張臉」，
+       然後把三個檔各自跟動手前那一份用 <code>cmp -l</code> 逐位元組比對：</p>
+<pre style="margin:8px 0"><code>attrib.dat.speedbak   跟動手前差 <span class="nu">0</span> 個位元組   <span class="cm">← 這份最舊</span>
+attrib.dat.facebak    跟動手前差 <span class="nu">1</span> 個位元組   <span class="cm">← 已經含著改速度那一次</span>
+attrib.dat（現在的）   跟動手前差 <span class="nu">2</span> 個位元組   <span class="cm">← 兩次改動都在</span></code></pre>
+    <p>所以這時候打 <code>mvp_swap_face.py --restore</code>，
+       你只會退回「速度已經改過」的狀態。
+       <u>最舊的那一份備份，才是你第一次動手之前的樣子</u>，
+       上一節的檢查腳本會直接把它指出來。</p>
+    <p class="small">檢查腳本印的字是「它才是原廠檔」。這裡的「原廠」<strong>是相對於你動手之前</strong>，
+       不是 EA 出廠。量測用的那台，<code>attrib.dat</code> 本身就已經是裝過中文模組的檔案。
+       要退到真正的 EA 出廠狀態，只有重裝，或是用你在裝模組之前做的那份備份。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">封裝檔更好認：三份大小全不一樣</p>
+    <p>同一件事發生在 <code>ingame.big</code> 上會直接寫在檔案大小裡。
+       實測先跑「關掉跑壘者速度數值」再跑「介面萬用工具」：</p>
+<pre style="margin:8px 0 0"><code>ingame.big.bak          2,665,562 bytes   <span class="cm">← 最舊</span>
+ingame.big.feltoolbak   2,750,503 bytes   <span class="cm">← 已含第一次修改</span>
+ingame.big（現在的）     2,828,256 bytes   <span class="cm">← 兩次都在</span></code></pre>
+    <p class="small" style="margin-top:8px">本站寫 <code>.big</code> 的腳本都是往檔尾接（球場瘦身那一課除外），檔案只會越改越大，
+       所以在這些工具底下，<strong>比較小的那一份備份就是比較早的那一份</strong>。
+       <b>球場瘦身那一課反過來</b>：它把目錄沒指到的位元組清掉，檔案會變小，
+       所以 <code>.shrinkbak</code> 一定比現在的檔<u>大</u>，這條規則對它不成立。
+       純文字的 <code>attrib.dat</code> 沒有這個線索：它是逗號分隔、欄位不補零，所以大小<strong>通常</strong>不變，只有改動前後的位數不同時才會差一兩個位元組（實測把 93 改成 5，檔案從 840,643 掉到 840,642）。大小不是可靠的先後線索。</p>
+  </div>
+
+  <h3>路線 B：從你自己的備份複製回去（退到你備份的那一刻）</h3>
+  <p>只要第三節那份備份還在，這條路就不受你中間跑過幾支工具、改過幾次、
+     工具的備份檔被誰蓋掉影響。它把你按下複製那一刻的狀態放回去，
+     <strong>不會比那個時間點更早</strong>。</p>
+  <p class="small"><strong>Windows</strong>（以還原 <code>ingame.big</code> 為例，其他檔同理換路徑）</p>
+<pre><code>copy /Y "%USERPROFILE%\Desktop\MVP-backup-20260825\data\frontend\ingame.big" "<span class="hl">你的遊戲資料夾</span>\data\frontend\"</code></pre>
+  <p class="small"><strong>Mac</strong></p>
+<pre><code>cp ~/Desktop/MVP-backup-20260825/data/frontend/ingame.big "<span class="hl">你的遊戲資料夾</span>"/data/frontend/</code></pre>
+  <div class="seen"><b>你會看到</b>
+    <p>Windows 回一句表示複製了 1 個檔案的訊息；Mac 一樣什麼都不印。</p>
+  </div>
+  <div class="ifnot"><b>如果印「拒絕存取」/ Permission denied</b>
+    <ul>
+      <li><strong>先把遊戲關掉</strong>，遊戲開著的時候檔案是鎖住的。</li>
+      <li>還是不行 → 用系統管理員身分重開命令提示字元。</li>
+    </ul>
+  </div>
+
+  <h2>六 · 怎麼確認還原成功</h2>
+  <p>這裡有一件事一定要先講清楚：<strong>工具會不會自己驗，每一支不一樣</strong>。
+     這不是誰寫壞了，是各課寫成的時間不同。
+     本站實際跑過<u>下面這六支</u>的 <code>--restore</code>（也就是核心五檔那一組），印出來的是這樣：</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">工具</th><th>還原後印什麼</th><th>有沒有自己驗位元組</th></tr></thead>
+    <tbody>
+      <tr><td data-label="工具" class="mono">mvp_edit_speed.py</td>
+          <td data-label="還原後印什麼" class="mono">已從備份還原 → attrib.dat<br>已還原,前 N 行裡有 M 行不同。</td>
+          <td data-label="有沒有自己驗位元組">沒有 —— 它比的是<u>還原前</u>那個檔跟還原後差幾行</td></tr>
+      <tr><td data-label="工具" class="mono">mvp_swap_face.py</td>
+          <td data-label="還原後印什麼" class="mono">已從備份還原 → attrib.dat<br>已還原,跟還原前有 N 行不同。</td>
+          <td data-label="有沒有自己驗位元組">沒有 —— 同上</td></tr>
+      <tr class="hi"><td data-label="工具" class="mono">mvp_fel_toolkit.py</td>
+          <td data-label="還原後印什麼" class="mono">位元組完全一致:✅ 是</td><td data-label="有沒有自己驗位元組"><strong>有</strong></td></tr>
+      <tr><td data-label="工具" class="mono">mvp_shift_schedule_year.py</td>
+          <td data-label="還原後印什麼" class="mono">✓ 已從備份還原:schedule.big.bak → schedule.big</td><td data-label="有沒有自己驗位元組">沒有</td></tr>
+      <tr><td data-label="工具" class="mono">mvp_hide_runner_speed.py</td>
+          <td data-label="還原後印什麼" class="mono">✓ 已從備份還原:ingame.big.bak → ingame.big</td><td data-label="有沒有自己驗位元組">沒有</td></tr>
+      <tr><td data-label="工具" class="mono">mvp_edit_stance.py</td>
+          <td data-label="還原後印什麼" class="mono">✓ 已還原 attrib.dat(打擊姿勢)</td><td data-label="有沒有自己驗位元組">沒有</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">另外二十支會寫檔的工具，本站<u>沒有逐支實跑過 <code>--restore</code> 再把畫面抄下來</u>，
+     所以這張表不涵蓋它們；不管哪一支，下面那三項驗收條件都照樣適用。
+     印「已還原」的那幾支只代表<u>複製這個動作沒出錯</u>，沒有回頭確認結果。
+     <code>mvp_fel_toolkit.py</code> 的「位元組完全一致」也要看清楚它比的是什麼：讀它的原始碼，
+     順序是先把<u>自己那一份備份</u>複製到原檔上，再把那份備份跟複製出來的結果對讀。
+     所以它抓得到的是「複製到一半失敗」，
+     <strong>它不會告訴你有沒有回到你動手之前的狀態</strong>。那件事要靠檢查腳本。</p>
+  <p class="small">（2026-09-05 訂正：這張表原本說 <code>mvp_edit_speed.py</code> 與
+     <code>mvp_swap_face.py</code> 也會印「<code>位元組完全一致:✅ 是</code>」。
+     那兩支後來把那一行拿掉了 —— 它們的原始碼裡寫著理由：那句話比的是
+     「剛複製過去的檔」跟「複製的來源」，複製成功就一定相等，等於只是在報告自己剛複製成功。
+     現在它們改成跟<u>還原前</u>的檔比，告訴你這次還原到底改動了幾行。
+     所以本站實跑過的六支裡，<strong>只剩 <code>mvp_fel_toolkit.py</code> 一支</strong>還印那一行。）</p>
+
+  <p>以下<strong>三項都成立</strong>才算還原完成。少一項就當作沒還原。</p>
+  <ul class="tick">
+    <li><strong>工具沒有報錯。</strong>上表唯一會自驗位元組的
+        <code>mvp_fel_toolkit.py</code>，要看到「<code>位元組完全一致:✅ 是</code>」；
+        印「<code>❌ 否</code>」就直接走路線 B。
+        <u>其他幾支不會印這一行</u>，看不到它<strong>不代表還原失敗</strong> ——
+        它們印的是「<code>已從備份還原 → 〈檔名〉</code>」或「<code>✓ 已從備份還原:…</code>」，
+        看到那一行加上下面兩條成立就算過。</li>
+    <li><strong>檢查腳本說備份跟現在的檔案一樣。</strong>再跑一次第四節那兩個指令，
+        【2】那一段該檔要顯示「<code>跟現在的檔案一樣</code>」，
+        【3】那一段要顯示「<code>內容一致</code>」。</li>
+    <li><strong>檔案大小回到備份的數字。</strong>封裝檔最明顯：
+        還原後的 <code>ingame.big</code> 要等於你備份那一份的大小，不是比它大的那個數字。</li>
+  </ul>
+
+  <div class="seen"><b>還原乾淨的樣子（實跑：關掉跑壘者速度數值 → --restore）</b>
+<pre style="margin:8px 0 0"><code>【2】遊戲資料夾裡的備份檔
+  ✅ ingame.big.bak                     2.5 MB  2023-02-21 10:49  <span class="hl">跟現在的檔案一樣</span>
+     ↑ 「關掉跑壘者速度數值」這一課建立的</code></pre>
+  </div>
+
+  <div class="ifnot"><b>沒還原乾淨的樣子（這是真的跑出來的）</b>
+    <p>先跑「關掉跑壘者速度數值」、再跑「介面萬用工具」，然後只用
+       <code>mvp_fel_toolkit.py --restore</code> 還原：</p>
+<pre style="margin:8px 0 0"><code>【2】遊戲資料夾裡的備份檔
+  ✅ ingame.big.bak                     2.5 MB  2023-02-21 10:49  <span class="hl">跟現在的檔案不同</span>
+     ↑ 「關掉跑壘者速度數值」這一課建立的
+  ✅ ingame.big.feltoolbak              2.6 MB  2026-08-25 09:17  跟現在的檔案一樣
+     ↑ 「介面萬用工具 fel_toolkit」這一課建立的
+     ⚠ ingame.big 有 2 份內容不同的備份 —— 它們是不同時間點的快照。
+       最舊的是 ingame.big.bak,它才是原廠檔;
+       其他幾份裡面已經含著前一次的修改。</code></pre>
+    <p style="margin-top:8px">工具那邊印的是「<code>位元組完全一致:✅ 是</code>」，
+       完全沒有報錯，因為它確實把 <u>它自己那份備份</u>還原乾淨了。
+       但檢查腳本一眼就看出來：<strong>離動手之前還差一步</strong>。
+       要再退一層，就再跑一次 <code>mvp_hide_runner_speed.py …\ingame.big --restore</code>，
+       或直接走路線 B。</p>
+    <p class="small">上面 <code>ingame.big.bak</code> 那一行的日期是 2023，不是今天：
+       工具建立備份用的是「連同時間一起複製」，所以備份檔帶著的是<u>它保存的那份內容</u>的時間。
+       這也是檢查腳本能排出先後的依據。</p>
+  </div>
+
+  <h2>出錯了？對照這張表</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th style="width:34%">畫面上的訊息</th><th>原因</th><th>你要做的</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="畫面上的訊息" class="mono">can't open file '…\mvp_*.py'</td>
+          <td data-label="原因">檔案還在「下載」資料夾，不在桌面</td>
+          <td data-label="你要做的">開檔案總管左邊點「下載」，把那個 <code>.py</code> 拖到桌面，再跑一次。
+              <u>這是本站最常見的第一個卡點。</u></td></tr>
+      <tr><td data-label="畫面上的訊息" class="mono">✗ 找不到這個資料夾</td><td data-label="原因">路徑打錯，或路徑有空格卻沒加引號</td>
+          <td data-label="你要做的">用拖曳取得路徑（<a href="../../start.html">第 0 課操作二</a>）</td></tr>
+      <tr><td data-label="畫面上的訊息" class="mono">一個都找不到 —— 你選的可能不是遊戲安裝資料夾</td>
+          <td data-label="原因">選到上一層或下一層了</td>
+          <td data-label="你要做的">選<strong>同時看得到 <code>data</code> 和 <code>mvp2005.exe</code></strong> 的那一層</td></tr>
+      <tr><td data-label="畫面上的訊息" class="mono">找不到備份 xxx.bak</td>
+          <td data-label="原因">那支工具沒有改過這個檔，或備份被搬走／刪掉了</td>
+          <td data-label="你要做的">改走路線 B，從你自己的備份資料夾複製回去</td></tr>
+      <tr class="hi"><td data-label="畫面上的訊息" class="mono">⚠ attrib.dat 有 2 份內容不同的備份</td>
+          <td data-label="原因">你先後跑過兩支動同一個檔的工具</td>
+          <td data-label="你要做的">看腳本印的「<strong>最舊的是 ___</strong>」，
+              <u>那一份是你第一次動手之前的樣子</u>（裝過模組的話，它是模組的狀態）</td></tr>
+      <tr><td data-label="畫面上的訊息" class="mono">位元組完全一致:❌ 否</td>
+          <td data-label="原因">把備份複製回原檔的過程本身出錯了</td>
+          <td data-label="你要做的"><strong>改走路線 B</strong>，然後照下面的範本回報</td></tr>
+      <tr><td data-label="畫面上的訊息" class="mono">拒絕存取 / Permission denied</td>
+          <td data-label="原因">遊戲還開著，或遊戲裝在 <code>C:\Program Files</code> 底下</td>
+          <td data-label="你要做的">先關遊戲；還不行就用系統管理員身分開命令提示字元</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="report">
+    <p class="card-h">📋 卡住的話，照這個格式回報</p>
+<pre style="margin:0"><code>作業系統：Windows 11 / Windows 10 / macOS ___
+卡在哪一節：一 / 二 / 三 / 四 / 五 / 六
+我打的指令：(整行複製貼上)
+畫面印出什麼：(整段複製貼上)
+檢查腳本【1】那一段印出幾個 ✅：___ 個
+檢查腳本【2】那一段有沒有出現「有 N 份內容不同的備份」：有 / 沒有</code></pre>
+  </div>
+
+  <h2 id="how-it-works">這支腳本在做什麼</h2>
+  <p>它把「你到底備份了沒有」拆成四個問題，照順序各回答一次，
+     而且<strong>四個問題全都是唯讀的</strong>：
+     【1】本站教學會動到的那幾個檔在不在、多大、什麼時候改的；
+     【2】這些檔旁邊有沒有工具自動留下的備份，那些備份跟現在的檔一不一樣；
+     【3】你自己那個備份資料夾裡有沒有對應的檔，內容一不一樣；
+     【4】把前面一路記下來的「值得注意」收成一段結論。</p>
+  <p>判斷「一不一樣」靠的是<strong>逐位元組比對</strong>，不是比大小、也不是比時間。
+     大小不同才會提早結束；大小一樣的話，兩個檔會整個讀完才敢說一樣。
+     這件事很重要，因為<u>大小一樣但內容不同</u>的檔案，
+     正是備份出問題時最常見的樣子。</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>哪一段</th><th>做什麼</th><th>為什麼要有它</th></tr></thead>
+    <tbody>
+      <tr><td data-label="哪一段"><code>TARGETS</code>（表）</td>
+          <td data-label="做什麼">列出本站教學會動到的五個檔：相對路徑、這個檔是什麼、
+              會動到它的是哪幾課。</td>
+          <td data-label="為什麼要有它">這張表決定【1】要去找哪些檔。
+              它是逐篇讀教學內文與腳本的寫入點整理出來的，不是照副檔名猜的；
+              也因此它<u>只涵蓋一部分課</u>，其餘的課動的檔不在表上，
+              畫面上會另外提醒你這件事。</td></tr>
+
+      <tr class="hi"><td data-label="哪一段"><code>BAK_SUFFIXES</code>（表）</td>
+          <td data-label="做什麼">本站工具留備份時用的那些備份副檔名，2026-09-05 數是 25 種
+              （<u>這個數字每加一課就會變</u>，腳本自己的註解也刻意不寫死它）。</td>
+          <td data-label="為什麼要有它">漏一個的後果是<strong>靜默的</strong>：
+              那支工具留的備份會完全看不見，而畫面上不會有任何提示，
+              你只會以為自己沒備份。所以本站有一支專門的檢查器在守這份清單，
+              每新增一課會寫檔的教學就要回來加一筆。</td></tr>
+
+      <tr><td data-label="哪一段"><code>BAK_OWNER</code> ＋
+              <code>BAK_OWNER_BY_SUFFIX</code>（表）</td>
+          <td data-label="做什麼">把「原檔名 ＋ 備份副檔名」對回是哪一課建立的。
+              先查兩者的組合，查不到再退回只看副檔名。</td>
+          <td data-label="為什麼要有它">順序不能反：同一個 <code>.bak</code>
+              出現在不同檔案上，是不同的工具留的，只看副檔名會認錯人。
+              兩張表都查不到就誠實說「不是本站工具建立的」，不冒認。</td></tr>
+
+      <tr><td data-label="哪一段"><code>main()</code> 的【1】</td>
+          <td data-label="做什麼">逐個檔看在不在，印出大小與最後修改時間，
+              並把合計的位元組數算出來。</td>
+          <td data-label="為什麼要有它">大小與時間是給<u>你自己</u>認的：
+              「這份備份對不對得上我改之前那個時間點」只有你知道。
+              <code>controller.cfg</code> 找不到不算問題，
+              那個檔要玩過一次遊戲才會出現，所以它被單獨放行。</td></tr>
+
+      <tr class="hi"><td data-label="哪一段"><code>main()</code> 的【2】</td>
+          <td data-label="做什麼">在原檔旁邊找「原檔名 ＋ 備份副檔名」的備份，
+              每一份都跟現在的檔比一次，並寫出是哪一課留的。</td>
+          <td data-label="為什麼要有它">同一個檔可能被好幾支工具動過。
+              有兩份以上內容不同時，它會挑出<strong>最舊的那一份</strong>說
+              「它才是原廠檔」，因為每支工具只在第一次寫入前備份，
+              晚一點那幾份裡已經含著前一次的修改。</td></tr>
+
+      <tr><td data-label="哪一段"><code>main()</code> 的【3】</td>
+          <td data-label="做什麼">給了外部備份資料夾的話，逐檔找對應的備份再逐位元組比。
+              保留原資料夾結構、或全部平放在同一層，兩種擺法都認。</td>
+          <td data-label="為什麼要有它">「複製過去了」跟「複製對了」是兩件事。
+              少一個檔通常是還原那天才會發現，而那天已經來不及了，
+              所以現在就把它記成一條。</td></tr>
+
+      <tr><td data-label="哪一段"><code>main()</code> 的【4】</td>
+          <td data-label="做什麼">把一路收集的「值得注意」列出來。
+              一條都沒有的時候再分兩種講：你給的外部備份資料夾是完整的，
+              印的是「<code>遊戲資料夾裡沒有工具留的備份 —— 你還沒動手改,那是正常的。</code>」
+              加上那份備份涵蓋了【1】列的每一個檔；
+              連外部備份都沒給，才印「<code>目前沒有需要處理的事 —— 但你也還沒有任何備份。</code>」</td>
+          <td data-label="為什麼要有它">什麼都還沒改過的機器本來就不該有備份，
+              那不是問題，是還沒開始。但也<u>不可以</u>因此說成「每一個都有備份」，
+              沒有問題不等於已經備份好了。這兩句話混在一起講，
+              等於把「你還沒開始」講成「你已經安全了」。
+              分出第三種講法也是同一個道理：【3】上面三行剛印完「涵蓋全部」，
+              結論再說「你也還沒有任何備份」，就是同一個畫面自己打自己。</td></tr>
+
+      <tr><td data-label="哪一段"><code>same_bytes()</code></td>
+          <td data-label="做什麼">逐位元組比兩個檔，一次讀 1 MB 對一段。
+              大小不同就直接回「不一樣」，連開檔都不必。</td>
+          <td data-label="為什麼要有它">「一樣」是整個檔讀完才敢說的話。
+              切塊讀是因為這張表上的 <code>ingame.big</code>
+              在本站的測試機上是 2.5 MB，整個吃進記憶體沒有必要。</td></tr>
+
+      <tr><td data-label="哪一段"><code>human()</code> ＋ <code>when()</code></td>
+          <td data-label="做什麼">把位元組數換成人看得懂的單位；
+              把最後修改時間印出來，<u>只到分鐘</u>。</td>
+          <td data-label="為什麼要有它">時間只到分鐘是刻意的：秒數對判斷
+              「哪一份比較舊」沒有幫助，卻會把這台機器的活動時間
+              精確地印在你要貼給別人看的畫面上。</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">唯讀不是形容詞：<strong>檢查那條路上唯一的開檔動作</strong>
+     是比對用的那兩個 <code>'rb'</code>，對你的遊戲資料夾與備份資料夾沒有
+     <code>open(..., 'w')</code>、沒有 <code>shutil.copy</code>、也沒有 <code>os.remove</code>。
+     （2026-09-05 訂正：這頁原本寫「整支腳本唯一的開檔動作」。腳本後來加了一段
+     <code>--selftest</code> 自我測試，那一段會建檔、寫檔、刪檔 —— 但它建的檔全部在
+     <u>系統暫存資料夾</u>裡，跑完自己刪掉，不碰你的遊戲。所以「唯讀」這句話的範圍是
+     「你的遊戲資料夾與備份資料夾」，不是「整支檔案」。）
+     做不到的事同樣寫在腳本開頭：它只認得<u>放在原檔旁邊、用原檔名加備份副檔名</u>
+     命名的備份（你自己改過名字或搬走的它看不到，那不代表你沒備份），
+     也不會判斷備份內容合不合理，只回答「跟現在的檔一不一樣」。</p>
+
+  <h2>附錄：檢查腳本原始碼</h2>
+  <p>零相依，只用 Python 內建功能。整份 933 行裡（程式碼到第 909 行，之後 23 行是 MIT 授權條款），
+     <strong>檢查那條路上只有一行在開檔（第 289 行同時開兩個檔做比對），
+     而且兩個都是唯讀的 <code>'rb'</code></strong>。
+     會建檔、寫檔、刪檔的只有第 345 行開始的 <code>self_test()</code>
+     （要打 <code>--selftest</code> 才會跑），它用的是
+     <code>tempfile.mkdtemp</code> 開在系統暫存資料夾裡的自己的測試檔，跑完自己刪掉。
+     你可以自己搜尋 <code>open(</code> 確認再跑。</p>
+  <p class="small">一個小提醒：程式裡 <code>TARGETS</code> 上面那段註解寫「會寫入的檔案」，
+     但 <code>controller.cfg</code> 是例外，暖身課只請你打開它來看，並不寫入。
+     腳本印出來的標題是「本站教學會動到的檔案」，那個講法才準。</p>
+
+  <div class="card">
+    <details>
+      <summary><strong>展開 / 收合完整原始碼（933 行）</strong></summary>
+<pre style="margin:10px 0 0">#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+mvp_check_backup.py
+檢查 EA MVP Baseball 2005 的備份狀況。
+
+    python3 mvp_check_backup.py "遊戲安裝資料夾"
+    python3 mvp_check_backup.py "遊戲安裝資料夾" "你的外部備份資料夾"
+    python3 mvp_check_backup.py --selftest
+
+例如:
+    python3 mvp_check_backup.py "C:\\Program Files (x86)\\EA SPORTS\\MVP Baseball 2005"
+
+這支腳本**全程唯讀**,不會建立、修改或刪除任何檔案。它只回答四個問題:
+
+  1. 本站教學會動到的檔案,在不在?多大?什麼時候改的?
+  2. 這些檔案旁邊有沒有工具自動建立的備份?
+  3. 那些備份跟現在的檔案一不一樣(還原後應該一樣)?
+  4. 給了外部備份資料夾的話,那份備份跟現在的檔案差在哪?
+
+吃什麼(輸入)
+  · 第一個參數:遊戲安裝資料夾,也就是同時看得到 data 這個子資料夾和 .exe 的那一層。
+    拖一個檔進來(mvp2005.exe 或 controller.cfg)也可以,腳本會自己往上一層走。
+  · 第二個參數(可以不給):你自己放備份的那個資料夾。
+    保留原本的資料夾結構、或把檔案全部平放在同一層,兩種擺法都認得。
+
+吐什麼(輸出)
+  · 只有畫面上那四段報告。你的遊戲資料夾與備份資料夾裡沒有任何檔案被建立、
+    修改或刪除,對它們唯一的開檔動作是比對用的兩個唯讀 'rb'。
+  · 唯一的例外是 --selftest:它在系統暫存資料夾裡建自己的測試檔來驗證下面
+    那幾道檢查真的會亮,跑完自己刪掉,全程不碰你的遊戲資料夾。
+  · 回傳值:0 = 檢查完了(或自我測試全綠);
+    1 = 參數不對、那個資料夾裡一個目標檔都找不到,或自我測試沒過;
+    2 = 掃描途中讀取出錯(外接碟斷線、檔案被別的程式鎖住),
+        或是在 python3 -O 底下跑 --selftest —— 它會拒跑。
+        「測試沒跑」跟「測試沒過」是兩回事,所以不跟 1 混在一起;
+        「碟不見了」跟「路徑打錯了」也是兩回事,所以也不跟 1 混在一起;
+    130 = 你按了 Ctrl-C。
+
+安全網
+  · 唯讀是唯一的模式:沒有 --apply,也沒有還原功能。要還原請照
+    「備份與還原 SOP」自己把檔案複製回去,這支只負責告訴你複製對了沒有。
+  · 「一不一樣」是**逐位元組**比出來的,不是比大小、也不是比時間。
+    大小不同才提早結束,大小一樣就整個讀完才敢說一樣。
+  · 一份「備份」如果其實就是正本本身(符號連結、硬連結,或把遊戲資料夾
+    自己當成第二個參數),逐位元組比對必然說「一樣」。這種情形會被指名
+    講出來,不會給你一個綠勾 —— 那個綠勾會害人放心去改檔。
+  · 讀不出來的檔(權限不足、壞掉的連結)會照實說「讀不出來」,
+    不會混進「不一樣」裡,也不會讓整份報告中途斷掉。
+  · 中途按 Ctrl-C 就只是少印幾行:這支從頭到尾沒有開任何檔案來寫,
+    也沒有搬移或刪除,所以停在哪裡都不會留下半截的東西。它會講一句話
+    告訴你這件事,而不是丟一串 Python 的錯誤訊息給你自己猜。
+  · 同一個檔有好幾份內容不同的備份時,會指出**最舊的那一份才是原廠檔**,
+    因為每支工具只在第一次寫入前備份,晚一點的那幾份裡已經含著前一次的修改。
+
+做不到的事
+  · 只看本站教學會動到的那幾個檔,不是整包遊戲的完整清單。
+    別的課動的檔(models.big / mvp2005.exe / 語音檔 …)不在表上,
+    完整的做法還是整包備份。
+  · 只認得「原檔名 + 備份副檔名」而且放在原檔旁邊的備份。
+    你自己改過名字、或搬去別的資料夾的那些,它看不到(那不代表你沒備份)。
+  · 不會判斷備份內容合不合理(例如中途斷掉的半截檔),
+    它只回答「跟現在的檔一不一樣」。
+  · controller.cfg 沒有任何本站工具會替它備份(暖身課是請你自己用記事本改),
+    所以它旁邊永遠不會出現備份檔。畫面上會直接請你自己複製一份,
+    不會把它寫成「哪一支工具漏了」。
+
+無外部相依,Python 3.7 以上即可。
+授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
+"""
+#
+# ─────────────────────────────────────────────────────────
+#  法律與免責(每一支本站腳本都帶著這一段)
+#
+#  · 本工具與 Electronic Arts 無任何官方關聯,也未經其授權或背書。
+#    MVP Baseball 2005 為 Electronic Arts 之作品與商標。
+#  · 本工具為原創程式碼,**不含任何 EA 的程式碼或資產**。
+#  · 本工具不提供、不教學、也不包含任何規避技術保護措施的功能。
+#  · 使用者應僅對自己合法取得的遊戲副本使用本工具,並自行承擔風險。
+#    使用前請自行確認你與遊戲發行商之間的使用者授權合約(EULA)。
+#  · 本工具按「現狀」提供,不附任何明示或默示的擔保。
+#  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
+#  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
+#    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
+#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+# ─────────────────────────────────────────────────────────
+
+import io
+import os
+import sys
+import time
+from pathlib import Path
+
+# Windows 主控台預設編碼存不下 ✓ ✗ 這類符號,先把輸出轉成 UTF-8。
+try:
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+except (AttributeError, ValueError):
+    pass
+
+# ── 本站教學實際會寫入的檔案 ────────────────────────
+# 逐篇讀教學內文與腳本的寫入點整理出來的。唯讀的那幾課(例如五秒看穿一個檔案、
+# 遊戲當掉了怎麼辦)不寫任何檔案,所以不在這張表上。
+# ⚠️ 這裡不寫「幾篇教學」的數字:本站每加一課它就過期,而且沒有人會回頭改它。
+# 一筆 = (相對於遊戲資料夾的路徑, 這個檔是什麼, 會動到它的課)。
+# 第三欄目前沒有印在畫面上,留著是為了改這張表的時候,看得出動它的是哪幾課。
+# ⚠️ 第三欄只列「指名改這個檔」的課。「一整包模組自動歸位」與「把你改好的
+#    東西打包成一包」是通用安裝器,它們可能寫進下面任何一個檔,不逐列重複寫。
+TARGETS = [
+    ('data/database/attrib.dat',   '球員資料',
+     ['修改球員跑壘速度', '幫球員換一張臉', '換打擊姿勢與投球姿勢',
+      '把一位球員改成你想要的球員', '把真實成績換算成遊戲裡的能力值']),
+    ('data/database/pitcher.dat',  '投手資料',
+     ['換打擊姿勢與投球姿勢', '把真實成績換算成遊戲裡的能力值']),
+    ('data/database/schedule.big', '賽程表',
+     ['把賽程換到任何年份']),
+    ('data/frontend/ingame.big',   '比賽中的介面',
+     ['關掉跑壘者速度數值', '介面實例集', '介面萬用工具', '改記分板的顏色']),
+    ('controller.cfg',             '手把與鍵盤設定',
+     ['暖身課:打開一個遊戲的檔案']),
+]
+
+# 玩過一次遊戲才會被建立的檔。沒有它不代表有問題。
+# ⚠️ 這裡比對的是 TARGETS 第一欄那個字串本身,不是檔名。
+#    哪天把上面那筆改成帶資料夾的寫法,這裡就對不上了,而且不會報錯,
+#    只會讓一台剛裝好的機器被說「找不到 controller.cfg」。
+BORN_ON_FIRST_RUN = {'controller.cfg'}
+
+# 本站沒有任何腳本會自動備份它的檔。暖身課是請你用記事本手動改 controller.cfg,
+# 沒有工具在旁邊留備份,所以【2】那一段對它**永遠**是「沒有備份」。
+# ⚠️ 不要因為「消不掉」就把這一項藏起來 —— 沒備份就是沒備份,藏起來是幫倒忙。
+#    要改的是措辭:講清楚該自己複製一份,而不是讓人以為哪一支工具漏了。
+NO_TOOL_BACKUP = {'controller.cfg'}
+
+# ⚠️ 這份清單漏一個,那一支工具留的備份就完全看不見,而且不會有任何提示。
+#    守門的是 .tools/site-check/selftest_backup_suffixes.py,不是 verify_site.py
+#    (那一支沒有這項檢查)。它把教學腳本字面寫出的備份副檔名跟這份清單對一次,
+#    但配不到通用的 .bak,也跳過 pack-a-mod 與 backup 兩課,那幾種少了不會紅。
+# ⚠️ 這份清單的長度會一直變(多一課會寫檔的教學通常就多一種),所以這裡
+#    **不寫死「幾支、幾種」** —— 那種數字放兩天就過期,而且沒有人會回頭改。
+#    要知道現在缺不缺,跑上面那支檢查器,它會把兩邊對一次。
+#    歷史上補過兩次:2026-09-03 補 .exepebak(執行檔那一課),
+#    2026-09-05 補 .introbak(關掉開場動畫那一課,2026-09-04 才進站)。
+# ⚠️ 補進清單不等於畫面上看得到:.exepebak 留在 mvp2005.exe 旁邊、
+#    .modernizebak 同理、.introbak 留在 movies 資料夾的 .vp6 影片旁邊,
+#    那三個檔都不在上面的 TARGETS 裡,所以【2】那一段仍然不會列它們。
+#    TARGETS 只認核心五個檔,這是刻意的。
+#    清單的順序只決定畫面上列出來的先後,不影響任何判斷。
+BAK_SUFFIXES = [
+    '.bak', '.audiobak', '.autobak', '.chantbak', '.datafilebak',
+    '.exepebak', '.facebak',
+    '.facetexbak', '.feltoolbak', '.fontbak', '.hudcolorbak', '.introbak',
+    '.locbak', '.modernizebak',
+    '.logobak', '.menutextbak', '.packbak', '.playerbak', '.portraitbak', '.ratingsbak',
+    '.screenbak',
+    '.shrinkbak', '.speedbak', '.unibak', '.unpackbak',
+]
+
+# 哪一支工具會留下哪一個備份檔。同一個 .bak 副檔名在不同檔案上是
+# 不同工具留的,所以要連檔名一起看,不能只看副檔名。
+# 鍵是 (原檔名, 備份副檔名) 的組合。查得到就能在畫面上寫出「這份是哪一課建立的」,
+# 查不到就誠實說不知道,不要冒認成本站的工具。
+BAK_OWNER = {
+    ('attrib.dat',   '.bak'):        '換打擊姿勢與投球姿勢',
+    ('attrib.dat',   '.speedbak'):   '修改球員跑壘速度',
+    ('attrib.dat',   '.facebak'):    '幫球員換一張臉',
+    ('pitcher.dat',  '.bak'):        '換打擊姿勢與投球姿勢',
+    ('schedule.big', '.bak'):        '把賽程換到任何年份',
+    ('ingame.big',   '.bak'):        '關掉跑壘者速度數值',
+    ('ingame.big',   '.feltoolbak'): '介面萬用工具 fel_toolkit',
+}
+
+# 上面那張表處理的是「同一個副檔名出現在不同檔案上」的情形（只有 .bak 這樣）。
+# 其餘每一個副檔名都只屬於一支工具，看副檔名就知道是誰留的。
+BAK_OWNER_BY_SUFFIX = {
+    '.audiobak':     '換掉遊戲的聲音',
+    '.autobak':      '一整包模組自動歸位',
+    '.chantbak':     '把應援曲指給別的球員',
+    '.datafilebak':  '介面萬用工具 fel_toolkit',
+    '.exepebak':     '執行檔上的六個旋鈕',
+    '.facebak':      '幫球員換一張臉',
+    '.facetexbak':   '做一張新的球員臉皮',
+    '.feltoolbak':   '介面萬用工具 fel_toolkit',
+    '.fontbak':      '中文版配大球場就跳出',
+    '.locbak':       '中文版配大球場就跳出',
+    '.modernizebak': '2026 年的電腦怎麼跑得起 2005 年的遊戲',
+    '.hudcolorbak':  '改記分板的顏色',
+    '.introbak':     '關掉開場動畫',
+    '.logobak':      '換球隊隊徽',
+    '.menutextbak':  '改主選單的文字',
+    '.packbak':      '把你改好的東西打包成一包（安裝前留的）',
+    '.playerbak':    '把一位球員改成你想要的球員',
+    '.portraitbak':  '換球員大頭照',
+    '.ratingsbak':   '把真實成績換算成遊戲裡的能力值',
+    '.screenbak':    '換掉開機畫面',
+    '.shrinkbak':    '球場超過 10MB 就當機',
+    '.speedbak':     '修改球員跑壘速度',
+    '.unibak':       '把一套球衣裝進遊戲',
+    '.unpackbak':    '封裝檔可以拆成散裝嗎',
+}
+
+
+def human(n):
+    """把位元組數寫成人看得懂的樣子。
+
+    1024 以下直接講 bytes:對「這個檔多大」這種問題,342 bytes 比 0.3 KB 好懂。
+    到 GB 就停住不再往上換,遊戲檔不會大到需要更上面的單位。
+    None 是「大小讀不出來」,不是 0 —— 印成 0 bytes 會讓人以為那個檔是空的。
+    """
+    if n is None:
+        return '(讀不到)'
+    if n &lt; 1024:
+        return '%d bytes' % n
+    for unit in ('KB', 'MB', 'GB'):
+        n /= 1024.0
+        if n &lt; 1024 or unit == 'GB':
+            return '%.1f %s' % (n, unit)
+    return '%.1f GB' % n
+
+
+def size_of(path):
+    """檔案大小;讀不到就回 None(權限不足、剛好被刪掉、壞掉的連結)。
+
+    這支是在別人的機器上跑的,拿不到大小是常態不是例外。原本直接 .stat()
+    會讓整份報告在中途噴 traceback,後面幾段就都看不到了。
+    """
+    try:
+        return path.stat().st_size
+    except OSError:
+        return None
+
+
+def when(path):
+    """這個檔上次被改的時間,只到分鐘;讀不到就照實說。"""
+    # 只顯示到分鐘。秒數對判斷「哪一份比較舊」沒有幫助,
+    # 卻會把這台機器的活動時間精確地印出來。
+    try:
+        return time.strftime('%Y-%m-%d %H:%M',
+                             time.localtime(path.stat().st_mtime))
+    except OSError:
+        return '(讀不到)'
+
+
+def mtime_of(path):
+    """排序用的修改時間;讀不到就當成無限新。
+
+    「最舊的那一份才是原廠檔」是要印給人看的結論,挑錯了會害人還原到
+    已經改過的版本。讀不到時間的那一份寧可排到最後,也不要被誤選成最舊。
+    """
+    try:
+        return path.stat().st_mtime
+    except OSError:
+        return float('inf')
+
+
+def same_file(a, b):
+    """兩個路徑是不是「同一個檔」(符號連結、硬連結,或根本同一條路徑)。
+
+    ⚠️ 這是這支腳本能犯的最嚴重的錯:一份「備份」如果其實就是正本本身,
+       逐位元組比對必然回 True,畫面上就出現一個綠勾,讀者於是放心去改檔 ——
+       而那一刻備份跟著一起被改掉,等到要還原才發現什麼都沒有。
+       實測兩種踩法,加這道檢查之前兩種都印綠勾:
+         (1) 把遊戲資料夾自己當成第二個參數(外部備份 = 遊戲本身);
+         (2) ln -s attrib.dat attrib.dat.speedbak(備份指回正本)。
+    """
+    try:
+        return os.path.samefile(str(a), str(b))
+    except OSError:
+        return False
+
+
+def same_bytes(a, b, chunk=1 &lt;&lt; 20):
+    """兩個檔案內容是否完全相同。大小不同就直接回 False,不必整個讀。
+
+    一次讀 1 MB(1 &lt;&lt; 20)兩邊對一段,不把整個檔吃進記憶體:
+    這張表上的 ingame.big 在本站的測試機上是 2.5 MB,沒有必要整個吃進來。
+    兩邊同時讀到空字串,代表一起走到檔尾,那才回 True。
+
+    回三種值不是兩種:True 一樣 / False 不一樣 / None 讀不出來。
+    ⚠️ None 不可以當成 False —— 「讀不到」跟「不一樣」是兩件事,混為一談
+       會讓人去追一個根本不存在的差異;而原本沒有 None 這一種的時候,
+       一個 chmod 000 的備份檔會讓整份報告當場 traceback 斷在半路。
+    """
+    try:
+        # 先比大小是為了快,不是為了省事:大小不同就一定不一樣,連開檔都不必。
+        if a.stat().st_size != b.stat().st_size:
+            return False
+        # 全程 'rb'。這是檢查你的檔案時唯一的開檔動作,而且兩個都是唯讀。
+        with open(a, 'rb') as fa, open(b, 'rb') as fb:
+            while True:
+                x = fa.read(chunk)
+                y = fb.read(chunk)
+                if x != y:
+                    return False
+                if not x:
+                    return True
+    except OSError:
+        return None
+
+
+def _run_capture(argv):
+    """跑一次 main(),把畫面上的字接起來回傳。只有自我測試用得到。"""
+    import contextlib
+    import traceback
+    buf = io.StringIO()
+    saved = sys.argv
+    sys.argv = argv
+    try:
+        with contextlib.redirect_stdout(buf):
+            code = main()
+    except Exception:
+        # 噴例外本身就是一種失敗,但不可以連帶把後面幾個餌一起帶走 ——
+        # 那會讓人以為只壞了一件事。回一個不可能的代碼,讓 check 去報。
+        return 99, buf.getvalue() + '\n' + traceback.format_exc()
+    finally:
+        sys.argv = saved
+    return code, buf.getvalue()
+
+
+def _run_cli(argv):
+    """跑一次 cli()(不是 main()),把畫面上的字接起來回傳。只有自我測試用得到。
+
+    ⚠️ 為什麼不共用上面那支:那支叫的是 main(),而 Ctrl-C 與「掃描途中讀取
+       出錯」這兩條路是外面的 cli() 接的。用 _run_capture 去測,cli() 的兩個
+       except 一次都不會執行 —— 餌會綠,而綠的理由是它根本沒測到那道守門。
+    ⚠️ 這裡接的是 BaseException 不是 Exception:Ctrl-C 丟的 KeyboardInterrupt
+       不是 Exception 的子類。cli() 的守門哪天被拿掉,例外會從這裡浮上來;
+       接住它,那個餌才會紅掉,而不是把整份自我測試一起帶走。
+    """
+    import contextlib
+    import traceback
+    buf = io.StringIO()
+    saved = sys.argv
+    sys.argv = argv
+    try:
+        with contextlib.redirect_stdout(buf):
+            code = cli()
+    except BaseException:
+        return 99, buf.getvalue() + '\n' + traceback.format_exc()
+    finally:
+        sys.argv = saved
+    return code, buf.getvalue()
+
+
+def self_test():
+    """種餌自我測試:每一道守門各放一個餌,抓不到就紅。
+
+    為什麼要有:下面這幾道檢查(備份其實是正本本身 / 指不到東西的連結 /
+    讀不出來 / 備份放在遊戲資料夾裡面)都是「沒事的時候完全不出聲」的那種。
+    沒有餌的話,它們壞掉跟正常運作在畫面上長得一模一樣 —— 本站踩過這個坑。
+    每一個餌都先確認「不下餌時不會亮」,再確認「下了餌一定亮」。
+
+    ⚠️ 全程在系統暫存資料夾裡建自己的測試檔,跑完自己刪掉,
+       不碰你的遊戲資料夾。這是整支腳本唯一會寫檔的地方。
+
+    ⚠️ 在 python3 -O 底下不跑,直接以結束碼 2 收工(不回傳 True/False)。
+    """
+    # ⚠️ python3 -O 會把整份程式裡的 assert 整段拿掉。本站別支工具的自我測試是
+    #    用 assert 判斷的,在 -O 底下那些餌一條都不會執行,螢幕上卻照樣一路 ✅ ——
+    #    那是一片假的綠燈,比沒有測試更危險。
+    #    這一支目前用的是下面那個 check() 不是 assert,所以 -O 還不會讓它假綠;
+    #    擋掉是為了跟全站的自我測試一致,而且哪天這裡改寫成 assert,守門已經在了,
+    #    不必指望那時候有人記得補。
+    #    這裡直接結束整支程式,不回傳 True/False ——「測試沒跑」跟「測試沒過」
+    #    是兩回事,用 1(有一項紅了)會把它們混在一起。
+    if sys.flags.optimize:
+        print('--selftest 不能在 python3 -O 底下跑:-O 會把 assert 整段拿掉,'
+              '哪天這裡改用 assert 判斷就會變成一片假的綠燈。請拿掉 -O 再跑一次。')
+        sys.exit(2)
+    import shutil
+    import tempfile
+
+    print('自我測試(在系統暫存資料夾裡跑,不碰你的遊戲資料夾)')
+    ok = [True]
+
+    def check(label, cond, out=''):
+        print('   %s %s' % ('✅' if cond else '❌', label))
+        if not cond:
+            ok[0] = False
+            print('      實際印出來的是:')
+            for line in out.strip().splitlines()[-12:]:
+                print('      | %s' % line)
+
+    def link(target, path):
+        """做一個符號連結;這台機器不給做就回 False(Windows 常見)。"""
+        try:
+            os.symlink(target, path)
+            return True
+        except (OSError, NotImplementedError, AttributeError):
+            return False
+
+    td = tempfile.mkdtemp(prefix='mvp_check_backup_selftest_')
+    try:
+        root = os.path.join(td, 'game')
+        vault = os.path.join(td, 'vault')
+        rels = ['data/database/attrib.dat', 'data/database/pitcher.dat',
+                'data/database/schedule.big', 'data/frontend/ingame.big']
+        for d in ('data/database', 'data/frontend'):
+            os.makedirs(os.path.join(root, *d.split('/')))
+        os.makedirs(vault)
+        for i, rel in enumerate(rels):
+            with open(os.path.join(root, *rel.split('/')), 'wb') as f:
+                f.write(bytes(bytearray([65 + i])) * (4096 + i))
+            shutil.copy2(os.path.join(root, *rel.split('/')),
+                         os.path.join(vault, os.path.basename(rel)))
+
+        # 陰性對照:乾淨的一份必須全綠。它紅了,後面的餌抓到也不算數。
+        code, out = _run_capture(['mvp_check_backup.py', root, vault])
+        check('陰性對照:乾淨的資料夾 + 真的另一份備份 = 沒有紅字',
+              code == 0 and '涵蓋全部' in out and '值得注意' not in out, out)
+
+        db = os.path.join(root, 'data', 'database')
+        att = os.path.join(db, 'attrib.dat')
+
+        # 餌一:一份是真的複本、一份是指回正本的連結。兩者必須被分開講。
+        shutil.copy2(att, att + '.facebak')
+        if link('attrib.dat', att + '.speedbak'):
+            code, out = _run_capture(['mvp_check_backup.py', root])
+            check('餌一:指回正本的「備份」被指名,真的複本仍然說一樣',
+                  '就是正本本身' in out and '跟現在的檔案一樣' in out, out)
+            os.remove(att + '.speedbak')
+        else:
+            print('   ⏭ 餌一:這台機器不給做符號連結,略過')
+        os.remove(att + '.facebak')
+
+        # 餌二:名字在、卻指不到東西的備份,不可以在畫面上消失成「沒有備份」。
+        pit = os.path.join(db, 'pitcher.dat')
+        if link(os.path.join(td, 'nowhere.dat'), pit + '.bak'):
+            code, out = _run_capture(['mvp_check_backup.py', root])
+            check('餌二:指不到東西的備份會被指名,不會被當成沒有備份',
+                  '指不到東西的連結' in out, out)
+            os.remove(pit + '.bak')
+        else:
+            print('   ⏭ 餌二:這台機器不給做符號連結,略過')
+
+        # 餌三:讀不出來的備份要照實說,而且整份報告不可以斷在半路。
+        sch = os.path.join(db, 'schedule.big')
+        shutil.copy2(sch, sch + '.bak')
+        os.chmod(sch + '.bak', 0)
+        readable = True
+        try:
+            with open(sch + '.bak', 'rb') as f:
+                f.read(1)
+        except OSError:
+            readable = False
+        # readable=True 代表「chmod 0 之後還是讀得到」(root、或不吃權限的
+        # 檔案系統)。那種機器上餌三、餌七都測不到東西,誠實略過,不要假綠。
+        if readable:
+            print('   ⏭ 餌三:這裡的權限擋不住讀取(root 或該檔案系統),略過')
+        else:
+            code, out = _run_capture(['mvp_check_backup.py', root])
+            # ⚠️ 餌要下在正確的地方:只驗「有沒有出現『讀不出來』」是抓不到
+            #    「把 None 當成不一樣」這個寫法的 —— 那時候備註欄照樣會寫
+            #    讀不出來。所以連「不可以說成內容不同」一起驗。
+            check('餌三:讀不出來的備份照實說,沒被講成內容不同,報告也沒斷',
+                  code == 0
+                  and '讀不出來(權限不足或檔案有問題)' in out
+                  and '跟現在的檔案不同' not in out
+                  and '=' * 52 in out, out)
+        os.chmod(sch + '.bak', 0o600)
+        os.remove(sch + '.bak')
+
+        # 餌四:備份資料夾放在遊戲資料夾裡面 —— 會跟遊戲一起消失。
+        inner = os.path.join(root, 'backup')
+        os.makedirs(inner)
+        for rel in rels:
+            shutil.copy2(os.path.join(root, *rel.split('/')),
+                         os.path.join(inner, os.path.basename(rel)))
+        code, out = _run_capture(['mvp_check_backup.py', root, inner])
+        check('餌四:備份資料夾在遊戲資料夾裡面會被提醒',
+              '在遊戲資料夾裡面' in out, out)
+        shutil.rmtree(inner)
+
+        # 餌五:把遊戲資料夾自己當成備份資料夾 —— 加這道檢查之前這裡全是綠勾。
+        code, out = _run_capture(['mvp_check_backup.py', root, root])
+        check('餌五:遊戲資料夾自己當備份時不會出現「涵蓋全部」',
+              '就是遊戲裡的那個檔本身' in out and '涵蓋全部' not in out, out)
+
+        # 餌六:【1】那一段的目標檔本身是壞掉的連結。
+        cfg = os.path.join(root, 'controller.cfg')
+        if link(os.path.join(td, 'nowhere.cfg'), cfg):
+            code, out = _run_capture(['mvp_check_backup.py', root])
+            check('餌六:目標檔是壞掉的連結時不會說成「還沒玩過遊戲」',
+                  '這個名字在' in out and '玩過一次遊戲才會出現' not in out, out)
+            os.remove(cfg)
+        else:
+            print('   ⏭ 餌六:這台機器不給做符號連結,略過')
+
+        # 餌七:外部備份那一段也有同一組三態,要各自下餌 —— 【2】綠不代表【3】綠。
+        if readable:
+            print('   ⏭ 餌七:同上,權限擋不住讀取,略過')
+        else:
+            os.chmod(os.path.join(vault, 'attrib.dat'), 0)
+            try:
+                code, out = _run_capture(['mvp_check_backup.py', root, vault])
+                check('餌七:外部備份讀不出來時不說成內容不同,也不說涵蓋全部',
+                      code == 0
+                      and '讀不出來(權限不足或檔案有問題)' in out
+                      and '內容不同' not in out and '涵蓋全部' not in out, out)
+            finally:
+                os.chmod(os.path.join(vault, 'attrib.dat'), 0o600)
+
+        # 餌八:同一個檔有兩份以上備份時,「讀不出來」不可以被算成「內容不同」。
+        #       算錯的後果不是少講一句,是憑空多一句「最舊的那一份才是原廠檔」,
+        #       把人指去還原一份它根本沒讀到的檔。先驗它該講的時候有講。
+        shutil.copy2(att, att + '.bak')
+        with open(att + '.speedbak', 'wb') as f:
+            f.write(b'X' * 512)
+        code, out = _run_capture(['mvp_check_backup.py', root])
+        check('餌八(陽性對照):真的有兩份內容不同的備份時要講出來',
+              '份內容不同的備份' in out, out)
+        shutil.copy2(att, att + '.speedbak')      # 改成兩份一模一樣
+        code, out = _run_capture(['mvp_check_backup.py', root])
+        check('餌八(陰性對照):兩份一模一樣就不可以說成不同',
+              '份內容不同的備份' not in out, out)
+        os.chmod(att + '.speedbak', 0)
+        if readable:
+            print('   ⏭ 餌八:同上,權限擋不住讀取,略過最後一段')
+        else:
+            code, out = _run_capture(['mvp_check_backup.py', root])
+            check('餌八:讀不出來的那一份不會被算成「內容不同的備份」',
+                  '份內容不同的備份' not in out, out)
+        os.chmod(att + '.speedbak', 0o600)
+        os.remove(att + '.speedbak')
+        os.remove(att + '.bak')
+
+        # 餌九:報告跑到一半,某個檔剛好被別的程式刪掉/搬走(這是真的會發生的:
+        #       雲端同步、防毒、另一支工具都可能在同一秒動它)。要製造這個時機
+        #       需要兩個行程搶時間,所以這裡讓那個名字的 stat 在「問過一次之後」
+        #       開始丟例外 —— 測的是「後面幾段還印不印得完」,不是 stat 本身。
+        shutil.copy2(att, att + '.bak')
+        with open(att + '.facebak', 'wb') as f:
+            f.write(b'Y' * 512)
+        shutil.copy2(att, att + '.playerbak')
+        real_stat = Path.stat
+        seen = [0]
+
+        def flaky_stat(self, *a, **k):
+            if self.name.endswith('.playerbak'):
+                seen[0] += 1
+                if seen[0] &gt; 1:                 # 第一次還在,之後就不見了
+                    raise OSError(2, 'no such file')
+            return real_stat(self, *a, **k)
+
+        Path.stat = flaky_stat
+        try:
+            code, out = _run_capture(['mvp_check_backup.py', root])
+        finally:
+            Path.stat = real_stat
+        check('餌九:檔案在報告中途消失時,四段報告照樣印得完',
+              code == 0 and '(讀不到)' in out and '=' * 52 in out, out)
+        for s in ('.bak', '.facebak', '.playerbak'):
+            os.remove(att + s)
+
+        # 餌十:外部備份是完整的時候,結論不可以說「你也還沒有任何備份」——
+        #       那句話跟【3】剛印的「涵蓋全部」在同一個畫面上互相打臉。
+        code, out = _run_capture(['mvp_check_backup.py', root, vault])
+        check('餌十:外部備份完整時,結論不會說「你也還沒有任何備份」',
+              '涵蓋全部' in out and '你也還沒有任何備份' not in out, out)
+
+        # ── 下面三道測的是 cli() 那兩道網,不是 main() 裡面的判斷 ──
+        # 陰性對照要先跑:一道接得太寬的網,會把一次好好的檢查講成「讀取出錯」,
+        # 而那種壞法在只有陽性餌的時候是全綠的。
+        code, out = _run_cli(['mvp_check_backup.py', root, vault])
+        check('餌十一(陰性對照):沒有中斷也沒有出錯時,cli() 照樣回 0',
+              code == 0 and '涵蓋全部' in out
+              and '已中止' not in out and '讀取途中出錯' not in out, out)
+
+        # 餌十一:掃描途中按 Ctrl-C。這支全程唯讀,停在哪裡都不會留下半截的
+        #        東西 —— 但它得把這句話講出來。加這道網之前,Ctrl-C 換來的是
+        #        一整串 Python traceback(本站實測,結束碼一樣是 130),
+        #        而讀者看到 traceback 的第一個念頭是「我把它弄壞了」。
+        #        順便驗它不可以印出跑完才有的那句結論 —— 沒跑完就說跑完了,
+        #        那是這道網最容易犯的錯。
+        # ⚠️ 這裡用 raise 不用真的送 SIGINT:訊號由直譯器挑時機送達,寫成餌會
+        #    偶爾落在別的地方,而偶爾紅一次的自我測試比沒有測試更難處理。
+        #    真的送一次 SIGINT 的那一版另外測過,走的是同一條路,結果一樣。
+        stat_before_ctrl_c = Path.stat
+
+        def stat_ctrl_c(self, *a, **k):
+            if self.name == 'ingame.big':       # 掃到第四個檔才中斷
+                raise KeyboardInterrupt
+            return stat_before_ctrl_c(self, *a, **k)
+
+        Path.stat = stat_ctrl_c
+        try:
+            code, out = _run_cli(['mvp_check_backup.py', root])
+        finally:
+            Path.stat = stat_before_ctrl_c
+        check('餌十一:掃描途中按 Ctrl-C 會講一句中文並以 130 收工,不噴 traceback',
+              code == 130 and '已中止' in out and 'Traceback' not in out
+              and '沒有建立、修改或刪除任何檔案' not in out, out)
+
+        # 餌十二:掃描途中讀取出錯 —— 外接碟被拔掉、防毒把檔案鎖住、雲端同步
+        #        把資料夾抽走,在這支唯讀的腳本上長成同一個樣子:某個呼叫丟
+        #        OSError。size_of / when / mtime_of / same_bytes 這幾支自己
+        #        接得住,但不是每一個呼叫都包得完,所以外面要有一道網。
+        #        結束碼要跟「路徑打錯了」的 1 分開,不然批次檔判斷不出差別
+        #        (本站實測:加這道網之前,兩種情形都是 1,而且都噴 traceback)。
+        is_file_before_io_error = Path.is_file
+
+        def is_file_io_error(self, *a, **k):
+            if self.name == 'ingame.big':
+                raise OSError(5, 'input/output error')
+            return is_file_before_io_error(self, *a, **k)
+
+        Path.is_file = is_file_io_error
+        try:
+            code, out = _run_cli(['mvp_check_backup.py', root])
+        finally:
+            Path.is_file = is_file_before_io_error
+        check('餌十二:掃描途中讀取出錯會講一句中文並以 2 收工,不噴 traceback',
+              code == 2 and '讀取途中出錯' in out and 'Traceback' not in out, out)
+
+    finally:
+        shutil.rmtree(td, ignore_errors=True)
+
+    print('   %s 自我測試%s' % ('✅' if ok[0] else '❌',
+                                '全部通過' if ok[0] else '沒過'))
+    return ok[0]
+
+
+def main():
+    """照【1】到【4】的順序把四個問題各回答一次,全程唯讀,最後給一段結論。"""
+    # --selftest 是這支唯一認得的旗標,而且它只在系統暫存資料夾裡跑,
+    # 不碰你的遊戲資料夾。要放在濾掉旗標之前判斷,否則會被下一行吃掉。
+    if '--selftest' in sys.argv[1:]:
+        return 0 if self_test() else 1
+    # 其餘 -- 開頭的東西濾掉:這支沒有 --apply 之類會動到檔案的旗標,
+    # 但從別課複製指令過來的人很容易把字尾帶著。濾掉它,才不會被當成路徑。
+    args = [a for a in sys.argv[1:] if not a.startswith('--')]
+    # 沒給路徑就把檔頭那段說明當使用說明印出來。
+    # 回傳 1 而不是 0:它沒有真的檢查過任何東西,不要讓外面誤判成「一切正常」。
+    if not args:
+        print(__doc__)
+        return 1
+
+    # 路徑常常是「把檔案拖進終端機」得到的,拖到的可能是 exe 或 .cfg,
+    # 所以下面接受檔案,取它的上一層當遊戲資料夾。
+    root = Path(args[0]).expanduser()
+    if root.is_file():                       # 拖到 exe 或 .cfg 也接受
+        root = root.parent
+    if not root.is_dir():
+        print('✗ 找不到這個資料夾:%s' % root)
+        return 1
+
+    vault = Path(args[1]).expanduser() if len(args) &gt; 1 else None
+    if vault is not None and not vault.is_dir():
+        print('✗ 找不到你給的備份資料夾:%s' % vault)
+        return 1
+
+    print('遊戲資料夾  %s' % root)
+    if vault:
+        print('外部備份    %s' % vault)
+    print('')
+
+    # 一路收集「值得注意」的事,最後在【4】一次講完。
+    # 邊走邊喊會讓畫面上的重點被四段報告沖散。
+    notes = []
+
+    # ── 1. 該備份哪些檔 ────────────────────────────────
+    # 大小與修改時間都印出來,是為了讓你自己認得出「這個檔我上次動是什麼時候」。
+    # 一份備份對不對得上某個時間點,只有你知道,腳本判斷不了。
+    print('【1】本站教學會動到的檔案')
+    total = 0
+    present = []
+    for rel, desc, lessons in TARGETS:
+        p = root / rel
+        if p.is_file():
+            size = size_of(p)
+            total += size or 0
+            present.append((rel, p))
+            print('  ✅ %-28s %12s  %s  %s'
+                  % (rel, human(size), when(p), desc))
+        else:
+            print('  ✗  %-28s %12s  %-19s  %s'
+                  % (rel, '(不存在)', '', desc))
+            # is_file() 對「指向不存在的目標」的符號連結回 False,畫面上跟
+            # 「真的沒有這個檔」長得一模一樣。用 lexists 把兩者分開:
+            # 那個名字確實在,只是指向空的地方 —— 那是壞掉,不是沒有。
+            if os.path.lexists(p):
+                print('     ⚠ 這個名字在,但它是一個指不到東西的連結。')
+                notes.append('%s 是一個指不到東西的連結' % rel)
+            # ⚠️ controller.cfg 是玩過一次遊戲之後才會被建立的。
+            #    一台剛安裝好、還沒玩過的機器沒有它是正常的,
+            #    把它列成「值得注意」會讓第一次接觸的人以為自己裝壞了。
+            elif rel in BORN_ON_FIRST_RUN:
+                print('     (這個檔要玩過一次遊戲才會出現,現在沒有是正常的)')
+            else:
+                notes.append('找不到 %s' % rel)
+    print('')
+    print('  這 %d 個檔合計 %s(%s bytes)。'
+          % (len(present), human(total), format(total, ',')))
+    # ⚠️ 這裡不要寫「涵蓋 N 課裡的 M 課」。程式印出來的字最像事實,讀者不會
+    #    去懷疑,而那兩個數字每加一課就過期。更不可以寫成「涵蓋所有會改檔的
+    #    教學」——那是反方向的謊,照著做的人會以為備份好了,接著去跑換臉皮 /
+    #    換球衣 / 改執行檔那幾課,而那些檔一份備份都沒有。
+    print('  把它們複製到別的地方,只涵蓋上面列出的那幾課動的檔。')
+    print('  ⚠️ 本站還有別的課動的是別的檔(models.big / datafile.big / mvp2005.exe /')
+    print('     portrait.big / uniforms.big / fonts.big / .LOC / 語音檔 …),')
+    print('     那些不在上面的清單裡。整包備份才是完整的做法,見「備份與還原 SOP」。')
+    if not present:
+        print('  一個都找不到 —— 你選的可能不是遊戲安裝資料夾。')
+        print('  正確的資料夾裡面應該同時看得到 data 這個子資料夾和 .exe。')
+        return 1
+
+    # ── 2. 旁邊有沒有工具自動留的備份 ──────────────────
+    # 本站的工具都把備份留在原檔旁邊、用「原檔名 + 備份副檔名」命名,
+    # 所以只在同一個資料夾裡找,而且連原檔名一起比對:
+    # 同一個 .bak 出現在不同檔案上,是不同的工具留的。
+    print('\n【2】遊戲資料夾裡的備份檔')
+    any_bak = False
+    missing_bak = []
+    for rel, p in present:
+        cand = [p.parent / (p.name + s) for s in BAK_SUFFIXES]
+        baks = [b for b in cand if b.is_file()]
+        # 名字在、卻指不到東西的備份:is_file() 說 False,於是它在畫面上整個
+        # 消失,讀者看到的是「沒有備份」。一個救不了你的名字擺在那裡,
+        # 比沒有更危險 —— 所以要指名講出來。
+        for b in [c for c in cand if not c.is_file() and os.path.lexists(c)]:
+            print('  ⚠  %-28s 是一個指不到東西的連結,救不了你' % b.name)
+            notes.append('%s 是一個指不到東西的連結,不是有效的備份' % b.name)
+        if not baks:
+            print('  ·  %-28s 沒有備份' % rel)
+            if rel in NO_TOOL_BACKUP:
+                print('     (本站沒有腳本會自動備份它 —— 請自己複製一份到別的地方)')
+            # 先記著,最後再決定要不要算成「值得注意」——
+            # 一台什麼都沒改過的機器本來就不該有備份,
+            # 那不是問題,是還沒開始。
+            missing_bak.append(rel)
+            continue
+        # 同一個檔可能被好幾支工具動過,每支各留自己那一份。全部列出來,
+        # 因為「哪一份才是原廠檔」要靠時間先後判斷,少列一份就會挑錯。
+        any_bak = True
+        for b in baks:
+            suffix = b.name[len(p.name):]
+            if same_file(b, p):
+                # 同一個檔:改正本的那一刻它跟著被改。這不是備份。
+                mark, state = '⚠ ', '它就是正本本身,不是另一份'
+                notes.append('%s 其實就是 %s 本身(同一個檔),不是備份'
+                             % (b.name, p.name))
+            else:
+                eq = same_bytes(b, p)
+                mark = '✅' if eq is not None else '⚠ '
+                state = ('跟現在的檔案一樣' if eq is True else
+                         '跟現在的檔案不同' if eq is False else
+                         '讀不出來(權限不足或檔案有問題)')
+                if eq is None:
+                    notes.append('%s 讀不出來,無法確認它是不是有效的備份'
+                                 % b.name)
+            print('  %s %-28s %12s  %s  %s'
+                  % (mark, b.name, human(size_of(b)), when(b), state))
+            # 先查 (檔名, 副檔名) 這個組合,查不到再退回只看副檔名。
+            # 順序不能反:.bak 這個副檔名同時屬於好幾課,只看副檔名會認錯人。
+            owner = (BAK_OWNER.get((p.name, suffix))
+                     or BAK_OWNER_BY_SUFFIX.get(suffix))
+            print('     ↑ %s' % ('「%s」這一課建立的' % owner if owner
+                                 else '不是本站工具建立的,可能是你自己複製的'))
+        # 同一個檔有兩份以上備份時,它們是不同時間點的快照,不是同一份東西。
+        # 每支工具只在第一次 --apply 時建立備份,所以最舊的那一份才是原廠檔。
+        # 兩兩比對,而不是只比最舊跟最新:內容相同的多份備份(例如同一支工具
+        # 重跑過)不算異常,只有真的存在內容不同的兩份時才值得把人叫住。
+        if len(baks) &gt; 1:
+            pairs = [(baks[i], baks[j])
+                     for i in range(len(baks)) for j in range(i + 1, len(baks))]
+            # 用 is False,不用 not:same_bytes 讀不出來時回 None,
+            # 而 not None 是 True —— 那會把「讀不到」講成「內容不同」。
+            if any(same_bytes(x, y) is False for x, y in pairs):
+                oldest = min(baks, key=mtime_of)
+                print('     ⚠ %s 有 %d 份內容不同的備份 —— 它們是不同時間點的快照。'
+                      % (p.name, len(baks)))
+                print('       最舊的是 %s,它才是原廠檔;' % oldest.name)
+                print('       其他幾份裡面已經含著前一次的修改。')
+                notes.append('%s 有 %d 份內容不同的備份,原廠檔是 %s'
+                             % (p.name, len(baks), oldest.name))
+    if not any_bak:
+        print('  一個備份都沒有。如果你還沒改過任何東西,這是正常的。')
+        # 全部都沒備份 = 還沒開始動手,不是「值得注意」。
+        # 這一段本來就已經印了「這是正常的」,再把每個檔各記一條
+        # 進結論,等於自己打自己(實測:剛安裝好的原版會被說「有 5 項值得注意」)。
+    else:
+        # 有些檔備份了、有些沒有 —— 那才值得提醒。
+        for rel in missing_bak:
+            if rel in NO_TOOL_BACKUP:
+                # 寫「沒有任何備份」會讓人去找是哪一支工具漏了,而答案是「沒有
+                # 那一支」。講清楚要自己複製,這一項才是做得完的,不是永遠的紅字。
+                notes.append('%s 沒有備份 —— 本站沒有腳本會自動備份它,'
+                             '請自己複製一份到別的地方' % rel)
+            else:
+                notes.append('%s 沒有任何備份' % rel)
+
+    # ── 3. 外部備份資料夾 ──────────────────────────────
+    print('\n【3】外部備份資料夾')
+    # 「外部備份是完整的」要留到結論那一段用:沒有這個變數的時候,一個檔案
+    # 都不缺的人會在最後一行被告知「你也還沒有任何備份」,而【3】就在上面
+    # 三行寫著涵蓋全部 —— 同一個畫面自己打自己。
+    vault_ok = False
+    if vault is None:
+        print('  沒有給。要一起檢查的話,把備份資料夾當第二個參數:')
+        print('    python3 %s "遊戲資料夾" "備份資料夾"'
+              % os.path.basename(sys.argv[0]))
+    else:
+        # 備份放在遊戲資料夾裡面等於沒有備份:重灌、把整包刪掉、還原到某個
+        # 時間點,兩份會一起消失。這一段只提醒,不改任何判斷。
+        try:
+            r = os.path.realpath(str(root))
+            inside = os.path.commonpath([r, os.path.realpath(str(vault))]) == r
+        except (OSError, ValueError):
+            inside = False          # 不同磁碟機(Windows)會丟 ValueError
+        if inside:
+            print('  ⚠ 這個備份資料夾在遊戲資料夾裡面 —— 遊戲整包被刪掉或重灌時,')
+            print('    它會跟著一起消失。請複製一份到別的地方,別顆硬碟更好。')
+            notes.append('外部備份資料夾在遊戲資料夾裡面,會跟遊戲一起消失')
+        # 少一個檔在還原那天才會發現,而那天通常來不及了,所以現在就記一條。
+        miss = 0
+        bad = 0
+        for rel, p in present:
+            # 兩種擺法都接受:保留原資料夾結構,或全部平放在同一層
+            cand = [vault / rel, vault / p.name]
+            b = next((c for c in cand if c.is_file()), None)
+            if b is None:
+                print('  ✗  %-28s 備份資料夾裡沒有' % rel)
+                miss += 1
+                notes.append('外部備份缺少 %s' % rel)
+                continue
+            if same_file(b, p):
+                # 最兇的假安全:把遊戲資料夾自己當成備份資料夾,每一列都是綠勾。
+                print('  ⚠  %-28s %12s  %s  這就是遊戲裡的那個檔本身,不是備份'
+                      % (rel, human(size_of(b)), when(b)))
+                notes.append('外部備份裡的 %s 就是遊戲裡的那個檔本身,'
+                             '等於沒有備份' % rel)
+                bad += 1
+                continue
+            eq = same_bytes(b, p)
+            if eq is None:
+                notes.append('外部備份裡的 %s 讀不出來,無法確認' % rel)
+                bad += 1
+            print('  %s %-28s %12s  %s  %s'
+                  % ('✅' if eq is True else '⚠ ', rel, human(size_of(b)),
+                     when(b),
+                     '內容一致' if eq is True else
+                     '內容不同(你改過了)' if eq is False else
+                     '讀不出來(權限不足或檔案有問題)'))
+        # ⚠️ 只有「一個都不缺、而且每一份都真的是另一份檔」才敢說涵蓋全部。
+        #    少了 bad 這個條件,一個指回正本的連結會讓這行印出來。
+        if miss == 0 and bad == 0:
+            vault_ok = True
+            print('\n  備份資料夾涵蓋全部 %d 個檔案。' % len(present))
+
+    # ── 4. 結論 ────────────────────────────────────────
+    # 結論只有三種狀態,不可以互相混:有事情要注意 / 什麼都還沒備份 / 都備份好了。
+    # 混在一起講,等於把「你還沒開始」講成「你已經安全了」。
+    print('\n' + '=' * 52)
+    if notes:
+        print('有 %d 項值得注意:' % len(notes))
+        for i, n in enumerate(notes, 1):
+            print('  %d. %s' % (i, n))
+    elif not any_bak and vault_ok:
+        # 遊戲資料夾裡沒有工具留的備份,但外部那份是完整的 —— 這種人是備份
+        # 做得最好的那一種,不可以對他說「你還沒有任何備份」。
+        print('遊戲資料夾裡沒有工具留的備份 —— 你還沒動手改,那是正常的。')
+        print('你給的那個外部備份資料夾涵蓋了上面【1】列的每一個檔。')
+    elif not any_bak:
+        # ⚠️ 不要在這裡說「每一個都有備份」—— 一個都沒有的時候
+        #    那句話是反方向的謊。沒有問題不等於已經備份好了。
+        print('目前沒有需要處理的事 —— 但你也還沒有任何備份。')
+        print('動手改之前,先把上面【1】列的那幾個檔複製到別的地方。')
+    else:
+        print('該備份的檔案都在,而且每一個都有備份。')
+    print('\n本次檢查全程唯讀,沒有建立、修改或刪除任何檔案。')
+    return 0
+
+
+def cli():
+    """main() 外面的最後一道網:接住 Ctrl-C 與掃描途中的讀取錯誤,回傳結束碼。
+
+    為什麼不直接寫 sys.exit(main()):那樣的話,中途按 Ctrl-C 換來的是一整串
+    Python traceback(本站實測),而讀者看到 traceback 的第一個念頭是
+    「我把它弄壞了」。這支全程唯讀,停在哪裡都沒有東西會壞 —— 要講的就是這句。
+
+    抽成一支函式、而不是寫在下面 `if __name__` 底下,是為了讓自我測試叫得到:
+    掛在 `if __name__` 裡面的那幾行,除非另外開一個行程,否則沒有辦法下餌,
+    而本站的腳本一律不開子行程。餌十一與餌十二測的就是這裡的兩個 except。
+    """
+    try:
+        return main()
+    except KeyboardInterrupt:
+        # 這支從頭到尾沒有開任何檔案來寫,也沒有搬移或刪除,所以中途停掉
+        # 就只是少印幾行。措辭限定在「你的遊戲資料夾與備份資料夾」:
+        # --selftest 確實會在系統暫存資料夾裡建自己的測試檔,講成
+        # 「沒有動到任何檔案」在那條路上就不精確了。
+        # 結束碼 130 = 128 + SIGINT,跟其他幾種結束方式分得開。
+        print('\n\n已中止。你的遊戲資料夾與備份資料夾全程唯讀,沒有動到任何檔案。')
+        return 130
+    except OSError as e:
+        # 掃描途中檔案被移走、被鎖住,或整顆碟不見了會走到這裡:雲端同步、
+        # 防毒隔離、外接碟斷線都算。裡面幾支(size_of / when / mtime_of /
+        # same_bytes)自己接得住,這一道是接剩下的,讓報告不要以 traceback 收場。
+        # 結束碼 2,跟「路徑打錯了」的 1 分開,批次檔才判斷得出差別。
+        print('\n✗ 讀取途中出錯:%s' % e)
+        print('  可能的原因:遊戲資料夾或備份資料夾正在被別的程式動')
+        print('  (雲端同步、防毒掃描),或是外接碟中途斷線。')
+        print('  關掉那些程式、確認碟還在,再跑一次。')
+        print('  本次檢查全程唯讀,沒有建立、修改或刪除任何檔案。')
+        return 2
+
+
+if __name__ == '__main__':
+    sys.exit(cli())
+
+# ─────────────────────────────────────────────────────────
+#  MIT License
+#
+#  Copyright (c) 2026 toni
+#
+#  Permission is hereby granted, free of charge, to any person obtaining a copy
+#  of this software and associated documentation files (the "Software"), to deal
+#  in the Software without restriction, including without limitation the rights
+#  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#  copies of the Software, and to permit persons to whom the Software is
+#  furnished to do so, subject to the following conditions:
+#
+#  The above copyright notice and this permission notice shall be included in
+#  all copies or substantial portions of the Software.
+#
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#  THE SOFTWARE.
+# ─────────────────────────────────────────────────────────
+</pre>
+    </details>
+  </div>
+
+  <h2>📋 回報範本</h2>
+
+  <p>卡住或做成了，複製下面這段填一填：</p>
+<pre><code>備份 status: ✅ / ❌
+我備份了幾個檔: ___
+檢查腳本的結論那一行(整段複製): ___
+還原試過了嗎: 有 / 沒有
+還原後檢查腳本說一樣嗎: 一樣 / 不一樣
+異常訊息: ___</code></pre>
+
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 最常被動到的四個遊戲檔，加上暖身課請你打開的 <code>controller.cfg</code> 共五個、合計 4,058,641 個位元組（3.87 MB），備份它們幾秒鐘就好 —— <strong>但那五個不是全部</strong>，39 課裡有 30 課會寫檔（2026-09-05 數的），其中 20 課動的是這五個以外的檔。</li>
+    <li><strong>核心五個是哪五個</strong> <code>data\database\attrib.dat</code>、<code>pitcher.dat</code>、<code>schedule.big</code>、<code>data\frontend\ingame.big</code>，加上遊戲根目錄的 <code>controller.cfg</code>；前四個只佔 <code>data</code>（扣掉使用者自己的備份夾後 2.02 GB）的 <strong>0.19%</strong>，光 <code>models.big</code> 一個檔就是這五個加起來的 138 倍。
+        <br><strong>五個以外還要備份什麼</strong>：看第二節第二張表 —— <code>data\datafile\datafile.big</code>（改視角）、<code>mvp2005.exe</code>（中文版修正、2026 年跑起來、執行檔上的六個旋鈕、把官方中文版的中文搬進英文版）、<code>data\fonts\fonts.big</code>（中文版修正、把官方中文版的中文搬進英文版）、兩個 <code>.LOC</code>（中文版修正、改主選單文字、把官方中文版的中文搬進英文版）、<code>data\models.big</code>（新臉皮、裝球衣）、<code>uniforms.big</code>（裝球衣）、<code>logos.big</code>（裝球衣、換球隊隊徽）、<code>portrait.big</code>（大頭照）、開機畫面三個 <code>.big</code>、<code>spch_cht.txt</code>（應援曲）、<code>data\stadium\</code> 的球場檔、你指定的聲音檔、<code>data\frontend\movies\</code> 底下的 <code>.vp6</code>（關掉開場動畫）；以及<u>「一整包模組自動歸位」與「把你改好的東西打包成一包」</u>安裝時可能動到的任何同名檔。</li>
+    <li><strong>封裝檔只會長不會縮</strong> 寫 <code>.big</code> 的腳本都是把新資料接在檔尾（球場瘦身那一課除外，它反過來把目錄沒指到的位元組清掉），<code>schedule.big</code> 每換一次年份固定多 521,311 個位元組，連跑三次就從 130,514 長到 1,694,447。</li>
+    <li><strong>最容易踩的雷</strong> 工具的備份只夠退一步。二十六支會改檔的腳本每一支都只在<strong>第一次</strong> <code>--apply</code> 時建備份，之後再改幾次都不覆蓋它；所以先後跑過兩支動同一個檔的工具，就會出現兩份內容不同的備份，<strong>最舊的那一份才是你動手之前的樣子</strong>。</li>
+    <li><strong>備份放哪三條規則</strong> 不要放在遊戲資料夾裡面、保留原本的資料夾結構、資料夾名字寫日期。</li>
+    <li><strong>安全網</strong> 檢查腳本 933 行，檢查你的遊戲資料夾與備份資料夾時全程唯讀（唯一會寫檔的是它的 <code>--selftest</code>，那些檔建在系統暫存資料夾裡，跑完自己刪掉），【3】那一段五行都要是「內容一致」（如果那五行寫的是「這就是遊戲裡的那個檔本身」，代表你把遊戲資料夾自己當成備份資料夾了，等於沒有備份）；它只認得核心五個檔，備份副檔名 2026-09-05 數是 25 種（要知道現在缺不缺，跑 <code>.tools/site-check/selftest_backup_suffixes.py</code>，不要背這個數字。但「認得副檔名」不等於「畫面上列得出來」：<code>.exepebak</code> 留在 <code>mvp2005.exe</code> 旁邊、<code>.introbak</code> 留在 <code>movies</code> 資料夾的影片旁邊，那些檔不在核心五個裡，所以【2】那一段仍然不會列它們，<code>.modernizebak</code> 同理。新的一課產生的副檔名如果沒補進那份清單，那一支留的備份就會完全掃不到，而且不會有任何提示）；不裝 Python 就比檔案大小，但大小相同不代表內容相同（<code>attrib.dat</code> 改一位球員速度後 840,643 還是 840,643，只有 1 個位元組不同）。</li>
+    <li><strong>還原兩條路</strong> 先試該課工具的 <code>--restore</code>（只退一步），不行就從你自己的備份複製回去；二十六支工具全部都有還原指令（都叫 <code>--restore</code>，只有「把真實成績換算成遊戲裡的能力值」那一支叫 <code>--restore-write</code>），本站實跑過的那六支裡<strong>只有 <code>mvp_fel_toolkit.py</code> 一支</strong>會自己驗位元組，而且它只驗「複製有沒有成功」，不會告訴你有沒有回到動手之前。</li>
+    <li><strong>本站沒驗的</strong> <code>schedule.big</code> 疊三次年份之後還能不能玩，沒有真的開遊戲跑完一個球季；也沒有量過任何社群模組動到哪些檔（裝第三方模組前請整個 <code>data</code> 複製一份）；<code>controller.cfg</code> 什麼時候被建立、刪掉會不會自己長回來，同樣沒有實測；另外二十支會寫檔的工具，本站沒有逐支實跑過 <code>--restore</code> 把畫面抄下來。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../../start.html">第 0 課：新手基本功</a>，開命令列、用拖曳取得路徑，這頁的指令會用到</li>
+    <li><a href="../change-schedule-year/index.html">把賽程換到任何年份</a>：備份做好了，這是最快有感的第一課</li>
+    <li><a href="../crash-diagnosis/index.html">遊戲當掉了怎麼辦</a>：另一支唯讀腳本，檢查記憶體上限與資料量</li>
+    <li><a href="../../reference/bigf.html">BIGF 封裝格式</a>：為什麼封裝檔改一次就長大、為什麼不能整包重新打包</li>
+  </ul>
+
+  <footer>
+    <p>本頁的檔案清單，是把教學資料夾裡 40 個頁面逐頁讀完、
+       再把 30 支腳本逐支找出真正的寫入點整理出來的（最後一次盤點 2026-09-05）；
+       所有檔案大小與位元組差異，都是在一台裝好的遊戲上實際跑出來、當場量到的，不是推算。
+       本頁附的檢查腳本在檢查時全程唯讀，不修改你遊戲資料夾裡的任何檔案。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯。</p>
+    <p>本教學只修改你自己電腦裡的檔案，不散布任何遊戲檔案。本文採 CC BY 4.0、腳本採 MIT 授權（<strong>站內的點陣圖片、社群模組與第三方工具不在此授權範圍</strong>，詳見<a href="../../legal.html">法律頁</a>）。
+       <a href="../../legal.html">法律與版權說明</a> ·
+       <a href="../../changelog.html">更新紀錄</a></p>
+  </footer>
+</div>
+<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

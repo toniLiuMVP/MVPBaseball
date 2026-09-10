@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/story/toni-2009/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>當年那兩份說明書，一句一句拿今天的檔案對過 — toni的MVP模組補習班</title>
+<meta name="description" content="2008 到 2009 年那份台灣模組留下兩份說明書。解開之後,裡面的數字幾乎全部跟今天量到的檔案對得上(八條臉皮備註裡有三條的人名對不上) —— 包括「為什麼非得搶別人的臉皮號碼」。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../../index.html">首頁</a>
+  <a class="item" href="../../start.html">新手基本功</a>
+  <a class="item" href="../../do.html">我想做什麼</a>
+  <a class="item" href="../../plan.html">課表</a>
+  <a class="item" href="../../tutorials/index.html">教學</a>
+  <a class="item" href="../../7min/index.html">七分鐘</a>
+  <a class="item" href="../../reference/index.html">速查</a>
+  <a class="item" href="../../coach/index.html">棒球教練</a>
+  <a class="item on" href="../index.html">故事</a>
+  <a class="item" href="../../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="../index.html">故事</a> › 當年那兩份說明書</p>
+  <h1>當年那兩份說明書，一句一句拿今天的檔案對過</h1>
+  <p class="lede">2008 到 2009 年那份台灣模組留下了兩份說明書，用當年的中文編碼寫的。
+     解開之後發現一件事：<strong>裡面的數字幾乎全部跟今天在檔案裡量到的對得上</strong>（八條臉皮備註裡有三條的人名對不上，那三條反而最好看）。
+     包括那個困擾很久的問題 —— <u>當年為什麼非得「搶」別人的臉皮號碼不可。</u></p>
+
+  <div class="card blue">
+    <p class="card-h">這一頁在講什麼</p>
+    <p>站上其他頁都在講「檔案格式是什麼」。這一頁不一樣 ——
+       它把<strong>一份十七年前的工作紀錄</strong>，跟<strong>今天量到的檔案</strong>放在一起對。</p>
+    <p>兩邊對得上的地方，就是這頁的內容。</p>
+  </div>
+
+  <h2>兩份文件</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">檔案</th><th class="num">行數</th><th>裝什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="檔案" class="mono">Readme.txt</td><td data-label="行數" class="num">281</td>
+          <td data-label="裝什麼">安裝說明 + <strong>一張 53 列的球員對照表</strong></td></tr>
+      <tr class="hi"><td data-label="檔案" class="mono">History.txt</td><td data-label="行數" class="num">1,281</td>
+          <td data-label="裝什麼"><strong>38 條改版紀錄</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>它們是用 <strong>Big5</strong> 寫的 —— 那是中文 Windows 在 Unicode 普及之前用的編碼。
+     現在的編輯器直接打開會是亂碼，要先轉碼。</p>
+  <p class="small">轉碼是<u>一個字元都沒有遺失</u>的（轉回去跟原檔位元組完全相同）。
+     要先確認一個檔是純文字才談得上轉碼，見<a href="../../tutorials/read-file-headers/index.html">看檔案開頭那課</a>；
+     那一課教的是從檔案開頭分辨封裝檔、壓縮檔與純文字，沒有教怎麼判斷中文編碼。</p>
+
+  <h2 id="table">那張 53 列的表</h2>
+  <p>表格的欄位是：<strong>臉皮編號 ｜ 球員 ｜ 大頭照編號 ｜ 球隊 ｜ 臉皮來源 ｜ 語音 ｜ 應援檔 ｜ 備註</strong>。
+     <span class="small">（檔案的標題列只寫了「使用臉皮／大頭照／臉皮來源／語音／應援檔／註」，球員與球隊那兩欄沒有標題，是從資料看出來的。）</span></p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>量到的</th><th class="num">數字</th></tr></thead>
+    <tbody>
+      <tr><td>球員列數</td><td class="num">53</td></tr>
+      <tr><td>有臉皮編號的</td><td class="num">30</td></tr>
+      <tr><td>臉皮欄寫「無」的</td><td class="num">23</td></tr>
+      <tr class="hi"><td>相異的臉皮編號</td>
+          <td class="num"><strong>29</strong><br><span class="small">30 筆裡有一個編號被兩個人共用</span></td></tr>
+      <tr class="hi"><td>大頭照編號</td>
+          <td class="num">53 筆<strong>零重複</strong><br><span class="small">範圍 0637 – 9485</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card grass">
+    <p class="card-h">大頭照編號有一個連號區</p>
+    <p>53 個大頭照編號散在 637 到 9485 之間，看起來很亂。但把它們排序就會看到：</p>
+<pre style="margin:8px 0 0"><code>3486 3487 3488 3493 3494 3497 3498 3499 3500 3501
+3502 3503 3504 3505 3506 3507 3508 3509 3510 3511
+3512 3513 3514 3515 3516 3517 3518 3519 3520 3521</code></pre>
+    <p style="margin-top:8px"><strong>30 個人擠在 3486 到 3521 這一段。</strong>
+       這一段的容量是 36 個號碼，用掉 30 個，
+       只空著六個（3489、3490、3491、3492、3495、3496）。</p>
+    <p>換句話說：<u>當年是找到一段沒人用的連續號碼，把台灣球員一個一個填進去。</u></p>
+  </div>
+
+  <h2 id="mechanism">最重要的一段：備註欄寫出了做法</h2>
+  <p>53 列裡只有 <strong>11 列</strong>有備註。而那 11 條備註，把整個做法講清楚了：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>備註寫的</th><th class="num">幾條</th><th>意思</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="備註寫的" class="mono">把 <u>某位大聯盟球員</u> 的臉皮編號 c### 給予之</td><td data-label="幾條" class="num">6</td>
+          <td data-label="意思"><strong>接收那個人的編號</strong></td></tr>
+      <tr><td data-label="備註寫的" class="mono">移除 <u>某位大聯盟球員</u> 並給予臉皮編號</td><td data-label="幾條" class="num">2</td>
+          <td data-label="意思">把那個人整個拿掉，位置讓出來</td></tr>
+      <tr><td data-label="備註寫的" class="mono">共用某某的 c### 臉皮</td><td data-label="幾條" class="num">3</td>
+          <td data-label="意思">兩個人指向同一張臉<br>
+              <span class="small">其中一條是<u>兄弟共用</u>，另外兩條是日籍球員共用同一張</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>那些名字，以及拿原版對出來的結果</h3>
+  <p>備註裡點名的都是<u>大聯盟球員</u>（跟本站其他頁寫的 Rod Carew、Lou Gehrig 一樣，
+     都是公眾人物）。把八條逐一拿<a href="../../tutorials/whats-original/index.html">剛安裝好的原版</a>去對：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>台灣球員</th><th class="mono">編號</th><th>2009 說明檔說是誰的</th>
+      <th>原版那個編號實際是誰</th><th class="num">對得上?</th></tr></thead>
+    <tbody>
+        <tr class="hi"><td>林彥峰</td><td class="mono">c183</td><td>Aaron Sele</td><td><strong>Roberto Hernandez</strong></td><td class="num">❌</td></tr>
+        <tr class="hi"><td>林旺億</td><td class="mono">c214</td><td>Roberto Hernandez</td><td><strong>Aaron Sele</strong></td><td class="num">❌</td></tr>
+      <tr><td>陳鴻文</td><td class="mono">c114</td><td>Armando Benitez</td><td>Armando Benitez</td><td class="num">✅</td></tr>
+      <tr><td>川上憲伸</td><td class="mono">c190</td><td>Keith Foulke</td><td>Keith Foulke</td><td class="num">✅</td></tr>
+      <tr><td>相川亮二</td><td class="mono">c192</td><td>Antonio Alfonseca</td><td>Antonio Alfonseca</td><td class="num">✅</td></tr>
+      <tr class="hi"><td><strong>洪晨恩</strong></td><td class="mono">c423</td><td>Steve Kline</td>
+          <td><strong>Lou Gehrig</strong></td><td class="num">❌</td></tr>
+      <tr><td>田澤純一</td><td class="mono">c813</td><td>Brian Shouse</td>
+          <td colspan="2"><span class="small">超過 c606，原版沒有這個編號</span></td></tr>
+      <tr><td>黃偉晟</td><td class="mono">c678</td><td>Tanyon Sturtze</td>
+          <td colspan="2"><span class="small">超過 c606，原版沒有這個編號</span></td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>三條精確吻合，而且說明書寫錯對象的不只一筆。</strong>十七年前寫在說明檔裡的八句話，
+     拿今天剛安裝好的遊戲一對：三條的編號跟人名一個不差，三條寫錯了對象，
+     另外兩條的編號原版根本沒有。</p>
+  <p class="small">上表最右邊那一欄對的是<u>原版名冊裡那個編號實際屬於誰</u>；
+     說明書當年<u>照原樣寫的字</u>另外列在〈<a href="../people-2009/index.html">2009 年那份名冊是誰做的</a>〉那張表裡。
+     兩張表並排看，才看得出來差的是哪三格。</p>
+
+  <div class="card amber">
+    <p class="card-h">那條不吻合的，才是最好看的一條</p>
+    <p>說明檔寫「把 <u>Steve Kline</u> 的臉皮編號 <code>c423</code> 給予之」。
+       但拿原版一查：<strong>Steve Kline 從來沒有 <code>c423</code></strong>
+       —— 他用的是通用臉 <code>901</code>。<code>c423</code> 是 <strong>Lou Gehrig</strong> 的。</p>
+    <p>而在那份 2009 名冊裡，<code>c423</code> 底下站著<u>兩個人</u>：
+       Lou Gehrig 與洪晨恩。<strong>他們共用同一張臉。</strong></p>
+    <p>本站在<a href="../../reference/models.html">臉皮那一頁</a>獨立量到過這件事 ——
+       2009 那份模組有 14 個撞號，其中 12 個被處理掉了（挪到通用臉或不放進名冊），
+       <u>只有兩個沒處理，Lou Gehrig 是其中一個</u>。</p>
+    <p><strong>文件說的、檔案裡的、以及玩家實際會看到的，是三件不同的事。</strong>
+       寫的人記錯了對象，於是那一次撞號就沒有被處理 ——
+       裝了那個臉皮包之後，這位名人堂球員頂著一位台灣投手的臉。</p>
+    <p class="small">另外兩條（<code>c813</code>、<code>c678</code>）超過 EA 的上限 <code>c606</code>，
+       原版根本沒有那些編號。所以那兩句「把某某的編號給予之」講的是
+       <u>當時那份模組基底</u>，不是 EA 原版。<span class="badge wip">未解</span></p>
+  </div>
+
+
+  <div class="card clay">
+    <p class="card-h">⭐ 十七年後，這個做法有了解釋</p>
+    <p>看到「把某某的臉皮編號給予之」，直覺會以為那是一種風格 ——
+       懶得新增，所以拿現成的來改。</p>
+    <p><strong>不是。是沒有別的選擇。</strong></p>
+    <p>本站在<a href="../../reference/player-numbers.html#wall">兩套球員編號</a>那頁量到：</p>
+    <div class="tablewrap" style="margin:8px 0"><table>
+      <tbody>
+        <tr><td>這台機器的臉皮檔總共<br><span class="small">剛安裝好的原版是 504 個，範圍只到 c606</span></td><td class="num"><strong>894 個</strong>（c001–c900）</td></tr>
+        <tr><td>901 以上的臉皮檔</td><td class="num"><strong>0 個</strong></td></tr>
+        <tr><td>2009 那份名單指派掉的號碼</td>
+            <td class="num">球員 872 + 教練 24 = <strong>896</strong></td></tr>
+        <tr class="hi"><td>其中真的有臉皮檔的<br><span class="small">另外六個號碼（c116 c125 c170 c177 c188 c219）名冊指派了、檔案卻不存在</span></td>
+            <td class="num"><strong>890</strong></td></tr>
+        <tr class="hi"><td><strong>沒有人用的空號</strong></td>
+            <td class="num"><strong>只剩 4 個</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>894 個位子，只剩四個空的。</strong>想給一位台灣球員一張專屬的臉，
+       就只能去找一個現有的號碼把它換掉。</p>
+    <p>備註欄那六條「把某某的編號給予之」，<u>不是做法的選擇，是當時唯一做得到的事。</u></p>
+  </div>
+
+  <h2>那 23 個寫「無」的人</h2>
+  <p>53 列裡有 23 列臉皮欄寫「無」—— 也就是那些球員<u>沒有自己的臉</u>。</p>
+  <p>拿他們的大頭照編號去查<u>同一個壓縮檔裡附的那份 2009 名冊</u>，會發現他們的臉皮值幾乎都在
+     <strong>900 以上</strong> —— 也就是<a href="../../reference/player-numbers.html#wall">罐頭臉</a>。
+     <span class="small">（23 個編號有 22 個在那份名冊裡查得到，其中 20 個是 900 以上，
+     另外兩個是說明書自己註明共用的 <code>c529</code>。）</span></p>
+  <div class="card blue">
+    <p class="card-h">當年的「無」，就是名冊裡的「罐頭臉」</p>
+    <p>這兩份資料同樣出自 2009 那一包，一份是說明書的文字、一份是名冊的數值欄，記錄方式完全不同，
+       <strong>但講的是同一件事</strong>：這些人沒有專屬的臉，遊戲拿通用長相湊。</p>
+    <p class="small">⚠️ <strong>2026-09-05 訂正</strong>：這一段原本寫「去現在的名單裡查」「兩份資料隔了十七年」。
+       那是錯的 —— 那 23 位球員在本站測試機今天的名冊裡一個都查不到，
+       查得到他們的只有跟說明書裝在同一個 2009 壓縮檔裡的那份名冊。
+       所以這是同一包檔案的兩個檔互相對照，不是隔了十七年的兩份資料獨立吻合。</p>
+  </div>
+
+  <h2 id="timeline">38 條改版紀錄</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>量到的</th><th>結果</th></tr></thead>
+    <tbody>
+      <tr><td>最早 ／ 最晚</td><td class="mono">2008-11-24 ／ 2009-10-30</td></tr>
+      <tr class="hi"><td><strong>跨度</strong></td><td class="num"><strong>340 天</strong></td></tr>
+      <tr><td>條目數</td><td class="num">38（2008 年 10 條、2009 年 28 條）</td></tr>
+      <tr class="hi"><td>最密的一個月</td><td>2009 年 2 月，<strong>8 條</strong></td></tr>
+      <tr class="hi"><td>完全沒有紀錄的月份</td><td>2009 年 <strong>5 月</strong>與 <strong>9 月</strong></td></tr>
+      <tr><td>最長的一條</td><td class="num">155 行</td></tr>
+    </tbody>
+  </table></div>
+  <p>把 38 條照時間排開，可以看出重心怎麼換：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>時期</th><th>在做什麼</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">2008-11 ～ 12</td><td>一直在<strong>加人</strong>，編號一路往上長</td></tr>
+      <tr><td class="mono">2008-12 中</td><td>確立幾支自訂球隊的固定編制</td></tr>
+      <tr class="hi"><td class="mono">2009-01</td><td><strong>一次把全大聯盟的打擊投球數值換成真實版</strong> —— 全檔最大的一次</td></tr>
+      <tr><td class="mono">2009-02</td><td>重心從「加人」轉到<strong>補生涯成績、薪資、背號</strong></td></tr>
+      <tr class="hi"><td class="mono">2009-04</td><td>把大頭照編號<strong>統一對齊</strong>另一套模組的編號</td></tr>
+      <tr class="hi"><td class="mono">2009-07 ～ 08</td><td><strong>看影片校球速</strong> —— 連續六條都在做這件事</td></tr>
+      <tr><td class="mono">2009-10-30</td><td>最後一條，之後停更</td></tr>
+    </tbody>
+  </table></div>
+  <div class="card grass">
+    <p class="card-h">「看影片校球速」是這份紀錄最有性格的一段</p>
+    <p>2009 年 7 月到 8 月，連續六條紀錄都在做同一件事：
+       <u>找球員的實際投球影片，一球一球對，把遊戲裡的球速改成真的</u>。</p>
+    <p>紀錄裡「有片有真相」這四個字出現了 <strong>18 次</strong>。</p>
+    <p class="small">當年貼了 49 條影片連結（37 條指向 <code>mlb.mlb.com</code>、9 條 <code>tw.youtube.com</code>、
+       3 條大都會官網），都是十七年前的網址，本站沒有逐條測試它們今天還通不通，
+       所以本站只描述這件事，不列連結。</p>
+  </div>
+
+  <h2>臉皮是從哪裡來的</h2>
+  <p>表格的「臉皮來源」欄記著每一張臉是誰做的：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>來源</th><th class="num">筆數</th></tr></thead>
+    <tbody>
+      <tr><td>（沒有填）</td><td class="num">24</td></tr>
+      <tr class="hi"><td class="mono">shojah</td><td class="num">10</td></tr>
+      <tr class="hi"><td class="mono">黃衫男子</td><td class="num">8</td></tr>
+      <tr><td class="mono">小豪前輩</td><td class="num">4</td></tr>
+      <tr><td class="mono">台灣之光模組</td><td class="num">3</td></tr>
+      <tr><td>其他四個來源</td><td class="num">各 1</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>這份模組不是一個人做的。</strong>那張表上有名有姓的來源標記有六個，
+     貢獻的張數分別是 10、8、4、3、1、1
+     <span class="small">（上表「其他四個來源」那一列裡，另外兩個是「遊戲內附」與「MVP2005原版」，也就是遊戲本身）</span>。</p>
+  <p class="small">上表列的是當年在這份文件裡留下的<u>圈內代號與模組名稱</u>，不是真實姓名。
+     本站不連結任何個人身分，也不公開任何聯絡方式。
+     這張表的來源欄沒有出現個人帳號式的代號；當年大頭照資料夾名稱裡有兩個看起來像個人帳號的，
+     見〈<a href="../people-2009/index.html">那一年做臉的人</a>〉，本站兩頁都不列出。</p>
+
+  <h2>還沒寫的部分</h2>
+  <div class="card amber">
+    <p class="card-h">這一頁目前只有「檔案量得到的那一半」</p>
+    <p>上面每一個數字都是從那兩份文件與遊戲檔案裡量出來的。
+       但有些事情<strong>檔案裡沒有，只有當事人知道</strong>：</p>
+    <p style="margin-top:6px">
+       · 那 23 個沒有臉皮的球員，當年是<u>找不到</u>還是<u>來不及做</u>？<br>
+       · 2009 年 5 月和 9 月的空白，發生了什麼事？<br>
+       · 「看影片校球速」那六條，一條要花多久？<br>
+       · 2009 年 10 月之後為什麼停下來？</p>
+    <p><span class="badge wip">待補</span>
+       這些留著。<strong>本站的規矩是「檔案裡有的才寫」</strong> ——
+       所以沒有的部分就空著，不用猜的填。</p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 一份十七年前的工作紀錄，一句一句拿今天的檔案去對，數字幾乎全部對得上，連「當年為什麼非得搶別人的臉皮號碼」都有了答案。</li>
+    <li><strong>兩份文件</strong> <code>Readme.txt</code> 281 行（含一張 53 列的球員對照表）、<code>History.txt</code> 1,281 行（38 條改版紀錄），都是 Big5 寫的，現在的編輯器直接開會是亂碼。<u>轉碼一個字元都沒有遺失</u>，轉回去跟原檔位元組完全相同。</li>
+    <li><strong>那張表的形狀</strong> 53 列裡 30 個有臉皮編號、23 個寫「無」，相異的臉皮編號 29 個（有一個被兩人共用）；53 個大頭照編號零重複，散在 0637 到 9485 之間，但排序之後會看到 <strong>30 個人擠在 3486 到 3521</strong>，這一段容量 36 只空著六個。當年是找到一段沒人用的連續號碼，一個一個填進去。</li>
+    <li><strong>備註欄寫出了做法，而十七年後有了解釋</strong> 53 列只有 11 列有備註，6 條是「把某位大聯盟球員的臉皮編號給予之」、2 條「移除某人並給予」、3 條「共用某某的臉皮」。看起來像風格，其實是沒有選擇：臉皮位子總共 <strong>894 個</strong>（本站測試機這一份；剛安裝好的原版只有 504 個、範圍到 <code>c606</code>），2009 那份名單球員 872 加教練 24 指派掉 896 個號碼（其中六個號碼指派了、檔案卻不存在，真的有檔的是 890 個），<strong>只剩四個空號</strong>。而那 23 個寫「無」的人，拿編號去查<u>同一包裡附的那份 2009 名冊</u>（本站測試機今天的名冊查不到他們），臉皮值<u>幾乎都</u>在 900 以上，也就是罐頭臉。</li>
+    <li><strong>八條逐一對原版，三條精確吻合</strong> 陳鴻文 <code>c114</code> 對 Armando Benitez、川上憲伸 <code>c190</code> 對 Keith Foulke、相川亮二 <code>c192</code> 對 Antonio Alfonseca。<strong>三條對不上</strong>：洪晨恩 <code>c423</code> 說明書寫 Steve Kline，原版是 Lou Gehrig（Steve Kline 其實用的是通用臉 <code>901</code>，通用臉不對應 <code>models.big</code> 的 <code>c###</code>）；林彥峰 <code>c183</code> 與林旺億 <code>c214</code> 兩人的名字在說明書裡<u>對調了</u>——說明書寫 c183 移除 Aaron Sele、c214 移除 Roberto Hernandez，但原版名冊裡 <code>c183</code> 是 Roberto Hernandez、<code>c214</code> 是 Aaron Sele。剩下兩條的編號超過 <code>c606</code>，原版沒有那個編號，無法對照。<br>⚠️ <strong>2026-08-29 訂正</strong>：這一列原本寫「五條精確吻合」，c183 / c214 那兩格填的是<u>原版的答案</u>而不是說明書寫的字，所以自己跟自己吻合。一手來源是那份 2009 模組壓縮檔內附的 <code>Readme.txt</code> 第 57、58 行（本站不轉載該檔）。本站另一頁〈<a href="../people-2009/index.html">2009 年那份名冊是誰做的</a>〉抄的是說明書原文、沒有抄錯，但那一頁的欄位標題寫「原本是誰的」，<code>c183</code> / <code>c214</code> / <code>c423</code> 這三格照說明書寫，跟剛安裝好的原版不符。</li>
+    <li><strong>不吻合的那一條才是最好看的</strong> 說明檔寫洪晨恩接收 Steve Kline 的 <code>c423</code>，但原版 <code>c423</code> 是 <strong>Lou Gehrig</strong>，Steve Kline 用的是通用臉 901。<u>寫的人記錯了對象，於是那一次撞號就沒有被處理</u>，裝了那個臉皮包之後，這位名人堂球員頂著一位台灣投手的臉。<strong>文件說的、檔案裡的、玩家實際會看到的，是三件不同的事。</strong></li>
+    <li><strong>38 條改版紀錄的節奏</strong> 2008-11-24 到 2009-10-30，跨度 340 天（2008 年 10 條、2009 年 28 條），最密的是 2009 年 2 月的 8 條，完全沒有紀錄的是 5 月與 9 月，最長的一條 155 行。重心從「加人」換到補生涯成績與背號，2009 年 7 到 8 月<u>連續六條都在看影片一球一球校球速</u>，「有片有真相」在紀錄裡出現 <strong>18 次</strong>。臉皮來源欄還顯示這不是一個人做的：六個有名有姓的來源標記，貢獻的張數分別是 10、8、4、3、1、1（其中三個是人的代號，三個是既有模組的名字）。</li>
+    <li><strong>本站沒驗的</strong> 另外兩條備註（<code>c813</code>、<code>c678</code>）超過原版上限 <code>c606</code>，原版沒有那些編號，所以那兩句講的是當時那份模組基底而不是 EA 原版，本站沒解開。當年紀錄裡那 49 條影片連結今天還通不通，本站也沒有逐條測試。而檔案裡沒有、只有當事人知道的四件事一律留白不猜：那 23 個沒有臉皮的球員是找不到還是來不及做、2009 年 5 月與 9 月的空白發生了什麼、校一條球速要花多久、2009 年 10 月之後為什麼停下來。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../../reference/player-numbers.html">兩套球員編號</a> —— 894 個位子只剩四個的完整量測</li>
+    <li><a href="../../reference/portrait.html#grid">大頭照編號的網格</a> —— 那 23 個「無」對到什麼</li>
+    <li><a href="../orphan-data/index.html">一個檔案裡的地層</a> —— 另一種「十幾年前留下的東西還在」</li>
+    <li><a href="../../about.html">關於本站</a> —— 這個站跟那份模組的關係</li>
+  </ul>
+
+  <footer>
+    <p>本頁的行數、列數、編號分佈、時間軸皆為現場解開兩份 Big5 文件與遊戲檔案量測所得；
+       轉碼過程零字元遺失，並以往返比對驗證。
+       文中提到的社群代號為當年文件內留存的圈內代號，本站不連結任何個人身分、
+       不公開聯絡方式、不轉載任何第三方工具或檔案。
+       標示為「待補」之處本站尚未取得資料，不以推測填補。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../../legal.html">法律與版權說明</a> ·
+       <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

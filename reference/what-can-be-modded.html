@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/what-can-be-modded.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>什麼改得動、什麼還不行 — toni的MVP模組補習班</title>
+<meta name="description" content="MVP Baseball 2005 各項修改的難度與現況：哪些已經完全解開、哪些只解了一半、哪些短期內不會有解。誠實版。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 現況表</p>
+  <h1>什麼改得動、什麼還不行</h1>
+  <p class="lede">網路上談 mod 常有種錯覺：好像什麼都能改，只是你還沒找到方法。
+     這頁講實話 —— <strong>哪些已經完全解開、哪些只解了一半、哪些短期內大概不會有解</strong>。
+     省得你往死路鑽。</p>
+
+  <h2>四個等級</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th style="width:16%">等級</th><th>意思</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td><span class="badge ok">完全可改</span></td><td>格式清楚，有現成方法或工具，本站多半有教學</td></tr>
+      <tr><td><span class="badge lv">可以替換</span></td><td>不用懂格式，直接換檔案就好</td></tr>
+      <tr><td><span class="badge wip">半解</span></td><td>外層懂了，核心內容還沒 —— 能看不能改，或能改但沒把握</td></tr>
+      <tr><td><span class="badge wip">未解</span></td><td>目前沒有可行方法</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>完全可改</h2>
+  <div class="lesson">
+    <span class="badge ok">完全可改</span>
+    <span class="t">賽程（哪天打哪隊、幾點開打、哪一年）</span>
+    <span class="d">純 CSV 文字。<a href="../tutorials/change-schedule-year/index.html">有教學與腳本</a>。</span>
+  </div>
+  <div class="lesson">
+    <span class="badge ok">完全可改</span>
+    <span class="t">介面版面（HUD、選單、轉場的位置與顯示與否）</span>
+    <span class="d">解壓後是純文字腳本。<a href="fel.html">格式已完全解開</a>，<a href="../tutorials/hide-runner-speed/index.html">有教學</a>。</span>
+  </div>
+  <div class="lesson">
+    <span class="badge ok">完全可改</span>
+    <span class="t">球員姓名、體格、部分能力欄位</span>
+    <span class="d">CSV 文字。但<strong>只有部分欄位能安全寫</strong>，動手前務必先讀<a href="player-data.html">避雷頁</a>。</span>
+  </div>
+  <div class="lesson">
+    <span class="badge ok">完全可改</span>
+    <span class="t">球員的專屬語音（播報員唸名字）</span>
+    <span class="d"><strong>2026-08-29：整條路打通了。</strong>
+       「哪位球員用哪個號碼」（見<a href="player-voice.html">播報員為什麼不唸新球員的名字</a>）、
+       容器與內部切法（見<a href="../tutorials/read-voice/index.html">拆開一個語音檔</a>）、
+       以及最後那一格「15 個位元組怎麼變回 28 個取樣」——<strong>三層都解開了</strong>。
+       本站有<u>純 Python、零相依</u>的腳本可以把聲音匯出成 WAV、也把 WAV 編回去
+       （見<a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>），
+       解碼對照第三方工具 <strong>21,678,328 個取樣 0 個不同</strong>。
+       <br>現在真正的門檻只剩<u>錄音不是合成</u>：新球員的名字沒有人唸過，得自己錄或自己剪。
+       <br><span class="small">這一格本來掛在下面的「目前未解」區塊底下，是本站
+       <a href="#voice-fix">2026-08-28 那次訂正</a>只改了說法、沒有把項目搬上來。</span></span>
+  </div>
+
+  <h2>可以替換（不用懂格式）</h2>
+  <div class="lesson">
+    <span class="badge lv">可以替換</span>
+    <span class="t">大頭照、球衣、載入畫面、隊徽</span>
+    <span class="d">用社群既有的圖片工具轉檔後替換。本站有五課：
+       <a href="../tutorials/swap-portrait/index.html">換球員大頭照</a>、
+       <a href="../tutorials/install-uniform/index.html">把一套球衣裝進遊戲</a>（隊徽跟球衣共用同一組編號，安裝位置也在這一課）、
+       <a href="../tutorials/team-logo/index.html">換球隊隊徽</a>（哪個編號是哪一隊、怎麼匯出成 PNG 改完換回去）、
+       <a href="../tutorials/uniforms/index.html">球衣模組：安裝與製作入門</a>、
+       <a href="../tutorials/swap-splash/index.html">換掉開機畫面</a>（開機、標題、載入三張都在裡面；其中<strong>開機大圖目前只匯得出來、匯不回去</strong>）。</span>
+  </div>
+  <div class="lesson">
+    <span class="badge lv">可以替換</span>
+    <span class="t">球場（換成別人做好的球場包）</span>
+    <span class="d">整個檔案替換。但<strong>檔案很大，容易撞到記憶體上限</strong>，見<a href="../tutorials/crash-diagnosis/index.html">當機診斷</a>。</span>
+  </div>
+
+  <h2>半解 —— 能做但有但書</h2>
+  <div class="lesson">
+    <span class="badge wip">半解</span>
+    <span class="t">選單音樂</span>
+    <span class="d">那 9 個 <code>.asf</code> <strong>不是微軟的 ASF</strong> ——
+       開頭四碼是 <code>SCHl</code>，是 EA 自家的音訊容器，所以「丟一首 mp3 改名進去」不會成立。
+       <a href="audio.html#asf">為什麼副檔名會騙人</a>。
+       工具本站有：純 Python、零相依的腳本可以把它解成 WAV，也把 WAV 編回這個格式，見<a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>；
+       不想打指令的，做法見<a href="../7min/music.html">七分鐘置換遊戲音樂</a>。
+       但書是<u>格子是定長的</u>：塞回去的歌不會讓檔案變大，比原本短的補靜音、比原本長的直接被切掉。</span>
+  </div>
+  <div class="lesson">
+    <span class="badge wip">半解</span>
+    <span class="t">自製大頭照 / 臉皮圖片</span>
+    <span class="d">圖片格式的結構已經讀得出來，<strong>但自己產生的檔案遊戲吃不吃還沒實測過</strong>。
+       壓回去那一半本站自己也寫了（<code>0x60</code> DXT1 與 <code>0x61</code> DXT3），見
+       <a href="../tutorials/new-face/index.html">做一張新的球員臉皮</a>與<a href="../tutorials/swap-portrait/index.html">換球員大頭照</a>；
+       還沒實測的是<u>遊戲吃不吃自己產生的圖</u>那一關。</span>
+  </div>
+  <div class="lesson">
+    <span class="badge wip">半解</span>
+    <span class="t">字型</span>
+    <span class="d">外層容器解開了，<strong>每個字的點陣圖與間距資料還沒</strong>。所以能換整包字型檔，不能改單一字。</span>
+  </div>
+  <div class="lesson">
+    <span class="badge wip">半解</span>
+    <span class="t">動畫</span>
+    <span class="d">封包結構與命名規則清楚（<a href="../story/build-2004/index.html">連編譯時間都讀得出來</a>），
+       但動作資料本身是編譯過的骨架關鍵影格，等於要重寫一套 3D 工具。</span>
+  </div>
+
+  <div class="lesson">
+    <span class="badge wip">半解</span>
+    <span class="t">播報語音內容</span>
+    <span class="d">播報是<strong>預錄音檔</strong>不是文字轉語音，所以沒有「字幕檔」可以改。
+       <u>2026-08-29 訂正</u>：這一格原本整條標成「未解」，那貼錯位置了 ——<strong>音檔換得掉</strong>（格式已解，解碼對照 ffmpeg 21,678,328 個取樣 0 個不同，見<a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>）。真正沒解的是<u>哪一段唸的是哪一句</u> —— 錄音檔名對照表有 31,902 行（8,889 個群組名，加 23,013 筆「檔名＋位移」）、索引只有 2,056 段，編號系統跨三個檔案彼此對不上。<a href="audio.html">音訊系統結構</a>。
+       （<u>2026-09-05 訂正</u>：那次訂正只改了說法，項目本身還留在「目前未解」底下，現在搬到這一區。）</span>
+  </div>
+
+  <h2>目前未解</h2>
+  <div class="lesson">
+    <span class="badge wip">未解</span>
+    <span class="t">從零設計一座新球場</span>
+    <span class="d">球場檔含 3D 網格、貼圖座標、光源、碰撞判定。改貼圖與光源可行，重建幾何結構不可行。<a href="stadium.html">球場檔結構</a>。</span>
+  </div>
+  <div class="lesson">
+    <span class="badge wip">未解</span>
+    <span class="t">遊戲規則、AI 行為、數值公式</span>
+    <span class="d">這些寫在程式裡，不在資料檔。本站<strong>不涉及修改程式碼</strong>。</span>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">務實的結論</p>
+    <p>看起來「未解」的項目不少，但實際上 ——
+       <strong>換名單、換球衣、換球場、換賽程、調介面，這些檔案層級的替換已經涵蓋大多數人想做的事</strong>。</p>
+    <p>真正卡住的通常是兩件事：<strong>新球員的播報語音</strong>，
+       以及<strong>從零設計新球場</strong>。</p>
+    <p class="small">⚠️ 語音那一件的難處<u>已經不是格式</u>（見<a href="#voice-fix">下方訂正</a>），
+       而是<strong>沒有人唸過那個名字</strong> —— 要嘛自己錄，要嘛從播報員唸過的音裡一個字一個字剪出來。
+       二十年前台灣玩家就是這樣做的，很費工但做得到。</p>
+  </div>
+
+  <h2 id="voice-fix">⚠️ 2026-08-28 訂正一格：語音其實做得到</h2>
+  <p>上面把語音歸在「<u>能換不能編輯</u>」，理由是它的內部編碼沒解開。
+     <strong>那個歸類是錯的。</strong></p>
+  <p>本站後來量到：社群做的語音檔跟 EA 的<u>不是同一種子格式</u> ——
+     剛安裝好的原版 6,995 個聲音<strong>全部是一種</strong>，
+     而三個社群語音包<strong>絕大多數是另一種</strong>。
+     那些包當年是真的裝來玩的，<strong>所以遊戲兩種都吃</strong>。</p>
+  <p>要換語音，需要的是「<u>產生一個遊戲吃得下去的檔</u>」，
+     不是「把 EA 的解碼出來」。<strong>那兩件事被本站混為一談了。</strong>
+     檔頭格式、配對規則、產生的路徑<u>三段都有答案</u>，
+     完整說明見<a href="audio.html#voice-swap">播報與音訊那頁</a>。</p>
+  <p>⭐ <strong>後續：那一格又縮小了一次。</strong>本站把容器<u>裡面</u>也量開了 ——
+     每一段聲音資料的擺法（兩個聲道各自連續，1,945 段零例外）、
+     一個聲道裡每 15 個位元組一組（掃相位 97.7% vs 亂猜 50%），
+     兩件都解開。當時只剩「15 個位元組怎麼變回 28 個取樣」——
+     <u>2026-08-29 訂正</u>：那一格<strong>後來也解開了</strong>，見<a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>。
+     過程與一個差點推翻正確結論的假紅燈，寫在
+     <a href="../tutorials/read-voice/index.html">拆開一個語音檔</a>。</p>
+  <p class="small"><u>2026-08-29 訂正</u>：這裡原本寫「本站還沒有從頭到尾做過一次，所以還沒有這一課」——
+     那一課後來開了，見<a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>。
+     訂正留著不刪，是因為「還沒做」不是「做不到」、<strong>兩者不該用同一個標記</strong>這條教訓照樣成立。</p>
+
+  <h2>為什麼有些東西特別難</h2>
+  <p>難度不是隨機的，它取決於<strong>資料離「人看得懂的形式」有多遠</strong>：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>資料長什麼樣</th><th>難度</th><th>例子</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="資料長什麼樣">純文字</td><td data-label="難度">幾乎沒有難度</td><td data-label="例子">賽程、球員資料、介面版面</td></tr>
+      <tr><td data-label="資料長什麼樣">壓縮過的純文字</td><td data-label="難度">解壓就好</td><td data-label="例子">小聯盟賽程、部分介面檔</td></tr>
+      <tr><td data-label="資料長什麼樣">結構化的二進位</td><td data-label="難度">要逆向，但做得到</td><td data-label="例子">封裝檔、圖片</td></tr>
+      <tr><td data-label="資料長什麼樣">編譯過的產物</td><td data-label="難度">很難</td><td data-label="例子">動畫、3D 模型</td></tr>
+      <tr><td data-label="資料長什麼樣">編碼過的媒體</td><td data-label="難度">能換不能編輯 <span class="small">（<u>2026-09-05 訂正</u>：語音與選單音樂其實都編得動，見<a href="../tutorials/make-voice/index.html">換掉遊戲的聲音</a>）</span></td><td data-label="例子">語音、音樂</td></tr>
+    </tbody>
+  </table></div>
+  <p>這也是為什麼<a href="../tutorials/read-file-headers/index.html">五秒看穿一個檔案</a>那一課這麼重要 ——
+     先判斷你面對的是哪一類，才知道值不值得投入。</p>
+
+  <div class="card blue">
+    <p class="card-h">這張表會變</p>
+    <p>「未解」不代表永遠解不開，只代表<strong>目前還沒有人解出來</strong>。
+       本站的原則是：解開了就寫進來，沒解開就誠實說沒解開，
+       <strong>不會為了讓表格好看而把「可能可以」寫成「可以」</strong>。</p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 這一頁用四個等級（完全可改、可以替換、半解、未解）誠實列出各項修改的現況，用途是<u>省得你往死路鑽</u>。</li>
+    <li><strong>完全可改的四項</strong> 賽程（純 CSV 文字）、介面版面（解壓後是純文字腳本）、球員姓名體格與部分能力欄位，以及球員的專屬語音（2026-08-29 三層全部打通）。不必懂格式直接替換的則是大頭照、球衣、載入畫面、隊徽，以及整包球場；其中<u>開機大圖那一張目前只匯得出來、匯不回去</u>。</li>
+    <li><strong>務實的結論</strong> 換名單、換球衣、換球場、換賽程、調介面，這些檔案層級的替換已經涵蓋大多數人想做的事。頁面寫真正卡住的只有兩件：新球員的播報語音，以及從零設計一座新球場<u>（語音那一件下面就被自己推翻了）</u>。</li>
+    <li><strong>本頁訂正了自己一格（2026-08-28）</strong> 語音原本歸在「能換不能編輯」，<strong>那個歸類是錯的</strong>。錯在把「把 EA 的編碼解出來」跟「產生一個遊戲吃得下去的檔」混為一談。剛安裝好的原版 6,995 個聲音全部是一種子格式，三個社群語音包絕大多數是另一種，而那些包當年是真的裝來玩的，<u>所以遊戲兩種都吃</u>。</li>
+    <li><strong>然後那一格整個關掉了（2026-08-29）</strong> 球員專屬語音的三層全部解開（哪位球員用哪個號碼、容器與內部切法、15 個位元組怎麼變回 28 個取樣），本站有純 Python 零相依的腳本可以匯出成 WAV 也可以編回去，解碼對照第三方工具 21,678,328 個取樣 0 個不同。門檻只剩<u>錄音不是合成</u>：新球員的名字沒有人唸過，得自己錄或自己剪。</li>
+    <li><strong>副檔名會騙人</strong> 選單音樂那 9 個 <code>.asf</code> 不是微軟的 ASF，開頭四碼是 <code>SCHl</code>，是 EA 自家的音訊容器，所以「換首歌」沒有想像中簡單。</li>
+    <li><strong>難度不是隨機的</strong> 它取決於資料離「人看得懂的形式」有多遠。純文字幾乎沒有難度、壓縮過的純文字解壓就好、結構化的二進位要逆向但做得到、編譯過的產物（動畫與 3D 模型）很難。先判斷手上那個檔屬於哪一類，才知道值不值得投入。</li>
+    <li><strong>本站沒驗的</strong> 自製大頭照與臉皮圖片的結構讀得出來，壓回去那一半本站自己也寫了（<code>0x60</code> DXT1 與 <code>0x61</code> DXT3），但<u>自己產生的檔遊戲吃不吃還沒實測過</u>；字型只解開外層容器，單一個字的點陣圖與間距沒解，所以能換整包不能改單字；動畫的動作資料是編譯過的骨架關鍵影格，等於要重寫一套 3D 工具；從零設計新球場的幾何結構不可行；遊戲規則、AI 行為與數值公式寫在程式裡，本站不涉及修改程式碼。這張表會變，而且<strong>「還沒做」跟「做不到」本站不用同一個標記</strong>。</li>
+  </ul>
+
+  <footer>
+    <p>本頁的「已解 / 未解」判斷以實際嘗試過的結果為準；標示為半解的項目會說明卡在哪一層。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

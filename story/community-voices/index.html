@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/story/community-voices/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>EA 沒錄的名字，台灣人自己錄了 — toni的MVP模組補習班</title>
+<meta name="description" content="遊戲資料夾旁邊有 23 個資料夾、69 個語音檔，是 2005 到 2009 年台灣模組玩家自己做的。號碼對得上人，外層容器多半照遊戲的規矩走；最裡面那層聲音編碼寫這頁的時候還沒解開，2026-08-29／30 已經解開。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../../index.html">首頁</a>
+  <a class="item" href="../../start.html">新手基本功</a>
+  <a class="item" href="../../do.html">我想做什麼</a>
+  <a class="item" href="../../plan.html">課表</a>
+  <a class="item" href="../../tutorials/index.html">教學</a>
+  <a class="item" href="../../7min/index.html">七分鐘</a>
+  <a class="item" href="../../reference/index.html">速查</a>
+  <a class="item" href="../../coach/index.html">棒球教練</a>
+  <a class="item on" href="../index.html">故事</a>
+  <a class="item" href="../../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="../index.html">故事</a> › EA 沒錄的名字，台灣人自己錄了</p>
+  <h1>EA 沒錄的名字，台灣人自己錄了</h1>
+  <p class="lede">本站<a href="../../reference/player-voice.html">播報員為什麼不唸新球員的名字</a>那頁寫過一句話：
+     「<u>沒有人錄過他的名字</u>，所以無論你怎麼設定，播報員都唸不出來。」
+     前半句的「EA 沒錄」是對的，<strong>「沒有人錄過」是錯的</strong>。
+     遊戲資料夾旁邊躺著 <strong>23 個資料夾、69 個語音檔</strong>，
+     是 2005 到 2009 年台灣的模組玩家自己做的。這頁把它們全部打開量一遍。</p>
+
+  <div class="card amber">
+    <p class="card-h">⚠️ 先講這頁量的是什麼、不是什麼</p>
+    <p>量測對象是本站測試機上的 <code>MVP2026\audio\</code> 資料夾，
+       共 23 個子資料夾、138 個檔案、2,487,010 位元組（<strong>2.37 MB</strong>）。</p>
+    <p><strong>它不在遊戲會讀的路徑裡。</strong>遊戲讀的是 <code>data\audio\</code>，
+       這個資料夾是放在旁邊的<u>素材庫</u>。所以「這 23 個人的名字現在播報員會不會唸」
+       <strong>不是這頁能回答的問題</strong>，本站沒有實機驗過。<span class="badge wip">未驗</span></p>
+    <p class="small">靜態比對能講到的只有這一段：把這 23 個號碼拿去<u>遊戲真的會讀的那一份</u>語音庫
+       （<code>data\audio\cd\spch_pbp\pnamedat.big</code>）查，<strong>16 個連同名項目都沒有</strong>；
+       剩下 7 個雖然有同名項目，那 20 個檔<u>沒有一個跟資料夾裡的內容位元組相同</u>（細節在第八節）。
+       這是<u>靜態比對的結果，不是「所以播報員一定不會唸」</u> —— 那句話仍然要實機才算數。
+       同一組數字在<a href="../../reference/original-vs-modded.html">原版與這台機器差在哪</a>那頁也寫著。
+       ⚠️ 這跟第六節那 6 個「搬來的」檔是兩回事：那 6 個是<u>跨號碼</u>相同
+       （3245 對 2378、3487 對 9079、3499 對 2223），這裡比的是<u>同一個號碼</u>。</p>
+    <p>這頁能回答的是：<strong>這些檔案是不是真的照遊戲的格式做的、號碼是不是真的對得到人</strong>。
+       這兩件事有證據，下面全部列出來。</p>
+  </div>
+
+  <h2>一、資料夾自己就是一份紀錄</h2>
+  <p>命名規則很整齊：<strong>球員名字 + 四位數號碼 + 底線 + 來源標記</strong>。</p>
+<pre><code>李振昌<span class="hl">3497</span>_強者小雪靈同學
+上原浩治 Uehara Koji <span class="hl">6107</span>_NPB8.4模組
+倪福德<span class="hl">6503</span>_中職模組</code></pre>
+  <p>每個資料夾固定六個檔：<code>3497a.dat</code>、<code>3497c.dat</code>、<code>3497d.dat</code>
+     加上同名的三個 <code>.hdr</code>。23 個資料夾乘以六，剛好 138 個檔，沒有例外。
+     69 個 <code>.dat</code> 合計 2,485,906 位元組，69 個 <code>.hdr</code> 每個都是 16 位元組。</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>來源標記</th><th class="num">資料夾數</th><th>備註</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="來源標記">台灣之光模組</td><td data-label="資料夾數" class="num">13</td><td data-label="備註">另有 1 個寫成「台灣光之模組」，字序寫反了</td></tr>
+      <tr><td data-label="來源標記">強者小雪靈同學</td><td data-label="資料夾數" class="num">4</td><td data-label="備註">檔案時間全部是 2009-03-12</td></tr>
+      <tr><td data-label="來源標記">小雪靈同學</td><td data-label="資料夾數" class="num">3</td><td data-label="備註">檔案時間全部是 2009-01-17</td></tr>
+      <tr><td data-label="來源標記">中職模組</td><td data-label="資料夾數" class="num">1</td><td data-label="備註">倪福德</td></tr>
+      <tr><td data-label="來源標記">NPB8.4模組</td><td data-label="資料夾數" class="num">1</td><td data-label="備註">上原浩治</td></tr>
+        <tr><td data-label="來源標記">台灣光之模組</td><td data-label="資料夾數" class="num">1</td><td data-label="備註">鄭錡鴻。字序跟上面那個寫反了，照原樣列</td></tr>
+      <tr><td data-label="來源標記"><strong>合計</strong></td><td data-label="資料夾數" class="num"><strong>23</strong></td><td data-label="備註"></td></tr>
+    </tbody>
+  </table></div>
+  <div class="card clay">
+    <p class="card-h">⚠️ 2026-08-28 訂正：本站一次用詞訂正改壞了三格「照原樣列」的資料</p>
+    <p>2026-08-27 本站做過一次全站用詞訂正，把「中職」改成「台灣」——
+       理由是<u>加進遊戲的球員不一定是中華職棒出身</u>，那個訂正本身是對的。</p>
+    <p><strong>但它連這一頁三個「逐字引用資料夾名稱」的地方一起改了</strong>
+       （上面的檔名範例、這張來源標記表、下面的號碼對照表）。
+       磁碟上那個資料夾真的叫 <code>倪福德6503_中職模組</code>，
+       站上卻展示了一個<u>不存在的資料夾名</u>。已改回。</p>
+    <p class="small">⭐ 這個錯的形狀值得記：<u>全站替換會踩到「照原樣列」的區塊</u>。
+       這一頁的說服力完全建立在「我把它們全部打開量一遍、原文照列」，
+       而同一張表隔壁列還寫著「字序跟上面那個寫反了，<strong>照原樣列</strong>」——
+       那句話正好說明了這些格子不該被改。
+       <u>做全站用詞替換之前，要先把引用區塊排除掉。</u></p>
+  </div>
+
+  <figure class="figbox">
+  <div class="figscroll">
+<svg class="barchart" viewBox="-4 -4 648 218" role="img" aria-label="69 個語音檔的修改年份長條圖：2007 年 33 個最多，2009 年 21 個次之，2006 年只有 2 個">
+<text x="110" y="25.68" class="bl">2005 年</text>
+<rect x="118" y="8" width="94.6" height="26" class="bar"><title>2005 年：7 個檔。最早的一個是 2947a.dat，10 月 27 日 21:29</title></rect>
+<text x="219.6" y="25.68" class="bv">7 個</text>
+<text x="110" y="61.68" class="bl">2006 年</text>
+<rect x="118" y="44" width="27.0" height="26" class="bar"><title>2006 年：2 個檔，都是 9485 的 a 與 d</title></rect>
+<text x="152.0" y="61.68" class="bv">2 個</text>
+<text x="110" y="97.68" class="bl">2007 年</text>
+<rect x="118" y="80" width="446.0" height="26" class="bar"><title>2007 年：33 個檔。6 月 22 日 8 個、23 日 4 個、27 日 18 個，合計 30 個</title></rect>
+<text x="571.0" y="97.68" class="bv">33 個</text>
+<text x="110" y="133.68" class="bl">2008 年</text>
+<rect x="118" y="116" width="81.1" height="26" class="bar"><title>2008 年：6 個檔，4631 三個與 6503 三個</title></rect>
+<text x="206.1" y="133.68" class="bv">6 個</text>
+<text x="110" y="169.68" class="bl">2009 年</text>
+<rect x="118" y="152" width="283.8" height="26" class="bar"><title>2009 年：21 個檔，1 月 17 日 9 個、3 月 12 日 12 個</title></rect>
+<text x="408.8" y="169.68" class="bv">21 個</text>
+<line x1="118" y1="4" x2="118" y2="182" class="ax"/>
+<text x="118" y="200" class="bn">合計 69 個 .dat，跨度 2005-10-27 到 2009-03-12</text>
+</svg>
+  </div>
+  <figcaption><b>資料來源</b>：<code>MVP2026\audio\</code> 底下 69 個 <code>.dat</code> 的檔案修改時間。
+     這是<u>檔案上的時間，不是錄音的時間</u>。但它跟當年模組的更新紀錄對得起來：
+     紀錄寫 2009 年 3 月 17 日新增四位球員語音，那四個資料夾的 12 個檔的時間都是 3 月 12 日。</figcaption>
+  </figure>
+
+  <h2>二、號碼真的對得到人</h2>
+  <p>資料夾名字裡那四位數，就是球員資料檔第 16 欄
+     <code>playerattrib_audioid</code>（見<a href="../../reference/player-numbers.html">兩套球員編號</a>）。
+     問題是：<strong>拿去現在這台機器的名單查，23 個號碼只有 1 個有人在用。</strong></p>
+  <p>差一點就要下結論說「對不上」。但同一個遊戲資料夾裡還躺著<u>另一份名單</u>：
+     <code>MVP2026\database\attrib.dat</code>，檔案時間 2009 年 11 月，3,222 位球員。
+     用那一份查：</p>
+
+  <div class="card grass">
+    <p class="card-h">23 個號碼，在 2009 名單裡 23 個都查得到，而且都只有一個人在用</p>
+    <p>驗證點就用 <code>3497</code>：2009 名單裡是
+       <strong>Chen-Chang Lee</strong>，資料夾寫的是<strong>李振昌</strong>。</p>
+    <p>23 個裡面有 <strong>22 個</strong>的中文名字與名單上的英文拼音對得起來
+       （羅錦龍／Ching-Lung Lo、上原浩治／Koji Uehara、倪福德／Fu-Te Ni…）。
+       剩下 1 個是 <code>2892</code>：資料夾原文是
+       <code>石井 Travis Ishikawa 2892 _小雪靈同學</code> ——
+       <u>英文半段跟名單逐字相同</u>，對不上的只有中文那半
+       （<code>Ishikawa</code> 是石川不是石井）。這一半<u>本站兩邊原文照列，不做判斷</u>。</p>
+  </div>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">號碼</th><th>資料夾寫的</th><th>2009 名單裡的名字</th><th>來源標記</th>
+      <th class="num">最早檔案日期</th><th class="num">a</th><th class="num">c</th><th class="num">d</th></tr></thead>
+    <tbody>
+      <tr><td data-label="號碼" class="num">2892</td><td data-label="資料夾寫的">石井</td><td data-label="2009 名單裡的名字">Travis Ishikawa</td><td data-label="來源標記">小雪靈同學</td><td data-label="最早檔案日期" class="num">2009-01-17</td><td data-label="a" class="num">42,560</td><td data-label="c" class="num">67,384</td><td data-label="d" class="num">42,560</td></tr>
+      <tr><td data-label="號碼" class="num">2947</td><td data-label="資料夾寫的">羅錦龍</td><td data-label="2009 名單裡的名字">Ching-Lung Lo</td><td data-label="來源標記">台灣之光模組</td><td data-label="最早檔案日期" class="num">2005-10-27</td><td data-label="a" class="num">25,324</td><td data-label="c" class="num">70,532</td><td data-label="d" class="num">25,324</td></tr>
+      <tr><td data-label="號碼" class="num">3245</td><td data-label="資料夾寫的">中村紀洋</td><td data-label="2009 名單裡的名字">Norihiro Nakamura</td><td data-label="來源標記">小雪靈同學</td><td data-label="最早檔案日期" class="num">2009-01-17</td><td data-label="a" class="num">5,120</td><td data-label="c" class="num">85,876</td><td data-label="d" class="num">4,864</td></tr>
+      <tr><td data-label="號碼" class="num">3429</td><td data-label="資料夾寫的">詹智堯</td><td data-label="2009 名單裡的名字">Chih-Yao Chan</td><td data-label="來源標記">台灣之光模組</td><td data-label="最早檔案日期" class="num">2007-06-27</td><td data-label="a" class="num">22,536</td><td data-label="c" class="num">60,012</td><td data-label="d" class="num">22,536</td></tr>
+      <tr><td data-label="號碼" class="num">3486</td><td data-label="資料夾寫的">林旺衛</td><td data-label="2009 名單裡的名字">Wang-Wei Lin</td><td data-label="來源標記">台灣之光模組</td><td data-label="最早檔案日期" class="num">2007-06-22</td><td data-label="a" class="num">21,184</td><td data-label="c" class="num">61,272</td><td data-label="d" class="num">21,184</td></tr>
+      <tr><td data-label="號碼" class="num">3487</td><td data-label="資料夾寫的">郭勝安</td><td data-label="2009 名單裡的名字">Sheng-An Kuo</td><td data-label="來源標記">台灣之光模組</td><td data-label="最早檔案日期" class="num">2007-06-22</td><td data-label="a" class="num">3,972</td><td data-label="c" class="num">66,872</td><td data-label="d" class="num">4,136</td></tr>
+      <tr class="hi"><td data-label="號碼" class="num">3488</td><td data-label="資料夾寫的">林旺億</td><td data-label="2009 名單裡的名字">Wang-Yi Lin</td><td data-label="來源標記">台灣之光模組</td><td data-label="最早檔案日期" class="num">2007-06-22</td><td data-label="a" class="num">21,184</td><td data-label="c" class="num">66,392</td><td data-label="d" class="num">21,184</td></tr>
+      <tr><td data-label="號碼" class="num">3493</td><td data-label="資料夾寫的">洪晨恩</td><td data-label="2009 名單裡的名字">Chen-En Hong</td><td data-label="來源標記">台灣之光模組</td><td data-label="最早檔案日期" class="num">2007-06-27</td><td data-label="a" class="num">25,776</td><td data-label="c" class="num">66,692</td><td data-label="d" class="num">25,776</td></tr>
+      <tr><td data-label="號碼" class="num">3494</td><td data-label="資料夾寫的">林彥峰</td><td data-label="2009 名單裡的名字">Yen-Feng Lin</td><td data-label="來源標記">台灣之光模組</td><td data-label="最早檔案日期" class="num">2007-06-22</td><td data-label="a" class="num">21,184</td><td data-label="c" class="num">73,672</td><td data-label="d" class="num">21,184</td></tr>
+      <tr class="hi"><td data-label="號碼" class="num">3497</td><td data-label="資料夾寫的">李振昌</td><td data-label="2009 名單裡的名字">Chen-Chang Lee</td><td data-label="來源標記">強者小雪靈同學</td><td data-label="最早檔案日期" class="num">2009-03-12</td><td data-label="a" class="num">26,316</td><td data-label="c" class="num">64,144</td><td data-label="d" class="num">26,316</td></tr>
+      <tr><td data-label="號碼" class="num">3499</td><td data-label="資料夾寫的">邱子愷</td><td data-label="2009 名單裡的名字">Tzu-Kai Chiu</td><td data-label="來源標記">台灣之光模組</td><td data-label="最早檔案日期" class="num">2007-06-27</td><td data-label="a" class="num">3,193</td><td data-label="c" class="num">46,848</td><td data-label="d" class="num">3,453</td></tr>
+      <tr><td data-label="號碼" class="num">3500</td><td data-label="資料夾寫的">羅嘉仁</td><td data-label="2009 名單裡的名字">Chia-Jen Lo</td><td data-label="來源標記">強者小雪靈同學</td><td data-label="最早檔案日期" class="num">2009-03-12</td><td data-label="a" class="num">20,412</td><td data-label="c" class="num">56,532</td><td data-label="d" class="num">20,412</td></tr>
+      <tr><td data-label="號碼" class="num">3501</td><td data-label="資料夾寫的">郭嚴文</td><td data-label="2009 名單裡的名字">Yen-Wen Kuo</td><td data-label="來源標記">強者小雪靈同學</td><td data-label="最早檔案日期" class="num">2009-03-12</td><td data-label="a" class="num">13,572</td><td data-label="c" class="num">50,568</td><td data-label="d" class="num">13,572</td></tr>
+      <tr><td data-label="號碼" class="num">3506</td><td data-label="資料夾寫的">鄭錡鴻</td><td data-label="2009 名單裡的名字">Chi-Hung Cheng</td><td data-label="來源標記">台灣光之模組</td><td data-label="最早檔案日期" class="num">2005-10-27</td><td data-label="a" class="num">22,536</td><td data-label="c" class="num">51,768</td><td data-label="d" class="num">22,384</td></tr>
+      <tr><td data-label="號碼" class="num">3509</td><td data-label="資料夾寫的">鄭凱文</td><td data-label="2009 名單裡的名字">Kai-Wen Cheng</td><td data-label="來源標記">強者小雪靈同學</td><td data-label="最早檔案日期" class="num">2009-03-12</td><td data-label="a" class="num">22,536</td><td data-label="c" class="num">51,768</td><td data-label="d" class="num">22,536</td></tr>
+      <tr><td data-label="號碼" class="num">4631</td><td data-label="資料夾寫的">林哲瑄</td><td data-label="2009 名單裡的名字">Che-Hsuan Lin</td><td data-label="來源標記">台灣之光模組</td><td data-label="最早檔案日期" class="num">2008-03-13</td><td data-label="a" class="num">20,352</td><td data-label="c" class="num">50,508</td><td data-label="d" class="num">20,352</td></tr>
+      <tr><td data-label="號碼" class="num">6107</td><td data-label="資料夾寫的">上原浩治</td><td data-label="2009 名單裡的名字">Koji Uehara</td><td data-label="來源標記">NPB8.4模組</td><td data-label="最早檔案日期" class="num">2007-09-29</td><td data-label="a" class="num">34,228</td><td data-label="c" class="num">67,112</td><td data-label="d" class="num">34,228</td></tr>
+      <tr><td data-label="號碼" class="num">6203</td><td data-label="資料夾寫的">田澤純一</td><td data-label="2009 名單裡的名字">Junich Tazawa</td><td data-label="來源標記">小雪靈同學</td><td data-label="最早檔案日期" class="num">2009-01-17</td><td data-label="a" class="num">37,408</td><td data-label="c" class="num">66,100</td><td data-label="d" class="num">37,408</td></tr>
+      <tr><td data-label="號碼" class="num">6287</td><td data-label="資料夾寫的">蔣智賢</td><td data-label="2009 名單裡的名字">Chih-Hsien Chiang</td><td data-label="來源標記">台灣之光模組</td><td data-label="最早檔案日期" class="num">2007-06-23</td><td data-label="a" class="num">24,392</td><td data-label="c" class="num">63,992</td><td data-label="d" class="num">24,392</td></tr>
+      <tr><td data-label="號碼" class="num">6465</td><td data-label="資料夾寫的">增菘瑋</td><td data-label="2009 名單裡的名字">Sung-Wei Tseng</td><td data-label="來源標記">台灣之光模組</td><td data-label="最早檔案日期" class="num">2007-06-27</td><td data-label="a" class="num">29,496</td><td data-label="c" class="num">74,184</td><td data-label="d" class="num">29,496</td></tr>
+      <tr><td data-label="號碼" class="num">6503</td><td data-label="資料夾寫的">倪福德</td><td data-label="2009 名單裡的名字">Fu-Te Ni</td><td data-label="來源標記">中職模組</td><td data-label="最早檔案日期" class="num">2008-11-23</td><td data-label="a" class="num">34,768</td><td data-label="c" class="num">47,540</td><td data-label="d" class="num">34,768</td></tr>
+      <tr><td data-label="號碼" class="num">9146</td><td data-label="資料夾寫的">羅國輝</td><td data-label="2009 名單裡的名字">Kuo-Hui Lo</td><td data-label="來源標記">台灣之光模組</td><td data-label="最早檔案日期" class="num">2005-10-30</td><td data-label="a" class="num">25,324</td><td data-label="c" class="num">57,312</td><td data-label="d" class="num">25,324</td></tr>
+      <tr><td data-label="號碼" class="num">9485</td><td data-label="資料夾寫的">陳鴻文</td><td data-label="2009 名單裡的名字">Hung-Wen Chen</td><td data-label="來源標記">台灣之光模組</td><td data-label="最早檔案日期" class="num">2006-02-16</td><td data-label="a" class="num">21,696</td><td data-label="c" class="num">68,672</td><td data-label="d" class="num">21,696</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">大小單位是位元組。日期欄取的是那個資料夾裡<u>三個檔中最早的一個</u>，
+     因為有<strong>七個</strong>資料夾的三個檔不同天：<code>3486</code>、<code>3487</code>、<code>3488</code>、<code>3494</code>
+     的 a 與 d 是 2007-06-22、c 是 2007-06-27；<code>6287</code> 的 a 與 d 是 2007-06-23、c 是 2007-06-27；
+     <code>3506</code> 的 a 與 d 是 2007-06-23、c 是 2005-10-27；
+     <code>9485</code> 的 a 與 d 是 2006-02-16、c 是 2007-06-27。
+     英文名字照抄 2009 名單原文，包括 <code>Junich Tazawa</code> 少一個 i。</p>
+
+  <h2>三、檔頭是照遊戲的規矩寫的</h2>
+  <p>先拆最小的那個。<code>.hdr</code> 只有 <strong>16 個位元組</strong>，
+     69 個檔一個不漏全部拆開，欄位排法完全一致（下面的數字都是十六進位）：</p>
+<pre><code>+0x00  1 byte    <span class="hl">E1</span>=a 檔　<span class="hl">E3</span>=c 檔　<span class="hl">E5</span>=d 檔
++0x01  1 byte    固定 36
++0x02  2 bytes   <span class="hl">號碼</span>            <span class="cm">← little-endian,這一欄是十進位</span>
++0x04  2 bytes   固定 00 01
++0x06  2 bytes   固定 00 00
++0x08  1 byte    會變,<span class="cm">← 原版裡它跟下一格合起來是長度,這 69 個檔不是,見下面</span>
++0x09  5 bytes   固定 00
++0x0E  2 bytes   固定 70 70      <span class="cm">← 讀成文字是 pp</span></code></pre>
+  <p class="small">上面「固定」兩個字的範圍是<u>這 69 個社群檔</u>。遊戲內建的同型檔頭裡，
+     <code>+0x04</code> 與 <code>+0x0E</code> 這兩欄還會出現別的值。</p>
+
+  <div class="card grass">
+    <p class="card-h">69 個檔，69 次命中</p>
+    <p>第 3、4 個位元組讀成 little-endian，就是檔名裡那個號碼。
+       李振昌的 <code>3497a.hdr</code> 那兩個位元組是 <code>A9 0D</code>，
+       換算成十進位正好是 <strong>3497</strong>。69 個檔全部相符，沒有例外。</p>
+    <p>更重要的是<u>跟遊戲自己的檔一模一樣</u>。
+       把遊戲語音索引 <code>pnamehdr.big</code> 裡的 <code>6107a.hdr</code> 抽出來比：</p>
+<pre><code>遊戲內建  e136 <span class="hl">db17</span> 0001 0000 <span class="hl">0b</span>00 0000 0000 7070
+社群做的  e136 <span class="hl">db17</span> 0001 0000 <span class="hl">0f</span>00 0000 0000 7070</code></pre>
+    <p>只有第 9 個位元組不同，其餘 15 個位元組完全相同。
+       這不是只有這一對：69 個社群 <code>.hdr</code> 裡有 <strong>20 個</strong>在
+       <code>pnamehdr.big</code> 找得到同名項目，<strong>20 個全部只差第 9 個位元組</strong>。</p>
+  </div>
+
+  <p>那個第 9 個位元組是什麼？本頁寫的時候沒有解出來。
+     它會變，但<u>不是每個檔都不一樣</u>：這 69 個社群檔裡只出現三個值 ——
+     c 檔全部是 <code>16</code>、d 檔全部是 <code>0F</code>、a 檔是 <code>0F</code>（19 個）或 <code>11</code>（4 個）。
+     遊戲內建的 12,451 個 16 位元組檔頭則出現 <strong>67 種不同的值</strong>。
+     拿遊戲內建 12,443 組「<code>.hdr</code> 配得到 <code>.dat</code>」的檔逐一驗過六種猜法
+     （<code>SCDl</code> 段數、段數加一、項目大小除以 1024、除以 2048、
+     <code>0x85</code> 的值除以 1024、除以 2048），<u>最高的一種只對上 1,021 個，8.2%</u>。
+     所以本頁當時就寫「未解」，不編一個聽起來合理的解釋。</p>
+
+  <div class="card clay">
+    <p class="card-h">⚠️ 2026-09-05 訂正：這一格後來解開了，但解開的規則描述不了這 69 個檔</p>
+    <p>本站後來在<a href="../../reference/voice-header.html">語音檔頭那頁</a>把它量出來了：
+       這一格連同下一格（那頁的位元組從 0 數起，叫<strong>第 8–9 個位元組</strong>，
+       也就是上面的 <code>+0x08</code> 與 <code>+0x09</code>）是<strong>長度</strong>，
+       單位是 256 位元組的區塊<u>而且要減一</u>，所以
+       <code>(值 ＋ 1) × 256 ＝ .dat 的長度</code>。
+       那頁在兩份剛安裝好的原版上量到 <strong>6,995／6,995 相符</strong>。</p>
+    <p><strong>但那條規則對這 69 個社群檔一個都不成立。</strong>本站重跑同一條公式：
+       69 個社群 <code>.hdr</code> <u>零命中</u>（<code>6107a.hdr</code> 那一格寫 15，
+       算出來是 4,096，實際 34,228）。上面六種猜法之所以全部落空，
+       是因為<u>沒有一種是「除以 256」</u> —— 但就算補上，這批檔也還是對不上。</p>
+    <p>同一條公式在<u>這台裝過模組的機器</u>上，12,443 組裡成立
+       <strong>6,172 組（49.6%）</strong>，是舊的最佳猜法（1,021 組、8.2%）的六倍；
+       本站另外對<u>剛安裝好的原版</u>那份 <code>pnamedat.big</code> 重跑，
+       <strong>4,565／4,565 全中</strong>。也就是說：原版沒有例外，
+       這台機器上的例外是模組後來加進來的檔，而社群這 69 個檔全部是例外。
+       <u>它們為什麼不照這條規則寫，本站不知道。</u><span class="badge wip">未解</span></p>
+  </div>
+
+  <h2>四、聲音檔的骨架</h2>
+  <p><code>.dat</code> 的開頭四個位元組是 <code>SCHl</code>，
+     也就是<a href="../../reference/audio.html">音訊那頁</a>講過的 EA 音訊容器。
+     它的結構是<strong>一串接一串的區塊</strong>，每塊開頭四個字是名字、接著四個位元組是這塊多長：</p>
+<pre><code>SCHl   28~40 bytes  <span class="cm">檔頭:格式描述(69 個檔裡 65 個是 32,兩個 28,兩個 40)</span>
+SCCl      12 bytes  <span class="cm">這個檔有幾段聲音(69 個檔全部都是 12)</span>
+SCDl 116~10588 byte <span class="cm">聲音資料,一段一塊,可以有很多塊</span>
+SCEl       8 bytes  <span class="cm">結束(67 個檔有,而且全部都是 8)</span></code></pre>
+  <p>把 69 個檔照這個規則一路走下去，<strong>65 個剛好走到檔尾</strong>，
+     一個位元組不多不少。全部合計 <strong>331 塊 SCDl</strong>。
+     另外 4 個檔的狀況留到第六節講。</p>
+
+  <h3>檔頭裡是一串「代號、長度、值」</h3>
+  <p><code>SCHl</code> 那一段不是固定欄位，而是一組一組接上去的：
+     <u>一個位元組的代號、一個位元組的長度、然後是值</u>，讀到 <code>FF</code> 就結束。
+     用這個規則解，<strong>69 個檔全部解得開</strong>，而且結束之後剩下的位元組全是 0：</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">代號</th><th class="num">出現在幾個檔</th><th>值</th><th>本站量到什麼</th></tr></thead>
+    <tbody>
+      <tr><td data-label="代號" class="mono">0x06</td><td data-label="出現在幾個檔" class="num">69</td><td data-label="值" class="num">101</td><td data-label="本站量到什麼">全部一樣。遊戲內建 12,527 個解得開的項目也全部是 101</td></tr>
+      <tr><td data-label="代號" class="mono">0xFD</td><td data-label="出現在幾個檔" class="num">69</td><td data-label="值">沒有值</td><td data-label="本站量到什麼">單獨一個位元組，跳過</td></tr>
+      <tr><td data-label="代號" class="mono">0x80</td><td data-label="出現在幾個檔" class="num">69</td><td data-label="值" class="num">3（65 個）／2（4 個）</td><td data-label="本站量到什麼"><strong>編碼器</strong>（2026-09-05 訂正，本頁原本標「未解」）：1 是音樂那種、2 是語音／音效那種、3 是裝在 <code>GSTR</code> 容器裡的那種，見<a href="../../tutorials/make-voice/index.html">換掉遊戲的聲音</a>。遊戲內建還會出現 1</td></tr>
+      <tr class="hi"><td data-label="代號" class="mono">0x85</td><td data-label="出現在幾個檔" class="num">69</td><td data-label="值" class="num">10,198 – 79,558</td>
+          <td data-label="本站量到什麼"><strong>等於每一段 <code>SCDl</code> 開頭那個數字的總和</strong>，69 個檔全中。
+              那個數字是<u>取樣總數</u>（2026-09-05 訂正，本頁原本寫「本站沒有解開」；
+              見<a href="../../tutorials/make-voice/index.html">換掉遊戲的聲音</a>那支腳本的標籤表，
+              <code>--info</code> 會直接印出來）</td></tr>
+      <tr><td data-label="代號" class="mono">0x82</td><td data-label="出現在幾個檔" class="num">63</td><td data-label="值" class="num">2</td><td data-label="本站量到什麼"><span class="badge wip">未解</span>。這 63 個剛好就是 63 個 <code>GSTR</code> 檔</td></tr>
+      <tr><td data-label="代號" class="mono">0xA0</td><td data-label="出現在幾個檔" class="num">6</td><td data-label="值" class="num">4</td><td data-label="本站量到什麼"><span class="badge wip">未解</span>。這 6 個剛好就是 6 個 <code>PT</code> 檔</td></tr>
+      <tr class="hi"><td data-label="代號" class="mono">0x84</td><td data-label="出現在幾個檔" class="num">4</td><td data-label="值" class="num">44100（2 個）／24000（2 個）</td>
+          <td data-label="本站量到什麼">整個語音庫 12,527 個解得開的項目中有 7,182 項帶這欄，值只出現過
+              22050、24000、44100。三個都是常見取樣率，所以本頁當時只能<u>推測是取樣率</u>，
+              聲音編碼沒解開、播不出來，驗不了。<strong>2026-09-05 訂正：現在驗得了，它就是取樣率</strong> ——
+              <code>2892c.dat</code> 這一欄寫 44100，拿<a href="../../tutorials/make-voice/index.html">換掉遊戲的聲音</a>
+              那支腳本匯出來的 WAV 就是 44100 Hz</td></tr>
+      <tr><td data-label="代號" class="mono">0x8C</td><td data-label="出現在幾個檔" class="num">2</td><td data-label="值" class="num">4</td><td data-label="本站量到什麼"><span class="badge wip">未解</span>。這 2 個的檔頭標記是 <code>PT 05 00</code></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small"><b>這幾條對應關係能推廣多遠，本站分開量過。</b>
+     在遊戲內建語音庫裡，<code>0xA0</code> 出現 5,973 次、剛好就是全部 5,973 個 <code>PT</code> 項目；
+     <code>0x8C</code> 出現 538 次、剛好就是全部 538 個 <code>PT 05 00</code> 項目；
+     但 <code>0x82</code> 只出現 295 次，而 <code>GSTR</code> 項目有 6,554 個。
+     所以「<code>0x82</code> 等於 <code>GSTR</code>」<u>只在這 69 個社群檔裡成立</u>，不是通則。</p>
+
+  <div class="card grass">
+    <p class="card-h">數字怎麼讀，要看三個地方分別決定</p>
+    <p>檔頭第 9 個位元組開始，有的檔寫 <code>GSTR</code>（社群檔 63 個），有的寫 <code>PT</code>（6 個）。
+       位元組順序<u>不是整個檔一種</u>，而是分成三塊：</p>
+    <p>一、<strong>每塊開頭「這塊多長」永遠是 little-endian</strong>，兩種檔頭都一樣。
+       所以區塊鏈可以用同一套規則走完全部 69 個檔。</p>
+    <p>二、<strong>資料區的數字看檔頭標記</strong>：<code>SCCl</code> 記的段數、每塊 <code>SCDl</code> 開頭那個數字，
+       <code>GSTR</code> 讀 big-endian，<code>PT</code> 讀 little-endian。</p>
+    <p>三、<strong>檔頭那串「代號、長度、值」的值，兩種都是 big-endian。</strong></p>
+    <p><strong>這不是猜的，是四種組合各跑一次比出來的。</strong>驗算條件：
+       <code>SCCl</code> 記的段數要等於實際數到的 <code>SCDl</code> 塊數，
+       而且每塊開頭那個數字加起來要等於 <code>0x85</code>，<u>兩個條件同時成立才算通過</u>。</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>來源</th><th>檔頭標記</th><th class="num">項數</th>
+      <th class="num">資料 BE<br>檔頭 BE</th><th class="num">資料 BE<br>檔頭 LE</th>
+      <th class="num">資料 LE<br>檔頭 BE</th><th class="num">資料 LE<br>檔頭 LE</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="來源">遊戲內建</td><td data-label="檔頭標記" class="mono">GSTR</td><td data-label="項數" class="num">6,554</td>
+          <td data-label="資料 BE檔頭 BE" class="num"><strong>6,554</strong></td><td data-label="資料 BE檔頭 LE" class="num">122</td><td data-label="資料 LE檔頭 BE" class="num">0</td><td data-label="資料 LE檔頭 LE" class="num">0</td></tr>
+      <tr class="hi"><td data-label="來源">遊戲內建</td><td data-label="檔頭標記" class="mono">PT</td><td data-label="項數" class="num">5,973</td>
+          <td data-label="資料 BE檔頭 BE" class="num">0</td><td data-label="資料 BE檔頭 LE" class="num">0</td><td data-label="資料 LE檔頭 BE" class="num"><strong>5,973</strong></td><td data-label="資料 LE檔頭 LE" class="num">13</td></tr>
+      <tr><td data-label="來源">社群</td><td data-label="檔頭標記" class="mono">GSTR</td><td data-label="項數" class="num">63</td>
+          <td data-label="資料 BE檔頭 BE" class="num"><strong>63</strong></td><td data-label="資料 BE檔頭 LE" class="num">2</td><td data-label="資料 LE檔頭 BE" class="num">0</td><td data-label="資料 LE檔頭 LE" class="num">0</td></tr>
+      <tr><td data-label="來源">社群</td><td data-label="檔頭標記" class="mono">PT</td><td data-label="項數" class="num">6</td>
+          <td data-label="資料 BE檔頭 BE" class="num">0</td><td data-label="資料 BE檔頭 LE" class="num">0</td><td data-label="資料 LE檔頭 BE" class="num"><strong>6</strong></td><td data-label="資料 LE檔頭 LE" class="num">0</td></tr>
+    </tbody>
+  </table></div>
+
+    <p>每一組都只有一種組合能 100% 通過，其他三種最高只到 3.2%（社群 <code>GSTR</code> 那 63 個裡的 2 個）。
+       合計：社群 69 個檔 <strong>69 個全過</strong>；遊戲內建 12,528 個項目
+       <strong>12,527 個全過</strong>。<u>唯一沒過的那一項叫 <code>3632.wav</code></u>，
+       它的開頭是 <code>RIFF</code>／<code>WAVE</code>，根本不是 <code>SCHl</code> 容器。
+       兩邊合計 <strong>12,596 ／ 12,597</strong>。</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">本頁寫的時候，聲音本身還沒解開</p>
+    <p>知道有幾段、每段多長，<strong>不等於知道那些位元組怎麼變成聲音</strong>。
+       把 <code>3497c.dat</code> 全部 7 塊 <code>SCDl</code> 的資料（64,008 個位元組）當成 8 位元聲音來看，
+       落在中央那 33 個值（<code>0x70</code> 到 <code>0x90</code>）的只有 234 個，
+       <strong>0.37%</strong>。未壓縮的 8 位元人聲會不會集中在這一段，本站<strong>沒有對照組可以驗</strong>：整個語音庫裡唯一的 WAV 是 16 位元，當不了 8 位元的對照。所以這只能當成一條線索，不是證據。<span class="badge wip">未驗</span></p>
+    <p>而且「一單位對應幾個位元組」這個比值，在不同檔頭欄位組合下差很多：
+       遊戲內建語音庫拆成 7 種欄位組合，各組的<u>中位數從 0.22 到 1.08</u>，
+       最高是最低的五倍，代表<u>裡面不只一種編碼</u>。
+       本頁寫到這裡就停住，也<u>不打算猜</u>。</p>
+    <p class="small">⚠️ 2026-09-05 訂正：<strong>最裡面那層後來解開了</strong>
+       —— 2026-08-29 是編碼那一層，2026-08-30 是 <code>GSTR</code> 容器那一支分支，
+       見<a href="../../tutorials/make-voice/index.html">換掉遊戲的聲音</a>。
+       本站拿那一課的腳本對這 69 個檔<u>一個一個跑過</u>：
+       <strong>65 個匯得出 WAV</strong>（例如 <code>3497c.dat</code> 匯出 2 聲道 22050 Hz、2.25 秒）；
+       解不出來的 4 個正好是第六節說的那一批照抄來的
+       —— <code>3245a</code>／<code>3245d</code>／<code>3499a</code>／<code>3499d</code>，
+       它們是 <code>PT</code> 容器的編碼器 2。
+       上面這一整段是還沒解開之前寫的，推論的過程留著不刪。</p>
+  </div>
+
+  <h2>五、a、c、d 可能是什麼</h2>
+  <p><a href="../../reference/player-voice.html">播報員那頁</a>後來把這件事解開了（2026-08-28）：
+     <code>a</code> 是球評唸姓氏、<code>c</code> 是主播唸全名、<code>d</code> 是主播唸姓氏，
+     答案寫在 <code>spch_pbp.txt</code> 裡，四個類別的編號集合跟檔案後綴的集合<u>完全相同</u>，
+     不只是數量吻合。<strong>下面這一節是那之前寫的</strong>，
+     只靠這批社群檔推出來的路，方向跟後來的答案一致，過程留著不刪。
+     先講一件會誤導人的事：<strong>在這 23 個社群資料夾裡，a 跟 d 位元組完全相同的有 19 個</strong>（82.6%），而遊戲內建的語音庫裡同號碼的 a 與 d 相同的只有 35／4,061（0.86%）。所以「a 跟 d 一樣」在社群檔裡是<u>常態</u>，本身不是線索。真正特別的是下面這件事：<strong>三個姓林的人，六個檔跨三個不同的人，聲音資料位元組完全一樣。</strong></p>
+  <p>林彥峰 3494、林旺億 3488、林旺衛 3486，六個檔的聲音資料<u>位元組完全一樣</u>。
+     但三個人的 c 檔各不相同，大小分別是 73,672、66,392、61,272。</p>
+  <p>如果 a 跟 d 是<strong>姓</strong>、c 是<strong>全名</strong>，這就說得通了。
+     拿遊戲自己的語音庫檢驗這個想法：把 12,527 個項目照聲音內容分組，
+     再用 2009 名單把號碼換回名字。</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>後綴</th><th class="num">項數</th><th class="num">不重複的聲音</th>
+      <th class="num">兩個以上號碼共用</th><th class="num">其中有 2 個以上查得到名字</th><th class="num">查得到的那些全部同姓</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="後綴" class="mono">a</td><td data-label="項數" class="num">4,091</td><td data-label="不重複的聲音" class="num">3,368</td>
+          <td data-label="兩個以上號碼共用" class="num">330 組</td><td data-label="其中有 2 個以上查得到名字" class="num">146 組</td><td data-label="查得到的那些全部同姓" class="num"><strong>126 組（86.3%）</strong></td></tr>
+      <tr><td data-label="後綴" class="mono">c</td><td data-label="項數" class="num">4,121</td><td data-label="不重複的聲音" class="num">4,083</td>
+          <td data-label="兩個以上號碼共用" class="num">35 組</td><td data-label="其中有 2 個以上查得到名字" class="num">10 組</td><td data-label="查得到的那些全部同姓" class="num">8 組（80.0%）<br><span class="small">其中 6 組是同一個人重複登錄</span></td></tr>
+      <tr class="hi"><td data-label="後綴" class="mono">d</td><td data-label="項數" class="num">4,313</td><td data-label="不重複的聲音" class="num">3,571</td>
+          <td data-label="兩個以上號碼共用" class="num">348 組</td><td data-label="其中有 2 個以上查得到名字" class="num">152 組</td><td data-label="查得到的那些全部同姓" class="num"><strong>131 組（86.2%）</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">最後兩欄的限制條件：<u>這台測試機的</u>語音庫涵蓋 4,343 個號碼，比 2009 名單多，
+     查不到名字的號碼無法比對姓氏。所以只算「組內至少有兩個號碼查得到名字」的那些組，
+     而且只比對<u>查得到名字的那幾個</u>。a 是 330 組裡的 146 組、d 是 348 組裡的 152 組、
+     c 是 35 組裡的 10 組。百分比是「同姓組數 ÷ 有 2 個以上查得到名字的組數」。</p>
+
+  <div class="card grass">
+    <p class="card-h">本頁當時的推測：a 與 d 是姓，c 是全名（後來證實了）</p>
+    <p><code>a</code> 跟 <code>d</code> 有幾百組共用，而且查得到名字的那些多半同姓：
+       Abreu 兩個、Anderson 四個、Aybar 兩個、Bell 三個。
+       <code>c</code> 幾乎沒有共用，<u>接近每個人一段</u>。</p>
+    <p>長度也對得起來：遊戲內建同時有 a 與 c 的 3,897 個號碼裡，
+       <code>a</code> 的 <code>SCDl</code> 內容中位數 5,504 位元組，
+       <code>c</code> 是 12,540 位元組，<strong>c 是 a 的 2.28 倍</strong>。名字比姓長。</p>
+    <p class="small">中位數的算法：把一個項目全部 <code>SCDl</code> 區塊的內容加起來，
+       含每塊開頭那 4 個位元組。<strong>這一整段在本頁寫的時候是推測</strong>，本站沒有聽過任何一個檔；
+       2026-08-28 <a href="../../reference/player-voice.html">播報員那頁</a>從
+       <code>spch_pbp.txt</code> 的類別集合把它解開了，跟這裡推的方向相同。</p>
+  </div>
+
+  <p><strong>不同姓的那些怎麼算？</strong>本站不知道。
+     a 檔那 146 組裡有 <strong>20 組</strong>是不同姓的，例如 <code>0053</code>（Miguel Batista）
+     跟 <code>6110</code>（David Hernandez）共用同一段。這種例外<u>沒有解釋就不寫解釋</u>。</p>
+  <p>而且這批社群檔自己也有一組例外：<code>3429a</code>、<code>3429d</code>（詹智堯，Chan）
+     跟 <code>3506a</code>（鄭錡鴻，Cheng）<u>三個檔位元組完全相同</u>，但兩個人不同姓。
+     本站不知道原因。另外 <code>a</code> 跟 <code>d</code> 兩者互相不同
+     （遊戲內建同號碼下只有 35／4,061 相同），所以就算真的都是姓，也是<strong>兩種不同的錄法</strong>。
+     這一點後來也有答案了：那是<u>兩位播報員</u> —— <code>a</code> 是球評唸姓氏、<code>d</code> 是主播唸姓氏。
+     還沒解開的是<u>各自在哪些播報情境下會被叫用</u>。<span class="badge wip">未解</span></p>
+
+  <h2>六、有六個檔的內容跟語音庫完全一樣</h2>
+  <p>這節是本頁最重要的誠實聲明。把兩個 <code>pnamedat.big</code> 全部 16,186 個項目的聲音內容做成指紋
+     （其中 <code>3632.wav</code> 不是 <code>SCHl</code>，沒有指紋），得到 <strong>14,623 種</strong>。
+     拿 69 個社群檔去比，<strong>有 6 個完全相同</strong>：</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>社群檔</th><th>與語音庫哪一項相同</th><th>那個號碼在 2009 名單是誰</th><th>本站看得出什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="社群檔" class="mono">3487a／3487d<br><span class="small">郭勝安 Sheng-An Kuo</span></td>
+          <td data-label="與語音庫哪一項相同" class="mono">9079a／9079d<br><span class="small">整個檔案位元組完全相同；同一段內容在語音庫裡也掛在 2332a／2332d 底下</span></td>
+          <td data-label="那個號碼在 2009 名單是誰"><strong>Hong-Chih Kuo</strong><br><span class="small">當年的說明書那一列也寫 郭泓志 2332</span></td>
+          <td data-label="本站看得出什麼">2332 那個號碼在 2009 名單是 Hong-Chih Kuo，跟社群這邊<strong>同姓 Kuo</strong>；但整檔相同的是 9079，而 9079 在 2009 名單是別人。<u>同姓只是其中一個候選的巧合，不能當成規則</u></td></tr>
+      <tr><td data-label="社群檔" class="mono">3499a／3499d<br><span class="small">邱子愷 Tzu-Kai Chiu</span></td>
+          <td data-label="與語音庫哪一項相同" class="mono">2223a／2223d</td><td data-label="那個號碼在 2009 名單是誰">Shin-Soo Choo</td>
+          <td data-label="本站看得出什麼">兩個姓的拼法不同（<code>Chiu</code>／<code>Choo</code>）。<u>為什麼挑這一段，本站不知道</u></td></tr>
+      <tr><td data-label="社群檔" class="mono">3245a／3245d<br><span class="small">中村紀洋</span></td>
+          <td data-label="與語音庫哪一項相同" class="mono">2378a／2378d</td><td data-label="那個號碼在 2009 名單是誰">兩份名單都沒有人使用</td>
+          <td data-label="本站看得出什麼">不知道 2378 原本是誰</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small"><code>9079</code> 這個號碼，2009 名單填的是 Zach McAllister、現在的名單填的是 Hong-Chih Kuo，
+     兩份對不起來，所以本站<u>不判斷 9079 原本是誰</u>，只記錄「它的 a／d 內容跟 2332 相同」這件量得到的事。</p>
+
+  <p>這三組的 <code>c</code> 檔<u>跟兩個語音庫裡的任何一段都不同</u>，是另外做的。
+     三組裡<strong>只有一組（3487 對 2332）</strong>雙方在 2009 名單裡同姓，
+     另外兩組本站看不出關係。所以<u>不能推廣成「姓一律沿用現成的」</u>，
+     只能說：<strong>這 6 個檔是搬來的，其餘 63 個在兩個語音庫裡都找不到相同的一段。</strong></p>
+
+  <div class="card blue">
+    <p class="card-h">為什麼這件事一定要寫出來</p>
+    <p>如果只寫「台灣人自己錄了 23 個人」，聽起來比較漂亮，但<strong>不精準</strong>。
+       精準的說法是：<u>23 個資料夾的 c 檔在語音庫裡都找不到相同的一段；
+       其中 3 個號碼的 a 與 d 是照抄語音庫現成的項目。</u></p>
+    <p>當年的更新紀錄用的詞也是<strong>「製作」</strong>不是「錄」。本站跟著用「製作」。</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">順便講一個容易誤用的證據</p>
+    <p>這 6 個檔的檔頭標記確實是 <code>PT</code> 不是 <code>GSTR</code>，
+       資料密度也只有其他檔的四分之一左右（社群 <code>GSTR</code> 檔的比值中位數 1.085、這 6 個是 0.284）。
+       但這<strong>不是額外的兩個證據</strong>：
+       本站去查了被抄的那 6 個來源項目，它們本來就是 <code>PT</code>、
+       欄位組合本來就一樣、密度本來就是那個值。
+       <u>照抄的結果當然一樣</u>。真正的證據只有一個：<strong>聲音內容位元組完全相同</strong>。</p>
+       <p class="small">要說清楚的是「完全相同」指的是<u>哪一層</u>：這 6 個檔裡，整個檔案位元組完全相同的有 4 個（3245 對 2378、3487 對 9079）；3499 那一對只有聲音內容相同，整檔差在 <code>SCEl</code> 後面幾百個尾巴位元組。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">還留著一個沒擦乾淨的舊檔頭</p>
+    <p><code>3245a.dat</code> 走完 <code>SCEl</code> 之後還有 300 個位元組。
+       前面 272 個全是 0，最後 28 個是這樣：</p>
+<pre><code>4872496e  <span class="cm">HrIn</span>
+e136 <span class="hl">4a09</span> 0001 0000 1300 0000 0000 7070   <span class="cm">← 一個完整的 16 bytes 檔頭</span>
+4872537a 00000010  <span class="cm">HrSz + 長度 16</span></code></pre>
+    <p>那個檔頭裡寫的號碼是 <strong>2378</strong>，不是 3245。
+       <u>跟上面指紋比對的結果一致</u>。<code>3245d.dat</code> 尾巴 316 個位元組，
+       結構一樣，寫的號碼同樣是 2378。</p>
+    <p class="small"><strong>2378 原本是誰，本站不知道，也不猜。</strong>兩份名單都沒有人用這個號碼。</p>
+  </div>
+
+  <p>另外兩個檔也有問題：<code>3499a.dat</code> 跟 <code>3499d.dat</code>
+     的結束標記只寫了 5 個位元組（<code>SCEl</code> 加一個 <code>08</code>），
+     <strong>比正常的 8 個少 3 個</strong>。聲音段本身走得完，缺的是最後那個收尾。</p>
+
+  <h2>七、當年的說明書寫了誰做的</h2>
+  <p>同一個遊戲資料夾裡有兩份 Big5 文件（<a href="../toni-2009/index.html">另一頁專門講它們</a>）。
+     在 <code>History.txt</code> 裡搜「語音」兩個字，全檔 1,281 行<u>只有第 798 行與第 988 行兩條命中</u>：</p>
+<pre><code><span class="cm">(這條所屬那筆更新的標題:2009年3月17日 AM05:11)</span>
+3.新增 強者小雪靈同學製作的 羅嘉仁、郭嚴文、鄭凱文、李振昌 語音。
+
+<span class="cm">(這條所屬那筆更新的標題:更新日期 : 2009年1月28日)</span>
+4.新增田澤純一、中村紀洋、石井語音檔(製作者:小雪靈同學)。</code></pre>
+  <p><strong>四個人對四個資料夾，三個人對三個資料夾，姓名完全吻合，一個不多一個不少。</strong>
+     檔案時間也對得起來：前者那四個資料夾的檔是 3 月 12 日，紀錄的標題是 3 月 17 日；
+     後者那三個資料夾的檔是 1 月 17 日，紀錄的標題是 1 月 28 日。</p>
+
+  <p><code>Readme.txt</code> 裡那張 53 列的球員對照表還有一欄叫<strong>「語音」</strong>：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>欄位值</th><th class="num">列數</th><th>意思</th><th>本站查核結果</th></tr></thead>
+    <tbody>
+      <tr><td data-label="欄位值">原有</td><td data-label="列數" class="num">6</td><td data-label="意思">遊戲本來就有</td>
+          <td data-label="本站查核結果">王建民 2474、郭泓志 2332、陳金鋒 1598、陳鏞基 7015、野茂英雄 0637
+              <strong>五個在語音庫查得到 a／c／d 三個檔</strong>；胡金龍 2884 <u>一個都沒有</u></td></tr>
+      <tr class="hi"><td data-label="欄位值">內附</td><td data-label="列數" class="num">22</td><td data-label="意思">這份模組附的</td>
+          <td data-label="本站查核結果">21 個在資料夾裡找得到；<strong>林柏佑 3498 沒有</strong></td></tr>
+      <tr><td data-label="欄位值">無</td><td data-label="列數" class="num">24</td><td data-label="意思">沒有</td><td data-label="本站查核結果">—</td></tr>
+      <tr><td data-label="欄位值">原版</td><td data-label="列數" class="num">1</td><td data-label="意思">只有 Mark Prior 1923 一列</td><td data-label="本站查核結果">—</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>本站量不出 EA 當年的收錄標準。</strong>
+     <u>EA 原廠錄的是 <strong>1,673 個號碼</strong></u>（這台測試機的 4,343 個裡，多的是模組加的）。
+     真正對不起來的是這件事：被標成「原有」的胡金龍 2884，在原版裡<strong>一個檔都沒有</strong>。
+     所以「EA 只錄大聯盟球員」這類說法<u>對不起來，本站不寫</u>。<span class="badge wip">未解</span></p>
+  <p class="small">⚠️ 2026-08-25 訂正：這一段原本寫「語音庫涵蓋 4,343 個號碼，遠多於任何一份大聯盟名單」，
+     拿的是<u>裝過模組的這台</u>的數字去推論 EA 的做法。EA 原廠是 1,673 個，
+     而那個數字既不足以支持「只錄大聯盟」，也不足以推翻它
+     —— 換掉數字之後，本站更沒有立場對 EA 的收錄標準下任何結論。</p>
+  <p class="small">胡金龍 2884 對不上、林柏佑 3498 對不上，本站不知道原因，就寫不知道。
+     資料夾裡多出來的石井 2892 與中村紀洋 3245 不在那張表上，也照實記。<span class="badge wip">未解</span></p>
+
+  <h2>八、今天沒有人在用這些名字</h2>
+  <p>把 23 個號碼拿去<u>現在這台機器的名單</u>（3,247 位球員）查：</p>
+  <div class="card clay">
+    <p class="card-h">23 個號碼，只有 1 個有人在用</p>
+    <p><code>3488</code> 有人用，但那個人是 <strong>J.D. Davis</strong>，不是林旺億。
+       其餘 22 個號碼<u>一個人都沒有</u>。</p>
+    <p>名單換過幾輪之後，當年那些人被移走了，號碼被別人拿去用了，
+       <strong>但檔案還在。</strong></p>
+  </div>
+  <p>這跟本站另一頁講的<a href="../orphan-data/index.html">孤兒資料</a>是同一件事：
+     <strong>沒有人刪掉它，只是不再指向它。</strong>
+     差別在於，介面檔裡的孤兒是 EA 自己留下的；<u>這一批是台灣人自己做的，然後被自己的名單遺忘。</u></p>
+
+  <div class="card amber">
+    <p class="card-h">一個量得到、但不能拿來下結論的巧合</p>
+    <p>現在裝在遊戲裡的語音庫，有 <strong>295 個項目</strong>帶著跟這批社群檔相同的欄位組合
+       （含 <code>0x82</code>），分佈在 157 個號碼，其中一個是 <code>3488c</code>。</p>
+    <p>但把它跟資料夾裡的 <code>3488c.dat</code> 逐位元組比，<strong>兩個檔不一樣</strong>
+       （語音庫裡 71,944 位元組，資料夾裡 66,392）。
+       23 個號碼裡有 7 個在語音庫裡查得到同名項目，總共 20 個檔，
+       <u>沒有一個跟資料夾裡的檔相同</u>；其餘 <strong>16 個號碼連同名項目都沒有</strong>。</p>
+    <p>所以本站只能說「語音庫裡有一批項目跟這些社群檔的欄位組合相同」，
+       <strong>不能說這批檔被裝進去過</strong>。<span class="badge wip">未解</span></p>
+  </div>
+
+  <h2>九、本站訂正了自己一句話</h2>
+  <div class="card amber">
+    <p class="card-h">原本寫「沒有人錄過他的名字」</p>
+    <p><a href="../../reference/player-voice.html">播報員為什麼不唸新球員的名字</a>那頁的結論是：
+       「你新增的球員不在那 4,343 個裡面。<u>沒有人錄過他的名字</u>，
+       所以無論你怎麼設定，播報員都唸不出來。」</p>
+    <p><strong>「EA 沒錄」是對的，「沒有人錄過」是錯的。</strong>
+       那是一句全稱句，而這 23 個資料夾就是反例。</p>
+    <p>訂正後的說法：<strong>新球員 EA 沒錄；
+       但「做一個外層格式跟遊戲一致的語音檔」是做得到的，當年就有人做了 23 個號碼。</strong>
+       本頁寫的時候本站做不出來，原因是<u>最裡面那層聲音編碼還沒解開</u>，
+       不是「這件事不可能」。<strong>那一層 2026-08-29／30 也解開了</strong>，
+       站上現在有一課在教<a href="../../tutorials/make-voice/index.html">換掉遊戲的聲音</a>。</p>
+  </div>
+
+  <h2>這頁不能告訴你什麼</h2>
+  <div class="card blue">
+    <p class="card-h">五件事，其中兩件後來解開了</p>
+    <p>一、<code>SCDl</code> 裡的聲音編碼。本頁量的都是外殼 ——
+       <strong>那一層 2026-08-29／30 解開了</strong>，見<a href="../../tutorials/make-voice/index.html">換掉遊戲的聲音</a>；
+       本站拿那一課的腳本對這 69 個檔跑過，65 個匯得出 WAV。<span class="badge ok">已解開</span><br>
+       二、<code>.hdr</code> 第 9 個位元組的意思。本頁那六種猜法全部驗過都不對，
+       <strong>後來在<a href="../../reference/voice-header.html">語音檔頭那頁</a>解開了</strong>：它是長度，
+       單位 256 位元組的區塊而且要減一。<u>但這 69 個社群檔沒有一個照那條規則寫，為什麼不知道。</u><span class="badge wip">未解</span><br>
+       三、<code>a</code> 與 <code>d</code> 分別在哪些播報情境下會被叫用。
+       （「它們是姓、各自是誰唸的」2026-08-28 已經解開，見<a href="../../reference/player-voice.html">播報員那頁</a>：
+       <code>a</code> 是球評唸姓氏、<code>d</code> 是主播唸姓氏。）<span class="badge wip">未解</span><br>
+       四、把這些檔裝回遊戲，播報員是不是真的會唸出這 23 個名字。
+       <strong>本站沒有實機驗過</strong>，全頁結論都是從檔案結構與號碼對應推的。<span class="badge wip">未驗</span><br>
+       五、2378 原本是誰、胡金龍 2884 為什麼查不到、林柏佑 3498 的檔在哪。<span class="badge wip">未解</span></p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 遊戲資料夾旁邊躺著 <strong>23 個資料夾、69 個語音檔</strong>，是 2005 到 2009 年台灣模組玩家自己做的，外層容器多半照遊戲的規矩走、號碼真的對得到人；最裡面那層聲音編碼<u>寫這頁的時候還沒解開</u>，2026-08-29／30 已經解開（見<a href="../../tutorials/make-voice/index.html">換掉遊戲的聲音</a>），本站拿那一課的腳本對這 69 個檔跑過，<strong>65 個匯得出 WAV</strong>。</li>
+    <li><strong>本站訂正了自己一句話</strong> <a href="../../reference/player-voice.html">播報員那頁</a>原本的結論是「<u>沒有人錄過他的名字</u>」。<strong>「EA 沒錄」是對的，「沒有人錄過」是錯的</strong>，那是一句全稱句，這 23 個資料夾就是反例。本頁寫的時候本站做不出來，原因是最裡面那層編碼還沒解開，<u>不是這件事不可能</u> —— 那一層後來也解開了。</li>
+    <li><strong>另一個訂正，形狀更值得記</strong> 2026-08-27 本站做過一次全站用詞訂正，把「中職」改成「台灣」，<strong>連這一頁三個「照原樣列」的地方一起改了</strong>，站上因此展示了一個磁碟上不存在的資料夾名（真的叫 <code>倪福德6503_中職模組</code>），已改回。<u>做全站替換之前，要先把逐字引用的區塊排除掉。</u></li>
+    <li><strong>號碼真的對得到人</strong> 資料夾名裡那四位數就是球員資料檔的 <code>audioid</code>。拿<u>現在這台機器的名單</u>（3,247 位）查，23 個號碼只有 1 個有人在用，而且那個人是 J.D. Davis 不是林旺億；但拿同一個資料夾裡 2009 年 11 月那份名單（3,222 位）查，<strong>23 個全部查得到、都只有一個人使用</strong>，其中 22 個的中文名跟英文拼音對得起來。當年的說明書也對得上：<code>History.txt</code> 全檔 1,281 行只有兩條提到語音，<strong>四個人對四個資料夾、三個人對三個資料夾，姓名一個不多一個不少</strong>。（另有一處訂正：語音庫 4,343 個號碼是這台裝過模組的數字，EA 原廠是 <strong>1,673 個</strong>，本站原本拿前者去推 EA 的收錄標準，已改掉。）</li>
+    <li><strong>外殼是照遊戲的規矩寫的</strong> 69 個 <code>.hdr</code> 每個 16 個位元組，第 3、4 個位元組讀成 little-endian 就是檔名那個號碼，<strong>69 次全中</strong>；其中 20 個在遊戲自己的 <code>pnamehdr.big</code> 找得到同名項目，<strong>20 個全部只差第 9 個位元組</strong>。位元組順序分三塊各有規則（塊長永遠 little-endian、資料區看檔頭標記、檔頭的值一律 big-endian），四種組合各跑一次比出來：社群 69／69、遊戲內建 12,527／12,528 通過，<u>唯一沒過的那項叫 <code>3632.wav</code>，它根本是 RIFF／WAVE 不是同一種容器</u>。</li>
+    <li><strong>這頁最重要的誠實聲明：有 6 個檔是搬來的</strong> 三組的 <code>a</code>／<code>d</code> 跟語音庫現成項目<strong>聲音內容位元組完全相同</strong>，其中 <code>3245a.dat</code> 尾巴甚至還留著一個寫著 <strong>2378</strong> 的舊檔頭沒擦乾淨。其餘 63 個在兩個語音庫裡都找不到相同的一段，三組的 <code>c</code> 檔也都是另外做的。所以精準的說法不是「錄了 23 個人」，當年的紀錄用的詞是<strong>「製作」</strong>，本站跟著用。</li>
+    <li><strong>兩個看起來像證據、其實不是的東西</strong> 那 6 個搬來的檔標記是 <code>PT</code>、資料密度也只有其他檔的四分之一（0.284 對 1.085），但<u>被抄的來源項目本來就是那樣，照抄的結果當然一樣</u>，真正的證據只有「聲音內容位元組完全相同」這一個。同理，社群檔裡 <code>a</code> 跟 <code>d</code> 相同的有 19 個（82.6%），那是<strong>常態不是線索</strong>，遊戲內建同號碼相同的只有 35／4,061。</li>
+    <li><strong>本站沒驗的</strong> <code>SCDl</code> 裡的聲音編碼<u>本頁沒有解</u>，全頁講的都是外殼（那一層 2026-08-29／30 已經解開，本站拿那一課的腳本對這 69 個檔跑過，65 個匯得出 WAV）；<code>.hdr</code> 第 9 個位元組本頁六種猜法最高只對上 8.2%，後來量出來是長度（單位 256 位元組的區塊而且要減一），<u>但這 69 個社群檔沒有一個照那條規則寫，為什麼不知道</u>；「<code>a</code> 與 <code>d</code> 是姓、<code>c</code> 是全名」在本頁寫的時候只是推測（同姓比例 86.3% 與 86.2%、<code>c</code> 的長度是 <code>a</code> 的 2.28 倍）、<strong>本站沒有聽過任何一個檔</strong>，2026-08-28 已由播報員那頁從 <code>spch_pbp.txt</code> 的類別集合解開，還開著的是 <code>a</code> 與 <code>d</code> 各自用在哪些播報情境；把這些檔裝回遊戲播報員會不會唸這 23 個名字，<u>沒有實機驗過</u>，因為這個資料夾根本不在遊戲會讀的路徑上；還有 2378 原本是誰、被標成「原有」的胡金龍 2884 為什麼一個檔都沒有、林柏佑 3498 的檔在哪。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../../reference/player-voice.html">播報員為什麼不唸新球員的名字</a> —— 號碼與語音庫的完整對應，本頁訂正的就是那一頁</li>
+    <li><a href="../../reference/audio.html">播報音訊系統</a> —— <code>SCHl</code> 容器在整個音訊區的位置</li>
+    <li><a href="../toni-2009/index.html">當年那兩份說明書，一句一句拿今天的檔案對過</a> —— 這頁引用的兩份 Big5 說明書</li>
+    <li><a href="../orphan-data/index.html">一個檔案裡的地層</a> —— 「不刪只是不指向」的另一個例子</li>
+    <li><a href="../../reference/player-numbers.html">兩套球員編號</a> —— <code>audioid</code> 的另一半用途</li>
+  </ul>
+
+  <footer>
+    <p>本頁所有數字皆為現場打開 <code>MVP2026\audio\</code> 底下 138 個檔案、
+       <code>data\audio\</code> 底下兩個 <code>pnamedat.big</code> 與一個 <code>pnamehdr.big</code>、
+       以及兩份 <code>attrib.dat</code> 名單量測所得；
+       標示為「推測」「未解」「未驗」之處未經證實，本站不寫成定論。
+       文中的社群代號取自當年模組文件內留存的圈內代號，本站不連結任何個人身分、
+       不公開聯絡方式、不提供任何語音檔案。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../../legal.html">法律與版權說明</a> ·
+       <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

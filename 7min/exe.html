@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/7min/exe.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>七分鐘調好你的執行檔 — toni的MVP模組補習班</title>
+<meta name="description" content="七分鐘把 mvp2005.exe 的六個旋鈕調好:記憶體池、大位址、解析度、IAT 目錄、節區權限、檢查碼。兩支腳本,先預覽再寫入,隨時可還原。不含任何保護措施相關內容。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item on" href="index.html">七分鐘</a>
+  <a class="item" href="../reference/index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+
+  <p class="eyebrow"><a href="index.html">七分鐘</a> › 調執行檔</p>
+  <h1>七分鐘調好你的執行檔</h1>
+
+  <p class="lede">把 <code>mvp2005.exe</code> 上的六個旋鈕一次調好：
+     <strong>記憶體池</strong>（中文版配大球場不再跳出）、大位址、解析度，
+     以及三個把檔頭修正確的項目。<u>全程先預覽、再寫入、隨時可還原。</u></p>
+
+  <div class="card">
+    <p class="card-h">⏱ 七分鐘怎麼分配</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>做什麼</th><th>分鐘</th></tr></thead>
+      <tbody>
+        <tr><td data-label="做什麼">備份整個遊戲資料夾</td><td data-label="分鐘" class="num">2</td></tr>
+        <tr><td data-label="做什麼">看你那顆現在什麼狀態（唯讀）</td><td data-label="分鐘" class="num">1</td></tr>
+        <tr><td data-label="做什麼">兩支腳本各跑一次預覽</td><td data-label="分鐘" class="num">2</td></tr>
+        <tr><td data-label="做什麼">加 <code>--apply</code> 真的寫</td><td data-label="分鐘" class="num">1</td></tr>
+        <tr><td data-label="做什麼">開遊戲看一眼</td><td data-label="分鐘" class="num">1</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <h2>前置</h2>
+  <ul class="tick">
+    <li>已安裝的 MVP Baseball 2005，而且<strong>現在打得開</strong></li>
+    <li>Python 3.7 以上</li>
+    <li>兩支腳本：<a href="../tutorials/exe-tuning/mvp_exe_pe.py">mvp_exe_pe.py</a>
+        與 <a href="../tutorials/run-in-2026/mvp_modernize.py">mvp_modernize.py</a></li>
+  </ul>
+
+  <div class="card clay">
+    <p class="card-h">⛔ 這一頁不碰保護措施</p>
+    <p>你那顆執行檔能不能改，是你跟你自己買的那張光碟之間的事。
+       本站不提供、不教學、不連結任何相關資訊。
+       這一頁從<u>「你手上已經有一顆打得開遊戲的執行檔」</u>開始講。</p>
+  </div>
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法看<a href="../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <h2>👉 你要做的事</h2>
+
+  <p><strong>步驟 1</strong>：先看你那顆現在什麼狀態。<u>這一步不會動到任何檔案。</u></p>
+  <p class="small">Windows:</p>
+<pre><code>python mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe"</code></pre>
+  <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe"</code></pre>
+
+  <p><strong>步驟 2</strong>：三個檔頭層面的項目，先預覽（<u>還是不會寫入</u>）。
+     你只要下兩個參數，<u>第三個「檔頭檢查碼」腳本會自己跟著重算</u>。</p>
+  <p class="small">Windows:</p>
+<pre><code>python mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe" --iat --sections</code></pre>
+  <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe" --iat --sections</code></pre>
+
+  <p><strong>步驟 3</strong>：看過計畫沒問題，加 <code>--apply</code> 真的寫。</p>
+  <p class="small">Windows:</p>
+<pre><code>python mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe" --iat --sections --apply</code></pre>
+  <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe" --iat --sections --apply</code></pre>
+
+  <p><strong>步驟 4</strong>：另外三個旋鈕，先預覽（<u>還是不會寫入</u>）。
+     <u>記憶體池是六項裡唯一真的會讓遊戲跑不跑得動的</u>，解析度挑一個你螢幕的。</p>
+  <p class="small">Windows:</p>
+<pre><code>python mvp_modernize.py "〔你的遊戲資料夾〕/mvp2005.exe" --4gb --pool 128 --resolution 1920x1080</code></pre>
+  <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_modernize.py "〔你的遊戲資料夾〕/mvp2005.exe" --4gb --pool 128 --resolution 1920x1080</code></pre>
+
+  <p><strong>步驟 5</strong>：看過它列的計畫沒問題，同一行最後加上 <code>--apply</code> 才真的寫。</p>
+  <p class="small">Windows:</p>
+<pre><code>python mvp_modernize.py "〔你的遊戲資料夾〕/mvp2005.exe" --4gb --pool 128 --resolution 1920x1080 --apply</code></pre>
+  <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_modernize.py "〔你的遊戲資料夾〕/mvp2005.exe" --4gb --pool 128 --resolution 1920x1080 --apply</code></pre>
+
+  <p class="small">⚠️ <strong>照原版光碟安裝的遊戲，<code>--pool</code> 這一項做不到</strong>：
+     那種執行檔的程式碼是加密的，腳本會印「找不到記憶體池的樣態」
+     <u>然後整行停下來，連 <code>--4gb</code> 與 <code>--resolution</code> 都不會被套用</u>。
+     把 <code>--pool 128</code> 拿掉再跑一次，另外兩項照樣做得到。
+     為什麼，看<a href="../tc2026/index.html#pool">中文版那一課</a>。</p>
+
+  <p><strong>步驟 6</strong>：開遊戲。</p>
+
+  <h2>✅ Pass 條件</h2>
+  <p>以下<strong>全部</strong>滿足：</p>
+  <ul class="tick">
+    <li>兩支腳本都印出<code>複驗:改動的位元組剛好是預期那 N 個，其他一個都沒動 ✅</code></li>
+    <li>遊戲<strong>開得起來</strong>，能進到主選單</li>
+    <li>解析度真的變了</li>
+    <li>如果你玩的是中文版：<u>裝上你最大的那座球場，讀取條走完不跳出</u></li>
+  </ul>
+
+  <h2>❌ Fail 處理</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>狀況</th><th>怎麼辦</th></tr></thead>
+    <tbody>
+      <tr><td data-label="狀況">腳本說「這不是 Windows 執行檔」</td>
+          <td data-label="怎麼辦">路徑指錯了。確認指到 <code>mvp2005.exe</code> 本身，不是資料夾</td></tr>
+      <tr><td data-label="狀況">腳本說每一項都「本來就填好了 / 沒有需要收緊的」</td>
+          <td data-label="怎麼辦"><strong>那不是失敗。</strong>你那顆本來就是好的，跳到步驟 4</td></tr>
+      <tr class="hi"><td data-label="狀況">遊戲開不起來了</td>
+          <td data-label="怎麼辦">立刻還原，兩支都要，<u>後改的先還原</u>：
+          <p class="small">Windows:</p>
+<pre><code>python mvp_modernize.py "〔路徑〕/mvp2005.exe" --restore</code></pre>
+<pre><code>python mvp_exe_pe.py "〔路徑〕/mvp2005.exe" --restore</code></pre>
+          <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_modernize.py "〔路徑〕/mvp2005.exe" --restore</code></pre>
+<pre><code>python3 mvp_exe_pe.py "〔路徑〕/mvp2005.exe" --restore</code></pre>
+          <p class="small"><u>順序不可以反</u>：<code>mvp_modernize</code> 的備份是在
+          <code>mvp_exe_pe</code> 寫完之後才留下的，記的是中間狀態。反過來做的話，
+          第二行會判定「這份備份跟現在這顆執行檔對不上」而停住
+          （檔案其實已經回到原版了，但畫面看起來像失敗）。</p></td></tr>
+      <tr><td data-label="狀況">中文版還是跳出</td>
+          <td data-label="怎麼辦">池子開大一點試 <code>--pool 256</code>。還是不行就
+              <a href="../tutorials/fix-chinese/index.html">完整那一課</a>，那裡有對照實驗</td></tr>
+      <tr><td data-label="狀況">畫面破圖或介面跑位</td>
+          <td data-label="怎麼辦">解析度往下挑一階再跑一次：步驟 4 填 <code>3840x2160</code> 的改成
+              <code>1920x1080</code>，本來就填 <code>1920x1080</code> 的改成 <code>1600x900</code>。
+              <u>版面檔是 640×480 座標系寫的，4K 下會不會跑位本站沒驗過</u></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>📋 回報範本</h2>
+<pre><code>七分鐘調執行檔 status: ✅ / ❌
+執行檔大小: &lt;bytes&gt;
+步驟 1 印出的三項狀態（IAT 目錄 / 節區權限 / 檔頭檢查碼）: &lt;貼上來&gt;
+mvp_exe_pe 動到幾個位元組: &lt;N&gt;
+mvp_modernize 動到幾個位元組: &lt;N&gt;
+遊戲開得起來: 是 / 否
+解析度有變: 是 / 否
+中文版 + 大球場: 沒試 / 不跳出 / 還是跳出
+異常: &lt;...&gt;</code></pre>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong>：六個旋鈕，兩支腳本，<u>先預覽再寫入</u>，兩支都能還原。</li>
+    <li><strong>只有一個旋鈕真的會改變遊戲跑不跑得動</strong>：
+        記憶體池 <u>64 MiB → 128 MiB</u>。其他五項是把檔案修正確或改畫面。</li>
+    <li><strong>4GB 旗標單獨做沒有感覺</strong>，它是給記憶體池撐空間的，兩個一起做才有意義。</li>
+    <li><strong>腳本預設唯讀</strong>：不加參數只會印狀態，加了參數也只是預覽，
+        <u>要再加 <code>--apply</code> 才會真的寫</u>。</li>
+    <li><strong>本站沒驗的</strong>：<u>檔頭那三項都做完的那顆</u>在真實 Windows 上長期玩起來如何、
+        4K 下介面會不會跑位。（<u>記憶體池那一項不在此列</u>：四種大小是 Windows 與 macOS 兩邊都做過的實機測試。）
+        原理與逐位元組的完整說明在
+        <a href="../tutorials/exe-tuning/index.html">執行檔上的六個旋鈕</a>。</li>
+  </ul>
+
+  <footer>
+    <p>本頁的參數與位元組數字，皆為在兩顆實際的執行檔上量測所得。
+       本頁不涉及任何防盜拷措施之規避，相關提問一律不回應。
+       本站不提供任何遊戲檔案下載，包括執行檔。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

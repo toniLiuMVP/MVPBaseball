@@ -1,0 +1,2234 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# ─────────────────────────────────────────────────────────
+#  法律與免責(每一支本站腳本都帶著這一段)
+#
+#  · 本工具與 Electronic Arts 無任何官方關聯,也未經其授權或背書。
+#    MVP Baseball 2005 為 Electronic Arts 之作品與商標。
+#  · 本工具為原創程式碼,**不含任何 EA 的程式碼或資產**。
+#  · 本工具不提供、不教學、也不包含任何規避技術保護措施的功能。
+#  · 使用者應僅對自己合法取得的遊戲副本使用本工具,並自行承擔風險。
+#    使用前請自行確認你與遊戲發行商之間的使用者授權合約(EULA)。
+#  · 本工具按「現狀」提供,不附任何明示或默示的擔保。
+#  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
+#  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
+#    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
+#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+# ─────────────────────────────────────────────────────────
+
+"""
+mvp_pack.py —— 把你改好的東西打包成一包,給別人裝。
+
+    python3 mvp_pack.py "<遊戲資料夾>" --scan
+    python3 mvp_pack.py "<遊戲資料夾>" --build 台灣之光.mvpmod --name "台灣之光" --author "你的名字"
+    python3 mvp_pack.py "<遊戲資料夾>" --preview 台灣之光.mvpmod
+    python3 mvp_pack.py "<遊戲資料夾>" --install 台灣之光.mvpmod          ← 預覽
+    python3 mvp_pack.py "<遊戲資料夾>" --install 台灣之光.mvpmod --apply  ← 真的裝
+    python3 mvp_pack.py "<遊戲資料夾>" --restore
+    python3 mvp_pack.py --selftest                       ← 只測自己,不碰遊戲
+
+【怎麼知道你改了什麼】
+本站的課程腳本在第一次寫入之前都會留一份備份,各課用各課的副檔名
+(.playerbak / .facebak / .feltoolbak …)。2026-09-05 重數 site/tutorials/ 底下的
+原始碼:會留備份的課程腳本有 25 支(散在 24 課),一共產生 24 種副檔名;
+下面 BAK_SUFFIXES 那份清單剛好 24 種全部認得,一種都沒漏。
+⚠️ 2026-09-03 數的是 24 支 / 23 課 / 23 種,那組數字在 2026-09-04
+   「關掉開場動畫」那一課上線之後就過期了(它留的是 .introbak),
+   清單當時漏收了它。2026-09-05 補進清單並重數。
+清單裡沒有 .packbak —— 那是這支自己幫你裝別人的模組時留的(寫在 INSTALL_BAK),
+不算「你改過的東西」。多一課會寫檔的教學,通常就多一種副檔名,這個數字會長。
+所以「哪些檔旁邊有備份」就等於「你用本站工具改過哪些檔」——
+不需要跟原版比對,也不需要你自己記得改過什麼。
+
+⚠️ 這個方法只看得到**本站工具**留下的備份。你用別的工具改的、
+   手動覆蓋的,它看不到 —— 那些要用 --add 自己指定。
+
+【格式】
+.mvpmod 就是一個 ZIP:
+    manifest.json   包的描述 + 檔案清單 + 每個檔的 SHA-256
+    files/          你改過的檔,照遊戲資料夾的相對路徑擺
+跟 launcher 的 mod_package.py 是同一個格式,兩邊互通。
+⚠️ 但「互通」不代表兩邊寫進 manifest 的欄位一樣。2026-09-03 在本機這一份
+   mod_package.py(671 行)上讀到:它放進檔案清單的每一項只有
+   path / category / size 三個欄位,整支程式裡 sha256 出現 0 次。
+   所以那種包拿來 --install,一個雜湊都不會被比對,只會過路徑檢查。
+   本站在暫存資料夾拿一個沒寫 sha256 的包實跑過,確認照樣裝得進去。
+
+【輸入與輸出】
+--scan      輸入 = 遊戲資料夾。輸出 = 螢幕上的清單。不寫任何檔。
+--build     輸入 = 遊戲資料夾(加上 --add 額外指定的相對路徑)。
+            輸出 = 一個 .mvpmod 檔,寫在你指定的位置;遊戲資料夾一個位元組都不動。
+            包的描述靠 --name(必填)、--author、--version(不給就是 1.0)、--note
+            這四個,它們會寫進 manifest.json —— 別人 --preview 的時候看到的就是它們。
+            ⚠️ 輸出路徑會先被擋一次:那個位置已經有檔案的話,只有「副檔名是
+               .mvpmod 而且不在遊戲資料夾裡面」才准蓋過去(重打同一包的正常情形)。
+               其餘一律停下來,不寫。
+--preview   輸入 = 遊戲資料夾 + 一個 .mvpmod。輸出 = 螢幕上的清單。不寫任何檔。
+--install   同上。不加 --apply 就等於 --preview;加了 --apply 才會寫進遊戲資料夾,
+            並把每個被蓋掉的檔備份成「同名 + .packbak」,
+            外加一張「同名 + .packbak.json」的收據(那份備份的大小與 SHA-256,
+            --restore 靠它判斷備份完不完整)。
+--restore   輸入 = 遊戲資料夾。把所有 .packbak 蓋回去,備份本身留著不刪。
+            蓋回去之前每一份備份都要先過完整性檢查(見安全網第 6 條),
+            檢查沒過的、以及「驗不出來的」那幾份都不蓋,
+            那幾個遊戲檔一個位元組都不動,整支的結束碼是 1。
+            加 --allow-unverified 才會連「驗不出來的」也蓋回去。
+--selftest  不吃遊戲資料夾。在系統暫存區自己造一份假的,把每一道守門
+            各下一個餌測一次(見檔尾 _selftest),跑完就刪。全綠回 0。
+            ⚠️ 不可以加 python 的 -O:那個旗標會把 assert 整句拿掉,
+               檔尾那十幾行「每次執行都會跑」的檢查一句都不會執行,
+               測試就變成假綠燈。加了 -O 跑這一項會直接停下來、結束碼 2。
+               (2026-09-06 之前不會停:python3 -O … --selftest 照樣印全綠回 0。)
+
+第一個參數永遠是**遊戲資料夾**(裡面有 data 那一層),不是某個檔案。
+開頭會先確認 data/database/attrib.dat 在不在,指錯地方當場就會講。
+
+【安全網】
+1. 預設不寫。--install 沒有 --apply 就只是列清單。
+2. 打包完立刻讀回來驗:把包裡每個檔的 SHA-256 跟 manifest 寫的比一次,
+   對不上就當場停下來報錯。
+   ✅ 這一驗排在改名**之前**(2026-09-05 第二輪改的):驗的是還沒改名的
+      暫存檔,沒過就把暫存檔刪掉,你指定的那個位置**不會生出任何東西**,
+      也就沒有「一個壞包躺在那裡等你誤傳給別人」這回事。
+      (第二輪之前是先改名再驗,驗不過會留下一個完整、打得開、卻跟 manifest
+       對不上的包,而且腳本不會替你刪。)
+3. 安裝分三個階段(讀 → 試寫 → 真的寫):先把整包讀進記憶體,全部讀完才動第一個檔,
+   所以不會裝到一半才發現包是壞的。讀的時候會比對雜湊,但**只比對
+   manifest 上有寫 sha256 那一欄的項目**;沒寫的一個都不驗,照樣寫進
+   遊戲資料夾。本腳本 --build 打的包每個檔都有 sha256,別的工具打的
+   就不一定(見【格式】那一段)。
+   讀完之後、動第一個檔之前還有兩道:
+     (a) 這個檔旁邊已經有 .packbak 的話,先驗那份舊備份是不是完整的。
+         它是你退回原狀的唯一依靠,壞的話不敢再往上蓋 —— 整支停在這裡,
+         一個檔都還沒有被改到。(第二輪之前完全不驗,於是你會在
+         「已經沒有退路」的狀態下又蓋了一層新的,而且沒有人講。)
+     (b) 每一個要寫的位置都先在它旁邊建一個**名字猜不到的**暫存檔再刪掉,
+         確認真的寫得進去。這一關擋的是「遊戲裝在
+         C:\\Program Files 而你沒有用系統管理員身分執行」與「檔案正被遊戲鎖住」
+         這兩種最常見的失敗 —— 它們以前會讓你拿到一套半新半舊的遊戲。
+   ⚠️ 這一關過了不代表後面一定寫得成(權限可以在中間被改掉、磁碟可以寫滿)。
+      真的寫到一半失敗時,腳本會**自動退回**這一輪已經寫進去的那幾個檔
+      (照 .packbak 一個一個蓋回去,原本不存在的檔就刪掉),
+      再告訴你退了幾個、有沒有退不回去的,結束碼是 1。
+      退回去的是**原始**的遊戲檔,跟你自己跑 --restore 的結果一樣;
+      那個檔身上本來就有別的模組時,那一份也會一起退掉。
+   ✅ 2026-09-06 第三輪起,「真的寫」那一段自己又分成兩半:先把每個檔的備份與
+      **已經驗過的暫存檔**全部備妥(這一整段一個遊戲檔都沒有動),全部備妥了
+      才一次把它們換上去,而且整批換名包在同一段不可中斷的程式裡。
+      所以磁碟寫滿、權限中途被改掉這一類失敗,結果是「全部沒裝」而不是
+      「裝了一半再退回去」;Ctrl-C 也不會落在兩個檔中間。
+      (自動退回那條路留著:換名途中真的有一次失敗,還是照 .packbak 退回去。)
+      ✅ 失敗訊息也照這兩半分:一個檔都還沒換過就失敗,第一句是
+         「還沒開始換檔就失敗了」,而且會明講「遊戲檔一個位元組都沒有動」;
+         真的換到一半才失敗才會說「寫到一半失敗了」。分辨的依據是**登記的狀態**
+         不是計數器 —— 中斷或例外可以剛好落在「換完了、還沒記到」那一瞬間。
+   ⚠️ 中途按 Ctrl-C:結束碼是 130,而且會告訴你**有沒有**檔案已經被換掉、
+      換了哪幾個。第二輪之前不管有沒有動到檔都印「中止了」然後結束碼 0 ——
+      批次檔看到 0 會把一套半新半舊的遊戲當成裝好了。
+      ✅ 第三輪再補一道:「換名 + 登記」現在包在一段**不可中斷**的程式裡,
+         那一段收到 Ctrl-C 會先記著、離開之後才丟出來,所以不會出現
+         「檔案換掉了,收尾卻說一個都沒動」,也不會出現反過來的
+         「什麼都沒換,卻說換了一個」(第二輪是後面這一種)。
+         萬一連那一道都裝不上(非主執行緒之類),還有第三個狀態接住:
+         收尾會照實說「中斷的那一刻正在替換 X,換成了沒有這裡答不出來」。
+4. 每一個路徑都要過 safe_target():組出絕對路徑之後還要確認它真的落在
+   遊戲資料夾底下,逃出去的一個都不裝。
+5. 打包(--build)、安裝(--install --apply)與還原(--restore)三條路都是
+   先寫暫存檔、fsync、**讀回來比對 SHA-256**、通過了才 os.replace 換上去,
+   都不留半截檔;讀回來對不上就把暫存檔丟掉,正本一個位元組都不動。
+   ⚠️ 暫存檔的名字由 tempfile.mkstemp 產生(像 .attrib.dat.install-8p3k2q1x),
+      不是「目的檔 + .part」。2026-09-05 第二輪改的,理由是那種名字**猜得到**:
+      先在旁邊擺一個叫 <目的檔>.part 的符號連結指到別的地方,
+      腳本自己開檔的那一刻就會跟著連結把外面那個檔截成 0,
+      等到 os.replace 只換掉連結本身,外面的檔已經回不來了。
+      Path.exists() 擋不住這一招(指向不存在目標的連結在它眼裡是 False),
+      mkstemp 擋得住:名字是隨機的,而且它內部用 O_CREAT|O_EXCL 開檔。
+      目的檔與備份檔本身則另外用 os.path.islink 問一次,是連結就整支停下來。
+      ⚠️ 「要蓋掉的那個遊戲檔本身是連結」這一道是 2026-09-06 第三輪才補的。
+         在那之前 --install --apply 會照著連結寫到它指的那個檔去
+         (實測:回 0、印 ✅,被改掉的是連結指向的檔,連結本身原封不動)。
+         現在照你打的那個名字問一次 islink,是連結就停下來;
+         路徑**中間**的資料夾是連結沒關係(有人把遊戲放在別顆碟),只看最後那一段。
+      換名那一步(還有緊接著的登記)包在一段不可中斷的程式裡,見安全網第 3 條。
+   ⚠️ --restore 以前不是這樣。2026-09-05 之前它用 shutil.copy2 直接蓋回遊戲檔,
+      下面這一段是當時量到的樣子,留著說明為什麼要改:本站在這台 Mac(APFS)
+      上拿一個 300 MB(314,572,800 bytes)的測試檔當遊戲檔,配一份同樣大的
+      .packbak 跑 --restore,每 5 毫秒量一次遊戲檔的大小,量到
+      314,572,800 → 0 → 1,048,576 一路長回 314,572,800,
+      一趟裡出現 22 個不同的大小(這個數字每次跑都不一樣,重點是它不只一個);
+      同一份檔改走 --install --apply(300 MB 換成 200 MB),同樣的量法只量到
+      314,572,800 與 209,715,200 兩個值,中間沒有第三個。
+      也就是說遊戲檔本人會先被清成 0,再一段一段長回去。複製途中送中斷訊號
+      各試 21 次:按 Ctrl-C 有 4 次留下 0 bytes 的遊戲檔,其餘來得及跑完
+      (這個次數跟上面那個一樣每次跑都不一樣,同一台機器重跑一批是 3 次,
+       差別只在訊號落在哪一刻);
+      直接強制結束行程(模擬斷電或當機)21 次全部留下 0 或半截
+      (例如 51,380,224 bytes)。
+      .packbak 不會被刪,再跑一次 --restore 補得回來,但那一刻的遊戲檔是壞的。
+      改成先複製到一個暫存檔、再 os.replace 之後,2026-09-05 在同一台機器上
+      用同樣的量法重跑一次(這次是 150 MB):遊戲檔只量得到
+      104,857,600(舊的)與 157,286,400(新的)兩個大小,14 個取樣點裡沒有第三個。
+      ⚠️ 那一次量的版本用的暫存檔名還是 orig + '.part';同一天第二輪把它換成
+         tempfile.mkstemp 給的隨機名字(理由見第 5 條),原子性沒有改變,
+         上面那組數字照樣成立。改法就寫在 atomic_copy_over 與 cmd_restore 裡。
+
+6. --restore 蓋回去之前,每一份 .packbak 都要先過完整性檢查:
+   · 0 bytes 的不用(複製到一半被中斷的多半長這樣)。
+   · 有收據的比對收據:--install --apply 留備份的同時會在旁邊寫一個
+     「同名 + .packbak.json」,裡面是那份備份的大小與 SHA-256。
+     對不上就不蓋 —— 這一關擋得住任何形式的半截與竄改,不只 0 bytes。
+   · 沒有收據的(舊版腳本留下的備份、或收據被刪了)退而求其次看格式:
+     BIGF 的檔頭第 5-8 個位元組寫著整包該有多大(⚠️ 這個數字有的檔存成小端、
+     有的存成大端,所以兩種都算,只有「比兩種都小」才叫半截 —— 詳見
+     truncation_evidence 的說明),PE(MZ 開頭的執行檔)
+     的最後一個區段算得出檔案至少該有多大,純文字檔比對「原檔以換行結尾
+     而備份沒有」。抓到其中一種就是明確的半截,不蓋。
+   · 備份檔本身是符號連結、或者要蓋回去的遊戲檔是符號連結:兩種都不蓋。
+     那代表讀到的、寫到的都不是這個資料夾裡的東西,情況太特別,交給你自己處理。
+   · 沒有收據、而格式又抓不到證據時(可能是它真的完整,也可能是這個格式
+     驗不出來,例如一個沒有收據的 .fsh),**預設不蓋**,那個遊戲檔維持原狀,
+     結束碼 1,並且告訴你怎麼放行。驗不出來就當成不能信:什麼都不做,
+     永遠比把一份可能是半截的東西蓋到遊戲檔上安全。
+     你自己確定它是完整的,加上 --allow-unverified 再跑一次,
+     結尾的統計會把這幾個跟驗過的分開數。
+     (2026-09-05 第二輪之前是照樣蓋回去只印一行 ⚠️。)
+   ⚠️ 這裡刻意**不用**「不得小於原檔一半」那種地板。本站別的工具可以用,
+      因為它們是就地改幾個位元組,備份跟現在的檔大小差不多。這一支不行:
+      它裝的是別人給的檔,新檔可以比原檔大好幾倍也可以小好幾倍,
+      拿現在的檔當尺會把正常的還原也擋掉。
+
+【做不到的事】
+· 看不到不是本站工具改的東西。判斷依據只有「旁邊有沒有本站的備份副檔名」,
+  你用 TiT、MVPEdit 改的或手動覆蓋的,一個都不會被收進去,那些要 --add 自己指定。
+· 不看包裡的內容。沒有病毒掃描,也沒有任何內容審查。
+  路徑安全不等於檔案安全:一個位置完全正確的 attrib.dat 可以把你的名單改成任何樣子。
+  只裝你認識的人給你的包。
+· .packbak 只擋得住「裝了不喜歡」與「寫到一半失敗」(後者會自動退回),
+  擋不住「裝到一半**斷電**」—— 那會留下一套半新半舊的遊戲
+  (已經寫進去的檔是新的,還沒輪到的是舊的),要靠 --restore 退回去。
+  自動退回本身也可能被斷電打斷。裝之前自己另外留一份備份。
+· --restore 驗得出備份是不是半截的,但驗不出備份「內容對不對」:
+  一份完整無誤、卻是別人遊戲的 attrib.dat,它照樣會蓋回去。
+· 不處理相依關係,也不處理版本衝突。兩個模組動到同一個檔,後裝的就贏
+  (.packbak 保留的仍然是最早那一份,所以 --restore 還是回得到原始狀態)。
+· --restore 只認得這支工具自己留下的 .packbak,不會去動別課留下的備份。
+
+法律與免責
+    本教學與本腳本與 Electronic Arts 無任何官方關聯,不含 EA 的程式碼或資產,
+    也不含任何規避技術保護措施的功能。僅供你對**自己合法取得的副本**使用,
+    風險自負。本軟體按現狀提供,不附任何擔保。
+    ⚠️ 你打包出來的那一包裡面**是 EA 的遊戲檔案**(被你改過的)。
+       要不要把它給別人,是你自己的判斷與責任,本站不提供散布管道。
+
+—— toni的MVP模組補習班
+"""
+
+import argparse
+import hashlib
+import json
+import os
+import shutil
+import signal
+import sys
+import tempfile
+import zipfile
+
+# Windows 主控台預設編碼(繁中是 cp950)存不下 ⚠️ ✅ 🔴 這類符號,
+# 輸出被導向檔案或管線時會整支以 UnicodeEncodeError 收場,連 -h 都印不完。
+# 先把輸出轉成 UTF-8。
+try:
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+except (AttributeError, ValueError):
+    pass
+
+BAK_SUFFIXES = (
+    '.audiobak', '.autobak', '.bak', '.chantbak', '.datafilebak',
+    '.exepebak', '.facebak',
+    '.facetexbak', '.feltoolbak', '.fontbak', '.hudcolorbak',
+    '.introbak', '.locbak',
+    '.modernizebak',
+    '.logobak', '.menutextbak', '.playerbak', '.portraitbak', '.ratingsbak', '.screenbak',
+    '.shrinkbak',
+    '.speedbak', '.unibak', '.unpackbak',
+)
+# ⚠️ 這份清單漏一個就會靜默漏檔:少了某個副檔名，那一課改過的檔案就不會被
+#    當成「你改過的東西」，打包出來的模組少了它，而且不會有任何提示。
+#    踩過兩次:
+#      · 2026-08-29 漏了 .ratingsbak,跑過能力值換算的人打包時 attrib.dat 不會進去。
+#      · 2026-09-03 漏了 .exepebak(「執行檔上的六個旋鈕」那一課留的)。做一個假的
+#        遊戲資料夾實測:mvp2005.exe 旁邊放 mvp2005.exe.exepebak,--scan 只印得出
+#        attrib.dat 那一列,改過的執行檔整個不出現;補進清單之後同一個資料夾印出兩列。
+#      · 2026-09-05 漏了 .introbak(「關掉開場動畫」那一課 2026-09-04 上線時留的)。
+#        同樣的假資料夾實測:intro.vp6 旁邊放 intro.vp6.introbak,--scan 只印得出
+#        attrib.dat 一列;補進清單之後印出兩列。守門腳本從那一天起就一直在報紅,
+#        只是 prelaunch.sh 沒有跑它。
+#    守門的是 .tools/site-check/selftest_backup_suffixes.py,不是 verify_site.py
+#    (那一支沒有這項檢查)。它把教學腳本字面寫出的備份副檔名跟這份清單對一次,
+#    但配不到通用的 .bak,也跳過 pack-a-mod 與 backup 兩課,那幾種少了不會紅。
+#
+# 補充兩件讀者看不出來的事:
+#   · 這裡面的 '.bak' 是通用副檔名(換賽程年份那一課留下的就是它)。
+#     別的程式留下的 .bak 也會被當成「你改過這個檔」。這是刻意寧可多收不要漏收,
+#     所以 --scan 印出來的清單值得自己看一眼。
+#   · find_changed() 只要配到第一個吻合的副檔名就停,不再往下試,
+#     用意是「一個檔名只算一種備份」。但這份清單目前的排列順序不影響結果:
+#     在這份 mvp_pack.py 上把清單裡的 24 個項目兩兩互測 a.endswith(b),0 組重疊
+#     (每個都以點開頭、中間又沒有第二個點,所以 '.chantbak' 不會吻合 '.bak'),
+#     任何檔名最多只配得到一個,重排這個 tuple 掃出來的結果完全一樣。
+#     24 是這份清單自己的長度(含通用的 '.bak')。守門腳本
+#     selftest_backup_suffixes.py 印的「23 種」是另一個口徑:它的比對規則
+#     抓不到 '.bak',兩個數字不是在數同一件事,不要互相對照。
+#     ⚠️ 順序什麼時候才會開始有意義:哪天新增一個中間帶點的副檔名
+#     (例如 '.big.bak'),它會同時吻合 '.bak',那時就要把長的排在短的前面,
+#     不然 x.big.bak 會被當成「x.big 的備份」而不是「x 的備份」。
+INSTALL_BAK = '.packbak'          # 這支自己裝東西之前留的備份
+# 備份的收據:跟 .packbak 放在一起,裡面只有那份備份的大小與 SHA-256。
+# --restore 靠它判斷備份是不是完整的(見 check_backup())。
+# 名字刻意不以任何一個 BAK_SUFFIXES 結尾,免得 --scan 把收據也當成「你改過的檔」。
+BAK_RECEIPT = INSTALL_BAK + '.json'
+MANIFEST = 'manifest.json'
+
+# ── Ctrl-C 的三個狀態 ───────────────────────────────────────
+# 中斷的時候要跟玩家講的只有一件事:**檔案動到了沒有**。答案有三種,
+# 三種要做的事完全不一樣,所以狀態也要有三個,不可以只有「有」跟「沒有」:
+#   還沒動   兩個清單都是空的      → 「一個檔都沒有被動到」
+#   正在換   _INFLIGHT 裡還有東西  → 「中斷的那一刻正在替換 X,換成了沒有不確定」
+#   已換過   _MUTATED 裡有東西      → 「已經有 N 個檔被換掉」+ 叫他跑 --restore
+# 2026-09-05 之前不管哪一種都印「中止了。」然後 exit 0 ——
+# 批次檔看到 0 會當成裝好了。
+# 2026-09-06 第三輪補上中間那一個狀態,理由見 _NoInterrupt 與 _swap。
+_MUTATED = []     # os.replace 已經做完、而且登記也做完了的遊戲檔
+_INFLIGHT = []    # 進了「換名 + 登記」那一段,但還沒確定結果的
+
+
+class _NoInterrupt(object):
+    """把「os.replace + 登記」包成一段**不可中斷**的程式。
+
+    這一段期間收到 Ctrl-C 先記著,離開這一段之後再照常丟出去。
+    所以 KeyboardInterrupt 的收尾看到的登記,一定跟磁碟上的狀態一致:
+    不會出現「檔案已經換掉了,收尾卻說一個都沒動」(漏報,最糟的一種),
+    也不會出現「什麼都沒換,收尾卻說換了一個」(多報,舊版是這一種 ——
+    2026-09-06 實測:把訊號插在登記之後、os.replace 之前,檔案內容沒變
+    而收尾說「已經有 1 個遊戲檔被換掉」)。
+
+    ⚠️ 非主執行緒之類的情況裝不上訊號處理器(signal.signal 會丟 ValueError),
+       那時就退回舊行為,不會比舊版更糟;真的在那個縫隙被打斷,
+       由 _swap 的 _INFLIGHT 中間態接住,收尾照實說「正在替換」。
+    """
+
+    def __enter__(self):
+        self._pending = False
+        self._old = None
+        try:
+            self._old = signal.signal(signal.SIGINT, self._remember)
+        except (ValueError, OSError):
+            self._old = None
+        return self
+
+    def _remember(self, signum, frame):
+        self._pending = True
+
+    def __exit__(self, exc_type, exc, tb):
+        if self._old is not None:
+            signal.signal(signal.SIGINT, self._old)
+        # 這一段裡本來就出事了(例如 os.replace 丟 OSError)的話,
+        # 讓真正的死因往外走,不要用 KeyboardInterrupt 把它蓋掉。
+        if self._pending and exc_type is None:
+            raise KeyboardInterrupt
+        return False
+
+
+def _swap(tmp, dst, record=False):
+    """換名 + 登記。**呼叫的人要把它包在 _NoInterrupt 裡面**,不然中間有縫。
+
+    先把 dst 登記成「正在換」,結果確定了才把它拿掉:
+      · os.replace 丟 OSError → 確定沒換成:拿掉,而且不記進 _MUTATED
+      · 換完、也登記完了      → 確定換成了:拿掉
+      · 兩者都不是            → 留在 _INFLIGHT。只有在 _NoInterrupt 裝不上
+        訊號處理器的時候才可能走到這裡,收尾會照實說「正在替換」。
+    """
+    settled = False
+    _INFLIGHT.append(dst)
+    try:
+        try:
+            os.replace(tmp, dst)
+        except OSError:
+            # 只有 OSError 才確定「這一次 rename 沒有發生」。
+            settled = True
+            raise
+        if record:
+            _MUTATED.append(dst)
+        settled = True
+    finally:
+        if settled:
+            _INFLIGHT.remove(dst)
+
+
+def _commit(tmp, dst, record=False):
+    """換一個檔:自己開一段不可中斷段,把 _swap 包起來。
+
+    多檔一起換的地方(cmd_install 的第三階段)不走這裡:它整批只開一段,
+    直接呼叫 _swap,免得一段裡面再套一段。
+    """
+    with _NoInterrupt():
+        _swap(tmp, dst, record=record)
+
+
+def report_interrupt():
+    """Ctrl-C 的收尾:講清楚檔案動到了沒有。__main__ 與 --selftest 共用同一份。
+
+    「中止了」這三個字不夠。要講的是**檔案動到了沒有**,
+    因為這幾種狀況要玩家做的事完全相反。
+    """
+    # 已經確定換掉的就不必再列一次「正在換」。
+    pending = [p for p in _INFLIGHT if p not in _MUTATED]
+    print()
+    print()
+    if _MUTATED:
+        print('  中止了,但是**已經有 %d 個遊戲檔被換掉**:' % len(_MUTATED))
+        for p in _MUTATED[:10]:
+            print('      %s' % p)
+        if len(_MUTATED) > 10:
+            print('      …另外還有 %d 個。' % (len(_MUTATED) - 10))
+    if pending:
+        if not _MUTATED:
+            print('  中止了,而且中斷的那一刻**正在替換**這 %d 個檔:' % len(pending))
+        else:
+            print('  另外這 %d 個是中斷的那一刻**正在替換**的:' % len(pending))
+        for p in pending[:10]:
+            print('      %s' % p)
+        if len(pending) > 10:
+            print('      …另外還有 %d 個。' % (len(pending) - 10))
+        print('  它們換成了沒有,這裡答不出來 —— 當成已經換掉處理比較安全。')
+    if _MUTATED or pending:
+        print('  現在這套遊戲是半新半舊的。跑一次 --restore 退回去。')
+        if pending:
+            print('  (或者自己拿旁邊的 %s 跟遊戲檔比對。)' % INSTALL_BAK)
+    else:
+        print('  中止了。一個檔都沒有被動到。')
+    print()
+
+
+class Stop(Exception):
+    """帶著一句人話中止。"""
+
+
+# ── 路徑安全 ────────────────────────────────────────────────
+# 這一段的判斷抄自 launcher 的 mod_package.py(已審過),
+# 但補上一件當時它的 docstring 說有、程式碼裡沒有的:**Windows 保留檔名**。
+# 2026-08-29 實測那支:CON / PRN / AUX / COM1 / LPT1 一個都沒擋。
+# ✅ 2026-08-30 那一支已經補上同一份清單(mod_package._WIN_RESERVED),
+#    而且它的註解寫著是抄這一支的做法。上面那句留著記錄當時量到的事實。
+WIN_RESERVED = {
+    'con', 'prn', 'aux', 'nul',
+    *('com%d' % i for i in range(1, 10)),
+    *('lpt%d' % i for i in range(1, 10)),
+}
+
+
+def is_safe_relpath(rel):
+    """拒絕:絕對路徑、父層跳脫、NUL / 換行、磁碟機代號、~、Windows 保留檔名。"""
+    if not isinstance(rel, str) or not rel:
+        return False
+    # NUL 會讓底層的 C 函式提早把字串當成結束:'data/x\x00../../evil'
+    # 在 Python 眼裡是一整串,傳到某些系統呼叫卻只剩前半段。
+    # 換行則會弄壞任何逐行處理的記錄與輸出。
+    if '\x00' in rel or '\n' in rel or '\r' in rel:
+        return False
+    if os.path.isabs(rel):
+        return False
+    # 冒號一律拒絕,不是只看第二個字元。兩種東西都靠它:
+    #   · 'C:/…' 磁碟機代號。在 Mac 上不算絕對路徑(上面那一道抓不到),
+    #     在 Windows 上卻是。
+    #   · 'data/x.dat:payload' 在 NTFS 上是 Alternate Data Stream(另一條資料流),
+    #     不是一個普通的子檔案:寫下去會附在 x.dat 身上,而 safe_target() 那一道
+    #     realpath 之後看到的仍然是遊戲資料夾裡面的路徑,擋不掉。
+    #     2026-09-05 之前這裡只看 rel[1],冒號放在別的位置就整條放行。
+    # 遊戲資料夾裡本來就不會有帶冒號的檔名(Windows 根本不准),誤殺的機會是 0。
+    if ':' in rel:
+        return False
+    # '~' 本身不是路徑語法,但很多工具會替你展開,展開之後就跑到家目錄去了。
+    if rel.startswith('~'):
+        return False
+    # 反斜線先統一成斜線,不然 Windows 寫法的 'data\..\..\evil'
+    # 會整段被當成一個檔名,'..' 那一道就形同虛設。
+    # '' 代表 'data//x' 這種空路徑段,各系統解讀不一致,一律拒絕。
+    parts = rel.replace('\\', '/').split('/')
+    if '..' in parts or '.' in parts or '' in parts:
+        return False
+    for p in parts:
+        # Windows 的裝置名不管副檔名都算數:CON、CON.txt、con.dat 指的都是主控台,
+        # 寫進去不會產生檔案。所以比對的是第一個點之前那一段。
+        stem = p.split('.')[0].lower().rstrip(' ')
+        if stem in WIN_RESERVED:
+            return False
+        if p != p.rstrip(' .'):        # Windows 會把結尾的空白與點吃掉
+            return False
+    return True
+
+
+def safe_target(game_root, rel):
+    """相對路徑 → 絕對 realpath;不合法或逃出遊戲資料夾就回 None。
+
+    這是「寫進去之前的最後一道門」。上面的 is_safe_relpath() 看的是字面,
+    這裡看的是**組合之後的真實落點**,兩道缺一不可。
+    """
+    if not is_safe_relpath(rel):
+        return None
+    # 兩邊都走 realpath,把符號連結在比較之前就解開。
+    # 否則遊戲資料夾裡放一個指向別處的捷徑,組出來的路徑字面上還在資料夾裡,
+    # 實際寫入卻會落到外面去。
+    root = os.path.realpath(game_root)
+    target = os.path.realpath(os.path.join(root, rel))
+    try:
+        # 用 commonpath 而不是字串 startswith:
+        # startswith('/game') 會把 '/game2/x' 也算成在 '/game' 底下。
+        if os.path.commonpath([root, target]) != root:
+            return None
+    except ValueError:
+        # 兩條路徑不在同一個磁碟機(Windows 的 C: 與 D:)時 commonpath 會丟這個。
+        # 不同磁碟機本來就代表逃出去了,一樣拒絕。
+        return None
+    return target
+
+
+def sha256(path):
+    """整個檔案的 SHA-256。
+
+    1 MB 一塊串流讀,不是整包讀進記憶體:模組裡可能有 models.big 這種
+    536 MB 的大檔,整包讀進去會直接把記憶體吃光。
+    """
+    h = hashlib.sha256()
+    with open(path, 'rb') as f:
+        for chunk in iter(lambda: f.read(1 << 20), b''):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def human(n):
+    """位元組數轉成人看得懂的寫法。B 不帶小數,KB 以上一位小數,單位到 GB 為止。"""
+    for unit in ('B', 'KB', 'MB', 'GB'):
+        if n < 1024 or unit == 'GB':
+            return '%.1f %s' % (n, unit) if unit != 'B' else '%d B' % n
+        n /= 1024.0
+
+
+# ── 原子寫入:所有會動到磁碟的地方都走這裡 ──────────────────
+# 為什麼不用「目的檔 + '.part'」這種名字(2026-09-05 第二輪修掉的):
+# 那個名字**猜得到**。先在旁邊擺一個叫 '<目的檔>.part' 的符號連結指到別處,
+# 腳本自己 open(part, 'wb') 的那一刻就會跟著連結,把外面那個檔截成 0,
+# 而 os.replace 只換掉連結本身 —— 等腳本發現不對,外面的檔已經被清掉了。
+# Path.exists() 擋不住這一招:指向不存在目標的連結在 exists() 眼裡是 False。
+# 改用 tempfile.mkstemp(dir=同一個資料夾):名字是隨機的,而且它內部用
+# O_CREAT|O_EXCL 開檔,已經存在(包含已經是連結)就直接失敗,不會跟著連結走。
+
+
+def refuse_if_link(path, what):
+    """path 是符號連結就中止。目的檔與備份檔在動它之前都要問一次。
+
+    ⚠️ 這裡一定要用 os.path.islink 而不是 os.path.exists:
+       指向不存在目標的連結(dangling symlink)在 exists() 眼裡是 False,
+       在 islink() / os.path.lexists() 眼裡才是 True。
+    """
+    if not os.path.islink(path):
+        return
+    try:
+        where = os.readlink(path)
+    except OSError:
+        where = '(讀不出來)'
+    raise Stop('%s 是一個符號連結(%s),不敢動它。\n'
+               '  它指向:%s\n'
+               '  寫下去改到的是那一個檔,不是這裡的檔。\n'
+               '  自己確認那是不是你要的,確認完把連結刪掉再跑一次。'
+               % (path, what, where))
+
+
+def _mktemp_beside(dst, tag):
+    """在 dst 隔壁開一個名字猜不到的暫存檔,回傳 (fd, 路徑)。
+
+    一定要跟 dst 同一個資料夾:os.replace 只有在同一個檔案系統上才是原子的,
+    暫存檔放 /tmp 再 replace 回來,跨磁碟時會退化成「複製 + 刪除」。
+    名字前面加一個點,是為了讓它在檔案總管裡不顯眼;結尾的隨機碼由 mkstemp 給。
+    留下來的殘骸長成 '.attrib.dat.install-8p3k2q1x',
+    不以任何一種備份副檔名結尾,所以 --scan 與 --restore 都不會把它當成備份。
+    """
+    d = os.path.dirname(dst) or '.'
+    base = os.path.basename(dst)[:80]        # 檔名長度上限 255,留餘裕給隨機碼
+    return tempfile.mkstemp(dir=d, prefix='.%s.%s-' % (base, tag))
+
+
+def _drop_tmp(tmp):
+    """收拾暫存檔。它自己失敗不可以蓋掉真正的錯誤,所以吞掉例外。"""
+    try:
+        os.remove(tmp)
+    except OSError:
+        pass
+
+
+def _match_mode(tmp, dst, src_for_stat=None):
+    """把暫存檔的權限(必要時還有時間戳)調成該有的樣子。換名之前做。"""
+    if src_for_stat is not None and os.path.isfile(src_for_stat):
+        try:
+            shutil.copystat(src_for_stat, tmp)     # 保住來源的時間戳
+        except OSError:
+            pass
+    if os.path.isfile(dst):
+        shutil.copymode(dst, tmp)                  # 目的檔原本的權限優先
+    else:
+        os.chmod(tmp, 0o644)                       # mkstemp 給的是 0600,太緊
+
+
+def _put_in_place(tmp, dst, src_for_stat=None, record=False):
+    """暫存檔就位:對權限,再在不可中斷段裡換名並登記。共用收尾。
+
+    ⚠️ 順序是「換完才記」,而且兩件事包在同一段不可中斷的程式裡(_commit)。
+       2026-09-05 第二輪是「先記,再換」,理由是怕訊號落在 replace 與登記之間
+       而漏報 —— 但那樣就換成了另一種說謊:訊號落在登記與 replace 之間時,
+       檔案一個位元組都沒變,收尾卻說「已經有 1 個遊戲檔被換掉」
+       (2026-09-06 實測到的)。兩個縫隙都不必忍:包成不可中斷段就都沒了。
+    """
+    _match_mode(tmp, dst, src_for_stat)
+    _commit(tmp, dst, record=record)
+
+
+def _prepare_bytes(dst, data, tag='tmp'):
+    """把 data 寫成 dst 隔壁的暫存檔:fsync、讀回來比對 SHA-256、對好權限,
+    回傳暫存檔的路徑。**只準備,不換名。**
+
+    換名交給 _swap / _commit,分開的用意是讓多檔安裝做得到「要嘛全裝、
+    要嘛全不裝」:先把每一個檔的暫存檔都備妥(這一整段一個遊戲檔都沒動),
+    全部備妥了才一次換完。磁碟寫滿、權限中途被改掉這一類失敗,
+    結果就是「全部沒裝」而不是「裝了一半」。
+    """
+    refuse_if_link(dst, '要寫入的目的檔')
+    want = hashlib.sha256(data).hexdigest()
+    fd, tmp = _mktemp_beside(dst, tag)
+    try:
+        with os.fdopen(fd, 'wb') as fh:
+            fh.write(data)
+            fh.flush()
+            os.fsync(fh.fileno())
+        if sha256(tmp) != want:
+            raise Stop('%s 寫出去之後讀回來對不上 —— 磁碟或檔案系統有問題,'
+                       '原本的檔一個位元組都沒動。' % dst)
+        _match_mode(tmp, dst)
+        return tmp
+    except BaseException:
+        _drop_tmp(tmp)
+        raise
+
+
+def _drop_staged(staged, done):
+    """把還沒換上去的暫存檔收乾淨(已經換掉的那幾個 tmp 早就不在了)。"""
+    for item in staged[done:]:
+        _drop_tmp(item[0])
+
+
+def atomic_write_bytes(dst, data, tag='tmp', record=False):
+    """把 data 原子地寫成 dst。任何一步失敗,dst 一個位元組都不會變。
+
+    順序是:開唯一暫存檔 → 寫 → fsync → **讀回來比對 SHA-256** → 換上去。
+    複驗排在 os.replace **之前**,所以驗不過的時候正本還是原來那一份,
+    不需要「發現不對再補救」。驗不過就丟例外,絕不會安靜地回 0。
+    換名與登記包在同一段不可中斷的程式裡(見 _NoInterrupt),
+    Ctrl-C 不會落在那兩行中間。
+    """
+    tmp = _prepare_bytes(dst, data, tag=tag)
+    try:
+        _commit(tmp, dst, record=record)
+    except BaseException:
+        _drop_tmp(tmp)
+        raise
+
+
+def atomic_copy_over(dst, src, tag='tmp', want_digest=None, record=False):
+    """把 src 原子地換到 dst 上(備份、還原、回滾都走這裡)。
+
+    一樣是先寫暫存檔、讀回來逐位元組比對(比的是 SHA-256)、通過才換上去;
+    換名與登記一樣包在不可中斷段裡(見 _NoInterrupt)。
+    want_digest 是呼叫的人已經算過的來源雜湊,省一次整檔重讀;沒給就當場算。
+    ⚠️ 2026-09-05 之前 --restore 是 shutil.copy2(備份, 遊戲檔) 直接蓋,
+       copy2 開檔的第一件事就是把遊戲檔截成 0 —— 檔頭安全網第 5 條有量到的數字。
+    """
+    refuse_if_link(dst, '要蓋回去的目的檔')
+    refuse_if_link(src, '來源檔')
+    want = want_digest or sha256(src)
+    fd, tmp = _mktemp_beside(dst, tag)
+    try:
+        with os.fdopen(fd, 'wb') as fh:
+            with open(src, 'rb') as sf:
+                shutil.copyfileobj(sf, fh, 1 << 20)
+            fh.flush()
+            os.fsync(fh.fileno())
+        if sha256(tmp) != want:
+            raise Stop('%s 複製過去之後讀回來跟來源對不上,不敢換上去 —— '
+                       '目的地那個檔一個位元組都沒動。' % dst)
+        _put_in_place(tmp, dst, src_for_stat=src, record=record)
+    except BaseException:
+        _drop_tmp(tmp)
+        raise
+
+
+# ── 找出你改過什麼 ──────────────────────────────────────────
+def find_changed(game_root):
+    """哪些檔旁邊有本站工具留下的備份 = 你改過哪些檔。
+
+    這是整支工具的地基:不跟原版比對、也不要你自己記得改過什麼,
+    只認「同一個資料夾裡,某個檔與它的備份同時存在」。
+    回傳每一筆都帶著 same 欄位,標記它跟備份是不是逐位元組相同。
+    """
+    out = []
+    seen_rel = set()   # 2026-09-06:同一個檔旁邊同時有兩課的備份(.bak 與 .playerbak)時只收一筆,
+                       #            不然 --scan 印兩行、--build 對同一個 arcname 寫兩次
+    root = os.path.realpath(game_root)
+    for dirpath, dirnames, filenames in os.walk(root):
+        # 必須「就地」改 dirnames 才會影響 os.walk 接下來要走的路,
+        # 指派一個新的 list 給它是沒有用的。
+        # 跳過點開頭的資料夾:.git、macOS 的 .Trashes 那些不是遊戲檔。
+        dirnames[:] = [d for d in dirnames if not d.startswith('.')]
+        names = set(filenames)
+        for fn in sorted(filenames):
+            # 一個檔名只算一種備份副檔名:配到就處理完然後 break,不再往下試。
+            for suf in BAK_SUFFIXES:
+                if not fn.endswith(suf):
+                    continue
+                orig = fn[:-len(suf)]
+                # 「備份」與「被備份的那個檔」要同時在,才算你改過。
+                # 只剩備份代表本尊被刪了,那沒有東西可以打包。
+                if orig in names:
+                    p = os.path.join(dirpath, orig)
+                    b = os.path.join(dirpath, fn)
+                    rel = os.path.relpath(p, root).replace(os.sep, '/')
+                    if rel in seen_rel:
+                        break
+                    seen_rel.add(rel)
+                    out.append({
+                        'rel': rel,
+                        'size': os.path.getsize(p),
+                        'bak': suf,
+                        # 逐位元組比對現在的檔與備份:一樣就代表你改了又改回去,
+                        # 打包時會自動略過,不必讓別人多蓋一次一模一樣的檔。
+                        'same': sha256(p) == sha256(b),
+                    })
+                break
+    return sorted(out, key=lambda x: x['rel'])
+
+
+def cmd_scan(game_root):
+    """--scan:把「你改過什麼」列出來。整支不寫任何檔。
+
+    這一步的價值不在功能,在於**讓你在打包之前先看一眼**:
+    清單裡有沒有你不預期的東西,是判斷這一包該不該送出去的唯一機會。
+    """
+    items = find_changed(game_root)
+    if not items:
+        print('  這份遊戲裡找不到任何本站工具留下的備份。')
+        print('  也就是說:你還沒有用本站的工具改過東西,或者你已經全部還原了。')
+        return 0
+    print('  你改過這些檔(依據是旁邊有本站工具留下的備份):')
+    print()
+    total = 0
+    for it in items:
+        mark = '  ⚠️ 跟備份一樣(等於沒改)' if it['same'] else ''
+        print('    %-46s %10s  %s%s'
+              % (it['rel'], human(it['size']), it['bak'], mark))
+        total += it['size']
+    print()
+    print('  共 %d 個檔,合計 %s。' % (len(items), human(total)))
+    same = [i for i in items if i['same']]
+    if same:
+        print('  ⚠️ 其中 %d 個跟備份逐位元組相同 —— 打包時會自動略過。' % len(same))
+    print()
+    print('  ⚠️ 這只看得到**本站工具**留下的備份。你用別的工具改的、手動覆蓋的,')
+    print('     它看不到 —— 那些要用 --add 自己指定。')
+    return 0
+
+
+# ── 打包 ────────────────────────────────────────────────────
+def cmd_build(game_root, out, name, author, version, note, extra):
+    """--build:把改過的檔收成一個 .mvpmod(本質就是一個 ZIP)。
+
+    收的東西 = 掃到的改動(跳過與備份逐位元組相同的)加上 --add 明確指定的。
+    manifest.json 記下每個檔的相對路徑、大小與 SHA-256;
+    打完會立刻重新開起來驗一次雜湊,對不上就停下來報錯。
+    ✅ 2026-09-05 第二輪起,那一驗排在 os.replace **之前**:驗的是還沒改名的
+       暫存檔,沒過就把暫存檔刪掉,你指定的位置**不會生出任何東西**。
+       (之前是先改名再驗,驗不過會在那個位置留下一個完整、打得開、
+        卻跟 manifest 對不上的包,要玩家自己記得刪。)
+
+    整段只讀遊戲資料夾、只寫你指定的那個 .mvpmod,不會動到遊戲的任何一個檔 ——
+    但那是**擋出來的**,不是天生的,見下面第一段。
+    """
+    root = os.path.realpath(game_root)
+    # 輸出路徑是你自己打的,腳本不會替你判斷那是不是一個重要的檔。
+    # 2026-09-05 之前這裡沒有任何檢查:把 --build 指到一個已經存在的遊戲檔,
+    # 那個檔會直接被寫成一個 ZIP,沒有備份、沒有警告,最後還印一個 ✅
+    # (實測拿一份 840,643 bytes 的 attrib.dat 複本,跑完變成 154,336 bytes 的 ZIP)。
+    # 所以現在只有兩種情形准蓋過去:那個位置本來就沒有東西,
+    # 或者它是一個副檔名 .mvpmod、而且不在遊戲資料夾裡面的檔(重打同一包的正常情形)。
+    refuse_if_link(out, '--build 的輸出位置')
+    out_abs = os.path.realpath(out)
+    out_dir = os.path.dirname(out_abs) or '.'
+    if not os.path.isdir(out_dir):
+        raise Stop('%s 的上一層資料夾不存在,寫不進去。' % out)
+    if os.path.exists(out_abs):
+        try:
+            inside = os.path.commonpath([root, out_abs]) == root
+        except ValueError:
+            inside = False        # 不同磁碟機,當然不在遊戲資料夾裡面
+        if inside:
+            raise Stop('%s 已經存在,而且就在遊戲資料夾裡面。\n'
+                       '  寫下去會直接蓋掉它,而且不會留備份。換一個位置。' % out)
+        if not out_abs.lower().endswith('.mvpmod'):
+            raise Stop('%s 已經存在,而且副檔名不是 .mvpmod。\n'
+                       '  怕蓋掉你重要的檔,不寫。換一個檔名。' % out)
+    # 改了又改回去的檔不收:收進去只會讓別人多蓋一次一模一樣的檔。
+    items = [i for i in find_changed(root) if not i['same']]
+    # --add 是給「本站工具看不到的改動」用的逃生口(別的工具改的、手動覆蓋的)。
+    # 一樣要過 safe_target(),而且檔案要真的在,免得把一個打不開的路徑寫進 manifest。
+    for rel in extra:
+        rel = rel.replace(os.sep, '/')
+        t = safe_target(root, rel)
+        if not t or not os.path.isfile(t):
+            raise Stop('--add 指定的 %s 不在遊戲資料夾裡,或者不存在。' % rel)
+        if rel not in [i['rel'] for i in items]:
+            items.append({'rel': rel, 'size': os.path.getsize(t), 'bak': '(手動指定)', 'same': False})
+    if not items:
+        raise Stop('沒有東西可以打包。\n'
+                   '  先跑 --scan 看看你改過什麼;如果是用別的工具改的,用 --add 指定。')
+
+    files = []
+    for it in sorted(items, key=lambda x: x['rel']):
+        p = safe_target(root, it['rel'])
+        if not p:
+            raise Stop('這個路徑不安全,不敢打包:%s' % it['rel'])
+        files.append({'path': it['rel'], 'size': it['size'], 'sha256': sha256(p)})
+
+    manifest = {
+        'format': 'mvpmod/1',
+        'name': name,
+        'author': author,
+        'version': version,
+        'note': note or '',
+        'made_by': 'mvp_pack.py · toni的MVP模組補習班',
+        'files': files,
+    }
+    # 全部寫進一個名字猜不到的暫存檔,**驗過了**才換到你指定的位置。
+    # 暫存檔的名字由 mkstemp 給(見 _mktemp_beside 的說明),不是 out + '.part' ——
+    # 那個名字猜得到,先擺一個同名的符號連結在那裡就能騙腳本去寫別的檔。
+    fd, tmp = _mktemp_beside(out_abs, 'build')
+    try:
+        with os.fdopen(fd, 'wb') as fh:
+            with zipfile.ZipFile(fh, 'w', zipfile.ZIP_DEFLATED) as z:
+                z.writestr(MANIFEST, json.dumps(manifest, ensure_ascii=False, indent=1))
+                for f in files:
+                    z.write(safe_target(root, f['path']), 'files/' + f['path'])
+            fh.flush()
+            os.fsync(fh.fileno())
+        # 讀回來驗。「讀回來」是從磁碟重新開檔,不是拿記憶體裡的 bytes 再算一次雜湊:
+        # 拿記憶體那份驗等於自己驗自己,壓縮或寫檔那一步壞掉也照樣印成功。
+        with zipfile.ZipFile(tmp) as z:
+            m = json.loads(z.read(MANIFEST).decode('utf-8'))
+            for f in m['files']:
+                if hashlib.sha256(z.read('files/' + f['path'])).hexdigest() != f['sha256']:
+                    raise Stop('包裡的 %s 跟原檔對不上,這一包不能用。\n'
+                               '  沒有寫出任何檔案 —— %s 那個位置維持原狀。'
+                               % (f['path'], out))
+        size = os.path.getsize(tmp)
+        _put_in_place(tmp, out_abs)
+    except BaseException:
+        _drop_tmp(tmp)
+        raise
+    print('  ✅ 打好了:%s(%s)' % (out, human(size)))
+    print('     %d 個檔,每一個的 SHA-256 都寫進 manifest 並當場驗過。' % len(files))
+    print('  ⚠️ 這一包裡面是**被你改過的 EA 遊戲檔案**。')
+    print('     要不要給別人是你自己的判斷,本站不提供散布管道。')
+    return 0
+
+
+# ── 備份的完整性 ────────────────────────────────────────────
+# 這一整段只服務一件事:--restore 拿一份備份蓋回遊戲檔之前,先問「這份備份完整嗎」。
+# 2026-09-05 之前只問「是不是 0 bytes」,所以一份被截成 60% 的備份會被照樣蓋回去,
+# 而且收尾還印 ✅(實測:840,643 bytes 的 attrib.dat 被換成 504,385 bytes,零警告)。
+#
+# 分兩層:
+#   第一層  收據。--install --apply 留備份的同時,在旁邊寫一個
+#           「同名 + .packbak.json」,記下那份備份的大小與 SHA-256。
+#           有收據就逐位元組驗得出來,任何形式的半截與竄改都擋得住。
+#   第二層  格式。舊版腳本留下的備份沒有收據,只能看檔案本身的格式自打嘴巴
+#           (見 truncation_evidence)。驗不出來的照樣蓋回去,但會明講「沒驗到」。
+#
+# ⚠️ 這裡刻意不用「備份不得小於現在那個檔的一半」那種地板。本站別的工具可以用,
+#    因為它們是就地改幾個位元組,備份跟現在的檔大小本來就差不多。這一支不行:
+#    它裝的是別人給的檔,新檔可以比原檔大好幾倍也可以小好幾倍,
+#    拿現在的檔當尺會把正常的還原也擋掉。
+
+
+def write_receipt(path, size, digest):
+    """寫一張備份收據(暫存檔 → 驗 → 改名,自己也不留半截)。
+
+    走 atomic_write_bytes 是為了跟別的寫入用同一套規矩:名字猜不到的暫存檔、
+    fsync、讀回來比對、才換上去。2026-09-05 之前是 path + '.part',
+    那個名字先被人擺一個符號連結就會寫到別的地方去。
+    """
+    refuse_if_link(path, '備份收據')
+    blob = json.dumps({'size': size, 'sha256': digest, 'made_by': 'mvp_pack.py'})
+    atomic_write_bytes(path, blob.encode('utf-8'), tag='receipt')
+
+
+def read_receipt(path):
+    """讀一張備份收據。回傳 (大小, SHA-256);讀不到就回 None。
+
+    讀不到、壞掉、形狀不對,一律當成「沒有收據」而不是「檢查失敗」——
+    收據是 2026-09-05 才加的額外保障,舊版腳本留下的備份本來就沒有,
+    把「沒有」當成「壞了」會讓那些人再也還原不了。
+    """
+    try:
+        with open(path, encoding='utf-8') as f:
+            d = json.load(f)
+        size, digest = d['size'], d['sha256']
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+    if not isinstance(size, int) or size < 0:
+        return None
+    if not isinstance(digest, str) or len(digest) != 64:
+        return None
+    return size, digest
+
+
+def _looks_texty(head):
+    """這一塊位元組看起來像純文字嗎(給 truncation_evidence 用的粗篩)。"""
+    if b'\x00' in head:
+        return False
+    try:
+        head.decode('utf-8')
+    except UnicodeDecodeError:
+        # 4 KB 的切點可能剛好切在一個多位元組字的中間,那不算「不是文字」。
+        try:
+            head[:-3].decode('utf-8')
+        except UnicodeDecodeError:
+            return False
+    return True
+
+
+def _pe_min_size(head):
+    """MZ/PE 檔頭算出「這個檔至少該有多大」。看不懂就回 None。"""
+    if len(head) < 0x40 or head[:2] != b'MZ':
+        return None
+    lf = int.from_bytes(head[0x3c:0x40], 'little')
+    if lf + 24 > len(head) or head[lf:lf + 4] != b'PE\x00\x00':
+        return None
+    nsec = int.from_bytes(head[lf + 6:lf + 8], 'little')
+    opt = int.from_bytes(head[lf + 20:lf + 22], 'little')
+    tab = lf + 24 + opt
+    if nsec == 0 or tab + nsec * 40 > len(head):
+        return None
+    end = 0
+    for i in range(nsec):
+        e = tab + i * 40
+        raw_size = int.from_bytes(head[e + 16:e + 20], 'little')
+        raw_ptr = int.from_bytes(head[e + 20:e + 24], 'little')
+        if raw_ptr:
+            end = max(end, raw_ptr + raw_size)
+    return end or None
+
+
+def truncation_evidence(bak, orig):
+    """只找「這一份備份明顯是半截的」的**正面證據**。找不到就回 None。
+
+    ⚠️ None 代表「沒驗到」,不代表「驗過了」。兩件事不可以混為一談,
+       呼叫的人(cmd_restore)也是分開講的。
+
+    三種格式驗得出來,三種的門檻都在這台機器上實際量過:
+
+      BIGF  檔頭第 5-8 個位元組寫著整包該有多大。⚠️ 這個數字有的檔存成小端、
+            有的存成大端:本機 383 個 BIGF 開頭的 .big 裡,379 個小端、4 個大端
+            (models.big / portrait.big / pnamedat.big / pnamehdr.big);
+            剛安裝好的原版那一份 207 個全部對得上其中一種。
+            所以兩種都算,只有「比兩種都小」才叫半截。比兩種都大**不算** ——
+            那是社群模組往檔尾接資料留下的孤兒區塊,本站早就量過。
+      MZ/PE 最後一個區段的 PointerToRawData + SizeOfRawData 就是檔案至少該有多大。
+            本機 18 個 exe / dll 全部通過,包含後面接了安裝資料的 TiT.exe
+            (5,221,437 bytes,而區段只算到 233,984)。
+      純文字 原檔以換行結尾而備份沒有,就是抄到一半停了。本機抽驗 20 個純文字
+            遊戲檔(含 attrib.dat)全部以換行結尾。
+            ⚠️ 這一條有誤判的可能:哪天遇到一個本來就不以換行結尾的文字檔,
+               完整的備份也會被擋。擋下來不會弄壞任何東西 —— 備份還在原地,
+               確定它是完整的就自己複製回去。
+    """
+    size = os.path.getsize(bak)
+    with open(bak, 'rb') as f:
+        head = f.read(16384)
+
+    if head[:4] in (b'BIGF', b'BIGH', b'BIG4') and len(head) >= 8:
+        le = int.from_bytes(head[4:8], 'little')
+        be = int.from_bytes(head[4:8], 'big')
+        want = min(le, be)
+        if want and size < want:
+            return ('的 %s 檔頭說整包至少要有 %d bytes,它只有 %d —— 是半截的。'
+                    % (head[:4].decode('ascii'), want, size))
+        return None
+
+    least = _pe_min_size(head)
+    if least is not None:
+        if size < least:
+            return ('是一個執行檔,區段表說它至少要有 %d bytes,它只有 %d —— 是半截的。'
+                    % (least, size))
+        return None
+
+    # 純文字:要兩邊都看得到才算數,所以原檔不在(被刪了)就不驗這一條。
+    if not os.path.isfile(orig) or os.path.getsize(orig) == 0:
+        return None
+    with open(orig, 'rb') as f:
+        ohead = f.read(16384)
+        f.seek(-1, os.SEEK_END)
+        olast = f.read(1)
+    if _looks_texty(head) and _looks_texty(ohead):
+        with open(bak, 'rb') as f:
+            f.seek(-1, os.SEEK_END)
+            blast = f.read(1)
+        if olast in (b'\n', b'\r') and blast not in (b'\n', b'\r'):
+            return '是純文字,而它沒有像原檔那樣以換行結尾 —— 抄到一半停了。'
+    return None
+
+
+def check_backup(bak, orig):
+    """這一份備份能不能拿來蓋回去。回傳 (判定, 一句話)。
+
+    判定有三種:
+      'ok'          驗過了,完整。
+      'unverified'  沒有收據,只驗得出「不是 0 bytes、也看不出明顯的半截」。
+                    ⚠️ 這不等於「驗過了」:truncation_evidence 找不到證據,
+                       有可能是它真的完整,也有可能是這個格式驗不出來。
+      'refuse'      驗出問題,不可以拿來蓋。
+    """
+    if os.path.islink(bak):
+        # 備份檔本身是連結:讀到的是別的地方的內容,而且那個地方可能在遊戲資料夾外。
+        return 'refuse', '是一個符號連結,不是真的備份 —— 不敢照著它蓋回去。'
+    if os.path.islink(orig):
+        # 遊戲檔本身是連結:蓋回去只會把連結換成普通檔,連結指向的那一份反而還在。
+        return 'refuse', '對應的遊戲檔是一個符號連結,情況太特別,交給你自己處理。'
+    if not os.path.isfile(bak):
+        return 'refuse', '不見了。'
+    size = os.path.getsize(bak)
+    if size == 0:
+        # 0 bytes 的備份多半是複製到一半被中斷的。
+        # 拿它蓋回去等於直接把遊戲檔清空。
+        return 'refuse', '是 0 bytes —— 複製到一半被中斷的多半長這樣。'
+    receipt = read_receipt(orig + BAK_RECEIPT)
+    if receipt is not None:
+        want_size, want_digest = receipt
+        if size != want_size:
+            return 'refuse', ('的收據說它應該有 %d bytes,實際只有 %d —— 是半截的。'
+                              % (want_size, size))
+        if sha256(bak) != want_digest:
+            return 'refuse', '的內容跟收據上的 SHA-256 對不上 —— 它被改過或壞了。'
+        return 'ok', ''
+    why = truncation_evidence(bak, orig)
+    if why:
+        return 'refuse', why
+    return 'unverified', '沒有收據(舊版腳本留下的),只驗得出「不是 0 bytes、看不出明顯的半截」。'
+
+
+# ── 預覽 / 安裝 / 還原 ──────────────────────────────────────
+def read_manifest(mod):
+    """打開 .mvpmod 讀出 manifest.json,順便回傳 ZIP 裡所有項目的名字。
+
+    名字清單是給 --preview 用的:manifest 說有這個檔、ZIP 裡卻找不到,
+    代表這一包壞掉或被人動過,要在裝之前就看出來。
+    每一種讀不下去的狀況都換成一句人話(Stop),不讓 Python 的原始例外噴到玩家臉上。
+    """
+    if not os.path.isfile(mod):
+        raise Stop('找不到 %s。' % mod)
+    try:
+        with zipfile.ZipFile(mod) as z:
+            if MANIFEST not in z.namelist():
+                raise Stop('%s 裡面沒有 manifest.json —— 這不是一個 .mvpmod 包。' % mod)
+            m = json.loads(z.read(MANIFEST).decode('utf-8'))
+            names = set(z.namelist())
+    except zipfile.BadZipFile:
+        raise Stop('%s 不是一個壓縮檔。' % mod)
+    except (UnicodeDecodeError, ValueError):
+        # json.JSONDecodeError 是 ValueError 的子類,兩種一起接:
+        # 下載途中被截斷、或被人手動改壞的 manifest 會走到這裡。
+        # 2026-09-05 之前這兩種都是 Python 的原始 traceback 噴到玩家臉上。
+        raise Stop('%s 的 manifest.json 讀不下去 —— 這一包壞了,或是被人動過。' % mod)
+    if not isinstance(m, dict):
+        raise Stop('manifest 壞了:最外層不是一組設定。')
+    if not isinstance(m.get('files'), list):
+        raise Stop('manifest 壞了:沒有 files 清單。')
+    # 清單裡的每一項都要是一組設定。不是的話,後面 f.get('path') 那一行
+    # 會丟 AttributeError,同樣是原始 traceback。
+    if not all(isinstance(f, dict) for f in m['files']):
+        raise Stop('manifest 壞了:檔案清單裡有不是一組設定的項目。')
+    return m, names
+
+
+def cmd_preview(game_root, mod):
+    """--preview:逐檔列出這一包要放到哪裡,並確認每個位置都在遊戲資料夾裡面。
+
+    ⚠️ 這裡驗的是**位置**,不是內容。一個路徑完全合法的 attrib.dat
+       可以把你的名單改成任何樣子。本站沒有掃描包內容的能力,
+       所以這一頁只能告訴你「有哪些檔、會放到哪裡」。
+
+    回傳 0 代表這一包可以裝;回傳 1 代表有問題,--install 會直接停在這裡。
+    """
+    m, names = read_manifest(mod)
+    print('  包名:%s' % m.get('name', '(沒寫)'))
+    print('  作者:%s   版本:%s' % (m.get('author', '(沒寫)'), m.get('version', '(沒寫)')))
+    if m.get('note'):
+        print('  說明:%s' % m['note'])
+    print()
+    print('  裡面有 %d 個檔:' % len(m['files']))
+    bad = 0
+    for f in m['files']:
+        rel = f.get('path', '')
+        # 兩件事分開查,錯的時候才講得出是哪一種:
+        # 路徑不安全 = 這一包想寫到遊戲資料夾外面;包裡找不到 = 這一包本身缺東西。
+        safe = safe_target(game_root, rel) is not None
+        inzip = ('files/' + rel) in names
+        flag = '' if (safe and inzip) else ('  🔴 %s' % ('路徑不安全' if not safe else '包裡找不到這個檔'))
+        if flag:
+            bad += 1
+        print('    %-46s %10s%s' % (rel, human(f.get('size', 0)), flag))
+    print()
+    if bad:
+        print('  🔴 有 %d 個檔有問題,這一包不可以裝。' % bad)
+        return 1
+    print('  ✅ 每一個檔的路徑都在遊戲資料夾裡面,而且包裡都找得到。')
+    return 0
+
+
+def _rollback(journal):
+    """把這一輪已經寫進去的檔退回去。回傳 (退回幾個, [退不回去的說明])。
+
+    每一筆的處理只有兩種:
+      · 原本就有這個檔  → 照 .packbak 蓋回去(蓋之前一樣要過 check_backup)
+      · 原本沒有這個檔  → 直接刪掉,因為它整個是這一輪生出來的
+    倒著跑(reversed)是慣例:交易日誌回滾一律照相反順序,
+    這樣「後面的動作依賴前面的動作」時才不會踩到自己。
+
+    ⚠️ 退回去的是**原始**的遊戲檔,不是「這一輪開始之前的樣子」。
+       那個檔身上本來就有別的模組時,那一份也會一起被退掉 ——
+       跟玩家自己跑 --restore 的結果一樣,是一個講得清楚的狀態。
+    ⚠️ 這裡不可以丟例外:它自己是在收拾別的例外,再丟一個會蓋掉真正的死因。
+       所以每一筆都各自 try,失敗的收進 bad 讓呼叫的人一起講。
+    """
+    ok, bad = 0, []
+    for e in reversed(journal):
+        t, bak, existed = e['t'], e['bak'], e['existed']
+        try:
+            if not existed:
+                if os.path.isfile(t) and not os.path.islink(t):
+                    os.remove(t)
+                ok += 1
+                continue
+            verdict, why = check_backup(bak, t)
+            if verdict == 'refuse':
+                bad.append('%s(它的備份%s)' % (os.path.basename(t), why))
+                continue
+            atomic_copy_over(t, bak, tag='rollback', record=True)
+            ok += 1
+        except Exception as exc:
+            bad.append('%s(%s)' % (os.path.basename(t), exc))
+    return ok, bad
+
+
+def cmd_install(game_root, mod, apply_it):
+    """--install:先跑一次 --preview,通過了才考慮寫。
+
+    寫入分三個階段:
+      第一階段  把每個檔讀進記憶體,順便比對 manifest 上的 SHA-256
+      第二階段  每一個要寫的位置都先試一次,確認真的寫得進去
+      第三階段  兩關都過了才動磁碟
+    先讀完才寫,才不會裝到一半發現包是壞的;先試過才寫,
+    才不會因為權限或檔案被鎖住而留下一套半新半舊的遊戲。
+    ⚠️ 第二階段只是「試」,不是保證。真的寫到一半失敗時(權限中途被改、
+       磁碟寫滿),腳本會**自動退回**這一輪已經寫進去的那幾個檔
+       (照著 .packbak 一個一個蓋回去,原本不存在的檔就刪掉),
+       然後停下來、講清楚退了幾個、結束碼是 1。
+       退回去的是**原始**的遊戲檔,跟你自己跑 --restore 的結果一樣 ——
+       所以如果那個檔身上早就有別的模組,那一份也會一起退掉。
+       退不回去的(例如備份自己壞了)會逐一列出來,那幾個要你自己處理。
+       ⚠️ 備妥階段(留備份、寫暫存檔)就失敗的話,一個遊戲檔都還沒換過,
+          第一句會是「還沒開始換檔就失敗了」,並且明講「遊戲檔一個位元組
+          都沒有動」;真的換到一半才失敗才會說「寫到一半失敗了」。
+          這兩句的差別是問 _MUTATED / _INFLIGHT 得來的,不是拿計數器猜的。
+       ⚠️ 自動退回擋得住「寫失敗」,擋不住「斷電」:電源在退回的途中斷掉,
+          仍然會留下一套半新半舊的遊戲,那時要靠 --restore。
+
+    ⚠️ 雜湊比對是**有條件**的:manifest 上那一項沒有 sha256 欄位就完全不驗,
+       照樣寫進遊戲資料夾(見下面 f.get('sha256') 那一行)。
+       本腳本 --build 打的包每個檔都帶 sha256;launcher 的 mod_package.py
+       打的包一個都沒有,那種包等於只過路徑檢查。
+
+    apply_it 是 False 時,整支到 --preview 為止就結束,一個位元組都不寫。
+    """
+    if cmd_preview(game_root, mod) != 0:
+        return 1
+    m, _names = read_manifest(mod)
+    root = os.path.realpath(game_root)
+    print()
+    if not apply_it:
+        print('  這是預覽,一個位元組都沒有寫。確定的話再跑一次,最後加上 --apply。')
+        return 0
+
+    with zipfile.ZipFile(mod) as z:
+        # 先全部讀進記憶體,全部讀完才開始寫,不會寫一半。
+        # 但雜湊是有條件的:下一行 f.get('sha256') 為真才比對,
+        # manifest 沒寫 sha256 的項目不驗就收(launcher 打的包就是這種)。
+        blobs = {}
+        for f in m['files']:
+            data = z.read('files/' + f['path'])
+            if f.get('sha256') and hashlib.sha256(data).hexdigest() != f['sha256']:
+                raise Stop('包裡的 %s 跟 manifest 寫的 SHA-256 對不上,不敢裝。' % f['path'])
+            blobs[f['path']] = data
+
+    # 第二階段:一個位元組都還沒寫之前,先確認每一個位置都寫得進去。
+    # 擋的是「遊戲裝在 C:\\Program Files 而沒有用系統管理員身分執行」與
+    # 「檔案正被遊戲鎖住」這兩種最常見的失敗 —— 2026-09-05 之前它們會讓你拿到
+    # 一套半新半舊的遊戲,外加一個 Python 原始 traceback(實測過)。
+    targets = {}
+    for rel in blobs:
+        t = safe_target(root, rel)
+        if not t:
+            raise Stop('路徑不安全:%s' % rel)
+        targets[rel] = t
+    for rel, t in targets.items():
+        bak = t + INSTALL_BAK
+        # 要蓋掉的那個遊戲檔**本身**是符號連結的話,整支停下來。
+        # ⚠️ 這一道不可以靠 safe_target:它會 realpath,連結早就被解開成真正的
+        #    落點了,t 永遠不是連結 —— 也就是說「解開之後照樣寫下去」。
+        #    2026-09-06 實測舊版:把 data/database/attrib.dat 換成一個指向
+        #    data/real_target.bin 的連結,--install --apply 回 0、印 ✅,
+        #    真正被改掉的是 real_target.bin,而 attrib.dat 還是那個連結,
+        #    .packbak 也留在 real_target.bin 旁邊。
+        #    (連結指到遊戲資料夾**外面**時,safe_target 會擋,但擋下來的理由是
+        #     「逃出資料夾」,跟這一道不是同一件事,訊息也不對。)
+        #    路徑**中間**的資料夾是連結沒關係(有人把遊戲放在別顆碟),
+        #    只看最後那一段 —— os.path.islink 問的正好就是最後那一段。
+        refuse_if_link(os.path.join(root, rel), '要蓋掉的遊戲檔')
+        # 備份檔與收據是等一下要寫的位置,先問它們是不是符號連結。
+        refuse_if_link(bak, '舊的備份檔')
+        refuse_if_link(t + BAK_RECEIPT, '舊的備份收據')
+        # 這個檔旁邊已經有 .packbak 的話,那就是你**唯一**的退路,
+        # 裝新東西之前先確認它是完整的。2026-09-05 之前完全不驗:
+        # 一份已經壞掉的 .packbak 不會擋下安裝,於是你在「沒有退路」的狀態下
+        # 又蓋了一層新的,而且從頭到尾沒有人講。
+        if os.path.lexists(bak):
+            verdict, why = check_backup(bak, t)
+            if verdict == 'refuse':
+                raise Stop('%s 旁邊那份舊的 %s%s\n'
+                           '  它是你退回原狀的唯一依靠,壞的話不敢再往上蓋。\n'
+                           '  一個檔都還沒有被改到。先處理那份備份(確定原檔沒問題\n'
+                           '  就把 %s 與 %s 一起刪掉,這支會重新留一份)。'
+                           % (rel, os.path.basename(bak), why,
+                              os.path.basename(bak), os.path.basename(t + BAK_RECEIPT)))
+            if verdict == 'unverified':
+                print('  ⚠️ %s 旁邊那份舊的 %s%s'
+                      % (rel, os.path.basename(bak), why))
+        try:
+            os.makedirs(os.path.dirname(t), exist_ok=True)
+            # 試建一個暫存檔再刪掉:這一關看的是資料夾寫不寫得進去。
+            # 名字由 mkstemp 給,不是 t + '.probe' —— 那個名字猜得到,
+            # 先擺一個同名的檔在那裡會被截成 0 再刪掉(它如果是連結,
+            # 被清掉的是連結指向的那個檔)。2026-09-05 之前就是這樣寫的。
+            fd, probe = _mktemp_beside(t, 'probe')
+            os.close(fd)
+            os.remove(probe)
+            # 已經在那裡的檔要另外試:Windows 上「檔案正被遊戲開著」
+            # 不會反映在資料夾權限上,要真的開一次才知道。
+            # 'r+b' 只是開起來就關掉,不寫任何東西。
+            if os.path.exists(t):
+                with open(t, 'r+b'):
+                    pass
+        except OSError as e:
+            raise Stop('%s 這個位置寫不進去:%s\n'
+                       '  常見原因:遊戲正開著、或者遊戲裝在需要系統管理員權限的地方。\n'
+                       '  先把遊戲關掉再試一次。一個檔都還沒有被改到。' % (rel, e))
+
+    # 第三階段:真的寫。這一段自己又分成兩半(2026-09-06 第三輪改的):
+    #   備妥  每個檔各留一份備份,再各寫好一個**已經驗過**的暫存檔。
+    #         這一整段**一個遊戲檔都沒有動**,所以磁碟寫滿、權限中途被改掉
+    #         這一類失敗,結果是「全部沒裝」而不是「裝了一半」。
+    #   換名  全部備妥了才換,而且整批換名包在**同一段**不可中斷的程式裡
+    #         (見 _NoInterrupt),Ctrl-C 不會落在兩個檔中間。
+    #         中途某一次換名失敗,照 .packbak 把已經換掉的退回去。
+    # journal 是這一輪的交易日誌:每換掉一個遊戲檔就記一筆(見 _rollback)。
+    wrote = 0
+    journal = []
+    staged = []          # [(暫存檔, 目的檔, 備份檔, 本來有沒有這個檔)]
+    try:
+        for rel, data in blobs.items():
+            t = targets[rel]
+            bak = t + INSTALL_BAK
+            existed = os.path.isfile(t)
+            # 只在第一次備份。已經有 .packbak 就保留最早那一份,那才是你原本的檔;
+            # 蓋掉的話,裝了第二個模組之後就再也退不回原始狀態了。
+            # 備份走的是跟寫檔同一套原子流程:名字猜不到的暫存檔 → fsync →
+            # 讀回來逐位元組比對 → 才換上去。備份是還原時唯一的依靠,
+            # 少了 fsync,斷電時改上去的 .packbak 仍然可能是 0 或半截的。
+            # ⚠️ 備妥到一半失敗時,這一輪已經留下的 .packbak **不刪**:
+            #    它的內容就是現在那個沒被動過的遊戲檔,留著不會害到任何人,
+            #    下次真的裝的時候用的還是同一份原始檔。
+            if existed and not os.path.lexists(bak):
+                before = sha256(t)
+                atomic_copy_over(bak, t, tag='packbak', want_digest=before)
+                # 收據:記下這份備份的大小與 SHA-256,--restore 靠它判斷完不完整。
+                write_receipt(t + BAK_RECEIPT, os.path.getsize(bak), before)
+            staged.append((_prepare_bytes(t, data, tag='install'), t, bak, existed))
+        with _NoInterrupt():
+            for tmp, t, bak, existed in staged:
+                _swap(tmp, t, record=True)
+                journal.append({'t': t, 'bak': bak, 'existed': existed})
+                wrote += 1
+    except Exception as e:
+        # 寫到一半才失敗(Stop 也算,它可能是「讀回來對不上」丟出來的)。
+        # 先把還沒換上去的暫存檔收乾淨,再自動退回,
+        # 然後講清楚現在是什麼狀態 —— 不假裝沒事,也不印 ✅。
+        # ⚠️ 「有沒有動到遊戲檔」要問 _MUTATED / _INFLIGHT,不可以只看 wrote:
+        #    _swap 換完之後、wrote += 1 之前還有一個縫(跟下面 BaseException
+        #    那一段同一個理由)。而且這一行要算在 _rollback **之前** ——
+        #    退回去之後那幾個檔的內容雖然回到原狀,它們確實被換過。
+        touched = [t for t in targets.values() if t in _MUTATED or t in _INFLIGHT]
+        done = len(touched)
+        _drop_staged(staged, wrote)
+        back, bad = _rollback(journal)
+        # 「先全部備妥、再一次換完」之後,最常見的失敗變成「備妥階段就出事」,
+        # 那時一個遊戲檔都還沒換過:第一句照舊說「寫到一半失敗了」是假的,
+        # 而且底下那幾道閘門本來全掛在 wrote 上,wrote 是 0 的時候玩家
+        # 一個字都收不到,不會有人告訴他遊戲檔沒被動到。
+        # 2026-09-06 第三輪把這一整段改成問**狀態**(_MUTATED / _INFLIGHT),
+        # 不再問計數器 —— 理由跟下面 BaseException 那一段一模一樣。
+        msg = ['%s:%s' % ('寫到一半失敗了' if done else '還沒開始換檔就失敗了', e),
+               '  已經裝進去 %d 個檔,剩下 %d 個沒動到。' % (done, len(blobs) - done)]
+        if journal:
+            msg.append('  自動退回了 %d 個(退回的是**原始**的遊戲檔,跟 --restore 一樣)。'
+                       % back)
+        if bad:
+            msg.append('  ⚠️ 有 %d 個退不回去,這幾個要你自己處理:' % len(bad))
+            msg.extend('       %s' % b for b in bad)
+            msg.append('  備份都還留著。再跑一次 --restore 試試看。')
+        elif not done:
+            # 一個檔都沒換過才敢講這一句(SPEC 第 3 節:換名之後就不可以這樣說)。
+            msg.append('  遊戲檔一個位元組都沒有動。')
+        elif back == done:
+            msg.append('  現在這套遊戲跟你裝之前一樣。')
+        else:
+            # 換掉了、卻沒有進到交易日誌裡:退回去的那一輪碰不到它。
+            # (要落在 _swap 換完之後、journal.append 之前那一個縫才會發生。)
+            msg.append('  ⚠️ 有 %d 個檔已經被換掉,而且沒有退回去。'
+                       '跑一次 --restore 退回去。' % (done - back))
+        raise Stop('\n'.join(msg))
+    except BaseException:
+        # Ctrl-C 這一類不是 Exception 的東西:**不**自動退回
+        # (退回本身是一連串寫入,再被中斷只會更亂),但一定要逐檔講清楚
+        # 哪些已改、哪些沒改,不可以只接 Exception 就讓它安靜地跑掉。
+        # 結束碼由最外層的 KeyboardInterrupt 收尾決定(130),不會是 0。
+        # ⚠️ 逐檔的狀態要問 _MUTATED / _INFLIGHT,**不可以**拿 wrote 這個計數器判:
+        #    中斷可以剛好落在 _swap 已經換完、而 wrote += 1 還沒跑到的那一瞬間,
+        #    那時 wrote 還是 0,照著它印就會對一個真的被換掉的檔說「沒改」——
+        #    正是這一輪要修掉的那種說謊。2026-09-06 自己先寫錯過一次,
+        #    餌 9b 當場抓到(檔案內容已經是新的,而這裡印「一個都沒有被動到」)。
+        # 列的是**這一包裡的每一個檔**,不是只列已經備妥的那幾個:
+        # 中斷可以落在備妥階段,那時 staged 還是半條清單,只印它會漏講後面那些。
+        _drop_staged(staged, wrote)
+        print()
+        print('  ⚠️ 中斷了。這一輪逐檔的狀態:')
+        moved = 0
+        for rel in blobs:
+            t = targets[rel]
+            if t in _MUTATED:
+                mark = '已改  '
+                moved += 1
+            elif t in _INFLIGHT:
+                mark = '正在換'
+                moved += 1
+            else:
+                mark = '沒改  '
+            print('      %s  %s' % (mark, rel))
+        if moved:
+            print('  已經改掉的(或正在改的)那幾個,跑一次 --restore 退回去。')
+        else:
+            print('  一個遊戲檔都沒有被動到。')
+        raise
+    print('  ✅ 裝好了 %d 個檔。原本的檔案備份成 %s,旁邊那個 %s 是備份的收據。'
+          % (wrote, INSTALL_BAK, BAK_RECEIPT))
+    print('     要退回去:--restore')
+    return 0
+
+
+def cmd_restore(game_root, allow_unverified=False):
+    """--restore:把整個遊戲資料夾裡所有 .packbak 蓋回去。
+
+    只認得這支工具自己留下的 .packbak,不會去碰別課留下的備份
+    (那些各課有自己的 --restore)。備份留著不刪,所以可以再裝一次。
+
+    蓋回去之前每一份備份都要先過 check_backup():0 bytes 的、跟收據對不上的、
+    格式上明顯半截的、以及符號連結,一律不蓋,那個遊戲檔維持原狀,結束碼是 1。
+    2026-09-05 之前這裡只擋 0 bytes,一份被截成 60% 的備份會被照樣蓋上去,
+    收尾還印 ✅ —— 實測把 840,643 bytes 的 attrib.dat 換成了 504,385 bytes。
+
+    ⚠️ 「沒有收據、格式也驗不出證據」那一種(check_backup 回 'unverified'),
+       2026-09-05 第二輪起**預設不蓋**:驗不出來就當成不能信,寧可什麼都不做。
+       確定那一份其實是完整的,再加上 --allow-unverified 跑一次。
+       (之前是照樣蓋回去只印一行 ⚠️ —— 一份格式驗不出來的半截備份
+        會被安靜地蓋到遊戲檔上。)
+
+    寫入本身是原子的:先寫一個名字猜不到的暫存檔、讀回來跟備份逐位元組比對,
+    通過了才 os.replace 換上去。2026-09-05 之前是 copy2 直接蓋,
+    量到的樣子寫在檔頭安全網第 5 條。
+    """
+    root = os.path.realpath(game_root)
+    done = 0          # 蓋回去了幾個
+    unverified = 0    # 其中幾個是「沒驗到」就蓋的(要 --allow-unverified 才會有)
+    refused = 0       # 幾個因為備份沒過檢查而沒蓋
+    skipped = 0       # 幾個是「驗不出來」而被跳過的
+    failed = 0        # 幾個是真的寫下去才失敗的(磁碟滿了、權限被改掉…)
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if not d.startswith('.')]
+        for fn in sorted(filenames):
+            if not fn.endswith(INSTALL_BAK):
+                continue
+            bak = os.path.join(dirpath, fn)
+            orig = os.path.join(dirpath, fn[:-len(INSTALL_BAK)])
+            verdict, why = check_backup(bak, orig)
+            if verdict == 'refuse':
+                print('  🔴 %s %s' % (fn, why))
+                print('     不敢拿它覆蓋 %s,這個檔維持原狀。'
+                      % os.path.basename(orig))
+                refused += 1
+                continue
+            if verdict == 'unverified':
+                if not allow_unverified:
+                    # 驗不出來就當成不能信。備份留在原地、遊戲檔一個位元組都不動,
+                    # 什麼都不做永遠比「蓋一份可能是半截的東西上去」安全。
+                    print('  ⏭ %s %s' % (fn, why))
+                    print('     驗不出來的預設不蓋,%s 維持原狀。'
+                          % os.path.basename(orig))
+                    print('     你確定它是完整的,加上 --allow-unverified 再跑一次。')
+                    skipped += 1
+                    continue
+                print('  ⚠️ %s %s' % (fn, why))
+                print('     你自己加了 --allow-unverified,所以照樣蓋回去。')
+                unverified += 1
+            # 原子還原:先寫一個名字猜不到的暫存檔、讀回來跟備份逐位元組比對,
+            # 通過了才在不可中斷段裡一次改名換上去。中途被中斷只會留下那個暫存檔,
+            # 遊戲檔要嘛是舊的要嘛是新的,不會是半截的。
+            try:
+                atomic_copy_over(orig, bak, tag='restore', record=True)
+            except (OSError, Stop) as e:
+                # 這**一個**檔還原失敗(磁碟滿了、權限中途被改掉、讀回來對不上)。
+                # 不整支中斷:剩下的檔還原得了就還原,最後一起算帳、結束碼 1。
+                # 2026-09-06 之前這裡什麼都沒接,一個 OSError 就是一整片
+                # Python 原始 traceback 噴到玩家臉上,而且不會講其他檔怎麼了。
+                # ⚠️ Ctrl-C 不走這裡(它不是 Exception),交給最外層誠實收尾。
+                print('  🔴 %s 沒還原成功:%s' % (os.path.basename(orig), e))
+                print('     這個檔維持原狀,備份留著沒刪。')
+                failed += 1
+                continue
+            done += 1
+    if not done and not refused and not skipped and not failed:
+        raise Stop('找不到任何 %s 備份 —— 你還沒用這支工具裝過東西。' % INSTALL_BAK)
+    print()
+    if refused or skipped or failed:
+        # 有東西沒還原成功就不可以印 ✅,結束碼也不可以是 0。
+        if refused:
+            print('  🔴 有 %d 份備份沒過完整性檢查,那幾個遊戲檔一個位元組都沒動。'
+                  % refused)
+        if skipped:
+            print('  ⏭ 有 %d 份備份沒有收據、格式也驗不出證據,預設不蓋,'
+                  '那幾個遊戲檔一個位元組都沒動。' % skipped)
+            print('     確定它們是完整的:再跑一次,加上 --allow-unverified。')
+        if failed:
+            print('  🔴 有 %d 個檔寫下去才失敗,那幾個遊戲檔維持原狀'
+                  '(換名之前就停住了)。' % failed)
+        if done:
+            print('     另外 %d 個檔還原好了(其中 %d 個是你自己放行的沒驗到的)。'
+                  % (done, unverified))
+        print('     備份都還留著。你確定某一份其實是完整的,自己把它複製回去。')
+        return 1
+    print('  ✅ 還原了 %d 個檔。備份留著沒刪。' % done)
+    if unverified:
+        print('  ⚠️ 其中 %d 個沒有收據,只驗得出「不是 0 bytes、看不出明顯的半截」,'
+              '是你自己加 --allow-unverified 放行的。' % unverified)
+    return 0
+
+
+# ── 自我測試 ────────────────────────────────────────────────
+# 檔尾那幾行 assert 每次執行都會跑,但它們只驗得到「純函式」那一層。
+# 這一段是 --selftest 才跑的:每一道會動到磁碟的守門都下一個餌,
+# 證明它真的會擋 —— 不是「看起來有寫」。
+# ⚠️ 反向測試沒有產生可見的變化,等於測試本身失敗:所以每個餌都要驗
+#    「不該被動的那個檔真的沒被動」,不是只驗「有丟例外」。
+# 全部在系統暫存區自己造一份假的遊戲資料夾,跑完就刪,不碰任何真的遊戲檔。
+
+
+class _Hush:
+    """把被測那幾支印的東西吞起來,自我測試只印自己的結果。"""
+
+    def __init__(self):
+        self.buf = []
+
+    def write(self, text):
+        self.buf.append(text)
+        return len(text)
+
+    def flush(self):
+        pass
+
+    def __enter__(self):
+        self._old = sys.stdout
+        sys.stdout = self
+        return self
+
+    def __exit__(self, *_a):
+        sys.stdout = self._old
+        return False
+
+    @property
+    def text(self):
+        return ''.join(self.buf)
+
+
+def _st_game(tmp, name, entries):
+    """造一個假的遊戲資料夾。entries 是 {相對路徑: 內容}。"""
+    root = os.path.join(tmp, name)
+    os.makedirs(os.path.join(root, 'data', 'database'), exist_ok=True)
+    for rel, blob in entries.items():
+        p = os.path.join(root, rel.replace('/', os.sep))
+        os.makedirs(os.path.dirname(p), exist_ok=True)
+        with open(p, 'wb') as f:
+            f.write(blob)
+    return root
+
+
+def _st_mod(path, entries):
+    """手工打一個 .mvpmod,雜湊都寫對(不經過 cmd_build,免得互相掩護)。"""
+    files = []
+    with zipfile.ZipFile(path, 'w') as z:
+        for rel, blob in entries:
+            files.append({'path': rel, 'size': len(blob),
+                          'sha256': hashlib.sha256(blob).hexdigest()})
+            z.writestr('files/' + rel, blob)
+        z.writestr(MANIFEST, json.dumps(
+            {'format': 'mvpmod/1', 'name': '自我測試', 'files': files}))
+    return path
+
+
+def _st_read(path):
+    with open(path, 'rb') as f:
+        return f.read()
+
+
+# 餌的名單。這裡是「餌數」的**唯一真相來源**:跳過的餌要照**名字**扣掉,
+# 不可以拿「跳過了幾則訊息」當扣除量。
+# ⚠️ 2026-09-06 第三輪之前扣的是訊息數,而「餌11 / 餌12」共用一則訊息只放一筆
+#    (它們一起需要 signal.raise_signal),於是 Python 3.7 以下實測印
+#    「陰性對照 2 項 + 餌 14 項」而真的跑過的只有 13 個 —— 多報一個。
+BAIT_NAMES = ('餌1', '餌2', '餌3', '餌4', '餌4b', '餌5', '餌6', '餌7',
+              '餌8', '餌9b', '餌9', '餌10', '餌11', '餌12', '餌13', '餌15',
+              '餌14')
+
+
+def _bait_tally(skipped):
+    """算出「這一次真的跑過幾個餌」。skipped 收的是**餌名**,不是訊息。
+
+    多報一個餌就是「只回報自己跑過的」那條紀律要擋的過度宣稱,
+    所以這裡不只相減:名字不在 BAIT_NAMES 裡、或者同一個名字記了兩次,
+    一律當場停下來,不會安靜地算出一個好看的數字。
+    """
+    unknown = [n for n in skipped if n not in BAIT_NAMES]
+    if unknown:
+        raise Stop('自我測試的跳過清單有不存在的餌名:%s' % '、'.join(unknown))
+    if len(set(skipped)) != len(skipped):
+        raise Stop('自我測試的跳過清單有重複的餌名:%s' % '、'.join(skipped))
+    return len(BAIT_NAMES) - len(skipped)
+
+
+def _selftest():
+    """跑所有的餌。全綠回 0,任何一個沒抓到回 1,在 python -O 底下回 2。"""
+    if sys.flags.optimize:
+        # -O 會把 assert 整句拿掉:檔尾那十幾行「每次執行都會跑」的 assert
+        # 一句都不會執行,自我測試就變成假綠燈 —— 什麼都沒測到卻印 ✅。
+        # 2026-09-06 實測 2026-09-05 那一版:python3 -O mvp_pack.py --selftest
+        # 照樣印「全綠」、結束碼 0。所以這裡直接停下來,不給那個假綠燈。
+        print()
+        print('  🔴 --selftest 不能在 python -O 下跑:'
+              '-O 會把 assert 全部拿掉,測試會假綠。')
+        print('     把 -O 拿掉再跑一次(python3 mvp_pack.py --selftest)。')
+        print()
+        return 2
+    fails = []
+    skips = []       # 這個 Python 版本做不到而跳過的餌:一個餌一筆 (餌名, 為什麼)。
+    #                  一筆講兩個餌會讓下面的餌數多報一個,見 _bait_tally。
+    ATT = b'data/database/attrib.dat'
+    tmp = tempfile.mkdtemp(prefix='mvp_pack_selftest-')
+    try:
+        # ── 陰性對照:整條路走得通,不然下面每個餌都是假綠燈 ──────
+        g = _st_game(tmp, 'ok', {'data/database/attrib.dat': b'old attrib\n'})
+        mod = _st_mod(os.path.join(tmp, 'ok.mvpmod'),
+                      [('data/database/attrib.dat', b'new attrib\n')])
+        with _Hush():
+            rc = cmd_install(g, mod, True)
+        att = os.path.join(g, 'data', 'database', 'attrib.dat')
+        if rc != 0 or _st_read(att) != b'new attrib\n':
+            fails.append('陰性對照:一般安裝就失敗了(rc=%s)' % rc)
+        if not os.path.isfile(att + INSTALL_BAK):
+            fails.append('陰性對照:沒有留下 %s' % INSTALL_BAK)
+        with _Hush():
+            rc = cmd_restore(g)
+        if rc != 0 or _st_read(att) != b'old attrib\n':
+            fails.append('陰性對照:還原沒有回到原本的內容(rc=%s)' % rc)
+        if not _MUTATED:
+            fails.append('陰性對照:換過檔卻沒有記進 _MUTATED,'
+                         'Ctrl-C 收尾會說謊')
+
+        # ── 陰性對照 2:--build 打得出包,而且驗得過 ──────────────
+        g2 = _st_game(tmp, 'build', {
+            'data/database/attrib.dat': b'changed\n',
+            'data/database/attrib.dat.playerbak': b'original\n'})
+        outmod = os.path.join(tmp, 'out.mvpmod')
+        with _Hush():
+            rc = cmd_build(g2, outmod, 'n', 'a', '1.0', '', [])
+        if rc != 0 or not os.path.isfile(outmod):
+            fails.append('陰性對照:--build 打不出包')
+
+        # ── 餌 1:NTFS 的另一條資料流(冒號不在第二個字元) ────────
+        if is_safe_relpath('data/file.txt:payload'):
+            fails.append('餌1 沒抓到:data/file.txt:payload 竟然算安全路徑')
+        if not is_safe_relpath('data/file.txt'):
+            fails.append('餌1 誤殺:正常路徑被冒號那一道擋掉了')
+
+        # ── 餌 2:先擺好的暫存檔名符號連結,不可以動到資料夾外的檔 ──
+        # 這是 2026-09-05 第二輪最主要的那一條:.part / .tmp / .probe
+        # 這些名字都猜得到,先擺一個同名的連結指到外面,舊版就會跟著寫過去。
+        outside = os.path.join(tmp, 'outside.txt')
+        with open(outside, 'wb') as f:
+            f.write(b'DO NOT TOUCH ME' * 100)
+        before = _st_read(outside)
+        g3 = _st_game(tmp, 'link', {'data/database/attrib.dat': b'old\n'})
+        a3 = os.path.join(g3, 'data', 'database', 'attrib.dat')
+        for bait in (a3 + '.tmp', a3 + '.probe', a3 + '.part',
+                     a3 + INSTALL_BAK + '.part', a3 + BAK_RECEIPT + '.part'):
+            os.symlink(outside, bait)
+        mod3 = _st_mod(os.path.join(tmp, 'link.mvpmod'),
+                       [('data/database/attrib.dat', b'brand new\n')])
+        with _Hush():
+            try:
+                cmd_install(g3, mod3, True)
+            except Stop as e:
+                fails.append('餌2:正常安裝被擋掉了(%s)' % e)
+        if _st_read(outside) != before:
+            fails.append('餌2 沒抓到:資料夾外的檔被 .tmp/.probe 連結帶著改掉了')
+        if _st_read(a3) != b'brand new\n':
+            fails.append('餌2:遊戲檔沒有被正確寫入')
+        with _Hush():
+            cmd_restore(g3)
+        if _st_read(outside) != before:
+            fails.append('餌2 沒抓到:還原時資料夾外的檔被 .part 連結帶著改掉了')
+
+        # ── 餌 3:還原到一半失敗,正本必須原封不動 ────────────────
+        g4 = _st_game(tmp, 'half', {'data/database/attrib.dat': b'old\n'})
+        a4 = os.path.join(g4, 'data', 'database', 'attrib.dat')
+        mod4 = _st_mod(os.path.join(tmp, 'half.mvpmod'),
+                       [('data/database/attrib.dat', b'installed\n')])
+        with _Hush():
+            cmd_install(g4, mod4, True)
+        real_replace = os.replace
+        MARK = '自我測試故意讓 os.replace 失敗'
+
+        def _always_fail(_src, _dst):
+            raise OSError(MARK)
+
+        os.replace = _always_fail
+        try:
+            with _Hush() as h4:
+                rc4 = cmd_restore(g4)
+            if rc4 == 0:
+                fails.append('餌3 沒抓到:os.replace 都失敗了,--restore 竟然回 0')
+            # 這個餌一定要**真的走到寫檔那一步**才算數:如果是被前面別的檢查
+            # 攔下來的,測到的就不是「還原到一半失敗」這件事。
+            if MARK not in h4.text:
+                fails.append('餌3 是被別的東西擋掉的,還原那一步根本沒被測到(%r)'
+                             % h4.text[:200])
+        except BaseException as e:
+            # 2026-09-06 起 --restore 逐檔接住 OSError / Stop,自己講人話、
+            # 結束碼 1;原始例外噴到玩家臉上就是退步。
+            fails.append('餌3:--restore 不該把原始例外丟給玩家(%r)' % e)
+        finally:
+            os.replace = real_replace
+        if _st_read(a4) != b'installed\n':
+            fails.append('餌3 沒抓到:還原失敗卻動到了正本(現在是 %r)'
+                         % _st_read(a4)[:20])
+        junk = [n for n in os.listdir(os.path.dirname(a4))
+                if n.startswith('.attrib.dat.')]
+        if junk:
+            fails.append('餌3:失敗之後沒有把暫存檔收乾淨,留下 %s' % junk)
+
+        # ── 餌 4:.packbak 是符號連結 ────────────────────────────
+        # ⚠️ 這個餌一定要直接問 check_backup 拿「理由」,不可以只看
+        #    cmd_restore 的結束碼:連結指到的那個檔剛好也過不了別的規則時,
+        #    整支照樣回 1,符號連結那一道被拿掉也看不出來(實測過)。
+        g5 = _st_game(tmp, 'baklink', {'data/database/attrib.dat': b'real\n'})
+        a5 = os.path.join(g5, 'data', 'database', 'attrib.dat')
+        os.symlink(outside, a5 + INSTALL_BAK)
+        verdict, why = check_backup(a5 + INSTALL_BAK, a5)
+        if verdict != 'refuse' or '符號連結' not in why:
+            fails.append('餌4 沒抓到:.packbak 是符號連結,判定卻是 %s(%s)'
+                         % (verdict, why))
+        with _Hush():
+            rc = cmd_restore(g5)
+        if rc == 0:
+            fails.append('餌4 沒抓到:.packbak 是符號連結竟然照樣還原')
+        if _st_read(a5) != b'real\n':
+            fails.append('餌4 沒抓到:遊戲檔被連結指到的內容蓋掉了')
+        if _st_read(outside) != before:
+            fails.append('餌4 沒抓到:資料夾外的檔被動到了')
+        # 反過來:遊戲檔自己是符號連結,也不可以蓋 —— 蓋回去只會把連結換成
+        # 普通檔,連結指向的那一份反而原封不動,兩邊都不是玩家要的結果。
+        g5b = _st_game(tmp, 'origlink', {'data/database/attrib.dat': b'real\n'})
+        link5 = os.path.join(g5b, 'data', 'link.dat')
+        os.symlink(outside, link5)
+        with open(link5 + INSTALL_BAK, 'wb') as f:
+            f.write(b'whatever\n')
+        verdict, why = check_backup(link5 + INSTALL_BAK, link5)
+        if verdict != 'refuse' or '符號連結' not in why:
+            fails.append('餌4b 沒抓到:遊戲檔是符號連結,判定卻是 %s(%s)'
+                         % (verdict, why))
+
+        # ── 餌 5:沒有收據又驗不出格式的備份,預設不可以蓋 ──────────
+        g6 = _st_game(tmp, 'unver', {
+            'data/database/attrib.dat': b'text\n',
+            'data/x.bin': b'\x00\x01\x02\x03now',
+            'data/x.bin' + INSTALL_BAK: b'\x00\x01\x02\x03older-and-longer'})
+        x6 = os.path.join(g6, 'data', 'x.bin')
+        with _Hush() as h:
+            rc = cmd_restore(g6)
+        if rc == 0:
+            fails.append('餌5 沒抓到:驗不出來的備份預設竟然照樣蓋,而且回 0')
+        if _st_read(x6) != b'\x00\x01\x02\x03now':
+            fails.append('餌5 沒抓到:驗不出來的備份被蓋回去了')
+        if 'allow-unverified' not in h.text:
+            fails.append('餌5:訊息裡沒有告訴玩家怎麼放行')
+        with _Hush():
+            rc = cmd_restore(g6, allow_unverified=True)
+        if rc != 0 or _st_read(x6) != b'\x00\x01\x02\x03older-and-longer':
+            fails.append('餌5 反向:自己放行之後應該要蓋得回去(rc=%s)' % rc)
+
+        # ── 餌 6:舊的 .packbak 壞掉,不可以讓新的安裝繼續 ──────────
+        g7 = _st_game(tmp, 'badbak', {'data/database/attrib.dat': b'origin\n'})
+        a7 = os.path.join(g7, 'data', 'database', 'attrib.dat')
+        mod7 = _st_mod(os.path.join(tmp, 'badbak.mvpmod'),
+                       [('data/database/attrib.dat', b'first mod\n')])
+        with _Hush():
+            cmd_install(g7, mod7, True)
+        with open(a7 + INSTALL_BAK, 'wb') as f:      # 把備份截半
+            f.write(b'ori')
+        mod7b = _st_mod(os.path.join(tmp, 'badbak2.mvpmod'),
+                        [('data/database/attrib.dat', b'second mod\n')])
+        try:
+            with _Hush():
+                cmd_install(g7, mod7b, True)
+            fails.append('餌6 沒抓到:備份已經壞掉,第二個模組竟然照裝')
+        except Stop:
+            pass
+        if _st_read(a7) != b'first mod\n':
+            fails.append('餌6 沒抓到:被擋下來了卻還是動到了遊戲檔')
+
+        # ── 餌 7:--build 驗不過,不可以在輸出位置留下任何東西 ──────
+        g8 = _st_game(tmp, 'badbuild', {
+            'data/database/attrib.dat': b'changed\n',
+            'data/database/attrib.dat.playerbak': b'original\n'})
+        out8 = os.path.join(tmp, 'badbuild.mvpmod')
+        real_sha = globals()['sha256']
+        globals()['sha256'] = lambda p: real_sha(p)[::-1]   # 每個檔都算錯,但仍然各不相同
+        try:
+            with _Hush():
+                cmd_build(g8, out8, 'n', 'a', '1.0', '', [])
+            fails.append('餌7 沒抓到:manifest 的雜湊全是錯的,--build 竟然說成功')
+        except Stop:
+            pass
+        finally:
+            globals()['sha256'] = real_sha
+        if os.path.lexists(out8):
+            fails.append('餌7 沒抓到:驗不過卻在輸出位置留下了 %s'
+                         % os.path.basename(out8))
+
+        # ── 餌 8:多檔安裝寫到一半失敗,已經寫進去的要自動退回 ──────
+        g9 = _st_game(tmp, 'rollback', {
+            'data/database/attrib.dat': b'A original\n',
+            'data/database/other.dat': b'B original\n'})
+        a9 = os.path.join(g9, 'data', 'database', 'attrib.dat')
+        b9 = os.path.join(g9, 'data', 'database', 'other.dat')
+        mod9 = _st_mod(os.path.join(tmp, 'rollback.mvpmod'),
+                       [('data/database/attrib.dat', b'A new\n'),
+                        ('data/database/other.dat', b'B new\n')])
+        real_replace = os.replace
+
+        def _fail_on_b(src, dst):
+            if os.path.realpath(dst) == os.path.realpath(b9):
+                raise OSError('自我測試故意讓第二個檔寫失敗')
+            return real_replace(src, dst)
+
+        os.replace = _fail_on_b
+        try:
+            with _Hush() as h9:
+                cmd_install(g9, mod9, True)
+            fails.append('餌8 沒抓到:第二個檔寫失敗竟然沒有報錯')
+        except Stop as e:
+            if '退回' not in str(e):
+                fails.append('餌8:失敗訊息沒有講自動退回(%s)' % e)
+            # 陰性對照:這裡是真的換掉一個檔之後才失敗的,
+            # 第一句必須還是「寫到一半失敗了」,不可以被餌13 那一支的改法帶歪。
+            if '寫到一半失敗了' not in str(e):
+                fails.append('餌8:換掉一個檔之後才失敗,第一句卻不是'
+                             '「寫到一半失敗了」(%s)' % e)
+            if '遊戲檔一個位元組都沒有動' in str(e):
+                fails.append('餌8 沒抓到:已經換掉一個檔了,竟然說一個位元組都沒動')
+        finally:
+            os.replace = real_replace
+        if _st_read(a9) != b'A original\n':
+            fails.append('餌8 沒抓到:第一個檔沒有被退回去(現在是 %r)'
+                         % _st_read(a9)[:20])
+        if _st_read(b9) != b'B original\n':
+            fails.append('餌8:第二個檔本來就不該被動到')
+
+        # ── 餌 9b:連不可中斷段都失效時,「正在換」那個中間態要接住 ────
+        # 模擬最壞的情形:_NoInterrupt 裝不上訊號處理器(非主執行緒之類),
+        # 於是 KeyboardInterrupt 真的落在 os.replace 成功之後、登記之前。
+        # 這時 _MUTATED 一定是空的 —— 只有第三個狀態 _INFLIGHT 救得了,
+        # 沒有它,收尾就會告訴玩家「一個檔都沒有被動到」,而檔案已經換掉了。
+        g11 = _st_game(tmp, 'ctrlc', {'data/database/attrib.dat': b'before\n'})
+        a11 = os.path.join(g11, 'data', 'database', 'attrib.dat')
+        mod11 = _st_mod(os.path.join(tmp, 'ctrlc.mvpmod'),
+                        [('data/database/attrib.dat', b'after\n')])
+        real_replace = os.replace
+
+        def _replace_then_boom(src, dst):
+            real_replace(src, dst)
+            if os.path.realpath(dst) == os.path.realpath(a11):
+                raise KeyboardInterrupt
+            return None
+
+        os.replace = _replace_then_boom
+        n11 = len(_MUTATED)
+        hi11 = _Hush()
+        try:
+            with hi11:
+                cmd_install(g11, mod11, True)
+            fails.append('餌9b:模擬的 Ctrl-C 沒有傳出來,這個餌沒測到東西')
+        except KeyboardInterrupt:
+            pass
+        finally:
+            os.replace = real_replace
+        # cmd_install 自己那份「逐檔已改 / 沒改」也不可以說謊。它一度是拿
+        # wrote 這個計數器印的,而中斷剛好落在「換完了、wrote 還沒加」的那一刻,
+        # 於是對一個真的被換掉的檔印「沒改」+「一個遊戲檔都沒有被動到」。
+        if '正在換' not in hi11.text:
+            fails.append('餌9b 沒抓到:逐檔狀態沒有把它列成「正在換」(%r)'
+                         % hi11.text[-200:])
+        if '一個遊戲檔都沒有被動到' in hi11.text:
+            fails.append('餌9b 沒抓到:檔案已經是新的了,逐檔狀態卻說'
+                         '「一個遊戲檔都沒有被動到」')
+        # ⚠️ 兩個清單裡存的是 realpath(safe_target 解過的),
+        #    而 a11 是 mkdtemp 給的路徑 —— 在 macOS 上 /var 是連到 /private/var 的
+        #    連結,兩個字串不一樣。2026-09-06 第一次寫這個餌就是拿沒解過的路徑去比,
+        #    測出「沒抓到」,其實守門好好的,錯的是量法。
+        real_a11 = os.path.realpath(a11)
+        if _st_read(a11) != b'after\n':
+            fails.append('餌9b:這個餌應該讓檔案真的被換掉才有意義')
+        if len(_MUTATED) != n11:
+            fails.append('餌9b:這個餌模擬的是「登記那一行沒跑到」,'
+                         '_MUTATED 不該增加')
+        if real_a11 not in _INFLIGHT:
+            fails.append('餌9b 沒抓到:檔案已經換掉了,兩個清單卻都沒記 —— '
+                         'Ctrl-C 收尾會說「一個檔都沒有被動到」')
+        else:
+            with _Hush() as h11:
+                report_interrupt()
+            if '正在替換' not in h11.text or real_a11 not in h11.text:
+                fails.append('餌9b:收尾沒有說「正在替換」那個檔(%r)'
+                             % h11.text[:200])
+            if '一個檔都沒有被動到' in h11.text:
+                fails.append('餌9b 沒抓到:收尾竟然說「一個檔都沒有被動到」')
+            _INFLIGHT.remove(real_a11)
+
+        # ── 餌 9:預覽不可以動到任何東西,也不可以記進 _MUTATED ──────
+        g10 = _st_game(tmp, 'preview', {'data/database/attrib.dat': b'keep\n'})
+        a10 = os.path.join(g10, 'data', 'database', 'attrib.dat')
+        mod10 = _st_mod(os.path.join(tmp, 'preview.mvpmod'),
+                        [('data/database/attrib.dat', b'nope\n')])
+        n_before = len(_MUTATED)
+        with _Hush():
+            cmd_install(g10, mod10, False)
+        if _st_read(a10) != b'keep\n':
+            fails.append('餌9 沒抓到:不加 --apply 竟然寫了')
+        if len(_MUTATED) != n_before:
+            fails.append('餌9 沒抓到:預覽竟然被記成「改過檔」')
+
+        # ── 餌 10:要蓋掉的遊戲檔本身是符號連結 ─────────────────────
+        # 舊版靠 safe_target 的 realpath 把連結解開,然後**照樣寫下去** ——
+        # 2026-09-06 實測:回 0、印 ✅,真正被改掉的是連結指到的那個檔。
+        # 連結指到遊戲資料夾外面的會被 safe_target 擋(理由是逃出資料夾),
+        # 所以這個餌刻意讓它指到資料夾**裡面**,只有新加的那一道擋得住。
+        g12 = _st_game(tmp, 'tgtlink', {'data/database/attrib.dat': b'origin\n'})
+        inside12 = os.path.join(g12, 'data', 'real_target.bin')
+        with open(inside12, 'wb') as f:
+            f.write(b'I AM THE REAL FILE\n')
+        keep12 = _st_read(inside12)
+        link12 = os.path.join(g12, 'data', 'link.dat')
+        os.symlink(os.path.join('.', 'real_target.bin'), link12)
+        mod12 = _st_mod(os.path.join(tmp, 'tgtlink.mvpmod'),
+                        [('data/link.dat', b'PWNED\n')])
+        try:
+            with _Hush():
+                cmd_install(g12, mod12, True)
+            fails.append('餌10 沒抓到:要蓋掉的遊戲檔是符號連結,竟然照裝')
+        except Stop as e:
+            if '符號連結' not in str(e):
+                fails.append('餌10 是被別的東西擋掉的(%s)' % e)
+        if _st_read(inside12) != keep12:
+            fails.append('餌10 沒抓到:連結指到的那個檔被改掉了')
+        if not os.path.islink(link12):
+            fails.append('餌10:連結本身不該被動到')
+
+        # ── 餌 11 / 12:真的對自己送一個 SIGINT(SPEC 的 T1 / T2) ────
+        # 不是「丟一個 KeyboardInterrupt 假裝」,是真的訊號 —— 只有真訊號
+        # 測得到 _NoInterrupt 有沒有把它擋在門外。
+        # signal.raise_signal 是 Python 3.8 才有的,而且是兩個平台上唯一安全的
+        # 送法(Windows 的 os.kill 送 SIGINT 會直接把行程 TerminateProcess 掉)。
+        raise_sigint = getattr(signal, 'raise_signal', None)
+        if raise_sigint is None:
+            # ⚠️ 兩個餌各記一筆,不可以一筆講兩個 —— 下面扣的是餌名,
+            #    一筆會少扣一個,印出來的餌數就比真的跑過的多一個。
+            _why37 = '這個 Python 沒有 signal.raise_signal,要 3.8 以上才跑得了'
+            skips.append(('餌11', '真訊號 Ctrl-C(落在換名之後):' + _why37))
+            skips.append(('餌12', '真訊號 Ctrl-C(落在換名之前):' + _why37))
+        else:
+            # 餌 11(T1):訊號落在「os.replace 已經做完、登記還沒做」的那一刻。
+            #            不可中斷段要先把它收著,等登記做完才丟出來。
+            g13 = _st_game(tmp, 'sig1', {'data/database/attrib.dat': b'before\n'})
+            a13 = os.path.join(g13, 'data', 'database', 'attrib.dat')
+            mod13 = _st_mod(os.path.join(tmp, 'sig1.mvpmod'),
+                            [('data/database/attrib.dat', b'after\n')])
+            saved_m, saved_i = list(_MUTATED), list(_INFLIGHT)
+            del _MUTATED[:]
+            del _INFLIGHT[:]
+            real_replace = os.replace
+
+            def _replace_then_sigint(src, dst):
+                real_replace(src, dst)
+                if os.path.realpath(dst) == os.path.realpath(a13):
+                    raise_sigint(signal.SIGINT)
+                return None
+
+            os.replace = _replace_then_sigint
+            try:
+                with _Hush():
+                    cmd_install(g13, mod13, True)
+                fails.append('餌11:訊號沒有變成 KeyboardInterrupt,沒測到東西')
+            except KeyboardInterrupt:
+                pass
+            finally:
+                os.replace = real_replace
+            real_a13 = os.path.realpath(a13)     # 同餌9b 的理由:清單裡是 realpath
+            if _st_read(a13) != b'after\n':
+                fails.append('餌11:這個餌應該讓檔案真的被換掉才有意義')
+            if real_a13 not in _MUTATED:
+                fails.append('餌11 沒抓到:不可中斷段沒擋住訊號,'
+                             '換掉的檔沒有被登記')
+            if real_a13 in _INFLIGHT:
+                fails.append('餌11:結果已經確定了,不該留在「正在換」')
+            with _Hush() as h13:
+                report_interrupt()
+            if '已經有 1 個遊戲檔被換掉' not in h13.text or '--restore' not in h13.text:
+                fails.append('餌11:收尾沒有照實說已經換掉、也沒叫他跑 --restore'
+                             '(%r)' % h13.text[:120])
+            del _MUTATED[:]
+            del _INFLIGHT[:]
+
+            # 餌 12(T2):訊號落在「暫存檔備妥了、還沒換名」的那一刻。
+            #            這時遊戲檔一個位元組都還沒變,收尾就要說「沒動到」。
+            g14 = _st_game(tmp, 'sig2', {'data/database/attrib.dat': b'keepme\n'})
+            a14 = os.path.join(g14, 'data', 'database', 'attrib.dat')
+            mod14 = _st_mod(os.path.join(tmp, 'sig2.mvpmod'),
+                            [('data/database/attrib.dat', b'never\n')])
+            real_prep = globals()['_prepare_bytes']
+            fired = []
+
+            def _prep_then_sigint(dst, data, tag='tmp'):
+                out = real_prep(dst, data, tag=tag)
+                if not fired and os.path.realpath(dst) == os.path.realpath(a14):
+                    fired.append(1)
+                    raise_sigint(signal.SIGINT)
+                return out
+
+            globals()['_prepare_bytes'] = _prep_then_sigint
+            try:
+                with _Hush():
+                    cmd_install(g14, mod14, True)
+                fails.append('餌12:訊號沒有變成 KeyboardInterrupt,沒測到東西')
+            except KeyboardInterrupt:
+                pass
+            finally:
+                globals()['_prepare_bytes'] = real_prep
+            if _st_read(a14) != b'keepme\n':
+                fails.append('餌12 沒抓到:換名之前就中斷了,遊戲檔卻被動到'
+                             '(現在是 %r)' % _st_read(a14)[:20])
+            if _MUTATED or _INFLIGHT:
+                fails.append('餌12 沒抓到:什麼都沒換,卻登記成「換過 / 正在換」'
+                             '—— 收尾會叫玩家白跑一次 --restore')
+            with _Hush() as h14:
+                report_interrupt()
+            if '一個檔都沒有被動到' not in h14.text:
+                fails.append('餌12:收尾沒有說「一個檔都沒有被動到」(%r)'
+                             % h14.text[:120])
+            _MUTATED[:] = saved_m
+            _INFLIGHT[:] = saved_i
+
+        # ── 餌 13:備妥階段就失敗,一個遊戲檔都不可以被動到 ──────────
+        # 「先全部備妥、再一次換完」要做到的就是這個:寫暫存檔那一段出事
+        #  (磁碟寫滿之類),結果是「全部沒裝」而不是「裝了一半再退回去」。
+        g15 = _st_game(tmp, 'allornone', {
+            'data/database/attrib.dat': b'A original\n',
+            'data/database/other.dat': b'B original\n'})
+        a15 = os.path.join(g15, 'data', 'database', 'attrib.dat')
+        b15 = os.path.join(g15, 'data', 'database', 'other.dat')
+        mod15 = _st_mod(os.path.join(tmp, 'allornone.mvpmod'),
+                        [('data/database/attrib.dat', b'A new\n'),
+                         ('data/database/other.dat', b'B new\n')])
+        real_prep = globals()['_prepare_bytes']
+
+        def _prep_fail_on_b(dst, data, tag='tmp'):
+            if os.path.realpath(dst) == os.path.realpath(b15):
+                raise Stop('自我測試故意讓第二個檔的暫存檔寫失敗')
+            return real_prep(dst, data, tag=tag)
+
+        globals()['_prepare_bytes'] = _prep_fail_on_b
+        try:
+            with _Hush():
+                cmd_install(g15, mod15, True)
+            fails.append('餌13 沒抓到:備妥階段失敗竟然沒有報錯')
+        except Stop as e:
+            if '已經裝進去 0 個檔' not in str(e):
+                fails.append('餌13:訊息沒有照實說一個都沒裝進去(%s)' % e)
+            # 備妥階段失敗 = 一個遊戲檔都還沒換過。第一句說「寫到一半」是假的,
+            # 而且要真的把「沒動到」講出來 —— 舊版兩道閘門都掛在 wrote 上,
+            # wrote 是 0 的時候玩家一個字都收不到。
+            if '還沒開始換檔就失敗了' not in str(e):
+                fails.append('餌13:一個檔都沒換過,第一句卻說「寫到一半」(%s)' % e)
+            if '遊戲檔一個位元組都沒有動' not in str(e):
+                fails.append('餌13:沒有告訴玩家遊戲檔一個位元組都沒被動到(%s)' % e)
+        finally:
+            globals()['_prepare_bytes'] = real_prep
+        if _st_read(a15) != b'A original\n' or _st_read(b15) != b'B original\n':
+            fails.append('餌13 沒抓到:備妥階段失敗,遊戲檔卻被動到了')
+        junk15 = [n for n in os.listdir(os.path.dirname(a15))
+                  if n.startswith('.attrib.dat.') or n.startswith('.other.dat.')]
+        if junk15:
+            fails.append('餌13:失敗之後沒有把暫存檔收乾淨,留下 %s' % junk15)
+
+        # ── 餌 15:換完了、登記那一行沒跑到 —— 不可以說「0 個」 ──────
+        # 跟餌 9b 同一種病,只是落在**例外**這一條路上(9b 走的是 Ctrl-C):
+        # _swap 已經把檔案換掉,而 journal.append / wrote += 1 還沒跑到就爆掉。
+        # 那一刻 wrote 還是 0,照著它印就會對一個真的被換掉的檔說「沒動到」——
+        # 正是這一輪要修掉的那種說謊,所以失敗訊息改成問 _MUTATED / _INFLIGHT。
+        g16 = _st_game(tmp, 'gap', {'data/database/attrib.dat': b'G original\n'})
+        a16 = os.path.join(g16, 'data', 'database', 'attrib.dat')
+        mod16 = _st_mod(os.path.join(tmp, 'gap.mvpmod'),
+                        [('data/database/attrib.dat', b'G new\n')])
+        real_swap = globals()['_swap']
+
+        def _swap_then_boom(tmp16, dst, record=False):
+            # 只讓**遊戲檔**那一次爆掉:備份與收據也走 _swap,
+            # 把它們一起弄爆的話就變成備妥階段失敗,測到的是別的東西了。
+            real_swap(tmp16, dst, record=record)
+            if os.path.realpath(dst) == os.path.realpath(a16):
+                raise RuntimeError('自我測試故意讓「登記」那一行沒跑到')
+
+        saved_m16, saved_i16 = list(_MUTATED), list(_INFLIGHT)
+        globals()['_swap'] = _swap_then_boom
+        try:
+            with _Hush():
+                cmd_install(g16, mod16, True)
+            fails.append('餌15 沒抓到:換名之後爆掉竟然沒有報錯')
+        except Stop as e:
+            if '已經裝進去 1 個檔' not in str(e):
+                fails.append('餌15 沒抓到:檔案已經換掉了,訊息卻不是「1 個」(%s)' % e)
+            if '遊戲檔一個位元組都沒有動' in str(e):
+                fails.append('餌15 沒抓到:檔案已經換掉了,竟然說一個位元組都沒動')
+            if '--restore' not in str(e):
+                fails.append('餌15:已經換掉又沒退回去,卻沒叫玩家跑 --restore(%s)' % e)
+        finally:
+            globals()['_swap'] = real_swap
+        if _st_read(a16) != b'G new\n':
+            fails.append('餌15:這個餌應該讓檔案真的被換掉才有意義(現在是 %r)'
+                         % _st_read(a16)[:20])
+        _MUTATED[:] = saved_m16
+        _INFLIGHT[:] = saved_i16
+
+        # ── 餌 14:餌數不可以多報 ────────────────────────────────
+        # 這一支腳本會下到讀者手上,而 Python 3.7 以下跑不了餌11 / 餌12。
+        # 那條跳過的路我這台機器走不到(3.9.6),所以改成直接測算數的那個
+        # 函式:一則訊息代表兩個餌時要扣兩個,不是扣一則。
+        # (2026-09-06 之前扣的是訊息數,模擬 3.7 實測印「餌 14 項」而
+        #  真的跑過的只有 13 個 —— 多報一個。)
+        if _bait_tally([]) != len(BAIT_NAMES):
+            fails.append('餌14 沒抓到:一個都沒跳過,算出來卻不是 %d'
+                         % len(BAIT_NAMES))
+        if _bait_tally(['餌11', '餌12']) != len(BAIT_NAMES) - 2:
+            fails.append('餌14 沒抓到:跳過兩個餌卻沒有扣掉兩個')
+        try:
+            _bait_tally(['餌11', '餌11'])
+            fails.append('餌14 沒抓到:同一個餌記了兩次竟然照算')
+        except Stop:
+            pass
+        try:
+            _bait_tally(['餌沒這個'])
+            fails.append('餌14 沒抓到:名單上沒有的餌名竟然照扣')
+        except Stop:
+            pass
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+    print()
+    if fails:
+        print('  🔴 自我測試沒過,%d 項:' % len(fails))
+        for f in fails:
+            print('      %s' % f)
+        print()
+        return 1
+    # 餌一共幾個看 BAIT_NAMES(那裡是唯一的真相來源);跳過的不算跑過,
+    # 照**餌名**從總數扣掉,不可以拿「全綠」蓋過去。
+    print('  ✅ 自我測試全綠:陰性對照 2 項 + 餌 %d 項,'
+          '每一道守門都真的擋下了它該擋的東西。'
+          % _bait_tally([name for name, _why in skips]))
+    for name, why in skips:
+        print('  ⏭ 跳過:%s —— %s' % (name, why))
+    print('     (在系統暫存區造假的遊戲資料夾跑的,跑完就刪,沒有碰任何真的遊戲檔。)')
+    print()
+    return 0
+
+
+def main():
+    """指令列入口。回傳值就是行程的結束碼。
+
+    五個動作(scan / build / preview / install / restore)共用同一個前置檢查:
+    第一個參數必須是遊戲資料夾。路徑指錯是這一課最常見的卡關點,
+    所以寧可在第一行就講清楚,也不要等到後面才冒出一句看不懂的錯誤。
+    """
+    # add_help=False 再自己接一個 -h:argparse 內建的說明是英文的,
+    # 這裡要印的是檔頭那份中文說明(__doc__)。
+    ap = argparse.ArgumentParser(add_help=False)
+    ap.add_argument('gamedir', nargs='?')
+    ap.add_argument('--scan', action='store_true')
+    ap.add_argument('--build', metavar='檔名')
+    ap.add_argument('--add', action='append', default=[], metavar='相對路徑')
+    ap.add_argument('--name', default='')
+    ap.add_argument('--author', default='')
+    ap.add_argument('--version', default='1.0')
+    ap.add_argument('--note', default='')
+    ap.add_argument('--preview', metavar='檔名')
+    ap.add_argument('--install', metavar='檔名')
+    ap.add_argument('--apply', action='store_true')
+    ap.add_argument('--restore', action='store_true')
+    # 還原時放行「驗不出來」的那一種備份。預設不放行:驗不出來就不蓋,
+    # 什麼都不做永遠比蓋一份可能是半截的東西上去安全。
+    ap.add_argument('--allow-unverified', action='store_true', dest='allow_unverified')
+    ap.add_argument('--selftest', action='store_true')
+    ap.add_argument('-h', '--help', action='store_true')
+    a = ap.parse_args()
+
+    if a.selftest:
+        # 自我測試自己造一個假的遊戲資料夾,不需要也不會碰到真的遊戲。
+        return _selftest()
+    if a.help or not a.gamedir:
+        print(__doc__)
+        return 0
+    g = a.gamedir
+    # 用 attrib.dat 當「這裡是遊戲資料夾」的路標:每一份安裝都有它,
+    # 而且位置固定在 data/database/ 底下。找不到就是路徑指錯了層。
+    if not os.path.isfile(os.path.join(g, 'data', 'database', 'attrib.dat')):
+        raise Stop('%s 底下找不到 data/database/attrib.dat。\n'
+                   '  第一個參數要是**遊戲資料夾**(裡面有 data 那一層)。' % g)
+    if a.scan:
+        return cmd_scan(g)
+    if a.build:
+        if not a.name:
+            raise Stop('--build 要同時給 --name "你的模組叫什麼"。')
+        return cmd_build(g, a.build, a.name, a.author, a.version, a.note, a.add)
+    if a.preview:
+        return cmd_preview(g, a.preview)
+    if a.install:
+        return cmd_install(g, a.install, a.apply)
+    if a.restore:
+        return cmd_restore(g, a.allow_unverified)
+    print(__doc__)
+    return 0
+
+
+# 雙向自我測試:安全的要放行,不安全的一個都不能漏
+assert is_safe_relpath('data/database/attrib.dat'), '正常路徑被誤殺'
+assert not is_safe_relpath('/etc/passwd'), '絕對路徑沒擋'
+assert not is_safe_relpath('../../etc/passwd'), '父層跳脫沒擋'
+assert not is_safe_relpath('C:/Windows/system32'), '磁碟機代號沒擋'
+# NTFS 的另一條資料流(Alternate Data Stream):冒號不在第二個字元,
+# 舊版的 rel[1] == ':' 那一道整條放行。
+assert not is_safe_relpath('data/file.txt:payload'), '另一條資料流的冒號沒擋'
+assert not is_safe_relpath('~/.ssh/id_rsa'), '家目錄沒擋'
+assert not is_safe_relpath('data/\x00evil'), 'NUL 沒擋'
+assert not is_safe_relpath('data/CON'), 'Windows 保留檔名沒擋'
+assert not is_safe_relpath('data/com1.txt'), 'COM1 沒擋'
+assert not is_safe_relpath('data/evil.'), '結尾的點沒擋'
+assert not is_safe_relpath('data//x'), '空路徑段沒擋'
+assert is_safe_relpath('data/CONFIG.dat'), 'CONFIG 不是保留字,不可以誤殺'
+
+# 備份完整性:壞的要擋,好的不可以誤殺。
+# 用組出來的位元組直接測 truncation_evidence 的兩個純檔頭分支,不碰任何真實檔案。
+assert _pe_min_size(b'notanexe') is None, '不是 PE 的東西不可以被當成 PE'
+assert _looks_texty(b'0 first_name,1 last_name\r\n'), '純文字被誤判成二進位'
+assert not _looks_texty(b'BIGF\x00\x01\x02\x00'), '二進位被誤判成純文字'
+assert read_receipt(os.devnull) is None, '讀不到收據要回 None,不可以爆掉'
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main())
+    except Stop as e:
+        print()
+        print('  ✗ %s' % e)
+        print()
+        sys.exit(1)
+    except KeyboardInterrupt:
+        # 「中止了」這三個字不夠。要講的是**檔案動到了沒有**,
+        # 而那幾種狀況要玩家做的事完全相反。收尾的內容見 report_interrupt();
+        # 結束碼一律 130(shell 對 Ctrl-C 的慣例),
+        # 不可以是 0 —— 批次檔看到 0 會當成裝好了。
+        report_interrupt()
+        sys.exit(130)
+
+# ─────────────────────────────────────────────────────────────
+# MIT License
+#
+# Copyright (c) 2026 toni
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+# ─────────────────────────────────────────────────────────────

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/fel.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>FEL 版面語法速查 — toni的MVP模組補習班</title>
+<meta name="description" content="MVP Baseball 2005 介面版面檔 .fel 的完整語法：22 個指令對照表、巢狀規則實測、三條會壞檔的鐵律。所有數字現場量測。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › FEL 版面語法</p>
+  <h1>FEL 版面語法速查</h1>
+  <p class="lede">遊戲的選單、HUD、轉場全部寫在 <code>.fel</code> 版面檔裡。它外面包一層壓縮，
+     <strong>解開後是純文字腳本</strong>，每行一個元件。看懂這頁，就能改遊戲裡幾乎所有介面。</p>
+
+  <h2>先看規模</h2>
+  <p>以比賽中的介面檔 <code>ingame.big</code> 為例，把裡面 47 個 <code>.fel</code> 全部解開後：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>項目</th><th class="num">數字</th><th>備註</th></tr></thead>
+    <tbody>
+      <tr><td data-label="項目">版面檔</td><td data-label="數字" class="num">47 個</td><td data-label="備註">比賽中的每一塊畫面各一個檔</td></tr>
+      <tr class="hi"><td data-label="項目">總行數</td><td data-label="數字" class="num">22,516 行</td><td data-label="備註">全部是人看得懂的純文字</td></tr>
+      <tr><td data-label="項目">畫面（<code>SC:</code>）</td><td data-label="數字" class="num">410 個</td><td data-label="備註">一個檔可以裝很多個畫面</td></tr>
+      <tr><td data-label="項目">指令種類</td><td data-label="數字" class="num">22 種</td><td data-label="備註">下面有完整對照表（不含每個檔結尾的 <code>END:</code>，也不含下面那兩個錯字）</td></tr>
+      <tr><td data-label="項目">群組（<code>GR:</code> 等）</td><td data-label="數字" class="num">4,272 個</td><td data-label="備註">巢狀結構，包最多的那個群組底下直接掛了 111 個元件</td></tr>
+      <tr><td data-label="項目">壓縮前後</td><td data-label="數字" class="num">1,560,268 → 195,999</td><td data-label="備註">壓到 13%，所以打開前要先解壓</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">上面每個數字都是把 <code>ingame.big</code> 現場解開數出來的，不是引用他人資料。</p>
+
+  <h2>一個檔案的骨架</h2>
+  <p>每行都是「指令<code>:</code>名稱<code>,</code>一串參數」，<strong>縮排代表層級</strong>（縮越深包越裡面）。
+     檔案開頭是版本行，結尾一定是 <code>END:</code>：</p>
+<pre><code>VR:78                                 <span class="cm">版本行,每個頂層區塊前面都有一行</span>
+SC:PITCHERINFO,1,0,0,0,640,480,...    <span class="cm">畫面定義,畫布 640×480</span>
+ LF:twn14_en.ffn                      <span class="cm">載入字型</span>
+ LS:ingameov                          <span class="cm">載入圖集</span>
+ GR:PITCHER,1,0,371,68,254,356,...    <span class="cm">群組:投手資訊區</span>
+  GR:BACKARTH,1,0,371,68,220,356,...  <span class="cm">群組:底圖</span>
+   TX:POSITION,<span class="hl">1</span>,0,291,276,51,16,...  <span class="cm">← 文字元件,開關在第 1 個參數</span>
+END:                                  <span class="cm">檔案結束(47 個檔全部如此)</span></code></pre>
+  <ul class="plain">
+    <li><strong>頂層（完全不縮排）有五種指令</strong>：<code>VR:</code>（版本）、<code>SC:</code>（畫面）、
+        <code>SF:</code>（引用另一個 .fel）、<code>TS:</code>，再加上每個檔案結尾的 <code>END:</code>。
+        實測 47 個檔的縮排 0 那一層：VR 504、SC 410、SF 76、END 45、TS 17。
+        <span class="small">（本站這份檔案裡有 2 個 <code>END:</code> 縮排了 1 格 ——<code>fes_hudleft.fel</code> 與 <code>fes_hudright.fel</code> —— 所以縮排 0 那層只數到 45。<u>EA 原版那 44 個 <code>END:</code> 全部在縮排 0。</u>）</span>
+        其他全部都掛在某個東西底下。</li>
+    <li><strong><code>VR:</code> 不是只有開頭一行</strong>。它出現在每個頂層區塊前面，
+        47 個檔共 504 行。實測 408/410 個 <code>SC:</code> 的前一行就是 <code>VR:</code>。</li>
+  </ul>
+
+  <h2>參數怎麼看（以 TX 為例）</h2>
+<pre><code>TX:RATING,1,0,618,391,20,12,1,1,1,1,0,0,hrdbg_en.ffn,3501,0,255,255,255,...
+   │      │ │  │   │  │  │                  │        │   │  └ 顏色 RGB(白)
+   │      │ │  │   │  │  └ 高 12            │        │   └ 對齊方式
+   │      │ │  │   │  └── 寬 20             │        └ 字串編號 3501
+   │      │ │  │   └───── Y 座標 391        └ 字型檔
+   │      │ │  └───────── X 座標 618
+   │      │ └──────────── 保留(此檔一律 0)
+   │      └────────────── <span class="hl">顯示開關:1 顯示 / 0 隱藏 ← 最常改的就是它</span>
+   └───────────────────── 元件名稱</code></pre>
+  <ul class="plain">
+    <li><strong>座標系</strong>：原點在左上角，X 向右、Y 向下，單位是 640×480 底下的像素。
+        版面檔一律用這個座標系寫，所以你也永遠填 640×480 的座標。
+        <span class="badge wip">未驗證</span> 遊戲怎麼把這個座標系換算到你的實際解析度，<u>本站沒有量過</u>
+        （見<a href="hud-map.html">介面座標圖</a>的「這張圖不能告訴你什麼」）。</li>
+    <li><strong>字串編號</strong>：版面檔不存文字本身，只存編號 ——
+        真正的文字在<a href="loc-strings.html">文字表 .LOC</a>裡，本站已完整解開。要做中文化不是改這裡；
+        調位置、關顯示、改顏色才是改這裡。</li>
+    <li><strong>想移走而不是關掉</strong>：把 X 改成大於 640（例如 2000），等同移出畫面。</li>
+    <li><strong>欄位數不固定</strong>：不同指令欄位數差很多（<code>SE:</code> 只有 1 欄，
+        <code>KA:</code> 有 403 欄）。所以寫程式處理時要先檢查欄位夠不夠，不能直接取第 N 個。</li>
+  </ul>
+
+  <h2>22 個指令完整對照</h2>
+  <p>行數是 <code>ingame.big</code> 全 47 檔的實際統計。「證據」欄說明我們憑什麼這樣解釋：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">指令</th><th class="num">行數</th><th>用途</th><th>證據</th></tr></thead>
+    <tbody>
+      <tr><td data-label="指令" class="mono">VR</td><td data-label="行數" class="num">504</td><td data-label="用途">版本行，出現在每個頂層區塊前</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 值有 78 / 71 / 69 三種</td></tr>
+      <tr class="hi"><td data-label="指令" class="mono">SC</td><td data-label="行數" class="num">410</td><td data-label="用途">畫面定義，畫布 640×480</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 只出現在頂層，參數含 640,480</td></tr>
+      <tr><td data-label="指令" class="mono">LF</td><td data-label="行數" class="num">142</td><td data-label="用途">載入<a href="fonts.html">字型</a></td>
+          <td data-label="證據"><span class="badge ok">實測</span> 值就是 <code>.ffn</code> 檔名，142/142 掛在 <code>SC</code> 下</td></tr>
+      <tr><td data-label="指令" class="mono">LS</td><td data-label="行數" class="num">851</td><td data-label="用途">載入圖集</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 值是圖集名，貼圖指令都引用它</td></tr>
+      <tr><td data-label="指令" class="mono">SF</td><td data-label="行數" class="num">78</td><td data-label="用途">引用另一個 <code>.fel</code></td>
+          <td data-label="證據"><span class="badge ok">實測</span> 參數第二欄就是檔名（<code>fes_popup.fel</code>）</td></tr>
+      <tr class="hi"><td data-label="指令" class="mono">GR</td><td data-label="行數" class="num">3,933</td><td data-label="用途">群組，可巢狀</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 縮排層級</td></tr>
+      <tr><td data-label="指令" class="mono">GG</td><td data-label="行數" class="num">267</td><td data-label="用途">會閃動的群組</td>
+          <td data-label="證據"><span class="badge wip">命名佐證</span> 名稱含 FLASH 或 BLINK 者 <strong>150/267</strong>（FLASH 87、BLINK 63、兩者皆含 0；例：<code>TEAMSCOREFLASH</code>、<code>SCOREBLINK</code>、<code>STAMINABLINK</code>）</td></tr>
+      <tr><td data-label="指令" class="mono">SG</td><td data-label="行數" class="num">72</td><td data-label="用途">某種群組</td>
+          <td data-label="證據"><span class="badge wip">未確認</span> 名稱只有 <code>SG1</code>/<code>SG2</code> 這種代號，看不出用途</td></tr>
+      <tr class="hi"><td data-label="指令" class="mono">TX</td><td data-label="行數" class="num">1,796</td><td data-label="用途">文字。<strong>最常改的就是它</strong></td>
+          <td data-label="證據"><span class="badge ok">實測</span> 帶字型檔、字串編號、RGB</td></tr>
+      <tr><td data-label="指令" class="mono">TL</td><td data-label="行數" class="num">282</td><td data-label="用途">多段文字的容器</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 底下 100% 只掛 <code>TE</code></td></tr>
+      <tr><td data-label="指令" class="mono">TE</td><td data-label="行數" class="num">563</td><td data-label="用途"><code>TL</code> 的項目</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 563/563 掛在 <code>TL</code> 下，值是字串編號</td></tr>
+      <tr><td data-label="指令" class="mono">TB</td><td data-label="行數" class="num">706</td><td data-label="用途">文字區塊，帶多組顏色</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 40 欄含字型 + 六組 RGB；底下永遠沒有子元素</td></tr>
+      <tr><td data-label="指令" class="mono">SH</td><td data-label="行數" class="num">4,063</td><td data-label="用途">貼圖，從圖集取一張來畫</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 參數含圖集名（<code>blsr</code>）</td></tr>
+      <tr><td data-label="指令" class="mono">RT</td><td data-label="行數" class="num">1,629</td><td data-label="用途">色塊矩形，常做半透明底</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 兩組 RGB，無字型無貼圖</td></tr>
+      <tr><td data-label="指令" class="mono">SL</td><td data-label="行數" class="num">532</td><td data-label="用途">影格序列容器</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 底下 100% 只掛 <code>SE</code></td></tr>
+      <tr><td data-label="指令" class="mono">SE</td><td data-label="行數" class="num">1,684</td><td data-label="用途"><code>SL</code> 的影格</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 1684/1684 掛在 <code>SL</code> 下，值形如 <code>a000</code></td></tr>
+      <tr><td data-label="指令" class="mono">BU</td><td data-label="行數" class="num">544</td><td data-label="用途">可操作的元件（按鈕）</td>
+          <td data-label="證據"><span class="badge wip">命名佐證</span> 名稱如 <code>NEXT</code>／<code>PREV</code>／<code>ZOOMIN</code>／<code>ROTATECAMERA</code></td></tr>
+      <tr><td data-label="指令" class="mono">FC</td><td data-label="行數" class="num">721</td><td data-label="用途">影格容器</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 底下 100% 只掛 <code>FR</code></td></tr>
+      <tr><td data-label="指令" class="mono">FR</td><td data-label="行數" class="num">3,605</td><td data-label="用途"><code>FC</code> 的影格</td>
+          <td data-label="證據"><span class="badge ok">實測</span> 3605/3605 掛在 <code>FC</code> 下，欄位結構同 <code>GR</code></td></tr>
+      <tr><td data-label="指令" class="mono">KA</td><td data-label="行數" class="num">57</td><td data-label="用途">關鍵影格動畫資料</td>
+          <td data-label="證據"><span class="badge wip">推測</span> 403 欄浮點數的長串，未逐欄解讀</td></tr>
+      <tr class="hi"><td data-label="指令" class="mono">VS</td><td data-label="行數" class="num">9</td><td data-label="用途"><strong>直向捲軸</strong></td>
+          <td data-label="證據"><span class="badge ok">實測</span> 見<a href="#vs">下面那一節</a>。
+              貼圖名字就是證據：<code>sup0</code>／<code>sdn0</code>／<code>sldv</code>／<code>sldb</code></td></tr>
+      <tr><td data-label="指令" class="mono">TS</td><td data-label="行數" class="num">17</td><td data-label="用途">用途未知</td>
+          <td data-label="證據"><span class="badge wip">未確認</span> 17 行內容<strong>完全一樣</strong>都是 <code>TS:CROPLOGOS,</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card blue">
+    <p class="card-h">我們改過這張表</p>
+    <p>這頁上線時，表上寫「<code>VR</code> 固定 78」和「<code>TS</code> 是編譯時間」。
+       重新量測後兩條都不對：<code>VR</code> 實際有 78、71、69 三種值；
+       <code>TS</code> 的 17 行內容一模一樣，不可能是時間戳。已修正。</p>
+    <p>寫成「未確認」不好看，但比寫錯有用。</p>
+  </div>
+
+  <h2>巢狀規則（這幾條是硬的）</h2>
+  <p>把 22,516 行的每一行跟它的上層對照一遍，有五組是 <strong>100% 成立</strong>的：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>規則</th><th class="num">符合</th></tr></thead>
+    <tbody>
+      <tr><td><code>SE</code> 一定掛在 <code>SL</code> 底下</td><td class="num">1684 / 1684</td></tr>
+      <tr><td><code>TE</code> 一定掛在 <code>TL</code> 底下</td><td class="num">563 / 563</td></tr>
+      <tr><td><code>FR</code> 一定掛在 <code>FC</code> 底下</td><td class="num">3605 / 3605</td></tr>
+      <tr><td><code>LF</code> 一定掛在 <code>SC</code> 底下</td><td class="num">142 / 142</td></tr>
+      <tr class="hi"><td><code>SC</code> 一定在頂層</td><td class="num">410 / 410</td></tr>
+    </tbody>
+  </table></div>
+  <p>這對你有什麼用：<strong>看到 <code>SE:</code> 就往上找 <code>SL:</code>，看到 <code>TE:</code> 就往上找 <code>TL:</code></strong>，
+     不用猜。反過來說，如果你動了縮排讓這個關係斷掉，那一行大概就失效了。</p>
+
+  <h2>同一個東西會出現很多次（最容易踩的坑）</h2>
+  <p>你在檔案裡找到要改的那一行，改了、存回去、進遊戲一看 —— <strong>沒變</strong>。
+     十次有八次是這個原因：<strong>那個元件在同一個檔案裡有好幾份，你只改到其中一份。</strong></p>
+  <p>原因是一個 <code>.fel</code> 通常裝了同一塊畫面的許多版本，每個版本各自把元件重畫一次。以左側 HUD 為例：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>檔案</th><th class="num">行數</th><th class="num">畫面數</th><th>畫面代號</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="檔案" class="mono">fes_hudleft.fel</td><td data-label="行數" class="num">1,175</td><td data-label="畫面數" class="num">26</td>
+          <td data-label="畫面代號" class="mono">HUDLEFT, HUDLEFT1 … HUDLEFT25</td></tr>
+      <tr><td data-label="檔案" class="mono">fes_ingameinfobar.fel</td><td data-label="行數" class="num">951</td><td data-label="畫面數" class="num">5</td>
+          <td data-label="畫面代號" class="mono">PITCHERINFO, JUMBOBIO, PLAYERGRP, TEAMSMATCHUP, IGPAUSEINFO</td></tr>
+    </tbody>
+  </table></div>
+  <p>在 <code>fes_hudleft.fel</code> 裡，好球壞球數那個 <code>TX:BALLS</code> 出現 <strong>6 次</strong>，
+     分屬 <code>HUDLEFT</code>、<code>HUDLEFT22</code>、<code>HUDLEFT23</code> 三個畫面。
+     只改第一個，另外兩個畫面照舊。</p>
+  <div class="card amber">
+    <p class="card-h">兩個方向都要記得</p>
+    <p><strong>想全面生效</strong>：把該檔裡所有同名的那個元件<strong>全部改一遍</strong>。
+       本站<a href="../tutorials/hide-runner-speed/index.html">跑壘者速度那一課</a>的腳本就是這樣做的，
+       它不寫死數量，掃到幾個就改幾個；在本站測試機那一份上是 <strong>6 行</strong>：四個壘包各一份，而<code>GR:FIRSTBASE</code> 這個群組
+     <strong>在這份檔案裡被宣告了兩次</strong>（第 782 行與第 791 行，座標略有不同），
+       第二次那份底下又有兩行。只改前四行，一壘的數字還是會冒出來。</p>
+    <p><strong>想只在某個情境隱藏</strong>：那就反過來利用它，只改那個畫面裡的那一行。</p>
+  </div>
+  <div class="card clay">
+    <p class="card-h">別拿「名稱」當識別</p>
+    <p>元件名稱完全不唯一。實測最誇張的是 <code>fes_ingamesettings.fel</code> 裡的
+       <code>SH:F5</code>，同一個檔出現 <strong>191 次</strong>。
+       要定位一行，請用<strong>「檔名 + 行號」</strong>或<strong>「畫面代號 + 上層群組路徑」</strong>，不要只記名字。</p>
+  </div>
+
+  <h2>群組不記錄「我底下有幾個」</h2>
+  <p>改版面時很容易冒出一個念頭：<em>「我可以直接把整行刪掉嗎？還是父群組會發現少了一個？」</em></p>
+  <p>這是可以直接量的。把 4,272 個群組全部按「它自己那行有幾欄」分類，再看每一類的<strong>直接子元素</strong>數 —— 這裡的「直接子元素」指縮排剛好比它深一層的那些行，不含更深層的孫元素：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">群組行的欄位數</th><th class="num">這類群組有幾個</th><th class="num">它們的<u>直接</u>子元素數範圍</th></tr></thead>
+    <tbody>
+      <tr><td data-label="群組行的欄位數" class="num">16</td><td data-label="這類群組有幾個" class="num">53</td><td data-label="它們的直接子元素數範圍" class="num">0 ～ 10</td></tr>
+      <tr><td data-label="群組行的欄位數" class="num">17</td><td data-label="這類群組有幾個" class="num">1</td><td data-label="它們的直接子元素數範圍" class="num">1</td></tr>
+      <tr class="hi"><td data-label="群組行的欄位數" class="num">18</td><td data-label="這類群組有幾個" class="num">3,951</td><td data-label="它們的直接子元素數範圍" class="num">0 ～ 32</td></tr>
+      <tr><td data-label="群組行的欄位數" class="num">25</td><td data-label="這類群組有幾個" class="num">1</td><td data-label="它們的直接子元素數範圍" class="num">42</td></tr>
+      <tr><td data-label="群組行的欄位數" class="num">27</td><td data-label="這類群組有幾個" class="num">266</td><td data-label="它們的直接子元素數範圍" class="num">0 ～ 111</td></tr>
+    </tbody>
+  </table></div>
+  <p>3,951 個群組欄位數一模一樣都是 18，可是直接子元素從 0 個到 32 個都有。
+     <strong>欄位數取決於群組的種類，跟它裝了幾個東西完全無關。</strong>
+     另外有 792 個群組底下一個元件都沒有 —— 空群組是合法的。</p>
+  <div class="card grass">
+    <p class="card-h">結論：刪行不會讓父群組「數量對不上」</p>
+    <p>但本站還是<strong>建議改開關而不是刪行</strong>，理由不是怕數量對不上，而是：
+       改開關可以一秒改回來，刪掉就要從備份撈。這是操作上的保險，不是格式上的限制。</p>
+  </div>
+
+  <h2>三條鐵律（踩到會壞檔）</h2>
+  <div class="card clay">
+    <p class="card-h">1 · 存回 .big 一律用「接到檔尾」，絕不整包重新打包</p>
+    <p>以<u>本站測試機那份</u> <code>ingame.big</code> 為例：全檔 2,665,562 bytes，但目錄指到的資料合計只有 195,999 bytes，
+       <strong>只佔 7.4%</strong>。其餘 92.6% 是目錄已經不指向、但確實還躺在檔案裡的資料。
+       重新打包會把它們整批丟掉（實測 2.5 MB 變 198 KB），而且<strong>不會有任何錯誤訊息</strong>。</p>
+    <p class="small">這三個數字是<strong>本站測試機那一份</strong>量到的，不是這個格式的性質：
+       剛安裝好的原版 <code>ingame.big</code> 只有 167,682 bytes、44 個版面檔，孤兒資料 71 bytes ＝ <strong>0.04%</strong>，
+       兩份差兩千倍以上。鐵律照舊 —— 理由是<u>你不知道手上這份被疊過什麼</u>，不是「這種檔天生有孤兒」。
+       <a href="bigf.html#orphan-def">兩份的對照與算法定義見這裡</a>。</p>
+    <p>正確做法：新資料接檔尾，只改目錄 8 bytes + 檔頭 4 bytes。本站腳本都是這樣寫的。
+       詳見 <a href="bigf.html#append">BIGF 的 append 鐵律</a>。</p>
+  </div>
+  <div class="card clay">
+    <p class="card-h">2 · 要關單一元素，改它自己那行，不要關父群組</p>
+    <p>群組（<code>GR:</code>）的開關會被遊戲程式在執行時覆寫 —— 例如本壘群組寫 0，有跑者時照樣被打開。
+       改元素自己那一行的開關才穩定有效。</p>
+  </div>
+  <div class="card clay">
+    <p class="card-h">3 · .fel 全部使用 CRLF 換行，編輯器不能自作主張</p>
+    <p>實測 <strong>47 個檔全部是純 CRLF，沒有一個混入 LF</strong>
+       （全檔共 22,515 個 CRLF，單獨的 LF 與單獨的 CR 都是 <strong>0 個</strong>）。
+       若編輯器把 CRLF 統一成 LF，檔案長度會少掉一個行數的位元組數，直接壞檔。</p>
+    <p>還有一個更容易被「順手修好」的地方：<strong>檔尾有沒有換行，每一份檔案不一樣，
+       改之前一定要先看</strong>。很多編輯器存檔時會自動補上檔尾換行，那會讓檔案多出 2 bytes。</p>
+    <div class="card grass" style="margin:12px 0">
+      <p class="card-h">2026-08-28 補：把這條規則推到全遊戲，而且量到一個相反的例子</p>
+      <p>上面那個「47 個檔」只量了 <code>ingame.big</code>。
+         把剛安裝好的原版<u>全部 329 個版面檔</u>解壓後重量：</p>
+      <div class="tablewrap"><table class="stack">
+        <thead><tr><th>檔案</th><th class="num">個數</th><th>換行符號</th></tr></thead>
+        <tbody>
+          <tr class="hi"><td data-label="檔案"><code>.fel</code> 版面檔（六個封裝檔全部）</td><td data-label="個數" class="num">329</td>
+              <td data-label="換行符號"><strong>CRLF 329 個，LF 0 個</strong></td></tr>
+          <tr><td data-label="檔案"><code>data/datafile/</code> 底下的 <code>.txt</code></td><td data-label="個數" class="num">466</td>
+              <td data-label="換行符號"><strong>LF 460 個，CRLF 0 個</strong>（另外 6 個是 0 bytes 的空檔，一個換行位元組都沒有）</td></tr>
+          <tr><td data-label="檔案"><code>anims.big</code> <u>裡面</u>的 <code>.axt</code></td><td data-label="個數" class="num">244</td>
+              <td data-label="換行符號">CRLF 200 個、LF 44 個（<u>同一批裡混的</u>）</td></tr>
+        </tbody>
+      </table></div>
+      <p><strong>同樣是純文字，兩個封裝檔用相反的慣例。</strong>
+         所以規則是<u>看檔案家族，不是看副檔名</u> ——
+         寫工具的人如果照副檔名決定換行符號，一定會寫壞其中一邊。</p>
+      <p class="small">⚠️ 動作庫那 244 個的副檔名是 <code>.axt</code> 不是 <code>.txt</code>，
+         而且 <code>data/anims/</code> 這個資料夾裡<u>只有 <code>anims.big</code> 一個檔</u> ——
+         244 個 <code>.axt</code> 全在它<strong>裡面</strong>，要先解開封裝檔才看得到。
+         逐項說明見<a href="anims.html">動作庫 anims</a>那頁。</p>
+      <p class="small">⚠️ 這個數字第一次量的時候是錯的。
+         <code>datafile.big</code> 裡那 460 個 <code>.txt</code> <strong>全部是 QFS 壓縮的</strong>，
+         直接在壓縮位元組裡數 <code>\r\n</code> 會得到一堆假的「混合」。
+         <u>要先解壓再數</u>。本站是印出一個實例、看到內容是亂碼才發現的 ——
+         <strong>量之前先問「我的量法本身可信嗎」。</strong></p>
+    </div>
+    <p class="small">實測：EA 原版那 44 個版面檔<u>全部</u>以 CRLF 結尾，一個例外都沒有；
+       但本站這份 <code>ingame.big</code> 裡，<code>fes_hudleft.fel</code> 的
+       <code>END:</code> 後面沒有換行符。所以規矩是
+       <strong>改完確認檔案長度跟改前一模一樣</strong>，不要去背哪個檔有、哪個檔沒有。</p>
+    <p>用 Notepad++ / VS Code 這類會保留原始換行的編輯器，
+       關掉「存檔時自動補檔尾換行」，改完確認<strong>檔案長度跟改前一模一樣</strong>。</p>
+  </div>
+
+  <h2>順帶一提：這台機器的檔案裡有兩個錯字 —— 但原版沒有</h2>
+  <div class="card blue">
+    <p class="card-h">我們改過這一段</p>
+    <p>這一節上線時的標題是「<u>原廠檔案裡</u>有兩個錯字」。拿剛安裝好、從未改動的原版一驗，那句話不成立：</p>
+    <p>原版<strong>全遊戲 329 個版面檔，三字母指令一個都沒有</strong>（<code>END:</code> 除外）。同一支掃描在原版讀出 9,556 行 <code>TX:</code>，證明它確實有讀到內容。原版的 <code>fes_hudleft.fel</code> 對應那一行，是拼寫正確的 <code>TX:BALLS</code>。</p>
+    <p>另一個錯字所在的 <code>fes_ingameinfobar.fel</code>，<strong>在原版的 <code>ingame.big</code> 裡根本不存在</strong>（原版只有 44 個版面檔）。</p>
+    <p><strong>所以這兩個錯字不是 EA 留下的，是這份檔案被改過的過程中產生的。</strong>本站無法判定是哪一個工具或哪一次改動造成的。<span class="badge wip">未解</span></p>
+  </div>
+  <p>本站這份 <code>ingame.big</code> 的 22,516 行裡，有兩行的指令是三個字母：</p>
+<pre><code><span class="cm">fes_ingameinfobar.fel 第 900 行</span>
+     GR:X2Y1,0,0,229,330,64,8,...
+      <span class="hl">SSH</span>:BARBACK,1,0,77,448,66,16,...      <span class="cm">← 多了一個 S</span>
+      SH:POWERBAR,1,0,79,450,62,6,...
+
+<span class="cm">fes_hudleft.fel 第 615 行</span>
+    GR:COUNT,1,0,10,61,35,13,...
+     <span class="hl">TTX</span>:BALLS,1,0,53,61,17,25,...        <span class="cm">← 多了一個 T</span>
+     TX:STRIKES,1,0,72,61,17,11,...</code></pre>
+  <p>兩行都緊挨著一個拼寫正確的同類指令，參數結構也完全相同。
+     <code>TTX:BALLS</code> 甚至就在 <code>TX:STRIKES</code> 上面 —— 那是好球壞球數的顯示。</p>
+  <div class="card amber">
+    <p class="card-h">這裡要誠實</p>
+    <p>我們<strong>沒有驗證遊戲拿這兩行怎麼辦</strong>。合理的猜想是直接跳過，
+       但那是猜的，本站不寫成定論。能確定的只有：全部 47 個檔、22,516 行裡，
+       只有這兩行用了三字母指令。</p>
+  </div>
+
+  <h2 id="vs">VS 是直向捲軸（2026-08-29 從「用途未知」升級）</h2>
+  <p>這一頁上線時把 <code>VS</code> 標成「用途未知」，理由是
+     「<u>只有 9 行，名稱全是 <code>VS1</code></u>」。
+     那是<strong>樣本太小</strong> —— 上表只算 <code>ingame.big</code> 的 47 個版面檔。
+     把<a href="fel-archives.html">六個封裝檔的 332 個版面檔</a>全部算進來，<code>VS</code> 有 <strong>128 個</strong>。</p>
+  <p>一個 <code>VS</code> 打開來長這樣（<code>fes_savesys.fel</code>，存檔畫面）：</p>
+<pre>GR:<span class="hl">VSCROLL</span>,1,0,560,156,20,194,…
+  VS:VS1,1,0,560,156,20,194,…
+    BU:<span class="hl">SU</span>,…                 ← 上捲按鈕
+      SH:BN … <span class="hl">sup0</span>          ← 平常
+      SH:BP … <span class="hl">sup1</span>          ← 按下去
+      SH:BH … <span class="hl">sup1</span>          ← 滑鼠移上去
+    SH:<span class="hl">SB</span>  … <span class="hl">sldv</span>          ← 軌道
+    BU:<span class="hl">SD</span>,…                 ← 下捲按鈕
+      SH:BN … <span class="hl">sdn0</span>
+      SH:BP … <span class="hl">sdn1</span>
+      SH:BH … <span class="hl">sdn1</span>
+    SH:<span class="hl">SS</span>  … <span class="hl">sldb</span>          ← 滑塊</pre>
+  <p><strong>真正的證據是貼圖的名字，不是數量。</strong></p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>貼圖名</th><th class="num">出現次數</th><th>拆開來讀</th></tr></thead>
+    <tbody>
+      <tr><td data-label="貼圖名"><code>sup0</code> / <code>sup1</code></td><td data-label="出現次數" class="num">151 / 229</td>
+          <td data-label="拆開來讀"><strong>s</strong>croll <strong>up</strong> 的兩個狀態</td></tr>
+      <tr><td data-label="貼圖名"><code>sdn0</code> / <code>sdn1</code></td><td data-label="出現次數" class="num">151 / 229</td>
+          <td data-label="拆開來讀"><strong>s</strong>croll <strong>d</strong>ow<strong>n</strong></td></tr>
+      <tr><td data-label="貼圖名"><code>sldv</code></td><td data-label="出現次數" class="num">128</td>
+          <td data-label="拆開來讀"><strong>sl</strong>i<strong>d</strong>er <strong>v</strong>ertical，軌道</td></tr>
+      <tr><td data-label="貼圖名"><code>sldb</code></td><td data-label="出現次數" class="num">126</td>
+          <td data-label="拆開來讀"><strong>sl</strong>i<strong>d</strong>er <strong>b</strong>utton，滑塊</td></tr>
+    </tbody>
+  </table></div>
+  <p>結構本身也一致到不像巧合：</p>
+  <ul>
+    <li><strong>128 / 128（100%）</strong>的直屬子元素組合都是
+        <code>BU:SU + SH:SB + BU:SD + SH:SS</code>（上捲鈕、軌道、下捲鈕、滑塊）</li>
+    <li><strong>127 / 128（99.2%）</strong>的父群組直接叫 <code>GR:VSCROLL</code>。
+        剩下 1 個在 <code>GR:PLAYBYPLAY</code> 底下 —— 那是<u>播報文字的捲動區</u>，同樣說得通</li>
+  </ul>
+  <div class="card clay">
+    <p class="card-h">⚠️ 一併推翻一個順手寫下的說法：「X 貼著畫面左右邊」</p>
+    <p>本站的內部筆記曾經寫過「<u>VS 的 X 座標貼著畫面左右邊</u>」，當成佐證之一。
+       <strong>實測不成立。</strong>128 個的 X 座標落在 <strong>19 到 600</strong> 之間，
+       <u>貼畫面左緣（&lt;10）0 個、貼右緣（&gt;630）0 個</u>。</p>
+    <p>正確的說法是<strong>貼在它服務的那個清單面板側邊</strong>。
+       上面那個例子裡，<code>GG:FILETABLE</code> 從 X=50 佔到 590，
+       捲軸就在 X=560 —— 貼的是<u>面板</u>不是畫面。</p>
+  </div>
+  <p class="small">上表 <code>VS</code> 那一列的「9」維持不變 ——
+     <u>那一欄算的是 <code>ingame.big</code></u>。本節的 128 是把六個封裝檔全部算進來的。
+     <a href="how-we-measured.html">口徑說明見這裡</a>。</p>
+  <p class="small">（2026-09-05 訂正：本節原本寫 <code>VS</code> 有 <strong>228 個</strong>。
+     那個數字是掃了本站測試機資料夾裡的每一個 <code>.big</code> 算出來的，
+     而那台機器上除了 <code>frontend.big</code>，還躺著一份<u>逐位元組相同</u>的副本
+     （兩者 SHA-256 完全一樣），於是<strong>同一份東西被數了兩次</strong>。
+     照本站一貫的「<a href="fel-archives.html">六個封裝檔、332 個版面檔</a>」口徑重量是 <strong>128 個</strong>，
+     上面的貼圖次數、子元素組合、父群組與 X 座標範圍都已跟著重量。
+     <u>結論不變：<code>VS</code> 是直向捲軸。</u>）</p>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> <code>.fel</code> 外面包一層壓縮，解開後是<strong>純文字腳本</strong>，每行一個元件、縮排代表層級，名稱後面第 1 個參數就是顯示開關，看懂這頁就能改遊戲裡幾乎所有介面。</li>
+    <li><strong>規模</strong> <code>ingame.big</code> 47 個版面檔、<strong>22,516 行</strong>、410 個畫面、22 種指令、4,272 個群組，壓縮前後 1,560,268 → 195,999（壓到 13%）。座標一律填 640×480 的值（<u>遊戲怎麼把它換算到你的實際解析度，本站沒有量過</u>）；想移走而不是關掉，把 X 改成大於 640 即可。</li>
+    <li><strong>最容易踩的坑</strong> 同一個元件在同一個檔裡有好幾份。<code>fes_hudleft.fel</code> 的 <code>TX:BALLS</code> 出現 <strong>6 次</strong>、分屬三個畫面；<code>fes_ingamesettings.fel</code> 的 <code>SH:F5</code> 出現 <strong>191 次</strong>。所以定位要用「檔名 ＋ 行號」或「畫面代號 ＋ 上層群組路徑」，<u>不要用名字</u>。</li>
+    <li><strong>五條 100% 成立的巢狀規則</strong> <code>SE</code> 掛 <code>SL</code> 1684/1684、<code>TE</code> 掛 <code>TL</code> 563/563、<code>FR</code> 掛 <code>FC</code> 3605/3605、<code>LF</code> 掛 <code>SC</code> 142/142、<code>SC</code> 一定在頂層 410/410。另一件量得出來的事：群組不記錄自己底下有幾個，3,951 個同樣是 18 欄的群組，直接子元素從 0 個到 32 個都有，還有 792 個空群組。</li>
+    <li><strong>本站訂正過的兩處</strong> 指令表原本寫「<code>VR</code> 固定 78」與「<code>TS</code> 是編譯時間」，重量後兩條都不對，<code>VR</code> 實際有 78 / 71 / 69 三種值，<code>TS</code> 那 17 行內容一模一樣都是 <code>TS:CROPLOGOS,</code>，不可能是時間戳。錯字那一節原本叫「<u>原廠檔案裡</u>有兩個錯字」，拿原版一驗也不成立：原版全遊戲 329 個版面檔一個三字母指令都沒有，而錯字所在的 <code>fes_ingameinfobar.fel</code> 在原版的 <code>ingame.big</code> 裡根本不存在（原版只有 44 個版面檔）。</li>
+    <li><strong>第三處訂正順便推翻了自己寫的佐證</strong> <code>VS</code> 從「用途未知」升級成<strong>直向捲軸</strong>，原因是樣本太小（上表只算 <code>ingame.big</code> 的 9 個，把六個封裝檔的 332 個版面檔全部算進來才是 128 個 —— 這個數字 2026-09-05 訂正過，原本寫 228 是把 <code>frontend.big</code> 與測試機上另一份逐位元組相同的副本各數了一次）。真正的證據是貼圖名字 <code>sup0</code>／<code>sdn0</code>／<code>sldv</code>／<code>sldb</code>，加上 128/128 的子元素組合相同、127/128 的父群組叫 <code>GR:VSCROLL</code>。而本站內部筆記寫過的「<u><code>VS</code> 的 X 座標貼著畫面左右邊</u>」實測不成立：128 個的 X 落在 19 到 600，貼左緣 0 個、貼右緣 0 個，正確講法是<strong>貼在它服務的那個面板側邊</strong>。</li>
+    <li><strong>三條鐵律</strong> 一、存回 <code>.big</code> 只能接到檔尾，<u>本站測試機那份</u> <code>ingame.big</code> 全檔 2,665,562 bytes 但目錄只指到 195,999（7.4%），重新打包會把其餘 92.6% 靜悄悄丟掉（實測 2.5 MB 變 198 KB，<u>不會有任何錯誤訊息</u>）；剛安裝好的原版是 167,682 bytes、44 個版面檔、孤兒只有 0.04%，所以這條的理由是<u>你不知道手上這份被疊過什麼</u>。二、要關單一元素改它自己那行，父群組的開關會被遊戲程式執行時覆寫。三、<code>.fel</code> 全部是 CRLF，47 個檔零混入，改完要確認<strong>檔案長度跟改前一模一樣</strong>，連檔尾有沒有換行都要先看。</li>
+    <li><strong>本站沒驗的</strong> 那兩行三字母指令遊戲拿它們怎麼辦<u>沒有驗證</u>，是哪一個工具或哪一次改動造成的也查不出來；<code>SG</code> 的用途、<code>KA</code> 那 403 欄浮點數都還沒解讀；<u>遊戲怎麼把 640×480 這個版面座標系換算到你的實際解析度，本站也沒有量過</u>。另外附一條方法上的教訓：換行符第一次量錯，因為 <code>datafile.big</code> 裡那 460 個 <code>.txt</code> 全是壓縮的，直接在壓縮位元組裡數會得到一堆假的「混合」，<strong>量之前先問「我的量法本身可信嗎」</strong>。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../tutorials/fel-toolkit/index.html">介面萬用工具</a> —— 用名字找到並關掉任何元素，不用手動翻檔案</li>
+    <li><a href="ingame-files.html">ingame.big 47 個版面檔對照</a> —— 想改哪塊畫面，先找對檔案（可搜尋）</li>
+    <li><a href="hud-map.html">介面座標圖</a> —— 座標欄位畫成圖：哪個元素在畫面哪裡</li>
+    <li><a href="../tutorials/hide-runner-speed/index.html">實戰教學：關掉跑壘者速度數值</a> —— 完整走一次流程</li>
+    <li><a href="qfs.html">QFS 壓縮</a> —— <code>.fel</code> 外面包的那一層</li>
+  </ul>
+
+  <footer>
+    <p>本頁所有數字皆為現場解開遊戲的封裝檔量測所得 ——
+       沒有另外註明母體的那些算的是 <code>ingame.big</code>，
+       換行符那張表與 <code>VS</code> 那一節另有註明；
+       標示為「命名佐證」「推測」「未確認」「未驗證」之處未經證實，本站不寫成定論。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

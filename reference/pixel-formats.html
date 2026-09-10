@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/pixel-formats.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>圖片的像素怎麼排 — toni的MVP模組補習班</title>
+<meta name="description" content="大頭照與臉皮的像素編碼解開了,而且拿計算機就能驗:像素位元組數除以寬除以高,48,885 張圖沒有一張例外。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 圖片的像素怎麼排</p>
+  <h1>圖片的像素怎麼排</h1>
+  <p class="lede"><a href="portrait.html">大頭照</a>與<a href="models.html">臉皮</a>那兩頁各留了一個「未解」：
+     知道格式代號、知道尺寸，<strong>但不知道像素是怎麼排的</strong>。
+     這頁把它解開 —— 而且不用寫程式，<u>拿計算機就能驗</u>。</p>
+
+  <h2>先講清楚：什麼是實測，什麼只是名字</h2>
+  <div class="card amber">
+    <p class="card-h">「代號叫什麼」跟「像素怎麼排」是兩件事</p>
+    <p><strong>像素怎麼排 = 實測。</strong>照規則解出來是一張正常的人臉，就是對的；
+       排錯一個位元組，臉會立刻散成雜訊。</p>
+    <p><strong>代號叫什麼名字 = 只是索引。</strong>名字對不對，不影響你能不能改圖。</p>
+    <p class="small">這個區分不是講究 —— 本站在做這頁的時候，
+       <u>發現自己工具裡那張「代號 → 名字」的表有三格是錯的</u>。見<a href="#wrong">下面</a>。</p>
+  </div>
+
+  <h2 id="arith">算術自證：拿計算機就能驗</h2>
+  <p>區塊壓縮的規則只有一條：<strong>畫面切成 4×4 的小方塊，每個方塊固定用同樣多的位元組。</strong>
+     只有兩種方塊大小 —— <strong>8 個</strong>或 <strong>16 個</strong>位元組。</p>
+
+  <figure class="figbox">
+  <div class="figscroll">
+<svg class="blockmap" viewBox="-6 -6 692 262" role="img" aria-label="4×4 區塊壓縮示意圖:16 個像素壓成 8 或 16 個位元組">
+<rect x="8" y="44" width="11.5" height="11.5" class="px"/>
+<rect x="21" y="44" width="11.5" height="11.5" class="px"/>
+<rect x="34" y="44" width="11.5" height="11.5" class="px"/>
+<rect x="47" y="44" width="11.5" height="11.5" class="px"/>
+<rect x="8" y="57" width="11.5" height="11.5" class="px"/>
+<rect x="21" y="57" width="11.5" height="11.5" class="px"/>
+<rect x="34" y="57" width="11.5" height="11.5" class="px"/>
+<rect x="47" y="57" width="11.5" height="11.5" class="px"/>
+<rect x="8" y="70" width="11.5" height="11.5" class="px"/>
+<rect x="21" y="70" width="11.5" height="11.5" class="px"/>
+<rect x="34" y="70" width="11.5" height="11.5" class="px"/>
+<rect x="47" y="70" width="11.5" height="11.5" class="px"/>
+<rect x="8" y="83" width="11.5" height="11.5" class="px"/>
+<rect x="21" y="83" width="11.5" height="11.5" class="px"/>
+<rect x="34" y="83" width="11.5" height="11.5" class="px"/>
+<rect x="47" y="83" width="11.5" height="11.5" class="px"/>
+<text x="8" y="113" class="sm">4×4 = 16 個像素</text>
+<path d="M72 68 L98 68" class="ar"/>
+<polygon points="97,63 104,68 97,73" class="ah"/>
+<text x="74" y="60" class="sm">壓成</text>
+<text x="116" y="33" class="lb">臉皮 <tspan class="hx">0x60</tspan> — 每塊 <tspan class="em">8</tspan> 個位元組</text>
+<rect x="116.0" y="44" width="137.0" height="30" class="by c1"/>
+<text x="184.5" y="63" class="bt">底色 1</text>
+<rect x="255.0" y="44" width="137.0" height="30" class="by c1"/>
+<text x="323.5" y="63" class="bt">底色 2</text>
+<rect x="394.0" y="44" width="276.0" height="30" class="by c2"/>
+<text x="532.0" y="63" class="bt">16 個 2 位元索引</text>
+<text x="116" y="91" class="sm">一個像素只花 <tspan class="em">0.5</tspan> 個位元組</text>
+<text x="116" y="129" class="lb">大頭照 <tspan class="hx">0x61</tspan> — 每塊 <tspan class="em">16</tspan> 個位元組</text>
+<rect x="116.0" y="140" width="276.0" height="30" class="by c3"/>
+<text x="254.0" y="159" class="bt">16 個像素的透明度</text>
+<rect x="394.0" y="140" width="67.5" height="30" class="by c1"/>
+<text x="427.8" y="159" class="bt">底色 1</text>
+<rect x="463.5" y="140" width="67.5" height="30" class="by c1"/>
+<text x="497.2" y="159" class="bt">底色 2</text>
+<rect x="533.0" y="140" width="137.0" height="30" class="by c2"/>
+<text x="601.5" y="159" class="bt">2 位元索引</text>
+<text x="116" y="187" class="sm">一個像素花 <tspan class="em">1.0</tspan> 個位元組 —— 多出來的那 8 個全是透明度</text>
+<text x="8" y="242" class="sm">顏色怎麼來：每個像素的 2 位元索引,在「底色 1、底色 2,或兩者之間的兩種混色」裡四選一</text>
+</svg>
+  </div>
+  <figcaption>兩種區塊的位元組怎麼分配。這張圖是照量到的排列方式畫的，不是遊戲畫面。</figcaption>
+  </figure>
+
+  <p>知道這條規則，就能自己算。<a href="portrait.html">大頭照那頁</a>已經量到
+     「每張圖的像素資料都是 65,536 bytes」，代進去：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>圖</th><th>尺寸</th><th>算式</th><th class="num">結果</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="圖">臉皮 <code>0x60</code></td><td data-label="尺寸">256 × 512</td>
+          <td data-label="算式" class="mono">(256÷4) × (512÷4) × 8<br>= 64 × 128 × 8</td>
+          <td data-label="結果" class="num"><strong>65,536</strong> ✅</td></tr>
+      <tr class="hi"><td data-label="圖">大頭照 <code>0x61</code></td><td data-label="尺寸">256 × 256</td>
+          <td data-label="算式" class="mono">(256÷4) × (256÷4) × 16<br>= 64 × 64 × 16</td>
+          <td data-label="結果" class="num"><strong>65,536</strong> ✅</td></tr>
+      <tr><td data-label="圖">小張的 <code>0x61</code></td><td data-label="尺寸">128 × 128</td>
+          <td data-label="算式" class="mono">(128÷4) × (128÷4) × 16<br>= 32 × 32 × 16</td>
+          <td data-label="結果" class="num">16,384 ✅</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>算式只有一種填法對得起來。</strong>
+     同一個代號換一個尺寸照樣成立 —— 所以不是湊出來的。</p>
+
+  <div class="card grass">
+    <p class="card-h">更好記的驗法：一個像素花幾個位元組</p>
+    <p>把「像素資料的位元組數 ÷ 寬 ÷ 高」算出來：</p>
+<pre style="margin:8px 0 0"><code>0x60  →  永遠是 0.5
+0x61  →  永遠是 1.0</code></pre>
+    <p style="margin-top:8px">本站走過兩個倉庫裡<strong>全部 48,885 張圖</strong>，
+       <u>沒有任何一張算出別的數字</u>。這代表代號真的決定了像素排法。</p>
+  </div>
+
+  <h2>解出來長什麼樣</h2>
+  <p>本站照上面的規則實際解了兩張（<strong>EA 原廠的圖不會放上站</strong>，那是遊戲的內容。
+     社群自己做的模組另當別論，見<a href="../tutorials/uniforms/index.html">球衣那一課</a>）：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>來源</th><th>代號</th><th>解出來看到什麼</th></tr></thead>
+    <tbody>
+      <tr><td data-label="來源" class="mono">portrait.big<br>的一張大頭照</td><td data-label="代號" class="mono">0x61</td>
+          <td data-label="解出來看到什麼"><strong>一張正常的球員證件照</strong> —— 球帽、隊徽、五官、膚色、帽沿陰影全部正常</td></tr>
+      <tr><td data-label="來源" class="mono">models.big<br>的一張臉皮</td><td data-label="代號" class="mono">0x60</td>
+          <td data-label="解出來看到什麼"><strong>一張攤平的 3D 貼圖</strong> —— 正中央是攤開的臉、兩側耳朵被拉到邊緣、
+              上方是頭髮、下面一條是脖子；<u>左下角另外放了兩顆眼球、右下角放了牙齒</u></td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>看到的東西本身就是最強的證據。</strong>一個位元組排錯，人臉會立刻散成條紋雜訊。</p>
+
+  <h2>第二次獨立驗證：透明度層</h2>
+  <p><code>0x61</code> 每個方塊多出來的 8 個位元組是透明度。把它單獨畫成黑白圖：</p>
+  <ul class="tick">
+    <li>得到一個<strong>乾淨的頭肩剪影</strong>，輪廓跟彩色圖完全對得上</li>
+    <li>65,536 個像素裡，<strong>36,194 個完全不透明、27,610 個完全透明</strong>，中間值很少</li>
+    <li>透明區域的連通塊：隨機 30 張裡<strong>中位數只有 1 塊</strong>
+        <br><span class="small">但不是上限 —— 有一張長捲髮球員的髮絲把背景切碎，
+        連通塊 64 塊。已確認不是解錯：那張圖解出來是完全正常的證件照。
+        <strong>「中位數 1 塊」可以寫，「最多只有幾塊」這種上限句不能寫</strong> ——
+        30 張的抽樣抽不到極端值。</span></li>
+  </ul>
+  <p>如果透明度解錯了，會得到滿版雜點、幾千個碎塊。
+     <strong>得到一個完整剪影，等於第二次獨立驗證。</strong></p>
+  <p class="small">臉皮 <code>0x60</code> 則相反：隨機 30 張、合計三百九十多萬個像素，
+     <strong>完全透明的像素是 0 個</strong> —— 臉皮是不透明貼圖。</p>
+
+  <h2>九個代號各是什麼</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">代號</th><th class="num">每像素</th><th>排列方式</th><th>憑什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="代號" class="mono">0x60</td><td data-label="每像素" class="num">0.5</td>
+          <td data-label="排列方式">4×4 區塊，每塊 8 bytes<br><span class="small">兩個底色 + 16 個 2 位元索引</span></td>
+          <td data-label="憑什麼"><span class="badge ok">實測</span> 解出真實臉皮</td></tr>
+      <tr class="hi"><td data-label="代號" class="mono">0x61</td><td data-label="每像素" class="num">1.0</td>
+          <td data-label="排列方式">4×4 區塊，每塊 16 bytes<br><span class="small">前 8 bytes 是透明度，後 8 bytes 同上</span></td>
+          <td data-label="憑什麼"><span class="badge ok">實測</span> 解出真實證件照 + 剪影</td></tr>
+      <tr><td data-label="代號" class="mono">0x6D</td><td data-label="每像素" class="num">2.0</td>
+          <td data-label="排列方式">每像素 2 bytes，<strong>四個四位元：透明度、紅、綠、藍</strong></td><td data-label="憑什麼"><span class="badge ok">實測</span> 解 2009 台灣模組的打擊頭盔，換成 1-5-5-5 排法整張變桃紅色</td></tr>
+      <tr><td data-label="代號" class="mono">0x78</td><td data-label="每像素" class="num">2.0</td>
+          <td data-label="排列方式">每像素 2 bytes，<strong>紅 5 位元、綠 6 位元、藍 5 位元</strong>，沒有透明度</td><td data-label="憑什麼"><span class="badge ok">實測</span> 解 2009 台灣模組的球衣，換成 1-5-5-5 顏色偏綠、換成 4-4-4-4 整片桃紅</td></tr>
+      <tr class="hi"><td data-label="代號" class="mono">0x7B</td><td data-label="每像素" class="num"><strong>1.0</strong></td>
+          <td data-label="排列方式">每像素 1 個位元組 = <strong>調色盤索引</strong>。
+              調色盤就在<u>緊接著的 <code>0x2A</code> 區塊</u>裡（256 筆 × 4 bytes），見下</td>
+          <td data-label="憑什麼"><span class="badge ok">實測</span> 剛安裝好的原版裡 9 筆記錄（3 張相異的圖）</td></tr>
+      <tr><td data-label="代號" class="mono">0x7D</td><td data-label="每像素" class="num">4.0</td>
+          <td data-label="排列方式">每像素 4 bytes，順序是<strong>藍、綠、紅、透明度</strong></td><td data-label="憑什麼"><span class="badge ok">實測</span></td></tr>
+      <tr><td data-label="代號" class="mono">0x7E</td><td data-label="每像素" class="num">—</td>
+          <td data-label="排列方式">外部說明書說是 16 位元 1:5:5:5（含透明度）</td>
+          <td data-label="憑什麼"><span class="badge wip">未解</span> 本站在任何地方都<u>找不到樣本</u>，無從實測</td></tr>
+      <tr><td data-label="代號" class="mono">0x7F</td><td data-label="每像素" class="num">3.0</td>
+          <td data-label="排列方式">每像素 3 bytes，順序是<strong>藍、綠、紅</strong></td>
+          <td data-label="憑什麼"><span class="badge ok">實測</span> 照紅綠藍解整張臉是藍的，換成藍綠紅膚色才正常</td></tr>
+      <tr><td data-label="代號" class="mono">0x79</td><td data-label="每像素" class="num">0.5</td>
+          <td data-label="排列方式"><strong>4 位元索引色</strong>（每個位元組裝兩個像素），後面接一個
+              <code>0x2A</code> 調色盤區塊</td>
+          <td data-label="憑什麼"><span class="badge ok">實測</span> 字型 <code>au20b_en.ffn</code> 的
+              <code>0x2A</code> 區塊<u>正好 16 個項目</u>（<code>size</code> 欄位寫 80 =
+              16 + 16×4），全部是白色配 <code>0x00 0x11 0x22 …0xff</code> 的透明度階梯
+              —— <strong>2⁴ = 16 級,一個不多一個不少</strong>。
+              另外量到中文字型的字圖集是 1024×512、資料量 262,368 bytes，
+              <u>正好 0.500 bytes/像素</u></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card clay">
+    <p class="card-h">⚠️ 2026-08-28 訂正：<code>0x79</code> 本站原本寫「不是圖，永遠 1×1」</p>
+    <p><strong>原文是這樣寫的</strong>（留著給你對照）：</p>
+    <blockquote class="small" style="margin:6px 0 10px;padding-left:12px;border-left:3px solid var(--pre-line)">
+      <code>0x79</code>　—　<strong>不是圖</strong>。永遠 1×1，整筆記錄固定 32 個位元組。<br>
+      <span class="badge ok">實測</span> <code>uniforms.big</code> 的 431 個空球衣槽全部是它，431/431 都是 1×1
+    </blockquote>
+    <p><u>那個量測本身沒有錯</u> —— 球衣檔裡確實 431/431 都是 1×1。
+       <strong>錯在把「它在這個檔裡的用途」寫成了「這個格式的定義」。</strong></p>
+    <p>去量中文字型之後，同一個代號長這樣：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>樣本</th><th class="num">尺寸</th><th class="num">資料量</th><th class="num">每像素</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="樣本">中文 <code>twc14_en.ffn</code> 的字圖集</td><td data-label="尺寸" class="num">1024 × 512</td>
+            <td data-label="資料量" class="num">262,368</td><td data-label="每像素" class="num"><strong>0.500</strong></td></tr>
+        <tr><td data-label="樣本">英文 <code>au20b_en.ffn</code> 的字圖集</td><td data-label="尺寸" class="num">256 × 128</td>
+            <td data-label="資料量" class="num">16,592</td><td data-label="每像素" class="num">0.506</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>定案的證據是調色盤，不是尺寸。</strong>
+       <code>au20b_en.ffn</code> 的像素資料後面接著一個 <code>0x2A</code> 區塊，
+       它的 <code>size</code> 欄位寫 <strong>80 = 16 + 16×4</strong>，
+       裡面正好 <u>16 個項目</u>，全部是白色配 <code>00 11 22 33 …ff</code> 的透明度階梯：</p>
+<pre> # | R  G  B  A
+ 0 | ff ff ff <span class="hl">00</span>      ← 透明度 = 編號 × 17
+ 1 | ff ff ff <span class="hl">11</span>
+ 2 | ff ff ff <span class="hl">22</span>
+ …
+15 | ff ff ff <span class="hl">ff</span>      ← 16 級,一個不多一個不少</pre>
+    <p><strong>2⁴ = 16。</strong>4 位元的索引只能指到 16 個顏色，而它給的正好是 16 級抗鋸齒灰階
+       —— 那是字型需要的東西。這不是「數量剛好對得上」，這是格式定義本身。</p>
+    <p class="small">本站下載腳本裡的 <code>0x79: 'EMPTY_1x1'</code> 已經同步改成 <code>'PAL4'</code>。
+       <u>這一次沒有重蹈下面那一節的覆轍</u>。這個代號的實際後果見
+       <a href="../tutorials/fix-chinese/index.html">中文版配大球場就跳出</a>：
+       Direct3D 8 沒有 4 位元貼圖格式，所以中文字型每一張都要在執行時展開，
+       光字型就吃掉 13.50 MB。</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">⚠️ 2026-08-28：那個訂正<u>從來沒有進到程式碼</u></p>
+    <p>本頁下面「<a href="#selfcaught">本站工具裡的名字有三格是錯的</a>」那一節，
+       是這頁上線時就寫好的。<strong>但被指出錯的那份程式碼，一直沒有改。</strong>
+       同一份「代號 → 名字」字典出現在<strong>當時的五支下載腳本</strong>裡
+       （做新臉皮、換大頭照、裝球衣、拆封裝檔、清孤兒），五份一模一樣、五份都是舊的。</p>
+    <p>而且複驗時發現不只名字錯，還<strong>少了兩個代號</strong>：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>代號</th><th class="num">量到的每像素</th><th>腳本原本的字典</th><th>後果</th></tr></thead>
+      <tbody>
+        <tr><td data-label="代號" class="mono">0x6D</td><td data-label="量到的每像素" class="num">2.0</td><td data-label="腳本原本的字典"><code>ARGB32</code>（=4 bytes）</td><td data-label="後果">顯示錯名字</td></tr>
+        <tr><td data-label="代號" class="mono">0x7B</td><td data-label="量到的每像素" class="num">1.0</td><td data-label="腳本原本的字典"><code>ARGB16_1555</code>（=2 bytes）</td><td data-label="後果">顯示錯名字</td></tr>
+        <tr><td data-label="代號" class="mono">0x7D</td><td data-label="量到的每像素" class="num">4.0</td><td data-label="腳本原本的字典"><code>RGB24</code>（=3 bytes）</td><td data-label="後果">顯示錯名字</td></tr>
+        <tr class="hi"><td data-label="代號" class="mono">0x7F</td><td data-label="量到的每像素" class="num">3.0</td><td data-label="腳本原本的字典">沒有這一格</td><td data-label="後果"><strong>會擋掉真實的檔</strong></td></tr>
+        <tr class="hi"><td data-label="代號" class="mono">0x79</td><td data-label="量到的每像素" class="num">0.5</td><td data-label="腳本原本的字典">沒有這一格</td><td data-label="後果"><strong>同上</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>後兩列有真實後果。</strong>那份字典同時被當成守門員
+       （<code>if code not in FSH_FORMATS: raise …</code>），
+       所以<a href="../tutorials/new-face/index.html">做新臉皮</a>那支腳本會拒絕 <code>models.big</code> 裡
+       <strong>45 個真實存在的檔</strong>（<code>g001.fsh</code>–<code>g045.fsh</code>）。實測前後：</p>
+<pre><code>修之前   g001.fsh → ❌ 沒見過的格式代號 0x7F
+修之後   g001.fsh → 0x7F (RGB24) 128x128 · 像素 49152 bytes · 每像素 3.000</code></pre>
+    <p><code>128 × 128 × 3 = 49,152</code>，算術自己對上。
+       名字錯的那三格只影響顯示，不會寫壞檔（寫入前另有一道尺寸守衛）。
+       <strong>五支腳本與頁面附錄都已同步。</strong>
+       （2026-09-05 補：後來又有三支腳本帶了同一份字典 ——
+       <a href="../tutorials/swap-splash/index.html">換掉開機畫面</a>、
+       <a href="../tutorials/team-logo/index.html">換球隊隊徽</a>、
+       <a href="../tutorials/auto-install/index.html">一整包模組自動歸位</a> ——
+       現在是<strong>八支</strong>。八份的九行逐字相同，都是改好之後的版本。）</p>
+    <p class="small">⭐ 這個錯的形狀值得記：<u>把錯誤寫進文件，不等於修好了它</u>。
+       而且六道檢查器一道都沒抓到 —— 它們查連結、標籤、數字一致性，
+       但沒有一道會去比對「頁面上的結論」與「附在頁面上的程式碼」。
+       已補上第九道檢查專門做這件事。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h" id="fshtool">⭐ 2026-08-28：一份 2002 年的說明書，把上面整張表背書了一次</p>
+    <p>上面那張表的每像素位元組數，全部是本站自己在剛安裝好的原版上量出來的。
+       後來在舊資料裡翻到 <strong>FSHTOOL 1.22</strong>（Denis Auroux，1998–2002）的說明書，
+       它直接列了格式表 —— <u>本站量到的每一格都對上</u>：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th>代號</th><th>那份說明書寫的</th><th class="num">它隱含的每像素</th><th class="num">本站量到的</th></tr></thead>
+      <tbody>
+        <tr><td data-label="代號" class="mono">0x60</td><td data-label="那份說明書寫的">DXT1 compressed</td><td data-label="它隱含的每像素" class="num">0.5</td><td data-label="本站量到的" class="num">0.5 ✅</td></tr>
+        <tr><td data-label="代號" class="mono">0x61</td><td data-label="那份說明書寫的">DXT3 compressed (with alpha channel)</td><td data-label="它隱含的每像素" class="num">1.0</td><td data-label="本站量到的" class="num">1.0 ✅</td></tr>
+        <tr><td data-label="代號" class="mono">0x6D</td><td data-label="那份說明書寫的">16-bit 4:4:4:4 (with alpha channel)</td><td data-label="它隱含的每像素" class="num">2.0</td><td data-label="本站量到的" class="num">2.0 ✅</td></tr>
+        <tr><td data-label="代號" class="mono">0x78</td><td data-label="那份說明書寫的">16-bit 0:5:6:5</td><td data-label="它隱含的每像素" class="num">2.0</td><td data-label="本站量到的" class="num">2.0 ✅</td></tr>
+        <tr class="hi"><td data-label="代號" class="mono">0x7B</td><td data-label="那份說明書寫的"><strong>8-bit (with palette)</strong></td><td data-label="它隱含的每像素" class="num">1.0</td><td data-label="本站量到的" class="num">1.0 ✅</td></tr>
+        <tr><td data-label="代號" class="mono">0x7D</td><td data-label="那份說明書寫的">32-bit 8:8:8:8 (with alpha channel)</td><td data-label="它隱含的每像素" class="num">4.0</td><td data-label="本站量到的" class="num">4.0 ✅</td></tr>
+        <tr><td data-label="代號" class="mono">0x7E</td><td data-label="那份說明書寫的">16-bit 1:5:5:5 (with alpha channel)</td><td data-label="它隱含的每像素" class="num">2.0</td><td data-label="本站量到的" class="num">找不到樣本</td></tr>
+        <tr><td data-label="代號" class="mono">0x7F</td><td data-label="那份說明書寫的">24-bit 0:8:8:8</td><td data-label="它隱含的每像素" class="num">3.0</td><td data-label="本站量到的" class="num">3.0 ✅</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>兩邊互相獨立</strong>：那份說明書是 2002 年為另一款遊戲寫的，
+       本站的數字是 2026 年在這款遊戲的檔案上量的。<u>七格全中。</u></p>
+    <p class="small">⚠️ 但要照本站自己的規矩分開講：<u>「每像素幾個位元組」是量到的，
+       「代號叫什麼名字」是那份說明書說的</u>。這兩件事的強度不一樣。
+       <code>0x7E</code> 就是例子 —— 說明書給了它名字，但本站一張樣本都沒有，
+       所以它的徽章仍然是「未解」。</p>
+    <p class="small">那份說明書還有一條本站原本不知道的規則：
+       <strong>代號 +0x80 代表「這張圖本身是壓縮過的」</strong>。
+       本站在兩個倉庫裡沒有遇過這種代號，記在這裡備查。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h" id="pal">⭐ <code>0x7B</code> 的調色盤找到了 —— 就在同一個檔裡，接在圖片後面</p>
+    <p>本站原本寫「每像素 1 個位元組，<u>內部排法未解</u>」。
+       缺的那一半是<strong>調色盤</strong>，而它一直都在同一個檔案裡 ——
+       只是不在 SHPI 目錄上，要順著<u>圖片記錄自己的長度欄位</u>往下走才看得到。</p>
+    <p>拿 <code>data\igshapes\igcrsr1.fsh</code> 走一次，每一筆的鏈都長這樣：</p>
+<pre><code><span class="hl">0x7B</span> 圖片 16,400 bytes (128×128)
+  → <span class="hl">0x2A</span> 調色盤 1,040 bytes
+  → 0x69 附掛文字 80 bytes
+  → 0x70 結束</code></pre>
+    <p><strong>算術自己對上</strong>：<code>1,040 = 16（區塊表頭）+ 256 × 4</code>，
+       而那個區塊的「寬高」欄位寫的正是 <code>256, 1</code> —— 就是「256 筆」。
+       <code>(1040 − 16) ÷ 256 = 4.00</code>，一個顏色四個位元組。</p>
+    <p><strong>第二個獨立驗證</strong>：這 256 筆裡<u>每一筆的第 4 個位元組都是 255，只有索引 0 是 0</u>。
+       而索引 0 在那張 128×128 的圖裡佔了 <strong>14,433 / 16,384 個像素（88%）</strong> ——
+       那是游標圖的透明背景。<u>第 4 個位元組確實是透明度</u>，
+       而且「最常用的索引剛好是透明的那一個」不可能是巧合。</p>
+    <p><span class="badge ok">2026-08-29 第三個獨立驗證</span>
+       「第 4 個位元組是透明度」現在有<u>另一個格式</u>的佐證。
+       字型檔裡的 <code>0x79</code> 圖片後面也接著一個 <code>0x2A</code> 調色盤，
+       而 <code>au20b_en.ffn</code> 那一張長這樣：</p>
+<pre> # | R  G  B  A
+ 0 | ff ff ff <span class="hl">00</span>
+ 1 | ff ff ff <span class="hl">11</span>
+ 2 | ff ff ff <span class="hl">22</span>
+ …
+15 | ff ff ff <span class="hl">ff</span>      ← 16 筆,透明度 = 編號 × 17</pre>
+    <p><strong>RGB 三格全部是 <code>ff</code>（純白），只有第 4 格從 0 均勻爬到 255。</strong>
+       兩個不同的格式、兩批不同的檔案，都指向同一個結論。
+       （這也順便定死了 <code>0x79</code> 是 4 位元 ——
+       <u>2⁴ = 16 筆，一筆不多一筆不少</u>。）</p>
+    <p class="small">⚠️ 沒解開的：這三個檔一共九個調色盤，其中<strong>七個是 256 筆全部灰階</strong>
+       （R=G=B）；剩下兩個（<code>feonlyln.big</code> 與 <code>igcrsr9.fsh</code> 的
+       <code>BPP4</code>）各有 <strong>133 筆</strong>不是灰階，但那 133 筆裡有
+       <u>118 筆第 1 個與第 3 個位元組相等</u>，差的只有中間那一格 ——
+       而 RGB 與 BGR 兩種順序，中間那一格都是綠。
+       所以<u>本站還是無法判斷前三個位元組的順序是 RGB 還是 BGR</u>。
+       要判斷得找一張真正彩色的 <code>0x7B</code>。
+       <br><span class="badge ok">2026-08-29 補掃</span>
+       本站把<u>裝滿模組的測試機</u>也整套掃了一次（424 個封裝檔與 <code>.fsh</code>）
+       —— <strong>還是那 9 筆，一筆不多</strong>，而且最大彩度只有 21（近乎全灰）。
+       所以「找不到彩色樣本」不是沒有找，是<u>這款遊戲裡就沒有</u>。
+       <br>（2026-09-05 訂正：上面那句原本寫「這三個檔的調色盤 256 筆全部是灰階」，
+       那跟這一句自己量到的「最大彩度只有 21」互相矛盾 —— 真的每一筆 R=G=B 的話，
+       最大彩度必定是 0。<strong>結論沒有變，錯的是理由。</strong>）
+       <span class="badge wip">未解</span></p>
+    <p class="small">⚠️ 想自己寫工具的話有個坑：調色盤資料<u>不是從區塊起點開始</u>，
+       前面有 <strong>16 個位元組的區塊表頭</strong>。少扣這 16 個，
+       會把表頭當成前四個顏色。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h" id="found">我們改過這一段：0x7B 找到了</p>
+    <p>這頁上線時把 <code>0x7B</code> 標成「兩個倉庫裡一張都沒有，無法實測」。
+       後來拿到<a href="../tutorials/whats-original/index.html">剛安裝好、從未改動的原版</a>，
+       把整套安裝掃了一次 —— <strong>52,747 筆影像記錄裡，有 9 筆是 <code>0x7B</code></strong>。</p>
+    <p>它們不在大頭照或臉皮那兩個倉庫裡，所以之前才找不到。實際位置是：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th class="mono">檔案</th><th class="num">筆數</th><th>項目名稱</th><th class="num">尺寸</th></tr></thead>
+      <tbody>
+        <tr><td data-label="檔案" class="mono">data\frontend\feonlyln.big</td><td data-label="筆數" class="num">3</td>
+            <td data-label="項目名稱" class="mono">BPP4 · BPP5 · BPP6</td><td data-label="尺寸" class="num">128×128</td></tr>
+        <tr><td data-label="檔案" class="mono">data\igshapes\igcrsr9.fsh</td><td data-label="筆數" class="num">3</td>
+            <td data-label="項目名稱" class="mono">BPP4 · BPP5 · BPP6</td><td data-label="尺寸" class="num">128×128</td></tr>
+        <tr><td data-label="檔案" class="mono">data\igshapes\igcrsr1.fsh</td><td data-label="筆數" class="num">3</td>
+            <td data-label="項目名稱" class="mono">BPP2 · BPP3 · FTM2</td><td data-label="尺寸" class="num">128×128 ×2、128×64 ×1</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>每像素剛好 1.000 個位元組</strong>，9 筆全部整除：
+       128×128 的 payload 是 16,384、128×64 的是 8,192。</p>
+    <p class="small">要說清楚的是 <strong>9 筆記錄不等於 9 張圖</strong> ——
+       把像素資料取 md5，只有 <u>3 種</u>（一張 128×128 出現 6 次、另一張出現 2 次、128×64 那張 1 次）。
+       同樣的 9 筆在原版繁中安裝裡也找得到，內容相同。</p>
+    <p class="small"><strong>還沒解開的是它的內部排法。</strong>
+       每像素 1 個位元組跟 <code>0x61</code> 一樣，但 <code>0x61</code> 是 4×4 區塊，
+       <code>0x7B</code> 看起來不是 —— 本站沒有把它解出來，也不猜。
+       <span class="badge wip">未解</span></p>
+    <p class="small">項目名稱 <code>BPP2</code> 到 <code>BPP6</code> 看起來像在講「每像素幾位元」，
+       但這六筆<u>格式代號全部都是 <code>0x7B</code></u>，沒有對應到不同格式。
+       名字是什麼意思，本站不知道。</p>
+  </div>
+  <p class="small">順帶解釋一件<a href="portrait.html">大頭照那頁</a>量到但沒說明原因的事：
+     <code>0x7D</code> 的 128×128 × 4 bytes 跟 <code>0x61</code> 的 256×256 × 1 byte
+     <strong>剛好一樣大</strong>。一個是每像素四個位元組的完整色彩、一個是區塊壓縮，
+     平均差四倍，所以能塞的面積就差四倍。</p>
+
+  <h2>2026-08-29 再掃一次：把以前漏掉的一整類補進來</h2>
+  <p>上面那次掃描是 <strong>52,747 筆</strong>影像記錄。這次重掃，加了兩類以前沒走到的地方：</p>
+  <ul>
+    <li><strong>巢狀封裝檔</strong> —— 有些封裝檔裡<u>只裝一個壓縮過的封裝檔</u>
+        （見 <a href="source-traces.html">執行檔裡剩下的原始碼痕跡</a>）。
+        不多拆一層，裡面的東西在統計上等於不存在。</li>
+    <li><strong>散裝的 FSH 與單獨壓縮的檔</strong> —— 不在任何封裝檔裡的那些。</li>
+  </ul>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th></th><th class="num">上次</th><th class="num">這次</th></tr></thead>
+    <tbody>
+      <tr><td>掃到的影像記錄</td><td data-label="上次" class="num">52,747</td><td data-label="這次" class="num"><strong>105,834</strong></td></tr>
+      <tr><td>來源</td><td data-label="上次" class="num">封裝檔</td>
+          <td data-label="這次" class="num">封裝檔 + 巢狀 + 散裝</td></tr>
+      <tr><td>掃的是哪一台</td><td data-label="上次" class="num">剛安裝好的原版</td>
+          <td data-label="這次" class="num"><strong>裝滿模組的測試機</strong></td></tr>
+      <tr class="hi"><td><code>0x7B</code></td><td data-label="上次" class="num">9</td><td data-label="這次" class="num"><strong>還是 9</strong></td></tr>
+      <tr class="hi"><td><code>0x7E</code></td><td data-label="上次" class="num">0</td><td data-label="這次" class="num"><strong>還是 0</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>結論沒有變，<strong>但「沒有」這句話的份量變了</strong>：
+     以前是「在剛安裝好的原版上掃了五萬多筆沒找到」，現在是「連裝滿模組的測試機也掃了十萬多筆、
+     而且把以前漏掉的一整類補進來之後，還是沒找到」。
+     <u>否定句的可信度取決於你找過哪裡，不取決於你找了幾次。</u></p>
+  <p class="small">（2026-09-05 訂正：<strong>上面那兩欄不是同一台機器</strong>，本頁原本沒有講。
+     五萬多那次掃的是剛安裝好的原版，十萬多這次掃的是裝滿模組的測試機 ——
+     光是 <code>0x79</code> 就從 <strong>431</strong> 筆變成 <strong>568</strong> 筆，
+     那正是這台機器多出來的球衣槽（見<a href="../tutorials/uniforms/index.html">球衣那一課</a>）。
+     本站把剛安裝好的原版照這次的口徑（含巢狀與散裝，往下拆三層）重走一次，得到
+     <strong>52,822 筆</strong> —— 比上次只多 75 筆。
+     <u>所以筆數會翻倍，主要來自換了機器，不是來自補進巢狀與散裝那兩類。</u>
+     兩台都掃過，兩台都是 <code>0x7B</code> 9 筆、<code>0x7E</code> 0 筆，結論本身不受影響。）</p>
+  <div class="card amber">
+    <p class="card-h">兩個數字要對帳，不然讀者會被搞混</p>
+    <p>上面那次寫「掃了 424 個封裝檔與 <code>.fsh</code>」，是<strong>把兩種東西加在一起數</strong>。
+       這次分開數：<strong>真的是 BIGF 封裝檔的 387 個</strong>、
+       <u>再往裡拆一層的巢狀封裝檔 2 個</u>、<strong>磁碟上直接是 SHPI 的 22 個</strong>。</p>
+    <p>差額主要來自兩件事：這次<u>只認檔頭</u>不認副檔名
+       （這個遊戲有 17 個叫 <code>.big</code> 的檔<strong>根本不是封裝檔</strong>），
+       而且磁碟上被單獨壓縮過的 <code>.fsh</code> 這次是先解壓再算。</p>
+    <p><strong>兩個數字都沒錯，只是口徑不同。</strong>本站的紀律是
+       <u>兩個數字對不起來時，先確認它們是不是在數同一件事</u>。</p>
+    <p class="small">同一種對帳還有第二筆，方向相反：<a href="patches.html">官方更新檔那頁</a>
+       講的是同一份剛安裝好的原版，分母卻寫 <strong>52,719</strong>，
+       比本頁上面那次的 <strong>52,747</strong> 少 <strong>28 筆</strong>。
+       差別一樣出在口徑：那一頁<u>只走頂層封裝檔</u>，本頁那一次<u>連磁碟上散裝的 SHPI 一起數</u>。
+       那 28 筆已經逐檔對出來了（<code>data\misc\textures\</code> 18 個各 1 筆、
+       <code>igcrsr.fsh</code> 1 筆、<code>igcrsr1.fsh</code> 與 <code>igcrsr9.fsh</code> 各 3 筆、
+       <code>data\frontend\feonlyln.big</code>（它其實是 SHPI）3 筆），
+       <strong>52,719 ＋ 28 ＝ 52,747，是同一批資料的兩種口徑</strong>；
+       對帳過程與逐檔清單寫在那一頁。</p>
+  </div>
+  <p class="small">其餘格式這次量到：<code>0x6D</code> 37,633 · <code>0x78</code> 32,215 ·
+     <code>0x61</code> 13,658 · <code>0x60</code> 10,978 · <code>0x7D</code> 10,728 ·
+     <code>0x79</code> 568 · <code>0x7F</code> 45。</p>
+
+  <h2>⭐ 每張圖後面都掛著一句 EA 自己寫的話</h2>
+  <p>主圖後面接著一個附掛區塊，代號 <code>0x69</code>，固定 <strong>80 個位元組</strong>。
+     裡面是純文字，而且它自己說出自己是什麼：</p>
+<pre><code>EAGL64 metal bin attachment for runtime texture management</code></pre>
+  <p><code>EAGL</code> 就是 EA 自家的繪圖引擎（執行檔裡有一整排
+     <code>EAGL::ViewPort::…</code> 的符號）。這是一句給執行時貼圖管理用的註記。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>封裝檔</th><th class="num"><code>.fsh</code> 檔</th><th class="num">有這個區塊</th><th class="num">內容壞掉</th></tr></thead>
+    <tbody>
+      <tr><td data-label="封裝檔"><code>portrait.big</code></td><td data-label=".fsh 檔" class="num">7,542</td>
+          <td data-label="有這個區塊" class="num">7,542（<strong>100%</strong>）</td><td data-label="內容壞掉" class="num"><strong>3</strong></td></tr>
+      <tr><td data-label="封裝檔"><code>models.big</code></td><td data-label=".fsh 檔" class="num">2,331</td><td data-label="有這個區塊" class="num">2,331</td><td data-label="內容壞掉" class="num">0</td></tr>
+      <tr><td data-label="封裝檔"><code>uniforms.big</code></td><td data-label=".fsh 檔" class="num">692</td><td data-label="有這個區塊" class="num">124</td><td data-label="內容壞掉" class="num">0</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">（2026-09-05 訂正：這一欄原本的欄名寫「圖」，<u>跟本頁其他地方的口徑不一樣</u>。
+     它數的是 <strong><code>.fsh</code> 檔的個數</strong>，不是子圖的張數 ——
+     一個 <code>.fsh</code> 可以裝很多張圖。<code>models.big</code> 那 2,331 個檔裡有
+     四萬多張子圖（見<a href="models.html">模型與臉皮那頁</a>），
+     <code>uniforms.big</code> 的 692 個檔裡有 <strong>1,336</strong> 張；
+     <code>portrait.big</code> 剛好一個檔一張，所以 7,542 兩種算法一樣。
+     <code>models.big</code> 的目錄上其實有 2,332 個 <code>.fsh</code>，這裡只數到 2,331 ——
+     有一個（<code>c333.fsh</code>）本站的 QFS 解壓器解不開。
+     本頁頁尾的 48,885 用的是<u>子圖</u>那個口徑。）</p>
+
+  <div class="card amber" id="x7c">
+    <p class="card-h">⚠️ 本站訂正過自己的一條筆記 —— 然後那條訂正自己也錯了（2026-08-29）</p>
+    <p>本站的待辦清單上寫著「<u><code>0x7C</code> 區塊（256 bytes，只在 2653.fsh 與 2663.fsh），
+       不在說明書清單裡，未解</u>」。</p>
+    <p>這裡原本寫「<u>三個前提全錯：代號是 <code>0x69</code> 不是 <code>0x7C</code>、
+       長度是 80 不是 256、而且 7,542 張圖 100% 都有</u>」。
+       <strong>那句訂正才是錯的，現在收回。</strong></p>
+    <p>對的部分只有一半：<code>0x69</code> 那 80 個位元組的註記，上面那張表量到的
+       <strong>7,542 張 100% 都有</strong>，這一條成立。
+       錯在把它跟 <code>0x7C</code> 當成同一塊 —— <strong>它們是接在同一張圖後面的兩個不同區塊。</strong></p>
+    <p>2026-08-29 拿<u>三份剛安裝好的原版</u>（英文版、中文版、PK 版）逐項走過附掛鏈，
+       三份都是 2,391 張圖：<strong>2,389 張</strong>是
+       <code>0x7D</code> 圖 → <code>0x69</code> 80 bytes → <code>0x70</code> 結束，
+       另外 <strong>2 張</strong>在中間多一塊 <code>0x7C</code>、<strong>256 bytes</strong>，
+       而那 2 張三份都正好是 <code>2653.fsh</code> 與 <code>2663.fsh</code>。
+       <strong>在 <code>portrait.big</code> 裡，原本那條筆記三個前提都成立。</strong>
+       細節見<a href="portrait.html">大頭照 portrait.big</a>那頁。</p>
+    <p>（2026-09-05 訂正：上面那句原本沒有限定範圍，寫成「三個前提都成立」。
+       其中「<u>只在 <code>2653.fsh</code> 與 <code>2663.fsh</code></u>」這一個前提
+       <strong>只對 <code>portrait.big</code> 這個封裝檔成立</strong> ——
+       本頁下面那節的 <code>data\igshapes\igcrsr.fsh</code> 也帶著一塊 <code>0x7C</code>，
+       而且長度是 <strong>576</strong> 不是 256。三份剛安裝好的原版、它那份
+       <code>.bak</code>、本站測試機都有：本尊的附掛鏈是
+       <code>0x7D → 0x69 → 0x7C → 0x70</code>，<code>.bak</code> 少了中間那個
+       <code>0x69</code>。<strong>這正好是同一條教訓再犯一次</strong> ——
+       「只在某兩個檔出現」要先去看第三個檔，而第三個檔就在這一頁上。）</p>
+    <p><strong>為什麼會訂正錯：上面那張表量的是本站測試機。</strong>
+       測試機上這兩張已經被換過（<code>2653.fsh</code> 原版 49,311 bytes、測試機 49,471，
+       <code>2663.fsh</code> 原版 25,600、測試機 26,124，md5 都不同），
+       換進去的那一份沒有帶著 <code>0x7C</code>，所以整台機器一張都掃不到。</p>
+    <p><strong>「只在某兩個檔出現」這種話，要先確認自己有沒有去看第三個檔；
+       而「一張都沒有」這種話，要先確認自己看的那台機器還是不是原版。</strong></p>
+  </div>
+
+  <div class="card">
+    <p class="card-h">⭐ 順手抓到 3 張被不同工具處理過的大頭照</p>
+    <p>7,542 張裡有 <strong>3 張</strong>的那段字是壞的：</p>
+<pre><code>正常　　：EAGL64 metal bin attachment for runtime texture management
+這 3 張：EAGL64 mel   bin attachment for runtime texture management</code></pre>
+    <p><code>4174.fsh</code>、<code>4215.fsh</code>、<code>4901.fsh</code> ——
+       <code>metal</code> 少了兩個字母變成 <code>mel</code>。
+       <strong>圖本身完全正常</strong>（都是 <code>0x61</code> 256×256，解開後 65,680 bytes，
+       跟鄰居一模一樣），只有這段註解不對。</p>
+    <p>那不影響遊戲，但它是一個<u>指紋</u>：這三張跟其他 7,539 張
+       <strong>不是同一支工具做出來的</strong>。球衣庫與模型庫則一張都沒壞。</p>
+  </div>
+
+  <h2 id="wrong">兩個抓到自己錯的地方</h2>
+  <div class="card clay">
+    <p class="card-h"><span id="selfcaught"></span>一、本站工具裡的名字有三格是錯的</p>
+    <p>走過兩個倉庫全部 48,885 張圖之後，<strong>有三個代號跟資料對不上</strong>：</p>
+    <div class="tablewrap" style="margin:8px 0"><table class="stack">
+      <thead><tr><th class="mono">代號</th><th class="num">表上寫</th><th class="num">實測</th></tr></thead>
+      <tbody>
+        <tr><td data-label="代號" class="mono">0x6D</td><td data-label="表上寫" class="num">4.0</td><td data-label="實測" class="num"><strong>2.0</strong></td></tr>
+        <tr><td data-label="代號" class="mono">0x7D</td><td data-label="表上寫" class="num">3.0</td><td data-label="實測" class="num"><strong>4.0</strong></td></tr>
+        <tr><td data-label="代號" class="mono">0x7F</td><td data-label="表上寫" class="num">1.0</td><td data-label="實測" class="num"><strong>3.0</strong></td></tr>
+      </tbody>
+    </table></div>
+    <p class="small">單位是「每個像素幾個位元組」。<code>0x7D</code> 這一格是本站上線後複驗才抓到的
+       —— 第一次只抓到兩個。</p>
+    <p>把 <code>0x6D</code> 硬當四個位元組解，相鄰像素差 50.72（雜訊）；當兩個位元組解，
+       差 6.96 而且圖正常。</p>
+    <p><strong>程式碼註解只能當線索，不能當證據。</strong>
+       這也正好證明「名字」跟「像素排法」必須分開講。</p>
+  </div>
+  <div class="card clay">
+    <p class="card-h">二、驗證方法自己也有盲點</p>
+    <p>本站用「相鄰像素差」當作「有沒有解錯」的檢查器 —— 自然影像數字小，雜訊數字大。
+       大頭照那邊很好用：</p>
+    <div class="tablewrap" style="margin:8px 0"><table>
+      <thead><tr><th>解法</th><th class="num">相鄰像素差</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td><strong>正解</strong></td><td class="num"><strong>5.19</strong></td></tr>
+        <tr><td>錯解：每塊只讀 8 bytes</td><td class="num">16.82</td></tr>
+        <tr><td>錯解：整體位移一個位元組</td><td class="num">20.90</td></tr>
+        <tr><td>錯解：當成每像素兩個位元組</td><td class="num">91.25</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>但它對臉皮 <code>0x60</code> 不只是失效，是會<u>選錯邊</u>。</strong>
+       故意把臉皮當成「每塊 16 bytes」讀，天真地算全圖：
+       <strong>誤讀 5.29 分，正解 8.99 分 —— 誤讀看起來還比較好。</strong></p>
+    <p>原因有兩層。第一層：那樣誤讀等於「每隔一個方塊取一個真方塊」，取到的還是真顏色，圖仍然平滑。
+       第二層更陰險 —— <strong>誤讀會讓下半張圖整整 256 列全黑，而全黑區的相鄰差是 0，
+       把平均硬生生拉下去。</strong>
+       就算只比對同樣的前 256 列讓條件公平（正解 9.41、誤讀 10.42），
+       30 張裡仍然有 4 張是誤讀分數比較好。
+       真正抓到它的是<a href="#arith">算術</a> ——
+       65,536 bytes 只夠 4,096 個方塊，但 256×512 需要 8,192 個，
+       <u>結果是整整下半張圖 256 列完全空白</u>。</p>
+    <p class="small">教訓：<strong>檢查器過關不代表沒錯</strong>，要有第二種完全不同的驗法。</p>
+  </div>
+
+  <h2>這頁不能告訴你什麼</h2>
+  <div class="card blue">
+    <p class="card-h">解得開，不等於做得出來</p>
+    <p>知道像素怎麼排，可以<u>把遊戲的圖讀出來看</u>。
+       但要做一張新的放回去，還需要把圖壓縮回區塊格式 ——
+       <strong>那一半後來做了</strong>：<code>0x60</code>（DXT1）與 <code>0x61</code>（DXT3）兩種都能壓回去，用在<a href="../tutorials/swap-portrait/index.html">換大頭照</a>、<a href="../tutorials/new-face/index.html">做新臉皮</a>、<a href="../tutorials/swap-splash/index.html">換開機畫面</a>三課。<u>其餘代號沒有做</u>，腳本遇到會直接拒絕而不是猜。
+       <strong>但壓得回去不等於裝得回去</strong>：換開機畫面那一課的 <code>splash.fsh</code>，DXT1 壓出來的長度是對的，卡在那一筆記錄自己宣告的長度多 16 個位元組，<a href="../tutorials/swap-splash/index.html#splash-blocked">目前匯不回去</a>。</p>
+      <p><span class="badge wip">未解</span> <code>0x7E</code> 這個代號，
+         本站到目前為止<u>在任何地方都還沒找到一張</u>，無從實測。</p>
+      <p class="small">⚠️ 這裡原本寫「<code>0x7B</code> 與 <code>0x7E</code> 兩個代號，
+         這兩個倉庫裡一張都沒有」——
+         <strong>但這一頁上面已經把 <code>0x7B</code> 找到了</strong>
+         （<a href="#found">9 筆記錄，3 張相異的圖</a>）。
+         這是本站訂正上半段時<u>漏改了頁尾</u>，同一頁自己跟自己打架。
+         現在只剩 <code>0x7E</code>。</p>
+  </div>
+
+  <h2 id="igshapes">三個沒有包在封裝檔裡的圖（2026-08-28 量的）</h2>
+  <p><code>data\igshapes\</code> 是少數<u>不用解封裝檔就看得到的圖</u> ——
+     四個檔直接躺在資料夾裡，而且<strong>沒有壓縮</strong>，
+     開頭就是 <code>SHPI</code>。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>檔案</th><th class="num">大小</th><th class="num">子圖</th><th>格式與尺寸</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="檔案"><code>igcrsr.fsh</code></td><td data-label="大小" class="num">525,264</td><td data-label="子圖" class="num">1</td>
+          <td data-label="格式與尺寸"><strong>32 位元無壓縮 · 512 × 256</strong></td></tr>
+      <tr><td data-label="檔案"><code>igcrsr1.fsh</code></td><td data-label="大小" class="num">44,464</td><td data-label="子圖" class="num">3</td>
+          <td data-label="格式與尺寸">8 位元調色盤 · 128×128 ×2、128×64</td></tr>
+      <tr><td data-label="檔案"><code>igcrsr9.fsh</code></td><td data-label="大小" class="num">52,800</td><td data-label="子圖" class="num">3</td>
+          <td data-label="格式與尺寸">8 位元調色盤 · 128×128 ×3</td></tr>
+      <tr class="hi"><td data-label="檔案"><code>igcrsr.fsh.bak</code></td><td data-label="大小" class="num">525,184</td><td data-label="子圖" class="num">1</td>
+          <td data-label="格式與尺寸"><strong>EA 自己附的備份檔</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>驗算：<code>512 × 256 × 4 位元組 = 524,288</code>，加上 976 個位元組的表頭
+     正好是 <strong>525,264</strong>。而且每個檔的 SHPI 檔頭裡宣告的長度
+     <u>都等於檔案本身的長度</u>，四個檔全對。</p>
+
+  <div class="card grass">
+    <p class="card-h">⭐ EA 在出貨的遊戲裡留了一個 <code>.bak</code></p>
+    <p><code>igcrsr.fsh.bak</code> 是<strong>正式版光碟裡就有的檔案</strong> ——
+       官方英文版與官方繁體中文版<u>兩邊都有</u>。</p>
+    <p>它比本尊<strong>小 80 個位元組</strong>，而且從第 4 個位元組就開始不一樣
+       （那一格正是 SHPI 宣告的長度）。所以它是<u>同一張圖的前一個版本</u>，
+       某個人存檔前先備份了一次，<strong>然後那份備份跟著出貨了</strong>。</p>
+    <p class="small">這跟本站在
+       <a href="../story/build-2004/index.html">平安夜那次建置</a>看到的是同一類東西：
+       <u>正式產品裡留著開發現場的痕跡</u>。</p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 大頭照與臉皮的像素排法解開了，而且不用寫程式就能驗，把「像素位元組數 ÷ 寬 ÷ 高」算出來，<code>0x60</code> 永遠是 <strong>0.5</strong>、<code>0x61</code> 永遠是 <strong>1.0</strong>，走過兩個倉庫全部 <strong>48,885 張圖</strong>沒有一張算出別的數字。</li>
+    <li><strong>規則只有一條</strong> 畫面切成 4×4 的小方塊，每塊固定 8 或 16 個位元組。256×512 的 <code>0x60</code> 與 256×256 的 <code>0x61</code> 都剛好是 65,536 bytes，128×128 的 <code>0x61</code> 是 16,384，同一個代號換尺寸照樣成立。第二次獨立驗證是透明度層：<code>0x61</code> 多出來那 8 個位元組單獨畫出來是一個乾淨的頭肩剪影，65,536 個像素裡 36,194 個完全不透明、27,610 個完全透明。<u>但「連通塊中位數 1 塊」可以寫，「最多只有幾塊」這種上限句不能寫</u>，有一張長捲髮球員的髮絲把背景切成 64 塊，而那張圖是正常的。</li>
+    <li><strong>本站訂正之一：用途不等於格式定義</strong> <code>0x79</code> 原本寫成「不是圖，永遠 1×1」，依據是 <code>uniforms.big</code> 的 431 個空球衣槽 431/431 都是 1×1。<u>那個量測本身沒有錯，錯在把「它在這個檔裡的用途」寫成了「這個格式的定義」</u>。中文字型的字圖集同一個代號是 1024×512、262,368 bytes、正好 0.500，而定案的證據是調色盤：<code>au20b_en.ffn</code> 後面接的 <code>0x2A</code> 區塊 <code>size</code> 欄位寫 80 = 16 + 16×4，裡面正好 16 筆白色配透明度階梯，2⁴ = 16，一筆不多一筆不少。</li>
+    <li><strong>本站訂正之二：訂正從來沒有進到程式碼</strong> 頁面上早就寫著「本站工具裡的名字有三格是錯的」，<strong>但被指出錯的那份程式碼一直沒有改</strong>，同一份字典出現在當時的五支下載腳本裡，五份一模一樣、五份都是舊的（<u>今天帶著這份字典的是八支</u>，內容都已同步）。複驗還發現不只名字錯，<u>還少了 <code>0x7F</code> 與 <code>0x79</code> 兩格</u>，而那份字典同時被當成守門員，所以做新臉皮那支腳本會拒絕 <code>models.big</code> 裡 <strong>45 個真實存在的檔</strong>。修好之後 <code>g001.fsh</code> 認得出來是 <code>0x7F</code> 128×128、49,152 bytes，128 × 128 × 3 算術自己對上。⭐ 這個錯的形狀值得記：<u>把錯誤寫進文件，不等於修好了它</u>，而且六道檢查器一道都沒抓到，已補上第九道專門比對「頁面上的結論」與「附在頁面上的程式碼」。</li>
+    <li><strong>另外兩處自己抓到的錯</strong> 一、工具表上三格的每像素位元組數是錯的，<code>0x6D</code> 表上 4.0 實測 <strong>2.0</strong>、<code>0x7D</code> 表上 3.0 實測 <strong>4.0</strong>、<code>0x7F</code> 表上 1.0 實測 <strong>3.0</strong>（<code>0x7D</code> 那格還是上線後複驗才抓到的）。二、本站待辦清單上寫著「<code>0x7C</code> 區塊 256 bytes，只在兩個檔出現」，本頁原本判它<u>三個前提全錯</u>，<strong>2026-08-29 收回那句訂正</strong>：<code>0x69</code>／80 bytes 的註記確實 7,542 張<u>100% 都有</u>，但它跟 <code>0x7C</code> 是兩個不同的區塊 —— 三份剛安裝好的原版各 2,391 張圖裡，<code>2653.fsh</code> 與 <code>2663.fsh</code> 這 2 張真的多一塊 <code>0x7C</code>、256 bytes，三份完全一致。在 <code>portrait.big</code> 裡，原本那條筆記是對的，掃不到是因為測試機上這兩張已經被換過（2026-09-05 訂正：但「只在那兩個檔」只對 <code>portrait.big</code> 成立 —— <code>data\igshapes\igcrsr.fsh</code> 也帶著一塊 <code>0x7C</code>，長度是 <strong>576</strong> 不是 256）。<strong>「只在某兩個檔出現」要先去看第三個檔；「一張都沒有」要先確認自己看的那台機器還是不是原版。</strong></li>
+    <li><strong>驗證器自己也有盲點</strong> 本站用「相鄰像素差」判斷有沒有解錯，對大頭照很好用（正解 5.19、各種錯解 16 到 91）。<strong>但它對臉皮 <code>0x60</code> 不只是失效，是會選錯邊</strong>：誤讀 5.29 分、正解 8.99 分，誤讀看起來還比較好，因為誤讀會讓下半張圖整整 256 列全黑，而全黑區的相鄰差是 0，把平均硬生生拉下去。真正抓到它的是算術。<u>檢查器過關不代表沒錯，要有第二種完全不同的驗法</u>。</li>
+    <li><strong>否定句的份量取決於你找過哪裡</strong> <code>0x7B</code> 原本標成「兩個倉庫裡一張都沒有」，後來在剛安裝好的原版裡 52,747 筆影像記錄中找到 <strong>9 筆</strong>（md5 只有 3 張相異的圖），調色盤就接在圖片後面，1,040 = 16 + 256×4，而且索引 0 佔了 88% 的像素、剛好是透明背景。2026-08-29 重掃把巢狀封裝檔與散裝檔補進來，總數從 52,747 變成 <strong>105,834</strong>，<code>0x7B</code> 還是 9 筆、<code>0x7E</code> 還是 0 筆 —— <u>但這兩個數字不是同一台機器</u>（2026-09-05 訂正）：五萬多那次是剛安裝好的原版，十萬多那次是裝滿模組的測試機，原版照同一個口徑重走只有 52,822 筆。另外每張圖後面都掛著一個 80 位元組的 <code>0x69</code> 註記，7,542 張裡有 3 張的那句字壞了（<code>metal</code> 變 <code>mel</code>），圖本身完全正常，那是<u>不同工具留下的指紋</u>。</li>
+    <li><strong>本站沒驗的</strong> <code>0x7E</code> 這個代號在十萬多筆記錄裡一張樣本都找不到，無從實測，徽章仍然是未解。<code>0x7B</code> 的<u>內部排法也還沒解開</u>，本站沒有解出來也不猜；它那九個調色盤裡有七個是 256 筆全部灰階，剩下兩個雖然各有 133 筆不是灰階，但其中 118 筆第 1 與第 3 個位元組相等、差的只有中間那一格，所以前三個位元組是 RGB 還是 BGR 本站無法判斷（連裝滿模組的測試機都掃過，最大彩度只有 21）。項目名稱 <code>BPP2</code> 到 <code>BPP6</code> 是什麼意思，本站不知道。壓縮那一半後來做了：<code>0x60</code>（DXT1）與 <code>0x61</code>（DXT3）兩種都壓得回去，用在換大頭照、做新臉皮、換開機畫面三課；<u>其餘代號沒有做</u>，腳本遇到會直接拒絕而不是猜。最後要分開講的是強度：「每像素幾個位元組」是本站量到的，「代號叫什麼名字」是 2002 年那份 FSHTOOL 說明書說的，兩件事不一樣。</li>
+  </ul>
+
+<h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="portrait.html">大頭照 portrait.big</a> —— <code>0x61</code> 與 <code>0x7D</code> 的家</li>
+    <li><a href="models.html">模型與臉皮 models.big</a> —— <code>0x60</code> 的家</li>
+    <li><a href="qfs.html">QFS 壓縮</a> —— 這些圖在倉庫裡是壓縮過的，要先解開才看得到代號</li>
+    <li><a href="player-numbers.html">兩套球員編號</a> —— 哪一張圖屬於哪一位球員</li>
+  </ul>
+
+  <footer>
+    <p>本頁的張數、尺寸、每像素位元組數、相鄰像素差皆為現場走過
+       <code>data\frontend\portrait.big</code> 與 <code>data\models.big</code>
+       全部 48,885 張影像記錄量測所得。解出的圖片僅供本站驗證之用，不隨本站散布。
+       標示為「未解」之處本站尚未解讀。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

@@ -1,0 +1,1832 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+mvp_hud_color.py
+改 EA MVP Baseball 2005 介面元素的顏色(預設是比賽畫面左上角的記分板)。
+
+    先看有哪些顏色可以改(唯讀)
+        python3 mvp_hud_color.py "你的遊戲資料夾"
+
+    預覽(不會改檔)
+        python3 mvp_hud_color.py "你的遊戲資料夾" --set SCOREBLACK=#204080
+
+    實際套用
+        python3 mvp_hud_color.py "你的遊戲資料夾" --set SCOREBLACK=#204080 --apply
+
+    還原
+        python3 mvp_hud_color.py "你的遊戲資料夾" --restore
+
+    自我測試(不碰任何遊戲檔)
+        python3 mvp_hud_color.py --selftest
+        在 python -O 下會拒絕跑並回傳 2:-O 會把 assert 整個拿掉,測試會假綠。
+
+顏色可以寫 #204080、#f0a、32,64,128,或 black / white / red / navy 這些名字。
+換別的版面檔用 --fel,例如 --fel fes_hudright.fel(原版與模組機都有這個檔)。
+
+原理:ingame.big 內的 .fel 用 QFS/RefPack 壓縮,解開後是純文字版面腳本。
+RT(色塊矩形)的第 12-14 個欄位就是填色 RGB —— 這個位置是量出來的,
+量法寫在下面 RT_RGB_INDEX 那一段。
+
+⚠️ 一定要先看一次不帶 --set 的清單:元素的「顯示」欄如果是關的,
+   改了顏色畫面上也不會有變化(本站測試機的記分板色塊就全是關的)。
+
+寫回時採 append 模式:新資料接在檔尾,只改 TOC 8 bytes + 檔頭 4 bytes,
+原始資料區一個 byte 都不動。切勿用「全部讀出再重新打包」的方式存檔 ——
+你不知道手上這份封裝檔被前人疊過什麼。
+
+備份副檔名是 .hudcolorbak,本工具只認自己這一個,不會去動別課留下的 .bak。
+
+輸入 / 輸出
+    輸入  一個遊戲資料夾(它自己去找 data/frontend/ingame.big),或直接給一個
+          .big 的路徑。要改哪一個版面檔用 --fel 指定,預設是記分板那一個
+          fes_hudleft.fel。要改的顏色用 --set 指定,可以重複寫很多次。
+    輸出  沒有 --apply 的時候只往螢幕印字,一個位元組都不寫。
+          不帶 --set 是列清單,帶了 --set 是列「哪一行、原本什麼色、要改成什麼色」。
+          加了 --apply 才動檔:改寫那個 .big,並在它旁邊留一份 .hudcolorbak。
+
+安全網(四層,由外而內)
+    一、唯讀是預設,但這一句只涵蓋 --set。沒打 --apply 就只有預覽,連備份都不會產生。
+        --restore 不在這一句裡。它是另一條路,不看 --apply,備份通過覆蓋前那幾道把關
+        之後,就把 .hudcolorbak 整份蓋回那個封裝檔。本站把測試機那份 ingame.big
+        (2,665,562 bytes)複製到別的資料夾實測,只下 --restore、沒有加 --apply,
+        那份複本的 MD5 當場變成備份的 MD5。
+    二、第一次寫入之前自動備份成 <原檔名>.hudcolorbak,而且備份是原子的
+        (先寫同資料夾裡一個隨機名字的暫存檔,fsync 落地之後才 os.replace
+        換成正式的備份名),中途被中斷不會留下半截備份騙人。
+        已經有備份就保留最早那一份,不會被後來的蓋掉。
+    三、寫入之前檢查行數沒變;寫入之後重新開檔、重新走目錄、重新解壓、
+        重新掃一次顏色。顏色對不上,或是整段根本讀不回來(目錄讀不出來、
+        版面檔在目錄裡不見了),都當場自動還原回備份的內容,並回報失敗
+        (exit code 1)—— 不會噴一頁 traceback 讓你不知道遊戲檔已經換過。
+        --restore 自己也會先驗備份的檔頭,擋掉半截備份
+        把正本吃掉;蓋回去之後再整份逐位元組比對一次,比不過就回報失敗。
+    四、寫入與還原都不直接覆蓋正本:一律先寫同資料夾的唯一暫存檔,
+        驗過之後用 os.replace 換上 —— 換上去之前正本永遠是完整的舊檔。
+        暫存檔名用 tempfile.mkstemp 產生,不用猜得到的 .part / .tmp,
+        免得有人事先在那個名字上放一條指向資料夾外的符號連結。
+        要寫的那兩條路(--apply / --restore)只要正本、備份或暫存檔的名字
+        是符號連結(包含指向不存在檔案的懸空連結)就整個停下來,不跟著它
+        寫到資料夾外面去;唯讀那條路不受限,跟著連結讀沒有風險。
+        「換名 + 登記」包成不可中斷的一段:Ctrl-C 落在那兩行中間會先被記著,
+        登記完才丟出去,所以中斷時螢幕上講的話一定跟磁碟上的狀態一致
+        (離開碼一律 130,不會跟「複驗沒過」的 1 混在一起)。
+
+做不到的事(讀之前先知道會少走冤枉路)
+    · 只動 RT 的第一組 RGB(名稱之後的第 12-14 欄)。第 18-20 欄那一組是什麼,
+      本站沒驗。拿來定位的那兩行它都是 000,000,000,分不出來。
+    · TX 一行有六組三元組,只動第一組(主要顏色)。其餘五組沒驗,不碰。
+    · 只改顏色。位置、大小、字型、字串內容、顯示開關,通通不動。
+    · 顯示欄是「關」的元素,改了顏色畫面上不會有變化。
+      這支只改顏色,不會替你把它打開。
+    · 檔頭那個「檔案總大小」欄一律以小端寫回。ingame.big 本來就是小端,
+      兩份剛安裝好的原版(英文版 data 底下 207 個封裝檔、繁體中文版 205 個)
+      也全部是小端。會是大端的不是「大檔」,是被模組重新打包過的檔:本站
+      測試機那份 data 裡出現大端的,全部落在這 7 個檔名上(models.big /
+      portrait.big / pnamedat.big / pnamehdr.big / coornite.big /
+      dodgnite.big / wrignite.big),而同一台機器上另外留著的那三顆原始
+      球場檔,同樣的檔名仍然是小端。真要踩到得同時滿足「那個 .big 的大小
+      欄是大端」而且「裡面剛好有你指定的版面檔」,而那 7 個檔的目錄裡一個
+      .fel 都沒有,本站手上沒有這種檔,所以沒驗過那條路。
+    · 「改完在遊戲畫面上長怎樣」本站沒驗過。驗過的是檔案層面:
+      項目數、解壓行數、顏色複驗、還原之後逐位元組相同。
+
+無外部相依,Python 3.7 以上即可。
+授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
+"""
+#
+# ─────────────────────────────────────────────────────────
+#  法律與免責(每一支本站腳本都帶著這一段)
+#
+#  · 本工具與 Electronic Arts 無任何官方關聯,也未經其授權或背書。
+#    MVP Baseball 2005 為 Electronic Arts 之作品與商標。
+#  · 本工具為原創程式碼,**不含任何 EA 的程式碼或資產**。
+#  · 本工具不提供、不教學、也不包含任何規避技術保護措施的功能。
+#  · 使用者應僅對自己合法取得的遊戲副本使用本工具,並自行承擔風險。
+#    使用前請自行確認你與遊戲發行商之間的使用者授權合約(EULA)。
+#  · 本工具按「現狀」提供,不附任何明示或默示的擔保。
+#  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
+#  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
+#    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
+#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+# ─────────────────────────────────────────────────────────
+
+import hashlib
+import re
+import os
+import shutil
+import signal
+import struct
+import sys
+import tempfile
+from pathlib import Path
+
+# 「正本現在是什麼狀態」。Ctrl-C 的收尾照著它講話:換之前中斷才可以說
+# 「一個位元組都沒動到」,換之後中斷要老實說檔案已經改了、可以用 --restore 回去。
+#
+# ⚠️ 2026-09-06 第三輪訂正:原本只有一個布林 _REPLACED,而它跟 os.replace
+#    是分開的兩行。Ctrl-C 落在那兩行中間的話,收尾一定會講錯其中一種:
+#    旗標立在後面,會對著一個**已經換好的檔**說「一個位元組都沒動到」;
+#    立在前面(上一版的解法),會對著一個**沒換成的檔**叫使用者去還原。
+#    現在改成三態,而且「換名 + 登記」被 _NoInterrupt 包成不可中斷的一段:
+#      idle       還沒動過
+#      replacing  正在換(_NoInterrupt 裝得上的話幾乎看不到,它是保險)
+#      replaced   換過了(kind 記的是「套用」還是「還原」,兩者的說法不一樣)
+_STATE = {'phase': 'idle', 'target': None, 'kind': None}
+
+
+class _NoInterrupt(object):
+    """把「os.replace + 登記」包起來,這段期間不讓 Ctrl-C 插隊。
+
+    收到 SIGINT 先記著,離開這一段之後再照常丟出 KeyboardInterrupt。
+    這樣收尾看到的登記一定跟磁碟上的狀態一致,不會出現「檔案換掉了、
+    程式卻還以為沒換」的那一瞬間。
+
+    ⚠️ signal.signal 只有主執行緒裝得上,裝不上就退回原本的行為 ——
+       不會比以前更糟,而且外面那個 replacing 狀態就是為這種情形留的:
+       真的落在縫裡,收尾會誠實說「不確定換好了沒有」,不會猜一個好聽的。
+    """
+
+    def __enter__(self):
+        self._pending = False
+        self._old = None
+        try:
+            self._old = signal.signal(signal.SIGINT, self._remember)
+        except (ValueError, OSError):
+            self._old = None
+        return self
+
+    def _remember(self, signum, frame):
+        self._pending = True
+
+    def __exit__(self, exc_type, exc, tb):
+        if self._old is not None:
+            try:
+                signal.signal(signal.SIGINT, self._old)
+            except (ValueError, OSError):
+                pass
+        if self._pending and exc_type is None:
+            raise KeyboardInterrupt
+        return False
+
+
+# ── 備份的原子性(2026-08-29 上線前稽核加)────────────────────────────
+# 原本是直接 shutil.copy2(遊戲檔, .bak)。複製途中被中斷(磁碟滿、外接碟拔掉、
+# Windows 上按 Ctrl-C)會留下一個**半截的 .bak**;下一次執行看到它「存在」
+# 就印「備份已存在,保留最早那一份」繼續改遊戲檔,之後 --restore
+# 會拿那個半截檔覆蓋掉正本。
+#
+# 實測(2026-08-29):把 2,665,562 bytes 的備份截成 300,000 bytes,
+# 本站防護最嚴的那支還原指令三道把關全過、印「✓ 已從備份還原」、exit code 0,
+# 2.66 MB 的遊戲檔當場被 300 KB 蓋掉。magic 只看開頭,看不出後面少了多少。
+
+def _quiet_unlink(path):
+    """刪掉暫存檔;刪不掉也不要蓋掉原本要往外丟的那個錯誤。"""
+    try:
+        os.remove(path)
+    except OSError:
+        pass
+
+
+def _refuse_if_symlink(p, what):
+    """目的檔或備份檔是符號連結就整個動作拒絕掉。
+
+    ⚠️ 為什麼一定要用 os.path.islink 而不是 Path.exists():
+       exists() 會**跟著連結走**,連結指向的東西不存在時它回 False ——
+       所以「一條指向不存在檔案的連結」在 exists() 眼裡等於「沒這個檔」,
+       後面 open(..., 'wb') 一寫下去就會在連結指的地方生出一個新檔。
+       islink()/lexists() 看的是連結本身,不跟著走,這種才擋得下來。
+
+    ⚠️ 遊戲檔本身是連結的情況多半在更前面就被擋掉了:要寫的那兩條路
+       (--apply / --restore)在 _symlink_gate() 就停下來了。這一道是保險
+       ——「先檢查、後開檔」中間那一小段時間裡有人把檔案換成連結,
+       就會在這裡被擋住。
+    """
+    p = os.fspath(p)
+    if os.path.islink(p):
+        raise SystemExit(
+            '✗ %s是一個符號連結,本工具不對連結動手:%s\n'
+            '  它指向:%s\n'
+            '  連結有可能指到遊戲資料夾以外的檔案,寫下去會傷到不相干的東西。\n'
+            '  請直接對真正的那個檔案執行,或先把這條連結移開。'
+            % (what, p, os.path.realpath(p)))
+
+
+def _mkstemp_beside(dst, tag):
+    """在 dst 所在的那個資料夾裡開一個「不可能被預先佔走」的暫存檔。
+
+    ⚠️ 舊寫法是 dst + '.part' / dst + '.tmp' 這種猜得到的名字。猜得到就佔得住:
+       事先在那個名字上放一條指向資料夾外的符號連結,shutil.copy2()
+       跟 open(..., 'wb') 都會**跟著連結**先把外面那個檔截成 0 bytes;
+       之後的 os.replace() 雖然只換掉連結本身,但外面那個檔已經死了。
+       tempfile.mkstemp 是用 O_CREAT|O_EXCL 開檔的:名字已經存在就直接失敗,
+       絕不會跟著任何既有的連結走。名字帶亂數,也就沒有「事先佔位」這回事。
+
+    暫存檔一定要跟 dst 同一個資料夾,os.replace 才是同一個檔案系統內的
+    原子改名;丟到系統暫存區會變成跨裝置搬移,那就不是原子的了。
+    """
+    d = os.path.dirname(os.path.abspath(os.fspath(dst))) or '.'
+    return tempfile.mkstemp(
+        dir=d, prefix='.' + os.path.basename(os.fspath(dst)) + '.' + tag + '-')
+
+
+def _atomic_copy(src, dst):
+    """備份要嘛完整、要嘛不存在 —— 中間狀態不會留在 dst 這個名字上。
+
+    ⚠️ 本站有些腳本用 pathlib.Path 存路徑,有些用字串。
+       2026-08-29 第一版寫成 dst + '.part',在 Path 上直接 TypeError,
+       等於所有備份都失敗 —— 而且「半截備份被擋下來」那個測試照樣是綠的。
+       是陰性對照(先證明正常流程真的會產生備份)抓到的。
+    """
+    # os.fspath 把 Path 與字串統一成字串,下面才不會踩到型別。
+    src, dst = os.fspath(src), os.fspath(dst)
+    _refuse_if_symlink(dst, '備份檔')
+    # 兩步走:先完整複製到一個亂數暫存名,成功了才改名成正式的備份名。
+    # 這樣一來「.hudcolorbak 這個名字存在」就等於「它是完整的」,
+    # 中間狀態永遠掛在暫存名上,不會被下一次執行誤認成好的備份。
+    fd, part = _mkstemp_beside(dst, 'part')
+    try:
+        with os.fdopen(fd, 'wb') as fo:
+            with open(src, 'rb') as fi:
+                shutil.copyfileobj(fi, fo)
+            fo.flush()
+            os.fsync(fo.fileno())      # 先落地,再改名
+        # mkstemp 開出來的權限是 0600,跟原檔對齊回去(等同 copy2 的行為)。
+        shutil.copystat(src, part)
+        os.replace(part, dst)          # os.replace 是原子的
+    # 這裡抓 BaseException 而不是 Exception:最常見的中斷是使用者按 Ctrl-C,
+    # 而 KeyboardInterrupt 不是 Exception 的子類,只抓 Exception 會漏掉它。
+    except BaseException:
+        _quiet_unlink(part)            # 半截的暫存檔不留在磁碟上
+        raise                          # 清乾淨之後照樣把錯誤丟回去,不吞
+
+
+def _restore_from_backup(bak, dst):
+    """還原之前先擋掉明顯壞掉的備份。
+
+    ⚠️ 這裡**不能**比對「備份與目標大小相同」—— 本站多數腳本是把資料接到
+    檔尾來改檔(專案鐵律:封裝檔不可重新打包),改完之後正本本來就比備份大,
+    那樣比會擋掉每一次合法的還原。
+
+    ── 2026-08-30 補上三道(上線前資安稽核抓到的真漏洞)────────────────
+    原本只有「不是 0 bytes」+「BIGF 檔頭宣告長度」兩道。**BIGF 以外全破。**
+    實測拿「前 1/8 的半截備份」去還原,六支腳本把正本吃掉而且都印成功:
+        mvp_fix_loc / mvp_menu_text   .LOC        416,753 →  52,094
+        mvp_edit_speed / mvp_ratings
+        / mvp_player                  attrib.dat  840,643 → 105,080
+        mvp_modernize                 mvp2005.exe 5,443,584 → 680,448
+                                      (它還印「複驗:內容與備份相同 ✅」)
+    最後那個會讓遊戲**完全開不起來**,而站上每一課都寫著「隨時可以 --restore」。
+
+    現在檢查五件事:
+      1. 備份不是 0 bytes
+      2. BIGF:檔頭第 4-8 個位元組宣告的總長度要等於實際長度
+         (2026-09-05 實測本站測試機 MVP2026/ 整棵樹的 678 個 BIGF 檔,
+          678 個的大小欄都對得上;661 小端、17 大端,兩種都接受。
+          這個數字會隨資料夾增減而變 —— 要重數就對每個 .big 讀前 8 個
+          位元組,看 <I 或 >I 其中一種解讀等不等於檔案實際大小)
+      3. LOCH(語系檔):檔頭指到的 LOCL 要在檔內,而且最後一條字串的位移
+         也要在檔內 —— 截斷之後那個位移一定會超出去
+      4. MZ(執行檔):PE 節區表裡 raw offset + raw size 的最大值不得超過檔案長度
+      5. **通用地板**:非 BIGF 的備份不得小於「要被蓋掉的那個檔」的一半。
+         非 BIGF 的工具都是原地改(大小幾乎不變),所以這條很安全;
+         BIGF 走 append 會越改越大,所以刻意**不套**這條,由第 2 道負責。
+    """
+    # 這一段在本站多支腳本裡是同一份複本,所以函式內自己再 import 一次 struct,
+    # 整段搬到別的腳本就能用,不必連帶檢查那邊有沒有在檔案開頭 import。
+    import struct
+    bak, dst = os.fspath(bak), os.fspath(dst)
+    if not os.path.exists(bak):
+        raise SystemExit('找不到備份:%s' % bak)
+    n = os.path.getsize(bak)
+    # 第 1 道:0 bytes。這是備份中斷最明顯的樣子,先擋掉。
+    if n == 0:
+        raise SystemExit(
+            '備份是 0 bytes(多半是上次備份到一半被中斷),不敢拿它覆蓋 %s。' % dst)
+    # 只讀開頭 8 個位元組來認格式,不整個讀進來(備份可能有好幾 MB)。
+    with open(bak, 'rb') as _f:
+        head = _f.read(8)
+
+    # 每一道檢查失敗都走這個出口:講清楚是哪裡對不上、多半是什麼原因造成的,
+    # 而且**不覆蓋任何東西**就結束。寧可還原失敗,也不要拿壞備份蓋掉正本。
+    def _stop(why):
+        raise SystemExit(
+            '這份備份是壞的,不敢拿它覆蓋 %s。\n'
+            '  %s\n'
+            '  多半是備份途中被中斷(磁碟滿、外接碟拔掉、按了 Ctrl-C)。\n'
+            '  請改用你自己另外留的那一份備份。' % (dst, why))
+
+    # 第 2 道:BIGF 封裝檔。檔頭第 4-8 個位元組是「這個檔應該多大」,
+    # 兩種位元組順序都遇得到:兩份剛安裝好的原版(英文版 207 個、中文版 205 個 .big)
+    # 全部是小端,一個大端都沒有;本站 MVP2026/ 整棵樹(含一份備份資料夾),678 個 .big 裡
+    # 有 17 個是大端,而那 17 個都是被模組重新打包過的檔(models.big 就從原版的
+    # 172,992,803 bytes 變成 561,891,312 bytes)。跟檔案大不大無關:同一台測試機上
+    # 85 MB 的 audio/cd/spch_pa/pnamedat.big 仍然是小端。
+    # 所以兩種都算一次,只要有一種等於實際大小就算過。被截斷的備份兩種都對不上。
+    if len(head) == 8 and head[:4] == b'BIGF':
+        le = struct.unpack('<I', head[4:8])[0]
+        be = struct.unpack('>I', head[4:8])[0]
+        if le != n and be != n:
+            _stop('檔頭說它應該是 %d bytes(或 %d),實際只有 %d bytes。' % (le, be, n))
+        return _do_copy(bak, dst)
+
+    # 第 3 道:LOCH(遊戲的文字表 .LOC)。這種檔沒有「總長度」欄位可以對,
+    # 所以改成沿著它自己的指標走一遍:檔頭第 16-20 個位元組(小端)指到字串區,
+    # 字串區有一張位移表,拿**最後一條**字串的位移去比檔案長度。
+    # 檔案被截掉一半的話,那個位移一定會指到檔案外面。
+    if len(head) >= 4 and head[:4] == b'LOCH':
+        try:
+            d = open(bak, 'rb').read()
+            L = struct.unpack('<I', d[16:20])[0]
+            if L + 16 > n or d[L:L + 4] != b'LOCL':
+                _stop('語系檔的字串區(LOCL)應該在位移 %d,那裡不是 LOCL。' % L)
+            lcnt = struct.unpack('<I', d[L + 12:L + 16])[0]
+            if lcnt <= 0 or L + 16 + lcnt * 4 > n:
+                _stop('語系檔的位移表被截斷了(宣告 %d 條)。' % lcnt)
+            last = struct.unpack('<I', d[L + 16 + (lcnt - 1) * 4:L + 20 + (lcnt - 1) * 4])[0]
+            if L + last >= n:
+                _stop('語系檔最後一條字串在位移 %d,超出檔案結尾(%d bytes)。'
+                      % (L + last, n))
+        except SystemExit:
+            raise
+        except (struct.error, IndexError):
+            _stop('讀不出語系檔的結構,它壞了。')
+
+    # 第 4 道:MZ(Windows 執行檔)。同樣沿著它自己的結構走:
+    # 位移 0x3C 那 4 個位元組(小端)指到 PE 檔頭,PE 檔頭 +6 是節區數、
+    # +20 是選用檔頭長度,節區表就接在後面,每一項 40 個位元組,
+    # 其中 +16 是節區在檔案裡的長度、+20 是它的位置(都是小端)。
+    # 把所有節區的「位置 + 長度」取最大值,那就是這個執行檔至少該有多大。
+    if len(head) >= 2 and head[:2] == b'MZ':
+        try:
+            d = open(bak, 'rb').read()
+            pe = struct.unpack('<I', d[0x3C:0x40])[0]
+            if pe + 24 > n or d[pe:pe + 4] != b'PE\x00\x00':
+                _stop('執行檔的 PE 檔頭不在它該在的地方,檔案不完整。')
+            nsec = struct.unpack('<H', d[pe + 6:pe + 8])[0]
+            optsz = struct.unpack('<H', d[pe + 20:pe + 22])[0]
+            sec = pe + 24 + optsz
+            end = 0
+            for i in range(nsec):
+                o = sec + i * 40
+                if o + 40 > n:
+                    _stop('執行檔的節區表被截斷了(宣告 %d 個節區)。' % nsec)
+                raw_sz, raw_off = struct.unpack('<II', d[o + 16:o + 24])
+                end = max(end, raw_off + raw_sz)
+            if end > n:
+                _stop('執行檔的節區指到 %d bytes,實際只有 %d bytes。' % (end, n))
+        except SystemExit:
+            raise
+        except (struct.error, IndexError):
+            _stop('讀不出執行檔的結構,它壞了。')
+
+    # 通用地板 —— 非 BIGF 走到這裡
+    # 第 5 道:認不出格式的檔(或前面幾道都沒攔下來的)最後一關。
+    # 非 BIGF 的工具都是原地改,改完大小幾乎不變,所以「備份不到現況的一半」
+    # 一定不正常。BIGF 走附加寫入會越改越大,套這條會擋掉每一次合法的還原,
+    # 所以上面 BIGF 那一支是直接 return,根本走不到這裡。
+    if os.path.exists(dst):
+        live = os.path.getsize(dst)
+        if live > 0 and n * 2 < live:
+            _stop('備份只有 %d bytes,而要被蓋掉的那個檔有 %d bytes ——'
+                  '差太多了(不到一半)。' % (n, live))
+    return _do_copy(bak, dst)
+
+
+# 真正動手覆蓋的只有這一個函式,而且只有通過上面那些檢查的路徑才會走到。
+# 「檢查」跟「覆蓋」分成兩個函式,是為了讓人一眼看得出覆蓋只有一個入口。
+def _do_copy(bak, dst):
+    """把備份原子地換回正本:先寫同資料夾的唯一暫存檔,逐位元組驗過才換上。
+
+    ⚠️ 2026-09-05 之前這裡是一行 shutil.copy2(bak, dst)。copy2 做的第一件事
+       就是把 dst 開成 'wb' —— **正本當場變成 0 bytes**,然後才一塊一塊寫回去。
+       中途按 Ctrl-C、磁碟滿、外接碟被拔掉、程式崩潰,正本就停在半截或 0。
+       上面那五道把關只擋得住「備份是壞的」,擋不住「覆蓋到一半死掉」。
+       還原是使用者最後一根稻草,它自己不可以是「有機會把檔案弄得更糟」的動作。
+
+    現在的流程:寫暫存檔 → flush → fsync → 權限對齊 → 讀回來比雜湊 →
+    os.replace 換上。任何一步失敗都只丟掉暫存檔,正本一個位元組都沒被碰過。
+    """
+    bak, dst = os.fspath(bak), os.fspath(dst)
+    _refuse_if_symlink(dst, '要還原的目標檔')
+    _refuse_if_symlink(bak, '備份檔')
+    fd, tmp = _mkstemp_beside(dst, 'restore')
+    swapped = False
+    prev = dict(_STATE)                # 這次動手之前的狀態,失敗時要退回它
+    try:
+        # 一邊複製一邊算備份的雜湊,不必為了驗證再讀一次備份。
+        h_src = hashlib.sha256()
+        with os.fdopen(fd, 'wb') as fo:
+            with open(bak, 'rb') as fi:
+                while True:
+                    chunk = fi.read(1 << 20)      # 一次 1 MB,幾百 MB 的檔也不吃記憶體
+                    if not chunk:
+                        break
+                    h_src.update(chunk)
+                    fo.write(chunk)
+            fo.flush()
+            os.fsync(fo.fileno())
+        # 權限沿用「正要被換掉的那個檔」,換完之後遊戲看到的權限跟換之前一樣。
+        # 正本已經不見了(被刪掉才來還原)就退而沿用備份的。
+        try:
+            shutil.copymode(dst, tmp)
+        except OSError:
+            shutil.copymode(bak, tmp)
+        # 讀回來重算一次:磁碟上真的躺著的東西跟備份逐位元組相同,才敢換上去。
+        h_dst = hashlib.sha256()
+        with open(tmp, 'rb') as f2:
+            while True:
+                chunk = f2.read(1 << 20)
+                if not chunk:
+                    break
+                h_dst.update(chunk)
+        if h_dst.digest() != h_src.digest():
+            raise SystemExit(
+                '✗ 還原用的暫存檔跟備份對不起來,已經丟掉它,%s 沒有被動到。\n'
+                '  多半是磁碟有問題。請改用你自己另外留的那一份備份。' % dst)
+        # 換名與登記中間不可以有縫(2026-09-06 第三輪)。Python 是在兩個
+        # 位元組碼之間才處理 Ctrl-C 的訊號,所以「os.replace 已經回來了、
+        # 下一行還沒跑到」這個縫隙真的存在(2026-09-05 用假的 os.replace
+        # 打中過)。上一版的解法是「旗標先立再換」,那只是把錯誤換到另一邊。
+        # 現在把兩件事包進 _NoInterrupt:這段期間的 Ctrl-C 先記下來,
+        # 登記完才丟出去,收尾看到的狀態一定跟磁碟上的一致。
+        _STATE['target'], _STATE['phase'] = dst, 'replacing'
+        with _NoInterrupt():
+            os.replace(tmp, dst)       # 到這一行為止,正本都還是原來那一個
+            swapped = True
+            _STATE.update(phase='replaced', kind='restore')
+    except BaseException as e:
+        if not swapped:
+            _quiet_unlink(tmp)
+            if isinstance(e, OSError):
+                # os.replace 自己失敗 = 換名確定沒有發生,狀態退回動手之前。
+                # **只有「確定沒換成」才可以退**:退成 idle 之前那一步如果
+                # 早就有人換過(例如複驗沒過那條路),退回去就是說謊,
+                # 所以退的是 prev 而不是寫死的 idle。
+                _STATE.update(prev)
+        raise
+
+
+def _atomic_write(dst, blob):
+    """把一整份新內容原子地換上去:寫暫存檔 → fsync → os.replace。
+
+    跟 _do_copy 同一套安全網,差別只在來源是記憶體裡的位元組而不是備份檔。
+    暫存名一樣走 mkstemp(理由見 _mkstemp_beside)。
+    """
+    dst = os.fspath(dst)
+    _refuse_if_symlink(dst, '要寫入的目標檔')
+    fd, tmp = _mkstemp_beside(dst, 'tmp')
+    swapped = False
+    prev = dict(_STATE)                # 這次動手之前的狀態,失敗時要退回它
+    try:
+        with os.fdopen(fd, 'wb') as fo:
+            fo.write(blob)
+            fo.flush()
+            os.fsync(fo.fileno())
+        try:
+            shutil.copymode(dst, tmp)  # 沿用正本的權限
+        except OSError:
+            pass                       # 正本不存在就用 mkstemp 的預設,不是致命問題
+        # 「換名 + 登記」包成不可中斷的一段,理由見 _do_copy 裡的說明。
+        _STATE['target'], _STATE['phase'] = dst, 'replacing'
+        with _NoInterrupt():
+            os.replace(tmp, dst)
+            swapped = True
+            _STATE.update(phase='replaced', kind='apply')
+    except BaseException as e:
+        if not swapped:
+            _quiet_unlink(tmp)
+            if isinstance(e, OSError):
+                _STATE.update(prev)    # 確定沒換成,狀態退回這次動手之前
+        raise
+
+
+
+
+# Windows 主控台預設編碼(繁中是 cp950)存不下 ✓ ✗ 這類符號,
+# 輸出被重導向到檔案時會直接 UnicodeEncodeError 中斷。先把輸出轉成 UTF-8。
+try:
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+except (AttributeError, ValueError):                # Python 3.6 以下沒有 reconfigure
+    pass
+
+# ─────────────────────────────────────────────────────────
+#  QFS / RefPack 解壓
+# ─────────────────────────────────────────────────────────
+def qfs_decompress(data: bytes) -> bytes:
+    """把 QFS / RefPack 壓縮過的位元組解開。不是壓縮檔就原樣還你。
+
+    認法是第 2 個位元組固定為 0xFB(第 1 個是旗標,常見的是 0x10)。
+    緊接著是「解開來有多大」,大端,長度看旗標的最低位元:
+      旗標 bit0 = 1 → 4 個位元組,放在位移 6-10,資料從位移 10 開始
+      旗標 bit0 = 0 → 3 個位元組,放在位移 2-5,資料從位移 5 開始
+    之後就是一串指令,每一種指令都做兩件事:先原樣抄幾個位元組(literal),
+    再從**已經解出來的結果**往回抄一段(反向參照)。
+    """
+    if len(data) < 2 or data[1] != 0xFB:
+        return data                                    # 未壓縮,原樣返回
+
+    if data[0] & 0x01:                                 # 4-byte 尺寸欄位
+        if len(data) < 10:
+            raise ValueError('QFS 檔頭不完整')
+        size = int.from_bytes(data[6:10], 'big')
+        pos = 10
+    else:                                              # 3-byte 尺寸欄位
+        if len(data) < 5:
+            raise ValueError('QFS 檔頭不完整')
+        size = int.from_bytes(data[2:5], 'big')
+        pos = 5
+
+    # 第一道防呆:檔頭自己宣稱的大小就不合理的話,連解都不要解。
+    if not 0 <= size <= MAX_UNCOMPRESSED:
+        raise ValueError(f'QFS 宣稱解壓尺寸異常:{size}')
+
+    out = bytearray()
+    end = len(data)
+
+    def guard():
+        # ⚠️ 只檢查檔頭宣稱的大小是不夠的 —— 那是「檔案自己說的」。
+        #    惡意檔可以宣稱很小(通過上面那道),再用反向參照無限吐資料,
+        #    把記憶體吃光。實際輸出也要有上限,而上限就是它自己宣稱的大小。
+        if len(out) > size:
+            raise ValueError(f'QFS 解出來的資料超過檔頭宣稱的 {size} 位元組 —— '
+                     f'這個檔可能已損毀或被動過手腳')
+
+    def copy_back(offset, length):
+        # 從結果尾端往回數 offset 個位元組開始抄 length 個。
+        # 注意來源可以跟目的重疊(offset 比 length 小的時候),那是刻意的:
+        # 「往回 1 個位元組抄 20 次」就是把同一個位元組重複 20 遍,
+        # 所以只能一個一個抄,不可以改成一次切一段。
+        if not 0 < offset <= len(out):
+            raise ValueError(f'QFS 反向參照越界 offset={offset}')
+        src = len(out) - offset
+        for _ in range(length):
+            out.append(out[src])
+            src += 1
+        guard()
+
+    # 指令迴圈。第一個位元組(b0)決定是哪一種指令,四段的分界是
+    # 0xFC / 0xE0 / 0xC0 / 0x80,由大到小判斷。
+    while pos < end:
+        b0 = data[pos]
+
+        if b0 >= 0xFC:                                 # 結束標記 + 0~3 個 literal
+            n = b0 & 0x03
+            pos += 1
+            out += data[pos:pos + n]
+            guard()
+            break
+
+        if b0 >= 0xE0:                                 # 純 literal
+            n = ((b0 & 0x1F) << 2) + 4
+            pos += 1
+            out += data[pos:pos + n]
+            guard()
+            pos += n
+            continue
+
+        # 下面三種都是「抄 n 個 literal,再往回抄 length 個」。
+        # 差別只在能表達多長、多遠。位元被拆散在好幾個位元組裡,
+        # 是為了讓最常用的短距離參照只花 2 個位元組。
+        if b0 >= 0xC0:                                 # 4-byte 指令:長距離參照
+            # literal 0~3 · 長度 5~1028 · 回頭 1~131072(128 KB)
+            b1, b2, b3 = data[pos + 1], data[pos + 2], data[pos + 3]
+            pos += 4
+            n = b0 & 0x03
+            length = ((b0 & 0x0C) << 6) + b3 + 5
+            offset = ((b0 & 0x10) << 12) + (b1 << 8) + b2 + 1
+        elif b0 >= 0x80:                               # 3-byte 指令:中距離參照
+            # literal 0~3(這一種放在 b1 的高兩位)· 長度 4~67 · 回頭 1~16384
+            b1, b2 = data[pos + 1], data[pos + 2]
+            pos += 3
+            n = (b1 >> 6) & 0x03
+            length = (b0 & 0x3F) + 4
+            offset = ((b1 & 0x3F) << 8) + b2 + 1
+        else:                                          # 2-byte 指令:短距離參照
+            # literal 0~3 · 長度 3~10 · 回頭 1~1024
+            b1 = data[pos + 1]
+            pos += 2
+            n = b0 & 0x03
+            length = ((b0 & 0x1C) >> 2) + 3
+            offset = ((b0 & 0x60) << 3) + b1 + 1
+
+        # 順序不能對調:先把 literal 抄進去,那幾個位元組本身
+        # 有可能就是下一句反向參照要回頭抄的來源。
+        out += data[pos:pos + n]
+
+        guard()
+        pos += n
+        copy_back(offset, length)
+
+    # 結束指令之後就算資料流裡還有位元組也不算數,上面那個 break 就收工了。
+    # 至於這一行的 [:size],它看起來是「截到檔頭宣稱的長度」,實際上永遠切不到東西:
+    # 上面每一次往 out 加料之後都會叫一次 guard(),一超過 size 就當成壞檔擋下來,
+    # 連結束指令那 0 到 3 個位元組也是先 guard() 再 break,
+    # 所以能走到這一行的時候,len(out) 一定小於或等於 size。
+    # 2026-09-03 實測:餵一份宣稱 6 個位元組、實際會吐出 7 個的資料流進來,
+    # 拿到的是「QFS 解出來的資料超過檔頭宣稱的 6 位元組」這個錯誤,
+    # 不是一份被切短的結果;再拿本站測試機 MVP2026/data/frontend/ 底下
+    # 98 個封裝檔裡的 9,643 個 QFS 項目各解一次,沒有一項解出來的長度
+    # 超過檔頭宣稱的大小,也就是 [:size] 一次都沒有真的切到東西。
+    # 所以它是最後一道保險,不是這支程式的正常路徑。
+    return bytes(out[:size])
+
+
+# ─────────────────────────────────────────────────────────
+#  QFS / RefPack 壓縮(純 literal 編碼)
+#
+#  RefPack 允許整份資料都用 literal 指令表達。不做字串匹配搜尋,
+#  所以是瞬間完成,而且不必依賴壓縮器的正確性,格式一樣合法。
+#  代價是檔案較大(本例 84 KB 對上原檔的 11.6 KB —— 那份原檔是社群做的,不是 EA 出貨的),
+#  對 2.5 MB 的 ingame.big 而言只多 3%。
+# ─────────────────────────────────────────────────────────
+def qfs_compress_literal(data: bytes) -> bytes:
+    """把資料包成合法的 QFS,但一個反向參照都不用,全部走 literal。
+
+    產出的檔頭是 0x10 0xFB 加 3 個位元組的原始長度(大端),
+    也就是這個寫法最多只能包 16,777,215 個位元組。版面檔離那個上限很遠
+    (本站量到最大的解開後也只有幾十 KB),所以夠用。
+
+    ⚠️ 這裡不做字串比對,所以**壓不小**,只是把資料合法地包起來。
+       換來的是速度,以及「不可能壓錯」:解壓端只會走 literal 那一條路。
+    """
+    n = len(data)
+    out = bytearray([0x10, 0xFB, (n >> 16) & 0xFF, (n >> 8) & 0xFF, n & 0xFF])
+    tail = n % 4                                       # 0~3,交給結束指令帶走
+    body = n - tail
+    pos = 0
+    # literal 指令一次只能帶 4 的倍數個位元組,所以先把「不足 4 的尾巴」切出去,
+    # 中間整批用 0xE0 系列的指令送,尾巴交給結束指令 0xFC | tail 帶走。
+    while pos < body:
+        chunk = min(112, body - pos)                   # 必為 4 的倍數,上限 112
+        # 指令位元組 = 0xE0 加上「這一塊有幾個 4 位元組」減 1。
+        # chunk 最大 112 時算出 0xFB,剛好停在 0xFC 之前。
+        # 再大一格就會被解壓端當成結束標記,檔案當場截斷。
+        out.append(0xE0 | ((chunk - 4) // 4))          # 0xE0~0xFB,不會撞到 0xFC
+        out += data[pos:pos + chunk]
+        pos += chunk
+    out.append(0xFC | tail)                            # 結束標記
+    out += data[pos:]
+    return bytes(out)
+
+
+# ─────────────────────────────────────────────────────────
+#  BIG 檔目錄
+# ─────────────────────────────────────────────────────────
+class BigFormatError(Exception):
+    """.big 檔頭或目錄不合格式。"""
+
+
+def list_entries(data: bytes):
+    """走一次目錄,回傳 [(名稱, TOC 欄位位置, 資料 offset, 資料長度), ...]。
+
+    BIG 檔的開頭 16 個位元組是檔頭,本工具只用到其中兩段:
+      位移 0-4    'BIGF'
+      位移 4-8    檔案總大小(寫回去時要更新的就是這一欄)
+      位移 8-12   目錄有幾項,**大端**
+    目錄從位移 16 開始,每一項是:資料位移 4 位元組 + 資料長度 4 位元組
+    (兩個都是大端),接一個以 \\0 結尾的名字,長度不固定。
+    所以只能從頭一項一項走,沒有辦法直接跳到第 N 項。
+
+    回傳裡的「TOC 欄位位置」就是那 8 個位元組在檔案裡的絕對位移。
+    留著它,之後改這一項的去處只要覆蓋那 8 個位元組,不必重寫整個目錄。
+    """
+    if len(data) < 16 or data[:4] != b'BIGF':
+        raise BigFormatError('檔頭前四碼不是 BIGF,這不是 EA BIG 封裝檔')
+    count = int.from_bytes(data[8:12], 'big')
+    # 防呆:壞掉的檔會把項目數讀成天文數字,下面那個迴圈就會空轉很久。
+    if not 0 < count < 100000:
+        raise BigFormatError(f'目錄項目數異常({count}),檔案可能已損毀')
+
+    items = []
+    pos = 16
+    for i in range(count):
+        field = pos
+        if pos + 8 > len(data):
+            raise BigFormatError(f'目錄在第 {i + 1} 項處被截斷,檔案不完整')
+        offset, size = struct.unpack('>II', data[pos:pos + 8])
+        pos += 8
+        end = data.find(b'\x00', pos)                  # find 不會丟例外
+        if end < 0:
+            raise BigFormatError(f'第 {i + 1} 項的名稱沒有結束符,檔案已損毀')
+        # 每一項都驗一次「資料範圍在不在檔案裡面」。之後 data[off:off+size]
+        # 這種切法在 Python 裡越界不會出錯,只會**默默給你短的資料**,
+        # 那樣壞掉的檔會被當成好的一路走下去,錯得更難查。
+        if offset + size > len(data):
+            raise BigFormatError(f'第 {i + 1} 項的資料範圍超出檔案結尾')
+        # 名字用 latin-1 解:一個位元組對一個字元,不會因為遇到非 ASCII 就爆掉,
+        # 而且轉回去是無損的:這裡只需要能比對,不需要「讀得懂」。
+        items.append((data[pos:end].decode('latin-1', 'replace'), field, offset, size))
+        pos = end + 1
+    return items
+
+
+def find_entry(items, name: bytes):
+    """回傳 (TOC 欄位位置, 資料 offset, 資料長度)。找不到回傳 None。
+
+    名字是逐字比對,**區分大小寫**。--fel 打錯大小寫會被當成找不到,
+    而找不到的時候呼叫端會把這個封裝檔裡所有的版面檔列出來給你看。
+    """
+    want = name.decode('latin-1')
+    for entry_name, field, offset, size in items:
+        if entry_name == want:
+            return field, offset, size
+    return None
+
+
+
+# ─────────────────────────────────────────────────────────
+#  顏色欄位在哪裡:這是本課唯一的一手發現
+# ─────────────────────────────────────────────────────────
+# RT(色塊矩形)的欄位長這樣:
+#
+#   RT:名稱,顯示,保留,X,Y,寬,高,?,?,?,?,?,R,G,B,...
+#   欄位序號(名稱之後從 0 起算)  0  1 2 3 4 5 6 7 8 9 10 11 12 13
+#                                              └── RGB ──┘
+#
+# 這個位置**不是推的**。定位方法有兩步:
+#
+#   一、fes_hudleft.fel 裡 RT:SCOREBLACK 與 RT:SCOREWHITE 兩行,
+#       逐欄比對只差三個欄位 —— 就是 11、12、13:
+#         RT:SCOREBLACK,0,0,67,35,152,50,1,1,1,1,1,000,000,000,0,...
+#         RT:SCOREWHITE,0,0,67,35,152,50,1,1,1,1,1,255,255,255,0,...
+#
+#   二、拿「元素名字」當標準答案,掃剛安裝好的原版 ingame.big 全部 44 個版面檔:
+#       名字裡帶 BLACK / WHITE / RED / GREEN / BLUE / YELLOW 的 RT 共 1,057 個,
+#       其中 **1,028 個**的欄位 11-13 剛好等於名字說的那個顏色(97.3%)。
+#       對不上的 29 個裡,27 個是同方向的變體:BLACK1 (30,30,30) 深灰 11 個、
+#       BLACK2 (30,30,30) 11 個、BLACKTRANS (50,50,50) 2 個、
+#       BLUE (20,30,91) 深藍 2 個、RED (101,30,15) 深紅 1 個。
+#       另外 2 個方向不對:fes_ingamecontrolmenu.fel 第 54 行的 RT:RED
+#       與第 58 行的 RT:GREEN,欄位 11-13 都是 000,000,000(純黑)。
+#       所以「名字對得上數值」的是 1,028 個,不是 1,057 個裡全部都有解釋。
+#
+# 為什麼這算硬證據:名字是**獨立於數值**的第二來源。這不是本站列為紅燈的
+# 「數量剛好對得上」,是 1,028 個各自成立的名字↔數值吻合。
+#
+# ⚠️ 本站沒驗的:第二組三元組(欄位 17-19)是什麼。SCOREBLACK 與 SCOREWHITE
+#    那兩行它都是 000,000,000,分不出來。所以本工具**只動第一組**。
+RT_RGB_INDEX = 11          # 名稱之後從 0 起算
+
+# TX(文字)的顏色在字型檔名與字串編號之後。它一行有六組三元組,
+# 本站只能確定第一組是主要顏色(把它改掉,畫面上那個字就變色),
+# 其餘五組(陰影/外框/漸層?)**未驗**,本工具不碰。
+TX_RGB_AFTER_STRINGID = 2  # 字串編號之後再跳幾欄才是 R
+
+MAX_UNCOMPRESSED = 256 * 1024 * 1024      # 防壞檔宣稱超大尺寸而吃光記憶體
+DEFAULT_FEL = b'fes_hudleft.fel'          # 記分板
+DEFAULT_BIG = 'data/frontend/ingame.big'
+
+# 版面檔一行長這樣:「〔縮排〕RT:名稱,欄位,欄位,…」。
+# 第 1 組抓縮排(縮排代表群組層級,重建那一行時要原樣接回去),
+# 第 2 組抓名稱(--set 用的就是它),第 3 組是逗號分隔的欄位串。
+# 名稱只吃英數與底線;抓不到就代表這一行不是本工具認得的元素,直接跳過。
+_RT = re.compile(r'^(\s*)RT:([A-Za-z0-9_]+),(.*)$')
+_TX = re.compile(r'^(\s*)TX:([A-Za-z0-9_]+),(.*)$')
+
+
+# 欄位就是逗號分隔,沒有引號也沒有跳脫,所以直接切。
+# 切完的每一格都保持原始字串(不轉成數字),因為換色時要保住原本的字元寬度。
+def _fields(rest):
+    return rest.split(',')
+
+
+def rt_color(rest):
+    """回傳 (R,G,B) 或 None。
+
+    回 None 有三種情況:欄位數不夠、那三格不是數字、數字不在 0-255。
+    三種都當成「這一行不是我認得的色塊」而**放過它**。
+    寧可漏掉一個,也不要把不是顏色的欄位當成顏色去改。
+    """
+    f = _fields(rest)
+    if len(f) < RT_RGB_INDEX + 3:
+        return None
+    try:
+        v = tuple(int(x) for x in f[RT_RGB_INDEX:RT_RGB_INDEX + 3])
+    except ValueError:
+        return None
+    return v if all(0 <= x <= 255 for x in v) else None
+
+
+def tx_color(rest):
+    """TX 的主要顏色。回傳 ((R,G,B), 欄位起點) 或 None。
+
+    做法是先找到字型檔名那一欄(唯一以 .ffn 結尾的欄位),
+    再跳過字串編號與一個對齊欄 —— 不寫死欄號,因為 TX 的欄位數不固定。
+
+    為什麼拿 .ffn 當錨:副檔名是**內容自己帶著的線索**,不必先數對前面有幾欄。
+    只要那一行有字型,就一定找得到起點;沒有字型的 TX 本來就沒有顏色可改。
+    """
+    f = _fields(rest)
+    ffn = next((i for i, x in enumerate(f) if x.lower().endswith('.ffn')), None)
+    if ffn is None:
+        return None
+    # 從字型檔名那一欄往後數:+1 是字串編號,再往後 2 欄才是 R
+    # (中間隔著的那一欄是對齊)。回傳時把起點一起帶出去,
+    # 改色的時候才知道要覆蓋哪三格,不必再算一次。
+    start = ffn + 1 + TX_RGB_AFTER_STRINGID
+    if len(f) < start + 3:
+        return None
+    try:
+        v = tuple(int(x) for x in f[start:start + 3])
+    except ValueError:
+        return None
+    return (v, start) if all(0 <= x <= 255 for x in v) else None
+
+
+def scan(text):
+    """列出這個版面檔裡所有帶顏色的元素。
+
+    回傳 [(行號, 種類, 名稱, 顯示中?, (R,G,B)), ...]
+
+    「顯示中」是名稱之後的第 0 欄:1 是顯示、0 是關掉。
+    它跟顏色是分開的兩件事:關掉的元素照樣有顏色欄,改得動,
+    只是畫面上看不到。清單把這一欄印出來,就是為了讓你在改之前先知道。
+    """
+    out = []
+    # 用 '\r\n' 切行,不是用 splitlines():.fel 全檔是 CRLF,
+    # 而且行數與換行字元都是這個格式的一部分,不能在中途被「整理」掉。
+    for n, line in enumerate(text.split('\r\n'), 1):
+        m = _RT.match(line)
+        if m:
+            c = rt_color(m.group(3))
+            if c:
+                on = _fields(m.group(3))[0] == '1'
+                out.append((n, 'RT', m.group(2), on, c))
+            continue
+        m = _TX.match(line)
+        if m:
+            r = tx_color(m.group(3))
+            if r:
+                on = _fields(m.group(3))[0] == '1'
+                out.append((n, 'TX', m.group(2), on, r[0]))
+    return out
+
+
+def _width_preserving(old, val):
+    """把數字換掉但保持原本的字元寬度。
+
+    ⚠️ 這一步是**格式紀律**不是潔癖:.fel 全用 CRLF,而本站鐵律說
+       「編輯器統一成 LF 會讓檔案壞掉」。同理,欄位寬度是這個檔的一部分,
+       原本寫 000 就補成 000,原本寫 0 就寫 0 —— 不要順手「整理」它。
+    """
+    # 實測:RT 與 TX 的 RGB 欄位**大多**是三位數零填充
+    # (SCOREBLACK 寫 000,000,000、SCOREWHITE 寫 255,255,255、
+    #  TX 裡還有 243,220,020),但不是全部:剛安裝好的原版 ingame.big 裡
+    # 本工具認得的 9,093 格 RGB 欄位中,8,763 格是三位數、306 格是一位數、
+    # 24 格是兩位數(一位數的例子:fes_defensivepositions.fel 的
+    # TX:TITLE1 寫 ...,3600,0,0,0,0,...;兩位數的例子:fes_playerinfobar.fel
+    # 的 RT:RT1 寫 50,50,50)。所以照**原欄位寬度**補,
+    # 不是「開頭有 0 才補」—— 第一版那樣寫會把 255 換成 7 而不是 007。
+    # ⚠️ zfill 只補不截:原本是一位數的欄位換成三位數的顏色時會變寬(0 → 255),
+    #    那幾格保不住寬度。保得住的是行數、CRLF 與其他欄位。
+    return str(val).zfill(len(old))
+
+
+def recolor(text, wants):
+    """wants = {名稱大寫: (R,G,B)}。回傳 (新文字, [(名稱, 舊色, 新色, 行號)])。
+
+    只改被點名的元素,而且只改那三格數字。行數、換行字元、縮排、
+    其他欄位的內容與字元寬度,通通原封不動。
+    這四件事只要有一件變了,遊戲就可能讀不了這個版面檔。
+    """
+    changed = []
+    lines = text.split('\r\n')
+    for i, line in enumerate(lines):
+        # 一行只可能是 RT 或 TX 其中一種,兩種都試一次,中了就 break。
+        for pat, getter in ((_RT, 'rt'), (_TX, 'tx')):
+            m = pat.match(line)
+            if not m:
+                continue
+            nm = m.group(2).upper()
+            # 沒被 --set 點到名的元素,連碰都不碰。
+            # 名字一律轉大寫再比,所以指令列打小寫也認得。
+            if nm not in wants:
+                continue
+            f = _fields(m.group(3))
+            # RT 的顏色在固定欄號;TX 的要現場找(欄位數不固定),
+            # 所以兩種取回來的「起點」不一樣,底下才共用同一段覆蓋邏輯。
+            if getter == 'rt':
+                start = RT_RGB_INDEX
+                old = rt_color(m.group(3))
+            else:
+                r = tx_color(m.group(3))
+                if not r:
+                    continue
+                old, start = r
+            if old is None:
+                continue
+            new = wants[nm]
+            # 顏色本來就一樣就不算一次變更,這樣「沒有東西要改」
+            # 跟「改了但沒生效」在輸出上分得開。
+            if old == new:
+                continue
+            for k in range(3):
+                f[start + k] = _width_preserving(f[start + k], new[k])
+            # 重組這一行:縮排(group 1)原樣接回去、指令關鍵字照原本那一種、
+            # 名稱照原本的大小寫,只有欄位串是新的。
+            lines[i] = '%s%s:%s,%s' % (m.group(1), pat is _RT and 'RT' or 'TX',
+                                       m.group(2), ','.join(f))
+            changed.append((m.group(2), old, new, i + 1))
+            break
+    # 用同一個 '\r\n' 接回去,行數與換行字元都跟進來時一樣。
+    return '\r\n'.join(lines), changed
+
+
+# 顏色名的快捷表。這些是好打好記的近似值,**不是遊戲裡的標準色**。
+# 只有 black / white 跟原版一致(000,000,000 與 255,255,255)。
+# navy 用的是掃原版時量到的那個深藍變體 (20,30,91);
+# cpbl 是中職紅的近似值,目前跟 red 同一組數字。
+# 要精確就直接寫 #rrggbb,不要透過名字。
+NAMED = {
+    'black': (0, 0, 0), 'white': (255, 255, 255), 'red': (200, 30, 30),
+    'green': (30, 140, 60), 'blue': (30, 60, 160), 'yellow': (230, 200, 40),
+    'orange': (220, 130, 30), 'grey': (128, 128, 128), 'gray': (128, 128, 128),
+    'navy': (20, 30, 91), 'cpbl': (200, 30, 30),
+}
+
+
+def parse_color(s):
+    """吃 '255,0,0' 或 '#ff0000' 或 'red'。回傳 (R,G,B)。"""
+    s = s.strip().lower()
+    # 一、顏色名。放第一個是因為它最好認,而且不會跟另外兩種寫法搞混。
+    if s in NAMED:
+        return NAMED[s]
+    # 二、十六進位。#f0a 這種三位的寫法要先展開成六位(每個字元重複一次),
+    #     展開之後才一律當六位來切,兩碼一組轉成 0-255。
+    if s.startswith('#'):
+        s = s[1:]
+        if len(s) == 3:
+            s = ''.join(c * 2 for c in s)
+        if len(s) != 6:
+            raise ValueError('十六進位顏色要寫成 #rgb 或 #rrggbb')
+        return tuple(int(s[i:i + 2], 16) for i in (0, 2, 4))
+    # 三、R,G,B。逗號或空白都可以當分隔,連著打好幾個也沒關係。
+    parts = [p for p in re.split(r'[,\s]+', s) if p]
+    if len(parts) != 3:
+        raise ValueError('顏色要寫成 R,G,B(0-255)或 #rrggbb 或顏色名')
+    # int() 本身會擋掉不是數字的東西(丟 ValueError,呼叫端會接住並印出來),
+    # 範圍則要自己驗:300 是合法的數字,但不是合法的顏色。
+    v = tuple(int(p) for p in parts)
+    if not all(0 <= x <= 255 for x in v):
+        raise ValueError('R/G/B 每一個都要在 0 到 255 之間')
+    return v
+
+
+# ─────────────────────────────────────────────────────────
+#  主流程
+# ─────────────────────────────────────────────────────────
+def _symlink_gate(p, writing):
+    """符號連結:唯讀那條路跟著它讀,會寫的那兩條路(--apply / --restore)停下來。
+
+    ⚠️ 這一段改過兩次,兩次的理由不一樣,寫下來免得有人又改回去:
+       第一版直接對連結寫。寫回是「寫暫存檔再 os.replace」,而 os.replace
+       換掉的是**連結本身**:連結變成一個實體檔,真正的遊戲檔一個位元組都
+       沒改,螢幕上卻印「✓ 已寫入」「顏色複驗 1/1 正確」,連結也回不來了。
+       第二版(2026-09-05)改成「先走到真檔再動手」,至少動到的是同一個檔。
+       第三版(2026-09-06)就是現在這樣:要寫的時候一律停下來 —— 走到真檔
+       等於替使用者決定去改一個**可能不在這個資料夾裡**的檔案,那個決定
+       應該由他自己講明白。2026-09-06 實測第二版的行為:連結指到工作資料夾
+       外面的一份 2,665,562 bytes 的封裝檔,--apply 照樣把它改成 2,743,315
+       bytes,連備份也生在外面那個資料夾裡。
+       唯讀那條路(列清單、預覽)不受限:只是讀,跟著連結走沒有風險。
+    """
+    if not p.is_symlink():
+        return p
+    real = os.path.realpath(os.fspath(p))
+    if writing:
+        raise SystemExit(
+            '✗ %s 是一個符號連結,本工具不跟著連結寫:%s\n'
+            '  它指向:%s\n'
+            '  連結有可能指到遊戲資料夾以外的檔案,寫下去會傷到不相干的東西。\n'
+            '  請直接把真正的那個檔的路徑餵給它,或先把這條連結換成實體檔。\n'
+            '  (目前一個位元組都沒有動到。)' % (p.name, p, real))
+    print('· %s 是一個符號連結,現在只是讀,跟著它走到:%s' % (p.name, real))
+    return Path(real)
+
+
+def _resolve_big(arg, writing):
+    """吃「遊戲資料夾」或「直接給 .big」兩種寫法。
+
+    給資料夾的話它自己往 data/frontend/ingame.big 找,這樣使用者
+    直接把遊戲資料夾拖進終端機就能跑,不用知道版面檔藏在哪一層。
+    找到之後如果它是一條符號連結:唯讀那條路跟著它讀,會寫的那兩條路
+    直接停下來(見 _symlink_gate)。writing 就是在講這一趟會不會寫。
+    """
+    p = Path(arg).expanduser()          # 展開 ~,Mac 上直接貼家目錄路徑才會動
+    if p.is_dir():
+        cand = p / DEFAULT_BIG
+        if not cand.is_file():
+            # 檔案整個不見(不是壞掉)的話 --restore 也走不到後面那段,
+            # 所以在這裡就把「備份還在」講出來,不要讓人以為連備份都沒了。
+            hint = ''
+            bak = cand.with_suffix(cand.suffix + '.hudcolorbak')
+            if bak.is_file():
+                hint = ('\n  不過本工具的備份還在:%s\n'
+                        '  它是完整的原始檔,把它複製一份、改名成 %s 就等於還原了。'
+                        % (bak, cand.name))
+            raise SystemExit('✗ 在這個資料夾裡找不到 %s\n  你給的是:%s%s'
+                             % (DEFAULT_BIG, p, hint))
+        return _symlink_gate(cand, writing)
+    if not p.is_file():
+        raise SystemExit('✗ 找不到:%s' % p)
+    return _symlink_gate(p, writing)
+
+
+def main():
+    """指令列入口。回傳值就是 exit code:0 成功、1 有問題。
+
+    整支的流程是:解析參數 → 找到 .big → 讀目錄找到版面檔 → 解壓 →
+    掃出帶顏色的元素 → (沒有 --set 就印清單收工) → 算出新內容 →
+    (沒有 --apply 就印預覽收工) → 備份 → 附加寫回 → 重新讀出來複驗。
+    """
+    argv = sys.argv[1:]
+    if not argv or '-h' in argv or '--help' in argv:
+        print(__doc__)          # 沒給參數就是把檔頭那段說明直接印出來
+        return 1
+
+    # 自己走一遍參數,不用 argparse:--set 要能重複出現好幾次,
+    # 而且值是「名字=顏色」這種要當場解析、當場把錯誤講清楚的東西。
+    args, sets, fel_name = [], {}, DEFAULT_FEL
+    i = 0
+    while i < len(argv):
+        a = argv[i]
+        if a == '--set':
+            i += 1
+            if i >= len(argv):
+                print('✗ --set 後面要接「元素名=顏色」,例如 --set SCOREBLACK=#204080')
+                return 1
+            spec = argv[i]
+            if '=' not in spec:
+                print('✗ --set 要寫成 元素名=顏色,你給的是:%s' % spec)
+                return 1
+            nm, col = spec.split('=', 1)
+            try:
+                sets[nm.strip().upper()] = parse_color(col)
+            except ValueError as e:
+                print('✗ %s 的顏色看不懂:%s' % (nm, e))
+                return 1
+        elif a == '--fel':
+            i += 1
+            if i >= len(argv):
+                print('✗ --fel 後面要接版面檔名')
+                return 1
+            # 封裝檔裡的名字都是英數,latin-1 存不下中文。不接住的話
+            # 打中文檔名會噴 UnicodeEncodeError 的 traceback,看起來像壞掉了。
+            try:
+                fel_name = argv[i].encode('latin-1')
+            except UnicodeEncodeError:
+                print('✗ --fel 只吃封裝檔裡的原始檔名(全是英數),你給的是:%s'
+                      % argv[i])
+                print('  不確定有哪些名字可以用,就先不帶 --set 跑一次,它會列給你看。')
+                return 1
+        elif a.startswith('--'):
+            args.append(a)
+        else:
+            args.append(a)
+        i += 1
+
+    # 剩下的參數分兩堆:--開頭的是旗標,其餘的是位置參數(第一個就是路徑)。
+    flags = {a for a in args if a.startswith('--')}
+    pos = [a for a in args if not a.startswith('--')]
+    if not pos:
+        print(__doc__)
+        return 1
+
+    # 會寫的只有 --apply 與 --restore 這兩條路。符號連結的把關要看是哪一條:
+    # 唯讀跟著連結讀沒有風險,要寫就停下來(見 _symlink_gate)。
+    writing = ('--apply' in flags) or ('--restore' in flags)
+    big = _resolve_big(pos[0], writing)
+    # 備份名是「原檔名再接一個副檔名」,例如 ingame.big.hudcolorbak。
+    # 用專屬字尾而不是通用的 .bak,是為了不去碰別課的備份:
+    # 一個遊戲資料夾裡可能同時躺著好幾課留下來的備份。
+    backup = big.with_suffix(big.suffix + '.hudcolorbak')
+
+    # ── 還原 ──────────────────────────────────────────
+    # 還原走在最前面:它不需要讀目錄也不需要解壓,而且使用者會來按這個,
+    # 通常正是因為檔案已經壞到讀不下去了。
+    if '--restore' in flags:
+        # 這一道排在 is_file() 之前:備份如果是一條指向不存在檔案的符號連結,
+        # is_file() 會回 False,使用者只會看到「找不到備份」—— 那是錯的診斷。
+        _refuse_if_symlink(backup, '備份檔')
+        if not backup.is_file():
+            print('✗ 找不到本工具的備份:%s' % backup.name)
+            print('  (本工具只認自己的副檔名 .hudcolorbak,不會去動別課留下的 .bak)')
+            return 1
+        if backup.read_bytes()[:4] != b'BIGF':
+            print('✗ 這個備份不是封裝檔,不敢拿它覆蓋任何東西:%s' % backup.name)
+            return 1
+        # 目標檔自己壞掉**不是**拒絕還原的理由 —— 那正是要還原的時候。
+        # (2026-09-05 訂正:原本這裡擋著,把檔頭被寫壞、或被截成 0 bytes 的
+        #  遊戲檔關在門外 —— 而那正是上面那段註解說的「使用者會來按這個」的情況,
+        #  頁面的 ❌ Fail 表也是這樣教的:遊戲開不起來就 --restore。)
+        # 真正的把關在 _restore_from_backup():它驗的是「這份備份能不能信」,
+        # 跟目標現在長什麼樣子無關。
+        if big.read_bytes()[:4] != b'BIGF':
+            print('· 目標現在不是完整的封裝檔(它可能已經壞掉了)——')
+            print('  這正是要還原的時候,繼續。')
+        _restore_from_backup(backup, big)
+        # 蓋回去之後真的讀回來比一次。filecmp 是分塊比對:檔案再大也不會
+        # 整份吃進記憶體,而且長度不同它直接判不同 —— 不會像 zip() 那樣
+        # 在短的那一邊停下來,把「短了一截」看成「完全相同」。
+        import filecmp
+        if not filecmp.cmp(os.fspath(backup), os.fspath(big), shallow=False):
+            print('✗ 還原之後比對不相符:%s' % big.name)
+            print('  備份本身還在(%s),請改用你自己另外留的那一份。' % backup.name)
+            return 1
+        print('✓ 已從備份還原:%s(整份逐位元組比對相符)' % big.name)
+        return 0
+
+    # 整個封裝檔讀進記憶體(本站量到的 ingame.big 是幾 MB 等級,吃得下),
+    # 用 bytearray 是因為待會要就地改目錄那 8 個位元組跟檔頭那 4 個。
+    data = bytearray(big.read_bytes())
+    # 拖錯檔案是最常見的操作失誤。不接住的話這裡會噴一整段 traceback,
+    # 對不開終端機的人來說跟「壞掉了」看起來一樣 —— 而其實什麼都沒被動到。
+    try:
+        entries = list_entries(bytes(data))
+    except BigFormatError as e:
+        print('✗ 讀不出這個檔的目錄:%s' % e)
+        print('  你指到的是:%s' % big)
+        print('  這一課要的是 EA 的 BIG 封裝檔(預設 %s)。' % DEFAULT_BIG)
+        print('  一個位元組都沒有被改到。')
+        return 1
+    found = find_entry(entries, fel_name)
+    # 找不到就把這個封裝檔裡所有的 .fel 印出來。
+    # 使用者多半是不知道有哪些名字可以選,直接給他清單比叫他去查快。
+    if not found:
+        print('✗ %s 裡沒有 %s' % (big.name, fel_name.decode('latin-1')))
+        print('  這個封裝檔裡的版面檔有:')
+        for nm, _f, _o, _s in entries:
+            if nm.lower().endswith('.fel'):
+                print('    %s' % nm)
+        return 1
+    field, off, size = found
+    if size > MAX_UNCOMPRESSED:
+        print('✗ 這個項目宣稱有 %d bytes,不合理,拒絕解開' % size)
+        return 1
+    # 解開之後用 latin-1 當文字讀:一個位元組對一個字元,原封不動,
+    # 待會 encode('latin-1') 寫回去也是原封不動。
+    # 這裡要的是「能用正規表示式處理的字串」,不是「讀得懂的文字」。
+    text = qfs_decompress(bytes(data[off:off + size])).decode('latin-1')
+
+    rows = scan(text)
+    print('%s → %s' % (big.name, fel_name.decode('latin-1')))
+    print('  解開後 %d 行,帶顏色的元素 %d 個\n' % (len(text.split('\r\n')), len(rows)))
+
+    # ── 只是看看 ──────────────────────────────────────
+    # 沒有 --set = 純列表模式。這一支的第一課就是「先看哪些是開的」,
+    # 所以列完之後把「有幾個是關的」單獨再講一次。
+    if not sets:
+        print('  %6s  %-3s %-22s %-4s %s' % ('行號', '種類', '名稱', '顯示', 'RGB'))
+        print('  %s' % ('-' * 60))
+        for n, kind, nm, on, c in rows:
+            print('  %6d  %-3s %-22s %-4s %3d,%3d,%3d   #%02X%02X%02X'
+                  % (n, kind, nm, '開' if on else '關', c[0], c[1], c[2],
+                     c[0], c[1], c[2]))
+        off_n = sum(1 for r in rows if not r[3])
+        print('\n  其中 %d 個現在是「關」的 —— 改它們的顏色畫面上不會有變化。' % off_n)
+        print('  要改顏色請加 --set,例如:')
+        print('    python3 %s "%s" --set SCOREBLACK=#204080'
+              % (Path(sys.argv[0]).name, pos[0]))
+        return 0
+
+    # ── 預覽 / 套用 ───────────────────────────────────
+    # 先確認每個被點名的元素都真的存在。打錯字如果不擋,
+    # 後面會安安靜靜地什麼都沒改,而輸出看起來卻很成功。
+    known = {nm.upper() for _n, _k, nm, _o, _c in rows}
+    missing = [nm for nm in sets if nm not in known]
+    if missing:
+        print('✗ 這個版面檔裡沒有這些元素:%s' % ' '.join(missing))
+        print('  先不帶 --set 跑一次,看有哪些名字可以用。')
+        return 1
+
+    new_text, changed = recolor(text, sets)
+    if not changed:
+        print('· 指定的顏色跟現在完全一樣,沒有東西要改。')
+        return 0
+
+    # 列出每一筆要改的:哪一行、原本什麼色、要改成什麼色。
+    # 順便回頭查這個元素的顯示欄是不是關的,是的話待會要特別提醒:
+    # 「改了卻看不到變化」是這一課最常見的誤會。
+    print('  %6s  %-22s %-16s %s' % ('行號', '名稱', '原本', '改成'))
+    print('  %s' % ('-' * 62))
+    warn_off = []
+    for nm, old, new, ln in changed:
+        print('  %6d  %-22s %3d,%3d,%3d      → %3d,%3d,%3d'
+              % (ln, nm, old[0], old[1], old[2], new[0], new[1], new[2]))
+        for n2, _k, nm2, on2, _c2 in rows:
+            if nm2 == nm and not on2:
+                warn_off.append(nm)
+                break
+
+    if warn_off:
+        print('\n  ⚠️ 下面這幾個元素的「顯示」是關的:%s' % ' '.join(sorted(set(warn_off))))
+        print('     改了顏色也**不會**在畫面上看到差別 —— 它根本沒被畫出來。')
+        print('     本站測試機的記分板色塊就全是關的(原版是 14 開 3 關),')
+        print('     那是社群模組動過的痕跡,不是你做錯。')
+
+    # 唯讀是預設:走到這裡沒看到 --apply 就收工,連備份都還沒產生。
+    if '--apply' not in flags:
+        print('\n這是預覽,沒有改到任何檔案。')
+        print('確定要套用請加上 --apply:')
+        print('\n  python3 %s "%s" ... --apply\n' % (Path(sys.argv[0]).name, pos[0]))
+        return 0
+
+    # 行數與 CRLF 不可以變 —— 這是壞檔的兩個最常見來源
+    # (自我測試裡也各下了一個餌鎖住這兩件事)。這一關沒過就不寫,
+    # 而且是在備份之前就擋下來,連檔案都不會被開起來寫。
+    if len(new_text.split('\r\n')) != len(text.split('\r\n')):
+        print('✗ 內部檢查沒過:行數變了,不寫檔。')
+        return 1
+
+    # 備份只做一次。第二次以後保留最早那一份,因為那一份才是「還沒被改過的」;
+    # 用現況再備一次,等於把還原點往前推,--restore 就回不到原始狀態了。
+    # 動手之前先確認備份這個名字不是一條符號連結 —— 已經存在的備份也要驗,
+    # 不然寫完遊戲檔之後才在 --restore 那一步發現備份根本不能用。
+    _refuse_if_symlink(backup, '備份檔')
+    if not backup.exists():
+        # 備份失敗就**不寫**。資料夾唯讀或磁碟滿的時候原本會噴 traceback,
+        # 遊戲檔一樣沒被動到,但訊息看起來像已經出事了。
+        try:
+            _atomic_copy(big, backup)
+        except OSError as e:
+            print('\n✗ 備份失敗,所以遊戲檔一個位元組都沒有動:%s' % e)
+            print('  多半是這個資料夾是唯讀的,或磁碟空間不夠。')
+            return 1
+        print('\n✓ 已備份原始檔:%s' % backup.name)
+    else:
+        print('\n· 備份已存在,保留最早那一份:%s' % backup.name)
+
+    # ── 附加寫回:全檔只動 12 個位元組,舊資料一個都不碰 ──
+    # 1. 新內容壓好之後接在檔尾,新位移就是「接之前的檔案長度」
+    # 2. 目錄那一項的 8 個位元組改指向新位置(目錄一律大端)
+    # 3. 檔頭的檔案總大小欄更新(ingame.big 是小端)
+    # 舊的那一段資料還原封不動躺在檔案中間,只是沒有人指向它了。
+    # 這也是為什麼檔案會越改越大;想收回去就 --restore 重來一次。
+    payload = qfs_compress_literal(new_text.encode('latin-1'))
+    new_offset = len(data)
+    data += payload                                              # 接到檔尾
+    data[field:field + 8] = struct.pack('>II', new_offset, len(payload))
+    data[4:8] = struct.pack('<I', len(data))
+    # 先整個寫到同資料夾的一個亂數暫存檔、fsync 落地,再用 os.replace 換掉正本。
+    # 中途停電或按 Ctrl-C,正本都還是完整的舊檔,不會出現寫到一半的封裝檔。
+    # (暫存名為什麼不能用猜得到的 <檔名>.tmp,見 _mkstemp_beside 的說明。)
+    try:
+        _atomic_write(big, bytes(data))
+    except OSError as e:
+        # Ctrl-C 不在這裡處理:_atomic_write 已經把暫存檔清掉並把中斷往外丟,
+        # 由檔尾那個 KeyboardInterrupt 出口統一回報(那時正本仍是完整的舊檔)。
+        print('\n✗ 寫入失敗,遊戲檔沒有被動到(備份留著):%s' % e)
+        print('  多半是磁碟空間不夠,或這個資料夾是唯讀的。')
+        return 1
+
+    # 複驗沒過(對不上、或整段根本讀不回來)的共同收尾:當場還原回備份。
+    # 兩條路的措辭不一樣,但「怎麼收拾」是同一件事,所以只寫一份。
+    def _rollback_after_bad_write():
+        # 這件事做得起,是因為還原本身已經是原子的(見 _do_copy):
+        # 備份先驗過、寫暫存檔、雜湊比對相符才 os.replace 換上,失敗正本原封不動。
+        try:
+            _restore_from_backup(backup, big)
+        except (SystemExit, OSError) as e:
+            print('  自動還原沒有成功(%s)。' % e)
+            print('  備份還在:%s' % backup.name)
+            print('  請手動執行:python3 %s "%s" --restore'
+                  % (Path(sys.argv[0]).name, pos[0]))
+            return 1
+        print('  已自動還原成備份的內容(%s),遊戲檔回到改之前的樣子。' % backup.name)
+        print('  請把上面這幾行回報給我們。')
+        return 1
+
+    # ── 寫入後複驗 ────────────────────────────────────
+    # 重新從磁碟讀一次,重新走目錄、重新解壓、重新掃一次顏色。
+    # 不拿記憶體裡那份 data 來驗,那樣只是驗自己剛剛算對不對,
+    # 驗不到「寫進檔案之後讀回來還是不是同一件事」。
+    #
+    # ⚠️ 整段包在 try 裡面(2026-09-11 補):走到這裡遊戲檔**已經被換掉了**,
+    #    而讀回來這幾步每一步都可能爆:目錄讀不出來(BigFormatError)、
+    #    目錄裡找不到那個版面檔(find_entry 回 None)、解壓中途發現長度對不上。
+    #    沒接住的話畫面上是一整頁英文 traceback、離開碼由 Python 決定,
+    #    而且**一句 --restore 都不會印** —— 讀者只會看到「壞掉了」,
+    #    不知道遊戲檔其實已經換過、也不知道備份就在旁邊。
+    #    這裡接得寬(Exception)是刻意的:這一刻不管是哪一種讀不回來,
+    #    正確的收尾都是同一個 —— 誠實說已經換過、自動還原、回傳 1。
+    #    KeyboardInterrupt / SystemExit 是 BaseException,不在這裡被吃掉,
+    #    照舊交給檔尾那個 Ctrl-C 出口(它會說「已經換好了」)。
+    try:
+        check = big.read_bytes()
+        e2 = list_entries(check)
+        found2 = find_entry(e2, fel_name)
+        if not found2:
+            # 舊寫法是直接 f2, o2, s2 = find_entry(...),回 None 就是
+            # 「cannot unpack non-iterable NoneType object」那一行 traceback。
+            raise BigFormatError('寫回去之後,目錄裡找不到 %s'
+                                 % fel_name.decode('latin-1'))
+        _f2, o2, s2 = found2
+        t2 = qfs_decompress(check[o2:o2 + s2]).decode('latin-1')
+        got = {nm.upper(): c for _n, _k, nm, _o, c in scan(t2)}
+    except Exception as e:
+        print('\n✗ 寫進去之後讀不回來:%s' % e)
+        print('  ⚠️ 遊戲檔已經換成新的那一份了 —— 不是「一個位元組都沒動」。')
+        print('  備份是完整的原始檔:%s' % backup.name)
+        return _rollback_after_bad_write()
+    bad = [nm for nm, want in sets.items() if got.get(nm) != want]
+
+    print('\n✓ 已寫入 %s' % big.name)
+    print('  項目數     %d 個(原本 %d 個)' % (len(e2), len(entries)))
+    print('  檔案大小   %s bytes' % format(len(check), ','))
+    print('  解壓行數   %d 行(改前 %d 行)'
+          % (len(t2.split('\r\n')), len(text.split('\r\n'))))
+    print('  顏色複驗   %d/%d 正確' % (len(sets) - len(bad), len(sets)))
+    # 兩件事都成立才算成功:項目數跟改之前一樣(目錄沒被寫壞),
+    # 而且每一個指定的顏色都真的變成指定的值。任一項不對就叫使用者還原並回報,
+    # 而且回傳 1 讓外面的批次檔知道這一步失敗了。
+    if len(e2) == len(entries) and not bad:
+        print('\n完成。要還原:python3 %s "%s" --restore'
+              % (Path(sys.argv[0]).name, pos[0]))
+        return 0
+    print('\n✗ 複驗未通過:%s' % (' '.join(bad) or '項目數對不上'))
+    # 複驗沒過就當場自己還原回去,不要留一個「驗不過的檔」在使用者手上等他自己想起來。
+    return _rollback_after_bad_write()
+
+
+# ─────────────────────────────────────────────────────────
+#  自我測試(--selftest):不碰遊戲檔,全部在記憶體裡做
+#  每一條都下餌 —— 沒有反向測試的檢查,分不出「沒問題」跟「根本沒跑」。
+# ─────────────────────────────────────────────────────────
+def _selftest_run(argv):
+    """把 main() 當成使用者那樣跑一遍,把它印出來的東西收起來不要洗版。
+
+    走 SystemExit('訊息') 那種出口的訊息本來是丟到 stderr 的,這裡一起收進來
+    ——「擋下來的時候到底說了什麼」是餌要驗的重點,收不到就驗不了。
+    """
+    import contextlib
+    import io as _io
+    old_argv, buf = sys.argv, _io.StringIO()
+    sys.argv = ['mvp_hud_color.py'] + list(argv)
+    try:
+        with contextlib.redirect_stdout(buf):
+            try:
+                rc = main()
+            except SystemExit as e:
+                rc = 1
+                if isinstance(e.code, str):
+                    buf.write(e.code + '\n')
+                elif isinstance(e.code, int):
+                    rc = e.code
+    finally:
+        sys.argv = old_argv
+    return rc, buf.getvalue()
+
+
+def _selftest_big(fel_text):
+    """造一個最小但格式合法的封裝檔:一個項目,內容就是那份版面文字。
+
+    檔頭 16 個位元組(BIGF、總大小、項目數、目錄起點),接一項目錄
+    (資料位移、資料長度,兩個都是大端)與以 \\0 結尾的名字,然後才是資料。
+    要這樣造一份,是因為「遊戲檔是符號連結」那兩個餌少了它就不夠力:
+    拿一份讀不出目錄的假檔去測,程式在更前面就退出了,分不出是把關擋的
+    還是它自己讀不下去。
+    """
+    payload = qfs_compress_literal(fel_text.encode('latin-1'))
+    name = DEFAULT_FEL + b'\x00'
+    head = 16 + 8 + len(name)
+    return (b'BIGF' + struct.pack('<I', head + len(payload))
+            + struct.pack('>I', 1) + struct.pack('>I', head)
+            + struct.pack('>II', head, len(payload)) + name + payload)
+
+
+def selftest():
+    """不碰任何遊戲檔,在記憶體裡把整條處理鏈跑一遍。
+
+    兩行樣本是從遊戲裡的 fes_hudleft.fel 抄出來的真實資料,不是編的。
+    RT 那一行逐字照抄;TX 那一行只把顯示欄從 0 改成 1,
+    這樣兩行才一開一關,顯示旗標的判斷才驗得到正反兩面。
+    所以驗的不是「程式跑不跑得動」,是「拿到真資料時抓的欄位對不對」。
+    """
+    # python -O 會把 assert 整個拿掉 —— 下面的餌有一大半是靠 assert 站著的,
+    # 在 -O 下會一路走到「全部通過」而其實什麼都沒驗。寧可不跑也不要假綠。
+    if sys.flags.optimize:
+        print('--selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠')
+        return 2
+
+    RT = ('    RT:SCOREBLACK,0,0,67,35,152,50,1,1,1,1,1,'
+          '000,000,000,0,1,1,000,000,000,0,0,255,-1,0,0')
+    TX = ('    TX:SCORE2,1,0,90,41,26,12,1,1,1,1,0,0,hrdbg_en.ffn,7207,0,'
+          '255,255,255,255,255,255,243,220,020,128,128,128,128,128,128,0,0,0,-1,0,0,0,1,0')
+
+    # 一、單行取色。split(',', 1)[1] 是把「RT:名稱」那一段切掉,
+    #     留下跟正規表示式第 3 組一樣的欄位串。
+    assert rt_color(RT.split(',', 1)[1]) == (0, 0, 0), 'RT 顏色抓錯'
+    assert tx_color(TX.split(',', 1)[1])[0] == (255, 255, 255), 'TX 顏色抓錯'
+    # 反向餌:欄位不夠長時不可以硬抓
+    assert rt_color('0,0,1') is None, '欄位不足卻回傳了顏色'
+    assert tx_color('0,0,1,2,3') is None, '沒有字型檔名卻回傳了顏色'
+
+    # 二、整段掃描。兩行一開一關,所以顯示旗標的正反兩面都驗得到。
+    text = '\r\n'.join([RT, TX])
+    rows = scan(text)
+    assert len(rows) == 2, '掃不到兩個元素'
+    assert rows[0][3] is False and rows[1][3] is True, '顯示旗標判斷反了'
+
+    # 三、換色。除了「有沒有改成功」,更重要的是四件不可以變的事:
+    #     欄位寬度、行數、CRLF、以及沒被點名的那一行原封不動。
+    new, ch = recolor(text, {'SCOREBLACK': (32, 64, 128)})
+    assert len(ch) == 1 and ch[0][1] == (0, 0, 0) and ch[0][2] == (32, 64, 128), '改色沒生效'
+    assert '032,064,128' in new, '沒有保持原本的三位數寬度(000 → 032)'
+    assert len(new.split('\r\n')) == len(text.split('\r\n')), '行數變了'
+    assert '\r\n' in new, 'CRLF 被吃掉了'
+    # 反向餌:沒點名的元素不可以被動到
+    assert TX in new, '沒有指名的元素竟然被改了'
+    # 反向餌:改成一樣的顏色不該產生變更
+    _n2, ch2 = recolor(text, {'SCOREBLACK': (0, 0, 0)})
+    assert ch2 == [], '顏色沒變卻回報有改'
+
+    # 四、顏色寫法。三種寫法各驗一次,再用四個壞例子確認「該擋的擋得下來」。
+    #     只驗好例子的話,一個什麼都放行的解析器也會全綠。
+    assert parse_color('#f0a') == (255, 0, 170), '#rgb 展開錯'
+    assert parse_color('#204080') == (32, 64, 128), '#rrggbb 解析錯'
+    assert parse_color('1,2,3') == (1, 2, 3), 'R,G,B 解析錯'
+    assert parse_color('white') == (255, 255, 255), '顏色名解析錯'
+    for bad in ('1,2', '300,0,0', '#12345', 'chartreuse'):
+        try:
+            parse_color(bad)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError('壞的顏色「%s」竟然通過了' % bad)
+
+    # 五、寬度。三個案例分別對應「補零」「不該補」「原本是三位數」。
+    assert _width_preserving('000', 7) == '007', '寬度沒保住'
+    assert _width_preserving('0', 7) == '7', '本來就一位數不該補零'
+    assert _width_preserving('255', 7) == '007', '三位數寬度沒保住'
+
+    # 六、寫檔安全網。全部在系統暫存資料夾裡做完就刪,不碰任何遊戲檔。
+    #     這一節每一條都下餌 —— 沒有餌的話,把 mkstemp 換回 <檔名>.part、
+    #     把原子還原換回 shutil.copy2(bak, dst),上面五節照樣全綠。
+    n_traps = 0
+    n_neg = 0                      # 陰性對照的數量(建不了符號連結的系統會少一個)
+    with tempfile.TemporaryDirectory() as _d:
+        # macOS 的 /var 是 /private/var 的連結,不先解開的話下面
+        # 「目標是符號連結就拒絕」那個餌會被暫存資料夾自己的連結誤觸。
+        _d = os.path.realpath(_d)
+        outside_dir = os.path.join(_d, 'outside')
+        work = os.path.join(_d, 'work')
+        os.mkdir(outside_dir)
+        os.mkdir(work)
+        # 這個檔在「工作資料夾以外」。任何一個餌讓它變了樣,就是真的會傷到
+        # 不相干檔案的漏洞 —— 站上教的是改遊戲檔,不是改遊戲資料夾外面的東西。
+        outside = os.path.join(outside_dir, 'DO_NOT_TOUCH.bin')
+        OUT = b'OUTSIDE-FILE-MUST-SURVIVE\n' * 40
+        with open(outside, 'wb') as f:
+            f.write(OUT)
+        src = os.path.join(work, 'ingame.big')
+        SRC = b'BIGF' + struct.pack('<I', 64) + b'\x00' * 56
+        with open(src, 'wb') as f:
+            f.write(SRC)
+        bak = src + '.hudcolorbak'
+
+        def _outside_ok(where):
+            with open(outside, 'rb') as f:
+                assert f.read() == OUT, '%s:資料夾外面的檔案被動到了' % where
+
+        def _no_leftovers(where):
+            junk = [n for n in os.listdir(work)
+                    if '.part-' in n or '.tmp-' in n or '.restore-' in n]
+            assert not junk, '%s:留下了沒清掉的暫存檔 %s' % (where, junk)
+
+        try:
+            os.symlink(outside, bak + '.part')
+        except (OSError, NotImplementedError, AttributeError):
+            # Windows 沒開開發者模式時建不了符號連結。跳過,但要講出來 ——
+            # 不然「這台機器沒驗到」跟「驗過了沒問題」在畫面上長得一樣。
+            print('· 這個系統不給建符號連結,跳過 6 個符號連結的餌與 1 個陰性對照')
+        else:
+            # 餌 1:備份的暫存檔名被人預先佔成一條指向資料夾外的連結。
+            #       舊寫法 dst + '.part' 會跟著它把外面那個檔截成 0。
+            _atomic_copy(src, bak)
+            _outside_ok('備份')
+            with open(bak, 'rb') as f:
+                assert f.read() == SRC, '備份內容跟原檔不一樣'
+            os.remove(bak + '.part')
+            n_traps += 1
+
+            # 餌 2:寫入的暫存檔名同樣被預先佔走(舊寫法是 <檔名>.tmp)
+            os.symlink(outside, src + '.tmp')
+            _atomic_write(src, SRC + b'XYZ')
+            _outside_ok('寫入')
+            with open(src, 'rb') as f:
+                assert f.read() == SRC + b'XYZ', '寫入的內容不對'
+            os.remove(src + '.tmp')
+            _atomic_write(src, SRC)               # 收拾乾淨,下面的餌才好比對
+            n_traps += 1
+
+            # 餌 3:正本或備份本身就是一條連結 —— 一律拒絕,不可以跟著它寫出去
+            linked = os.path.join(work, 'linked.big')
+            os.symlink(outside, linked)
+            for _label, _fn in (('寫入', lambda: _atomic_write(linked, b'ZZZZ')),
+                                ('還原', lambda: _do_copy(bak, linked)),
+                                ('讀備份', lambda: _do_copy(linked, src))):
+                try:
+                    _fn()
+                except SystemExit:
+                    pass
+                else:
+                    raise AssertionError('%s:目標是符號連結卻照樣動手了' % _label)
+            _outside_ok('拒絕符號連結')
+            os.remove(linked)
+            n_traps += 1
+
+            # 餌 4:指向不存在檔案的連結。os.path.exists() 對它回 False,
+            #       只用 exists() 把關的話會當成「這個檔不在」直接寫下去。
+            dang = os.path.join(work, 'dangling.big')
+            os.symlink(os.path.join(_d, 'no', 'such', 'file'), dang)
+            assert not os.path.exists(dang) and os.path.lexists(dang), \
+                'dangling 連結的行為跟預期不同,這個餌失效了'
+            try:
+                _atomic_write(dang, b'ZZZZ')
+            except SystemExit:
+                pass
+            else:
+                raise AssertionError('指向不存在檔案的連結沒被擋下來')
+            assert not os.path.exists(dang), '連結指到的地方被生出了一個新檔'
+            os.remove(dang)
+            n_traps += 1
+
+            # 餌 5:**遊戲檔本身**是一條符號連結 → --apply 要停下來。
+            #       上面那幾個餌守的是備份與暫存檔的名字,守不到這一個:
+            #       2026-09-05 到 09-06 之間的版本會「跟著連結走到真檔再改」,
+            #       實測把工作資料夾外面那份 2,665,562 bytes 的封裝檔改成
+            #       2,743,315 bytes,連備份都生在外面那個資料夾裡。
+            #       所以連結指向的檔要放在 outside_dir,而且要是一份**真的
+            #       改得動**的封裝檔 —— 拿讀不出目錄的假檔測,程式在更前面
+            #       就退出了,分不出是把關擋的還是它自己讀不下去。
+            real5 = os.path.join(outside_dir, 'real_ingame.big')
+            BIG5 = _selftest_big('\r\n'.join([RT, TX]))
+            with open(real5, 'wb') as f:
+                f.write(BIG5)
+            link5 = os.path.join(work, 'linked_ingame.big')
+            os.symlink(real5, link5)
+            rc, out = _selftest_run([link5, '--set', 'SCOREBLACK=navy', '--apply'])
+            assert rc != 0 and '本工具不跟著連結寫' in out, \
+                '遊戲檔是符號連結,--apply 卻照樣寫下去了:\n%s' % out
+            with open(real5, 'rb') as f:
+                assert f.read() == BIG5, '擋下來了,卻還是改到連結指向的那個檔'
+            assert not os.path.lexists(real5 + '.hudcolorbak'), \
+                '擋下來了,卻還是先在資料夾外面做了備份'
+            assert not os.path.lexists(link5 + '.hudcolorbak'), \
+                '擋下來了,卻還是先做了備份'
+            n_traps += 1
+
+            # 餌 6:同一條連結,--restore 也要停。備份故意放一份「格式合法
+            #       但內容不同」的 —— 拿一模一樣的當備份是驗不出來的:
+            #       真的蓋下去了,檔案內容也看不出差別。
+            other5 = _selftest_big('\r\n'.join(
+                [RT.replace('000,000,000', '001,002,003'), TX]))
+            assert other5 != BIG5, '這份備份跟正本一樣,那這個餌就白下了'
+            with open(real5 + '.hudcolorbak', 'wb') as f:
+                f.write(other5)
+            rc, out = _selftest_run([link5, '--restore'])
+            assert rc != 0 and '本工具不跟著連結寫' in out, \
+                '遊戲檔是符號連結,--restore 卻照樣蓋下去:\n%s' % out
+            with open(real5, 'rb') as f:
+                assert f.read() == BIG5, '擋下來了,卻還是還原到連結指向的那個檔'
+            os.remove(real5 + '.hudcolorbak')
+            os.remove(link5)
+            n_traps += 1
+
+            # 陰性對照(專門給上面那兩個餌用):同一份封裝檔**不透過連結**
+            # 直接跑,--apply 要真的改到、--restore 要真的換回來。
+            # 少了這一條,一個「什麼都拒絕」的版本上面兩個餌照樣全綠。
+            plain5 = os.path.join(work, 'plain_ingame.big')
+            with open(plain5, 'wb') as f:
+                f.write(BIG5)
+            rc, out = _selftest_run([plain5, '--set', 'SCOREBLACK=navy', '--apply'])
+            assert rc == 0, '不是連結的封裝檔竟然也改不動:\n%s' % out
+            with open(plain5, 'rb') as f:
+                assert f.read() != BIG5, '--apply 回報成功,檔案卻沒有被改到'
+            rc, out = _selftest_run([plain5, '--restore'])
+            assert rc == 0, '還原沒有成功:\n%s' % out
+            with open(plain5, 'rb') as f:
+                assert f.read() == BIG5, '還原之後跟原本那一份不一樣'
+            os.remove(plain5)
+            os.remove(plain5 + '.hudcolorbak')
+            _no_leftovers('連結把關的陰性對照')
+            n_neg += 1
+
+        # 餌 7:還原做到一半失敗(把 os.replace 換成會丟例外的假貨)——
+        #       正本必須原封不動。舊寫法 shutil.copy2(bak, dst) 在這一刻
+        #       已經把正本截成 0 bytes 了,這個餌就是對著那個病下的。
+        if not os.path.exists(bak):
+            _atomic_copy(src, bak)
+        with open(src, 'wb') as f:
+            f.write(SRC + b'-CHANGED-BY-APPLY')
+        with open(src, 'rb') as f:
+            before = f.read()
+
+        def _boom(_a, _b):
+            raise OSError(28, '磁碟空間不足(自我測試故意製造的)')
+
+        def _boom_one(_a):
+            raise OSError(28, '磁碟空間不足(自我測試故意製造的)')
+
+        _real_replace = os.replace
+        os.replace = _boom
+        try:
+            _do_copy(bak, src)
+        except OSError:
+            pass
+        else:
+            raise AssertionError('os.replace 失敗了卻沒有把錯誤丟出來')
+        finally:
+            os.replace = _real_replace
+        with open(src, 'rb') as f:
+            assert f.read() == before, '還原失敗時正本被動到了 —— 這正是舊寫法的病'
+        _no_leftovers('還原失敗')
+        n_traps += 1
+
+        # 餌 8:同樣是還原,但這次死在更前面 —— 資料還在往磁碟寫的時候
+        #       (fsync 丟磁碟滿)。舊寫法在這一刻正本已經被截斷了。
+        _real_fsync = os.fsync
+        os.fsync = _boom_one
+        try:
+            _do_copy(bak, src)
+        except OSError:
+            pass
+        else:
+            raise AssertionError('寫到一半失敗了卻沒有把錯誤丟出來')
+        finally:
+            os.fsync = _real_fsync
+        with open(src, 'rb') as f:
+            assert f.read() == before, '寫到一半失敗時正本被動到了'
+        _no_leftovers('寫到一半失敗')
+        n_traps += 1
+
+        # 餌 9:狀態退回不可以寫死 idle。情境:--apply 已經把正本換掉了,
+        #       接著複驗沒過要自動還原,而那個還原自己失敗(磁碟滿)。
+        #       這時候把狀態退成「還沒動過」,Ctrl-C 的收尾就會說
+        #       「一個位元組都沒有被動到」—— 而遊戲檔明明已經是改過的那一份。
+        #       所以退的是「這次動手之前」的狀態,不是寫死的 idle。
+        _STATE.update(phase='replaced', target=src, kind='apply')
+        os.replace = _boom
+        try:
+            _do_copy(bak, src)
+        except OSError:
+            pass
+        finally:
+            os.replace = _real_replace
+        assert _STATE['phase'] == 'replaced' and _STATE['kind'] == 'apply', \
+            '已經換過了,再一次還原失敗卻把狀態說成 %r —— Ctrl-C 會騙人' % (_STATE,)
+        # 陰性對照:反過來,沒換過的時候同樣的失敗**要**退回 idle。
+        # 少了這一條,一個「永遠不退」的版本上面那個斷言照樣是綠的。
+        _STATE.update(phase='idle', target=None, kind=None)
+        os.replace = _boom
+        try:
+            _do_copy(bak, src)
+        except OSError:
+            pass
+        finally:
+            os.replace = _real_replace
+        assert _STATE['phase'] == 'idle', \
+            '沒換過就失敗,狀態應該退回 idle,實際是 %r' % (_STATE,)
+        _STATE.update(phase='idle', target=None, kind=None)      # 收乾淨再走
+        _no_leftovers('狀態退回')
+        n_traps += 1
+        n_neg += 1
+
+        # 陰性對照:先證明這條路在沒有人搗亂的時候真的會動。
+        # 少了這一條,上面那些「沒被寫壞」的斷言對一個「根本不寫檔」的版本也全綠。
+        _do_copy(bak, src)
+        with open(src, 'rb') as f:
+            assert f.read() == SRC, '正常還原沒有把正本換回備份的內容'
+        _no_leftovers('正常還原')
+        n_neg += 1
+
+        # 餌 10、11:寫回去之後那一段複驗**自己爆掉**。走到那裡遊戲檔已經被
+        #       os.replace 換掉了,而 2026-09-11 之前那一段沒有 try ——
+        #       實測兩個變體(讓目錄讀不出來、讓目錄裡找不到那個版面檔)都是
+        #       噴一整頁 traceback、遊戲檔留在改過的狀態、**一句 --restore
+        #       都沒有印**。讀者只會看到「壞掉了」,不知道備份就在旁邊。
+        #       兩種爆法各下一個餌。
+        vbig = os.path.join(work, 'verify.big')
+        BIGV = _selftest_big('\r\n'.join([RT, TX]))
+
+        def _verify_trap(label, name, fake):
+            """把某個全域函式換成「第二次呼叫才作怪」的假貨,再跑一次 --apply。
+
+            第一次呼叫是寫之前那一次,要讓它照常過;第二次才是複驗那一次 ——
+            不分次數的話程式在更前面就退出了,驗不到「已經換過檔之後才爆」。
+            換模組全域是刻意的:main() 每次都從全域查這個名字,
+            跟上面那幾個把 os.replace / os.fsync 換掉的餌同一套做法。
+            """
+            with open(vbig, 'wb') as f:
+                f.write(BIGV)
+            real, seen = globals()[name], []
+
+            def _wrapper(*a):
+                seen.append(1)
+                return fake(real, len(seen), *a)
+
+            globals()[name] = _wrapper
+            try:
+                rc, out = _selftest_run(
+                    [vbig, '--set', 'SCOREBLACK=navy', '--apply'])
+            finally:
+                globals()[name] = real          # 一定要換回來,不然後面全歪
+            assert rc != 0, '%s:複驗整個爆掉了,卻回報成功\n%s' % (label, out)
+            assert '讀不回來' in out and '已經換成新的那一份' in out, \
+                '%s:複驗爆掉時沒有誠實交代遊戲檔已經換過\n%s' % (label, out)
+            with open(vbig, 'rb') as f:
+                assert f.read() == BIGV, '%s:爆掉之後沒有把遊戲檔還原回去' % label
+            os.remove(vbig + '.hudcolorbak')
+            _no_leftovers(label)
+
+        def _dir_boom(real, nth, d):
+            if nth >= 2:
+                raise BigFormatError('自我測試故意製造的:寫回去之後讀不出目錄')
+            return real(d)
+
+        def _entry_gone(real, nth, items, name):
+            return None if nth >= 2 else real(items, name)
+
+        _verify_trap('複驗讀不出目錄', 'list_entries', _dir_boom)
+        n_traps += 1
+        _verify_trap('複驗找不到版面檔', 'find_entry', _entry_gone)
+        n_traps += 1
+
+        # 陰性對照(專門給上面那兩個餌用):同一份封裝檔、同一條指令,
+        # 沒有人搗亂的時候要真的改得動。少了這一條,一個「複驗永遠當失敗」
+        # 的版本上面兩個餌照樣全綠。
+        with open(vbig, 'wb') as f:
+            f.write(BIGV)
+        rc, out = _selftest_run([vbig, '--set', 'SCOREBLACK=navy', '--apply'])
+        assert rc == 0, '沒有人搗亂的時候竟然也改不動:\n%s' % out
+        with open(vbig, 'rb') as f:
+            assert f.read() != BIGV, '--apply 回報成功,檔案卻沒有被改到'
+        os.remove(vbig)
+        os.remove(vbig + '.hudcolorbak')
+        _no_leftovers('複驗的陰性對照')
+        n_neg += 1
+        _STATE.update(phase='idle', target=None, kind=None)      # 收乾淨再走
+
+    print('自我測試:全部通過(含 9 個反向餌 + %d 個寫檔安全網的餌,'
+          '外加 %d 個陰性對照)' % (n_traps, n_neg))
+    return 0
+
+
+if __name__ == '__main__':
+    # --selftest 要排在最前面判斷:它不需要遊戲資料夾,
+    # 走進 main() 反而會因為「沒給路徑」被擋下來。
+    if '--selftest' in sys.argv:
+        sys.exit(selftest())
+    # Ctrl-C 的說法不可以只有兩種:換上去之前中斷,遊戲檔真的一個位元組都沒動;
+    # 換上去之後中斷(例如正在跑複驗),檔案已經是新的了 —— 這時候還印
+    # 「什麼都沒有動到」就是騙人。_STATE 記的就是這件事,而且是三態:
+    # 第三態 replacing 是保險 —— 「換名 + 登記」那一段的不可中斷保護裝不上
+    # (非主執行緒)而中斷剛好落在縫裡的話,它會誠實說「無法確定」。
+    # 三種都回傳 130(被訊號中斷的慣例),不可以回 0 讓外面的批次檔以為成功。
+    try:
+        _rc = main()
+    except KeyboardInterrupt:
+        _tgt = _STATE['target'] or '<那個 .big>'
+        print()
+        if _STATE['phase'] == 'replaced' and _STATE['kind'] == 'restore':
+            print('✗ 已中斷 —— 但備份在中斷之前就已經蓋回去了。')
+            print('  %s 現在是備份那一份(還原本身已經做完)。' % _tgt)
+        elif _STATE['phase'] == 'replaced':
+            print('✗ 已中斷 —— 但檔案在中斷之前就已經換好了,遊戲檔是新的。')
+            print('  要回到改之前:python3 %s "<你的遊戲資料夾>" --restore'
+                  % Path(sys.argv[0]).name)
+        elif _STATE['phase'] == 'replacing':
+            print('✗ 已中斷 —— 中斷時正在替換 %s,換好了沒有無法確定。' % _tgt)
+            print('  請拿 .hudcolorbak 跟它比對大小,或直接還原:')
+            print('  python3 %s "<你的遊戲資料夾>" --restore'
+                  % Path(sys.argv[0]).name)
+        else:
+            print('✗ 已中斷 —— 遊戲檔一個位元組都沒有被動到。')
+        sys.exit(130)
+    sys.exit(_rc)
+
+
+# ─────────────────────────────────────────────────────────
+#  MIT License
+#
+#  Copyright (c) 2026 toni
+#
+#  Permission is hereby granted, free of charge, to any person obtaining a copy
+#  of this software and associated documentation files (the "Software"), to deal
+#  in the Software without restriction, including without limitation the rights
+#  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#  copies of the Software, and to permit persons to whom the Software is
+#  furnished to do so, subject to the following conditions:
+#
+#  The above copyright notice and this permission notice shall be included in
+#  all copies or substantial portions of the Software.
+#
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#  THE SOFTWARE.
+# ─────────────────────────────────────────────────────────

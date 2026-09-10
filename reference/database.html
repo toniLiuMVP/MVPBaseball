@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/database.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>資料檔總覽 database — toni的MVP模組補習班</title>
+<meta name="description" content="MVP Baseball 2005 的 database 資料夾：23 個檔裡有 19 個是純文字，記事本就打得開，而且每個表頭都自帶欄位編號。哪種資料放在哪個檔，一次看完。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 資料檔總覽 database</p>
+  <h1>資料檔總覽 database</h1>
+  <p class="lede">球員能力、成績、名單、球隊資料，全部在 <code>data\database\</code> 這一個資料夾裡。
+     好消息是：<strong>23 個檔案裡有 19 個是純文字，記事本就打得開</strong>，
+     而且每個檔<strong>自己會說明每一欄是什麼</strong>。</p>
+  <p class="small">23 是<u>剛安裝好的原版</u>的數量。你自己的資料夾可能更多 ——
+     模組、工具、你自己的備份都會在這裡留下檔案。
+     本站測試機就有 26 個，多出來的三個是一份舊匯出、一個 <code>.bak</code>、
+     還有一個模組留下的資料夾。<strong>多出來的檔不是遊戲的，遊戲也不讀它們。</strong></p>
+
+    <div class="card blue" style="margin-top:14px">
+    <p class="card-h">先說清楚這頁的數字是從哪一份遊戲量的</p>
+    <p><u>本頁兩份都量，不是只量一份</u>：〈19 個純文字檔各裝什麼〉與〈全部 18 個檔的完整欄位表〉
+       量的是<strong>剛安裝好的原版</strong>（23 個檔）；〈先看規模〉那一節、
+       以及表格裡標「裝過模組那台」的欄位，量的是<strong>一台裝過台灣模組的遊戲</strong>。
+       <strong>用到另一份的地方，該節會再說一次</strong>，頁尾也整理了一次。</p>
+    <p><strong>格式與結構的部分兩邊一樣</strong>，那是遊戲程式決定的；
+       會變的是「有幾個」—— 站上別頁量到的臉皮 504 對 894、大頭照 1,487 對 6,638、
+       語音號碼 1,673 對 4,343 就是這樣來的。完整對照見
+       <a href="original-vs-modded.html">原版與這台機器差在哪</a>。</p>
+  </div>
+<div class="card amber">
+    <p class="card-h">⚠️ 跟名單內容有關的數字，你的會不一樣</p>
+    <p>本站測試機的球員名單被模組換過，裝的是一份混了大聯盟與台灣球員的名單。</p>
+    <p class="small">（2026-09-05 訂正：這裡原本寫「<code>attrib.dat</code> 檔案日期 2026 年 4 月」。
+       那個檔的<u>內容</u>沒變 —— 本站 2026-04-14 那份快照裡的 <code>attrib.dat</code>
+       與現役這一份 sha256 相同 —— 但檔案日期後來被本站自己的動作蓋掉了，
+       現在量到的日期不是換名單的日期，所以這句話拿掉。）</p>
+    <p>所以「幾位球員」「某某球員是幾號」這類數字，<strong>你自己跑會得到別的結果</strong>。
+       <u>不會變的是<strong>格式</strong></u> —— 表頭怎麼寫、每一格怎麼標編號、資料怎麼分隔，那是遊戲程式決定的。<br>⚠️ <strong>會變的不只是數量，還有<u>欄位的順序</u></strong>：本站實測 46 個欄位裡有 <strong>27 個</strong>在原版與社群名冊之間位置不同（<code>skin_tone</code> 從第 12 欄搬到第 38 欄，中間的欄位各前移一格）。所以<strong>永遠不要記欄號，要在執行時從表頭找欄位名</strong>。</p>
+  </div>
+
+  <h2>先看規模</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>項目</th><th class="num">數字</th><th>備註</th></tr></thead>
+    <tbody>
+      <tr><td data-label="項目">檔案數</td><td data-label="數字" class="num">25 個</td><td data-label="備註">合計 5.1 MB</td></tr>
+      <tr class="hi"><td data-label="項目">純文字檔</td><td data-label="數字" class="num">20 個</td><td data-label="備註"><strong>可以直接讀、直接改</strong></td></tr>
+      <tr><td data-label="項目">封裝檔（<code>.big</code>）</td><td data-label="數字" class="num">4 個</td>
+          <td data-label="備註"><code>schedule</code>（賽程）、<code>rookie</code>、<code>progress</code>，加一個備份</td></tr>
+      <tr><td data-label="項目">二進位檔</td><td data-label="數字" class="num">1 個</td><td data-label="備註"><code>hist.dat</code>，結構已解，欄位意義多半未解</td></tr>
+      <tr class="hi"><td data-label="項目">純文字檔的資料筆數</td><td data-label="數字" class="num">40,697 筆</td><td data-label="備註">20 個檔加總</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">上面每個數字都是把 <code>data\database\</code> 現場打開數出來的，不是引用他人資料。
+     <strong>量的是本站測試機那一份</strong>：25 個<u>檔案</u>，加上模組留下的那個資料夾就是開頭講的 26 個；
+     剛安裝好的原版是 23 個檔（測試機多出來的兩個檔是一份舊匯出 <code>attrib.dat.csv</code> 與一個
+     <code>schedule.big.bak</code>）。「純文字檔 20 個」同理 ——
+     遊戲自己的 19 個，加上那份不是遊戲的 <code>attrib.dat.csv</code>。</p>
+
+  <h2>表頭自己會說明每一欄是什麼</h2>
+  <p>這是這個資料夾最好用的地方。每個純文字檔的第一行長這樣：</p>
+<pre><code>0 first_name,1 last_name,2 playerattrib_jerseynum,3 playerattrib_bats,...;
+│            │            │
+│            │            └ 第 2 欄:背號
+│            └────────────── 第 1 欄:姓
+└─────────────────────────── 第 0 欄:名</code></pre>
+  <div class="card grass">
+    <p class="card-h">欄位編號直接寫在名字裡</p>
+    <p><strong>你不必自己數到第幾欄</strong> —— 名字前面那個數字就是它的欄位編號。
+       想找「背號」在第幾欄，用文字編輯器搜尋 <code>jerseynum</code> 就看到 <code>2</code>。</p>
+    <p>本站檢查了全部 18 個以編號開頭的檔案：<strong>表頭全部以分號 <code>;</code> 結尾</strong>，
+       格式完全一致。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">資料格也帶編號，不只表頭</p>
+    <p>這是最容易看漏的地方。<strong>每一格資料本身也寫著自己的欄位編號</strong>：</p>
+<pre><code><span class="cm">表頭</span>  0 first_name,1 last_name,2 playerattrib_jerseynum,...;
+<span class="cm">資料</span>  0fff0f559,0 Shohei,1 Ohtani,2 17,...
+          │         └───────┴─ 每一格都是「編號 空格 值」
+          └─────────────────── 行首多一個 9 碼識別碼</code></pre>
+      <p>所以取值要<strong>先把編號前綴切掉</strong>。本站檢查了 18 個檔案的每一格：
+         <strong>帶編號的比例 100%，零例外。</strong></p>
+    </div>
+
+    <div class="card clay">
+      <p class="card-h">⚠️ 但不要「照編號」建表 —— 有一個檔會讓你靜默取錯</p>
+      <p>看到每一格都帶編號，很自然會想「那我照編號建一張對照表就好，不必管位置」。
+         <strong>那個做法在一個檔上會出錯，而且不會報錯。</strong></p>
+      <p>本站 2026-08-28 實測 <code>tstat.dat</code>（球隊戰績表，126 列）：</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th></th><th>編號對不上的格</th></tr></thead>
+        <tbody>
+          <tr><td>剛安裝好的原版（英文與中文）</td><td><strong>0 個</strong></td></tr>
+          <tr class="hi"><td>社群名冊（含本站測試機）</td><td><strong>252 個</strong>（126 列 × 2）</td></tr>
+        </tbody>
+      </table></div>
+      <p>表頭寫的是 <code>3 team_wins_2ndhalf</code>、<code>4 team_losses_2ndhalf</code>，
+         但每一筆資料的那兩格<u>掛的編號是 <code>1</code> 和 <code>2</code></u> ——
+         那是上半季那兩欄的編號。</p>
+      <p><strong>照編號建表的後果</strong>：下半季的勝敗會把上半季的蓋掉，
+         下半季那兩個編號整個消失，而程式<u>一句話都不會說</u>。
+         你會拿到一張看起來完整、其實錯的表。</p>
+      <p><strong>正確做法：照位置讀，把編號當校驗碼用。</strong>
+         取第 N 格，然後檢查它掛的編號是不是 N；對不上就停下來問人，不要猜。
+         本站的 <code>mvp_swap_face.py</code>、<code>mvp_new_face.py</code>、
+         <code>mvp_swap_portrait.py</code>、<code>mvp_edit_speed.py</code>、
+         <code>mvp_swap_chant.py</code> 這五支是這樣寫的 ——
+         也因為這樣，它們在這個檔上會直接告訴你有問題，而不是靜靜給你錯的值。</p>
+      <p class="small">（2026-09-05 訂正：這裡原本寫「本站每一支讀名冊的腳本都是這樣寫的」，
+         那是全稱句而且不成立。本站至少還有三支
+         —— <code>mvp_player.py</code>、<code>mvp_ratings.py</code>、<code>mvp_edit_stance.py</code>
+         —— 走的正是上面警告的「照編號建表」那條路。
+         它們讀的是 <code>attrib.dat</code> 與 <code>pitcher.dat</code>、不碰 <code>tstat.dat</code>，
+         所以目前不會踩到這個坑；但那是<u>剛好沒踩到</u>，不是有東西擋著。）</p>
+      <p class="small">這是模組產生工具寫壞的，不是 EA 的格式性質：
+         三份剛安裝好的原版都是乾淨的。</p>
+    </div>
+
+  <div class="card clay">
+    <p class="card-h">兩個會讓你取錯值的陷阱</p>
+    <p><strong>一、資料列比表頭多一格。</strong>行首那個 9 碼識別碼（像 <code>0f58f3c1b</code>）
+       表頭沒有對應的欄，所以直接切開取第 22 格<strong>會整個錯開一位</strong>。</p>
+    <p><strong>二、取到的是「<code>22 3</code>」不是「<code>3</code>」。</strong>
+       忘了切掉編號前綴，數字就變成字串。</p>
+    <p>旁證：<code>attrib.dat.csv</code> 這個 2017 年的匯出版，
+       表頭第一欄多了一個叫 <code>hex</code> 的欄位 —— 那正是行首那個識別碼的名字。</p>
+    <p>完整的踩雷說明在<a href="player-data.html">球員資料檔那頁</a>。</p>
+  </div>
+
+  <h2>行首那個識別碼是把各表串起來的鑰匙</h2>
+  <p>它不只是流水號。原版 <code>attrib.dat</code> 的 2,921 列<strong>沒有一個重複</strong>，
+     <code>pitcher.dat</code> 的 1,430 列也是。而且<strong>其他表會用它來指向球員或球隊</strong>：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>對照</th><th class="num">原版</th><th class="num">裝過模組那台</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="對照"><code>roster.dat</code> 欄位 0 → <code>team.dat</code> 的識別碼</td>
+          <td data-label="原版" class="num">2,970 / 2,970</td><td data-label="裝過模組那台" class="num">3,004 / 3,004</td></tr>
+      <tr class="hi"><td data-label="對照"><code>roster.dat</code> 欄位 1 → <code>attrib.dat</code> 的識別碼</td>
+          <td data-label="原版" class="num">2,970 / 2,970</td><td data-label="裝過模組那台" class="num">3,004 / 3,004</td></tr>
+      <tr><td data-label="對照"><code>pitcher.dat</code> 的識別碼是否都出現在 <code>attrib.dat</code></td>
+          <td data-label="原版" class="num">1,430 / 1,430</td><td data-label="裝過模組那台" class="num">1,618 / 1,618</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">兩份都是 <strong>100%</strong>。這件事<u>換名單也不會壞</u> ——
+     模組作者換掉整份球員名單，這些對照關係還是全中，
+     代表它不是巧合，是遊戲要求的。</p>
+  <p>最後一列的意思是：<strong>投手也是球員</strong>。
+     兩張表用<strong>同一個識別碼</strong>描述同一個人，
+     <code>attrib.dat</code> 記他的打擊與體格，<code>pitcher.dat</code> 記他的投球能力。</p>
+
+  <div class="card grass">
+    <p class="card-h">串起來實際長這樣</p>
+    <p>拿 <code>roster.dat</code> 的一列，用兩個識別碼分別去 <code>attrib.dat</code>
+       與 <code>team.dat</code> 查，就得到完整資訊：</p>
+<pre><code>roster.dat 第 000000015 列
+  欄位0 = 00b87d5f5   欄位1 = <span class="hl">0fff0f559</span>   欄位2 = SP3
+            │                    │
+            │                    └→ attrib.dat 的這一列 = Shohei Ohtani
+            └──────────────────────→ team.dat 的這一列 = Los Angeles Angels
+
+結果:大谷翔平 · 天使隊 · 先發輪值第 3 號</code></pre>
+    <p>這就是為什麼<strong>不能隨便改行首那個識別碼</strong> ——
+       改了它，這位球員就從名單上消失了。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">名字不唯一，識別碼才唯一</p>
+    <p>實測<u>本站測試機</u>的 <code>attrib.dat</code> 裡有 <strong>10 組同名同姓</strong>的球員（剛安裝好的原版是 <strong>0 組</strong>）。
+       所以<strong>絕對不要用名字當識別依據</strong>，會改到別人。</p>
+    <p>而且同名不一定是不同人。以 <code>Shohei Ohtani</code> 為例，兩筆都是他本人：</p>
+    <div class="tablewrap" style="margin-top:10px"><table class="stack">
+      <thead><tr><th class="mono">識別碼</th><th class="num">主要守位</th><th>在 <code>pitcher.dat</code></th><th>身分</th></tr></thead>
+      <tbody>
+        <tr><td data-label="識別碼" class="mono">0fff0f536</td><td data-label="主要守位" class="num">8</td><td data-label="在 pitcher.dat">否</td><td data-label="身分">打者那一份</td></tr>
+        <tr class="hi"><td data-label="識別碼" class="mono">0fff0f559</td><td data-label="主要守位" class="num">0</td><td data-label="在 pitcher.dat">是</td><td data-label="身分">投手那一份</td></tr>
+      </tbody>
+    </table></div>
+    <p style="margin-top:10px">投打二刀流的球員<strong>在球員表裡佔兩列</strong>，各自帶一套能力。</p>
+    <p class="small">但反過來不成立：那 10 組同名裡，有 4 組是<strong>真的不同人剛好同名</strong>
+       （例如兩位 <code>Luis Castillo</code> 都在 <code>pitcher.dat</code> 裡）。
+       所以看到同名，不能直接假設是同一個人的兩份資料。</p>
+  </div>
+  <p class="small"><span class="badge ok">已解</span> <code>org.dat</code> 的欄位 1～4 是編號沒錯（像 <code>193451509</code>），本站上線時寫「對不到 <code>team.dat</code>，是另一套編號系統」——<strong>那是錯的</strong>。它就是 <code>team.dat</code> 那串<u>十六進位識別碼的十進位寫法</u>：<code>193451509</code> = <code>0xb87d5f5</code> = <code>team.dat</code> 的 <code>00b87d5f5</code>。實測 <strong>124 個非零的值，124 個全部對得上</strong>。對出來的內容也合理：第一列是天使，往下依序是它的 3A、2A、1A 農場球隊。完整說明見<a href="team-limit.html">為什麼你加不了新球隊</a>。</p>
+
+  <h2 id="list">19 個純文字檔各裝什麼</h2>
+  <p class="small">下表最後一列 <code>attrib.dat.csv</code> <strong>不是遊戲的檔</strong>，
+     剛安裝好的原版資料夾裡沒有它。列出來是因為很多人的資料夾裡會有，
+     看到它不用緊張，也<u>不要把它當成能改的目標</u>。</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th class="mono">檔案</th><th class="num">欄位</th><th class="num">資料列</th><th>裝什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td class="mono">attrib.dat</td><td class="num">46</td><td class="num">2,921</td>
+          <td><strong>打者能力</strong>。改能力前務必先讀<a href="player-data.html">避雷頁</a>。<br>
+              <code>playerattrib_face</code> 這一欄指向
+              <a href="models.html">3D 臉皮編號</a>（照名字找，<a href="player-fields.html#col-shift">欄號會因名冊而異</a>）</td></tr>
+      <tr class="hi"><td class="mono">pitcher.dat</td><td class="num">29</td><td class="num">1,430</td>
+          <td><strong>投手能力</strong></td></tr>
+      <tr><td class="mono">roster.dat</td><td class="num">10</td><td class="num">2,970</td><td>名單與打序，見下方說明</td></tr>
+      <tr><td class="mono">team.dat</td><td class="num">55</td><td class="num">126</td><td>球隊資料（最多欄位的一個檔）</td></tr>
+      <tr><td class="mono">tstat.dat</td><td class="num">5</td><td class="num">126</td><td>球隊上下半季勝敗</td></tr>
+      <tr><td class="mono">org.dat</td><td class="num">14</td><td class="num">34</td><td>球團與 3A／2A／1A 的隸屬關係</td></tr>
+      <tr><td class="mono">manager.dat</td><td class="num">21</td><td class="num">34</td><td>總教練</td></tr>
+      <tr><td class="mono">bstats.dat</td><td class="num">6</td><td class="num">2,921</td><td>打擊成績</td></tr>
+      <tr><td class="mono">pstats.dat</td><td class="num">15</td><td class="num">1,430</td><td>投球成績</td></tr>
+      <tr><td class="mono">fbstats.dat</td><td class="num">6</td><td class="num">2,921</td><td>守備成績</td></tr>
+      <tr><td class="mono">career.dat</td><td class="num">9</td><td class="num">2,921</td><td>打者生涯累計</td></tr>
+      <tr><td class="mono">careerp.dat</td><td class="num">11</td><td class="num">1,430</td><td>投手生涯累計</td></tr>
+      <tr><td class="mono">lhattrib.dat</td><td class="num">28</td><td class="num">2,921</td>
+          <td rowspan="6">對<strong>左投／右投</strong>分開記錄的能力與成績，見下方說明</td></tr>
+      <tr><td class="mono">rhattrib.dat</td><td class="num">29</td><td class="num">2,921</td></tr>
+      <tr><td class="mono">lhbstats.dat</td><td class="num">14</td><td class="num">2,921</td></tr>
+      <tr><td class="mono">rhbstats.dat</td><td class="num">14</td><td class="num">2,921</td></tr>
+      <tr><td class="mono">lhpstats.dat</td><td class="num">13</td><td class="num">1,430</td></tr>
+      <tr><td class="mono">rhpstats.dat</td><td class="num">13</td><td class="num">1,430</td></tr>
+      <tr class="lo"><td class="mono">attrib.dat.csv</td><td class="num">46</td><td class="num">3,167</td>
+          <td><strong>不在原版安裝裡。</strong>一份 2017 年的舊匯出版，遊戲不讀它</td></tr>
+      <tr><td class="mono">resign.csv</td><td class="num">—</td><td class="num">140</td>
+          <td>年齡與明星等級對應的續約機率表</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card blue">
+    <p class="card-h">資料列數自己會分群</p>
+    <p>注意上表的「資料列」欄，只有四個數字反覆出現：</p>
+    <p style="margin-top:8px">
+       <strong>2,921</strong> → 全部球員（8 個檔）　·
+       <strong>1,430</strong> → 只有投手（5 個檔）<br>
+       <strong>126</strong> → 球隊（2 個檔）　·
+       <strong>34</strong> → 球團（2 個檔）</p>
+    <p>所以拿到一個不認識的檔，<strong>看它有幾列就大概知道它在描述誰</strong>。</p>
+  </div>
+
+  <h2 id="compare">拿這張表去驗你自己那份名單被換過沒</h2>
+  <p>本站同時打開<u>剛安裝好的原版</u>與<u>一台裝了模組的機器</u>，把每個檔量了兩次：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">檔</th><th class="num">欄位<br>原版</th><th class="num">欄位<br>裝過模組</th>
+               <th class="num">資料列<br>原版</th><th class="num">資料列<br>裝過模組</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="檔" class="mono">attrib.dat</td><td data-label="欄位原版" class="num">46</td><td data-label="欄位裝過模組" class="num">46</td>
+          <td data-label="資料列原版" class="num">2,921</td><td data-label="資料列裝過模組" class="num"><strong>3,247</strong></td></tr>
+      <tr class="hi"><td data-label="檔" class="mono">pitcher.dat</td><td data-label="欄位原版" class="num">29</td><td data-label="欄位裝過模組" class="num">29</td>
+          <td data-label="資料列原版" class="num">1,430</td><td data-label="資料列裝過模組" class="num"><strong>1,618</strong></td></tr>
+      <tr><td data-label="檔" class="mono">roster.dat</td><td data-label="欄位原版" class="num">10</td><td data-label="欄位裝過模組" class="num">10</td>
+          <td data-label="資料列原版" class="num">2,970</td><td data-label="資料列裝過模組" class="num"><strong>3,004</strong></td></tr>
+      <tr><td data-label="檔" class="mono">team.dat</td><td data-label="欄位原版" class="num">55</td><td data-label="欄位裝過模組" class="num">55</td>
+          <td data-label="資料列原版" class="num">126</td><td data-label="資料列裝過模組" class="num">126</td></tr>
+      <tr><td data-label="檔" class="mono">org.dat</td><td data-label="欄位原版" class="num">14</td><td data-label="欄位裝過模組" class="num">14</td>
+          <td data-label="資料列原版" class="num">34</td><td data-label="資料列裝過模組" class="num">34</td></tr>
+      <tr><td data-label="檔" class="mono">manager.dat</td><td data-label="欄位原版" class="num">21</td><td data-label="欄位裝過模組" class="num">21</td>
+          <td data-label="資料列原版" class="num">34</td><td data-label="資料列裝過模組" class="num">34</td></tr>
+      <tr><td data-label="檔" class="mono">resign.csv</td><td data-label="欄位原版" class="num">—</td><td data-label="欄位裝過模組" class="num">—</td>
+          <td data-label="資料列原版" class="num">140</td><td data-label="資料列裝過模組" class="num">140</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card grass">
+    <p class="card-h">兩件事同時成立</p>
+    <p><strong>① 欄位數 19 個檔全部一模一樣，一個都沒差。</strong>
+       換名單不會改變結構 —— 這就是為什麼本站敢說
+       「這一頁講的規則對你成立」。</p>
+    <p><strong>② 只要跟球員有關的檔，列數就變了。</strong>
+       球隊（126）、球團（34）、續約機率表（140）完全沒動，
+       因為模組換的是<u>球員</u>不是<u>聯盟結構</u>。</p>
+    <p>所以你可以拿這個當<strong>最快的檢查</strong>：
+       打開你的 <code>attrib.dat</code>，看它有幾行。
+       <u>不是 2,921 就是被換過了</u>（要扣掉第一行表頭）。</p>
+    <p class="small">更完整的說明在
+       <a href="../tutorials/whats-original/index.html">怎麼看出哪些檔還沒被動過</a>那一課。</p>
+  </div>
+
+  <h2 id="lrshift"><code>lh</code> 與 <code>rh</code>：對左投跟對右投是分開記的</h2>
+  <p>六個檔名以 <code>lh</code>／<code>rh</code> 開頭，內容是<strong>同一批球員面對左投與右投的分開數據</strong>。
+     成對的三組：能力（<code>attrib</code>）、打擊成績（<code>bstats</code>）、投球成績（<code>pstats</code>）。</p>
+
+  <div class="card amber">
+    <p class="card-h">有一個不對稱的地方</p>
+    <p>三組裡有兩組左右欄位完全相同，但<strong>能力那一組不是</strong>：</p>
+    <p style="margin-top:8px">
+       <code>lhattrib.dat</code> <strong>28 欄</strong>　·
+       <code>rhattrib.dat</code> <strong>29 欄</strong></p>
+    <p>多出來的那一欄叫 <code>lrattrib_chasehardbreak</code>，<strong>只有右邊那個檔有</strong>。</p>
+    <p><span class="badge wip">未確認</span> 為什麼只記一邊，本站沒有查出來。</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">⚠️ 比「欄位數不一樣」更會咬人的是：<u>編號整個位移了</u></p>
+    <p>多出來那一欄<strong>不是加在最後面</strong>，是<strong>插在中間第 22 格</strong>。
+       所以從第 22 欄開始，同一個編號在兩個檔裡指的是不同的東西：</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th class="num">編號</th><th class="mono">lhattrib.dat</th><th class="mono">rhattrib.dat</th></tr></thead>
+      <tbody>
+        <tr><td class="num">0 – 21</td><td colspan="2"><strong>兩邊完全一樣</strong>（22 個欄位）</td></tr>
+        <tr class="hi"><td class="num">22</td><td class="mono">lrattrib_takefb</td><td class="mono">lrattrib_chasehardbreak</td></tr>
+        <tr class="hi"><td class="num">23</td><td class="mono">lrattrib_takeslowbreak</td><td class="mono">lrattrib_takefb</td></tr>
+        <tr class="hi"><td class="num">24</td><td class="mono">lrattrib_takehardbreak</td><td class="mono">lrattrib_takeslowbreak</td></tr>
+        <tr class="hi"><td class="num">25</td><td class="mono">lrattrib_missfb</td><td class="mono">lrattrib_takehardbreak</td></tr>
+        <tr class="hi"><td class="num">26</td><td class="mono">lrattrib_missslowbreak</td><td class="mono">lrattrib_missfb</td></tr>
+        <tr class="hi"><td class="num">27</td><td class="mono">lrattrib_misshardbreak</td><td class="mono">lrattrib_missslowbreak</td></tr>
+        <tr class="lo"><td class="num">28</td><td>（沒有這一欄）</td><td class="mono">lrattrib_misshardbreak</td></tr>
+      </tbody>
+    </table></div>
+    <p>規則很乾淨：<strong><code>lh</code> 的第 N 欄 ＝ <code>rh</code> 的第 N+1 欄</strong>，
+       N ≥ 22 時六個欄位<u>全部成立</u>。</p>
+    <p><strong>這代表什麼</strong>：如果你寫一支工具「讀 lhattrib 的第 25 欄、
+       照樣寫到 rhattrib 的第 25 欄」，你會把
+       <code>missfb</code>（沒揮到速球）的值寫進
+       <code>takehardbreak</code>（放掉大幅度變化球）那一格。
+       <u>不會報錯，不會壞檔，只會讓那個球員的能力變成另一回事。</u></p>
+    <p class="small">本站原本只寫「欄位數不一樣，不能假設一樣」——
+       那句話對，但<u>不足以擋住這個錯</u>：一個小心的人會去比對欄位數，
+       發現 28 vs 29，然後想「那我只處理前 28 欄就好」——
+       而那正好會踩到位移。<strong>要比對的是欄位名，不是欄位數。</strong></p>
+  </div>
+
+  <h2><code>roster.dat</code>：一支球隊有四套先發名單</h2>
+  <p>這個檔的欄位結構跟其他檔都不一樣：</p>
+<pre><code>0 roster_teamid          <span class="cm">哪一隊</span>
+1 roster_playerid        <span class="cm">哪一位球員</span>
+2 rh_roster_al_position       3 rh_roster_al_battingorder   <span class="cm">對右投 · 美聯</span>
+4 rh_roster_nl_position       5 rh_roster_nl_battingorder   <span class="cm">對右投 · 國聯</span>
+6 lh_roster_al_position       7 lh_roster_al_battingorder   <span class="cm">對左投 · 美聯</span>
+8 lh_roster_nl_position       9 lh_roster_nl_battingorder   <span class="cm">對左投 · 國聯</span></code></pre>
+  <p><strong>守備位置與打序各有四套</strong>，按「對手投手是左投還是右投」乘上「美聯還是國聯」分開存。
+     兩聯盟要分開，是因為指定打擊的規則不同。</p>
+  <div class="card clay">
+    <p class="card-h">改名單時要記得改四份</p>
+    <p>只改其中一組，換一個聯盟或換一個左右手的先發投手，<strong>你的調整就不見了</strong>。
+       這跟<a href="fel.html">介面版面檔</a>「同一個元件有很多份」是同一類陷阱。</p>
+  </div>
+
+  <h2 id="allfields">全部 18 個檔的完整欄位表</h2>
+  <p>站上<a href="player-fields.html">另一頁</a>列了 <code>attrib.dat</code> 的 46 欄
+     與 <code>pitcher.dat</code> 的 29 欄，那是最常改的兩個。
+     但那只是 <strong>75 / 338</strong>。</p>
+  <div class="card blue">
+    <p class="card-h">先看規模</p>
+    <div class="tablewrap"><table>
+      <tbody>
+        <tr><td>純文字的 <code>.dat</code></td><td class="num">18 個</td></tr>
+        <tr class="hi"><td>欄位總數</td><td class="num"><strong>338</strong></td></tr>
+        <tr><td>不重複的欄位名</td><td class="num">261</td></tr>
+        <tr><td>出現在最多檔案裡的名字</td><td class="num"><code>first_name</code> / <code>last_name</code>（各 14 個檔）</td></tr>
+      </tbody>
+    </table></div>
+    <p>下面整份表是<u>程式直接從每個檔的第一行讀出來的</u>，不是人抄的。
+       <strong>讀的是剛安裝好的原版</strong> —— 所以 <code>attrib.dat</code> 那張表的<u>欄號只對原版成立</u>。
+       社群名冊（含本站測試機）46 欄裡有 <strong>27 欄編號不同</strong>
+       （<code>speed</code> 在第 22 欄不是 23、<code>audioid</code> 在第 16 欄不是 17、
+       <code>skin_tone</code> 在第 38 欄不是 12），對照見
+       <a href="player-fields.html#col-shift">欄號會因名冊而異</a>。
+       你自己跑一次，會得到<u>你手上那一份</u>的欄序：</p>
+<pre><code>python -c "print(open(r'你的遊戲資料夾\data\database\attrib.dat').readline())"</code></pre>
+    <p class="small">把 <code>attrib.dat</code> 換成任何一個 <code>.dat</code> 都可以。
+       <code>hist.dat</code> 除外 —— 那個是二進位的。</p>
+  </div>
+
+      <h3><code>attrib.dat</code> —— 46 欄</h3>
+  <p class="small">共同前綴 <code>playerattrib_</code> 已省略。</p>
+  <div class="tablewrap"><table role="presentation"><tbody>
+        <tr><td class="num">0</td><td class="mono">first_name</td><td class="num">1</td><td class="mono">last_name</td><td class="num">2</td><td class="mono">jerseynum</td><td class="num">3</td><td class="mono">bats</td></tr>
+        <tr><td class="num">4</td><td class="mono">throws</td><td class="num">5</td><td class="mono">primary_position</td><td class="num">6</td><td class="mono">secondary_position</td><td class="num">7</td><td class="mono">height</td></tr>
+        <tr><td class="num">8</td><td class="mono">weight</td><td class="num">9</td><td class="mono">boneprofile</td><td class="num">10</td><td class="mono">face</td><td class="num">11</td><td class="mono">face2004style</td></tr>
+        <tr><td class="num">12</td><td class="mono">skin_tone</td><td class="num">13</td><td class="mono">hairstyle</td><td class="num">14</td><td class="mono">haircolour</td><td class="num">15</td><td class="mono">facialhair</td></tr>
+        <tr><td class="num">16</td><td class="mono">bodytype</td><td class="num">17</td><td class="mono">audioid</td><td class="num">18</td><td class="mono">photo</td><td class="num">19</td><td class="mono">platediscipline</td></tr>
+        <tr><td class="num">20</td><td class="mono">bunting</td><td class="num">21</td><td class="mono">stealing_aggressive</td><td class="num">22</td><td class="mono">baserunning</td><td class="num">23</td><td class="mono">speed</td></tr>
+        <tr><td class="num">24</td><td class="mono">fielding</td><td class="num">25</td><td class="mono">range</td><td class="num">26</td><td class="mono">throwstrength</td><td class="num">27</td><td class="mono">throwaccuracy</td></tr>
+        <tr><td class="num">28</td><td class="mono">durability</td><td class="num">29</td><td class="mono">battingstance</td><td class="num">30</td><td class="mono">swingtype</td><td class="num">31</td><td class="mono">batcolour</td></tr>
+        <tr><td class="num">32</td><td class="mono">batglove</td><td class="num">33</td><td class="mono">wristband</td><td class="num">34</td><td class="mono">elbowguard</td><td class="num">35</td><td class="mono">shinguard</td></tr>
+        <tr><td class="num">36</td><td class="mono">socks</td><td class="num">37</td><td class="mono">catchermask</td><td class="num">38</td><td class="mono">fieldglovecolour</td><td class="num">39</td><td class="mono">ditty</td></tr>
+        <tr><td class="num">40</td><td class="mono">salary</td><td class="num">41</td><td class="mono">contract_length</td><td class="num">42</td><td class="mono">starpower</td><td class="num">43</td><td class="mono">topprospect</td></tr>
+        <tr><td class="num">44</td><td class="mono">hidden</td><td class="num">45</td><td class="mono">birthday</td><td class="num">—</td><td></td><td class="num">—</td><td></td></tr>
+  </tbody></table></div>
+
+      <h3><code>bstats.dat</code> —— 6 欄</h3>
+  <p class="small">共同前綴 <code>batstat_</code> 已省略。</p>
+  <div class="tablewrap"><table role="presentation"><tbody>
+        <tr><td class="num">0</td><td class="mono">first_name</td><td class="num">1</td><td class="mono">last_name</td><td class="num">2</td><td class="mono">g</td><td class="num">3</td><td class="mono">r</td></tr>
+        <tr><td class="num">4</td><td class="mono">sb</td><td class="num">5</td><td class="mono">cs</td><td class="num">—</td><td></td><td class="num">—</td><td></td></tr>
+  </tbody></table></div>
+
+      <h3><code>career.dat</code> —— 9 欄</h3>
+  <p class="small">共同前綴 <code>batcareerstats_</code> 已省略。</p>
+  <div class="tablewrap"><table role="presentation"><tbody>
+        <tr><td class="num">0</td><td class="mono">first_name</td><td class="num">1</td><td class="mono">last_name</td><td class="num">2</td><td class="mono">g</td><td class="num">3</td><td class="mono">ab</td></tr>
+        <tr><td class="num">4</td><td class="mono">h</td><td class="num">5</td><td class="mono">hr</td><td class="num">6</td><td class="mono">rbi</td><td class="num">7</td><td class="mono">r</td></tr>
+        <tr><td class="num">8</td><td class="mono">sb</td><td class="num">—</td><td></td><td class="num">—</td><td></td><td class="num">—</td><td></td></tr>
+  </tbody></table></div>
+
+      <h3><code>careerp.dat</code> —— 11 欄</h3>
+  <p class="small">共同前綴 <code>pitchcareer_</code> 已省略。</p>
+  <div class="tablewrap"><table role="presentation"><tbody>
+        <tr><td class="num">0</td><td class="mono">first_name</td><td class="num">1</td><td class="mono">last_name</td><td class="num">2</td><td class="mono">g</td><td class="num">3</td><td class="mono">ip</td></tr>
+        <tr><td class="num">4</td><td class="mono">pip</td><td class="num">5</td><td class="mono">er</td><td class="num">6</td><td class="mono">w</td><td class="num">7</td><td class="mono">l</td></tr>
+        <tr><td class="num">8</td><td class="mono">sv</td><td class="num">9</td><td class="mono">so</td><td class="num">10</td><td class="mono">bb</td><td class="num">—</td><td></td></tr>
+  </tbody></table></div>
+
+      <h3><code>fbstats.dat</code> —— 6 欄</h3>
+  <p class="small">共同前綴 <code>fieldstat_</code> 已省略。</p>
+  <div class="tablewrap"><table role="presentation"><tbody>
+        <tr><td class="num">0</td><td class="mono">first_name</td><td class="num">1</td><td class="mono">last_name</td><td class="num">2</td><td class="mono">g</td><td class="num">3</td><td class="mono">po</td></tr>
+        <tr><td class="num">4</td><td class="mono">a</td><td class="num">5</td><td class="mono">e</td><td class="num">—</td><td></td><td class="num">—</td><td></td></tr>
+  </tbody></table></div>
+
+      <h3><code>lhattrib.dat</code> —— 28 欄</h3>
+  <p class="small">共同前綴 <code>lrattrib_</code> 已省略。</p>
+  <div class="tablewrap"><table role="presentation"><tbody>
+        <tr><td class="num">0</td><td class="mono">first_name</td><td class="num">1</td><td class="mono">last_name</td><td class="num">2</td><td class="mono">contact</td><td class="num">3</td><td class="mono">power</td></tr>
+        <tr><td class="num">4</td><td class="mono">hit_ul</td><td class="num">5</td><td class="mono">hit_um</td><td class="num">6</td><td class="mono">hit_ur</td><td class="num">7</td><td class="mono">hit_cl</td></tr>
+        <tr><td class="num">8</td><td class="mono">hit_cm</td><td class="num">9</td><td class="mono">hit_cr</td><td class="num">10</td><td class="mono">hit_ll</td><td class="num">11</td><td class="mono">hit_lm</td></tr>
+        <tr><td class="num">12</td><td class="mono">hit_lr</td><td class="num">13</td><td class="mono">lf_pct</td><td class="num">14</td><td class="mono">cf_pct</td><td class="num">15</td><td class="mono">rf_pct</td></tr>
+        <tr><td class="num">16</td><td class="mono">hr_pct</td><td class="num">17</td><td class="mono">fb_pct</td><td class="num">18</td><td class="mono">ld_pct</td><td class="num">19</td><td class="mono">gb_pct</td></tr>
+        <tr><td class="num">20</td><td class="mono">chasefb</td><td class="num">21</td><td class="mono">chaseslowbreak</td><td class="num">22</td><td class="mono">takefb</td><td class="num">23</td><td class="mono">takeslowbreak</td></tr>
+        <tr><td class="num">24</td><td class="mono">takehardbreak</td><td class="num">25</td><td class="mono">missfb</td><td class="num">26</td><td class="mono">missslowbreak</td><td class="num">27</td><td class="mono">misshardbreak</td></tr>
+  </tbody></table></div>
+
+      <h3><code>lhbstats.dat</code> —— 14 欄</h3>
+  <p class="small">共同前綴 <code>lrbatstat_</code> 已省略。</p>
+  <div class="tablewrap"><table role="presentation"><tbody>
+        <tr><td class="num">0</td><td class="mono">first_name</td><td class="num">1</td><td class="mono">last_name</td><td class="num">2</td><td class="mono">1b</td><td class="num">3</td><td class="mono">2b</td></tr>
+        <tr><td class="num">4</td><td class="mono">3b</td><td class="num">5</td><td class="mono">hr</td><td class="num">6</td><td class="mono">rbi</td><td class="num">7</td><td class="mono">so</td></tr>
+        <tr><td class="num">8</td><td class="mono">bb</td><td class="num">9</td><td class="mono">ibb</td><td class="num">10</td><td class="mono">sh</td><td class="num">11</td><td class="mono">sf</td></tr>
+        <tr><td class="num">12</td><td class="mono">hbp</td><td class="num">13</td><td class="mono">tpa</td><td class="num">—</td><td></td><td class="num">—</td><td></td></tr>
+  </tbody></table></div>
+
+      <h3><code>lhpstats.dat</code> —— 13 欄</h3>
+  <p class="small">共同前綴 <code>lrpitchstat_</code> 已省略。</p>
+  <div class="tablewrap"><table role="presentation"><tbody>
+        <tr><td class="num">0</td><td class="mono">first_name</td><td class="num">1</td><td class="mono">last_name</td><td class="num">2</td><td class="mono">so</td><td class="num">3</td><td class="mono">bb</td></tr>
+        <tr><td class="num">4</td><td class="mono">ibb</td><td class="num">5</td><td class="mono">hbp</td><td class="num">6</td><td class="mono">sf</td><td class="num">7</td><td class="mono">sh</td></tr>
+        <tr><td class="num">8</td><td class="mono">1b</td><td class="num">9</td><td class="mono">2b</td><td class="num">10</td><td class="mono">3b</td><td class="num">11</td><td class="mono">hr</td></tr>
+        <tr><td class="num">12</td><td class="mono">tpa</td><td class="num">—</td><td></td><td class="num">—</td><td></td><td class="num">—</td><td></td></tr>
+  </tbody></table></div>
+
+      <h3><code>manager.dat</code> —— 21 欄</h3>
+  <p class="small">共同前綴 <code>manager_</code> 已省略。</p>
+  <div class="tablewrap"><table role="presentation"><tbody>
+        <tr><td class="num">0</td><td class="mono">first_name</td><td class="num">1</td><td class="mono">last_name</td><td class="num">2</td><td class="mono">jerseynum</td><td class="num">3</td><td class="mono">audioid</td></tr>
+        <tr><td class="num">4</td><td class="mono">height</td><td class="num">5</td><td class="mono">weight</td><td class="num">6</td><td class="mono">boneprofile</td><td class="num">7</td><td class="mono">face</td></tr>
+        <tr><td class="num">8</td><td class="mono">face2004style</td><td class="num">9</td><td class="mono">skintone</td><td class="num">10</td><td class="mono">hairstyle</td><td class="num">11</td><td class="mono">haircolour</td></tr>
+        <tr><td class="num">12</td><td class="mono">facialhair</td><td class="num">13</td><td class="mono">bodytype</td><td class="num">14</td><td class="mono">hitting</td><td class="num">15</td><td class="mono">baserunning</td></tr>
+        <tr><td class="num">16</td><td class="mono">fielding</td><td class="num">17</td><td class="mono">pitching</td><td class="num">18</td><td class="mono">salary</td><td class="num">19</td><td class="mono">reallife</td></tr>
+        <tr><td class="num">20</td><td class="mono">birthday</td><td class="num">—</td><td></td><td class="num">—</td><td></td><td class="num">—</td><td></td></tr>
+  </tbody></table></div>
+
+      <h3><code>org.dat</code> —— 14 欄</h3>
+  <p class="small">共同前綴 <code>org_</code> 已省略。</p>
+  <div class="tablewrap"><table role="presentation"><tbody>
+        <tr><td class="num">0</td><td class="mono">unique_team</td><td class="num">1</td><td class="mono">team_mlb</td><td class="num">2</td><td class="mono">team_aaa</td><td class="num">3</td><td class="mono">team_aa</td></tr>
+        <tr><td class="num">4</td><td class="mono">team_a</td><td class="num">5</td><td class="mono">is_franchise</td><td class="num">6</td><td class="mono">spring</td><td class="num">7</td><td class="mono">budget</td></tr>
+        <tr><td class="num">8</td><td class="mono">penalty1</td><td class="num">9</td><td class="mono">penalty2</td><td class="num">10</td><td class="mono">penalty3</td><td class="num">11</td><td class="mono">penalty4</td></tr>
+        <tr><td class="num">12</td><td class="mono">mlb_manager</td><td class="num">13</td><td class="mono">minors_manager</td><td class="num">—</td><td></td><td class="num">—</td><td></td></tr>
+  </tbody></table></div>
+
+      <h3><code>pitcher.dat</code> —— 29 欄</h3>
+  <p class="small">共同前綴 <code>pitchattrib_</code> 已省略。</p>
+  <div class="tablewrap"><table role="presentation"><tbody>
+        <tr><td class="num">0</td><td class="mono">first_name</td><td class="num">1</td><td class="mono">last_name</td><td class="num">2</td><td class="mono">stamina</td><td class="num">3</td><td class="mono">pickoff</td></tr>
+        <tr><td class="num">4</td><td class="mono">fastball_movement</td><td class="num">5</td><td class="mono">fastball_description</td><td class="num">6</td><td class="mono">fastball_control</td><td class="num">7</td><td class="mono">fastball_velocity</td></tr>
+        <tr><td class="num">8</td><td class="mono">pitch2_type</td><td class="num">9</td><td class="mono">pitch2_movement</td><td class="num">10</td><td class="mono">pitch2_description</td><td class="num">11</td><td class="mono">pitch2_control</td></tr>
+        <tr><td class="num">12</td><td class="mono">pitch2_velocity</td><td class="num">13</td><td class="mono">pitch3_type</td><td class="num">14</td><td class="mono">pitch3_movement</td><td class="num">15</td><td class="mono">pitch3_description</td></tr>
+        <tr><td class="num">16</td><td class="mono">pitch3_control</td><td class="num">17</td><td class="mono">pitch3_velocity</td><td class="num">18</td><td class="mono">pitch4_type</td><td class="num">19</td><td class="mono">pitch4_movement</td></tr>
+        <tr><td class="num">20</td><td class="mono">pitch4_description</td><td class="num">21</td><td class="mono">pitch4_control</td><td class="num">22</td><td class="mono">pitch4_velocity</td><td class="num">23</td><td class="mono">pitch5_type</td></tr>
+        <tr><td class="num">24</td><td class="mono">pitch5_movement</td><td class="num">25</td><td class="mono">pitch5_description</td><td class="num">26</td><td class="mono">pitch5_control</td><td class="num">27</td><td class="mono">pitch5_velocity</td></tr>
+        <tr><td class="num">28</td><td class="mono">pitcher_delivery</td><td class="num">—</td><td></td><td class="num">—</td><td></td><td class="num">—</td><td></td></tr>
+  </tbody></table></div>
+
+      <h3><code>pstats.dat</code> —— 15 欄</h3>
+  <p class="small">共同前綴 <code>pitchstat_</code> 已省略。</p>
+  <div class="tablewrap"><table role="presentation"><tbody>
+        <tr><td class="num">0</td><td class="mono">first_name</td><td class="num">1</td><td class="mono">last_name</td><td class="num">2</td><td class="mono">g</td><td class="num">3</td><td class="mono">gs</td></tr>
+        <tr><td class="num">4</td><td class="mono">r</td><td class="num">5</td><td class="mono">er</td><td class="num">6</td><td class="mono">w</td><td class="num">7</td><td class="mono">l</td></tr>
+        <tr><td class="num">8</td><td class="mono">sv</td><td class="num">9</td><td class="mono">blsv</td><td class="num">10</td><td class="mono">cg</td><td class="num">11</td><td class="mono">sho</td></tr>
+        <tr><td class="num">12</td><td class="mono">pk</td><td class="num">13</td><td class="mono">ip</td><td class="num">14</td><td class="mono">pip</td><td class="num">—</td><td></td></tr>
+  </tbody></table></div>
+
+      <h3><code>rhattrib.dat</code> —— 29 欄</h3>
+  <p class="small">共同前綴 <code>lrattrib_</code> 已省略。</p>
+  <div class="tablewrap"><table role="presentation"><tbody>
+        <tr><td class="num">0</td><td class="mono">first_name</td><td class="num">1</td><td class="mono">last_name</td><td class="num">2</td><td class="mono">contact</td><td class="num">3</td><td class="mono">power</td></tr>
+        <tr><td class="num">4</td><td class="mono">hit_ul</td><td class="num">5</td><td class="mono">hit_um</td><td class="num">6</td><td class="mono">hit_ur</td><td class="num">7</td><td class="mono">hit_cl</td></tr>
+        <tr><td class="num">8</td><td class="mono">hit_cm</td><td class="num">9</td><td class="mono">hit_cr</td><td class="num">10</td><td class="mono">hit_ll</td><td class="num">11</td><td class="mono">hit_lm</td></tr>
+        <tr><td class="num">12</td><td class="mono">hit_lr</td><td class="num">13</td><td class="mono">lf_pct</td><td class="num">14</td><td class="mono">cf_pct</td><td class="num">15</td><td class="mono">rf_pct</td></tr>
+        <tr><td class="num">16</td><td class="mono">hr_pct</td><td class="num">17</td><td class="mono">fb_pct</td><td class="num">18</td><td class="mono">ld_pct</td><td class="num">19</td><td class="mono">gb_pct</td></tr>
+        <tr><td class="num">20</td><td class="mono">chasefb</td><td class="num">21</td><td class="mono">chaseslowbreak</td><td class="num">22</td><td class="mono">chasehardbreak</td><td class="num">23</td><td class="mono">takefb</td></tr>
+        <tr><td class="num">24</td><td class="mono">takeslowbreak</td><td class="num">25</td><td class="mono">takehardbreak</td><td class="num">26</td><td class="mono">missfb</td><td class="num">27</td><td class="mono">missslowbreak</td></tr>
+        <tr><td class="num">28</td><td class="mono">misshardbreak</td><td class="num">—</td><td></td><td class="num">—</td><td></td><td class="num">—</td><td></td></tr>
+  </tbody></table></div>
+
+      <h3><code>rhbstats.dat</code> —— 14 欄</h3>
+  <p class="small">共同前綴 <code>lrbatstat_</code> 已省略。</p>
+  <div class="tablewrap"><table role="presentation"><tbody>
+        <tr><td class="num">0</td><td class="mono">first_name</td><td class="num">1</td><td class="mono">last_name</td><td class="num">2</td><td class="mono">1b</td><td class="num">3</td><td class="mono">2b</td></tr>
+        <tr><td class="num">4</td><td class="mono">3b</td><td class="num">5</td><td class="mono">hr</td><td class="num">6</td><td class="mono">rbi</td><td class="num">7</td><td class="mono">so</td></tr>
+        <tr><td class="num">8</td><td class="mono">bb</td><td class="num">9</td><td class="mono">ibb</td><td class="num">10</td><td class="mono">sh</td><td class="num">11</td><td class="mono">sf</td></tr>
+        <tr><td class="num">12</td><td class="mono">hbp</td><td class="num">13</td><td class="mono">tpa</td><td class="num">—</td><td></td><td class="num">—</td><td></td></tr>
+  </tbody></table></div>
+
+      <h3><code>rhpstats.dat</code> —— 13 欄</h3>
+  <p class="small">共同前綴 <code>lrpitchstat_</code> 已省略。</p>
+  <div class="tablewrap"><table role="presentation"><tbody>
+        <tr><td class="num">0</td><td class="mono">first_name</td><td class="num">1</td><td class="mono">last_name</td><td class="num">2</td><td class="mono">so</td><td class="num">3</td><td class="mono">bb</td></tr>
+        <tr><td class="num">4</td><td class="mono">ibb</td><td class="num">5</td><td class="mono">hbp</td><td class="num">6</td><td class="mono">sf</td><td class="num">7</td><td class="mono">sh</td></tr>
+        <tr><td class="num">8</td><td class="mono">1b</td><td class="num">9</td><td class="mono">2b</td><td class="num">10</td><td class="mono">3b</td><td class="num">11</td><td class="mono">hr</td></tr>
+        <tr><td class="num">12</td><td class="mono">tpa</td><td class="num">—</td><td></td><td class="num">—</td><td></td><td class="num">—</td><td></td></tr>
+  </tbody></table></div>
+
+      <h3><code>roster.dat</code> —— 10 欄</h3>
+  
+  <div class="tablewrap"><table role="presentation"><tbody>
+        <tr><td class="num">0</td><td class="mono">roster_teamid</td><td class="num">1</td><td class="mono">roster_playerid</td><td class="num">2</td><td class="mono">rh_roster_al_position</td><td class="num">3</td><td class="mono">rh_roster_al_battingorder</td></tr>
+        <tr><td class="num">4</td><td class="mono">rh_roster_nl_position</td><td class="num">5</td><td class="mono">rh_roster_nl_battingorder</td><td class="num">6</td><td class="mono">lh_roster_al_position</td><td class="num">7</td><td class="mono">lh_roster_al_battingorder</td></tr>
+        <tr><td class="num">8</td><td class="mono">lh_roster_nl_position</td><td class="num">9</td><td class="mono">lh_roster_nl_battingorder</td><td class="num">—</td><td></td><td class="num">—</td><td></td></tr>
+  </tbody></table></div>
+
+      <h3><code>team.dat</code> —— 55 欄</h3>
+  <p class="small">共同前綴 <code>team_</code> 已省略。</p>
+  <div class="tablewrap"><table role="presentation"><tbody>
+        <tr><td class="num">0</td><td class="mono">unique_team</td><td class="num">1</td><td class="mono">location</td><td class="num">2</td><td class="mono">long_name</td><td class="num">3</td><td class="mono">short_name</td></tr>
+        <tr><td class="num">4</td><td class="mono">league</td><td class="num">5</td><td class="mono">division</td><td class="num">6</td><td class="mono">artid</td><td class="num">7</td><td class="mono">climatezone</td></tr>
+        <tr><td class="num">8</td><td class="mono">homeintensity</td><td class="num">9</td><td class="mono">vs_ana</td><td class="num">10</td><td class="mono">vs_oak</td><td class="num">11</td><td class="mono">vs_sea</td></tr>
+        <tr><td class="num">12</td><td class="mono">vs_tex</td><td class="num">13</td><td class="mono">vs_cws</td><td class="num">14</td><td class="mono">vs_cle</td><td class="num">15</td><td class="mono">vs_det</td></tr>
+        <tr><td class="num">16</td><td class="mono">vs_kc</td><td class="num">17</td><td class="mono">vs_min</td><td class="num">18</td><td class="mono">vs_bal</td><td class="num">19</td><td class="mono">vs_bos</td></tr>
+        <tr><td class="num">20</td><td class="mono">vs_nyy</td><td class="num">21</td><td class="mono">vs_tam</td><td class="num">22</td><td class="mono">vs_tor</td><td class="num">23</td><td class="mono">vs_ari</td></tr>
+        <tr><td class="num">24</td><td class="mono">vs_col</td><td class="num">25</td><td class="mono">vs_la</td><td class="num">26</td><td class="mono">vs_sdp</td><td class="num">27</td><td class="mono">vs_sfg</td></tr>
+        <tr><td class="num">28</td><td class="mono">vs_cub</td><td class="num">29</td><td class="mono">vs_cin</td><td class="num">30</td><td class="mono">vs_hou</td><td class="num">31</td><td class="mono">vs_mil</td></tr>
+        <tr><td class="num">32</td><td class="mono">vs_pit</td><td class="num">33</td><td class="mono">vs_stl</td><td class="num">34</td><td class="mono">vs_atl</td><td class="num">35</td><td class="mono">vs_fla</td></tr>
+        <tr><td class="num">36</td><td class="mono">vs_mon</td><td class="num">37</td><td class="mono">vs_nym</td><td class="num">38</td><td class="mono">vs_phi</td><td class="num">39</td><td class="mono">vs_al</td></tr>
+        <tr><td class="num">40</td><td class="mono">vs_nl</td><td class="num">41</td><td class="mono">pinchhitter</td><td class="num">42</td><td class="mono">pinchrunner</td><td class="num">43</td><td class="mono">pitchersub</td></tr>
+        <tr><td class="num">44</td><td class="mono">defensivesub</td><td class="num">45</td><td class="mono">defensivealign</td><td class="num">46</td><td class="mono">takepitch</td><td class="num">47</td><td class="mono">sacbunt</td></tr>
+        <tr><td class="num">48</td><td class="mono">buntforhit</td><td class="num">49</td><td class="mono">pickoff</td><td class="num">50</td><td class="mono">int_walks</td><td class="num">51</td><td class="mono">hitandrun</td></tr>
+        <tr><td class="num">52</td><td class="mono">steals</td><td class="num">53</td><td class="mono">advancebases</td><td class="num">54</td><td class="mono">suicidesqueeze</td><td class="num">—</td><td></td></tr>
+  </tbody></table></div>
+
+  <div class="card grass">
+    <p class="card-h">⭐ <code>team_climatezone</code> 的三個值（2026-08-28 解開）</p>
+    <p>一支社群編輯器附的設定檔給了名字，而<u>遊戲自己的球隊表可以把它驗到滿分</u>：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th class="num">值</th><th>設定檔寫的</th><th class="num">原版有幾支</th></tr></thead>
+      <tbody>
+        <tr><td data-label="值" class="num">0</td><td data-label="設定檔寫的"><code>Indoors</code>　室內</td><td data-label="原版有幾支" class="num">35</td></tr>
+        <tr><td data-label="值" class="num">1</td><td data-label="設定檔寫的"><code>Southern</code>　南方</td><td data-label="原版有幾支" class="num">67</td></tr>
+        <tr><td data-label="值" class="num">2</td><td data-label="設定檔寫的"><code>Northern</code>　北方</td><td data-label="原版有幾支" class="num">24</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>怎麼驗的：把「室內」那一組的大聯盟球隊列出來。</strong>
+       剛安裝好的原版裡是這八支 ——</p>
+<pre><code>Mariners  Twins  Devil Rays  Blue Jays
+Diamondbacks  Astros  Brewers  Nationals</code></pre>
+    <p>前七支<u>正好就是那個年代全部有巨蛋或開合式屋頂的球場</u>，一支不多一支不少。
+       <strong>這不是數量吻合，是名單本身對得上現實。</strong></p>
+    <p>另外兩組也對得起來：「北方」那組是白襪、印地安人、老虎、金鶯、紅襪、洋基、
+       小熊、紅人、海盜、大都會、費城人；「南方」那組是天使、運動家、遊騎兵、皇家、
+       落磯、道奇、教士、巨人、紅雀、勇士、馬林魚。
+       <u>三組是 8＋11＋11，剛好就是大聯盟 30 隊，大體上照地理分。</u></p>
+    <p class="small">（2026-09-05 訂正：本站原本在「南方」那組漏列了<strong>皇家</strong>，
+       只列出 10 支，三組加起來湊不滿 30 隊；而且原本寫「照地理分，沒有一支放錯邊」。
+       補上之後看，邊界其實沒那麼乾淨 —— 「南方」那組的<u>科羅拉多</u>，
+       緯度比「北方」那組的<u>辛辛那提</u>還要北。）</p>
+    <div class="card">
+      <p class="card-h">第八支很有意思：華盛頓為什麼被標成「室內」</p>
+      <p>2005 年華盛頓打的是 RFK 球場，<strong>那是露天的</strong>。</p>
+      <p>最可能的解釋是：這支球隊 2005 年才從<u>蒙特婁</u>搬過去，
+         而蒙特婁的奧林匹克球場是巨蛋。EA 把名字跟所在地改了，
+         <strong>氣候區那一格沒跟著改</strong>。原版的球隊表裡也<u>找不到任何一列還叫博覽會隊</u>
+         —— 那一列是被覆蓋掉的，不是新增的。</p>
+      <p class="small"><span class="badge wip">推論</span>
+         本站沒有直接證據把這一格跟搬家連起來，
+         能量到的只有「它被標成室內」與「RFK 是露天球場」這兩件事。</p>
+    </div>
+  </div>
+
+      <h3><code>tstat.dat</code> —— 5 欄</h3>
+  <p class="small">共同前綴 <code>team_</code> 已省略。</p>
+  <div class="tablewrap"><table role="presentation"><tbody>
+        <tr><td class="num">0</td><td class="mono">unique_team</td><td class="num">1</td><td class="mono">wins_1sthalf</td><td class="num">2</td><td class="mono">losses_1sthalf</td><td class="num">3</td><td class="mono">wins_2ndhalf</td></tr>
+        <tr><td class="num">4</td><td class="mono">losses_2ndhalf</td><td class="num">—</td><td></td><td class="num">—</td><td></td><td class="num">—</td><td></td></tr>
+  </tbody></table></div>
+
+  <div class="card clay">
+    <p class="card-h">看這張表要注意兩件事</p>
+    <p><strong>一、同名不代表同義。</strong>
+       <code>lhattrib.dat</code> 與 <code>rhattrib.dat</code> 的欄位名幾乎一樣，
+       但<u>編號從第 22 欄起整個位移一格</u>（見<a href="#lrshift">上面那一節</a>）。</p>
+    <p><strong>二、這張表只說「叫什麼」，沒說「值代表什麼」。</strong>
+       守位、慣用手、球種、姿勢那些數字的意義在
+       <a href="player-codes.html">代號對照那一頁</a>；
+       身高、生日、薪水三個編碼很怪的欄位在
+       <a href="player-fields.html#height">球員資料檔全欄位</a>。</p>
+  </div>
+
+  <h2>剩下那 5 個檔</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">檔案</th><th>格式</th><th>說明</th></tr></thead>
+    <tbody>
+      <tr><td data-label="檔案" class="mono">schedule.big</td><td data-label="格式"><span class="badge ok">已解</span></td>
+          <td data-label="說明">賽程。<a href="../tutorials/change-schedule-year/index.html">有教學與腳本</a></td></tr>
+      <tr><td data-label="檔案" class="mono">schedule.big.bak</td><td data-label="格式">—</td><td data-label="說明">賽程的備份副本</td></tr>
+      <tr><td data-label="檔案" class="mono">rookie.big</td><td data-label="格式"><span class="badge wip">未解</span></td><td data-label="說明">封裝檔，內容本站未解讀</td></tr>
+      <tr><td data-label="檔案" class="mono">progress.big</td><td data-label="格式"><span class="badge wip">未解</span></td><td data-label="說明">封裝檔，內容本站未解讀</td></tr>
+        <tr><td data-label="檔案" class="mono">hist.dat</td><td data-label="格式"><span class="badge ok">✓ 結構已解</span></td>
+            <td data-label="說明">唯一的二進位資料檔。結構與每一筆 25 個位元組<u>全部解開了</u> ——<a href="#hist">往下看</a></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="hist">hist.dat：唯一的二進位檔，結構解開了</h2>
+  <p>這是 <code>database\</code> 底下<u>唯一</u>不是純文字的資料檔。本站 2026-08-28 把它的<strong>外層結構</strong>解開：</p>
+<pre>開頭 4 個位元組   筆數（32 位元，小端序）
+接下來            筆數 × <strong>25 個位元組</strong>，定長，沒有分隔符號</pre>
+  <p><strong>驗算方法很硬</strong>：<code>(檔案大小 − 4) ÷ 筆數</code> 必須<u>剛好等於 25</u>。三份檔案都成立：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>來源</th><th class="num">檔案大小</th><th class="num">宣告筆數</th><th class="num">每筆</th></tr></thead>
+    <tbody>
+      <tr><td data-label="來源">剛安裝好的英文版原版</td><td data-label="檔案大小" class="num">299,729</td><td data-label="宣告筆數" class="num">11,989</td><td data-label="每筆" class="num">25.0000</td></tr>
+      <tr><td data-label="來源">剛安裝好的中文版原版</td><td data-label="檔案大小" class="num">299,729</td><td data-label="宣告筆數" class="num">11,989</td><td data-label="每筆" class="num">25.0000</td></tr>
+      <tr><td data-label="來源">本站測試機（社群名冊）</td><td data-label="檔案大小" class="num">78,504</td><td data-label="宣告筆數" class="num">3,140</td><td data-label="每筆" class="num">25.0000</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">對照組：把筆數那一欄當成 big-endian 讀會得到 35 億筆，除出來 0.0001 ——
+     所以那一欄確實是小端序，不是猜的。</p>
+
+  <h3>25 個位元組裡，解出來的只有一個欄位（2026-08-28 當時）</h3>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">位置</th><th>是什麼</th><th>怎麼確認的</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="位置" class="num">9–10</td><td data-label="是什麼"><strong>球季年份</strong>（16 位元小端序）</td>
+          <td data-label="怎麼確認的">原版 11,989 筆全部落在 <strong>1890–2004</strong>，<u>零例外</u>，而且 2004 年最多（1,954 筆）往前遞減。
+              同一個位置拿社群名冊解：<strong>2003–2022</strong>，2021 最多往前遞減。
+              <u>同一個位元組位置，在兩份不同年代的名冊上各自解出合理但不同的分布</u></td></tr>
+      <tr><td data-label="位置" class="num">0–3</td><td data-label="是什麼">某種識別碼（32 位元）</td>
+          <td data-label="怎麼確認的">原版有 <strong>1,304</strong> 個相異值，平均每個出現 9.2 次。
+              <span class="badge wip">未解</span> 它識別的是什麼，本站沒有答案</td></tr>
+      <tr><td data-label="位置" class="num">4–8、22–24</td><td data-label="是什麼">原版裡永遠是同一個值</td><td data-label="怎麼確認的">逐位元組統計，相異值數量都是 1</td></tr>
+      <tr><td data-label="位置" class="num">11–21</td><td data-label="是什麼">會變，意義不明</td><td data-label="怎麼確認的"><span class="badge wip">未解</span></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">（2026-09-05 註：上面這張表是 <strong>2026-08-28 當天</strong>的狀態。
+     位置 11 是球隊、12 是打擊／投球的來源標記、13–21 是成績欄位，
+     <u>都在隔天解開了</u> —— 見下面<a href="#hist-full">〈25 個位元組全部填滿了〉</a>那一節。）</p>
+  <div class="card amber">
+    <p class="card-h">一個差點被寫成結論的推測</p>
+    <p>樣本前幾筆長這樣：同一個識別碼配上 1990、1991、1992 三個連續年份。
+       看起來就是「同一個人的連續球季」，很想直接寫下去。</p>
+    <p><strong>但全部算過之後不成立</strong>：出現一次以上的 1,209 個識別碼裡，
+       年份剛好連續的只有 <strong>27.1%</strong>，而且有 <strong>827 個</strong>識別碼<u>年份是重複的</u>。
+       所以它不是「一個識別碼一年一筆」。</p>
+    <p>能寫的只有：<u>這是一張「識別碼 + 年份」的表，每個識別碼有多筆</u>。
+       至於為什麼同一年會有多筆（換隊？分項成績？），本站沒有答案。</p>
+  </div>
+
+  <h2 id="hist-full">⭐ 2026-08-29：25 個位元組全部填滿了</h2>
+  <p>上一節停在「位元組 11 到 21 會變，意義不明」。現在整張表填完了，
+     <strong>而且方法跟聲音格式那次是同一個</strong>：先找到一份能說「你錯了」的標準答案。</p>
+
+  <div class="card amber">
+    <p class="card-h">⚠️ 先說口徑：<u>這一節換了一份名冊</u>，數字跟上一節對不起來是正常的</p>
+    <p>上一節量的是<strong>剛安裝好的原版</strong>。這一節為了拿到年代更長、球隊更多的成績樣本，
+       量的是<strong>一份 2009 年的台灣名冊</strong>（<code>hist.dat</code> 237,229 個位元組、宣告 9,489 筆）。</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th></th><th class="num">剛安裝好的原版</th><th class="num">本節這份 2009 名冊</th></tr></thead>
+      <tbody>
+        <tr><td>筆數</td><td data-label="剛安裝好的原版" class="num">11,989</td><td data-label="本節這份 2009 名冊" class="num">9,489</td></tr>
+        <tr><td>年份範圍（位元組 9–10）</td><td data-label="剛安裝好的原版" class="num">1890–2004</td><td data-label="本節這份 2009 名冊" class="num">1890–2009</td></tr>
+        <tr><td>球隊（位元組 11）相異值</td><td data-label="剛安裝好的原版" class="num">31 種</td><td data-label="本節這份 2009 名冊" class="num">102 種</td></tr>
+        <tr class="hi"><td>129 打擊／130 投球</td><td data-label="剛安裝好的原版" class="num">8,040／3,949</td><td data-label="本節這份 2009 名冊" class="num">6,173／3,316</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>格式是同一套，會變的是筆數與分布。</strong>把下面這套切法拿回原版那 11,989 筆重跑，
+       四條必然關係一樣站得住（安打 ≤ 打數 8,039／8,040、全壘打 ≤ 安打 8,040／8,040、
+       打點 ≥ 全壘打 8,040／8,040、打數 ≤ 出賽×8 8,040／8,040），
+       整體打擊率 <strong>.2754</strong>、防禦率 <strong>3.84</strong>，
+       跟這一節用 2009 名冊算出來的 .2774 / 3.74 在同一個位置。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">這次的標準答案是<u>棒球史本身</u></p>
+    <p>成績那 9 個位元組沒有對齊位元組邊界，硬猜切法會有幾百種可能。
+       但棒球給了兩種免費的檢驗：</p>
+    <ol>
+      <li><strong>必然成立的關係</strong> —— 安打不可能多於打數，全壘打不可能多於安打。
+          切錯的話，六千筆裡一定會有一大堆違反。</li>
+      <li><strong>史上單季紀錄</strong> —— 一個欄位的上限，不可能超過人類做過的最好成績。</li>
+    </ol>
+  </div>
+
+  <h3>每一筆 25 個位元組</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>位置</th><th>是什麼</th><th>怎麼確認的</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">0–3</td><td>球員碼</td><td>跟名冊純文字檔每列開頭的十六進位數對得上</td></tr>
+      <tr><td class="mono">4</td><td>永遠是 1</td><td rowspan="2">逐位元組統計，相異值只有 1 種</td></tr>
+      <tr><td class="mono">5–8、22–24</td><td>永遠是 0</td></tr>
+      <tr><td class="mono">9–10</td><td>球季年份</td><td>16 位元小端序，1890–2009<span class="small">（這份名冊；原版是 1890–2004）</span></td></tr>
+      <tr><td class="mono">11</td><td>球隊</td><td>102 種相異值<span class="small">（這份名冊；原版是 31 種）</span></td></tr>
+      <tr class="hi"><td class="mono">12</td><td><strong>129 = 打擊　130 = 投球</strong></td>
+          <td>來自母檔的兩張表合併時留下的標記</td></tr>
+      <tr class="hi"><td class="mono">13–21</td><td><strong>成績（9 個位元組＝72 位元）</strong></td>
+          <td>見下面兩張表，<u>打擊與投球的欄位配置不一樣</u></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>打擊（第 12 個位元組 = 129，共 6,173 筆）</h3>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>位元</th><th>寬</th><th>欄位</th><th class="num">本檔上限</th><th class="num">大聯盟單季紀錄</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="位元" class="mono">0–9</td><td data-label="寬" class="num">10</td><td data-label="欄位">打數</td>
+          <td data-label="本檔上限" class="num">716</td><td data-label="大聯盟單季紀錄" class="num"><strong>716</strong></td></tr>
+      <tr><td data-label="位元" class="mono">10–17</td><td data-label="寬" class="num">8</td><td data-label="欄位">出賽</td><td data-label="本檔上限" class="num">163</td><td data-label="大聯盟單季紀錄" class="num">165</td></tr>
+      <tr><td data-label="位元" class="mono">18–24</td><td data-label="寬" class="num">7</td><td data-label="欄位">盜壘</td><td data-label="本檔上限" class="num">126</td><td data-label="大聯盟單季紀錄" class="num">138</td></tr>
+      <tr><td data-label="位元" class="mono">25–31</td><td data-label="寬" class="num">7</td><td data-label="欄位">盜壘失敗<span class="badge wip">推測</span></td>
+          <td data-label="本檔上限" class="num">53</td><td data-label="大聯盟單季紀錄" class="num">—</td></tr>
+      <tr class="hi"><td data-label="位元" class="mono">32–40</td><td data-label="寬" class="num">9</td><td data-label="欄位">安打</td>
+          <td data-label="本檔上限" class="num">262</td><td data-label="大聯盟單季紀錄" class="num"><strong>262</strong></td></tr>
+      <tr><td data-label="位元" class="mono">41–48</td><td data-label="寬" class="num">8</td><td data-label="欄位">打點</td><td data-label="本檔上限" class="num">184</td><td data-label="大聯盟單季紀錄" class="num">191</td></tr>
+      <tr><td data-label="位元" class="mono">49–56</td><td data-label="寬" class="num">8</td><td data-label="欄位">得分</td><td data-label="本檔上限" class="num">177</td><td data-label="大聯盟單季紀錄" class="num">198</td></tr>
+      <tr><td data-label="位元" class="mono">57–63</td><td data-label="寬" class="num">7</td><td data-label="欄位">全壘打</td><td data-label="本檔上限" class="num">60</td><td data-label="大聯盟單季紀錄" class="num">73</td></tr>
+      <tr><td data-label="位元" class="mono">64–71</td><td data-label="寬" class="num">8</td><td data-label="欄位">沒有用到（永遠 0）</td><td data-label="本檔上限" class="num">—</td><td data-label="大聯盟單季紀錄" class="num">—</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>兩個欄位的上限剛好各自等於一項真實的大聯盟紀錄</strong>：
+     打數 716（Jimmy Rollins，2007）、安打 262（鈴木一朗，2004）。</p>
+
+  <h3>投球（第 12 個位元組 = 130，共 3,316 筆）</h3>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>位元</th><th>寬</th><th>欄位</th><th class="num">本檔上限</th><th class="num">大聯盟單季紀錄</th></tr></thead>
+    <tbody>
+      <tr><td data-label="位元" class="mono">0–7</td><td data-label="寬" class="num">8</td><td data-label="欄位">自責分</td><td data-label="本檔上限" class="num">179</td><td data-label="大聯盟單季紀錄" class="num">186</td></tr>
+      <tr><td data-label="位元" class="mono">8–15</td><td data-label="寬" class="num">8</td><td data-label="欄位">保送</td><td data-label="本檔上限" class="num">208</td><td data-label="大聯盟單季紀錄" class="num">289</td></tr>
+      <tr class="hi"><td data-label="位元" class="mono">16–24</td><td data-label="寬" class="num">9</td><td data-label="欄位">三振</td>
+          <td data-label="本檔上限" class="num">383</td><td data-label="大聯盟單季紀錄" class="num"><strong>383</strong></td></tr>
+      <tr><td data-label="位元" class="mono">25–31</td><td data-label="寬" class="num">7</td><td data-label="欄位">出賽</td><td data-label="本檔上限" class="num">94</td><td data-label="大聯盟單季紀錄" class="num">106</td></tr>
+      <tr><td data-label="位元" class="mono">32–40</td><td data-label="寬" class="num">9</td><td data-label="欄位">投球局數</td><td data-label="本檔上限" class="num">453</td><td data-label="大聯盟單季紀錄" class="num">680</td></tr>
+      <tr><td data-label="位元" class="mono">41–42</td><td data-label="寬" class="num">2</td><td data-label="欄位">不明（只有 0/1/2 三種值）<span class="badge wip">未解</span></td>
+          <td data-label="本檔上限" class="num">2</td><td data-label="大聯盟單季紀錄" class="num">—</td></tr>
+      <tr><td data-label="位元" class="mono">43–48</td><td data-label="寬" class="num">6</td><td data-label="欄位">勝</td><td data-label="本檔上限" class="num">29</td><td data-label="大聯盟單季紀錄" class="num">59</td></tr>
+      <tr><td data-label="位元" class="mono">49–54</td><td data-label="寬" class="num">6</td><td data-label="欄位">敗</td><td data-label="本檔上限" class="num">25</td><td data-label="大聯盟單季紀錄" class="num">48</td></tr>
+      <tr><td data-label="位元" class="mono">55–63</td><td data-label="寬" class="num">9</td><td data-label="欄位">沒有用到（永遠 0）</td><td data-label="本檔上限" class="num">—</td><td data-label="大聯盟單季紀錄" class="num">—</td></tr>
+      <tr class="hi"><td data-label="位元" class="mono">64–71</td><td data-label="寬" class="num">8</td><td data-label="欄位">救援成功</td>
+          <td data-label="本檔上限" class="num">62</td><td data-label="大聯盟單季紀錄" class="num"><strong>62</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>三振上限 383 是 Nolan Ryan 1973 年的紀錄，救援 62 是 Francisco Rodríguez 2008 年的紀錄。</p>
+
+  <h3>⭐ 決定性的一筆：兩個人，各一年，七個欄位同時對上</h3>
+  <p>光靠上限還不夠 —— 那只是兩個點。真正釘死它的是<strong>從資料裡找出一筆
+     成績完全可查的球季，把每個欄位跟史實逐一比對</strong>。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>1911 年那一筆（打擊）</th><th class="num">解出來</th><th class="num">史實</th>
+               <th>1973 年那一筆（投球）</th><th class="num">解出來</th><th class="num">史實</th></tr></thead>
+    <tbody>
+      <tr><td data-label="1911 年那一筆（打擊）">打數</td><td data-label="解出來" class="num">591</td><td data-label="史實" class="num">591</td>
+          <td data-label="1973 年那一筆（投球）">自責分</td><td data-label="解出來" class="num">104</td><td data-label="史實" class="num">104</td></tr>
+      <tr><td data-label="1911 年那一筆（打擊）">出賽</td><td data-label="解出來" class="num">146</td><td data-label="史實" class="num">146</td>
+          <td data-label="1973 年那一筆（投球）">保送</td><td data-label="解出來" class="num">162</td><td data-label="史實" class="num">162</td></tr>
+      <tr><td data-label="1911 年那一筆（打擊）">盜壘</td><td data-label="解出來" class="num">83</td><td data-label="史實" class="num">83</td>
+          <td data-label="1973 年那一筆（投球）">三振</td><td data-label="解出來" class="num">383</td><td data-label="史實" class="num">383</td></tr>
+      <tr><td data-label="1911 年那一筆（打擊）">安打</td><td data-label="解出來" class="num">248</td><td data-label="史實" class="num">248</td>
+          <td data-label="1973 年那一筆（投球）">出賽</td><td data-label="解出來" class="num">41</td><td data-label="史實" class="num">41</td></tr>
+      <tr><td data-label="1911 年那一筆（打擊）">打點</td><td data-label="解出來" class="num">127</td><td data-label="史實" class="num">127</td>
+          <td data-label="1973 年那一筆（投球）">局數</td><td data-label="解出來" class="num">326</td><td data-label="史實" class="num">326</td></tr>
+      <tr><td data-label="1911 年那一筆（打擊）">得分</td><td data-label="解出來" class="num">147</td><td data-label="史實" class="num">147</td>
+          <td data-label="1973 年那一筆（投球）">勝</td><td data-label="解出來" class="num">21</td><td data-label="史實" class="num">21</td></tr>
+      <tr><td data-label="1911 年那一筆（打擊）">全壘打</td><td data-label="解出來" class="num">8</td><td data-label="史實" class="num">8</td>
+          <td data-label="1973 年那一筆（投球）">敗</td><td data-label="解出來" class="num">16</td><td data-label="史實" class="num">16</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>各七個欄位，全部命中。</strong>而且年份欄位是獨立解出來的
+     （1911 與 1973），不是本站挑的。</p>
+
+  <h3>全體檢驗</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>檢驗</th><th class="num">成立比例</th></tr></thead>
+    <tbody>
+      <tr><td>安打 ≤ 打數</td><td class="num">6,173／6,173 ＝ <strong>100.00%</strong></td></tr>
+      <tr><td>全壘打 ≤ 安打</td><td class="num">6,173／6,173 ＝ <strong>100.00%</strong></td></tr>
+      <tr><td>打點 ≥ 全壘打</td><td class="num">6,173／6,173 ＝ <strong>100.00%</strong></td></tr>
+      <tr><td>打數 ≤ 出賽×8</td><td class="num">6,173／6,173 ＝ <strong>100.00%</strong></td></tr>
+      <tr><td>得分 ≥ 全壘打</td><td class="num">6,172／6,173 ＝ 99.98%</td></tr>
+      <tr><td>勝＋敗 ≤ 出賽</td><td class="num">3,315／3,316 ＝ 99.97%</td></tr>
+      <tr class="hi"><td><strong>整體打擊率</strong>（總安打 ÷ 總打數）</td>
+          <td class="num"><strong>.2774</strong>　2001–2008 各年 .2696–.2747</td></tr>
+      <tr class="hi"><td><strong>整體防禦率</strong>（自責分×9 ÷ 局數，局數≥50）</td>
+          <td class="num"><strong>3.74</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>打擊率 .27 上下、防禦率 3.7 上下，<strong>那是真實棒球一百年來的位置</strong>。
+     切錯位元的話這兩個數字會是隨機的。</p>
+  <p class="small">⚠️ 那 1 筆「得分 &lt; 全壘打」在物理上不可能（每支全壘打至少得一分）。
+     本站判斷那是<u>名冊本身的一筆錯誤資料</u>，不是解碼錯誤 ——
+     因為其他四條關係在同一批資料上都是 100%。但這是判斷，不是證明。</p>
+
+  <div class="card amber">
+    <p class="card-h">⭐ 反過來也學到一件事：這個遊戲不記二壘打與三壘打</p>
+    <p>1911 年那位打了 <strong>47 支二壘打、24 支三壘打</strong>，
+       而 72 個位元裡<u>找不到這兩個數字</u>。投球那邊同樣找不到先發場次、完投、被安打、失分。</p>
+    <p><strong>兩邊都只記八項。</strong>缺的那些不是本站沒解出來，是<u>檔案裡就沒有</u>。</p>
+  </div>
+
+  <div class="card">
+    <p class="card-h">方法：讓資料自己說出欄位邊界</p>
+    <p>不用猜切法。把六千筆的同一個位元拿出來，算<strong>它是 1 的機率</strong>：</p>
+<pre><code>位元  0  1  2  3  4  5  6  7  8  9 │ 10 11 12 …
+     44 41 40 37 35 32 30 23 20 17 │ 50 50 45 …
+                                ↑
+                    一路遞減到 17%，然後跳回 50%</code></pre>
+    <p>一個數字的低位元接近一半機率是 1，高位元越來越少。
+       <strong>機率從遞減轉為上升的那一格，就是欄位邊界。</strong>
+       第一個邊界落在位元 10，而打數的合理範圍正好是 0–1023。</p>
+  </div>
+
+
+  <h2 id="mbe">這 19 個檔是從哪裡來的：一個 Access 資料庫</h2>
+  <p>社群做名冊時，<strong>不是直接編這 19 個文字檔</strong>。
+     他們編的是一個副檔名叫 <code>.mbe</code> 的母檔，改完再匯出成 <code>.dat</code>。</p>
+  <p>那個 <code>.mbe</code> 是<strong>微軟 Access 的資料庫</strong>，只是換了副檔名。
+     檔案開頭第 5 到第 19 個位元組直接寫著 <code>Standard Jet DB</code>：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>檔案日期</th><th class="num">大小</th><th class="num">是 4096 的倍數</th><th class="num">找得到的表名</th></tr></thead>
+    <tbody>
+      <tr><td data-label="檔案日期">2006-01</td><td data-label="大小" class="num">790,528</td><td data-label="是 4096 的倍數" class="num">✅</td><td data-label="找得到的表名" class="num">20</td></tr>
+      <tr><td data-label="檔案日期">2006-08</td><td data-label="大小" class="num">6,656,000</td><td data-label="是 4096 的倍數" class="num">✅</td><td data-label="找得到的表名" class="num">20</td></tr>
+      <tr><td data-label="檔案日期">2006-11</td><td data-label="大小" class="num">6,496,256</td><td data-label="是 4096 的倍數" class="num">✅</td><td data-label="找得到的表名" class="num">20</td></tr>
+      <tr><td data-label="檔案日期">2008-06</td><td data-label="大小" class="num">5,410,816</td><td data-label="是 4096 的倍數" class="num">✅</td><td data-label="找得到的表名" class="num">20</td></tr>
+      <tr><td data-label="檔案日期">2016-09</td><td data-label="大小" class="num">5,746,688</td><td data-label="是 4096 的倍數" class="num">✅</td><td data-label="找得到的表名" class="num">20</td></tr>
+      <tr class="hi"><td data-label="檔案日期">2019-01</td><td data-label="大小" class="num">5,361,664</td><td data-label="是 4096 的倍數" class="num">✅</td><td data-label="找得到的表名" class="num"><strong>20</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>七個檔全部以 <code>00 01 00 00</code> 開頭、全部是 4,096 個位元組的整數倍
+     （Jet 資料庫的分頁大小）。<strong>這不是數量吻合 —— 檔案自己寫著格式名稱。</strong></p>
+
+  <div class="card grass">
+    <p class="card-h">⭐ 十三年，同一份表結構</p>
+    <p>上面那六個檔<u>橫跨 2006 到 2019</u>，是不同人在不同年份做的，
+       而它們的<strong>表名完全相同，一個不多一個不少</strong>：</p>
+<pre><code>attrib   bstats   career   careerp  fbstats
+<span class="hl">histb    histp</span>    lhattrib lhbstats lhpstats
+manager  org      pitcher  pstats   rhattrib
+rhbstats rhpstats roster   team     tstat</code></pre>
+    <p><strong>20 張表，但 <code>data\database\</code> 只有 19 個 <code>.dat</code>。</strong>
+       多出來的那一張就是上面標亮的兩個：母檔裡
+       <code>histb</code>（打擊）與 <code>histp</code>（投球）是<u>分開的兩張表</u>，
+       匯出時才合併成一個 <code>hist.dat</code>。</p>
+    <p>這正好解釋了 <code>hist.dat</code> 裡那個
+       <a href="#hist">只有 129 與 130 兩個值的位元組</a> ——
+       <strong>它是合併時留下的來源標記。</strong></p>
+    <p class="small">為什麼社群的名冊檔大小都差不多，這也有答案了：
+       它們是同一個母檔範本改出來的，表結構一樣，只有列數不同。
+       上表六個檔裡，<u>最大的五個都落在 5.3 到 6.7 MB</u>；
+       最小的那一個只有 0.79 MB，明顯不在這個區間，本站沒有進一步分析它。</p>
+    <p class="small">⚠️ 例外要講清楚：第七個檔（2013 年、245,760 個位元組）只找得到 3 個表名。
+       本站沒有進一步分析它，只知道它同樣是 Jet 資料庫。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">這對你有什麼用</p>
+    <ul class="plain">
+      <li><strong>你不需要 Access。</strong>要改名冊，改那 19 個純文字 <code>.dat</code> 就好 ——
+          本站所有教學走的都是這條路</li>
+      <li>但知道母檔存在，可以解釋兩件事：<u>為什麼欄位順序在不同名冊之間會變</u>
+          （匯出工具的欄序不一定跟母檔一致），以及
+          <u>為什麼有些名冊檔的欄位比別的多</u></li>
+      <li>本站<strong>不提供任何 <code>.mbe</code> 檔</strong>，也不教怎麼用它</li>
+    </ul>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">⭐ 2026-08-28：上面那個問號有答案了 —— <u>換隊跟分項成績，兩個都是</u></p>
+    <p class="small">⚠️ <strong>這張卡是 2026-08-28 寫的，比上面〈25 個位元組全部填滿了〉那一節早一天</strong>，
+       排在這裡是因為它接的是同一節的問題，不是因為它比較新。
+       它量的是<u>剛安裝好的原版</u>（11,989 筆），
+       所以筆數與相異值跟那一節的 2009 名冊不同 ——
+       <u>位元組 12 的意義（129 打擊／130 投球）兩份都一樣</u>，沒有被推翻。</p>
+    <p>那一段結尾問「為什麼同一年會有多筆」。當天稍晚把 25 個位元組逐格重數，
+       其中一格立刻跳出來：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th class="num">位置</th><th>相異值</th><th>是什麼</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="位置" class="num">12</td><td data-label="相異值"><strong>只有兩個</strong>：129（8,040 筆）、130（3,949 筆）</td>
+            <td data-label="是什麼"><strong>打擊成績／投球成績</strong></td></tr>
+        <tr class="hi"><td data-label="位置" class="num">0–3</td><td data-label="相異值">1,304 個</td><td data-label="是什麼"><strong>球員碼</strong>（跟純文字檔行首那一串是同一個）</td></tr>
+        <tr><td data-label="位置" class="num">11</td><td data-label="相異值">31 個</td><td data-label="是什麼">球隊</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>怎麼確定 130 是投球（錨點）</strong>：用 130 的 651 位球員裡，
+       有 <strong>649 位出現在 <code>pitcher.dat</code></strong>。
+       用 129 的 1,281 位裡有 1,275 位在 <code>attrib.dat</code>。
+       <u>球員碼是直接拿去比對的，不是猜的</u> ——
+       純文字檔每一列開頭那九位十六進位數，就是這裡的 0–3 位元組。</p>
+    <p><strong>四個欄位合起來就是唯一鍵</strong>：
+       （球員碼，年份，129/130，球隊）在 11,989 筆裡<strong>零重複</strong>。
+       所以同一年多筆的兩個原因是：</p>
+    <ul class="plain">
+      <li>同一位球員同一年<u>既有打擊成績也有投球成績</u>（628 人兩種都有 —— 投手也要打擊）</li>
+      <li>同一位球員同一年<u>待過不只一支球隊</u>（球季中被交易）</li>
+    </ul>
+    <p class="small">還有一個外部佐證。社群當年用來編名冊的母檔是
+       <a href="#mbe">Access 資料庫</a>，那裡面有 20 張表，
+       而 <code>data\database\</code> 只有 19 個 <code>.dat</code>。
+       多出來的一張正是：母檔把它拆成 <code>histb</code> 與 <code>histp</code> 兩張表，
+       匯出時才合併成一個 <code>hist.dat</code>。
+       <strong>那個 129／130 就是合併時留下的來源標記。</strong></p>
+    <p class="small"><span class="badge ok">已解</span> 位置 13–21 那 9 個位元組（成績數字本身）
+       在寫這張卡的當下還沒解開 —— 它們沒有對齊位元組邊界，是把好幾個欄位擠在一起。
+       <strong>隔天（2026-08-29）解開了</strong>：切法與逐欄驗證見上面
+       <a href="#hist-full">〈25 個位元組全部填滿了〉</a>那一節。</p>
+  </div>
+
+
+  <h2>動手之前</h2>
+  <div class="card clay">
+    <p class="card-h">純文字不等於可以隨便改</p>
+    <p>這些檔<strong>讀</strong>很安全，<strong>寫</strong>要非常小心：</p>
+    <p style="margin-top:8px">
+       · 行首那個編號不能動<br>
+       · 欄位數量不能變<br>
+       · 換行符要保持原樣（跟<a href="fel.html">版面檔</a>同理）<br>
+       · <strong>大部分能力欄位不是 0-99 的分數</strong>，寫錯值會破壞欄位語意</p>
+    <p>改能力之前，<a href="player-data.html">球員資料檔那頁</a>一定要先讀完。</p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 球員能力、成績、名單、球隊資料全在 <code>data\database\</code> 這一個資料夾，而且純文字檔的表頭<u>自己會說明每一欄是什麼</u>，記事本就打得開。</li>
+    <li><strong>規模</strong> 純文字檔的資料筆數合計 40,697 筆（本站測試機 20 個檔加總）；18 個純文字 <code>.dat</code> 的欄位總數是 338 個，不重複的欄位名 261 個。反覆出現的資料列數只有四個：2,921（全部球員）、1,430（只有投手）、126（球隊）、34（球團），所以看列數就大概知道一個檔在描述誰。</li>
+    <li><strong>編號自帶，但不要照編號建表</strong> 表頭與每一格資料都寫著欄位編號，18 個檔逐格檢查帶編號比例 100%。可是 <code>tstat.dat</code> 在社群名冊上有 252 格（126 列 × 2）掛錯編號，剛安裝好的原版是 0 格。<strong>要照位置讀，把編號當校驗碼</strong>，否則下半季勝敗會靜靜蓋掉上半季，程式一句話都不會說。</li>
+    <li><strong>行首那 9 碼識別碼才是鑰匙</strong> <code>roster.dat</code> 指向 <code>team.dat</code> 與 <code>attrib.dat</code>，原版 2,970 筆全中、裝過模組那台 3,004 筆全中，換名單也不會壞。名字不能當識別依據，實測<u>本站測試機</u>有 10 組同名同姓（剛安裝好的原版是 0 組），其中 4 組是真的不同人剛好同名。</li>
+    <li><strong>最會咬人的是欄位位移</strong> <code>lhattrib.dat</code> 28 欄、<code>rhattrib.dat</code> 29 欄，多的那一欄插在第 22 格，從那裡起同一個編號在兩個檔裡指不同的東西。<code>attrib.dat</code> 的 46 欄裡也有 27 欄在原版與社群名冊之間位置不同 —— 本頁那張 46 欄的表<u>列的是原版的欄號</u>。<strong>永遠在執行時從表頭比對欄位名，不要記欄號。</strong></li>
+    <li><strong>本頁訂正過自己好幾次</strong> <code>org.dat</code> 欄位 1 到 4 上線時寫成「對不到 <code>team.dat</code>，是另一套編號系統」，那是錯的，它其實是同一串識別碼的十進位寫法，124 個非零值全部對得上。另一處原本只寫「lh 跟 rh 欄位數不一樣」，那句話對卻擋不住錯，因為一個小心的人會決定「只處理前 28 欄」，剛好踩到位移。2026-09-05 又訂正一批：南方氣候區漏列皇家、<code>hist.dat</code> 位元組 13–21 已在同一頁解開卻還掛著「未解」、欄位表沒標它量的是原版、以及一句「本站每一支讀名冊的腳本都是這樣寫的」的全稱句。</li>
+    <li><strong>2026-08-29：<code>hist.dat</code> 的 25 個位元組全部填滿了</strong> 打數上限 716、安打 262、三振 383、救援 62，各自等於一項真實的大聯盟單季紀錄；1911 與 1973 那兩筆各七個欄位全部命中史實；整體打擊率 .2774、防禦率 3.74。社群當年的母檔是換了副檔名的 Access 資料庫，六份跨 2006 到 2019 的檔表名一模一樣，<code>histb</code> 與 <code>histp</code> 合併時才留下那個 129／130 的來源標記。</li>
+    <li><strong>本站沒驗的</strong> <code>rookie.big</code> 與 <code>progress.big</code> 未解；<code>rhattrib.dat</code> 為什麼只多記一邊未確認；投球那段的位元 41 到 42 未解、盜壘失敗只是推測；華盛頓被標成「室內」的搬家解釋是推論，沒有直接證據；唯一那筆「得分少於全壘打」被判斷成名冊本身的錯誤資料，本站也寫明<u>那是判斷不是證明</u>。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="player-data.html">球員資料檔 attrib / pitcher</a> —— 能力欄位的完整避雷</li>
+    <li><a href="../tutorials/change-schedule-year/index.html">把賽程換到任何年份</a> —— 這個資料夾裡唯一有完整教學的檔</li>
+    <li><a href="file-map.html">遊戲檔案地圖</a> —— 其他資料放在哪裡</li>
+  </ul>
+
+  <footer>
+    <p>本頁所有數字皆為現場打開 <code>data\database\</code> 量測所得，不是引用他人資料。
+       多數量自<u>剛安裝好的原版</u>全 23 個檔，檔案表與欄位表都是；量別份的地方都在該節標明口徑 ——
+       〈先看規模〉與〈名字不唯一，識別碼才唯一〉量的是本站測試機，
+       〈2026-08-29：25 個位元組全部填滿了〉量的是一份 2009 年的台灣名冊，
+       <code>hist.dat</code> 的第一節與兩欄並列的比較表則是兩份都量、逐列標示。
+       標示為「未確認」「未解」之處未經證實，本站不寫成定論。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/player-numbers.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>兩套球員編號 — toni的MVP模組補習班</title>
+<meta name="description" content="每位球員同時掛著兩個完全無關的號碼:4 位數決定大頭照與播報語音,c### 決定臉皮。而遊戲裡的臉皮檔只有 894 個,901 以上一個都不存在。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 兩套球員編號</p>
+  <h1>兩套球員編號</h1>
+  <p class="lede">每一位球員同時掛著<strong>兩個完全無關的號碼</strong>。
+     一個是四位數，決定他的<a href="portrait.html">大頭照</a>與播報語音；
+     另一個是 <code>c###</code>，決定他的<a href="models.html">臉皮</a>。
+     搞混這兩個，是改球員外觀最常見的第一個錯。</p>
+
+    <div class="card blue" style="margin-top:14px">
+    <p class="card-h">先說清楚這頁的數字是從哪一份遊戲量的</p>
+    <p>本頁的項目數、檔案數、覆蓋率，量的是<strong>一台裝過台灣模組的遊戲</strong>。
+       <u>剛安裝好的原版數字小很多</u> —— 例如臉皮 504 對 894、大頭照 1,487 對 6,638、
+       語音號碼 1,673 對 4,343。</p>
+    <p><strong>格式與結構的部分兩邊一樣</strong>，那是遊戲程式決定的；
+       會變的是「有幾個」。完整對照見
+       <a href="original-vs-modded.html">原版與這台機器差在哪</a>。</p>
+  </div>
+<div class="card amber">
+    <p class="card-h">⚠️ 跟名單內容有關的數字，你的會不一樣</p>
+    <p>本站測試機的球員名單被模組換過，裝的是一份混了大聯盟與台灣球員的名單。</p>
+    <p class="small">（2026-09-06 訂正：這裡原本拿檔案日期當佐證，寫「<code>attrib.dat</code> 檔案日期 2026 年 4 月」。
+       <strong>檔案日期不能當證據</strong> —— 複製與同步都會動到它。現在量到的是 <strong>2026-08-29</strong>，
+       而它跟本站 2026 年 4 月那份備份裡的 <code>attrib.dat</code> <u>sha256 相同</u>，
+       代表被換掉的只有時間戳、內容一個位元組都沒改。「被模組換過」本身照舊成立，
+       那是從名冊內容看出來的，不是從日期。）</p>
+    <p>所以「幾位球員」「某某球員是幾號」這類數字，<strong>你自己跑會得到別的結果</strong>。
+       <u>不會變的是<strong>格式</strong></u> —— 表頭怎麼寫、每一格怎麼標編號、資料怎麼分隔，那是遊戲程式決定的。<br>⚠️ <strong>會變的不只是數量，還有<u>欄位的順序</u></strong>：本站實測 46 個欄位裡有 <strong>27 個</strong>在原版與社群名冊之間位置不同（<code>skin_tone</code> 從第 12 欄搬到第 38 欄，中間的欄位各前移一格）。所以<strong>永遠不要記欄號，要在執行時從表頭找欄位名</strong>。</p>
+  </div>
+
+  <h2>答案就寫在檔案第一行</h2>
+  <p><a href="player-data.html">球員資料檔</a>的第一行是欄位表，兩個號碼各佔一欄：</p>
+<pre><code>10 playerattrib_face      ← 臉皮號碼(c### 的數字部分)
+17 playerattrib_audioid   ← 球員本人的四位數號碼
+18 playerattrib_photo     ← 這一欄<b>不是</b>編號</code></pre>
+    <div class="card clay">
+      <p class="card-h">⚠️ 上面那三個欄號只對「剛安裝好的原版」成立</p>
+      <p>本站 2026-08-28 拿三份名冊逐欄比對，發現<strong>社群名冊的欄位順序不一樣</strong>：</p>
+      <div class="tablewrap"><table class="stack">
+        <thead><tr><th>欄位</th><th>剛安裝好的原版<br>（英文與中文相同）</th><th>社群名冊<br>（含本站測試機）</th></tr></thead>
+        <tbody>
+          <tr><td data-label="欄位"><code>playerattrib_face</code></td><td data-label="剛安裝好的原版（英文與中文相同）">10</td><td data-label="社群名冊（含本站測試機）">10</td></tr>
+          <tr class="hi"><td data-label="欄位"><code>playerattrib_audioid</code></td><td data-label="剛安裝好的原版（英文與中文相同）"><strong>17</strong></td><td data-label="社群名冊（含本站測試機）"><strong>16</strong></td></tr>
+          <tr class="hi"><td data-label="欄位"><code>playerattrib_photo</code></td><td data-label="剛安裝好的原版（英文與中文相同）"><strong>18</strong></td><td data-label="社群名冊（含本站測試機）"><strong>17</strong></td></tr>
+          <tr><td data-label="欄位"><code>playerattrib_skin_tone</code></td><td data-label="剛安裝好的原版（英文與中文相同）">12</td><td data-label="社群名冊（含本站測試機）"><strong>38</strong> ← 就是它搬家</td></tr>
+        </tbody>
+      </table></div>
+      <p><strong>46 個欄位裡有 27 個位置不同。</strong>原因是 <code>skin_tone</code> 從第 12 欄搬到了第 38 欄，
+         第 12 到 38 欄之間的每一欄都往前挪了一格（它後面還有 <code>ditty</code>、<code>salary</code>
+         一直到 <code>birthday</code> 共 7 欄，所以不是搬到最後一欄）。<code>face</code> 在第 10 欄，
+         剛好落在挪動範圍之外，所以兩邊都一樣 —— 這也是為什麼只看一個欄位很容易以為沒事。</p>
+      <p><strong>所以不要抄上面那三個數字。</strong>正確做法是<u>打開你自己那份名冊的第一行，
+         照欄位名字找</u>。本站每一支會讀名冊的腳本都是這樣做的，兩種排列都能用。</p>
+    </div>
+  <div class="card amber">
+    <p class="card-h">兩個陷阱，先講清楚</p>
+    <p><strong>一、<code>audioid</code> 這個名字騙人。</strong>
+       它字面是「語音編號」，但它<u>同時決定大頭照</u>。
+       一個號碼兩個用途，欄位名只寫了其中一個。</p>
+    <p><strong>二、<code>photo</code> 不是大頭照編號。</strong>
+       實測整份名冊只有三種值：<code>1</code>（2,908 人）、<code>0</code>（198 人）、<code>2</code>（141 人）。
+       它是開關，不是號碼。</p>
+    <p class="small">看到欄位名就猜用途，猜錯的機率比想像高。以資料為準。</p>
+  </div>
+
+  <h2>證明兩個號碼真的無關</h2>
+  <p>如果兩套號碼其實是同一套（例如取後三碼、或差一個固定值），這一頁就不用寫了。
+     所以先證明它們<strong>毫無數字關係</strong>。</p>
+  <p>拿十五位同時有大頭照、語音、臉皮三種素材的球員來看
+     （<u>這十五組數字你重現不了</u> —— 它們量自本站測試機上那份 2009 年台灣之光名冊，
+     遊戲現在裝著的那份名單裡已經沒有這些人）：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>球員</th><th class="num">四位數<br><span class="small">大頭照 + 語音</span></th>
+      <th class="num">臉皮</th></tr></thead>
+    <tbody>
+      <tr><td data-label="球員">上原浩治</td><td data-label="四位數大頭照 + 語音" class="num">6107</td><td data-label="臉皮" class="num">c873</td></tr>
+      <tr><td data-label="球員">倪福德</td><td data-label="四位數大頭照 + 語音" class="num">6503</td><td data-label="臉皮" class="num">c862</td></tr>
+      <tr><td data-label="球員">增菘瑋</td><td data-label="四位數大頭照 + 語音" class="num">6465</td><td data-label="臉皮" class="num">c119</td></tr>
+      <tr><td data-label="球員">李振昌</td><td data-label="四位數大頭照 + 語音" class="num">3497</td><td data-label="臉皮" class="num">c038</td></tr>
+      <tr class="hi"><td data-label="球員">林哲瑄</td><td data-label="四位數大頭照 + 語音" class="num">4631</td><td data-label="臉皮" class="num">c496</td></tr>
+      <tr><td data-label="球員">林彥峰</td><td data-label="四位數大頭照 + 語音" class="num">3494</td><td data-label="臉皮" class="num">c183</td></tr>
+      <tr><td data-label="球員">林旺億</td><td data-label="四位數大頭照 + 語音" class="num">3488</td><td data-label="臉皮" class="num">c214</td></tr>
+      <tr><td data-label="球員">洪晨恩</td><td data-label="四位數大頭照 + 語音" class="num">3493</td><td data-label="臉皮" class="num">c423</td></tr>
+      <tr><td data-label="球員">田澤純一</td><td data-label="四位數大頭照 + 語音" class="num">6203</td><td data-label="臉皮" class="num">c813</td></tr>
+      <tr><td data-label="球員">羅嘉仁</td><td data-label="四位數大頭照 + 語音" class="num">3500</td><td data-label="臉皮" class="num">c691</td></tr>
+      <tr><td data-label="球員">羅國輝</td><td data-label="四位數大頭照 + 語音" class="num">9146</td><td data-label="臉皮" class="num">c167</td></tr>
+      <tr><td data-label="球員">詹智堯</td><td data-label="四位數大頭照 + 語音" class="num">3429</td><td data-label="臉皮" class="num">c229</td></tr>
+      <tr><td data-label="球員">郭嚴文</td><td data-label="四位數大頭照 + 語音" class="num">3501</td><td data-label="臉皮" class="num">c874</td></tr>
+      <tr><td data-label="球員">鄭凱文</td><td data-label="四位數大頭照 + 語音" class="num">3509</td><td data-label="臉皮" class="num">c882</td></tr>
+      <tr><td data-label="球員">鄭錡鴻</td><td data-label="四位數大頭照 + 語音" class="num">3506</td><td data-label="臉皮" class="num">c892</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>十五個對子，沒有一個對得上任何規律。</strong>
+     不是取後三碼、不是相減固定值、不是同一個數。</p>
+  <div class="card grass">
+    <p class="card-h">整份名冊也是同一個答案</p>
+    <p>不只這十五人。把整份名冊的 3,247 <strong>列</strong>兩欄拿來比，
+       <code>face</code> 剛好等於 <code>audioid</code> 的<strong>只有 27 列</strong> ——
+       而這 27 列裡有 <strong>25 列</strong>是姓名空白、兩欄都寫 <code>0</code> 的預留列，
+       真的有名字又剛好相等的<strong>只有 2 位</strong>（Chris Rabago 907、Troy Stokes Jr 912）。</p>
+    <p class="small">這裡說「列」不說「人」是有原因的：名冊第一列是
+       姓名兩欄都寫 <code>Default</code> 的<strong>範本列</strong>，不是球員；
+       另外還有 25 列是姓名兩欄都空白、<code>hidden</code> 寫 1 的預留列。
+       3,247 列裡有名字的是 <strong>3,222 列</strong>。算比例的時候要記得它們都在裡面。</p>
+  </div>
+
+  <h2>大頭照與語音的檔案，都用這個號碼命名</h2>
+  <p>四位數不只是大頭照的檔名。<strong>同一個號碼會出現在三個倉庫的檔名裡</strong>：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>倉庫</th><th class="mono">檔名長相</th><th>裝什麼</th></tr></thead>
+    <tbody>
+      <tr><td data-label="倉庫" class="mono">frontend\portrait.big</td><td data-label="檔名長相" class="mono">6107.fsh</td><td data-label="裝什麼">大頭照</td></tr>
+      <tr><td data-label="倉庫" class="mono">audio\cd\spch_pbp\pnamedat.big</td><td data-label="檔名長相" class="mono">6107a.dat<br>6107c.dat<br>6107d.dat</td>
+          <td data-label="裝什麼">播報員唸這個人的名字</td></tr>
+      <tr><td data-label="倉庫" class="mono">audio\spch_pbp\pnamehdr.big</td><td data-label="檔名長相" class="mono">6107a.hdr 等</td><td data-label="裝什麼">上面那些語音的檔頭</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">語音為什麼是 <code>a</code>／<code>c</code>／<code>d</code> 三個，以及為什麼很多球員根本沒有語音檔，
+     見<a href="audio.html">播報音訊那頁</a>。</p>
+
+  <div class="card grass">
+    <p class="card-h">這個對應的覆蓋率是多少</p>
+    <p>本站拿<u>剛安裝好的原版</u>對了一遍：</p>
+    <div class="tablewrap"><table>
+      <tbody>
+        <tr><td><code>portrait.big</code> 裡檔名是四位數字的圖</td><td class="num">1,487</td></tr>
+        <tr><td>名冊裡非 0 的 <code>audioid</code></td><td class="num">1,300</td></tr>
+        <tr class="hi"><td><strong>兩邊都有的</strong></td><td class="num"><strong>1,232</strong>（94.8%）</td></tr>
+        <tr><td>有號碼但沒有圖的</td><td class="num">68</td></tr>
+        <tr><td>有圖但沒有人用那個號碼的</td><td class="num">255</td></tr>
+      </tbody>
+    </table></div>
+    <p>所以「照片檔名 ＝ 球員的 <code>audioid</code>」<strong>不是推測，是對得起來的</strong>。
+       剩下那 68 個沒有圖的，遊戲畫面上會顯示什麼，<strong>本站還沒實機看過</strong>；
+       至於那 255 張沒人用的圖是怎麼來的，<span class="badge wip">未解</span><strong>本站沒有查出來</strong>
+       ——（2026-09-05 訂正：這裡原本寫「是名單換過之後留下來的」，那是編出來的成因。
+       這一格量的就是<u>剛安裝好、名單沒被動過</u>的原版，不能說是名單換過留下來的。）</p>
+  </div>
+
+  <h2 id="wall">900 是一道硬邊界</h2>
+  <p>這是整頁最重要的一節。<strong>臉皮號碼不是想給幾號就給幾號 —— 它是有限的。</strong></p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>量到的</th><th class="num">數字</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td><code>models.big</code> 裡的 <code>cNNN.fsh</code> 檔案</td>
+          <td class="num"><strong>894 個</strong><br><span class="small">範圍 c001–c900</span></td></tr>
+      <tr class="hi"><td>c900 <strong>以上</strong>的臉皮檔</td><td class="num"><strong>0 個</strong></td></tr>
+      <tr><td>名冊裡用到 900 以上的值</td><td class="num">15 個<br><span class="small">901–915</span></td></tr>
+      <tr class="hi"><td>那 15 個值蓋住多少球員</td>
+          <td class="num"><strong>2,510 / 3,247</strong><br><span class="small">77.3%<br>分母是全部 3,247 列；只算有名字的 3,222 列是 77.9%</span></td></tr>
+      <tr><td>那 2,510 人裡有臉皮檔的</td><td class="num"><strong>0 人</strong></td></tr>
+      <tr><td><code>face</code> 在 1–900 的人有臉皮檔的</td><td class="num">711 / 712<br><span class="small">99.9%<br>唯一的例外是 <code>c219</code>，名冊指派了它，<code>models.big</code> 裡卻沒有這個檔</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>所以規則是：</p>
+  <div class="card blue">
+    <p class="card-h">≤900 是專屬臉，≥901 是罐頭臉</p>
+    <p><strong><code>face</code> 小於等於 900</strong> → 指向 <code>models.big</code> 裡一個真的臉皮檔，這個人有自己的臉。<br>
+       <strong><code>face</code> 大於等於 901</strong> → <u>沒有任何檔案</u>，是遊戲內建的共用長相。</p>
+    <p><strong>大部分球員用的是罐頭臉。</strong>（本站測試機 77.3%；<u>剛安裝好的原版是 84.1%</u> —— 模組加臉之後比例反而降了。）你在遊戲裡看到一堆人長得像，不是錯覺。</p>
+  </div>
+  <p>「901 以上沒有檔案」這句話很強，所以本站不靠任何解析器 ——
+     直接把 <code>data\</code> 底下<strong>每一個檔案的每一個位元組</strong>掃過一遍，
+     找 <code>c901.fsh</code> 到 <code>c915.fsh</code> 這十五個檔名：</p>
+<pre><code>掃過        912 個檔 · 2.02 GB
+c901 ~ c915  十五個全部 0 命中
+
+對照組(證明掃描器沒壞):
+c498.fsh  → models.big  ✔
+c890.fsh  → models.big  ✔
+c695.fsh  → models.big  ✔</code></pre>
+  <p class="small">上面這兩個數字是 <strong>2026-08-24</strong> 寫上站的當時量到的。
+     那之後測試機的 <code>data\</code> 底下又多放了幾份備份資料夾（球場與語系檔各留了一份原版），
+     所以現在同一棵樹會數到更多檔案，<u>你不會剛好數到 912 個檔</u>。
+     結論（十五個全部 0 命中、三個對照組都命中 <code>models.big</code>）本站 2026-09-05
+     在現在這棵樹上重跑過一次（1,091 個檔、3.28 GiB），仍然成立。</p>
+  <div class="card grass">
+    <p class="card-h">為什麼一定要有對照組</p>
+    <p>本站第一次做這個檢查是用 <code>grep</code>，十五個全是 0 命中，看起來完美。
+       <strong>但對照組也是 0 命中</strong> ——
+       <code>grep</code> 對這種二進位檔會靜默失效，找得到的東西也回報找不到。</p>
+    <p><u>沒有對照組，就是拿一個壞掉的工具去背書結論。</u>
+       任何「我找過了，沒有」的宣稱，都要先證明「我找得到已知存在的東西」。</p>
+  </div>
+
+  <div class="card clay">
+    <p class="card-h">⚠️ 「<code>cNNN.fsh</code>」這個檔名不是臉皮專屬的</p>
+    <p>本站原本以為「叫 <code>c123.fsh</code> 的就是臉皮」。<strong>不對。</strong></p>
+    <p><code>frontend\coopunis.big</code>（Cooperstown 經典球衣）<u>也用同一套檔名</u>，
+       裡面有 122 個 <code>cNNN.fsh</code>（c001–c122），
+       其中 <strong><code>c116.fsh</code> 在 <code>models.big</code> 裡根本不存在</strong>。</p>
+    <p>分辨的方法在<u>檔案內部</u>，不在檔名：</p>
+    <div class="tablewrap" style="margin:8px 0"><table class="stack">
+      <thead><tr><th>來自</th><th class="num">幾個</th><th class="mono">內部標記</th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="來自"><code>models.big</code>（臉皮）</td><td data-label="幾個" class="num">894</td>
+            <td data-label="內部標記" class="mono">全部帶 <strong>fa</strong></td></tr>
+        <tr><td data-label="來自"><code>coopunis.big</code>（球衣）</td><td data-label="幾個" class="num">122</td>
+            <td data-label="內部標記" class="mono">G357c0 / G357c1<br><span class="small">一個 fa 都沒有</span></td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>所以這頁講的 894，範圍是「已經裝在 <code>models.big</code> 裡的臉皮」</strong>，
+       不是「全遊戲叫這個名字的檔案」。兩者相差一個 <code>c116</code>。</p>
+    <p class="small">這一條是本站上線後才發現的。原本的寫法把「檔名唯一」當成不用檢驗的前提 ——
+       跟<a href="fel-archives.html">副檔名會騙人</a>是同一類錯。</p>
+  </div>
+
+  <h2>為什麼當年得「搶」別人的號碼</h2>
+  <p>把上面兩件事接起來，就得到一個結論：</p>
+  <div class="card clay">
+    <p class="card-h">想給新球員一張專屬臉，你需要一個沒人用的 <code>c###</code> 空位</p>
+    <p>而 <code>models.big</code> 裡總共只有 <strong>894 個</strong>位子，
+       而且<strong>遊戲出貨時沒有任何 901 以上的臉皮檔</strong>。</p>
+    <p class="small"><span class="badge wip">未驗</span>
+       「能不能自己新增一個 <code>c901.fsh</code> 讓遊戲讀到」——
+       <strong>本站沒有測過。</strong>已知的只有「原本沒有」，不是「不能有」。</p>
+    <p>所以幫一位台灣球員做臉，實際上是在做一件事：
+       <u>找一個現有的號碼，把它改成新的人</u>。</p>
+  </div>
+
+  <div class="card amber">
+    <p class="card-h">📌 本站手上有一份 2009 年的名單，可以看見當年有多擠</p>
+    <p><strong>你的遊戲不會有這個檔</strong> —— 這是本站測試機上留著的一份
+       2009 年台灣模組的舊名單，跟當年那份說明書同一天的日期。
+       下面這組數字<u>你重現不了</u>，本站把它單獨標出來：</p>
+<pre style="margin:8px 0 0"><code>臉皮檔總數  = 894
+球員指派    = 872
+教練指派    = 24
+合計指派    = 896   (兩邊沒有一個號碼重複)
+其中有檔的  = 890   (c116 c125 c170 c177 c188 c219 名冊指派了,
+                     models.big 裡卻沒有這個檔)
+沒有人用的  = c695 · c703 · c831 · c870
+飽和度      = 890 / 894 = 99.6%</code></pre>
+    <p style="margin-top:10px"><strong>894 個位子，只剩四個空的。</strong></p>
+    <p>當年那份說明書的備註欄寫的是這種句子：
+       「把某位大聯盟投手的臉皮編號給予之」「移除某位球員並給予臉皮編號」
+       「共用弟弟的臉皮」。
+       <strong>那不是風格，是沒有空號可以用。</strong></p>
+    <p class="small">你自己的遊戲上量到的數字會不一樣 —— 現在這份名單用掉的位子比較少，
+       因為它更依賴罐頭臉。規則相同，擁擠程度不同。</p>
+  </div>
+
+  <h2 id="crowd">一個數字就把「有多擠」講完了</h2>
+  <p>上面那組 99.6% 是「還剩幾個空位」。但擁擠還有第二種量法，
+     而且這一種<u>不必知道總共有幾個位子</u>：
+     <strong>數同一個臉皮編號被幾位球員共用。</strong></p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>名冊</th><th class="num">球員</th><th class="num">用到的編號</th>
+      <th class="num">被兩人以上共用的編號</th><th class="num">最多幾人共用一個</th></tr></thead>
+    <tbody>
+      <tr><td data-label="名冊">剛安裝好的英文原版</td><td data-label="球員" class="num">2,921</td><td data-label="用到的編號" class="num">465</td>
+          <td data-label="被兩人以上共用的編號" class="num"><strong>0</strong></td><td data-label="最多幾人共用一個" class="num">1</td></tr>
+      <tr class="hi"><td data-label="名冊">2009 台灣之光名冊<span class="small">（讀者重現不了）</span></td>
+          <td data-label="球員" class="num">3,222</td><td data-label="用到的編號" class="num">872</td>
+          <td data-label="被兩人以上共用的編號" class="num"><strong>49</strong></td><td data-label="最多幾人共用一個" class="num"><strong>4</strong></td></tr>
+      <tr><td data-label="名冊">本站測試機現在的名單</td><td data-label="球員" class="num">3,247</td><td data-label="用到的編號" class="num">699</td>
+          <td data-label="被兩人以上共用的編號" class="num">13</td><td data-label="最多幾人共用一個" class="num">2</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>EA 出貨的那份，一個共用都沒有。</strong>2,921 位球員、465 個臉皮編號，
+     一人一號，乾乾淨淨。2009 那份社群名冊有 <strong>49 個</strong>編號被兩人以上共用。
+     這是「號碼不夠用」最直接的證據 —— <u>不必聽誰說，也不必先知道 894 這個數字</u>。</p>
+  <p>共用最極端的兩個：</p>
+  <ul>
+    <li><strong><code>c529</code> 四個人共用</strong>：門倉健、野口茂樹、大塚晶則、高橋健
+        —— 當年那份說明書的備註欄就寫著「NPB 模組設定臉皮共用 <code>c529</code>」。</li>
+    <li><strong><code>c214</code> 三個人共用</strong>：林旺衛、林旺億<u>跟 Babe Ruth</u>。
+        說明書寫「共用弟弟林旺億的 <code>c214</code> 臉皮」——
+        兄弟共用一張是省號碼，而<strong>他們還得跟 Babe Ruth 共用同一張</strong>。</li>
+  </ul>
+
+  <figure class="figbox">
+    <div class="figscroll">
+<svg class="facegrid" viewBox="0 0 666 441" role="img" aria-label="c001 到 c900 這 900 個臉皮編號的分佈圖:每一格是一個編號,標出 toni 那 26 個收藏落在哪裡、2009 年那份名冊用掉了多少、以及當年只剩的四個空號 c695 c703 c831 c870">
+<path class="idle" d="M573 25h15v15h-15zM556 212h15v15h-15zM573 212h15v15h-15zM590 212h15v15h-15zM607 212h15v15h-15zM624 212h15v15h-15zM80 229h15v15h-15zM148 229h15v15h-15zM165 229h15v15h-15zM182 229h15v15h-15zM284 229h15v15h-15zM301 229h15v15h-15zM318 229h15v15h-15zM352 229h15v15h-15zM369 229h15v15h-15zM403 229h15v15h-15zM488 229h15v15h-15zM539 229h15v15h-15zM556 229h15v15h-15zM488 297h15v15h-15zM46 348h15v15h-15zM471 348h15v15h-15zM573 348h15v15h-15zM301 365h15v15h-15z"/>
+<path class="used" d="M46 8h15v15h-15zM63 8h15v15h-15zM80 8h15v15h-15zM97 8h15v15h-15zM114 8h15v15h-15zM131 8h15v15h-15zM148 8h15v15h-15zM165 8h15v15h-15zM182 8h15v15h-15zM199 8h15v15h-15zM216 8h15v15h-15zM233 8h15v15h-15zM250 8h15v15h-15zM267 8h15v15h-15zM284 8h15v15h-15zM301 8h15v15h-15zM318 8h15v15h-15zM335 8h15v15h-15zM352 8h15v15h-15zM369 8h15v15h-15zM386 8h15v15h-15zM403 8h15v15h-15zM420 8h15v15h-15zM437 8h15v15h-15zM454 8h15v15h-15zM471 8h15v15h-15zM488 8h15v15h-15zM505 8h15v15h-15zM522 8h15v15h-15zM539 8h15v15h-15zM556 8h15v15h-15zM573 8h15v15h-15zM590 8h15v15h-15zM607 8h15v15h-15zM624 8h15v15h-15zM641 8h15v15h-15zM46 25h15v15h-15zM80 25h15v15h-15zM97 25h15v15h-15zM114 25h15v15h-15zM131 25h15v15h-15zM148 25h15v15h-15zM165 25h15v15h-15zM182 25h15v15h-15zM199 25h15v15h-15zM216 25h15v15h-15zM233 25h15v15h-15zM250 25h15v15h-15zM267 25h15v15h-15zM284 25h15v15h-15zM301 25h15v15h-15zM318 25h15v15h-15zM335 25h15v15h-15zM352 25h15v15h-15zM369 25h15v15h-15zM386 25h15v15h-15zM403 25h15v15h-15zM420 25h15v15h-15zM437 25h15v15h-15zM454 25h15v15h-15zM471 25h15v15h-15zM488 25h15v15h-15zM505 25h15v15h-15zM522 25h15v15h-15zM539 25h15v15h-15zM556 25h15v15h-15zM590 25h15v15h-15zM607 25h15v15h-15zM624 25h15v15h-15zM641 25h15v15h-15zM46 42h15v15h-15zM63 42h15v15h-15zM80 42h15v15h-15zM97 42h15v15h-15zM114 42h15v15h-15zM131 42h15v15h-15zM148 42h15v15h-15zM165 42h15v15h-15zM182 42h15v15h-15zM199 42h15v15h-15zM216 42h15v15h-15zM233 42h15v15h-15zM250 42h15v15h-15zM267 42h15v15h-15zM284 42h15v15h-15zM301 42h15v15h-15zM318 42h15v15h-15zM335 42h15v15h-15zM352 42h15v15h-15zM369 42h15v15h-15zM386 42h15v15h-15zM403 42h15v15h-15zM420 42h15v15h-15zM437 42h15v15h-15zM454 42h15v15h-15zM471 42h15v15h-15zM488 42h15v15h-15zM505 42h15v15h-15zM522 42h15v15h-15zM539 42h15v15h-15zM556 42h15v15h-15zM573 42h15v15h-15zM590 42h15v15h-15zM607 42h15v15h-15zM624 42h15v15h-15zM641 42h15v15h-15zM46 59h15v15h-15zM63 59h15v15h-15zM80 59h15v15h-15zM97 59h15v15h-15zM114 59h15v15h-15zM148 59h15v15h-15zM165 59h15v15h-15zM182 59h15v15h-15zM199 59h15v15h-15zM233 59h15v15h-15zM250 59h15v15h-15zM267 59h15v15h-15zM284 59h15v15h-15zM301 59h15v15h-15zM318 59h15v15h-15zM335 59h15v15h-15zM352 59h15v15h-15zM369 59h15v15h-15zM386 59h15v15h-15zM437 59h15v15h-15zM454 59h15v15h-15zM471 59h15v15h-15zM488 59h15v15h-15zM505 59h15v15h-15zM522 59h15v15h-15zM539 59h15v15h-15zM556 59h15v15h-15zM573 59h15v15h-15zM590 59h15v15h-15zM607 59h15v15h-15zM624 59h15v15h-15zM641 59h15v15h-15zM46 76h15v15h-15zM63 76h15v15h-15zM80 76h15v15h-15zM97 76h15v15h-15zM114 76h15v15h-15zM131 76h15v15h-15zM148 76h15v15h-15zM165 76h15v15h-15zM182 76h15v15h-15zM199 76h15v15h-15zM216 76h15v15h-15zM233 76h15v15h-15zM250 76h15v15h-15zM267 76h15v15h-15zM284 76h15v15h-15zM301 76h15v15h-15zM318 76h15v15h-15zM335 76h15v15h-15zM352 76h15v15h-15zM369 76h15v15h-15zM386 76h15v15h-15zM403 76h15v15h-15zM437 76h15v15h-15zM454 76h15v15h-15zM471 76h15v15h-15zM488 76h15v15h-15zM505 76h15v15h-15zM522 76h15v15h-15zM539 76h15v15h-15zM556 76h15v15h-15zM573 76h15v15h-15zM590 76h15v15h-15zM607 76h15v15h-15zM624 76h15v15h-15zM641 76h15v15h-15zM46 93h15v15h-15zM63 93h15v15h-15zM97 93h15v15h-15zM114 93h15v15h-15zM131 93h15v15h-15zM148 93h15v15h-15zM165 93h15v15h-15zM182 93h15v15h-15zM216 93h15v15h-15zM250 93h15v15h-15zM267 93h15v15h-15zM284 93h15v15h-15zM301 93h15v15h-15zM318 93h15v15h-15zM335 93h15v15h-15zM352 93h15v15h-15zM369 93h15v15h-15zM386 93h15v15h-15zM403 93h15v15h-15zM420 93h15v15h-15zM437 93h15v15h-15zM454 93h15v15h-15zM471 93h15v15h-15zM488 93h15v15h-15zM505 93h15v15h-15zM522 93h15v15h-15zM539 93h15v15h-15zM556 93h15v15h-15zM573 93h15v15h-15zM590 93h15v15h-15zM624 93h15v15h-15zM641 93h15v15h-15zM46 110h15v15h-15zM63 110h15v15h-15zM80 110h15v15h-15zM97 110h15v15h-15zM114 110h15v15h-15zM131 110h15v15h-15zM148 110h15v15h-15zM165 110h15v15h-15zM182 110h15v15h-15zM199 110h15v15h-15zM216 110h15v15h-15zM233 110h15v15h-15zM267 110h15v15h-15zM284 110h15v15h-15zM301 110h15v15h-15zM318 110h15v15h-15zM335 110h15v15h-15zM352 110h15v15h-15zM369 110h15v15h-15zM386 110h15v15h-15zM403 110h15v15h-15zM420 110h15v15h-15zM437 110h15v15h-15zM454 110h15v15h-15zM471 110h15v15h-15zM488 110h15v15h-15zM505 110h15v15h-15zM522 110h15v15h-15zM539 110h15v15h-15zM556 110h15v15h-15zM573 110h15v15h-15zM590 110h15v15h-15zM607 110h15v15h-15zM624 110h15v15h-15zM641 110h15v15h-15zM46 127h15v15h-15zM63 127h15v15h-15zM80 127h15v15h-15zM97 127h15v15h-15zM114 127h15v15h-15zM131 127h15v15h-15zM148 127h15v15h-15zM165 127h15v15h-15zM182 127h15v15h-15zM199 127h15v15h-15zM216 127h15v15h-15zM233 127h15v15h-15zM250 127h15v15h-15zM267 127h15v15h-15zM284 127h15v15h-15zM301 127h15v15h-15zM318 127h15v15h-15zM335 127h15v15h-15zM352 127h15v15h-15zM369 127h15v15h-15zM386 127h15v15h-15zM403 127h15v15h-15zM420 127h15v15h-15zM437 127h15v15h-15zM454 127h15v15h-15zM471 127h15v15h-15zM488 127h15v15h-15zM505 127h15v15h-15zM522 127h15v15h-15zM539 127h15v15h-15zM556 127h15v15h-15zM573 127h15v15h-15zM590 127h15v15h-15zM607 127h15v15h-15zM624 127h15v15h-15zM641 127h15v15h-15zM46 144h15v15h-15zM63 144h15v15h-15zM80 144h15v15h-15zM97 144h15v15h-15zM114 144h15v15h-15zM131 144h15v15h-15zM148 144h15v15h-15zM165 144h15v15h-15zM182 144h15v15h-15zM199 144h15v15h-15zM216 144h15v15h-15zM233 144h15v15h-15zM250 144h15v15h-15zM267 144h15v15h-15zM284 144h15v15h-15zM301 144h15v15h-15zM318 144h15v15h-15zM335 144h15v15h-15zM352 144h15v15h-15zM369 144h15v15h-15zM386 144h15v15h-15zM403 144h15v15h-15zM420 144h15v15h-15zM437 144h15v15h-15zM454 144h15v15h-15zM471 144h15v15h-15zM488 144h15v15h-15zM505 144h15v15h-15zM522 144h15v15h-15zM539 144h15v15h-15zM556 144h15v15h-15zM573 144h15v15h-15zM590 144h15v15h-15zM607 144h15v15h-15zM624 144h15v15h-15zM641 144h15v15h-15zM46 161h15v15h-15zM63 161h15v15h-15zM80 161h15v15h-15zM97 161h15v15h-15zM114 161h15v15h-15zM131 161h15v15h-15zM148 161h15v15h-15zM165 161h15v15h-15zM182 161h15v15h-15zM199 161h15v15h-15zM216 161h15v15h-15zM233 161h15v15h-15zM250 161h15v15h-15zM267 161h15v15h-15zM284 161h15v15h-15zM301 161h15v15h-15zM318 161h15v15h-15zM335 161h15v15h-15zM352 161h15v15h-15zM369 161h15v15h-15zM386 161h15v15h-15zM403 161h15v15h-15zM420 161h15v15h-15zM437 161h15v15h-15zM454 161h15v15h-15zM471 161h15v15h-15zM488 161h15v15h-15zM505 161h15v15h-15zM522 161h15v15h-15zM539 161h15v15h-15zM556 161h15v15h-15zM573 161h15v15h-15zM590 161h15v15h-15zM607 161h15v15h-15zM624 161h15v15h-15zM641 161h15v15h-15zM46 178h15v15h-15zM63 178h15v15h-15zM80 178h15v15h-15zM97 178h15v15h-15zM114 178h15v15h-15zM131 178h15v15h-15zM148 178h15v15h-15zM165 178h15v15h-15zM182 178h15v15h-15zM199 178h15v15h-15zM216 178h15v15h-15zM233 178h15v15h-15zM250 178h15v15h-15zM267 178h15v15h-15zM284 178h15v15h-15zM301 178h15v15h-15zM318 178h15v15h-15zM335 178h15v15h-15zM352 178h15v15h-15zM369 178h15v15h-15zM386 178h15v15h-15zM403 178h15v15h-15zM420 178h15v15h-15zM437 178h15v15h-15zM454 178h15v15h-15zM471 178h15v15h-15zM488 178h15v15h-15zM505 178h15v15h-15zM522 178h15v15h-15zM539 178h15v15h-15zM556 178h15v15h-15zM573 178h15v15h-15zM590 178h15v15h-15zM607 178h15v15h-15zM624 178h15v15h-15zM641 178h15v15h-15zM46 195h15v15h-15zM63 195h15v15h-15zM80 195h15v15h-15zM97 195h15v15h-15zM114 195h15v15h-15zM131 195h15v15h-15zM148 195h15v15h-15zM165 195h15v15h-15zM182 195h15v15h-15zM199 195h15v15h-15zM216 195h15v15h-15zM233 195h15v15h-15zM250 195h15v15h-15zM267 195h15v15h-15zM284 195h15v15h-15zM301 195h15v15h-15zM318 195h15v15h-15zM335 195h15v15h-15zM352 195h15v15h-15zM369 195h15v15h-15zM386 195h15v15h-15zM403 195h15v15h-15zM420 195h15v15h-15zM437 195h15v15h-15zM454 195h15v15h-15zM471 195h15v15h-15zM505 195h15v15h-15zM522 195h15v15h-15zM539 195h15v15h-15zM556 195h15v15h-15zM573 195h15v15h-15zM590 195h15v15h-15zM607 195h15v15h-15zM624 195h15v15h-15zM641 195h15v15h-15zM46 212h15v15h-15zM63 212h15v15h-15zM80 212h15v15h-15zM97 212h15v15h-15zM114 212h15v15h-15zM131 212h15v15h-15zM148 212h15v15h-15zM165 212h15v15h-15zM182 212h15v15h-15zM216 212h15v15h-15zM233 212h15v15h-15zM250 212h15v15h-15zM267 212h15v15h-15zM284 212h15v15h-15zM301 212h15v15h-15zM318 212h15v15h-15zM335 212h15v15h-15zM352 212h15v15h-15zM369 212h15v15h-15zM386 212h15v15h-15zM403 212h15v15h-15zM420 212h15v15h-15zM437 212h15v15h-15zM454 212h15v15h-15zM471 212h15v15h-15zM488 212h15v15h-15zM505 212h15v15h-15zM522 212h15v15h-15zM539 212h15v15h-15zM641 212h15v15h-15zM46 229h15v15h-15zM63 229h15v15h-15zM97 229h15v15h-15zM114 229h15v15h-15zM131 229h15v15h-15zM199 229h15v15h-15zM216 229h15v15h-15zM233 229h15v15h-15zM250 229h15v15h-15zM267 229h15v15h-15zM335 229h15v15h-15zM386 229h15v15h-15zM420 229h15v15h-15zM437 229h15v15h-15zM454 229h15v15h-15zM471 229h15v15h-15zM522 229h15v15h-15zM573 229h15v15h-15zM590 229h15v15h-15zM607 229h15v15h-15zM624 229h15v15h-15zM641 229h15v15h-15zM46 246h15v15h-15zM63 246h15v15h-15zM80 246h15v15h-15zM97 246h15v15h-15zM114 246h15v15h-15zM131 246h15v15h-15zM148 246h15v15h-15zM165 246h15v15h-15zM182 246h15v15h-15zM199 246h15v15h-15zM216 246h15v15h-15zM233 246h15v15h-15zM250 246h15v15h-15zM267 246h15v15h-15zM284 246h15v15h-15zM318 246h15v15h-15zM335 246h15v15h-15zM352 246h15v15h-15zM369 246h15v15h-15zM386 246h15v15h-15zM403 246h15v15h-15zM420 246h15v15h-15zM437 246h15v15h-15zM454 246h15v15h-15zM471 246h15v15h-15zM488 246h15v15h-15zM505 246h15v15h-15zM522 246h15v15h-15zM539 246h15v15h-15zM556 246h15v15h-15zM573 246h15v15h-15zM590 246h15v15h-15zM607 246h15v15h-15zM624 246h15v15h-15zM641 246h15v15h-15zM46 263h15v15h-15zM63 263h15v15h-15zM80 263h15v15h-15zM97 263h15v15h-15zM114 263h15v15h-15zM131 263h15v15h-15zM148 263h15v15h-15zM165 263h15v15h-15zM182 263h15v15h-15zM199 263h15v15h-15zM216 263h15v15h-15zM233 263h15v15h-15zM250 263h15v15h-15zM267 263h15v15h-15zM284 263h15v15h-15zM301 263h15v15h-15zM318 263h15v15h-15zM335 263h15v15h-15zM352 263h15v15h-15zM369 263h15v15h-15zM386 263h15v15h-15zM403 263h15v15h-15zM420 263h15v15h-15zM437 263h15v15h-15zM454 263h15v15h-15zM471 263h15v15h-15zM488 263h15v15h-15zM505 263h15v15h-15zM522 263h15v15h-15zM539 263h15v15h-15zM556 263h15v15h-15zM573 263h15v15h-15zM590 263h15v15h-15zM607 263h15v15h-15zM624 263h15v15h-15zM641 263h15v15h-15zM46 280h15v15h-15zM63 280h15v15h-15zM80 280h15v15h-15zM97 280h15v15h-15zM114 280h15v15h-15zM131 280h15v15h-15zM148 280h15v15h-15zM165 280h15v15h-15zM182 280h15v15h-15zM199 280h15v15h-15zM216 280h15v15h-15zM233 280h15v15h-15zM250 280h15v15h-15zM267 280h15v15h-15zM284 280h15v15h-15zM301 280h15v15h-15zM318 280h15v15h-15zM335 280h15v15h-15zM352 280h15v15h-15zM369 280h15v15h-15zM386 280h15v15h-15zM403 280h15v15h-15zM420 280h15v15h-15zM437 280h15v15h-15zM454 280h15v15h-15zM471 280h15v15h-15zM488 280h15v15h-15zM505 280h15v15h-15zM522 280h15v15h-15zM539 280h15v15h-15zM556 280h15v15h-15zM573 280h15v15h-15zM590 280h15v15h-15zM607 280h15v15h-15zM624 280h15v15h-15zM641 280h15v15h-15zM46 297h15v15h-15zM63 297h15v15h-15zM80 297h15v15h-15zM97 297h15v15h-15zM114 297h15v15h-15zM131 297h15v15h-15zM148 297h15v15h-15zM165 297h15v15h-15zM182 297h15v15h-15zM199 297h15v15h-15zM216 297h15v15h-15zM233 297h15v15h-15zM250 297h15v15h-15zM267 297h15v15h-15zM284 297h15v15h-15zM301 297h15v15h-15zM318 297h15v15h-15zM335 297h15v15h-15zM352 297h15v15h-15zM369 297h15v15h-15zM386 297h15v15h-15zM403 297h15v15h-15zM420 297h15v15h-15zM437 297h15v15h-15zM454 297h15v15h-15zM471 297h15v15h-15zM505 297h15v15h-15zM522 297h15v15h-15zM539 297h15v15h-15zM556 297h15v15h-15zM573 297h15v15h-15zM590 297h15v15h-15zM607 297h15v15h-15zM624 297h15v15h-15zM641 297h15v15h-15zM46 314h15v15h-15zM63 314h15v15h-15zM80 314h15v15h-15zM97 314h15v15h-15zM114 314h15v15h-15zM131 314h15v15h-15zM148 314h15v15h-15zM165 314h15v15h-15zM182 314h15v15h-15zM199 314h15v15h-15zM216 314h15v15h-15zM233 314h15v15h-15zM250 314h15v15h-15zM267 314h15v15h-15zM284 314h15v15h-15zM301 314h15v15h-15zM318 314h15v15h-15zM335 314h15v15h-15zM352 314h15v15h-15zM369 314h15v15h-15zM386 314h15v15h-15zM403 314h15v15h-15zM420 314h15v15h-15zM437 314h15v15h-15zM454 314h15v15h-15zM471 314h15v15h-15zM488 314h15v15h-15zM505 314h15v15h-15zM522 314h15v15h-15zM556 314h15v15h-15zM573 314h15v15h-15zM590 314h15v15h-15zM641 314h15v15h-15zM46 331h15v15h-15zM63 331h15v15h-15zM80 331h15v15h-15zM97 331h15v15h-15zM114 331h15v15h-15zM131 331h15v15h-15zM165 331h15v15h-15zM182 331h15v15h-15zM199 331h15v15h-15zM233 331h15v15h-15zM250 331h15v15h-15zM267 331h15v15h-15zM284 331h15v15h-15zM301 331h15v15h-15zM318 331h15v15h-15zM335 331h15v15h-15zM369 331h15v15h-15zM386 331h15v15h-15zM403 331h15v15h-15zM420 331h15v15h-15zM437 331h15v15h-15zM454 331h15v15h-15zM471 331h15v15h-15zM488 331h15v15h-15zM505 331h15v15h-15zM522 331h15v15h-15zM539 331h15v15h-15zM556 331h15v15h-15zM573 331h15v15h-15zM590 331h15v15h-15zM607 331h15v15h-15zM624 331h15v15h-15zM641 331h15v15h-15zM63 348h15v15h-15zM80 348h15v15h-15zM97 348h15v15h-15zM114 348h15v15h-15zM131 348h15v15h-15zM148 348h15v15h-15zM165 348h15v15h-15zM182 348h15v15h-15zM199 348h15v15h-15zM216 348h15v15h-15zM233 348h15v15h-15zM250 348h15v15h-15zM267 348h15v15h-15zM284 348h15v15h-15zM301 348h15v15h-15zM318 348h15v15h-15zM335 348h15v15h-15zM352 348h15v15h-15zM369 348h15v15h-15zM386 348h15v15h-15zM403 348h15v15h-15zM420 348h15v15h-15zM437 348h15v15h-15zM454 348h15v15h-15zM488 348h15v15h-15zM505 348h15v15h-15zM522 348h15v15h-15zM539 348h15v15h-15zM556 348h15v15h-15zM590 348h15v15h-15zM607 348h15v15h-15zM624 348h15v15h-15zM641 348h15v15h-15zM46 365h15v15h-15zM63 365h15v15h-15zM80 365h15v15h-15zM97 365h15v15h-15zM114 365h15v15h-15zM131 365h15v15h-15zM148 365h15v15h-15zM165 365h15v15h-15zM182 365h15v15h-15zM199 365h15v15h-15zM216 365h15v15h-15zM233 365h15v15h-15zM250 365h15v15h-15zM267 365h15v15h-15zM284 365h15v15h-15zM335 365h15v15h-15zM352 365h15v15h-15zM369 365h15v15h-15zM386 365h15v15h-15zM403 365h15v15h-15zM420 365h15v15h-15zM437 365h15v15h-15zM454 365h15v15h-15zM471 365h15v15h-15zM488 365h15v15h-15zM505 365h15v15h-15zM522 365h15v15h-15zM539 365h15v15h-15zM556 365h15v15h-15zM573 365h15v15h-15zM590 365h15v15h-15zM607 365h15v15h-15zM624 365h15v15h-15zM641 365h15v15h-15zM46 382h15v15h-15zM63 382h15v15h-15zM80 382h15v15h-15zM97 382h15v15h-15zM114 382h15v15h-15zM131 382h15v15h-15zM148 382h15v15h-15zM165 382h15v15h-15zM182 382h15v15h-15zM199 382h15v15h-15zM216 382h15v15h-15zM233 382h15v15h-15zM250 382h15v15h-15zM267 382h15v15h-15zM284 382h15v15h-15zM301 382h15v15h-15zM318 382h15v15h-15zM335 382h15v15h-15zM352 382h15v15h-15zM369 382h15v15h-15zM403 382h15v15h-15zM420 382h15v15h-15zM437 382h15v15h-15zM454 382h15v15h-15zM471 382h15v15h-15zM488 382h15v15h-15zM505 382h15v15h-15zM522 382h15v15h-15zM539 382h15v15h-15zM556 382h15v15h-15zM573 382h15v15h-15zM590 382h15v15h-15zM607 382h15v15h-15zM624 382h15v15h-15zM641 382h15v15h-15zM46 399h15v15h-15zM63 399h15v15h-15zM97 399h15v15h-15zM114 399h15v15h-15zM131 399h15v15h-15zM148 399h15v15h-15zM165 399h15v15h-15zM182 399h15v15h-15zM199 399h15v15h-15zM216 399h15v15h-15zM233 399h15v15h-15zM250 399h15v15h-15zM267 399h15v15h-15zM284 399h15v15h-15zM301 399h15v15h-15zM318 399h15v15h-15zM335 399h15v15h-15zM352 399h15v15h-15zM369 399h15v15h-15zM386 399h15v15h-15zM403 399h15v15h-15zM420 399h15v15h-15zM437 399h15v15h-15zM454 399h15v15h-15zM471 399h15v15h-15zM488 399h15v15h-15zM505 399h15v15h-15zM522 399h15v15h-15zM539 399h15v15h-15zM556 399h15v15h-15zM573 399h15v15h-15zM590 399h15v15h-15zM624 399h15v15h-15zM641 399h15v15h-15zM46 416h15v15h-15zM63 416h15v15h-15zM80 416h15v15h-15zM97 416h15v15h-15zM114 416h15v15h-15zM148 416h15v15h-15zM165 416h15v15h-15zM216 416h15v15h-15zM233 416h15v15h-15zM250 416h15v15h-15zM267 416h15v15h-15zM284 416h15v15h-15zM301 416h15v15h-15zM318 416h15v15h-15zM352 416h15v15h-15zM369 416h15v15h-15zM386 416h15v15h-15zM403 416h15v15h-15zM420 416h15v15h-15zM437 416h15v15h-15zM454 416h15v15h-15zM471 416h15v15h-15zM488 416h15v15h-15zM522 416h15v15h-15zM539 416h15v15h-15zM556 416h15v15h-15zM573 416h15v15h-15zM590 416h15v15h-15zM607 416h15v15h-15zM624 416h15v15h-15zM641 416h15v15h-15z"/>
+<rect class="me on" x="63" y="25" width="15" height="15" rx="2"><title>c038 李振昌(來源：shojah) · 現在的名單還指派著</title></rect>
+<rect class="me on" x="131" y="59" width="15" height="15" rx="2"><title>c114 陳鴻文(來源：黃衫男子) · 現在的名單還指派著</title></rect>
+<rect class="me on" x="216" y="59" width="15" height="15" rx="2"><title>c119 增菘瑋(來源：shojah) · 現在的名單還指派著</title></rect>
+<rect class="me on" x="403" y="59" width="15" height="15" rx="2"><title>c130 蔣智賢(來源：shojah) · 現在的名單還指派著</title></rect>
+<rect class="me on" x="420" y="59" width="15" height="15" rx="2"><title>c131 陳金鋒(來源：shojah) · 現在的名單還指派著</title></rect>
+<rect class="me off" x="420" y="76" width="15" height="15" rx="2"><title>c167 羅國輝(來源：shojah) · 現在的名單沒有指派</title></rect>
+<rect class="me off" x="80" y="93" width="15" height="15" rx="2"><title>c183 林彥峰(來源：黃衫男子) · 現在的名單沒有指派</title></rect>
+<rect class="me on" x="199" y="93" width="15" height="15" rx="2"><title>c190 川上憲伸 Kenshin Kawakami(來源：黃衫男子) · 現在的名單還指派著</title></rect>
+<rect class="me on" x="233" y="93" width="15" height="15" rx="2"><title>c192 相川亮二 Ryoji Aikawa(來源：黃衫男子) · 現在的名單還指派著</title></rect>
+<rect class="me off" x="607" y="93" width="15" height="15" rx="2"><title>c214 林旺億(來源：黃衫男子) · 現在的名單沒有指派</title></rect>
+<rect class="me on" x="250" y="110" width="15" height="15" rx="2"><title>c229 詹智堯(來源：台灣之光模組) · 現在的名單還指派著</title></rect>
+<rect class="me on" x="488" y="195" width="15" height="15" rx="2"><title>c423 洪晨恩(來源：黃衫男子) · 現在的名單還指派著</title></rect>
+<rect class="me on" x="199" y="212" width="15" height="15" rx="2"><title>c442 前川勝彥 Katsuhiko Maekawa(來源：冬季聯盟模組) · 現在的名單還指派著</title></rect>
+<rect class="me off" x="505" y="229" width="15" height="15" rx="2"><title>c496 林哲瑄(來源：shojah) · 現在的名單沒有指派</title></rect>
+<rect class="me on" x="301" y="246" width="15" height="15" rx="2"><title>c520 羅錦龍(來源：台灣之光模組) · 現在的名單還指派著</title></rect>
+<rect class="me off" x="539" y="314" width="15" height="15" rx="2"><title>c678 黃偉晟(來源：黃衫男子) · 現在的名單沒有指派</title></rect>
+<rect class="me off" x="607" y="314" width="15" height="15" rx="2"><title>c682 陳鏞基(來源：小豪前輩) · 現在的名單沒有指派</title></rect>
+<rect class="me on" x="624" y="314" width="15" height="15" rx="2"><title>c683 野茂英雄(來源：沒有來源標記) · 現在的名單還指派著</title></rect>
+<rect class="me off" x="148" y="331" width="15" height="15" rx="2"><title>c691 羅嘉仁(來源：shojah) · 現在的名單沒有指派</title></rect>
+<rect class="zero" x="216" y="331" width="15" height="15" rx="2"><title>c695 2009 年那份名冊裡誰都沒有用到</title></rect>
+<rect class="zero" x="352" y="331" width="15" height="15" rx="2"><title>c703 2009 年那份名冊裡誰都沒有用到</title></rect>
+<rect class="me on" x="318" y="365" width="15" height="15" rx="2"><title>c773 Mark Prior(來源：MVP2005原版) · 現在的名單還指派著</title></rect>
+<rect class="me off" x="386" y="382" width="15" height="15" rx="2"><title>c813 田澤純一 Tazawa Junichi(來源：黃衫男子) · 現在的名單沒有指派</title></rect>
+<rect class="zero" x="80" y="399" width="15" height="15" rx="2"><title>c831 2009 年那份名冊裡誰都沒有用到</title></rect>
+<rect class="me on" x="607" y="399" width="15" height="15" rx="2"><title>c862 倪福德(來源：shojah) · 現在的名單還指派著</title></rect>
+<rect class="zero" x="131" y="416" width="15" height="15" rx="2"><title>c870 2009 年那份名冊裡誰都沒有用到</title></rect>
+<rect class="me on" x="182" y="416" width="15" height="15" rx="2"><title>c873 上原浩治 Uehara Koji(來源：NPB8.4模組) · 現在的名單還指派著</title></rect>
+<rect class="me on" x="199" y="416" width="15" height="15" rx="2"><title>c874 郭嚴文(來源：shojah) · 現在的名單還指派著</title></rect>
+<rect class="me on" x="335" y="416" width="15" height="15" rx="2"><title>c882 鄭凱文(來源：shojah) · 現在的名單還指派著</title></rect>
+<rect class="me on" x="505" y="416" width="15" height="15" rx="2"><title>c892 鄭錡鴻(來源：台灣之光模組) · 現在的名單還指派著</title></rect>
+<text class="rl" x="40" y="20">c001</text>
+<text class="rl" x="40" y="37">c037</text>
+<text class="rl" x="40" y="54">c073</text>
+<text class="rl" x="40" y="71">c109</text>
+<text class="rl" x="40" y="88">c145</text>
+<text class="rl" x="40" y="105">c181</text>
+<text class="rl" x="40" y="122">c217</text>
+<text class="rl" x="40" y="139">c253</text>
+<text class="rl" x="40" y="156">c289</text>
+<text class="rl" x="40" y="173">c325</text>
+<text class="rl" x="40" y="190">c361</text>
+<text class="rl" x="40" y="207">c397</text>
+<text class="rl" x="40" y="224">c433</text>
+<text class="rl" x="40" y="241">c469</text>
+<text class="rl" x="40" y="258">c505</text>
+<text class="rl" x="40" y="275">c541</text>
+<text class="rl" x="40" y="292">c577</text>
+<text class="rl" x="40" y="309">c613</text>
+<text class="rl" x="40" y="326">c649</text>
+<text class="rl" x="40" y="343">c685</text>
+<text class="rl" x="40" y="360">c721</text>
+<text class="rl" x="40" y="377">c757</text>
+<text class="rl" x="40" y="394">c793</text>
+<text class="rl" x="40" y="411">c829</text>
+<text class="rl" x="40" y="428">c865</text>
+</svg>
+    </div>
+    <ul class="fglegend">
+      <li><i class="k-on"></i>那批 2007-2009 收藏，現在的名單還指派著（18 個）</li>
+      <li><i class="k-off"></i>那批收藏，現在的名單沒有指派（8 個）</li>
+      <li><i class="k-used"></i>2009 名冊裡有球員在用</li>
+      <li><i class="k-idle"></i>2009 名冊裡球員沒有用到</li>
+      <li><i class="k-zero"></i>誰都沒有用的四個</li>
+    </ul>
+    <figcaption>c001 到 c900 這 <strong>900</strong> 個編號畫成格子，一格一個編號，左邊是每一列的起始編號。
+      （其中 894 個在 <code>models.big</code> 裡真的有檔案，缺的六號是 <code>c116</code>
+      <code>c125</code> <code>c170</code> <code>c177</code> <code>c188</code> <code>c219</code>。）
+      <strong>整片綠色就是「沒有空位」的樣子。</strong>
+      滑鼠移到亮色那 26 格會顯示是誰、來源是誰
+      —— 那 26 個就是<a href="../story/my-collection/index.html">二十六個資料夾那一頁</a>講的那批收藏。
+      這張圖跟<a href="hud-map.html">介面座標圖</a>一樣是<u>從量到的數字直接畫出來的</u>，
+      不是手繪也不是截圖。
+      <br>⚠️ 空心的四格（<code class="mono">c695</code> <code class="mono">c703</code>
+      <code class="mono">c831</code> <code class="mono">c870</code>）是把<u>教練也算進去</u>之後
+      誰都沒用到的；圖上的深色格子只算球員，所以深色格子比四個多。</figcaption>
+  </figure>
+
+  <h2>怎麼自己查一位球員的兩個號碼</h2>
+  <p>用記事本或任何文字編輯器打開 <code>data\database\attrib.dat</code>，搜球員的英文姓氏。
+     找到那一列之後，<strong>先回頭看第一行的欄位表</strong>，
+     確認你手上這一份的 <code>playerattrib_face</code> 與 <code>playerattrib_audioid</code>
+     各是第幾欄（<u>剛安裝好的原版是 10 與 17，社群名冊是 10 與 16</u>），
+     再去看以那兩個編號開頭的兩格：</p>
+<pre><code>（社群名冊的排法：face 第 10 欄、audioid 第 16 欄）
+...,10 183,...,16 3494,...</code></pre>
+  <p class="small">同一列在剛安裝好的原版裡，第二格會寫成 <code>17 3494</code> ——
+     <u>每一格的前綴數字是跟著欄號走的</u>，所以<strong>照著欄位名找、不要照著數字找</strong>。</p>
+  <div class="seen"><b>這代表</b>
+    <p style="margin:8px 0 0">臉皮是 <code>c183</code>（<code>models.big</code> 裡的 <code>c183.fsh</code>）、
+       本人號碼是 <code>3494</code>（大頭照 <code>3494.fsh</code>、語音 <code>3494a/c/d.dat</code>）。</p>
+  </div>
+  <p class="small">每一格都帶著自己的欄位編號當前綴，這是這個檔的通則 ——
+     見<a href="player-data.html">球員資料檔的真相</a>。<br>
+     ⚠️ 上面這一列<u>是從那份 2009 名單抄下來的</u>（就是上面十五人表裡的林彥峰），
+     拿來示範一列長什麼樣子；<strong>你自己那份名冊裡不會有 <code>3494</code> 這個號碼</strong>，
+     要查的是你自己搜到的那一列。</p>
+
+  <h2>一個順手抓到的教訓</h2>
+  <p>本站測試機上有 95 個依「球員名 + 編號 + 來源」命名的素材資料夾。
+     把<u>資料夾名字上的編號</u>跟<u>資料夾裡面真正的檔名</u>逐一比對：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>素材</th><th class="num">一致</th></tr></thead>
+    <tbody>
+      <tr><td>大頭照</td><td class="num">45 / 46</td></tr>
+      <tr><td>語音</td><td class="num">23 / 23</td></tr>
+      <tr><td>臉皮</td><td class="num">26 / 26</td></tr>
+    </tbody>
+  </table></div>
+  <p>不一致的那一個：資料夾名字寫 <code>4976</code>，裡面的檔案是 <code>4967.fsh</code>。
+     去名單裡查，<strong><code>4967</code> 才是對的</strong> ——
+     而且當年的說明書也把同一個數字寫顛倒了。</p>
+  <div class="card grass">
+    <p class="card-h">資料夾名字只是給人看的便條紙</p>
+    <p>錯的是人打的標籤，<u>遊戲讀到的檔案是好的</u>。
+       兩邊對不上的時候，<strong>以裡面的檔案加上名單為準</strong>。</p>
+  </div>
+
+  <h2>這頁不能告訴你什麼</h2>
+  <div class="card clay">
+    <p class="card-h">一件這頁不教的，三件本站沒有做到的事</p>
+    <p style="margin-top:6px">
+       一、<strong>這一頁不教你怎麼換臉皮</strong>，它只講號碼制度。動手的是另外兩課：
+       <a href="../tutorials/swap-face/index.html">幫球員換一張臉</a>（只改名冊那一欄，
+       指定某位球員改用哪一張現成的臉皮）、<a href="../tutorials/new-face/index.html">做一張新的球員臉皮</a>
+       （把空位現在的貼圖匯出來、在原圖上改成你自己的圖，再匯回 <code>models.big</code>）。<br>
+       二、<strong>901–915 這 15 個罐頭臉長什麼樣，本站沒有查出來。</strong>
+       只知道沒有對應的檔案。<span class="badge wip">未解</span><br>
+       三、<strong>四位數號碼是誰決定的、能不能自己指定，本站沒有驗過。</strong>
+       只證實了「改了那一欄，大頭照與語音會跟著換到哪個檔名」這件事的對應關係。<br>
+       四、<strong>那 68 個有號碼卻沒有圖的人，遊戲畫面上會顯示什麼，本站沒有實機看過；
+       255 張沒人用的圖是怎麼來的，也沒有查出來。</strong><span class="badge wip">未解</span></p>
+    <p class="small">（2026-09-06 訂正：第一條原本寫「本站沒有教你怎麼換掉一張臉皮…那需要 3D 模型與貼圖工具」。
+       那兩課後來做了，而且<a href="../tutorials/new-face/index.html">做一張新的球員臉皮</a>是在匯出來的原圖上改
+       256×512 的 2D 貼圖，不必動 3D 模型工具。）</p>
+  </div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 每位球員同時掛著兩個完全無關的號碼，四位數管大頭照與播報語音、<code>c###</code> 管臉皮，而臉皮的位子是有限的。</li>
+    <li><strong>兩個號碼真的無關</strong> 整份名冊 3,247 列（有名字的 3,222 列）裡，<code>face</code> 剛好等於 <code>audioid</code> 的只有 <strong>27 列</strong>，而這 27 列裡有 25 列是姓名空白、兩欄都寫 0 的預留列，真的有名字又剛好相等的只有 <strong>2 位</strong>。四位數同時決定三個倉庫的檔名（<code>6107.fsh</code>、<code>6107a/c/d.dat</code>、對應的 <code>.hdr</code>）；拿剛安裝好的原版對，1,300 個非 0 的 <code>audioid</code> 有 1,232 個找得到圖，命中 94.8%。</li>
+    <li><strong>900 是一道硬邊界（全頁最重要）</strong> 這台機器的 <code>models.big</code> 有 <strong>894 個</strong> <code>cNNN.fsh</code>（範圍 c001 到 c900），<strong>901 以上 0 個</strong>。名冊裡用 901 到 915 的 2,510 人（77.3%）一個臉皮檔都沒有，那是遊戲內建的共用長相；剛安裝好的原版罐頭臉比例更高，84.1%。你在遊戲裡看到一堆人長得像，不是錯覺。</li>
+    <li><strong>欄位名跟欄號都會騙人</strong> <code>audioid</code> 字面是「語音編號」，實際上<u>同時決定大頭照</u>；<code>photo</code> 不是大頭照編號，它只有 1、0、2 三種值，是開關。更麻煩的是欄位順序會變：46 個欄位裡有 <strong>27 個</strong>在原版與社群名冊之間位置不同（<code>skin_tone</code> 從第 12 欄搬到第 38 欄）。<u>永遠不要記欄號，要打開你自己那份名冊的第一行照欄位名找。</u></li>
+    <li><strong>本站訂正：檔名不代表身分</strong> 原本以為「叫 <code>c123.fsh</code> 的就是臉皮」，不對。<code>frontend\coopunis.big</code>（經典球衣）用同一套檔名，裡面有 122 個 <code>cNNN.fsh</code>，其中 <code>c116.fsh</code> 在 <code>models.big</code> 裡根本不存在。分辨的方法在檔案內部：臉皮全部帶 <code>fa</code>，球衣是 <code>G357c0</code>／<code>G357c1</code>。</li>
+    <li><strong>「我找過了，沒有」要先證明自己找得到</strong> 第一次驗「901 以上沒有檔案」是用 <code>grep</code>，十五個全是 0 命中，看起來完美，<u>但對照組也是 0 命中</u>：<code>grep</code> 對這種二進位檔會靜默失效。改成逐位元組掃 912 個檔、2.02 GB 之後，對照組 c498、c890、c695 才命中，結論才站得住。</li>
+    <li><strong>擁擠還有第二種量法，而且不必知道總共有幾個位子</strong> 數「同一個臉皮編號被幾位球員共用」——<u>剛安裝好的英文原版是 <strong>0</strong> 個</u>（2,921 位球員、465 個編號，一人一號），2009 那份台灣之光名冊是 <strong>49</strong> 個，最多一個號碼四個人（門倉健、野口茂樹、大塚晶則、高橋健）；還有一個號碼 <code>c214</code> 同時掛著林旺衛、林旺億<u>跟 Babe Ruth</u>。本站測試機現在這份是 13 個。頁上那張 900 格的圖就是把這件事畫出來。</li>
+    <li><strong>這解釋了當年為什麼要「搶」號碼</strong> 本站測試機上留著一份 2009 年的名單（<u>讀者重現不了，已單獨標明</u>）：894 個檔，球員指派了 872 個號碼、教練 24 個，兩邊沒有一個重複，合計指派 <strong>896</strong> 個 —— 其中 890 個在 <code>models.big</code> 裡真的有檔（另外六個號碼名冊指派了卻沒有檔），只剩四個空號，飽和度 890 / 894 ＝ 99.6%。當年說明書寫「把某位大聯盟投手的臉皮編號給予之」不是風格，是沒有空號可以用。</li>
+    <li><strong>本站沒驗的</strong> 能不能自己新增一個 <code>c901.fsh</code> 讓遊戲讀到，本站<u>沒有測過</u>，已知的只有「原本沒有」，不是「不能有」；901 到 915 那 15 個罐頭臉長什麼樣沒查出來；四位數號碼是誰決定的、能不能自己指定也沒驗過；那 68 個有號碼卻沒有圖的人遊戲畫面上會顯示什麼沒有實機看過，255 張沒人用的圖是怎麼來的也沒有查出來。另外跟名單內容有關的數字量自一台裝過台灣模組的機器，你自己跑會得到別的結果，不會變的是格式。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="portrait.html">大頭照 portrait.big</a> —— 四位數那一半的倉庫</li>
+    <li><a href="models.html">模型與臉皮 models.big</a> —— <code>c###</code> 那一半的倉庫</li>
+    <li><a href="player-data.html">球員資料檔的真相</a> —— 兩個欄位所在的檔案怎麼讀</li>
+    <li><a href="player-codes.html">球員代號對照表</a> —— 同一個檔裡其他「是代號不是數值」的欄位</li>
+    <li><a href="audio.html">播報音訊系統</a> —— 語音那一半</li>
+  </ul>
+
+  <footer>
+    <p>本頁的欄位分佈、檔案數量、命中率皆為現場打開 <code>data\database\attrib.dat</code>、
+       <code>data\models.big</code>、<code>data\frontend\portrait.big</code> 與音訊倉庫量測所得。
+       標示為「本站手上有一份 2009 年的名單」之處為測試機獨有，讀者無法重現，已單獨標明。
+       標示為「未解」之處本站尚未解讀。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

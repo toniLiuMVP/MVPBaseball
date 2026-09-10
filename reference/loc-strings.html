@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/loc-strings.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>文字表 .LOC — toni的MVP模組補習班</title>
+<meta name="description" content="遊戲本體介面的文字存在兩個 .LOC 檔裡（遊戲內建的那個網站另有自己的一套）。格式完全解開:三段式結構、編號怎麼對到文字,以及 EA 忘了拿掉的開發用字串。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 文字表 .LOC</p>
+  <h1>文字表 .LOC</h1>
+  <p class="lede"><a href="fel.html">版面檔</a>不存文字，只存編號。真正的文字在
+     <code>data\IGENG.LOC</code> 與 <code>data\FEENG.LOC</code> 這兩個檔裡。
+     這頁把格式完整解開 —— <strong>解開之後，你不用開遊戲就能看到每個介面元素寫什麼</strong>。</p>
+
+  <h2>先看規模</h2>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">檔案</th><th class="num">剛安裝好的原版</th><th class="num">本站測試機</th><th class="num">字串數</th><th>負責哪裡</th></tr></thead>
+    <tbody>
+      <tr><td data-label="檔案" class="mono">IGENG.LOC</td><td data-label="剛安裝好的原版" class="num">59,432 bytes</td><td data-label="本站測試機" class="num">60,023 bytes</td><td data-label="字串數" class="num">1,584</td>
+          <td data-label="負責哪裡"><strong>IG</strong> = in-game，比賽進行中的畫面</td></tr>
+      <tr class="hi"><td data-label="檔案" class="mono">FEENG.LOC</td><td data-label="剛安裝好的原版" class="num">415,528 bytes</td><td data-label="本站測試機" class="num">416,753 bytes</td><td data-label="字串數" class="num">6,352</td>
+          <td data-label="負責哪裡"><strong>FE</strong> = front-end，選單與所有比賽外的畫面</td></tr>
+      <tr><td data-label="檔案">合計</td><td data-label="剛安裝好的原版" class="num">464 KB</td><td data-label="本站測試機" class="num">466 KB</td><td data-label="字串數" class="num">7,936</td><td data-label="負責哪裡"></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card amber">
+    <p class="card-h">⚠️ 這一頁本來只寫了右邊那一欄</p>
+    <p>本站 2026-08-28 自我檢查時發現：原本那張表只列 <code>60,023</code> 與 <code>416,753</code>，
+       而那是<u>本站測試機那兩個被 2023 年名冊模組換過的檔</u>（檔案日期是 2023 年，原版是 2005 年）。
+       頁面底下明明寫著「測試機那份 FEENG.LOC 被模組換過」，最上面的規模表卻沒有跟著標。</p>
+    <p><strong>字串數兩邊一樣</strong>（索引段的宣告值逐位元組相同），所以這頁的結構結論完全不受影響 ——
+       但這正是本站自己訂的紀律：<u>數字要寫清楚量的是哪一份</u>。現在兩欄都列出來。</p>
+  </div>
+  <p class="small">上面每個數字都是把這兩個檔現場打開數出來的，不是引用他人資料。
+     檔名裡的 <code>ENG</code> 是語言代號。社群的中文化模組是<u>換掉這兩個檔的內容</u>；但 <a href="official-chinese.html">EA 自己的繁體中文版</a>不是這樣做的 —— 它另外放一對 <code>JPN</code> 檔，沒有覆蓋 <code>ENG</code>。</p>
+
+  <h2>三段式結構</h2>
+<pre><code>LOCH  ← 檔頭,20 bytes
+LOCI  ← 索引:每 4 bytes 一筆,把「字串編號」對到「第幾條」
+LOCL  ← 文字:條數 + 位移表 + UTF-16 內容</code></pre>
+
+  <div class="card grass">
+    <p class="card-h">索引那 4 個位元組是兩個數字疊在一起</p>
+<pre style="margin:8px 0 0"><code>一筆索引 = (第幾條 &lt;&lt; 16) | 字串編號
+
+例:0x003B0506
+   高 16 位 0x003B = 59     ← 文字表的第 59 條
+   低 16 位 0x0506 = 1286   ← 版面檔裡寫的編號</code></pre>
+    <p style="margin-top:8px">所以查一個編號要兩步：先在索引裡找到它，取出「第幾條」，
+       再去文字表拿那一條。</p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">文字是 UTF-16，不是一般的文字檔</p>
+    <p>每個字佔兩個位元組。所以你用一般文字編輯器或 <code>strings</code> 這類工具打開，
+       <strong>會什麼都看不到</strong> —— 本站第一次也是這樣，以為檔案是加密的。</p>
+    <p>實際上只是英文字母中間夾了一堆 <code>00</code>。</p>
+  </div>
+
+  <div class="card grass">
+    <p class="card-h">這件事 2008 年就有人在論壇上想通了</p>
+    <p>本站在歷史資料裡翻到一篇 2008 年 9 月的貼文。作者一開始被人告知
+       中文要用 <strong>Big5</strong> 編碼，卡了一陣子，
+       後來是家裡的長輩點醒他：<u>美國做的軟體要中文化，用的是萬國碼</u>。</p>
+    <p>他接著寫下一個具體的步驟：查到「美」這個字的編碼是 <code>7F8E</code>，
+       但<strong>寫進檔案要把高低位元互換</strong>，變成 <code>8E7F</code>。</p>
+    <p class="small">（本站不逐字引用當年的貼文，也不寫出作者的帳號。）</p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">十八年後驗一次，他是對的</p>
+    <p>本站打開 EA <u>官方繁體中文版</u>的兩個語系檔，
+       直接數「美」這個字的兩種位元組順序各出現幾次：</p>
+    <div class="tablewrap"><table class="stack">
+      <thead><tr><th class="mono">檔</th><th class="num"><code>8E 7F</code></th><th class="num"><code>7F 8E</code></th></tr></thead>
+      <tbody>
+        <tr class="hi"><td data-label="檔" class="mono">FEJPN.LOC</td><td data-label="8E 7F" class="num"><strong>43</strong></td><td data-label="7F 8E" class="num">0</td></tr>
+        <tr class="hi"><td data-label="檔" class="mono">IGJPN.LOC</td><td data-label="8E 7F" class="num"><strong>7</strong></td><td data-label="7F 8E" class="num">0</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>50 次全部是互換過的順序，反過來一次都沒有。</strong>
+       其中一段的上下文是「美國職棒大聯盟2005」——
+       那正是這款遊戲官方中文版的名字。</p>
+    <p>他當年說的「高低位元互換」，今天的說法叫
+       <strong>little-endian（小端序）</strong>。
+       <u>他沒有這個詞，但他把規則講對了。</u></p>
+    <p class="small">順帶一提，官方中文版的語系檔<strong>沿用了日文版的檔名</strong>
+       （<code>FEJPN</code>／<code>IGJPN</code>）。
+       這件事在<a href="official-chinese.html">EA 自己的繁體中文版</a>那頁有量。</p>
+  </div>
+
+  <h2>驗證：編號對得起來嗎</h2>
+  <p>光解出格式不夠，要證明對應是正確的。方法是拿<strong>版面檔裡已知用途的元素</strong>
+     去查，看查出來的文字合不合理：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="mono">版面檔裡的元素</th><th class="num">編號</th><th>查出來的文字</th><th>合理嗎</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="版面檔裡的元素" class="mono">TX:RATING（跑壘者速度）</td><td data-label="編號" class="num">3501</td><td data-label="查出來的文字" class="mono">99</td>
+          <td data-label="合理嗎"><span class="badge ok">合理</span> 速度是<strong>兩位數</strong></td></tr>
+      <tr class="hi"><td data-label="版面檔裡的元素" class="mono">TTX:BALLS（好壞球數）</td><td data-label="編號" class="num">3013</td><td data-label="查出來的文字" class="mono">3</td>
+          <td data-label="合理嗎"><span class="badge ok">合理</span> 壞球數是<strong>一位數</strong></td></tr>
+      <tr><td data-label="版面檔裡的元素" class="mono">TX:PITCHSPEED1（球速）</td><td data-label="編號" class="num">3500</td><td data-label="查出來的文字" class="mono">999</td>
+          <td data-label="合理嗎"><span class="badge ok">合理</span> 球速是三位數</td></tr>
+      <tr><td data-label="版面檔裡的元素" class="mono">TX:PAUSE（暫停選單標題）</td><td data-label="編號" class="num">15211</td><td data-label="查出來的文字" class="mono">Game Options</td>
+          <td data-label="合理嗎"><span class="badge ok">合理</span></td></tr>
+      <tr><td data-label="版面檔裡的元素" class="mono">TX:PRESS</td><td data-label="編號" class="num">14275</td><td data-label="查出來的文字" class="mono">Press START button</td>
+          <td data-label="合理嗎"><span class="badge ok">合理</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="card grass">
+    <p class="card-h">全檔驗證</p>
+    <p>把 <code>ingame.big</code> 全部 47 個版面檔裡的字串引用都拿去查：
+       <strong>2,719 處引用，2,719 處查得到文字，命中率 100%。</strong></p>
+  </div>
+
+  <h2 id="overlap">兩張表重疊的那 1,310 個編號</h2>
+  <p>兩個檔加起來 7,936 條，但編號<strong>不是各自獨立的</strong>：
+     有 <strong>1,310 個編號兩張表都有</strong>。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>狀況</th><th class="num">剛安裝好的原版</th><th class="num">本站測試機</th></tr></thead>
+    <tbody>
+      <tr><td data-label="狀況">兩張表都有這個編號</td><td data-label="剛安裝好的原版" class="num">1,310</td><td data-label="本站測試機" class="num">1,310</td></tr>
+      <tr><td data-label="狀況">　└ 文字<strong>完全一樣</strong></td><td data-label="剛安裝好的原版" class="num">1,310</td><td data-label="本站測試機" class="num">1,295</td></tr>
+      <tr class="hi"><td data-label="狀況">　└ 文字<strong>不一樣</strong></td><td data-label="剛安裝好的原版" class="num">0</td><td data-label="本站測試機" class="num">15</td></tr>
+    </tbody>
+  </table></div>
+  <p>共用的編號很好理解 —— 「確定」「取消」這種字兩邊都要用。
+     <strong>剛安裝好的原版，1,310 個共用編號兩張表寫的字完全一樣，一個例外都沒有</strong>；
+     本站測試機那 15 個不一樣的，<u>全部是 2023 年名冊模組造成的</u>。
+     <strong>這裡挑三個最說明問題的</strong>（下表兩欄都是本站測試機的值）：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">編號</th><th class="mono">選單那張表</th><th class="mono">比賽中那張表</th></tr></thead>
+    <tbody>
+      <tr><td data-label="編號" class="num">18</td><td data-label="選單那張表" class="mono">back</td><td data-label="比賽中那張表" class="mono">Back</td></tr>
+      <tr class="hi"><td data-label="編號" class="num">704</td><td data-label="選單那張表" class="mono">Home Run Derby</td><td data-label="比賽中那張表" class="mono">Home Run Showdown</td></tr>
+      <tr class="hi"><td data-label="編號" class="num">1540</td><td data-label="選單那張表" class="mono">MVP Baseball 2023</td><td data-label="比賽中那張表" class="mono">MVP Baseball™ 2005</td></tr>
+    </tbody>
+  </table></div>
+  <div class="card amber">
+    <p class="card-h">第 1540 條說明了一件事：改一張表、不改另一張，遊戲就會前後不一致</p>
+    <p>編號 1540 是遊戲標題。本站測試機正在跑的那份，
+       <strong>選單那張表寫著 2023，比賽中那張表還是 2005。</strong></p>
+    <p>改掉選單那張的是<u>名冊模組</u> —— 它把隊名更新到 2023 年
+       （Devil Rays 改成 Rays、Indians 改成 Guardians、Anaheim Angels 改成 Los Angeles Angels），
+       順手把標題也改了。它其實<strong>兩個檔都動過</strong>，
+       漏掉的是 <code>IGENG.LOC</code> 裡<u>標題那一條</u>。
+       <u>兩張表都要改</u>，不然遊戲會有一半是舊的。這是本站實際踩到的，不是推論。</p>
+    <p class="small">⚠️ 2026-09-05 訂正：這一段原本寫「名冊模組……但沒動 <code>IGENG.LOC</code>」，是錯的。
+       把本站測試機的 <code>IGENG.LOC</code> 跟剛安裝好的原版逐條比：共同的 1,584 個編號裡
+       <strong>203 條文字不同</strong>（<code>Devil Rays</code>→<code>Rays</code>、
+       <code>Cleveland Indians</code>→<code>Cleveland Guardians</code>、
+       <code>Anaheim Angels</code>→<code>Los Angeles Angels</code>，
+       還有一整批球場改名如 <code>Bank One Ballpark™</code>→<code>Chase Field</code>），
+       檔案日期也是 2023 年。<u>模組漏掉的只有標題那一條</u>，不是整個檔沒碰。</p>
+    <p class="small">⚠️ 2026-08-25 訂正：這一段原本寫成「中文化模組只換了一張表」，是錯的。
+       測試機正在用的這兩張表<strong>一個中文字都沒有</strong>（實測含漢字的字串各 0 條）。
+       機器上確實另外留著一份中文化的備份，而<u>那一份兩張表都換了</u>
+       （IGENG 992 條、FEENG 4,914 條含漢字）。
+       把「這台機器上看到的現象」寫成「別人的做法」，本站又犯了一次。</p>
+    <p class="small">同一條在兩張表裡的 ™ 符號也不一樣 —— 模組那張的商標符號被編碼弄壞了。
+       這說明<a href="fonts.html">字型與編碼</a>是中文化最容易出事的地方。</p>
+  </div>
+    <div class="card amber">
+      <p class="card-h">⚠️ 編號 704 那組，本站原本寫錯了</p>
+      <p>原本寫「<code>Home Run Derby</code> ／ <code>Home Run Showdown</code>
+         是 EA 原版就不一樣的，跟模組無關」。<strong>反了。</strong></p>
+      <p>拿<u>剛安裝好的原版</u>查：<code>FEENG.LOC</code> 與 <code>IGENG.LOC</code> 的第 704 條
+         <strong>都是 <code>Home Run Showdown</code></strong>，
+         而 <code>Home Run Derby</code> 這個字串<u>兩個檔加起來出現 0 次</u>。</p>
+      <p>本站測試機那份 <code>FEENG.LOC</code> 被 2023 年的名冊模組換過（md5 跟原版不同），
+         差異是<strong>模組造成的，不是 EA 原版就有的</strong>。</p>
+      <p class="small">這正是同一頁上面在講的那件事：
+         <u>把這台機器上的現象寫成 EA 的做法</u>。同一種錯，漏改了一處。</p>
+    </div>
+
+  <h2>那些「不是給玩家看的」字串</h2>
+  <p>翻文字表的時候會撞到一批明顯不是遊戲文案的東西。它們<strong>出現在正式出貨的遊戲裡</strong>：</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th class="num">位置</th><th class="mono">內容</th><th>看起來是什麼</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td data-label="位置" class="num">兩個檔的第 0 條</td><td data-label="內容" class="mono">&lt;some text&gt;</td><td data-label="看起來是什麼">佔位字串</td></tr>
+      <tr class="hi"><td data-label="位置" class="num">兩個檔的第 1 條</td><td data-label="內容" class="mono">Hello, world!</td>
+          <td data-label="看起來是什麼"><strong>程式設計的第一課</strong>，就這樣留在出貨版裡</td></tr>
+      <tr><td data-label="位置" class="num">IG 287–293<br>FE 594–603</td>
+          <td data-label="內容" class="mono">WWW / WWWW / …<br>最長 32 個 W</td>
+          <td data-label="看起來是什麼">見下方說明</td></tr>
+      <tr><td data-label="位置" class="num">IG 284–285</td><td data-label="內容" class="mono">999 / 99</td><td data-label="看起來是什麼">數字欄位的佔位</td></tr>
+      <tr><td data-label="位置" class="num">FE 4791–4793</td><td data-label="內容" class="mono">&lt;Required&gt;<br>&lt;********&gt;</td>
+          <td data-label="看起來是什麼">註冊表單的欄位提示（還有一條是信箱格式範例）</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card amber">
+    <p class="card-h">一整排 W 是有用途的</p>
+    <p><strong>W 在大多數字型裡是最寬的字母。</strong>
+       想確認「這個欄位能不能塞得下 8 個字」，最保險的做法就是塞 8 個 W 進去看看。</p>
+    <p>所以那些 <code>WWWW</code> 不是打錯字，是<strong>版面寬度的測試字串</strong>。
+       翻譯成別的語言時，這種欄位最容易爆版。</p>
+  </div>
+
+  <h2 id="third">其實還有第三套文字表</h2>
+  <p>上面講的兩個 <code>.LOC</code> 是遊戲本體的。
+     但<a href="../story/hidden-website/index.html">遊戲裡那個內建網站</a>有<strong>自己的一套</strong>，
+     而且做法完全相反 —— <u>它是純文字的 XML，記事本直接打得開</u>。</p>
+<pre><code>&lt;Row&gt;
+    &lt;Id&gt;BTN_OK&lt;/Id&gt;
+    &lt;en&gt;OK&lt;/en&gt;
+&lt;/Row&gt;</code></pre>
+  <div class="tablewrap"><table>
+    <thead><tr><th>量到的</th><th class="num">結果</th></tr></thead>
+    <tbody>
+      <tr><td>檔案</td><td class="mono">data\easo\mvp\main\MVP_lt_en.xml</td></tr>
+      <tr><td>大小</td><td class="num">142,317 bytes ／ 6,227 行</td></tr>
+      <tr class="hi"><td><strong>條目數</strong></td><td class="num"><strong>1,556</strong></td></tr>
+      <tr><td>語言</td><td>只有英文（標籤是 <code>&lt;en&gt;</code>，看得出本來設計成可以多語）</td></tr>
+    </tbody>
+  </table></div>
+  <p>它的編號不是數字，是<strong>看得懂的名字</strong>：</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th class="mono">前綴</th><th class="num">幾條</th><th>是什麼</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">UC_</td><td class="num">201</td><td rowspan="8">照名字分類：按鈕、警告、訊息、說明、錯誤、頁籤…</td></tr>
+      <tr><td class="mono">ALERT_</td><td class="num">79</td></tr>
+      <tr><td class="mono">BTN_</td><td class="num">77</td></tr>
+      <tr><td class="mono">MSG_</td><td class="num">72</td></tr>
+      <tr><td class="mono">SUBS_</td><td class="num">58</td></tr>
+      <tr><td class="mono">DESC_</td><td class="num">51</td></tr>
+      <tr><td class="mono">ERR_</td><td class="num">45</td></tr>
+      <tr><td class="mono">TAB_</td><td class="num">41</td></tr>
+    </tbody>
+  </table></div>
+  <div class="card grass">
+    <p class="card-h">同一款遊戲，兩種完全相反的做法</p>
+    <div class="tablewrap" style="margin:8px 0"><table class="stack">
+      <thead><tr><th></th><th>遊戲本體</th><th>內建網站</th></tr></thead>
+      <tbody>
+        <tr><td>格式</td><td data-label="遊戲本體"><strong>二進位</strong>（要寫程式才讀得出來）</td>
+            <td data-label="內建網站"><strong>純文字 XML</strong>（記事本就行）</td></tr>
+        <tr><td>編號</td><td data-label="遊戲本體">數字（<code>3501</code>）</td><td data-label="內建網站">名字（<code>BTN_OK</code>）</td></tr>
+        <tr><td>條數</td><td data-label="遊戲本體" class="num">7,936</td><td data-label="內建網站" class="num">1,556</td></tr>
+      </tbody>
+    </table></div>
+    <p>網頁那一套是用網頁技術做的，所以跟著網頁的慣例走。
+       <u>同一片光碟裡，兩個團隊各做各的。</u></p>
+  </div>
+  <p class="small">這份表裡有 <strong>32 個</strong>伺服器錯誤代號，
+     但<a href="../story/hidden-website/index.html">那個故事頁講的 <code>SERVER_ERROR_10016</code></a>
+     <strong>不在裡面</strong> —— 本站重驗過，確實查不到。</p>
+
+  <h2>做成中文版要動的就是這兩個檔</h2>
+  <p>版面檔只存編號，<strong>所以中文化不是改版面檔，是改 <code>.LOC</code></strong>。
+     本站測試機的這兩個檔<strong>都還是英文</strong>；動過它們的是 2023 年的名冊模組，不是中文化模組。</p>
+  <div class="card clay">
+    <p class="card-h">本站教的中文化,是「搬」不是「從零做」</p>
+    <p>格式解開了。要「從零做一套中文」還缺兩塊,但要「把官方現成的中文搬到英文版」不缺：</p>
+    <p style="margin-top:6px">
+       一、寫回 <code>.LOC</code> 的工具<strong>後來做了</strong> —— 在<a href="../tutorials/fix-chinese/index.html">中文版配大球場就跳出</a>那一課（<code>mvp_fix_loc.py</code>：照原結構寫回、索引偏移跟著更新、<code>--apply</code> 才真的寫、有 <code>--restore</code>）。本節原本寫「本站沒做，只做了讀」，那句已經過期。<br>
+       二、<a href="fonts.html">字型檔</a>的字圖集與字元表<u>讀得出來</u>（見那一頁 2026-09-05 的訂正），
+       但本站沒有<strong>從零產生一份、再寫回去</strong>的辦法 —— 中文字要顯示得出來，字型裡得先有那些字。</p>
+    <p><span class="badge ok">可繞過</span> 第一塊<u>後來做了</u>;第二塊(從零造一套字型)確實還沒解 —— <u>讀得出來、寫不回去</u> —— 但<strong>不必解它</strong>:官方繁中版的中文字型是現成的,搬過去就好。所以本站<strong>有</strong>中文化教學,教的是<a href="../tutorials/make-chinese/index.html">把官方中文搬進英文版</a>,不是教你從零刻一套中文字型。</p>
+    <p class="small">另外<strong>拆解 EA 官方繁中版</strong>(兩份官方發行版的格式比對,不是教人做東西)見<a href="official-chinese.html">官方中文版拆給你看</a>;官方那三個更新檔改了什麼見<a href="patches-tc.html">更新檔說明</a>。</p>
+  </div>
+
+  <h2>怎麼自己查</h2>
+  <p><a href="../tutorials/fel-toolkit/index.html">介面萬用工具</a>內建了這個功能：</p>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --strings fes_ingameoverlay.fel</code></pre>
+  <div class="seen"><b>你會看到</b>
+<pre style="margin:8px 0 0"><code>版面檔                       行號 元素            編號 文字
+------------------------------------------------------------------
+fes_ingameoverlay.fel         38 TEXT          23505 Argument Intensity
+fes_ingameoverlay.fel         43 TEXT           1286 To Charge Mound Press
+fes_ingameoverlay.fel         53 PRESS         14275 Press START button
+fes_ingameoverlay.fel        126 PITCHSPEED1    3500 999</code></pre>
+  </div>
+  <p class="small">不加檔名就掃封裝檔裡的每一個版面檔（<code>ingame.big</code> 在本站測試機是 47 個，<a href="original-vs-modded.html">剛安裝好的原版是 44 個</a>）。全程唯讀。</p>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 版面檔只存編號，真正的文字在 <code>IGENG.LOC</code> 與 <code>FEENG.LOC</code> 這兩個 UTF-16 二進位檔裡，三段式格式已完全解開，兩檔合計 <strong>7,936 條</strong>。</li>
+    <li><strong>關鍵數字</strong> <code>IGENG.LOC</code> 1,584 條管比賽中、<code>FEENG.LOC</code> 6,352 條管選單與所有比賽外的畫面。索引一筆 4 個位元組是兩個數字疊在一起：<u>高 16 位是「第幾條」、低 16 位是版面檔寫的編號</u>。拿 <code>ingame.big</code> 全部 47 個版面檔的引用去查，<strong>2,719 處全部查得到，命中率 100%</strong>。</li>
+    <li><strong>最容易誤讀的兩件事</strong> 一、文字是 UTF-16，一個字兩個位元組，用記事本或 <code>strings</code> 打開<u>什麼都看不到</u>，本站第一次也以為檔案被加密，實際上只是字母中間夾了一堆 <code>00</code>。二、同一個編號在兩張表可以寫不一樣的字，編號 1540 是遊戲標題，測試機的選單那張寫 2023、比賽中那張還是 2005，<strong>兩張表都要改</strong>，不然遊戲會有一半是舊的。</li>
+    <li><strong>2008 年有人講對了，十八年後量到</strong> 當年那篇貼文說美國軟體中文化用的是萬國碼不是 Big5，而且「美」的編碼 <code>7F8E</code> 寫進檔案要<u>高低位元互換</u>成 <code>8E7F</code>。數 EA 官方繁中版的兩個語系檔：<code>8E 7F</code> 出現 43 次與 7 次共 <strong>50 次，反過來一次都沒有</strong>。他沒有 little-endian 這個詞，但規則講對了。</li>
+    <li><strong>本站訂正了自己四次</strong> 一、規模表原本只列測試機那一欄（那兩個檔被 2023 名冊模組換過），沒標是量哪一份，現在原版的 59,432 與 415,528 位元組兩欄都列。二、原本寫「中文化模組只換了一張表」是<strong>錯的</strong>，測試機那兩張表<u>一個中文字都沒有</u>，機器上另一份中文化備份是兩張都換（IGENG 992 條、FEENG 4,914 條含漢字）。三、編號 704 原本寫成「EA 原版就不一樣」，<strong>反了</strong>：剛安裝好的原版兩張表都是 <code>Home Run Showdown</code>，<code>Home Run Derby</code> 兩個檔加起來出現 0 次，差異是<u>模組造成的</u>。四、原本寫名冊模組「沒動 <code>IGENG.LOC</code>」，也是<strong>錯的</strong>：測試機那份跟剛安裝好的原版比有 <strong>203 條</strong>文字不同（隊名與球場名一起更新過），模組漏掉的只有標題那一條；而原版那 1,310 個共用編號<u>兩張表寫的字完全一樣</u>，測試機那 15 個不一樣全是模組造成的。</li>
+    <li><strong>出貨版裡留著開發用字串</strong> 兩個檔的第 0 條是 <code>&lt;some text&gt;</code>、第 1 條是 <code>Hello, world!</code>。那一排最長 32 個 W 也不是打錯字，<strong>W 在多數字型裡是最寬的字母</strong>，那是版面寬度的測試字串，翻譯成別的語言時這種欄位最容易爆版。</li>
+    <li><strong>其實還有第三套文字表</strong> 遊戲內建網站自己一套，做法完全相反，是純文字 XML（<code>MVP_lt_en.xml</code>，142,317 位元組／6,227 行／<strong>1,556 條</strong>），編號是看得懂的名字如 <code>BTN_OK</code>。同一片光碟裡，兩個團隊各做各的。</li>
+    <li><strong>本站沒驗的</strong> 寫回 <code>.LOC</code> 的工具<u>後來做了</u>（見 <a href="../tutorials/fix-chinese/index.html">中文版配大球場就跳出</a>那一課）；<a href="fonts.html">字型檔</a>的字圖集與字元表<u>讀得出來</u>，仍然沒解的是<strong>從零產生一份、再寫回去</strong>，中文字要顯示得出來字型裡得先有那些字。但要「從零做一套中文字型」才需要它 —— 而本站的中文化教學是<u>搬官方現成的</u>,繞過這一塊,見<a href="../tutorials/make-chinese/index.html">把官方中文搬進英文版</a>。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="../tutorials/fel-toolkit/index.html">介面萬用工具</a> —— 用 <code>--strings</code> 自己查</li>
+    <li><a href="fel.html">FEL 版面語法</a> —— 編號寫在版面檔的哪一欄</li>
+    <li><a href="fonts.html">字型檔 .ffn</a> —— 這些文字用什麼字型畫出來</li>
+  </ul>
+
+  <footer>
+    <p>本頁所有數字皆為現場解開 <code>IGENG.LOC</code> 與 <code>FEENG.LOC</code> 量測所得；
+       文中引用的少量介面字串僅為說明格式之用。
+       標示為「未解」之處本站尚未解讀。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
+       <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

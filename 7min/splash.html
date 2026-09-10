@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/7min/splash.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>七分鐘學會置換遊戲開始畫面並匯入遊戲 — toni的MVP模組補習班</title>
+<meta name="description" content="七分鐘把遊戲的開機大圖換成你自己的。尺寸看版本：剛安裝好的原版 512×512、本站測試機 1024×1024。含本站自己寫的匯入工具。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item on" href="index.html">七分鐘</a>
+  <a class="item" href="../reference/index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">七分鐘</a> › 開始畫面</p>
+  <h1>七分鐘學會置換遊戲開始畫面並匯入遊戲</h1>
+  <p class="lede">遊戲開頭那三張圖，本站量出它們在哪、多大、什麼格式，並寫了一支腳本做這件事。
+     三張都匯得出來，<strong>但目前只有標題頁（<code>title</code>）與讀取畫面（<code>loading</code>）匯得回去</strong>；
+     開機大圖（<code>splash</code>）會被擋，原因寫在下面「這一課到哪裡為止」。</p>
+  <div class="card">
+    <p class="card-h">⏱ 七分鐘怎麼分配</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>做什麼</th><th class="num">分鐘</th></tr></thead>
+      <tbody>
+        <tr><td>看三個畫面各是什麼規格</td><td class="num">1</td></tr>
+        <tr><td>匯出一張當範本</td><td class="num">1</td></tr>
+        <tr><td>改圖</td><td class="num">3</td></tr>
+        <tr><td>匯入</td><td class="num">1</td></tr>
+        <tr><td>開遊戲確認</td><td class="num">1</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <h2>前置</h2>
+  <ul>
+    <li>已安裝的 MVP Baseball 2005</li>
+    <li>Python 3</li>
+    <li>任何能存 PNG 的繪圖軟體</li>
+    <li>下載 <a href="../tutorials/swap-splash/mvp_swap_screen.py" download>mvp_swap_screen.py</a></li>
+  </ul>
+
+  <div class="card clay" id="backup-first">
+    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
+       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
+    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <ul>
+      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
+          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
+          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
+      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
+          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
+          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
+    </ul>
+<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
+<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
+    <p class="small">上面第一行 Windows、第二行 Mac。
+       本站每一支工具都會自己備份它要動的那一個檔，
+       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
+       完整做法看<a href="../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+  </div>
+
+  <h2>👉 你要做的事</h2>
+
+  <div class="step">
+    <div class="step-n">1</div>
+    <div>
+      <p><strong>先看有哪三個畫面可以換。</strong></p>
+      <p class="small">Windows:</p>
+<pre><code>python mvp_swap_screen.py &quot;〔你的遊戲資料夾〕&quot; --info</code></pre>
+      <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_swap_screen.py &quot;〔你的遊戲資料夾〕&quot; --info</code></pre>
+      <div class="tablewrap"><table class="stack"><thead><tr><th>代號</th><th>是什麼</th><th>尺寸</th><th>格式</th></tr></thead><tbody><tr class="hi"><td data-label="代號"><code>splash</code></td><td data-label="是什麼">開機大圖</td><td data-label="尺寸">1024 × 1024<br><span class="small">（原版 512 × 512）</span></td><td data-label="格式">DXT1</td></tr><tr><td data-label="代號"><code>title</code></td><td data-label="是什麼">標題頁 / 授權畫面</td><td data-label="尺寸">1024 × 512</td><td data-label="格式">32 位元</td></tr><tr><td data-label="代號"><code>loading</code></td><td data-label="是什麼">讀取中那張</td><td data-label="尺寸">512 × 512</td><td data-label="格式">32 位元</td></tr></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">2</div>
+    <div>
+      <p><strong>匯出現在那張當範本。</strong></p>
+      <p class="small">Windows:</p>
+<pre><code>python mvp_swap_screen.py &quot;〔你的遊戲資料夾〕&quot; --export title old.png</code></pre>
+      <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_swap_screen.py &quot;〔你的遊戲資料夾〕&quot; --export title old.png</code></pre>
+      <p class="small">代號換成 <code>loading</code> 也可以。<code>splash</code> 也匯得出來，
+         但它匯不回去，所以這一課不拿它當例子。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">3</div>
+    <div>
+      <p><strong>用繪圖軟體改，存成 PNG。</strong></p>
+      <div class="card amber"><p class="card-h">⚠ 尺寸必須完全一樣</p><p>不一樣就<strong>直接拒絕寫入</strong>，腳本不會幫你縮放。最穩的做法是在匯出的那張上面直接改。</p></div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">4</div>
+    <div>
+      <p><strong>匯入。先預覽，再加 <code>--apply</code>。</strong></p>
+      <p class="small">Windows:</p>
+<pre><code>python mvp_swap_screen.py &quot;〔你的遊戲資料夾〕&quot; --import title mine.png</code></pre>
+      <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_swap_screen.py &quot;〔你的遊戲資料夾〕&quot; --import title mine.png</code></pre>
+      <p>確認沒問題之後，同一行後面加 <code>--apply</code>。</p>
+    </div>
+  </div>
+
+  <h2>✅ 怎麼知道成功了</h2>
+  <ul>
+    <li><code>--info</code> 印出三個畫面的規格</li>
+    <li>匯出的 PNG 打得開，就是你現在遊戲裡看到的那張</li>
+    <li>匯入預覽沒有報長度錯誤（換 <code>splash</code> 一定會報，那不是你的問題）</li>
+    <li>開遊戲看那張畫面</li>
+  </ul>
+
+  <h2>❌ 出錯處理</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>症狀</th><th>怎麼辦</th></tr></thead>
+    <tbody>
+      <tr><td>說尺寸不對</td><td>用匯出來的那張當底圖。<strong>換 <code>splash</code> 的話換底圖也沒用</strong>，它現在匯不回去</td></tr>
+      <tr><td>圖變模糊</td><td><code>title</code> 與 <code>loading</code> 是 32 位元未壓縮，不會糊；會糊的是 DXT1 的 <code>splash</code>，而它目前匯不回去</td></tr>
+      <tr><td>想還原</td><td><code>--restore</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="card red">
+    <p class="card-h">⚠️ 這一課到哪裡為止</p>
+    <p><strong>開機大圖（<code>splash</code>）目前匯不回去。</strong>
+       三張都匯得出來，但 <code>splash</code> 連 <code>--export</code> 出來的那張原封不動匯回去也會被擋。
+       本站手上六份 <code>data</code> 資料夾都一樣：<code>splash</code> 是 1024 × 1024 的兩份說
+       <code>新像素有 524288 個位元組,原本是 524304</code>，512 × 512 的四份說
+       <code>新像素有 131072 個位元組,原本是 131088</code>。差的永遠是 16 個位元組，
+       完整說明在<a href="../tutorials/swap-splash/index.html#splash-blocked">換掉開機畫面</a>。</p>
+    <p><code>splash</code> 是 <strong>DXT1 有損壓縮</strong>，就算哪天匯得回去也會掉一點畫質，
+       本站沒有無損的路；<code>title</code> 與 <code>loading</code> 是 32 位元未壓縮，沒有這個問題。</p>
+    <p>腳本<u>只處理 <code>0x60</code>（DXT1）與 <code>0x7D</code>（32 位元）兩種格式</u>，
+       遊戲裡其他格式的圖它會直接拒絕，不會亂猜。</p>
+    <p><strong>換完之後遊戲畫面實際長什麼樣，本站沒看到。</strong>
+       驗的是「檔案寫進去了、而且寫的內容正確」，不是「遊戲顯示正常」。</p>
+  </div>
+
+  <div class="card">
+    <p class="card-h">🔍 這一課怎麼查出來的（順便示範一次證據強度）</p><p>2007 年有一份社群工具的說明寫「開機畫面是遊戲根目錄的 <code>00000000.256</code>」。<strong>本站測的這台機器上，整個遊戲一個 <code>.256</code> 都沒有</strong>，執行檔裡也搜不到那個字串。</p><p>真正的線索在兩個地方對上：執行檔的符號表裡有 <code>FSPLASH</code>、<code>LEGAL</code>、<code>LOADING</code>;而版面檔 <code>fes_title.fel</code> 寫著 <code>SH:CLICKME,…,lice,lice</code> ——<strong>而 <code>license.fsh</code> 裡那張圖的名字就叫 <code>lice</code></strong>。</p><p>這是<u>名字對上名字</u>，不是數量對上數量。本站把後者列為最弱的一級證據。</p><p class="small">⚠️ 但本站<u>不能斷定那份 2007 年的說明當年是錯的</u>——也可能是某個版本或某個安裝方式才有。本站只能說：<strong>在這台機器上它不存在，而 <code>splash.fsh</code> 存在。</strong></p>
+  </div>
+
+
+  <h2>想弄懂為什麼</h2>
+  <ul class="plain">
+    <li><a href="../tutorials/swap-splash/index.html">換掉開機畫面</a> —— 完整版與腳本原始碼</li>
+    <li><a href="../reference/pixel-formats.html">圖片的像素怎麼排</a></li>
+    <li><a href="../reference/fel.html">FEL 版面語法</a></li>
+  </ul>
+
+  <footer>
+    <p>本頁是「下課七分鐘」系列，只講一件事怎麼做完。
+       原理、量測過程與本站驗到哪裡為止，寫在上面連過去的完整課程裡。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/qfs.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin">
+<title>QFS / RefPack 壓縮格式 — toni的MVP模組補習班</title>
+<meta name="description" content="EA QFS(RefPack)壓縮完整規格：如何辨識、四種指令編碼、以及不用寫壓縮器就能合法壓回去的技巧。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
+<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+</head>
+<body>
+<a class="skip sr-only" href="#main">跳到主要內容</a>
+
+<nav class="nav"><div class="nav-in">
+  <a class="brand" href="../index.html"><span class="ball">⚾</span> toni的MVP模組補習班</a>
+  <a class="item" href="../index.html">首頁</a>
+  <a class="item" href="../start.html">新手基本功</a>
+  <a class="item" href="../do.html">我想做什麼</a>
+  <a class="item" href="../plan.html">課表</a>
+  <a class="item" href="../tutorials/index.html">教學</a>
+  <a class="item" href="../7min/index.html">七分鐘</a>
+  <a class="item on" href="index.html">速查</a>
+  <a class="item" href="../coach/index.html">棒球教練</a>
+  <a class="item" href="../story/index.html">故事</a>
+  <a class="item" href="../about.html">關於</a>
+</div></nav>
+
+<div class="wrap" id="main" role="main" tabindex="-1">
+  <p class="crumb" style="margin-top:22px"><a href="index.html">速查</a> › 壓縮格式</p>
+  <h1>QFS / RefPack 壓縮</h1>
+  <p class="lede">從 <a href="bigf.html">.big 封裝檔</a>取出來的東西，很多還包著一層壓縮。
+     這是 EA 自家的 RefPack（也常被叫做 QFS）。解開它不難，
+     而且<strong>要壓回去時有個技巧，可以完全不用寫壓縮器</strong>。</p>
+
+  <h2>怎麼辨識</h2>
+  <p>看<strong>第二個位元組是不是 <code>0xFB</code></strong>。是就是 RefPack。</p>
+<pre><code>10 FB 01 48 D7 E5 ...   <span class="cm">← 壓縮過</span>
+44 41 54 45 2C 54 ...   <span class="cm">← 沒壓縮(這是「DATE,T」的 ASCII)</span></code></pre>
+  <p>同一個封裝檔裡<strong>壓縮和未壓縮可以混在一起</strong>。
+     這是 EA 出廠就有的：剛安裝好的原版 207 個封裝檔裡<strong>有 106 個是混合的</strong> ——
+     例如 <code>ingame.big</code> 的 44 項中，43 項壓縮、1 項（<code>alib_ingamelogos.fel</code>）是純文字。
+     所以工具要逐項判斷，不能假設「這個 .big 裡全都壓縮」。</p>
+  <div class="card blue">
+    <p class="card-h">我們改過這一段</p>
+    <p>這裡原本舉的例子是「<code>schedule.big</code> 的 9 個賽程表中，6 個壓縮、3 個是純文字」。
+       那是<u>本站測試機</u>的狀況 —— 拿剛安裝好的原版一驗：
+       <strong>原版那 9 個項目全部都是壓縮的，一個純文字都沒有。</strong></p>
+    <p>差別是本站這台的 <code>schedule.big</code> 被工具改寫過。那 3 個純文字項目，
+       正好是<a href="../tutorials/change-schedule-year/index.html">換賽程年份</a>那一課會動到的
+       <code>mlb162_1/2/3.dat</code>。</p>
+    <p><strong>順帶學到一件事：原本壓縮的項目，被工具改寫之後可能變成未壓縮存回去。</strong>
+       規則本身沒錯，錯的是拿一個被改過的檔當例子。</p>
+  </div>
+
+  <h2>檔頭</h2>
+<pre><code>byte[0]  旗標   <span class="cm">&amp; 0x01 決定檔頭長度</span>
+byte[1]  0xFB   <span class="cm">辨識碼</span>
+
+旗標 &amp; 0x01 == 0  →  檔頭 5 bytes:byte[2..4] 是解壓後大小(3 bytes,big-endian)
+旗標 &amp; 0x01 == 1  →  檔頭 10 bytes:壓縮後大小 + 解壓後大小(各 4 bytes,big-endian)</code></pre>
+  <p>遊戲裡絕大多數是前者，所以你最常看到的開頭就是 <code>10 FB</code> 加 3 個位元組的大小。
+     實際上本站在兩份安裝上量到的是<strong>一個 10 bytes 的檔頭都沒有</strong>：
+     剛安裝好的原版 14,816 個壓縮項目、本站測試機 36,620 個，第一個位元組<u>全部</u>是 <code>0x10</code>。
+     所以上面那一行 10 bytes 的寫法，<strong>本站沒有樣本可以驗</strong> —— 它不是本站量到的。</p>
+
+  <h2>四種指令</h2>
+  <p>解壓就是一直讀指令、往輸出區塞資料。指令用<strong>第一個位元組的值域</strong>來區分：</p>
+
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>byte0 範圍</th><th>指令</th><th>指令長度</th><th class="num">複製長度／資料量</th><th class="num">回看距離</th></tr></thead>
+    <tbody>
+      <tr><td data-label="byte0 範圍" class="mono">&lt; 0x80</td><td data-label="指令">短距離複製</td><td data-label="指令長度">2 bytes</td><td data-label="複製長度／資料量" class="num">3 – 10</td><td data-label="回看距離" class="num">1 – 0x400</td></tr>
+      <tr><td data-label="byte0 範圍" class="mono">0x80 – 0xBF</td><td data-label="指令">中距離複製</td><td data-label="指令長度">3 bytes</td><td data-label="複製長度／資料量" class="num">4 – 67</td><td data-label="回看距離" class="num">1 – 0x4000</td></tr>
+      <tr><td data-label="byte0 範圍" class="mono">0xC0 – 0xDF</td><td data-label="指令">長距離複製</td><td data-label="指令長度">4 bytes</td><td data-label="複製長度／資料量" class="num">5 – 1028</td><td data-label="回看距離" class="num">1 – 0x20000</td></tr>
+      <tr class="hi"><td data-label="byte0 範圍" class="mono">0xE0 – 0xFB</td><td data-label="指令"><strong>純資料</strong></td><td data-label="指令長度">1 byte</td><td data-label="複製長度／資料量" class="num">4 – 112（每 4 遞增）</td><td data-label="回看距離" class="num">—</td></tr>
+      <tr><td data-label="byte0 範圍" class="mono">≥ 0xFC</td><td data-label="指令">結束</td><td data-label="指令長度">1 byte</td><td data-label="複製長度／資料量" class="num">0 – 3（尾端資料）</td><td data-label="回看距離" class="num">—</td></tr>
+    </tbody>
+  </table></div>
+
+  <p class="small">後兩欄只有複製指令兩欄都有值。<strong>純資料</strong>與<strong>結束</strong>不往回看，
+     它們那一格填的是<u>一次帶出多少位元組</u>，不是距離 —— 對照下面純資料指令的算式
+     <code>n = ((byte0 &amp; 0x1F) &lt;&lt; 2) + 4</code>，byte0 落在 <code>0xE0</code>–<code>0xFB</code> 時剛好是 4 到 112、每 4 遞增。</p>
+  <p>每種複製指令都同時可以帶 0 到 3 個「順便寫出去」的位元組。實際算式：</p>
+<pre><code><span class="cm"># 2-byte 指令</span>
+n      = byte0 &amp; 0x03
+length = ((byte0 &amp; 0x1C) &gt;&gt; 2) + 3
+offset = ((byte0 &amp; 0x60) &lt;&lt; 3) + byte1 + 1
+
+<span class="cm"># 3-byte 指令</span>
+n      = (byte1 &gt;&gt; 6) &amp; 0x03
+length = (byte0 &amp; 0x3F) + 4
+offset = ((byte1 &amp; 0x3F) &lt;&lt; 8) + byte2 + 1
+
+<span class="cm"># 4-byte 指令</span>
+n      = byte0 &amp; 0x03
+length = ((byte0 &amp; 0x0C) &lt;&lt; 6) + byte3 + 5
+offset = ((byte0 &amp; 0x10) &lt;&lt; 12) + (byte1 &lt;&lt; 8) + byte2 + 1
+
+<span class="cm"># 純資料指令</span>
+n      = ((byte0 &amp; 0x1F) &lt;&lt; 2) + 4</code></pre>
+
+  <p>「回看距離」的意思是：往<strong>已經解出來的資料</strong>倒退 N 個位元組，從那裡複製過來。
+     這也是為什麼解壓一定要從頭循序做，不能跳著解。</p>
+
+  <h2 id="literal">壓回去的技巧：純資料編碼</h2>
+  <p>要把改好的內容壓回 RefPack，直覺是得寫一個壓縮器 —— 找重複字串、選最佳指令。
+     那很慢也容易寫錯。</p>
+
+  <div class="card grass">
+    <p class="card-h">但格式允許你完全不做匹配搜尋</p>
+    <p>純資料指令（<code>0xE0</code> 系列）可以表達任意內容。
+       整份資料<strong>全部用純資料指令輸出</strong>，格式一樣合法，遊戲照樣讀得懂。</p>
+  </div>
+
+<pre><code><span class="kw">def</span> qfs_compress_literal(data):
+    n = len(data)
+    out = bytearray([<span class="nu">0x10</span>, <span class="nu">0xFB</span>, (n &gt;&gt; <span class="nu">16</span>) &amp; <span class="nu">0xFF</span>, (n &gt;&gt; <span class="nu">8</span>) &amp; <span class="nu">0xFF</span>, n &amp; <span class="nu">0xFF</span>])
+    tail = n % <span class="nu">4</span>              <span class="cm"># 0~3,交給結束指令帶走</span>
+    body = n - tail
+    pos = <span class="nu">0</span>
+    <span class="kw">while</span> pos &lt; body:
+        chunk = min(<span class="nu">112</span>, body - pos)          <span class="cm"># 必為 4 的倍數,上限 112</span>
+        out.append(<span class="nu">0xE0</span> | ((chunk - <span class="nu">4</span>) // <span class="nu">4</span>))  <span class="cm"># 0xE0~0xFB,不會撞到 0xFC</span>
+        out += data[pos:pos + chunk]
+        pos += chunk
+    out.append(<span class="nu">0xFC</span> | tail)                    <span class="cm"># 結束標記</span>
+    out += data[pos:]
+    <span class="kw">return</span> bytes(out)</code></pre>
+
+  <h3>代價與效益</h3>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>做法</th><th class="num">47 個檔耗時<br><span class="small">（本站測試機的 <code>ingame.big</code>，原版那顆是 44 項）</span></th><th>檔案大小（單例）</th><th>風險</th></tr></thead>
+    <tbody>
+      <tr><td data-label="做法">完整壓縮器（貪婪匹配）</td><td data-label="47 個檔耗時" class="num">&gt; 120 秒</td><td data-label="檔案大小（單例）">11.6 KB</td><td data-label="風險">壓縮器寫錯就毀檔</td></tr>
+      <tr class="hi"><td data-label="做法"><strong>純資料編碼</strong></td><td data-label="47 個檔耗時" class="num">0.11 秒</td><td data-label="檔案大小（單例）">85 KB</td><td data-label="風險">幾乎沒有，邏輯只有十行</td></tr>
+    </tbody>
+  </table></div>
+  <p>換來的檔案大一些，但對本站測試機那顆 2.5 MB 的封裝檔來說只多 3%，而且<strong>速度差了一千倍</strong>。
+     本站所有教學腳本都用這個做法。</p>
+  <p class="small">驗證方式：272 種不同長度的資料各壓一次，逐一檢查每個控制位元組是否落在規格允許的值域，
+     再用另一套獨立寫的解壓器解回來比對 —— 全部通過。</p>
+
+  <div class="card clay">
+    <p class="card-h">寫回封裝檔時仍要遵守 append 鐵律</p>
+    <p>壓好之後別忘了：<strong>接到 .big 檔尾、只改目錄與檔頭</strong>，
+       不要整包重新打包。原因見 <a href="bigf.html#append">BIGF 格式頁</a>。</p>
+  </div>
+
+  <h2>實測案例</h2>
+  <p class="small">⚠️ 下面第一列的 <code>fes_ingameinfobar.fel</code>，以及上面「怎麼辨識」那段
+     <code>10 FB 01 48 D7 E5</code>（就是它的前六個位元組），都取自<u>本站測試機</u>的
+     <code>ingame.big</code>。<strong>剛安裝好的原版沒有這個項目</strong> ——
+     它是社群模組在 44 項之外多加的三個之一（另外兩個是 <code>fes_ingameboxscore2.fel</code>
+     與 <code>fes_ingamepauseinfo1.fel</code>）。<code>a140_1.dat</code> 那一列同理：
+     本站測試機是 13,138 解成 57,304，原版是 11,582 解成 54,581。
+     <code>mini1_en.ffn</code> 與 <code>mlbspr_1.dat</code> 兩列則是兩份安裝上逐位元組相同的。</p>
+  <div class="tablewrap"><table class="stack">
+    <thead><tr><th>檔案</th><th class="num">壓縮後</th><th class="num">解壓後</th><th class="num">比例</th></tr></thead>
+    <tbody>
+      <tr><td data-label="檔案" class="mono">fes_ingameinfobar.fel</td><td data-label="壓縮後" class="num">11,617</td><td data-label="解壓後" class="num">84,183</td><td data-label="比例" class="num">7.2×</td></tr>
+      <tr><td data-label="檔案" class="mono">mini1_en.ffn（字型）</td><td data-label="壓縮後" class="num">12,329</td><td data-label="解壓後" class="num">133,216</td><td data-label="比例" class="num">10.8×</td></tr>
+      <tr><td data-label="檔案" class="mono">a140_1.dat（賽程）</td><td data-label="壓縮後" class="num">13,138</td><td data-label="解壓後" class="num">57,304</td><td data-label="比例" class="num">4.4×</td></tr>
+      <tr><td data-label="檔案" class="mono">mlbspr_1.dat（春訓）</td><td data-label="壓縮後" class="num">2,272</td><td data-label="解壓後" class="num">8,749</td><td data-label="比例" class="num">3.9×</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="recap">📌 重點整理</h2>
+  <ul class="recap">
+    <li><strong>一句話</strong> 從 <code>.big</code> 取出來的東西很多還包著一層 EA 自家的 RefPack（也叫 QFS），解開它不難，而且<u>要壓回去時有個技巧，可以完全不用寫壓縮器</u>。</li>
+    <li><strong>怎麼辨識，以及不能做的假設</strong> 看<strong>第二個位元組是不是 <code>0xFB</code></strong>，是就是 RefPack。<u>同一個封裝檔裡壓縮和未壓縮可以混在一起</u>，這是 EA 出廠就有的：剛安裝好的原版 207 個封裝檔裡有 <strong>106 個是混合的</strong>，例如 <code>ingame.big</code> 的 44 項中 43 項壓縮、1 項是純文字。所以工具要逐項判斷，不能假設「這個 <code>.big</code> 裡全都壓縮」。</li>
+    <li><strong>本站改過這一段</strong> 這裡原本舉的例子是「<code>schedule.big</code> 的 9 個賽程表中 6 個壓縮、3 個是純文字」，那是<u>本站測試機</u>的狀況。拿剛安裝好的原版一驗，<strong>那 9 個項目全部都是壓縮的，一個純文字都沒有</strong>，而那 3 個純文字項目正好是換賽程年份那一課會動到的檔。<strong>規則本身沒錯，錯的是拿一個被改過的檔當例子</strong>，順帶學到：原本壓縮的項目被工具改寫之後，可能變成未壓縮存回去。</li>
+    <li><strong>格式本身</strong> 檔頭看第一個位元組的旗標，<code>&amp; 0x01</code> 是 0 就 5 bytes、是 1 就 10 bytes（<u>10 bytes 那一種本站沒有樣本可以驗</u>：兩份安裝合計 51,436 個壓縮項目，第一個位元組全部是 <code>0x10</code>），遊戲裡絕大多數是前者，所以最常看到的開頭就是 <code>10 FB</code> 加 3 個位元組的大小。解壓的部分是<strong>四種指令加一個結束標記</strong>，用第一個位元組的值域區分：<code>&lt; 0x80</code> 短距離、<code>0x80</code> 到 <code>0xBF</code> 中距離、<code>0xC0</code> 到 <code>0xDF</code> 長距離、<code>0xE0</code> 到 <code>0xFB</code> 純資料、<code>≥ 0xFC</code> 結束。因為複製指令是往<u>已經解出來的資料</u>倒退取用，所以解壓一定要從頭循序做，不能跳著解。</li>
+    <li><strong>不用寫壓縮器的技巧</strong> 純資料指令（<code>0xE0</code> 系列）可以表達任意內容，整份資料<strong>全部用純資料指令輸出，格式一樣合法</strong>。代價與效益差距很大：完整壓縮器 47 個檔（本站測試機的 <code>ingame.big</code>，原版那顆是 44 項）要 <strong>120 秒以上</strong>、單例 11.6 KB，純資料編碼只要 <strong>0.11 秒</strong>、單例 85 KB。檔案是大了一些，但對本站測試機那顆 2.5 MB 的封裝檔來說只多 3%，<u>速度差了一千倍</u>，而且邏輯只有十行、幾乎不會寫錯。本站所有教學腳本都用這個做法。</li>
+    <li><strong>壓好之後還有一條鐵律</strong> <strong>接到 <code>.big</code> 檔尾、只改目錄與檔頭，不要整包重新打包。</strong>實測的壓縮比可以拿來對照自己的結果：<code>fes_ingameinfobar.fel</code> 11,617 變 84,183（7.2 倍）、字型 <code>mini1_en.ffn</code> 12,329 變 133,216（10.8 倍）、賽程 <code>a140_1.dat</code> 13,138 變 57,304（4.4 倍）、春訓 <code>mlbspr_1.dat</code> 2,272 變 8,749（3.9 倍）。<u>第一列與賽程那一列只在本站測試機成立</u>：剛安裝好的原版沒有 <code>fes_ingameinfobar.fel</code>，<code>a140_1.dat</code> 是 11,582 變 54,581；字型與春訓兩列則是兩份安裝相同。</li>
+    <li><strong>本站沒驗的</strong> 這一頁列出的驗證<u>全部停在檔案層面</u>：272 種不同長度的資料各壓一次，逐一檢查每個控制位元組是否落在規格允許的值域，再用另一套獨立寫的解壓器解回來比對，全部通過。頁面上<strong>沒有列出任何「在遊戲裡跑起來」的測試</strong>。另外，檔頭那一行「旗標 &amp; 0x01 == 1 → 10 bytes」本站在兩份安裝上都取不到樣本，不是量到的。那次訂正也是一個提醒：本站測試機上的檔案跟剛安裝好的原版不一樣，看到跟本頁對不起來的數字，先確認你手上那份被工具改寫過沒有。</li>
+  </ul>
+
+  <h2>接下來</h2>
+  <ul class="plain">
+    <li><a href="bigf.html">BIGF 封裝格式</a> —— 壓縮檔外面那一層</li>
+    <li><a href="fel.html">FEL 版面檔</a> —— 解壓後最常見的內容之一</li>
+    <li><a href="../tutorials/change-schedule-year/index.html">實戰：換賽程年份</a> —— 解壓、改、壓回、寫入的完整範例</li>
+  </ul>
+
+  <footer>
+    <p>本頁所有數據皆取自實際解開的檔案內容，非推測。唯一的例外是檔頭那一行「10 bytes」的寫法，本站沒有樣本可以驗，已在該處註明。</p>
+    <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="../legal.html">法律與版權說明</a> ·
+       <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
+  </footer>
+</div>
+<script src="../assets/site.js?v=4f2ad90011" defer></script>
+</body>
+</html>

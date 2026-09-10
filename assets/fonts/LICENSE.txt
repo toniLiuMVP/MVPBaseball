@@ -1,0 +1,25 @@
+本資料夾裡的字型檔不是本站的作品。
+
+Barlow Condensed
+    Copyright (c) The Barlow Project Authors
+    SIL Open Font License, Version 1.1
+    https://github.com/jpt/barlow
+
+IBM Plex Sans / IBM Plex Mono
+    Copyright (c) 2017 IBM Corp.
+    SIL Open Font License, Version 1.1
+    https://github.com/IBM/plex
+
+SIL Open Font License 1.1 全文:
+    見同一個資料夾裡的 OFL.txt(英文原文,以該版本為準)
+    線上版與常見問答:https://openfontlicense.org/
+
+OFL 1.1 第 2 條要求「每一份拷貝都要含著作權聲明**與授權條款本身**」,
+只附一個網址不算數,所以 OFL.txt 直接放在這個資料夾裡一起散布。
+
+這兩套授權都明文允許重新散布與自行托管,條件是保留著作權聲明
+與授權全文,且不可單獨販售字型本身。本站符合這些條件:
+字型隨網站一起提供、免費、不單獨販售,並附上本檔案與 OFL.txt。
+
+本資料夾裡的檔案只有 latin 子集(拉丁字母、數字、常用標點)。
+中文由讀者作業系統的內建字型顯示,本站不散布任何中文字型。
