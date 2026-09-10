@@ -276,7 +276,7 @@ validate_exe_name() {
     EXE_REJECT_REASON=""
     case "$n" in
         "") EXE_REJECT_REASON="檔名是空的" ; return 1 ;;
-        .|..) EXE_REJECT_REASON="「$n」不是檔名" ; return 1 ;;
+        .|..) EXE_REJECT_REASON="「${n}」不是檔名" ; return 1 ;;
         */*) EXE_REJECT_REASON="只能給檔名,不可以帶 /" ; return 1 ;;
         *\\*) EXE_REJECT_REASON="只能給檔名,不可以帶 \\" ; return 1 ;;
         *:*) EXE_REJECT_REASON="不可以帶磁碟機代號(:)" ; return 1 ;;
@@ -509,16 +509,16 @@ run_selftest() {
     # ── 執行檔檔名
     for n in "../mvp2005.exe" "..\\mvp2005.exe" "/etc/passwd" ".." "-rf" "C:mvp2005.exe" ""; do
         if validate_exe_name "$n"; then
-            st_bad "檔名守門:「$n」被放行了"
+            st_bad "檔名守門:「${n}」被放行了"
         else
-            st_ok "檔名守門:「$n」被擋($EXE_REJECT_REASON)"
+            st_ok "檔名守門:「${n}」被擋($EXE_REJECT_REASON)"
         fi
     done
     for n in "mvp2005.exe" "mvp2005 - 4GB.exe"; do
         if validate_exe_name "$n"; then
-            st_ok "檔名守門:「$n」通過(正常檔名不能被誤擋)"
+            st_ok "檔名守門:「${n}」通過(正常檔名不能被誤擋)"
         else
-            st_bad "檔名守門:正常檔名「$n」被誤擋"
+            st_bad "檔名守門:正常檔名「${n}」被誤擋"
         fi
     done
 
@@ -706,7 +706,7 @@ run_selftest() {
     if [ "$n" = "1" ] && [ "$rc" = "1" ]; then
         st_ok "餌 8:不可中斷區裡的 Ctrl+C 被押後(記下來了,沒有當場斷)"
     else
-        st_bad "餌 8:押後沒生效(到達=$n、記下=$rc)"
+        st_bad "餌 8:押後沒生效(到達=${n}、記下=$rc)"
     fi
 
     # ── 餌 8b:離開不可中斷區之後,on_interrupt 要照常中斷 —— 離開碼 130 + 印報告
