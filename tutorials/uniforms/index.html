@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/uniforms/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="球衣模組：安裝與製作入門 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="球衣佔 models.big 的 82.6%，是這個檔裡最大的一塊。這頁量出球衣檔怎麼命名、放在哪個封裝檔、一支球隊最少需要幾個檔，以及 1X 與 2X 實際差在哪。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/uniforms/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>球衣模組：安裝與製作入門 — toni的MVP模組補習班</title>
+<title>球衣模組：安裝與製作入門 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="球衣佔 models.big 的 82.6%，是這個檔裡最大的一塊。這頁量出球衣檔怎麼命名、放在哪個封裝檔、一支球隊最少需要幾個檔，以及 1X 與 2X 實際差在哪。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -69,28 +79,15 @@
   </div>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix" id="quick">
-    <p class="card-h">⚡ 只想趕快做完？照這四步</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這四步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
       <li>要<strong>真的把球衣寫進封裝檔</strong>的話，這一課只講規則、不帶你動手，直接去<a href="../install-uniform/index.html">把一套球衣裝進遊戲</a>那一課，那裡有腳本會自動分類、先清點再安裝、寫完逐位元組複驗，一行還原。</li>
       <li>只想知道自己這台有哪些球衣檔，把本頁「自己在自己的遊戲上看一遍」那段程式存成 <code>list_uniform.py</code>。它全程唯讀，不會碰到你的遊戲檔，需要 Python 3。</li>
@@ -98,7 +95,7 @@
   <pre><code>python list_uniform.py "你的遊戲資料夾" 5</code></pre></li>
       <li>照印出來的清單數：一支球隊是五種檔散在三個封裝檔裡，<code>u###x.fsh</code>、<code>f###x.fsh</code>、<code>###.fsh</code>、<code>###x.fsh</code>、<code>l###.fsh</code>，改一隊時這幾種要一起換，別漏掉。</li>
     </ol>
-    <p class="tail">印出 0 個怎麼辦、字母為什麼會跳號、1X 跟 2X 差在哪，往下讀；只想複習跳到<a href="#recap">📌 重點整理</a>。</p>
+    <p class="tail">Mac / Linux 把開頭的 <code>python</code> 換成 <code>python3</code>，其餘一樣。印出 0 個怎麼辦、字母為什麼會跳號、1X 跟 2X 差在哪，往下讀；只想複習跳到<a href="#recap">📌 重點整理</a>。</p>
   </div>
 
   <h2>先看一件事：球衣是 models.big 裡最大的一塊</h2>
@@ -221,8 +218,8 @@
     <p>還有一件<u>只有拿原版對照才看得出來</u>的事 —— <strong>槽位用的字母不一樣</strong>：</p>
     <div class="tablewrap"><table>
       <tbody>
-        <tr><td>剛安裝好的原版</td><td><code>a b c d g h i j k l m n o p</code></td><td>14 個字母，<strong>沒有 e、f</strong></td></tr>
-        <tr class="hi"><td>這台機器</td><td><code>a b c d e f g h i j l m n o</code></td><td>14 個字母，<strong>沒有 k、p</strong></td></tr>
+        <tr><th scope="row">剛安裝好的原版</th><td><code>a b c d g h i j k l m n o p</code></td><td>14 個字母，<strong>沒有 e、f</strong></td></tr>
+        <tr class="hi"><th scope="row">這台機器</th><td><code>a b c d e f g h i j l m n o</code></td><td>14 個字母，<strong>沒有 k、p</strong></td></tr>
       </tbody>
     </table></div>
     <p>兩邊都是 14 個字母，但<u>不是同一組</u>。
@@ -376,6 +373,7 @@ for rel in ('models.big', 'frontend/uniforms.big', 'frontend/logos.big'):
       <div class="step-t">跑它，第一個參數是遊戲資料夾，第二個是球隊編號</div>
       <p class="step-why">球隊編號就是上一節那個「美術編號減一」。不確定的話從 0 開始試。</p>
 <pre><code>python list_uniform.py "<span class="hl">你的遊戲資料夾</span>" 5</code></pre>
+      <p class="small">Mac / Linux 把開頭的 <code>python</code> 換成 <code>python3</code>，其餘一樣。</p>
       <div class="seen"><b>本站測試機跑出來長這樣</b>
 <pre style="margin:8px 0 0"><code>== models.big  14 個
    f005a.fsh          7653 bytes
@@ -708,10 +706,10 @@ Readme.txt</code></pre>
     <p>本站手上有一個副檔名是 <code>.TiT</code> 的 2010 年球衣包。看它的開頭幾個位元組：</p>
     <div class="tablewrap"><table>
       <tbody>
-        <tr><td>檔頭</td><td class="mono">37 7A BC AF 27 1C</td><td><strong>那是 7-Zip 的識別碼</strong></td></tr>
-        <tr class="hi"><td>壓縮方式</td><td class="mono">LZMA + 7zAES</td><td><strong>內容是加密的</strong></td></tr>
-        <tr><td>檔名清單</td><td colspan="2">不用密碼就列得出來 —— 376 個檔、4 個資料夾</td></tr>
-        <tr class="hi"><td>檔案內容</td><td colspan="2"><strong>沒有密碼解不出來</strong>（376 個全部失敗）</td></tr>
+        <tr><th scope="row">檔頭</th><td class="mono">37 7A BC AF 27 1C</td><td><strong>那是 7-Zip 的識別碼</strong></td></tr>
+        <tr class="hi"><th scope="row">壓縮方式</th><td class="mono">LZMA + 7zAES</td><td><strong>內容是加密的</strong></td></tr>
+        <tr><th scope="row">檔名清單</th><td colspan="2">不用密碼就列得出來 —— 376 個檔、4 個資料夾</td></tr>
+        <tr class="hi"><th scope="row">檔案內容</th><td colspan="2"><strong>沒有密碼解不出來</strong>（376 個全部失敗）</td></tr>
       </tbody>
     </table></div>
     <p><strong>所以 <code>.TiT</code> 就是換了副檔名的 7-Zip 檔，而且內容上了鎖。</strong>
@@ -777,8 +775,21 @@ Readme.txt</code></pre>
     <li><strong>本站沒驗的</strong> 本站沒有真的換一套球衣進遊戲跑給你看，這頁量的是檔案結構與規格，任何關於遊戲畫面會怎樣的說法都不寫；哪個字母對應哪一套球衣沒解出來；28 個代號對應身上哪個部位沒把貼圖畫出來對過；怎麼把改好的圖壓縮回 FSH 沒有做；遊戲程式怎麼決定要載哪一個檔沒有讀執行碼。</li>
   </ul>
 
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p><a href="../../plan.html#f"><strong>⑥ 拆解班</strong></a> 第 5／5 堂（這一班的最後一堂）</p>
+    <p class="small">課表上寫：「讀完接得上速查區」</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../read-voice/index.html">← 上一堂：拆開一個語音檔</a>
+      <a class="btn" href="../../reference/index.html">接著看：速查區 →</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
+
   <h2>接下來</h2>
   <ul class="plain">
+    <li><a href="../../7min/uniform.html">七分鐘版</a>：只想把一套現成的球衣包裝進去，看這個</li>
     <li><a href="../../reference/bigf.html">BIGF 封裝格式</a>：動任何 <code>.big</code> 之前必看的那條鐵律</li>
     <li><a href="../../reference/models.html">模型與臉皮 models.big</a>：球衣就住在這個檔裡，另外 14.9% 是臉</li>
     <li><a href="../../reference/team-limit.html">為什麼你加不了新球隊</a>：球隊編號 126 這道牆在哪一層</li>
@@ -798,6 +809,6 @@ Readme.txt</code></pre>
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

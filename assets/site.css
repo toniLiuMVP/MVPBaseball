@@ -6,23 +6,23 @@
    而站上一個字都沒提。本站的讀者是「不會電腦的人」,
    那種事不該在他們不知道的情況下發生。
 
-   現在九個拉丁字型檔(latin 子集)放在 assets/fonts/,合計 191 KB。
+   現在六個拉丁字型檔(latin 子集)放在 assets/fonts/,合計約 98 KB(100,204 bytes)。
+   (2026-09-06 IBM Plex Sans 三個相同的檔併成一個;2026-09-23 拿掉從來沒有任何規則
+    用到的 Barlow Condensed 500。)
+   數目或大小再變,法律頁 legal.html「字型 2026-08-26 改成自己托管」那張卡片要一起改。
    中文**刻意不自己托管** —— 中文字型檔動輒好幾 MB,
-   而 PingFang TC(Mac)與微軟正黑體(Windows)是系統本來就有的,
-   下面每一條 font-family 都把它們列在後面當備援。
+   而 PingFang TC(Mac)與微軟正黑體(Windows)是系統本來就有的。
+   內文與等寬字型(--mono,表頭、徽章、程式碼都用它)把三個中文字型明列在後面當備援;
+   標題用的 Barlow 那幾條只列到 Noto Sans TC(h1–h3 另外列 PingFang TC),其餘交給 sans-serif。
+   ⚠️ 等寬字型那條以前沒有列中文字型,只寫 monospace。Chromium 原始碼裡
+      Windows 繁中「固定寬度字型」的預設值是 MingLiU(細明體),所以表頭與徽章裡的中文
+      會跟內文不是同一套字(還沒在 Windows 實機截圖確認)。
 
    授權:Barlow Condensed 與 IBM Plex 皆為 SIL Open Font License 1.1,
    明文允許重新散布與自行托管。授權英文全文見 assets/fonts/OFL.txt,
    中文說明與著作權人見 assets/fonts/LICENSE.txt。
    ───────────────────────────────────────────────────────── */
 
-@font-face{
-  font-family:'Barlow Condensed';
-  font-style:normal;
-  font-weight:500;
-  font-display:swap;
-  src:url('fonts/barlow-condensed-500.woff2') format('woff2');
-}
 @font-face{
   font-family:'Barlow Condensed';
   font-style:normal;
@@ -90,6 +90,16 @@
   --btn-bg:#8A5608; --btn-bg-hover:#B5720F; --btn-fg:#FFFFFF;
   --shadow:0 1px 2px rgba(15,30,25,.06),0 6px 20px rgba(15,30,25,.06);
   --nav-fade:rgba(22,36,30,.14);
+  /* 螢光筆(<u> 與重點整理):半透明,疊在哪一種底色的卡片上都分得出來
+     (不透明的 --amber-wash 疊在同色的琥珀卡上會完全看不見) */
+  --hl:rgba(224,163,70,.38);
+  /* 輸入框的框線:--line 是裝飾用的分隔線,對輸入框底色只有 1.5:1;
+     這個對 --card 3.58:1、對 --tint 3.25:1(UI 元件的邊界要 3:1) */
+  --control-border:#7A8880;
+  /* 等寬字型:拉丁字走 IBM Plex Mono,中文照內文的順序落到同一套中文字型 */
+  --mono:"IBM Plex Mono",Menlo,Consolas,"Noto Sans TC","PingFang TC","Microsoft JhengHei",monospace;
+  /* 讓瀏覽器自己畫的東西(捲軸、勾選框)在深色模式跟著變深 */
+  color-scheme:light dark;
 }
 @media (prefers-color-scheme:dark){
   :root{
@@ -104,6 +114,8 @@
     --btn-bg:#E0A346; --btn-bg-hover:#EDB963; --btn-fg:#1A1408;
     --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.28);
     --nav-fade:rgba(0,0,0,.42);
+    --hl:rgba(224,163,70,.30);
+    --control-border:#667A70;          /* 對 --card 3.51:1、對 --tint 3.24:1 */
   }
 }
 
@@ -112,9 +124,13 @@ html{-webkit-text-size-adjust:100%}
 body{
   margin:0; background:var(--paper); color:var(--text);
   font-family:"IBM Plex Sans","Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
-  font-size:17px; line-height:1.75; -webkit-font-smoothing:antialiased;
+  font-size:1.0625rem; line-height:1.75; -webkit-font-smoothing:antialiased;
 }
-@media (max-width:600px){ body{font-size:16px} }
+@media (max-width:600px){ body{font-size:1rem} }
+/* 2026-09-23:正文字級改用 rem。預設設定下 1.0625rem = 17px、1rem = 16px,畫面一個像素都不變;
+   差別在讀者把瀏覽器的「字型大小」調大時(例如 Chrome 的 設定 → 外觀 → 字型大小),
+   以前寫死 px 的正文不會跟著變大,用 rem 的表格、小字、導言卻會 —— 層次整個倒過來。
+   不要改回 px。 */
 .wrap{max-width:880px;margin:0 auto;padding:0 20px 72px}
 
 /* ── 導覽列 ─────────────────────────── */
@@ -147,17 +163,26 @@ h3{font-size:1.18rem;font-weight:600;margin:28px 0 8px}
 p{margin:0 0 12px;max-width:70ch}
 strong{color:var(--text)}
 a{color:var(--amber-dk);text-decoration-thickness:1px;text-underline-offset:3px;overflow-wrap:anywhere}
+/* 連結裡的粗體跟著連結的顏色走 —— 上面那條 strong{color} 會把它染回內文色,
+   「暖身課」這種行內連結看起來就只是一段粗體。有 class 的區塊連結(首頁公告、
+   教練卡、表格整列)自己管顏色,不套這條。 */
+a:not([class]) strong,a:not([class]) b{color:inherit}
 p,li,td,dd{overflow-wrap:break-word}
-a:hover{color:var(--amber)}
+/* 滑過連結時字色不變,改成底線加粗。以前換成較淺的 --amber,
+   在淺色底上只剩 3.2 到 3.8:1,低於一般文字要的 4.5:1。 */
+a:hover{text-decoration-thickness:2px}
 :focus-visible{outline:2.5px solid var(--amber);outline-offset:2px}
 
 /* ── 眉批 / 徽章 ────────────────────── */
 .eyebrow{
-  font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.16em;
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;
   text-transform:uppercase;color:var(--amber-dk);margin:0 0 4px;
 }
+/* 2026-09-23:徽章 .68rem(10.88px)→ .8rem(12.8px)。「會改你的檔案/只看不動」是安全提示,
+   課程地圖還叫讀者「先看一眼」,它卻是全站最小的字。
+   line-height 收到 1.5,徽章的高度跟以前差不多,放進段落裡不會把那一行撐高。 */
 .badge{
-  display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:.68rem;
+  display:inline-block;font-family:var(--mono);font-size:.8rem;line-height:1.5;
   padding:2px 8px;border-radius:3px;white-space:nowrap;vertical-align:middle;
   letter-spacing:.04em;
 }
@@ -201,7 +226,7 @@ button.term::after{
   box-shadow:0 6px 24px rgba(0,0,0,.28);padding:12px 14px;
 }
 .termpop .tp-h{margin:0 0 6px;font-weight:700;color:var(--grass);font-size:1rem}
-.termpop .tp-en{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+.termpop .tp-en{font-family:var(--mono);
   font-size:.9rem;color:var(--text-2)}
 .termpop p{margin:6px 0 0;font-size:.93rem;line-height:1.7}
 .termpop .tp-sci{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
@@ -219,7 +244,7 @@ button.term::after{
 .gl-term{border-top:1px solid var(--line);padding:14px 0}
 .gl-term:first-of-type{border-top:0}
 .gl-term h3{margin:0 0 4px;font-size:1.02rem}
-.gl-term h3 .en{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+.gl-term h3 .en{font-family:var(--mono);
   font-size:.86rem;color:var(--text-2);font-weight:400;margin-left:6px}
 .gl-term .sci{margin-top:6px;color:var(--text-2);font-size:.93rem}
 .card-h{
@@ -250,28 +275,31 @@ button.term::after{
 
 /* ── 代碼 ───────────────────────────── */
 code{
-  font-family:"IBM Plex Mono",Menlo,Consolas,monospace;font-size:.88em;
+  font-family:var(--mono);font-size:.88em;
   background:var(--tint-2);padding:.12em .4em;border-radius:4px;
 }
 pre{
   background:var(--pre-bg);color:var(--pre-fg);border:1px solid var(--pre-line);
   border-radius:6px;padding:14px 16px;overflow-x:auto;
-  font-family:"IBM Plex Mono",Menlo,Consolas,monospace;font-size:.86rem;line-height:1.65;
+  font-family:var(--mono);font-size:.86rem;line-height:1.65;
   margin:10px 0;
 }
 pre code{background:none;padding:0;font-size:1em;color:inherit}
+/* 程式碼框裡的粗體沿用框裡的淺色字。上面那條 strong{color:var(--text)} 會把它染成
+   內文的深色,淺色模式下深字壓在深底上只有 1.05:1 —— 等於一塊空白
+   (fix-chinese 的「64 MB」、play-on-mac 層次圖的三個名字都是這樣不見的)。 */
+pre strong{color:inherit}
 pre .cm{color:#7E9A8B;font-style:italic}
 pre .kw{color:#E0A346;font-weight:600}
 pre .nu{color:#8FCBA6}
 pre .hl{background:#5c4409;color:#FFE9BC;padding:0 2px;border-radius:2px;font-weight:600}
-.copyhint{font-size:.8rem;color:var(--text-3);margin:-6px 0 10px}
 
 /* ── 步驟元件(手把手核心)──────────── */
 .step{display:grid;grid-template-columns:34px 1fr;gap:12px;margin:0 0 22px}
 .step>*{min-width:0}
 .step-n{
   width:34px;height:34px;border-radius:50%;background:var(--btn-bg);color:var(--btn-fg);
-  font-family:"IBM Plex Mono",monospace;font-size:1rem;font-weight:600;
+  font-family:var(--mono);font-size:1rem;font-weight:600;
   display:flex;align-items:center;justify-content:center;margin-top:2px;
 }
 .step-t{
@@ -282,12 +310,12 @@ pre .hl{background:#5c4409;color:#FFE9BC;padding:0 2px;border-radius:2px;font-we
 .substep{margin:8px 0;padding-left:14px;border-left:2px solid var(--line)}
 .substep p{margin:0 0 6px;font-size:.97rem}
 .sk{
-  display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:.78rem;font-weight:600;
+  display:inline-block;font-family:var(--mono);font-size:.78rem;font-weight:600;
   color:var(--amber-dk);background:var(--amber-wash);border-radius:3px;
   padding:1px 6px;margin-right:5px;min-width:20px;text-align:center;
 }
 .key{
-  display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:.84rem;
+  display:inline-block;font-family:var(--mono);font-size:.84rem;
   border:1px solid var(--text-3);border-bottom-width:2.5px;border-radius:4px;
   padding:1px 7px;background:var(--card);white-space:nowrap;line-height:1.4;
 }
@@ -350,17 +378,21 @@ a.rowlink:hover,a.rowlink:focus-visible{text-decoration:underline}
      會把整張表撐開。只在手機上允許它從任何地方斷。 */
   .tablewrap td code,.tablewrap th code{overflow-wrap:anywhere;word-break:break-word}
 }
+/* 2026-09-23:表頭 .7rem(11.2px)→ .8rem(12.8px),字距 .1em → .03em
+   (跟下面眉批 2026-08-30 收字距是同一個理由:字距對中文是把詞拆散)。
+   表頭裡的 <code> 不要再縮一次,不然又掉回 12px 以下。 */
 th{
-  font-family:"IBM Plex Mono",monospace;font-size:.7rem;letter-spacing:.1em;
+  font-family:var(--mono);font-size:.8rem;letter-spacing:.03em;
   text-transform:uppercase;color:var(--text-3);text-align:left;font-weight:500;
   padding:9px 12px;background:var(--tint-2);border-bottom:1px solid var(--line);white-space:nowrap;
 }
+th code{font-size:1em}
 td{padding:8px 12px;border-bottom:1px solid var(--line-soft);vertical-align:top}
 tr:last-child td{border-bottom:none}
 tr.hi td{background:var(--amber-wash)}
 /* 「這一列不算在標題那個數字裡」的列 —— 例如原版沒有、只是常見的殘留檔 */
 tr.lo td{opacity:.62;font-style:italic}
-td.mono,th.mono{font-family:"IBM Plex Mono",monospace;font-size:.84rem;white-space:nowrap}
+td.mono,th.mono{font-family:var(--mono);font-size:.84rem;white-space:nowrap}
 td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 
 /* ── 清單 ───────────────────────────── */
@@ -381,8 +413,16 @@ ol.plain li,ul.plain li{margin-bottom:7px}
 }
 .lesson:last-child{border-bottom:none}
 .lesson .t{font-weight:600;flex:1 1 260px}
-.lesson .t a{text-decoration:none;color:var(--text)}
-.lesson .t a:hover{color:var(--amber-dk)}
+/* 2026-09-23:課名連結跟全站連結一樣是琥珀色加底線。以前是黑字、不畫底線,
+   看起來像標題;同一列說明裡的 <u> 反而畫著底線,像連結的是不能點的那個。
+   課名沒有連結的列(例如「什麼改得動、什麼還不行」那一頁的 13 列)維持黑字,一眼分得出哪列能點。
+   只有一個連結的課名撐成整格寬、上方多 12px 可點,負 margin 抵銷,版面不動。
+   下方:課名跟說明左右並排時(桌機)也多 12px;手機上說明換到下一排,
+   說明那一格排在後面、畫在連結多出來的那一截上面,下方實際只多兩排之間的 8px 列距
+   (依繪製順序推論,還沒在瀏覽器量過)。
+   首頁那列「課程地圖 · 格式速查」有兩個連結,:only-child 不會選到它,兩個各點各的。
+   不做整列覆蓋:說明裡的連結與名詞按鈕會被蓋住點不到。 */
+.lesson .t a:only-child{display:block;padding:12px 0;margin:-12px 0}
 .lesson .d{flex:2 1 300px;font-size:.9rem;color:var(--text-3)}
 
 /* ── 頁尾 ───────────────────────────── */
@@ -434,7 +474,9 @@ svg.facegrid .me{stroke:#0E1712;stroke-width:1}
 svg.facegrid .me.on{fill:#E0A346}
 svg.facegrid .me.off{fill:#D08A6E}
 svg.facegrid .zero{fill:none;stroke:#DCE6DE;stroke-width:1.5}
-svg.facegrid .rl{fill:#7E9488;font:500 9px/1 "IBM Plex Mono",monospace;text-anchor:end}
+/* 列標(c001、c037…)是讀者在 900 格裡找位置用的座標。2026-09-23 從 9 提到 12:
+   圖在手機上照 min-width 縮小,9 只剩約 7.6px。四個字寬約 29,錨在 x=40,不會被切到。 */
+svg.facegrid .rl{fill:#7E9488;font:500 12px/1 var(--mono);text-anchor:end}
 svg.facegrid rect.me:hover{fill:#F0BE6F}
 .fglegend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:10px 0 0;
   font-size:.84rem;color:var(--text-3);list-style:none;padding:0}
@@ -445,13 +487,21 @@ svg.facegrid rect.me:hover{fill:#F0BE6F}
 .fglegend .k-on{background:#E0A346}
 .fglegend .k-off{background:#D08A6E}
 .fglegend .k-zero{background:transparent;box-shadow:inset 0 0 0 1.5px #8FA79A}
+/* 深色模式的卡片底跟「未使用」色塊幾乎同色(1.12:1),圖例改放在跟圖一樣的深底上。
+   只在深色模式做:淺色模式圖例字是 --text-3,放到深底上只剩 3.0:1。 */
+@media (prefers-color-scheme:dark){
+  .fglegend{background:var(--pre-bg);padding:6px 10px;border-radius:4px}
+}
 
 svg.barchart{display:block;width:100%;height:auto;max-width:660px;min-width:460px;margin:0 auto;
   background:var(--pre-bg);border-radius:4px}
+/* 比較寬的長條圖(工具年代那張 viewBox 寬 760)用 460 會縮得比別張小,字剩 8px 左右;
+   540 讓它跟其他長條圖縮成差不多的比例。要套的圖在 HTML 加 class="barchart wide"。 */
+svg.barchart.wide{min-width:540px}
 svg.barchart .bar{fill:#E0A346}
 svg.barchart .bar:hover{fill:#F0BE6F}
 svg.barchart .ax{stroke:#5C7268;stroke-width:1.5}
-svg.barchart .bl{fill:#DCE6DE;font:600 14px/1 "IBM Plex Mono",monospace;text-anchor:end}
+svg.barchart .bl{fill:#DCE6DE;font:600 14px/1 var(--mono);text-anchor:end}
 svg.barchart .bv{fill:#DCE6DE;font:500 14px/1 "IBM Plex Sans",system-ui,sans-serif}
 svg.barchart .bn{fill:#9FB3A8;font:500 13px/1 "IBM Plex Sans",system-ui,sans-serif}
 svg.blockmap{display:block;width:100%;height:auto;max-width:680px;min-width:520px;margin:0 auto;
@@ -467,8 +517,8 @@ svg.blockmap .lb{fill:#DCE6DE;font:600 14px/1 "IBM Plex Sans",system-ui,sans-ser
 svg.blockmap .bt{fill:#12201A;font:600 12px/1 "IBM Plex Sans",system-ui,sans-serif;text-anchor:middle}
 svg.blockmap .sm{fill:#9FB3A8;font:400 12.5px/1 "IBM Plex Sans",system-ui,sans-serif}
 svg.blockmap .em{fill:#E0A346;font-weight:600}
-svg.blockmap .hx{fill:#E0A346;font-family:"IBM Plex Mono",monospace}
-kbd{font:600 .86em/1 "IBM Plex Mono",ui-monospace,monospace;background:var(--tint-2);
+svg.blockmap .hx{fill:#E0A346;font-family:var(--mono)}
+kbd{font:600 .86em/1 var(--mono);background:var(--tint-2);
   border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;
   padding:2px 6px;color:var(--text);white-space:nowrap}
 
@@ -485,7 +535,9 @@ kbd{font:600 .86em/1 "IBM Plex Mono",ui-monospace,monospace;background:var(--tin
 /* ⚠️ 只讓指令區塊獨立成行。原本這條把 li 底下的行內 <code> 也設成 block,
    句子被切成一行一個詞 —— HTML 檢查看不出來,只有看畫面才會發現。 */
 .quickfix pre{display:block;margin:.35em 0}
-.quickfix .tail{margin:12px 0 0;font-size:.82rem;color:var(--text-3)}
+/* 尾註寫的是「不加 --apply 就只預覽」這種保命句,2026-09-23 從 .82rem 提到 .9rem
+   (裡面的 <code> 再乘 .88,以前只剩 11.5px) */
+.quickfix .tail{margin:12px 0 0;font-size:.9rem;color:var(--text-3)}
 
 .recap{border-left:5px solid var(--btn-bg);padding:4px 0 4px 16px;margin:14px 0 4px}
 .recap > li{margin:.5em 0;line-height:1.6;list-style:none}
@@ -528,7 +580,7 @@ kbd{font:600 .86em/1 "IBM Plex Mono",ui-monospace,monospace;background:var(--tin
 .tblfind label,.errfind label{display:block;font-size:.9rem;
   font-weight:600;margin-bottom:6px}
 .tblfind input,.errfind input{width:100%;box-sizing:border-box;font:inherit;
-  padding:8px 10px;border:1px solid var(--line);border-radius:5px;
+  padding:8px 10px;border:1px solid var(--control-border);border-radius:5px;
   background:var(--card);color:var(--text)}
 .tblfind input:focus,.errfind input:focus{outline:2px solid var(--amber);outline-offset:2px}
 .tblmsg,.errmsg{margin:8px 0 0;min-height:1.2em}
@@ -543,7 +595,13 @@ tr.errhit td{font-weight:600}
   z-index:999;padding:10px 14px;border-radius:6px;
   background:var(--btn-bg);color:var(--btn-fg);font-weight:600;
   box-shadow:var(--shadow)}
-.wrap:focus{outline:none}
+/* 按了「跳到主要內容」之後,焦點落在 #main(整個內文區,tabindex=-1)。
+   以前這裡無條件拿掉外框,用鍵盤跳過去之後畫面上看不出焦點在哪裡。
+   現在只在滑鼠點內文時不畫(點一下內文,#main 也會拿到焦點);
+   瀏覽器判定是鍵盤操作(:focus-visible)時,沿用全站的琥珀色焦點框,
+   往內縮 3px —— 手機上內文區跟畫面一樣寬,往外畫的話左右兩邊會在畫面外。 */
+.wrap:focus:not(:focus-visible){outline:none}
+.wrap:focus-visible{outline-offset:-3px}
 
 /* ═══════════════════════════════════════════════════════════
    2026-08-29 版面稽核修正 —— 五項都是量出來的,不是感覺
@@ -588,8 +646,7 @@ tr.errhit td{font-weight:600}
     padding: 0 8px;
   }
   .nav-in .brand { padding-left: 0; padding-right: 12px; }
-  /* 右邊淡出,讓人知道還有東西可以捲 */
-  .nav { position: relative; }
+  /* 右邊淡出,讓人知道還有東西可以捲(.nav 的 position:relative 在下面「1. 導覽列」那段,全寬度都有) */
   .nav::after {
     content: ""; position: absolute; right: 0; top: 0; bottom: 0; width: 28px;
     pointer-events: none;
@@ -639,6 +696,13 @@ h1, h2, h3 { overflow-wrap: break-word; }
 @media (max-width: 700px) and (min-width: 340px) {
   .grid .card:nth-child(3):last-child { grid-column: 1 / -1; }
 }
+/* 2026-09-23:首頁「本站三個承諾」(.grid.prose)是三段要讀的文字,不是並排比較的小卡。
+   手機上改單欄,標題比內文大,內文吃 body 的字級。桌機三欄不變。 */
+@media (max-width:700px){
+  .grid.prose{grid-template-columns:1fr}
+  .grid.prose .card .card-h{font-size:1.04rem;margin-bottom:6px}
+  .grid.prose .card p:last-child{font-size:inherit}
+}
 
 /* ═══════════════════════════════════════════════════════════════════
    2026-08-30 版型現代化 —— 依手機實機檢視後訂的三件事
@@ -673,6 +737,9 @@ h1, h2, h3 { overflow-wrap: break-word; }
     border-left:4px solid var(--line);border-radius:10px;
     box-shadow:var(--shadow);
   }
+  /* 2026-09-23:上面那條 display:block 是作者樣式,會蓋掉瀏覽器內建的 [hidden],
+     速查頁表格搜尋在手機上就收不起沒命中的列。 */
+  table.stack tbody > tr[hidden]{display:none}
   table.stack tbody > tr.hi{border-left-color:var(--amber);background:var(--amber-wash)}
   table.stack tbody > tr.lo{opacity:1;border-left-style:dashed}
   table.stack tbody > tr > td{
@@ -684,7 +751,7 @@ h1, h2, h3 { overflow-wrap: break-word; }
   table.stack tbody > tr > td::before{
     content:attr(data-label);display:block;
     font-family:"Barlow Condensed","Noto Sans TC",sans-serif;
-    font-size:.74rem;font-weight:600;letter-spacing:.06em;
+    font-size:.84rem;font-weight:600;letter-spacing:0;    /* 2026-09-23:.74rem(11.84px)→ .84rem;欄名常是「這個數字是什麼」唯一的線索 */
     color:var(--text-3);text-transform:none;
     margin:0 0 2px;
   }
@@ -697,6 +764,15 @@ h1, h2, h3 { overflow-wrap: break-word; }
   table.stack tbody > tr > td:first-child::before{display:none}
   table.stack tbody > tr > td.num{text-align:left;white-space:normal;overflow-wrap:anywhere}  /* 2026-09-06:nowrap 沒解除害 reference/fonts.html 整頁橫向捲 */
   table.stack tbody > tr > td.mono{white-space:normal;overflow-wrap:anywhere}
+  /* 棒球教練頁「遊戲裡的欄位」那兩張表:卡片標題是 playerattrib_stealing_aggressive
+     這種最長 32 字的代號,1.06rem 在 360-390px 的手機上會斷在字中間(一個 e 掉到下一行)。
+     縮到 .9rem,32 字約 276px,360px 以上的手機放得進卡片。選擇器綁在欄名上,只有這一頁有這個欄名。 */
+  table.stack tbody > tr > td.mono:first-child[data-label="遊戲裡的欄位"]{font-size:.9rem}
+  /* 例外:欄位少、字又短的查詢表,在手機上保留表格形式比拆成卡片好比對。
+     這種表不加 stack、改加 keepgrid;min-width:0 是關鍵 ——
+     沒有它,表格會退回上面 table{min-width:540px},變成要左右滑的舊樣子。
+     (類別名稱刻意避開 stack 這個字串,免得被用子字串比對的工具誤認成堆疊表) */
+  table.keepgrid{min-width:0}
 }
 
 /* ── ② 重點整理:從一坨課文變成看得下去的卡片 ──────────────────
@@ -725,12 +801,40 @@ h1, h2, h3 { overflow-wrap: break-word; }
   font-size:1.1rem;font-weight:700;letter-spacing:.01em;
   color:var(--text);
 }
-/* 螢光筆 —— <u> 與 <mark> 都算 */
+/* 螢光筆 —— <u> 與 <mark> 都算
+   ⚠️ 2026-09-23 訂正:以前螢光用 --amber-wash,而首條卡片的底色也是 --amber-wash ——
+      同色疊同色,首條(「一句話」那條)裡的 <u> 螢光完全看不見,底線又被拿掉了,
+      等於跟普通字一樣;末條的 --clay-wash 也只差一點點。改用半透明的 --hl。 */
 .recap u,.recap mark{
-  text-decoration:none;background:linear-gradient(transparent 58%,var(--amber-wash) 58%);
+  text-decoration:none;background:linear-gradient(transparent 58%,var(--hl) 58%);
   box-shadow:none;color:inherit;padding:0 1px;border-radius:2px;
 }
-.recap mark{background:linear-gradient(transparent 52%,var(--amber-wash) 52%)}
+.recap mark{background:linear-gradient(transparent 52%,var(--hl) 52%)}
+/* 全站的 <u> 也用同一支螢光筆(2026-09-23)。
+   以前重點整理以外的 <u>(3,161 個)是瀏覽器預設的實線底線,跟連結只差一個顏色 ——
+   現在底線只剩「可以點」一個意思。
+   · 字色用內文色:<u> 常出現在淡色字裡(.small、課程列表的說明),淡色字疊上螢光
+     會掉到 4.5:1 以下;內文色疊在螢光上,淺色至少 10.4:1、深色至少 6.3:1。
+   · 行內連結(沒有 class 的 <a>)裡的 <u> 不畫螢光:連結自己有底線,
+     琥珀色的連結字疊上螢光,淺色模式最低只剩 4.0:1。目前全站沒有這種寫法,這條是先留著的。
+   · 首頁公告(.hero-note)、棒球教練卡這種整塊可點的卡片有 class、而且拿掉了底線,
+     裡面的 <u>(首頁 3 個)照樣畫螢光。不要把下面那條改回 a u —— 那會把這 3 處的重點整個抹掉。
+   · 包著連結的 <u>(全站 2 處)也不畫螢光,理由同上,連結自己的底線還在。
+     「關於本站」那一處的 <u> 還包著連結以外的幾個字,那幾個字只剩「比旁邊的小字深」這一點區別。
+   · 列印與 Windows 高對比模式不畫背景 → 退回底線,重點才不會消失。 */
+u{
+  text-decoration:none;color:var(--text);
+  background:linear-gradient(transparent 58%,var(--hl) 58%);
+  padding:0 1px;border-radius:2px;
+}
+a:not([class]) u{color:inherit;background:none;padding:0}
+u:has(a){background:none}
+@media print{
+  u,.recap u,.recap mark{background:none;text-decoration:underline}
+}
+@media (forced-colors:active){
+  u,.recap u,.recap mark{text-decoration:underline}
+}
 .recap code{background:var(--tint);border-radius:4px;padding:1px 5px}
 /* 顏色區分:首條是結論、末條是保留 */
 .recap > li:first-child{
@@ -758,8 +862,12 @@ h1, h2, h3 { overflow-wrap: break-word; }
 
 /* ── ③ 導覽列:從一排小字變成藥丸 ──────────────────────────────
    無障礙原本就做過了(44px 觸控、可捲、右側淡出),
-   「不現代」指的是外觀:字小、沒有形狀、品牌跟項目擠在同一條線上。 */
-.nav{position:sticky;top:0;z-index:40;backdrop-filter:saturate(1.2) blur(6px)}
+   「不現代」指的是外觀:字小、沒有形狀、品牌跟項目擠在同一條線上。
+   導覽列不黏在頂端,這是刻意的(2026-09-23 決定):黏住的話手機每一屏會少掉約 60px,
+   而導覽列只能換頁,不能幫讀者在頁內換節。
+   (這裡原本有一條 .nav{position:sticky;top:0;z-index:40;backdrop-filter:…},
+    跟後面「1. 導覽列」那段的 .nav{position:relative} 同一天加進來,被它蓋掉,從來沒生效過;
+    毛玻璃疊在不透明的 --card 底色上也看不見。2026-09-23 拿掉,畫面不變。) */
 .nav a.item{
   border-bottom:0;border-radius:999px;
   padding:5px 12px;font-weight:500;
@@ -846,13 +954,17 @@ h1{letter-spacing:0}                  /* 中文標題同理,不加字距 */
 }
 .hero-note .go{color:var(--amber-dk);font-weight:600;white-space:nowrap}
 
-/* ── 手機導覽:讓第三個項目「露一半」 ────────────────────────────
-   量到的問題:第三項左緣在 371px,而畫面只有 375px —— 差 4px,
+/* ── 手機導覽(≤640px):收緊內距與間距、縮小品牌字 ─────────────────
+   當初量到的問題:第三項左緣在 371px,而畫面只有 375px —— 差 4px,
    等於完全看不到。導覽**可以**橫向捲,但沒有任何跡象顯示這件事。
-   ⚠️ 我第一版加的是右緣漸層 transparent → var(--card),
-      而導覽底色**就是** --card:白色淡出到白色 = 隱形。
-      有效的提示是讓下一項被切一半 —— 半個字在視覺上不完整,
-      大腦會自己想看完。省 brand 30px + padding 12px + gap 8px。 */
+   這一段原本的目標是讓第三項「露一半」,靠半個字讓人想往右滑。
+   ⚠️ 2026-09-23 訂正:這個目標沒有做到。對照線上 390px 的手機截圖,
+      品牌字加分隔線佔掉左邊約 195px,第三項只露出最左邊約 7px。
+      「右邊還有」現在靠的是 .nav::after 那道右緣暗邊(--nav-fade),不是這一段。
+      這一段對導覽列實際做的只有:內距 10px 14px、間距 6px 10px、品牌字 1.05rem、暗邊寬 26px;
+      同一段另外讓按鈕列(.btnrow)的按鈕在手機上各佔一整行、間距 10px。
+   (更早的第一版右緣漸層寫成 transparent → var(--card),而導覽底色就是 --card:
+    白色淡出到白色 = 隱形;已經在上面「1. 導覽列」那段改掉。) */
 @media (max-width:640px){
   .nav-in{padding:10px 14px;gap:6px 10px}
   .nav .brand{font-size:1.05rem}
@@ -870,8 +982,154 @@ h1{letter-spacing:0}                  /* 中文標題同理,不加字距 */
    作者已經標過了,這裡只是換一種呈現 —— **零內容改動**。
    ⚠️ 排除 :first-child:那一個是條目標題,已經做成獨立的標題行。 */
 .recap > li > strong:not(:first-child){
-  background:linear-gradient(transparent 58%,var(--amber-wash) 58%);
+  background:linear-gradient(transparent 58%,var(--hl) 58%);
   padding:0 1px;
 }
 /* 2026-09-06:兩欄「項目 / 數值」表的列標題改成 <th scope="row"> 之後,不要套到欄標題那套等寬大寫樣式 */
 th[scope="row"]{font-family:inherit;font-size:inherit;letter-spacing:normal;text-transform:none;color:var(--text);font-weight:600;background:none;white-space:normal;text-align:left}
+/* 2026-09-23:列標題補齊到跟原本的 td 一樣(29 張表、98 格改成 th scope="row")。
+   沒有這幾條,列標題會吃到上面 th 的內距、深色底線、垂直置中,反白列的列標題也不會有琥珀底。 */
+th[scope="row"]{padding:8px 12px;border-bottom:1px solid var(--line-soft);vertical-align:top;overflow-wrap:break-word}
+tr:last-child > th[scope="row"]{border-bottom:none}
+tr.hi > th[scope="row"]{background:var(--amber-wash)}
+th[scope="row"].mono{font-family:var(--mono);font-size:.84rem;white-space:nowrap}
+th[scope="row"].num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+th[scope="row"].small{font-size:.88rem;font-weight:400;color:var(--text-3)}
+th[scope="row"] .small{font-weight:400}
+/* 名詞表(.gloss)第一格改成 th 之後,沿用 .gloss td:first-child 的不換行與 26% 欄寬,
+   不然第二欄一長,第一欄會被壓到一兩個字寬 */
+.gloss th[scope="row"]{white-space:nowrap;width:26%}
+@media (max-width:560px){
+  .tablewrap table:not(:has(tr > *:nth-child(3))) th[scope="row"]{padding-left:10px;padding-right:10px}
+}
+
+/* ── 2026-09-23 互動元件(複製鈕、輸出框、手機長指令、本頁目錄、OS 標籤)── */
+/* 這一段只「附加」,不改上面既有的規則;要覆蓋的地方靠寫在後面。
+   多數選擇器只在 assets/site.js 執行過之後才會命中(.prewrap、.oslabel、.toc、.tp-all、
+   指令區塊的 .swipehint)。關掉 JavaScript 時會生效的只有這幾條:
+   捲動陰影(①②)、「你會看到」框裡的輸出樣式(③)、手機上速解與先備份卡的指令自動換行(⑪)。 */
+
+/* ① 捲動陰影的顏色抽成變數。上面表格那條寫死 rgba(0,0,0,.28),
+      在深色底上黑色陰影幾乎看不見,深色模式改用一道淺色的邊。 */
+:root{--edge-shade:rgba(0,0,0,.28)}
+@media (prefers-color-scheme:dark){
+  :root{--edge-shade:rgba(232,237,231,.25)}
+}
+.tablewrap,.figscroll{background-image:
+  linear-gradient(to right,var(--card),transparent),
+  linear-gradient(to left,var(--card),transparent),
+  linear-gradient(to right,var(--edge-shade),transparent),
+  linear-gradient(to left,var(--edge-shade),transparent)}
+
+/* ② 指令區塊也用表格那一招:右邊還有東西時,右緣有一道淺色的邊;捲過之後左緣也有。
+      background-attachment:local 讓遮罩跟著內容捲,捲到盡頭那一側的邊就被遮掉,
+      沒有溢出的區塊兩邊都被遮住、看不出任何變化。不支援的瀏覽器只是沒有邊。
+      指令區塊在淺色、深色模式都是深底,所以邊一律用淺色。 */
+pre{
+  background-image:
+    linear-gradient(to right,var(--pre-bg),transparent),
+    linear-gradient(to left,var(--pre-bg),transparent),
+    linear-gradient(to right,rgba(220,230,222,.22),transparent),
+    linear-gradient(to left,rgba(220,230,222,.22),transparent);
+  background-position:left,right,left,right;
+  background-size:22px 100%,22px 100%,11px 100%,11px 100%;
+  background-repeat:no-repeat;
+  background-attachment:local,local,scroll,scroll;
+}
+
+/* ③「你會看到」綠框裡的程式輸出:改成淺底虛線框,跟要打的指令(深底)分得開。
+      site.js 也不再替這些區塊掛「複製」鈕 —— 它們是會看到的東西,不是要打的東西。
+      語法上色原本是配深底的顏色,放到淺底上看不清楚,這裡換成站上的文字色票。 */
+.seen pre{
+  color:var(--text);border:1px dashed var(--line);margin:8px 0 0;
+  background-color:var(--card);
+  background-image:
+    linear-gradient(to right,var(--card),transparent),
+    linear-gradient(to left,var(--card),transparent),
+    linear-gradient(to right,var(--edge-shade),transparent),
+    linear-gradient(to left,var(--edge-shade),transparent);
+}
+.seen pre .cm{color:var(--text-3)}
+.seen pre .nu,.seen pre .kw{color:var(--grass)}
+
+/* ④ 複製鈕平常的淡度。原本 .35,「複製」兩個字對按鈕底只有 2.56:1(深色 2.43:1),看不太到;
+      .65 是 5.41:1(深色 5.22:1),過 4.5:1。滑鼠移進程式碼框、或用鍵盤聚焦時照舊全亮(上面那條規則)。
+      觸控裝置沒有「滑鼠移進去」這回事,一律全亮 —— 寬度超過 700px 的平板以前會一直停在淡的。 */
+@media (min-width:701px){
+  .copybtn{opacity:.65}
+}
+@media (hover:none){
+  .copybtn{opacity:1}
+}
+
+/* ⑤ 作業系統標籤(「Windows:」「Mac / Linux:」):由 site.js 找出緊接在指令區塊前面的
+      那一行標上 .oslabel。所有寬度都加粗,讓它看起來像標籤而不是一句說明。 */
+.oslabel{font-weight:700;color:var(--text-2)}
+
+/* ⑥ 本頁目錄(site.js 只在長頁插入,預設收起來) */
+.toc{border:1px solid var(--line);border-radius:6px;background:var(--card);
+  padding:0 16px;margin:24px 0 8px}
+.toc > summary{cursor:pointer;padding:10px 0;font-weight:600;color:var(--text-2)}
+.toc[open] > summary{border-bottom:1px solid var(--line-soft);margin-bottom:6px}
+.toc ol{margin:0 0 12px;padding-left:1.6em}
+.toc li{margin:0;line-height:1.6}
+.toc li a{display:inline-block;padding:4px 0;text-decoration:none}
+.toc li a:hover,.toc li a:focus-visible{text-decoration:underline}
+
+/* ⑦ 名詞彈出框最下面那一行「看全部」 */
+.termpop .tp-all{margin-top:8px;padding-top:4px;border-top:1px dashed var(--line);font-size:.9rem}
+.termpop .tp-all a{display:inline-block;padding:6px 0}
+
+/* ⑧ 名詞按鈕後面那個小小的 ᴱᴺ 是裝飾:給它一個空的替代文字,報讀器就不會把它唸進按鈕名稱。
+      不支援這種寫法的瀏覽器會丟掉這一行,照樣用上面那條規則顯示 ᴱᴺ。 */
+button.term::after{content:"ᴱᴺ" / ""}
+
+/* ⑨ 指令區塊的「← 左右滑 →」提示:桌機不顯示(有 ② 的邊就夠),手機放在複製鈕左邊。
+      它在 .prewrap 裡、pre 的外面 —— 放進 pre 裡,複製出去的指令就會多出這串中文。
+      上面 .tablewrap .swipehint 那條也會命中表格儲存格裡的指令區塊,所以這裡把會衝突的屬性都寫一次。 */
+.prewrap > .swipehint{display:none}
+
+@media (max-width:700px){
+  /* ⑩ 手機上的複製鈕改成「分頁標籤」:直接貼在自己那一塊的上緣,跟上一塊隔開。
+        原本空帶是 50px、鈕高 44px,再加上 pre 自己的上邊距,鈕離上一塊只有 10px、
+        離自己那一塊反而有 16px,看起來像是上一塊的鈕。
+        ⚠️ padding-top 44px 等於手機上的鈕高(上面 min-height:44px),兩個數字要一起改。
+        !important 是為了壓過頁面上寫在 pre 行內的 margin(style="margin:8px 0 0" 那種)。 */
+  .prewrap{padding-top:44px;margin-top:18px}
+  .prewrap > pre{margin-top:0 !important;border-top-right-radius:0}
+  .copybtn{border-radius:6px 6px 0 0}
+
+  /* ⑤ 的手機版:標籤落進那條 44px 空帶的左半邊,跟複製鈕同一列,壓在自己那一塊正上方。
+        ⚠️ 負的下邊距 -44px 與 min-height / line-height 44px,都跟 ⑩ 的空帶高度連動。
+        標籤後面那一塊的上邊距歸零,兩個邊距才不會疊出錯位。 */
+  .wrap .oslabel{display:block;position:relative;z-index:1;max-width:none;
+    margin:18px 0 -44px;min-height:44px;line-height:44px;padding-right:96px}
+  .wrap .oslabel + .prewrap{margin-top:0}
+
+  /* ⑪ 速解與「先備份」卡裡的指令在手機上自動換行,整條看得到 ——
+        只想照做的人最常停在這兩塊,右半截(常常是 --apply)在畫面外又沒有提示。
+        只是顯示換行,複製出去的內容一字不差。正文與附錄不動:那裡有對齊的表格與十六進位傾印。 */
+  .quickfix pre,#backup-first pre{white-space:pre-wrap;overflow-wrap:anywhere}
+
+  /* ⑨ 的手機版 */
+  .prewrap > .swipehint{display:flex;align-items:center;position:absolute;top:0;left:auto;right:64px;
+    z-index:1;height:44px;width:auto;margin:0;padding:0;border:0;background:none;
+    white-space:nowrap;pointer-events:none;font-size:.76rem;color:var(--text-3)}
+  .prewrap.scrolled > .swipehint{display:none}
+}
+
+@media print{
+  .copybtn,.prewrap > .swipehint{display:none}
+}
+
+/* ── 2026-09-23 整合後視覺覆驗的修正 ──
+   ① .nobr:site.js 把指令裡的短「字」與「名詞 + 緊接的全形標點」包起來,只准在空白處換行。
+   ② 琥珀與紅棕卡片的底色跟螢光太接近(淺色實測約 1.18:1,等於沒標),卡片裡的螢光加深。
+      字的對比照樣過 4.5:1(淺色約 9:1;深色 .46 約 5:1,這個數字是依色票推算的,沒有逐頁量)。
+   ③ 螢光句子裡夾著行內 code 時,code 的底色會把螢光切斷;讓螢光從 code 底下穿過去。 */
+.nobr{white-space:nowrap}
+.card.amber u,.card.clay u{--hl:rgba(224,163,70,.62)}
+@media (prefers-color-scheme:dark){
+  .card.amber u,.card.clay u{--hl:rgba(224,163,70,.46)}
+}
+u code{background:linear-gradient(transparent 58%,var(--hl) 58%),var(--tint-2)}

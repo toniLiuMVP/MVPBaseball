@@ -64,6 +64,12 @@ mvp_swap_portrait.py — 換掉 MVP Baseball 2005 的球員大頭照
     (exists 會跟著連結去看,指到不存在檔案的連結會被它判成「沒有」)
   · 匯出的 PNG 也是先寫一個名字猜不到的暫存檔、fsync 之後才改名上位,
     所以中途被中斷不會把你原本那張圖變成半截的
+  · --apply 與 --restore 動手之前,先在 portrait.big 那個資料夾建一個空的試寫檔
+    (.mvp_probe-xxxxxxxxxxxx 這種)再馬上刪掉。沒有權限寫入(遊戲裝在 Program Files
+    底下的預設位置就會這樣)就印「停下來了:沒有權限寫入這個資料夾…」,
+    教你用系統管理員身分重跑,結束碼 2 —— 那時候遊戲檔跟備份都還沒被碰過。
+    試寫過了、後面才被拒絕寫入(例如那個檔被設成唯讀)則印「停下來了:沒有權限讀寫…」,
+    結束碼一樣是 2
   · 寫入走 append,舊資料一個位元組都不動
   · 寫完立刻重新開檔讀回來跟你的 PNG 比對,一致率低於 90% 就當成失敗:
     結束碼非 0,並把還原指令整行印出來
@@ -100,6 +106,7 @@ mvp_swap_portrait.py — 換掉 MVP Baseball 2005 的球員大頭照
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -114,7 +121,7 @@ mvp_swap_portrait.py — 換掉 MVP Baseball 2005 的球員大頭照
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 
 import os
@@ -175,6 +182,59 @@ def _new_temp_beside(dst, tag):
     folder = os.path.dirname(os.path.abspath(dst)) or '.'
     return tempfile.mkstemp(dir=folder,
                             prefix='.%s.%s-' % (os.path.basename(dst), tag))
+
+
+# ── 寫入之前先試一次(2026-09-23 加)──────────────────────────────────
+# 這個遊戲預設裝在 C:\Program Files (x86)\ 底下,那是受保護的資料夾:
+# 一般權限的命令提示字元在那裡建不了新檔。以前 --import --apply 要到做備份那一步
+# 才撞上,讀者先看到「出錯停下來了」再看到十幾行英文 traceback,結束碼 1 ——
+# 而課文寫的是「停下來了」、結束碼 2。
+# 現在 --apply / --restore 動手之前,先在同一個資料夾用 os.open(O_CREAT|O_EXCL)
+# 建一個空檔再刪掉;建不出來就丟 DataError,走「停下來了」那條路,結束碼 2。
+# ⚠️ 不拿 tempfile 來試:本站讀過 Python 3.9、3.11、3.12 的 tempfile 原始碼,
+#    它在 Windows 上碰到「拒絕存取」會換一個名字再試(3.14 改成最多試 20 次),
+#    所以最後丟出來的不一定是 PermissionError(可能是 FileExistsError),
+#    也可能要試很久才放棄(這一點是讀原始碼推論的,本站還沒在 Windows 上實測)。
+#    os.open 只試一次,結果立刻知道。
+def _probe_writable(folder):
+    """在 folder 建一個空檔再刪掉。寫得進去回傳 None,寫不進去回傳那個 OSError。"""
+    probe = os.path.join(folder, '.mvp_probe-%s' % os.urandom(6).hex())
+    try:
+        fd = os.open(probe, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    except OSError as e:
+        return e
+    os.close(fd)
+    try:
+        os.remove(probe)
+    except OSError:
+        print('  (提醒:試寫用的空檔 %s 刪不掉,可以自己刪;遊戲檔沒有被動到)' % os.path.basename(probe))
+    return None
+
+
+# 「怎麼辦」那一段。試寫失敗與 main() 最後那一道共用,兩邊講的話才不會分岔。
+_NO_PERMISSION_HOWTO = (
+    '  Windows:對「命令提示字元」按右鍵,選「以系統管理員身分執行」。\n'
+    '  新視窗一開是在 C:\\Windows\\System32,先 cd 回你放腳本的地方\n'
+    '  (放在「下載」的話是 cd %USERPROFILE%\\Downloads),再跑同一行。\n'
+    '  Mac / Linux 看到這一段,是你這個帳號沒有權限動上面那個路徑。')
+
+
+def _require_writable(bigpath):
+    """portrait.big 那個資料夾寫不進去就丟 DataError(→「停下來了」、結束碼 2)。
+
+    只有 PermissionError 才講「以系統管理員身分執行」那一套;
+    別的原因(唯讀的磁碟、磁碟滿……)那一套幫不上忙,就只照實說寫不進去。
+    """
+    folder = os.path.dirname(os.path.abspath(bigpath)) or '.'
+    err = _probe_writable(folder)
+    if err is None:
+        return
+    if isinstance(err, PermissionError):
+        raise DataError('沒有權限寫入這個資料夾:%s\n  (系統回的是:%s)\n'
+                        '  遊戲裝在 C:\\Program Files (x86) 或 C:\\Program Files 底下時會這樣,\n'
+                        '  而那正是這個遊戲的預設安裝位置。\n%s'
+                        % (folder, err.strerror or err, _NO_PERMISSION_HOWTO))
+    raise DataError('這個資料夾現在寫不進去:%s\n  (系統回的是:%s)' % (folder, err))
 
 
 def _sha256_of(path):
@@ -1173,8 +1233,20 @@ def png_write(path, rgba, w, h):
 
 def png_read(path):
     """回傳 (rgba bytes, w, h)。支援 8 位元的灰階/RGB/索引/灰階+透明/RGBA,不支援交錯。"""
-    with open(path, 'rb') as f:
-        data = f.read()
+    # 2026-09-23 補:路徑打錯是最常見的狀況,以前會噴 FileNotFoundError 的 traceback、
+    # 結束碼 1。改成 DataError,走「停下來了」那條路,結束碼 2。
+    try:
+        with open(path, 'rb') as f:
+            data = f.read()
+    except FileNotFoundError:
+        hint = ''
+        if str(path).startswith('~'):
+            # Windows 的命令提示字元不會把 ~ 換成家目錄;Mac 上把 ~ 包進引號裡也不會換。
+            hint = ('\n  路徑開頭的 ~ 沒有被換成你的家目錄。請寫完整路徑,'
+                    'Windows 例如 %USERPROFILE%\\Desktop\\5826.png。')
+        raise DataError('找不到這張 PNG:%s%s' % (path, hint))
+    except OSError as e:
+        raise DataError('讀不到這張 PNG:%s(%s)' % (path, e))
     if data[:8] != PNG_MAGIC:
         raise DataError('%s 不是 PNG 檔' % os.path.basename(path))
     # 從第 8 個位元組(魔術數字之後)開始逐塊走。認得的收下來,不認得的跳過就好。
@@ -1574,6 +1646,9 @@ def cmd_import(bigpath, number, pngpath, apply_it):
     #   · 判斷「備份在不在」要用 lexists 不是 exists。exists 會跟著連結去看,
     #     一個指到不存在檔案的連結會被它判成「不存在」。
     _refuse_symlink(backup, '備份檔')
+    # 備份與寫入都要在 portrait.big 那個資料夾動手。遊戲裝在 Program Files 底下時
+    # 這裡寫不進去 —— 在做備份之前先試一次,寫不進去就走「停下來了」那條路。
+    _require_writable(bigpath)
     if not os.path.lexists(backup):
         _atomic_copy(bigpath, backup)
         print()
@@ -1614,6 +1689,8 @@ def cmd_restore(bigpath):
     _refuse_symlink(backup, '備份檔')
     if not os.path.exists(backup):
         raise DataError('找不到備份 %s —— 沒有東西可以還原。' % os.path.basename(backup))
+    # 蓋回去要先在同一個資料夾寫一個暫存檔,寫不進去的話現在就停。
+    _require_writable(bigpath)
     _restore_from_backup(backup, bigpath)
     # 複驗:把還原完的遊戲檔跟備份從頭比到尾。不比就印成功,等於只證明
     # 「複製指令沒有丟例外」,不證明檔案真的一樣。
@@ -1700,8 +1777,22 @@ def main():
         # 沒動過才敢說「什麼都沒有動到」。兩種都是 130,不可以回 0。
         _interrupt_note()
         return 130
+    except (PermissionError, FileExistsError) as e:
+        # 2026-09-23 補:試寫(_require_writable)過了、後面才被拒絕寫入的情形
+        # (例如那個檔被設成唯讀)、--export 寫不進你指定的那個資料夾,
+        # 以及還原時讀不到備份這種少見的情形(所以訊息寫「讀寫」,不只寫「寫入」)。
+        # FileExistsError 也收在這裡:這支腳本只有 tempfile 會丟它,而 tempfile
+        # 在 Windows 上碰到「拒絕存取」一路重試到放棄時丟的就是它(見 _probe_writable 上面)。
+        # 這是可以預料的狀況,不該走下面那條「印 traceback 回報」的路:
+        # 跟 DataError 一樣印「停下來了」、照三態說遊戲檔動了沒、結束碼 2。
+        print('\n  停下來了:沒有權限讀寫:%s' % e)
+        print('  可能的原因:要寫的地方在 C:\\Program Files 這種受保護的資料夾裡'
+              '(遊戲的預設安裝位置),\n  那個檔被設成唯讀,或遊戲正開著。')
+        print(_NO_PERMISSION_HOWTO)
+        _interrupt_note('停下來了')
+        return 2
     except Exception:
-        # 沒預料到的錯(磁碟滿、權限、外接碟拔掉…)要走**同一條**誠實路徑:
+        # 沒預料到的錯(磁碟滿、寫到一半外接碟被拔掉…)要走**同一條**誠實路徑:
         # 只接 KeyboardInterrupt 的話,這條路上的讀者會看到一串 traceback,
         # 卻不知道自己的遊戲檔動了沒。說完再把原本的例外丟回去 ——
         # traceback 照樣印出來(回報的時候用得上),結束碼一樣非 0。

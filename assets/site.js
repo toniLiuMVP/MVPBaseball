@@ -33,12 +33,43 @@
   }
 
   // ── 1. 指令一鍵複製 ───────────────────────────────────────
-  // 全站 886 個 <pre>(2026-09-05 重數)。複製前先把 .cm(中文註解)剝掉 ——
-  // 25 頁的指令區塊裡有中文,直接複製會把中文貼進終端機。
+  // 每一個 <pre> 都掛一顆(數量會變,要知道現在幾個就數 site/ 裡的 <pre>,不寫死在這裡)。
+  // 不掛的只有三種:data-nocopy、去掉空白後不到 3 個字、放在「你會看到」綠框(.seen)裡的範例輸出
+  // —— 最後那一種是讀者會看到的東西,不是要打的東西(2026-09-23 加)。
+  // 複製前先把 .cm(中文註解)剝掉 —— 有些指令行尾帶著中文註解,直接複製會把中文貼進終端機。
+
+  // 還沒換掉的佔位符要講出來,不給假的成功(檔頭紀律第 6 條)。
+  // 2026-09-23 以前只認 <span class="hl"> 包起來的字,而站上的佔位符大多是直接寫在指令裡的,
+  // 含佔位符的區塊只有大約二十分之一會提醒;反過來,.hl 也被拿來標「這裡要注意」的一般文字,
+  // 那幾格反而誤報「記得換」。改成從**真的複製出去的那段文字**裡找,寫法有四種:
+  //   〔…〕 / 含中文的 <…> / <...>(省略號) / 沒加括號的「你的遊戲資料夾」
+  // 每一種都限制長度、不跨行;開頭是 #! 或 30 行以上的是腳本原始碼附錄,不看。
+  var PLACEHOLDER = /〔[^〕\n]{1,16}〕|<[^<>\s]{0,12}[一-鿿][^<>\s]{0,12}>|<\.\.\.>|你的遊戲資料夾/;
+
+  function findPlaceholder(out) {
+    if (out.slice(0, 2) === '#!' || out.split('\n').length >= 30) return null;
+    var m = out.match(PLACEHOLDER);
+    if (!m) return null;
+    return m[0].length > 14 ? m[0].slice(0, 14) + '…' : m[0];
+  }
+
   function addCopyButtons() {
     var pres = document.querySelectorAll('pre');
+    var live = null;   // 報讀器用的共用狀態列,頁面上真的有複製鈕才建
+
+    // 按鈕上的字會變,可是 aria-label 固定是「複製這段指令」,報讀器唸的是名稱 ——
+    // 所以「已複製」「記得換…」「複製不了」要另外寫進一個 role=status 的隱藏節點才聽得到。
+    // aria-label 刻意保留:拿掉的話,名稱改變與狀態列會各唸一次,同一句話聽兩遍。
+    // 先清空再寫,是為了連按兩次、訊息一模一樣時也會再唸一次。
+    function say(t) {
+      if (!live) return;
+      live.textContent = '';
+      setTimeout(function () { live.textContent = t; }, 60);
+    }
+
     Array.prototype.forEach.call(pres, function (pre) {
       if (pre.getAttribute('data-nocopy') != null) return;
+      if (pre.closest && pre.closest('.seen')) return;          // 範例輸出,不是指令
       var txt = pre.textContent || '';
       if (txt.trim().length < 3) return;
 
@@ -51,6 +82,21 @@
       btn.setAttribute('aria-label', '複製這段指令');
       wrap.appendChild(btn);
 
+      // 「Windows:」「Mac / Linux:」這種作業系統標籤,標記起來讓 CSS 把它貼回自己那一塊
+      // (手機上複製鈕上方有一條空帶,標籤原本離上一塊比較近,看起來像上一塊的說明)。
+      var lab = wrap.previousElementSibling;
+      if (lab && ((lab.tagName === 'P' && lab.classList.contains('small')) || lab.tagName === 'STRONG')
+          && /^(Windows|Mac( \/ Linux)?)\s*[:：]?$/.test((lab.textContent || '').trim())) {
+        lab.classList.add('oslabel');
+      }
+
+      if (!live) {
+        live = el('p', 'sr-only');
+        live.setAttribute('role', 'status');
+        live.setAttribute('aria-live', 'polite');
+        document.body.appendChild(live);
+      }
+
       btn.addEventListener('click', function () {
         // 剝掉中文註解:clone 一份再刪,原本畫面上的不動
         var clone = pre.cloneNode(true);
@@ -58,17 +104,19 @@
           c.parentNode.removeChild(c);
         });
         var out = (clone.textContent || '').replace(/[ \t]+$/gm, '').trim();
+        // 原文只有一行、而且刻意以空格結尾(「打到空格停住,再把檔案拖進來」那一類)時,保留一個空格。
+        // 拖進命令提示字元的路徑只會插在游標處,不會自己補空格;少了這個空格,指令跟路徑會黏在一起。
+        // 判斷要看原文 pre.textContent,不能看剝掉 .cm 之後的 out ——
+        // 「指令後面接中文註解」的單行區塊剝完也會剩尾巴空白,那幾塊不該多一個空格。
+        if (/[ \t]$/.test(pre.textContent || '') && out.indexOf('\n') < 0) out += ' ';
 
-        // 還沒換掉的佔位符要講出來,不給假的成功
-        var ph = null;
-        Array.prototype.forEach.call(pre.querySelectorAll('.hl'), function (h) {
-          var t = (h.textContent || '').trim();
-          if (/[一-鿿]/.test(t) && t.length <= 12) ph = t;
-        });
+        var ph = findPlaceholder(out);
+        var okText = ph ? '已複製（記得換「' + ph + '」）' : '已複製';
 
-        function done(okText) {
+        function done() {
           btn.textContent = okText;
           btn.classList.add('is-done');
+          say(okText);
           setTimeout(function () {
             btn.textContent = '複製';
             btn.classList.remove('is-done');
@@ -86,15 +134,14 @@
             ta.select();
             var ok = document.execCommand('copy');
             document.body.removeChild(ta);
-            if (ok) { done(ph ? '已複製(記得換「' + ph + '」)' : '已複製'); return; }
+            if (ok) { done(); return; }
           } catch (e) { /* 落到最後一條 */ }
-          btn.textContent = '複製不了,請自己選取';
+          btn.textContent = '複製不了，請自己選取';
+          say('複製不了，請自己選取');
         }
 
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(out).then(function () {
-            done(ph ? '已複製(記得換「' + ph + '」)' : '已複製');
-          }, fallback);
+          navigator.clipboard.writeText(out).then(done, fallback);
         } else {
           fallback();
         }
@@ -109,8 +156,15 @@
   function addStepChecks() {
     var steps = document.querySelectorAll('.step > .step-n');
     if (!steps.length) return;
-    var key = 'mvp:step:' + location.pathname;
-    var saved = (load(key) || '').split(',').filter(Boolean);
+    // /x/ 與 /x/index.html 是同一頁(Pages 兩個網址都回 200,不轉址):
+    // canonical 與 sitemap 用前者,站內連結用後者。鍵要一樣,不然從搜尋進來勾的,
+    // 從站內點回同一課就看不到。往 index.html 那邊對齊,因為站內連結全部是那種寫法,
+    // 既有的紀錄多半本來就存在那把鍵底下。
+    var path = location.pathname.replace(/\/$/, '/index.html');
+    var key = 'mvp:step:' + path;
+    var alt = 'mvp:step:' + path.replace(/\/index\.html$/, '/');   // 舊版在資料夾網址存的那一把
+    var saved = ((load(key) || '') + ',' + (alt !== key ? (load(alt) || '') : ''))
+                  .split(',').filter(Boolean);
     var state = {};
     saved.forEach(function (i) { state[i] = 1; });
 
@@ -154,6 +208,7 @@
     function save() {
       var on = Object.keys(state);
       store(key, on.length ? on.join(',') : null);
+      if (alt !== key) store(alt, null);        // 兩把合成一把;清除這一頁時兩把一起清
       // 用字紀律:不可以寫「已完成」,更不可以寫「遊戲已經改好了」
       cnt.textContent = '你勾了 ' + on.length + ' / ' + boxes.length +
                         ' 步(只是你自己勾的,本站沒有幫你驗)。';
@@ -163,9 +218,12 @@
 
   // ── 3. 大表搜尋 ───────────────────────────────────────────
   // 只在速查頁、而且表夠大時才出現。已經自己有搜尋框的頁面(#q)跳過。
+  // 不在 reference/ 底下的頁,自己帶一個 data-tblfind 標記也放行(例如全站目錄);
+  // 那個屬性的值就是搜尋框上面的說明文字,空的就用速查頁那一句。
   function addTableFilter() {
     if (document.getElementById('q')) return;                 // 該頁已有自己的
-    if (location.pathname.indexOf('/reference/') < 0) return;  // 只給速查頁
+    var mark = document.querySelector('[data-tblfind]');
+    if (!mark && location.pathname.indexOf('/reference/') < 0) return;  // 只給速查頁
     var wrap = document.querySelector('.wrap');
     if (!wrap) return;
     var allRows = wrap.querySelectorAll('.tablewrap tbody tr');
@@ -193,7 +251,8 @@
     if (!blocks.length) return;
 
     var box = el('div', 'tblfind');
-    var lab = el('label', null, '在這一頁的對照表裡找(打代號、欄位名、英文名都可以)');
+    var lab = el('label', null, (mark && mark.getAttribute('data-tblfind'))
+                                || '在這一頁的對照表裡找(打代號、欄位名、英文名都可以)');
     var inp = el('input');
     inp.type = 'search';
     inp.id = 'tblq';
@@ -467,7 +526,12 @@
     '還原': {
       en: 'restore',
       zh: '把改過的檔案退回備份的那個樣子。',
-      sci: '本站每一支會改檔的工具都有一行還原指令，而且還原順序不重要 —— 每支工具只還原自己動過的那個檔，互不干涉。'
+      sci: '本站會改檔的工具大多有一行還原指令，多半是把「你第一次用這支工具之前」那一整份檔蓋回去。所以同一個檔被好幾課改過時（例如名冊 attrib.dat 就有好幾課會寫），還原其中一課，之後別課對同一個檔的修改也會一起不見；要全部退回去就倒著跑：最後做的那一課先還原。'
+    },
+    '複驗': {
+      en: 'read-back verification',
+      zh: '工具寫完之後，自己再把檔案讀一次，確認寫進去的跟預期對得上。',
+      sci: '像寄掛號前再核對一次地址。畫面上說複驗沒過，就代表這一次不算成功 —— 照畫面接下來那幾行做：有的工具會自己拿備份退回去，有的會把還原指令印給你。'
     },
     '環境變數': {
       en: 'environment variable',
@@ -487,7 +551,7 @@
     '記憶體池': {
       en: 'memory pool',
       zh: '程式一開機就跟系統要走的一整塊記憶體，之後自己切給各種東西用。',
-      sci: '像先端一大鍋飯再分裝到每個便當盒。這個遊戲要的是一整塊 64 MB，中文字型光字圖就吃掉 13.5 MB（英文只要 0.37 MB）—— 池子先被吃掉五分之一，再也塞不下一座大球場。改成 128 MB 就好了。'
+      sci: '像先端一大鍋飯再分裝到每個便當盒。這個遊戲要的是一整塊 64 MB，中文字型光字圖就吃掉 13.5 MB（英文只要 0.37 MB）—— 池子先被吃掉五分之一，再也塞不下一座大球場。改成 128 MB 就好了（照原版光碟安裝的那一份做不到）。'
     },
     '中位數': {
       en: 'median',
@@ -608,15 +672,49 @@
     }
   };
 
+  // 名詞小教室(glossary.html)每個詞的錨點。產生那一頁的程式用的是同一套算法,兩邊要一起改:
+  //   t- 加上 en 欄轉成的 slug:轉小寫 → 連續的非 [a-z0-9] 換成一個 - → 去掉頭尾的 -
+  //   兩個詞算出一樣的 slug:照 TERMS 的順序,第二個起加 -2、-3
+  //   算出來是空的(en 沒有英數字):t- 加它在 TERMS 裡的順序號,從 1 起、兩位數補零
+  var ANCHORS = null;
+  function termAnchor(w) {
+    if (!ANCHORS) {
+      ANCHORS = {};
+      var used = {};
+      Object.keys(TERMS).forEach(function (k, i) {
+        var s = String(TERMS[k].en || '').toLowerCase()
+                  .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        if (!s) {
+          ANCHORS[k] = 't-' + (i + 1 < 10 ? '0' : '') + (i + 1);
+          return;
+        }
+        used[s] = (used[s] || 0) + 1;
+        ANCHORS[k] = 't-' + s + (used[s] > 1 ? '-' + used[s] : '');
+      });
+    }
+    return ANCHORS[w];
+  }
+
+  // 彈出框裡「看全部名詞」的連結:從導覽列的站名連結(一定指到該層的 index.html)推出
+  // glossary.html 在哪一層。找不到就不放這一行,不要猜一個可能是錯的路徑。
+  function glossaryHref(w) {
+    var b = document.querySelector('.nav .brand');
+    var h = b && b.getAttribute('href');
+    if (!h || !/(^|\/)index\.html$/.test(h)) return null;
+    return h.replace(/index\.html$/, 'glossary.html') + '#' + termAnchor(w);
+  }
+
   function buildTermPop() {
     var pop = document.createElement('div');
     pop.className = 'termpop';
+    pop.id = 'termpop';
     pop.setAttribute('role', 'dialog');
+    pop.setAttribute('aria-labelledby', 'termpop-h');
     pop.hidden = true;
     var x = document.createElement('button');
     x.className = 'tp-x'; x.type = 'button';
     x.setAttribute('aria-label', '關閉'); x.textContent = '×';
-    var h = document.createElement('p'); h.className = 'tp-h';
+    var h = document.createElement('p'); h.className = 'tp-h'; h.id = 'termpop-h';
     var en = document.createElement('span'); en.className = 'tp-en';
     var zh = document.createElement('p');
     var sci = document.createElement('p'); sci.className = 'tp-sci';
@@ -624,12 +722,16 @@
     // 2026-08-29 訂正:原本以為彈出框只能放一行,所以把兩格科普寫成
     // 「要插進正文才放得下」。那是我自己發明的限制 —— 框可以變大。
     var more = document.createElement('p'); more.className = 'tp-more';
+    // 每頁最多只標八個詞,其餘的詞在這一頁沒有記號可點 —— 給一條路去看全部。
+    var all = document.createElement('p'); all.className = 'tp-all';
+    var allA = document.createElement('a');
+    all.appendChild(allA);
     h.appendChild(document.createTextNode(''));
     h.appendChild(en);
     pop.appendChild(x); pop.appendChild(h); pop.appendChild(zh);
-    pop.appendChild(sci); pop.appendChild(more);
+    pop.appendChild(sci); pop.appendChild(more); pop.appendChild(all);
     document.body.appendChild(pop);
-    return { pop: pop, h: h, en: en, zh: zh, sci: sci, more: more, x: x };
+    return { pop: pop, h: h, en: en, zh: zh, sci: sci, more: more, all: all, allA: allA, x: x };
   }
 
   function addTermMarks() {
@@ -639,20 +741,22 @@
     // 一個詞兩個意思，自動標記一定會有一頁標錯。
     var words = Object.keys(TERMS).filter(function (w) { return TERMS[w].mark !== false; });
     if (!words.length) return;
-    // 每頁最多標幾個。52 個詞全放行（2026-09-06 重數）的話，密集的頁面會被記號洗版 ——
-    // 對「不會用電腦」的讀者，滿頁虛線比沒有註解更難讀。
+    // 每頁最多標幾個。TERMS 裡的詞全部放行的話(有幾個就數 TERMS,不寫死),
+    // 密集的頁面會被記號洗版 —— 對「不會用電腦」的讀者，滿頁虛線比沒有註解更難讀。
     var CAP = 8;
     var marked = 0;
     var seen = {};
     // 只走正文的文字節點。這幾種祖先一律跳過 ——
     // code/pre 裡是可以複製的指令，details 裡是原始碼的逐字鏡像，
     // 動到任何一個都會讓讀者複製到壞掉的東西。
-    var SKIP = /^(CODE|PRE|SCRIPT|STYLE|TEXTAREA|BUTTON|A|ABBR|H1|TITLE|NAV|FOOTER)$/;
+    // 2026-09-23:各級標題與卡片標題(.card-h)也跳過 —— 標題不是正文,
+    // 而且很多課「先備份」卡的標題被切成「先完整備份ᴱᴺ整個遊戲資料夾」;名詞在內文裡照樣標得到。
+    var SKIP = /^(CODE|PRE|SCRIPT|STYLE|TEXTAREA|BUTTON|A|ABBR|H1|H2|H3|H4|H5|H6|TITLE|NAV|FOOTER)$/;
     // 導覽、麵包屑、徽章、表頭不是正文 —— 標在那裡會把導覽文字切開。
     // 2026-08-29 第一版沒排除 .crumb，於是「教學 › 封裝檔可以拆成散裝嗎」
     // 那行麵包屑被插了一顆按鈕進去。
     // gl-term 是 glossary.html 的條目 —— 那一頁本來就在解釋這些詞，不必再標一次。
-    var SKIPCLASS = /(^|\s)(crumb|badge|nav-in|copybtn|swipehint|recap|gl-term)(\s|$)/;
+    var SKIPCLASS = /(^|\s)(crumb|badge|nav-in|copybtn|swipehint|recap|gl-term|card-h)(\s|$)/;
     var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode: function (n) {
         for (var p = n.parentNode; p && p !== document.body; p = p.parentNode) {
@@ -671,12 +775,21 @@
     var nodes = [], n;
     while ((n = walker.nextNode())) nodes.push(n);
 
+    // owner = 現在開著的那一顆名詞按鈕。
+    // 2026-09-23 以前沒有記它,關框時去 DOM 裡找「第一顆 aria-expanded=true」來重設 ——
+    // 直接從 A 點到 B 之後,A 那顆永遠停在 true,再點它只會呼叫一個什麼都不做的 hide(),
+    // 關框時焦點還會跳到 A 去。記住 owner 之後,任何時候最多只有一顆是 true。
     var ui = null;
+    var owner = null;
     function show(btn, w) {
       if (!ui) {
         ui = buildTermPop();
-        ui.x.addEventListener('click', hide);
+        // 包一層:不包的話 click 的 event 物件會被當成 returnFocus 傳進去(它是 truthy)
+        ui.x.addEventListener('click', function () { hide(true); });
+        // 點框裡面的字不要關框(document 那一層的 click 會關框)
+        ui.pop.addEventListener('click', function (e) { e.stopPropagation(); });
       }
+      if (owner && owner !== btn) owner.setAttribute('aria-expanded', 'false');
       var t = TERMS[w];
       ui.h.firstChild.nodeValue = '🔬 ' + w + ' ';
       ui.en.textContent = t.en;
@@ -684,6 +797,12 @@
       ui.sci.textContent = '💡 ' + t.sci;
       ui.more.textContent = t.more || '';
       ui.more.hidden = !t.more;
+      var gh = glossaryHref(w);
+      if (gh) {
+        ui.allA.href = gh;
+        ui.allA.textContent = '📖 名詞小教室：看全部 ' + Object.keys(TERMS).length + ' 個詞 →';
+      }
+      ui.all.hidden = !gh;
       ui.pop.hidden = false;
       if (matchMedia('(min-width:701px)').matches) {
         var r = btn.getBoundingClientRect();
@@ -692,13 +811,23 @@
           r.left + scrollX, innerWidth - ui.pop.offsetWidth - 12)) + 'px';
       }
       btn.setAttribute('aria-expanded', 'true');
+      btn.setAttribute('aria-controls', 'termpop');
       ui.pop.dataset.owner = w;
+      owner = btn;
     }
-    function hide() {
-      if (!ui || ui.pop.hidden) return;
+    // returnFocus:只有按 Esc 或 × 關框時才把焦點還給剛才那顆名詞。
+    // 點畫面別的地方關框時不碰焦點 —— 不然讀者點搜尋框要打字,焦點會被搶回名詞,
+    // 手機上鍵盤剛跳出來就被收回去;畫面也會被捲回那個名詞的位置。
+    function hide(returnFocus) {
+      if (!ui) return;
+      var wasOpen = !ui.pop.hidden;
       ui.pop.hidden = true;
-      var b = document.querySelector('button.term[aria-expanded="true"]');
-      if (b) { b.setAttribute('aria-expanded', 'false'); b.focus(); }
+      var b = owner;
+      owner = null;
+      if (b) {
+        b.setAttribute('aria-expanded', 'false');
+        if (wasOpen && returnFocus === true) b.focus();
+      }
     }
 
     for (var i = 0; i < nodes.length; i++) {
@@ -721,26 +850,163 @@
         (function (b, word) {
           b.addEventListener('click', function (e) {
             e.stopPropagation();
-            if (b.getAttribute('aria-expanded') === 'true') hide(); else show(b, word);
+            // 焦點本來就在這顆按鈕上,關框不必再搬焦點
+            if (owner === b && !ui.pop.hidden) hide(false); else show(b, word);
           });
         })(btn, w);
-        after.parentNode.insertBefore(btn, after);
+        // 名詞後面緊接全形標點時,把按鈕和那個標點包在一起不斷行 ——
+        // 按鈕是行內區塊,它跟後面的標點之間會多出一個斷行點,
+        // 於是「自己備份」換行、下一行從「,」開始(2026-09-23 視覺覆驗在 do、hide-runner-speed 抓到)。
+        var head = after.nodeValue.charAt(0);
+        if (head && '，。、；：！？）」』'.indexOf(head) !== -1) {
+          var glue = document.createElement('span');
+          glue.className = 'nobr';
+          after.parentNode.insertBefore(glue, after);
+          glue.appendChild(btn);
+          glue.appendChild(document.createTextNode(head));
+          after.nodeValue = after.nodeValue.slice(1);
+        } else {
+          after.parentNode.insertBefore(btn, after);
+        }
         marked++;
         node = after;   // 同一個文字節點後半段繼續找別的詞
       }
     }
-    document.addEventListener('click', hide);
+    document.addEventListener('click', function () { hide(false); });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') hide();
+      if (e.key === 'Escape') hide(true);
     });
   }
 
+  // ── 本頁目錄 ─────────────────────────────────────────────
+  // 長頁(主內容的 h2 有 8 個以上)在第一個 h2 前面插一個預設收起的「本頁目錄」。
+  // 不插在 h1 後面:那會排到「先備份」卡與速解前面,打破每一課的版型順序。
+  // 速解與卡片裡的 h2 不算、不列;被藏起來的 h2 也不列 —— tc2026 同意閘後面的內容
+  // 在讀者勾完同意之前是藏著的,目錄不可以替它開一條繞過閘門的路。
+  // 沒有 id 的 h2 在這裡補一個 sec-N(先查有沒有撞名);關掉 JavaScript 時什麼都不插。
+  function addPageToc() {
+    var main = document.getElementById('main') || document.querySelector('.wrap');
+    if (!main || !main.querySelectorAll) return;
+    var heads = [];
+    Array.prototype.forEach.call(main.querySelectorAll('h2'), function (h) {
+      if (h.closest('.quickfix, .card, details, nav, footer, .toc, [hidden]')) return;
+      heads.push(h);
+    });
+    if (heads.length < 8) return;
+
+    var box = el('details', 'toc');
+    box.appendChild(el('summary', null, '本頁目錄（' + heads.length + ' 節）'));
+    var ol = el('ol');
+    heads.forEach(function (h, i) {
+      if (!h.id) {
+        var id = 'sec-' + (i + 1), k = 1;
+        while (document.getElementById(id)) id = 'sec-' + (i + 1) + '-' + (++k);
+        h.id = id;
+      }
+      var li = el('li');
+      var a = el('a', null, (h.textContent || '').replace(/\s+/g, ' ').trim());
+      a.href = '#' + h.id;
+      li.appendChild(a);
+      ol.appendChild(li);
+    });
+    box.appendChild(ol);
+    heads[0].parentNode.insertBefore(box, heads[0]);
+  }
+
+  // ── 導覽列:目前這一區標 aria-current ──────────────────────
+  // 畫面上亮著的那一顆(.item.on)只有顏色,報讀器不知道「你在這裡」。
+  // 連到本頁的設 page,連到本頁所屬分區首頁的設 true。只在這裡加,不寫進 HTML ——
+  // 導覽列在每一頁都是手寫的同一份,verify_site 會比對它們是不是完全一樣。
+  function markNavCurrent() {
+    var here = location.pathname.replace(/index\.html$/, '');
+    Array.prototype.forEach.call(document.querySelectorAll('.nav a.item.on'), function (a) {
+      var p = '';
+      try { p = new URL(a.getAttribute('href'), location.href).pathname.replace(/index\.html$/, ''); }
+      catch (e) { p = ''; }
+      a.setAttribute('aria-current', p && p === here ? 'page' : 'true');
+    });
+  }
+
+  // ── 指令區塊橫向捲動提示 ──────────────────────────────────
+  // 表格與圖早就有「← 左右滑動 →」(見下面 markScrollableTables),指令區塊沒有 ——
+  // 手機上長指令的右半截(常常正好是 --apply)在畫面外,又沒有任何跡象說得出來。
+  // 提示掛在 .prewrap 上、pre 的外面:掛進 pre 裡,複製鈕拿到的指令就會多出這串中文。
+  // 位置在手機那條放複製鈕的空帶裡、複製鈕左邊(CSS 管),捲過一次就收起來。
+  function markScrollablePres() {
+    var pres = document.querySelectorAll('.prewrap > pre');
+    for (var i = 0; i < pres.length; i++) {
+      var pre = pres[i], w = pre.parentNode, hint = null;
+      for (var c = w.firstChild; c; c = c.nextSibling) {
+        if (c.nodeType === 1 && c.classList.contains('swipehint')) { hint = c; break; }
+      }
+      if (pre.scrollWidth - pre.clientWidth <= 2) {
+        if (hint) w.removeChild(hint);
+        continue;
+      }
+      if (hint) continue;
+      // 前面有「Windows:」這種標籤的,空帶左半邊已經被標籤用掉了,提示改短一點
+      var lab = w.previousElementSibling;
+      var short = lab && lab.classList && lab.classList.contains('oslabel');
+      hint = el('span', 'swipehint', short ? '← 左右滑 →' : '← 左右滑看完整一行 →');
+      hint.setAttribute('aria-hidden', 'true');
+      w.appendChild(hint);
+      if (!pre.getAttribute('data-swipe')) {
+        pre.setAttribute('data-swipe', '1');
+        pre.addEventListener('scroll', function () {
+          if (this.scrollLeft > 4) this.parentNode.classList.add('scrolled');
+        }, { passive: true });
+      }
+    }
+  }
+
+  // ── 指令不要斷在連字號中間 ──────────────────────────────
+  // 手機上速解與「先備份」卡的指令會自動換行(CSS ⑪),而瀏覽器預設可以在 - 後面斷行,
+  // 於是 --iat --sections 會變成行尾「--iat -」、下一行「-sections」。讀者常是手機上看、
+  // 到電腦上照著打,這樣會打錯(2026-09-23 視覺覆驗在 exe-tuning、run-in-2026 抓到)。
+  // 做法:把每一個不太長的「字」(空白分隔)包成不斷行的片段,只讓它在空白處換行;
+  // 超過 28 個字元的(多半是路徑)不包,讓它照樣可以在中間斷開,免得撐破畫面。
+  // 行內的短旗標(--pool 這種)也一樣。只加外層 span,文字一字不改,複製鈕拿到的內容不變。
+  function keepTokensTogether() {
+    var LONG = 28;
+    var pres = document.querySelectorAll('.quickfix pre, #backup-first pre');
+    for (var i = 0; i < pres.length; i++) {
+      var walker = document.createTreeWalker(pres[i], NodeFilter.SHOW_TEXT, null, false);
+      var texts = [];
+      while (walker.nextNode()) texts.push(walker.currentNode);
+      for (var j = 0; j < texts.length; j++) {
+        var t = texts[j], parts = t.nodeValue.split(/(\s+)/);
+        if (parts.length < 2 && !/-/.test(t.nodeValue)) continue;
+        var frag = document.createDocumentFragment();
+        for (var k = 0; k < parts.length; k++) {
+          var p = parts[k];
+          if (!p) continue;
+          if (/^\s+$/.test(p) || p.length > LONG) { frag.appendChild(document.createTextNode(p)); continue; }
+          var s = document.createElement('span');
+          s.className = 'nobr';
+          s.textContent = p;
+          frag.appendChild(s);
+        }
+        t.parentNode.replaceChild(frag, t);
+      }
+    }
+    var codes = document.querySelectorAll('code');
+    for (var c = 0; c < codes.length; c++) {
+      var code = codes[c], v = code.textContent;
+      if (code.closest('pre, td, th')) continue;
+      if (v.length <= 24 && /^-/.test(v) && !/\s/.test(v)) code.classList.add('nobr');
+    }
+  }
+
   function boot() {
+    try { keepTokensTogether(); } catch (e) { }
+    try { markNavCurrent(); } catch (e) { }
     try { addCopyButtons(); } catch (e) { }
     try { addStepChecks(); } catch (e) { }
+    try { addPageToc(); } catch (e) { }
     try { addTableFilter(); } catch (e) { }
     try { addErrorFinder(); } catch (e) { }
     try { markScrollableTables(); } catch (e) { }
+    try { markScrollablePres(); } catch (e) { }
     try { addTermMarks(); } catch (e) { }
   }
 
@@ -759,7 +1025,11 @@
     for (var i = 0; i < wraps.length; i++) {
       var w = wraps[i];
       var over = w.scrollWidth - w.clientWidth > 2;
-      var hint = w.querySelector('.swipehint');
+      // 只認自己那一條提示:表格儲存格裡的指令區塊也可能掛著一條(見 markScrollablePres)
+      var hint = null;
+      for (var c = w.firstChild; c; c = c.nextSibling) {
+        if (c.nodeType === 1 && c.classList.contains('swipehint')) { hint = c; break; }
+      }
       if (!over) {
         if (hint) hint.remove();
         w.removeAttribute('tabindex'); w.removeAttribute('role'); w.removeAttribute('aria-label');
@@ -788,8 +1058,18 @@
      這裡不能只在腳本執行當下量 —— 那時版面還沒定，量到的是 0。 */
   addEventListener('load', function(){
     try { markScrollableTables(); } catch (e) { }
+    try { markScrollablePres(); } catch (e) { }
   });
   var rz; addEventListener('resize', function(){
-    clearTimeout(rz); rz = setTimeout(markScrollableTables, 150);
+    clearTimeout(rz); rz = setTimeout(function () {
+      try { markScrollableTables(); } catch (e) { }
+      try { markScrollablePres(); } catch (e) { }
+    }, 150);
   });
+  /* 收起來的 <details>(原始碼附錄)裡的東西量不到寬度,打開的時候再量一次。
+     toggle 不會冒泡,所以用 capture 在 document 這一層接。 */
+  document.addEventListener('toggle', function(){
+    try { markScrollableTables(); } catch (e) { }
+    try { markScrollablePres(); } catch (e) { }
+  }, true);
 })();

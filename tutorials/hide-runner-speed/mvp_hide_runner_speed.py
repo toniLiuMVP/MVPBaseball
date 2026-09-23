@@ -35,6 +35,9 @@ mvp_hide_runner_speed.py
     然後就被改名掉的中繼檔。中繼檔的名字是執行當下才生出來的隨機名
     (.<檔名>.tmp-xxxxxx 這種),用 tempfile.mkstemp 以 O_EXCL 建立 ——
     撞不到你的檔案,也沒有人能事先把那個名字佔起來。
+    另外,--apply 與 --restore 在動任何檔案之前,會先在同一個資料夾建一個
+    空的試寫檔(.mvp_probe-xxxxxxxxxxxx 這種)再馬上刪掉,確認這個資料夾寫得進去。
+    寫不進去就印中文說明、回傳 1,遊戲檔與備份都還沒被碰過。
 
 輸出:
   · 不加旗標:把找到的每一個速度數值印成一張表(行號、壘包、座標),
@@ -100,6 +103,7 @@ mvp_hide_runner_speed.py
 無外部相依,Python 3.7 以上即可。
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -114,7 +118,7 @@ mvp_hide_runner_speed.py
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 
 import re
@@ -190,6 +194,54 @@ def _refuse_symlink(path, what):
             '  (%s)寫過去會動到它指向的那個檔,而那個檔可能根本不在這個資料夾裡。\n'
             '  請先把它移走或換成實體檔,再跑一次。(目前沒有動到任何檔案。)'
             % (path, what))
+
+
+# ── 寫入之前先試一次(2026-09-23 加)──────────────────────────────────
+# 這個遊戲預設裝在 C:\Program Files (x86)\ 底下,那是受保護的資料夾:
+# 一般權限的命令提示字元在那裡建不了新檔。以前這支腳本要到做備份那一步才撞上,
+# 讀者看到的是十幾行英文 traceback,而且排錯表查不到。
+# 現在 --apply / --restore 動手之前,先在同一個資料夾用 os.open(O_CREAT|O_EXCL)
+# 建一個空檔再刪掉;建不出來就講人話停下來,那時候遊戲檔與備份都還沒被碰過。
+# ⚠️ 不拿 tempfile 來試:本站讀過 Python 3.9、3.11、3.12 的 tempfile 原始碼,
+#    它在 Windows 上碰到「拒絕存取」會換一個名字再試(3.14 改成最多試 20 次),
+#    所以最後丟出來的不一定是 PermissionError,也可能要試很久才放棄
+#    (這一點是讀原始碼推論的,本站還沒在 Windows 上實測)。
+#    os.open 只試一次,結果立刻知道。
+def _probe_writable(folder):
+    """在 folder 建一個空檔再刪掉。寫得進去回傳 None,寫不進去回傳那個 OSError。"""
+    probe = os.path.join(folder, '.mvp_probe-%s' % os.urandom(6).hex())
+    try:
+        fd = os.open(probe, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    except OSError as e:
+        return e
+    os.close(fd)
+    try:
+        os.remove(probe)
+    except OSError:
+        print('  (提醒:試寫用的空檔 %s 刪不掉,可以自己刪;遊戲檔沒有被動到)' % os.path.basename(probe))
+    return None
+
+
+def _print_no_permission(folder, err):
+    """寫不進去時印給人看的那一段。離開碼由呼叫的人決定(這支是 1)。
+
+    只有 PermissionError 才講「以系統管理員身分執行」那一套;
+    別的原因(唯讀的磁碟、磁碟滿……)那一套幫不上忙,就只照實說寫不進去。
+    """
+    if not isinstance(err, PermissionError):
+        print(f'\n✗ 這個資料夾現在寫不進去:{folder}')
+        print(f'  (系統回的是:{err})')
+        print('  遊戲檔沒有被改到,這個資料夾裡也沒有多出任何檔案。')
+        return
+    print(f'\n✗ 沒有權限寫入這個資料夾:{folder}')
+    print(f'  (系統回的是:{getattr(err, "strerror", None) or err})')
+    print('  遊戲裝在 C:\\Program Files (x86) 或 C:\\Program Files 底下時會這樣,')
+    print('  而那正是這個遊戲的預設安裝位置。')
+    print('  Windows:對「命令提示字元」按右鍵,選「以系統管理員身分執行」。')
+    print('  新視窗一開是在 C:\\Windows\\System32,先 cd 回你放腳本的地方')
+    print('  (例如 cd %USERPROFILE%\\Desktop),再跑同一行。')
+    print('  Mac / Linux 看到這一句,代表你這個帳號不能寫這個資料夾。')
+    print('  遊戲檔沒有被改到,這個資料夾裡也沒有多出任何檔案。')
 
 # ── 備份的原子性(2026-08-29 上線前稽核加)────────────────────────────
 # 原本是直接 shutil.copy2(遊戲檔, .bak)。複製途中被中斷(磁碟滿、外接碟拔掉、
@@ -887,6 +939,12 @@ def main():
             print(f'✗ 這個備份裡沒有這一課要的項目:{backup.name}')
             print('  它可能是別的教學留下來的備份。')
             return 1
+        # 蓋回去要先在同一個資料夾寫一個中繼檔。寫不進去的話現在就停,
+        # 不要等到中繼檔那一步才噴 traceback(理由見 _probe_writable 上面)。
+        _err = _probe_writable(str(big.parent))
+        if _err is not None:
+            _print_no_permission(big.parent, _err)
+            return 1
         _restore_from_backup(backup, big)
         # 蓋回去之後再比一次。copy2 中途出錯會丟例外,但「磁碟寫到一半滿了」
         # 這種情形值得再確認一次:比長度,再比內容,不用 zip()。
@@ -999,6 +1057,13 @@ def main():
         print(f'\n✗ 備份的名字是一個符號連結:{backup.name}')
         print('  本程式不跟著它寫 —— 它可能指到資料夾外面完全無關的檔。')
         print('  請先把它移走或換成實體檔,再跑一次。(目前沒有動到任何檔案。)')
+        return 1
+
+    # 備份與寫入都要在這個資料夾建新檔。遊戲裝在 Program Files 底下時這裡寫不進去,
+    # 在做備份之前先試一次,寫不進去就講人話停下來(理由見 _probe_writable 上面)。
+    _err = _probe_writable(str(big.parent))
+    if _err is not None:
+        _print_no_permission(big.parent, _err)
         return 1
 
     # ⚠️ 用 lexists 不用 exists:dangling 連結對 exists 回 False,
@@ -1422,6 +1487,22 @@ def selftest():
 if __name__ == '__main__':
     try:
         sys.exit(main())
+    except PermissionError as _pe:
+        # ⚠️ 2026-09-23 補:寫入前的試寫(_probe_writable)過了,後面才被拒的情形
+        #    (例如 Windows 上那個檔被設成唯讀,或正被別的程式開著),
+        #    以及連讀都不讓讀的情形(預覽也會走到這裡,所以不能只說「寫入」)。
+        #    一樣講人話、照 _STATE 說遊戲檔動了沒,不留一整片英文 traceback。
+        _paths = [a for a in sys.argv[1:] if not a.startswith('--')]
+        _who = _paths[0] if _paths else '<那個 .big>'
+        print(f'\n✗ 沒有權限讀寫:{_pe}')
+        print('  可能的原因:遊戲裝在 C:\\Program Files 底下、那個檔被設成唯讀,或遊戲正開著。')
+        print('  Windows 可以對「命令提示字元」按右鍵,選「以系統管理員身分執行」再跑一次。')
+        if _STATE['phase'] == 'idle':
+            print('  遊戲檔沒有被改到。')
+        else:
+            print('  遊戲檔可能已經被換過,請拿 .bak 跟它比對,或直接還原:')
+            print(f'  python3 {Path(sys.argv[0]).name} "{_who}" --restore')
+        sys.exit(1)
     except KeyboardInterrupt:
         # ⚠️ 2026-09-05 補:原本沒有接。Ctrl-C 會噴一整段 traceback,
         #    離開碼還是 1 —— 跟「複驗沒過」長得一模一樣,使用者分不出

@@ -14,7 +14,7 @@
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 
 """mvp_fingerprint.py — 幫一份遊戲資料夾算「指紋」,用來確認你我量的是同一份東西
@@ -57,10 +57,13 @@
   這份輸出是拿來貼給別人比對的,所以預設**不印完整路徑**:
   完整路徑裡常常有你的 Windows 使用者名稱、Mac 帳號名稱或磁碟布局。
   資料夾只印最後一層的名稱,讀不到的項目只印相對於它的路徑;
+  給錯路徑時的錯誤訊息也一樣:只說找不到、或說那是一個檔案,不把你給的路徑印回來。
+  路徑有空白卻沒用雙引號包起來、被拆成好幾段時,多出來的那幾段同樣不印。
   真的要完整路徑再加 --show-full-paths —— 那份輸出就不要直接公開。
   結束碼:0 = 跑完了,
          1 = 跑完了,但有檔案或資料夾讀不到,這份指紋不完整,不要拿去比對,
          2 = 給的路徑不是資料夾(參數本身給錯、或是根本沒給,也是 2;
+             路徑被空白拆成好幾段、多出參數,也是 2;
              在 python3 -O 底下跑 --selftest 也是 2 —— 見下面「安全網在哪」),
        130 = 你自己按了 Ctrl-C。它只讀不寫,所以中途停掉什麼都不會少。
 
@@ -90,6 +93,7 @@
 
 MIT License · Copyright (c) 2026 toni · 無外部相依,Python 3.7 以上
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 
 import argparse
 import hashlib
@@ -216,7 +220,7 @@ def selftest():
       · 遮蔽真的有遮到 —— 預設輸出裡不可以出現完整路徑
       · 唯讀真的是唯讀 —— 跑完之後那份資料夾要一個位元組都沒變
 
-    十六道檢查,其中十二道是餌(故意做一件「防線壞掉就會被印出來」的事):
+    二十三道檢查,其中十九道是餌(故意做一件「防線壞掉就會被印出來」的事):
       餌 1(1 道)把資料夾放在一層叫 ZZ_pretend_username 的路徑底下,
             預設輸出裡出現那個字就是漏了。
       餌 2(2 道)反向:加了 --show-full-paths 就**必須**印得出完整路徑,
@@ -233,11 +237,21 @@ def selftest():
             而且說清楚為什麼。守門被拆掉的話,-O 那一次會一路綠燈跑完,
             這兩道就會紅。(這一次本身就是上一層開的那個子程序時,
             這一組會照實說是略過 —— 不然會一層開一層停不下來。)
+      餌 7(3 道)給三種不存在的路徑:Mac 的 /Users/…、Windows 的 C 槽 Users 底下、
+            中間有空白的。結束碼要是 2、要說「找不到」,
+            而且錯誤訊息裡不可以出現路徑裡那段假名字。
+      餌 8(2 道)路徑指到一個檔案(不是資料夾);以及含空白的路徑沒加引號、
+            被拆成兩段。兩種都要結束碼 2、要說清楚是哪一種錯,
+            而且路徑裡的假名字一個都不可以印出來。
+      餌 9(2 道)反向:加了 --show-full-paths,找不到的那條路徑、
+            被拆開的那一段都**必須**原樣印出來。少了這一組,
+            「錯誤訊息整行沒印」也會讓餌 7、餌 8 通過。
     另外四道是一般斷言:資料夾名稱有印出來(擋住餌 1 假通過)、
     加旗標不會改到結束碼、遮蔽沒有動到清單雜湊本身、
     跑完之後那份資料夾一個位元組都沒變。
     做不出「讀不到的資料夾」的機器(以系統管理員身分跑、或 Windows)
     會少掉餌 3 那一組 4 道,畫面上會照實說是略過,不會假裝測過。
+    餌 7 那三條假路徑萬一在這台機器上真的存在,那一道也照實說是略過。
 
     測試自己是另開一個 Python 程序跑真的命令列,不是呼叫內部函式 ——
     要驗的就是「讀者打那一行下去看到什麼」。
@@ -258,7 +272,8 @@ def selftest():
 
     script = os.path.abspath(__file__)
     if not os.path.isfile(script):
-        print('  自我測試要用到腳本檔本身,但找不到:%s' % script)
+        # 只印檔名:完整路徑裡常常有帳號名稱,跟主程式那條錯誤訊息同一個理由。
+        print('  自我測試要用到腳本檔本身,但找不到:%s' % os.path.basename(script))
         return 1
 
     def cli(*extra):
@@ -384,6 +399,76 @@ def selftest():
                  '(應該是 2,要拒跑)' % rc_opt)
             need('-O' in out_opt,
                  '餌 6:python3 -O 底下拒跑了,卻沒有說清楚為什麼')
+        # 餌 7:給錯路徑的錯誤訊息也不可以把路徑印回來。
+        # 讀者最常把錯誤訊息整段複製去問人,而那正是路徑給錯的時候。
+        # 三條都是不存在的路徑;路徑裡那段假名字就是「帳號名稱」的替身。
+        # Windows 那條用 join 組出來,不直接寫成一整串:原始碼裡不要出現
+        # 一條看起來像真實使用者路徑的字串(這支的原始碼整份貼在頁面上)。
+        surname = 'ZZ_pretend_surname'
+        pretend = [
+            ('Mac 路徑', '/Users/%s/Games/MVP Baseball 2005' % canary, (canary,)),
+            ('Windows 路徑',
+             '\\'.join(('C:', 'Users', canary, 'Games', 'MVP Baseball 2005')),
+             (canary,)),
+            ('含空白的路徑',
+             '/Users/%s %s/Games/MVP Baseball 2005' % (canary, surname),
+             (canary, surname)),
+        ]
+        first_missing = None
+        for label, bad_path, secret_names in pretend:
+            if os.path.exists(bad_path):
+                skips.append('餌 7 的「%s」那一道(這條假路徑在這台機器上真的存在)'
+                             % label)
+                continue
+            if first_missing is None:
+                first_missing = bad_path
+            rc7, out7 = cli(bad_path)
+            if rc7 != 2:
+                why7 = '結束碼是 %s(應該是 2)' % rc7
+            elif '找不到' not in out7:
+                why7 = '沒有說「找不到」'
+            elif any(s in out7 for s in secret_names):
+                why7 = '錯誤訊息把你給的路徑印出來了'
+            else:
+                why7 = None
+            need(why7 is None, '餌 7(%s):%s' % (label, why7))
+        # 餌 8:路徑指到一個檔案,不是資料夾。用上面已經造好的 attrib.dat,
+        # 不另外造檔 —— 自我測試寫的東西越少越好。
+        a_file = os.path.join(root, 'data', 'database', 'attrib.dat')
+        rc8, out8 = cli(a_file)
+        if rc8 != 2:
+            why8 = '結束碼是 %s(應該是 2)' % rc8
+        elif '檔案' not in out8:
+            why8 = '沒有說那是一個檔案'
+        elif canary in out8 or base in out8:
+            why8 = '錯誤訊息把你給的路徑印出來了'
+        else:
+            why8 = None
+        need(why8 is None, '餌 8(路徑指到檔案):%s' % why8)
+        # 餌 8 之二:含空白的路徑沒加引號,被拆成兩段。多出來的那一段也不可以印。
+        split_a = '/Users/%s' % canary
+        split_b = '%s/Games/MVP Baseball 2005' % surname
+        rc8b, out8b = cli(split_a, split_b)
+        if rc8b != 2:
+            why8b = '結束碼是 %s(應該是 2)' % rc8b
+        elif '引號' not in out8b:
+            why8b = '沒有提醒要用引號把路徑包起來'
+        elif canary in out8b or surname in out8b:
+            why8b = '把拆開的那幾段印出來了'
+        else:
+            why8b = None
+        need(why8b is None, '餌 8(路徑被空白拆成兩段):%s' % why8b)
+        # 餌 9(反向):加了旗標就**必須**原樣印出來。
+        # 不然「錯誤訊息整行沒印」也會讓餌 7、餌 8 通過。
+        if first_missing is None:
+            skips.append('餌 9 的第一道(餌 7 那三條假路徑在這台機器上都存在)')
+        else:
+            _rc9, out9 = cli(first_missing, '--show-full-paths')
+            need(first_missing in out9,
+                 '餌 9:加了 --show-full-paths,找不到的那條路徑還是沒印出來')
+        _rc9b, out9b = cli(split_a, split_b, '--show-full-paths')
+        need(split_b in out9b,
+             '餌 9:加了 --show-full-paths,被拆開的那一段還是沒印出來')
         # 遮蔽只動顯示,不可以動到結束碼,也不可以動到算出來的值
         need(rc == rc_full,
              '加了 --show-full-paths 之後結束碼變了', bait=False)
@@ -442,7 +527,29 @@ def main():
                     help='連完整路徑一起印（預設只印資料夾名稱與相對路徑）')
     ap.add_argument('--selftest', action='store_true',
                     help='自我測試（不需要遊戲資料夾,不會碰到你的檔案）')
-    args = ap.parse_args()
+    # 用 parse_known_args 而不是 parse_args:多出來的參數要自己接。
+    # 最常見的來源是路徑裡有空白卻沒加引號,一條路徑被拆成好幾段 ——
+    # 交給 argparse 的話,它會用英文把多出來的那幾段原樣印出來,
+    # 而那幾段通常就是帳號名稱的後半截(例如 /Users/〔名〕 〔姓〕/… 被拆開之後的「〔姓〕/…」)。
+    args, extra = ap.parse_known_args()
+
+    if extra:
+        # 回 2:跟 argparse 自己遇到多餘參數時用的結束碼一樣。
+        print()
+        print('  參數多了 %d 個。最常見的原因是路徑裡有空白卻沒用雙引號包起來,'
+              % len(extra))
+        print('  一條路徑被拆成了好幾段。請把整條路徑用雙引號包起來再跑一次。')
+        if any(x.startswith('-') for x in extra):
+            print('  也可能是選項打錯了:這支只認得 --all、--show-full-paths、--selftest。')
+        if args.show_full_paths:
+            for x in extra:
+                print('     多出來的:%s' % x)
+        else:
+            # 預設不印那幾段:它們是路徑的一部分,常常就是帳號名稱。
+            print('  (為了不把帳號名稱印出來,這裡不重複那幾段;'
+                  '要看它們是什麼,加 --show-full-paths。)')
+        print()
+        return 2
 
     if args.selftest:
         return selftest()
@@ -454,7 +561,26 @@ def main():
     if not os.path.isdir(root):
         # 這裡回 2 不是 1:argparse 自己在參數有錯時用的也是 2,
         # 這樣「參數給錯了」跟「跑完但結果不如預期」在批次檔裡分得開。
-        print('\n  找不到資料夾:%s\n' % root)
+        # 預設不把路徑印回來:路徑給錯正是讀者最會把錯誤訊息整段貼出去問人的時候,
+        # 而完整路徑裡常常有帳號名稱 —— 檔頭說明裡「預設不印完整路徑」那句話
+        # 也要涵蓋這一條。讀者知道自己打了什麼,不需要我們複誦。
+        # 存在卻不是資料夾,幾乎都是指到了檔案(例如直接把 mvp2005.exe 拖進來)。
+        not_a_dir = os.path.exists(root)
+        print()
+        if args.show_full_paths:
+            if not_a_dir:
+                print('  這是一個檔案,不是資料夾:%s' % root)
+            else:
+                print('  找不到資料夾:%s' % root)
+        else:
+            if not_a_dir:
+                print('  你給的路徑是一個檔案,不是資料夾。')
+            else:
+                print('  找不到你給的那個資料夾。')
+            print('  (為了不把帳號名稱印出來,這裡不重複你給的路徑;'
+                  '要看它收到的是什麼,加 --show-full-paths。)')
+        print('  要指到「裡面有 data 資料夾」的那一層。')
+        print()
         return 2
 
     files, unreadable = walk(root)

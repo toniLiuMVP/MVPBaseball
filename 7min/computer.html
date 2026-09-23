@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/7min/computer.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="七分鐘從電腦小白到可以修改模組 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="完全不會電腦也能跟著做：開命令列、認路徑、拖資料夾、跑腳本、還原。Windows 與 Mac 並列。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/7min/computer.html">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>七分鐘從電腦小白到可以修改模組 — toni的MVP模組補習班</title>
+<title>七分鐘從電腦小白到可以修改模組 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="完全不會電腦也能跟著做：開命令列、認路徑、拖資料夾、跑腳本、還原。Windows 與 Mac 並列。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -53,24 +63,11 @@
   </ul>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <h2>👉 你要做的事</h2>
@@ -95,7 +92,9 @@
     <div class="step-n">3</div>
     <div>
       <p><strong>不要用打的，用拖的。</strong></p>
-      <p>這是最重要的一招：<strong>把資料夾直接拖進那個黑視窗</strong>，路徑會自己打出來，一個字都不會錯。</p><p>先打 <code>cd</code> 再打一個空白，然後把遊戲資料夾拖進去，按 Enter。你現在就「站在」那個資料夾裡了。</p>
+      <p>這是最重要的一招：<strong>把資料夾直接拖進那個黑視窗</strong>，路徑會自己打出來，一個字都不會錯。</p><p>Windows 先打 <code>cd /d</code>、Mac 先打 <code>cd</code>，再打一個空白，然後把遊戲資料夾拖進去，按 Enter。你現在就「站在」那個資料夾裡了。
+         （Windows 的 <code>/d</code> 是讓它連磁碟機一起換過去，遊戲裝在 D 槽也跑得到那裡。
+         這一點依據的是微軟官方文件，本站<u>還沒在裝在 D 槽的遊戲上實測</u>。）</p>
     </div>
   </div>
 
@@ -103,12 +102,16 @@
     <div class="step-n">4</div>
     <div>
       <p><strong>裝 Python(本站的腳本都是用它跑的)。</strong></p>
-      <ul><li><strong>Windows</strong>：到 <a href="https://www.python.org/downloads/" rel="nofollow">python.org</a> 下載安裝。<u>安裝時第一頁那個「Add Python to PATH」一定要打勾</u> —— 沒勾的話指令會找不到它</li><li><strong>Mac</strong>：通常已經有了。沒有的話一樣去 python.org 下載</li></ul><p>裝完確認：</p>
+      <ul><li><strong>Windows</strong>：到 <a href="https://www.python.org/downloads/" rel="nofollow">python.org</a>，按最上面那顆大按鈕「Download Python install manager」下載，點兩下按「Install」。
+          這個新的安裝方式<strong>沒有</strong>「Add python.exe to PATH」勾選框，不用找；電腦上還沒有任何一版 Python 的話，第一次打 <code>python</code> 時它會自己下載最新版。
+          <span class="small">（這個新的安裝方式本站<u>還沒在 Windows 上實測</u>。每一步的細節、舊式安裝程式那條退路，看<a href="../start.html#python">第 0 課操作五</a>。）</span></li><li><strong>Mac</strong>：較新的 macOS 本身帶著一個 <code>python3</code> 指令，但沒裝過「開發者工具」的 Mac，第一次打它<u>可能</u>會跳出要你安裝的視窗 —— 按「安裝」，裝完再打一次。
+          沒跳視窗也印不出版本，就照<a href="../start.html#python">第 0 課操作五</a>的 d 步驟，或到 python.org 下載 macOS 版。
+          <span class="small">（那個視窗本站<u>還沒在沒裝過開發者工具的 Mac 上實測</u>。）</span></li></ul><p>裝完確認：</p>
       <p class="small">Windows:</p>
 <pre><code>python --version</code></pre>
       <p class="small">Mac / Linux:</p>
 <pre><code>python3 --version</code></pre>
-      <p>印出版本號就成功了，<strong>第二個數字要 7 以上</strong>（<code>Python 3.7</code>、<code>3.9</code>、<code>3.12</code> 都行）。印出的是 <code>Python 2.7.x</code> 代表版本太舊：Windows 改打 <code>py -3 --version</code>（<code>py</code> 只有 Windows 有）、Mac 改打 <code>python3 --version</code> 試試，哪一個印出 3.x 就用哪一個。<strong>Windows 打 <code>python</code>、Mac 打 <code>python3</code></strong> ——本站大多數課的指令兩種都會給你；<u>只給 <code>python3</code> 的那幾課</u>（例如<a href="exe.html">七分鐘調好你的執行檔</a>），Windows 上請自己把開頭的 <code>python3</code> 換成 <code>python</code>。</p>
+      <p>印出版本號就成功了，<strong>第二個數字要 7 以上</strong>（<code>Python 3.7</code>、<code>3.9</code>、<code>3.12</code> 都行）。印出的是 <code>Python 2.7.x</code> 代表版本太舊：Windows 改打 <code>py -3 --version</code>（<code>py</code> 只有 Windows 有）、Mac 改打 <code>python3 --version</code> 試試，哪一個印出 3.x 就用哪一個。<strong>Windows 打 <code>python</code>、Mac 打 <code>python3</code></strong> ——本站大多數課的指令兩種都會給你；<u>只給 <code>python3</code> 的那幾課</u>（例如<a href="../tutorials/run-in-2026/index.html">2026 年的電腦怎麼跑得起 2005 年的遊戲</a>），Windows 上請自己把開頭的 <code>python3</code> 換成 <code>python</code>；反過來，只給 <code>python</code> 的課，Mac 請換成 <code>python3</code>。</p>
     </div>
   </div>
 
@@ -140,11 +143,13 @@
   <div class="tablewrap"><table>
     <thead><tr><th>症狀</th><th>怎麼辦</th></tr></thead>
     <tbody>
-      <tr><td>說找不到 <code>python</code></td><td>Windows 上八成是安裝時沒勾「Add Python to PATH」。重新安裝並勾起來</td></tr>
+      <tr><td>說找不到 <code>python</code></td><td>Windows 上用舊式安裝程式裝的話，八成是安裝時沒勾「Add python.exe to PATH」，重新安裝並勾起來；新的 Python install manager 沒有這個勾選框，照<a href="../start.html#python">第 0 課操作五</a>的 e 步驟檢查</td></tr>
+      <tr><td>印出一段 <code>Python was not found</code> 開頭的英文，或跳出 Microsoft Store</td><td>多半是這台電腦還沒裝 Python，跳出來的是 Windows 內建的轉接捷徑，不是 Python 本身。關掉它，照上面第 4 步裝（這兩種畫面本站還沒在 Windows 上實測）</td></tr>
       <tr><td>印出的是 <code>Python 2.7.x</code></td><td>版本太舊。Windows 改打 <code>py -3 --version</code>（<code>py</code> 只有 Windows 有），Mac 改打 <code>python3 --version</code>；哪一個印出 3.x，就把本站指令開頭的 <code>python</code> 換成它</td></tr>
       <tr><td>說找不到檔案</td><td>路徑打錯了。<strong>用拖的</strong>，不要用打的</td></tr>
       <tr><td>路徑有空白就出錯</td><td>整個路徑用雙引號包起來</td></tr>
       <tr><td>視窗一閃就關掉</td><td>不要雙擊 <code>.py</code> 檔。要先開命令列，再在裡面打指令</td></tr>
+      <tr><td>按下載之後，瀏覽器說檔案被擋下來、「可能有害」或「不常下載」</td><td>那是瀏覽器對程式檔的預防，不代表檔案有問題。怎麼放行看<a href="../start.html#download-blocked">第 0 課這一張卡片</a></td></tr>
     </tbody>
   </table></div>
 
@@ -168,6 +173,6 @@
        <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

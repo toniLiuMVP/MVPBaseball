@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/fonts.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="字型檔 .ffn — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="遊戲的 12 個點陣字型:兩種檔頭代號、四個內容完全相同的檔案,以及一個把「孤兒資料是怎麼產生的」完整證明出來的例子。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/reference/fonts.html">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>字型檔 .ffn — toni的MVP模組補習班</title>
+<title>字型檔 .ffn — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="遊戲的 12 個點陣字型:兩種檔頭代號、四個內容完全相同的檔案,以及一個把「孤兒資料是怎麼產生的」完整證明出來的例子。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -98,14 +108,14 @@
      <span class="badge wip">部分已解</span> 兩個差距一模一樣，不像隨機出錯。本站後來把那 1,088 個位元組打開看，得到三件事：</p>
     <div class="tablewrap" style="margin:8px 0"><table>
       <tbody>
-        <tr><td>它<strong>不是填充</strong></td>
+        <tr><th scope="row">它<strong>不是填充</strong></th>
             <td>開頭是 <code>ff ff ff 04</code>、<code>ff ff ff 05</code>、<code>ff ff ff 06</code>…
                 這種<u>規律遞增的結構</u>，不是一片 0</td></tr>
-        <tr class="hi"><td>其中一個帶著標記</td>
+        <tr class="hi"><th scope="row">其中一個帶著標記</th>
             <td class="mono"><strong>EAGL64</strong><br>
                 <span class="small">EAGL 是 EA 的圖形函式庫，
                 <a href="anims.html">動畫那頁</a>也出現過</span></td></tr>
-        <tr class="hi"><td>兩個尾巴<strong>不一樣</strong></td>
+        <tr class="hi"><th scope="row">兩個尾巴<strong>不一樣</strong></th>
             <td>逐位元組比對 <strong>90.8% 不同</strong> ——
                 所以不是同一塊資料被複製兩份</td></tr>
       </tbody>
@@ -202,8 +212,8 @@ twc18_en.ffn</code></pre>
   </table></div>
   <div class="tablewrap"><table>
     <tbody>
-      <tr><td>原版</td><td class="num">12 個字型</td><td class="num">204,523 bytes</td><td>全部 <code>_en</code></td></tr>
-      <tr class="hi"><td>中文包</td><td class="num"><strong>13 個</strong></td><td class="num"><strong>1,683,191 bytes</strong></td>
+      <tr><th scope="row">原版</th><td class="num">12 個字型</td><td class="num">204,523 bytes</td><td>全部 <code>_en</code></td></tr>
+      <tr class="hi"><th scope="row">中文包</th><td class="num"><strong>13 個</strong></td><td class="num"><strong>1,683,191 bytes</strong></td>
           <td>12 個 <code>_jp</code> ＋ 留著原本的 <code>dflt_en</code></td></tr>
     </tbody>
   </table></div>
@@ -265,15 +275,15 @@ case 3、4 → "_jp"    case 5 → "_es"</pre>
     <p>打開 <code>data\fonts\fonts.big</code>，看裡面的檔名結尾<u>與合計大小</u>：</p>
     <div class="tablewrap"><table>
       <tbody>
-        <tr><td>全部是 <code>_en</code>，合計約 200 KB</td><td><strong>沒裝中文字型</strong></td></tr>
-        <tr class="hi"><td>出現 <code>_jp</code>，合計超過 1 MB</td><td><strong>裝過中文字型了</strong></td></tr>
-        <tr class="hi"><td>全部是 <code>_en</code>，但合計遠超過 200 KB（例如 1.2 MB）</td>
+        <tr><th scope="row">全部是 <code>_en</code>，合計約 200 KB</th><td><strong>沒裝中文字型</strong></td></tr>
+        <tr class="hi"><th scope="row">出現 <code>_jp</code>，合計超過 1 MB</th><td><strong>裝過中文字型了</strong></td></tr>
+        <tr class="hi"><th scope="row">全部是 <code>_en</code>，但合計遠超過 200 KB（例如 1.2 MB）</th>
             <td><strong>也裝過中文字型了</strong> —— 那是<u>直接蓋掉英文槽位</u>的社群包
             （<a href="../tutorials/fix-chinese/index.html">中文版配大球場就跳出</a>那一課量的那份就是），
             <strong>檔名分不出來，要看大小</strong></td></tr>
       </tbody>
     </table></div>
-<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data\fonts\fonts.big --entries</code></pre>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data/fonts/fonts.big --entries</code></pre>
     <p class="small">工具在<a href="../tutorials/fel-toolkit/index.html">介面萬用工具</a>那一課。
        更完整的說明在
        <a href="../tutorials/whats-original/index.html">怎麼看出哪些檔還沒被動過</a>。</p>
@@ -297,7 +307,7 @@ case 3、4 → "_jp"    case 5 → "_es"</pre>
   <div class="card clay">
     <p class="card-h">誠實邊界</p>
     <p>本站解出的是<strong>容器層</strong>：有幾個字型、各多大、壓縮與否、檔頭前 10 個位元組怎麼讀。</p>
-    <p>⚠️ <strong>2026-09-05 訂正：字符本身後來解開了。</strong>
+    <p>⚠️ <strong>2026-09-05 訂正：字形本身後來解開了。</strong>
        這裡原本寫「字符本身長什麼樣、怎麼對應到文字編碼，本站沒有解讀」，那句已經不成立：
        <a href="pixel-formats.html">圖片的像素怎麼排</a>那頁量到 <code>au20b_en.ffn</code> 裡有一張
        格式 <code>0x79</code>、256×128、每個像素半個位元組的字圖集，後面接著一張 16 筆的
@@ -336,6 +346,6 @@ case 3、4 → "_jp"    case 5 → "_es"</pre>
        <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

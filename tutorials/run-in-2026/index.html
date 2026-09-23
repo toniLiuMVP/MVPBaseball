@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/run-in-2026/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="2026 年的電腦怎麼跑得起 2005 年的遊戲 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="MVP Baseball 2005 是 32 位元的 Windows XP 時代遊戲。這一課講它在今天的 Windows 與 Apple Silicon Mac 上會遇到什麼、怎麼檢查你手上那份，以及「球場不能超過 20MB」那條老規矩本站實際量到的結果（那個數字站不住）。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/run-in-2026/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>2026 年的電腦怎麼跑得起 2005 年的遊戲 — toni的MVP模組補習班</title>
+<title>2026 年的電腦怎麼跑得起 2005 年的遊戲 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="MVP Baseball 2005 是 32 位元的 Windows XP 時代遊戲。這一課講它在今天的 Windows 與 Apple Silicon Mac 上會遇到什麼、怎麼檢查你手上那份，以及「球場不能超過 20MB」那條老規矩本站實際量到的結果（那個數字站不住）。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -53,44 +63,32 @@
   </div>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix" id="quick">
-    <p class="card-h">⚡ 只想趕快做完？照這五步</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
+    <p class="small">下面照 Mac 寫法；Windows 把 <code>python3</code> 換成 <code>python</code>。</p>
     <ol>
-      <li>下載 <a href="mvp_modernize.py" download>mvp_modernize.py</a>（零相依，不用裝任何套件）</li>
+      <li>下載 <a href="mvp_modernize.py" download>mvp_modernize.py</a>（零相依，不用裝任何套件）。下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打（Mac 開終端機先打 <code>cd ~/Downloads</code>）。</li>
       <li>先唯讀看你手上那顆是什麼，完全不會動到檔案<br>
   <pre><code>python3 mvp_modernize.py "&lt;遊戲資料夾&gt;/mvp2005.exe"</code></pre></li>
       <li>預覽要改哪幾個位元組，這一步還是不會寫入<br>
-  <pre><code>python3 mvp_modernize.py "&lt;...&gt;/mvp2005.exe" --4gb --resolution 1920x1080</code></pre></li>
+  <pre><code>python3 mvp_modernize.py "&lt;遊戲資料夾&gt;/mvp2005.exe" --4gb --resolution 1920x1080</code></pre></li>
       <li>確認列出來的位元組沒問題，才真的改（會先備份，寫完自動複驗）<br>
-  <pre><code>python3 mvp_modernize.py "&lt;...&gt;/mvp2005.exe" --4gb --resolution 1920x1080 --apply</code></pre></li>
+  <pre><code>python3 mvp_modernize.py "&lt;遊戲資料夾&gt;/mvp2005.exe" --4gb --resolution 1920x1080 --apply</code></pre></li>
       <li>不對勁就一行還原<br>
-  <pre><code>python3 mvp_modernize.py "&lt;...&gt;/mvp2005.exe" --restore</code></pre></li>
+  <pre><code>python3 mvp_modernize.py "&lt;遊戲資料夾&gt;/mvp2005.exe" --restore</code></pre></li>
     </ol>
-    <p class="tail">Windows 把 <code>python3</code> 換成 <code>python</code>。
-       中文版配大球場會跳出的話，那是另一顆旋鈕 <code>--pool</code>，看
+    <p class="tail">中文版配大球場會跳出的話，那是另一顆旋鈕 <code>--pool</code>，看
        <a href="../fix-chinese/index.html">中文版配大球場就跳出</a>那一課。
        想知道為什麼是 4 GB 而不是 8 GB、以及「球場不能超過 20MB」到底怎麼回事，往下讀；
        只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+    <p class="tail">照做卡住了？直接跳到<a href="#fix">❌ 出錯處理</a>（可以把畫面上印出來的那一行貼進那裡的搜尋框）；做完對照<a href="#ok">✅ 成功標準</a>。</p>
   </div>
 
   <h2>先看清楚你手上那份是什麼</h2>
@@ -230,6 +228,8 @@
        那 28 MB 是「同時擠在記憶體裡」的 28 MB，不是硬碟上的 28 MB。</p>
     <p class="small">這個推論解釋得了「為什麼大 389 MB 的檔沒事」，而總量說解釋不了 ——
        這是本站採信它的唯一理由，不是因為它聽起來合理。
+       後來找到的 64 MB 記憶體池（見<a href="../fix-chinese/index.html">中文版配大球場就跳出</a>）
+       跟這個推論的方向一致，但執行時的用量本站仍然沒量到。
        <span class="badge wip">未解</span> 要確認的話得量執行時的記憶體。</p>
     <p class="small">⚠️ 單位：本頁這幾個 MB 是用 1,000,000 位元組算的（173 MB / 562 MB / 差 389 MB）。
        <a href="../shrink-big/index.html">封裝檔為什麼會越長越大</a>那一課用的是 1,048,576 位元組，
@@ -441,11 +441,17 @@
 
   <h2>👉 你要做的事</h2>
 
+  <div class="card blue">
+    <p class="card-h">指令裡的 python 與 python3</p>
+    <p>下面範例照 Mac 寫法用 <code>python3</code>；Windows 使用者把每行開頭改成 <code>python</code>。</p>
+  </div>
+
   <div class="step">
     <div class="step-n">1</div>
     <div>
       <p class="step-t">下載腳本</p>
-      <p><a href="mvp_modernize.py" download>mvp_modernize.py</a>（1,298 行，零相依）</p>
+      <p><a href="mvp_modernize.py" download>mvp_modernize.py</a>（1,299 行，零相依）</p>
+      <p class="small"><strong>指令要在放腳本的那個資料夾打。</strong>瀏覽器下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter —— 開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。Mac：打開終端機，先打 <code>cd ~/Downloads</code> 按 Enter。</p>
     </div>
   </div>
 
@@ -462,7 +468,7 @@
     <div class="step-n">3</div>
     <div>
       <p class="step-t">預覽要改什麼（還是不會動到檔案）</p>
-<pre>python3 mvp_modernize.py "&lt;...&gt;/mvp2005.exe" --4gb --resolution 1920x1080</pre>
+<pre>python3 mvp_modernize.py "&lt;遊戲資料夾&gt;/mvp2005.exe" --4gb --resolution 1920x1080</pre>
       <p>它會先講<strong>總共會改幾個位元組</strong>，再把位置列出來（位置只列前 16 個，總數以前面那一句為準）。本站在剛安裝好的英文版原版上跑上面這一行，實測是 <strong>7 個位元組</strong>，7 個位置全部列得出來。</p>
     </div>
   </div>
@@ -471,12 +477,12 @@
     <div class="step-n">4</div>
     <div>
       <p class="step-t">確定了才真的改</p>
-<pre>python3 mvp_modernize.py "&lt;...&gt;/mvp2005.exe" --4gb --resolution 1920x1080 --apply</pre>
+<pre>python3 mvp_modernize.py "&lt;遊戲資料夾&gt;/mvp2005.exe" --4gb --resolution 1920x1080 --apply</pre>
       <p>會先備份，寫完再讀回來確認<u>改動的位元組剛好是預期那幾個、其他一個都沒動</u>。</p>
     </div>
   </div>
 
-  <h2>✅ 成功標準</h2>
+  <h2 id="ok">✅ 成功標準</h2>
   <ul class="plain">
     <li>「已備份 → mvp2005.exe.modernizebak」</li>
     <li><strong>「複驗:改動的位元組剛好是預期那 N 個,其他一個都沒動 ✅」</strong></li>
@@ -487,10 +493,14 @@
      「<code>備份已存在,保留最早那一份 → mvp2005.exe.modernizebak(5443584 位元組,2026-09-05 20:34)</code>」——
      那是正常的：它不會用新的蓋掉你動手前那一份，而且沿用之前會先確認那份備份對得上現在這顆執行檔。</p>
 
-  <h2>❌ 出錯處理</h2>
+  <h2 id="fix">❌ 出錯處理</h2>
   <div class="tablewrap"><table>
     <thead><tr><th>看到什麼</th><th>怎麼做</th></tr></thead>
     <tbody>
+      <tr class="hi"><td class="mono">can't open file '…mvp_*.py'</td>
+          <td><strong>命令視窗跟腳本不在同一個資料夾。</strong>
+              打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）。
+              還是一樣的話，是檔名對不上：瀏覽器可能在檔名後面加了 <code>(1)</code>，把它改成跟指令裡一模一樣</td></tr>
       <tr><td>開頭不是 MZ / 找不到 PE 檔頭</td><td>路徑指錯了，要指到 <code>mvp2005.exe</code> 本身</td></tr>
       <tr><td>找不到解析度表</td><td>你這個版本的表長得不一樣。腳本不會亂猜位址，這是刻意的。<strong>只有 <code>--resolution</code> 會因此停下來</strong>，<code>--4gb</code> 與 <code>--timestamp</code> 不看那張表，照樣做得下去（<code>--pool</code> 也不看那張表，但它在有光碟保護的原版上找不到樣態，而那會讓<u>整行指令</u>停下來 —— 同一行裡的 <code>--4gb</code> 與 <code>--resolution</code> 也不會被套用，要把 <code>--pool</code> 拿掉再跑一次）</td></tr>
       <tr><td>找到 N 個看起來像表的地方</td><td>同上，不確定就不動。回報你的執行檔大小</td></tr>
@@ -506,7 +516,8 @@
 
   <div class="card grass">
     <p class="card-h">一行就能還原</p>
-<pre>python3 mvp_modernize.py "&lt;...&gt;/mvp2005.exe" --restore</pre>
+<pre>python3 mvp_modernize.py "&lt;遊戲資料夾&gt;/mvp2005.exe" --restore</pre>
+    <p class="small">Windows 把 <code>python3</code> 換成 <code>python</code>。</p>
     <p>本站實測：兩份剛安裝好的原版（英文版與中文版）各改各的、再還原，
        <strong>SHA-256 都跟動手前完全相同</strong>。</p>
     <p class="small">⚠️ <code>--restore</code> 有可能<u>拒絕還原</u>：備份跟現在這顆執行檔對不上的時候
@@ -545,7 +556,10 @@
   <div class="card grass">
     <p class="card-h">本站實測到什麼</p>
     <p>測試機：<strong>Apple M4 · macOS 26.5.2 · arm64</strong>，
-       用 <code>brew install --cask wine-crossover</code> 裝的 Wine 8.0.1。</p>
+       用 <code>brew install --cask wine-crossover</code> 裝的 Wine 8.0.1。
+       <u>這個套件現在已經拿不到了</u>（2026-04 起從它所在的第三方來源移除），
+       這一行留著是記錄當時實測用的是什麼，不是叫你照打；現況見
+       <a href="../play-on-mac/index.html">在 Mac 上玩 MVP 2005</a>那一課第 1 步。</p>
     <div class="tablewrap"><table>
       <thead><tr><th>驗的是什麼</th><th>結果</th></tr></thead>
       <tbody>
@@ -712,9 +726,20 @@ Mac 的話：晶片是 Intel 還是 Apple Silicon
     <li><strong>裝了模組會跳出，先換這兩個檔</strong> 把 <code>uniforms.big</code> 與 <code>stadiums.big</code> 換回原版，等於少載 <strong>28 MB</strong>，那正是班主任機器上會不會當的分界。反例很關鍵：<code>models.big</code> 大了 389 MB 卻一直沒事，所以「總量太大」這個解釋不成立。</li>
     <li><strong>最容易踩的雷：檔名會騙人</strong> 手邊 8 個 <code>mvp2005 - XXX.exe</code> 逐位元組比對，其實只有 6 種不同的二進位。「更新4GB」那顆連解析度都改成 1080p 了，還有一個資料夾叫 <code>4GB-Patch_1920x1024</code> 而裡面其實是 1920×1080。要確認一顆執行檔是什麼，跑唯讀檢查看內容。</li>
     <li><strong>改了解析度，畫面還是被拉伸的</strong> 那張表只告訴遊戲「有多少像素」，沒告訴它「像素的形狀變了」，內部投影比例仍然是 4:3。真正修比例要靠第三方的 <code>mvp2005fix</code>，它在執行時攔投影矩陣，跟本站的腳本改的是不同筆（本站改第 1、2 筆 640×480，它找第 3、4 筆 800×600），可以並存。</li>
-    <li><strong>安全網有三層</strong> 預覽模式會先講總共會改幾個位元組，位置只列前 16 個（剛安裝好的英文版原版加 <code>--4gb</code> 與 <code>--resolution 1920x1080</code> 是 7 個，全部列得出來；換成一顆找得到記憶體池、檔頭校驗值原本就有填的執行檔，四個旋鈕連 <code>--timestamp</code> 一起開本站量到 17 個，畫面就只列得出前 16 個，總數要看前面那一句）；<code>--apply</code> 會先備份成 <code>mvp2005.exe.modernizebak</code>（已經有備份就沿用最早那一份，但沿用之前會先確認它對得上現在這顆執行檔，<u>對不上就停下來不動你的檔</u>），寫完讀回來確認「改動的位元組剛好是預期那幾個，其他一個都沒動」；<code>--restore</code> 一行還原，覆蓋之前也有三道把關、備份對不上就拒絕，而且真的覆蓋那一步是<u>先寫暫存檔、比對 SHA-256 過了才原子改名換上去</u>，<u>改名之前</u>中途斷掉正本原封不動（改名跑完之後才按 Ctrl-C 的話，腳本會照實說「還原那一步已經做完了」，不會反過來說沒動到），兩份原版實測還原後 <strong>SHA-256 與動手前完全相同</strong>。複驗說不符就立刻還原並回報（畫面會把那一行還原指令直接印出來給你複製）。還有一道跟這三層平行的：<u>遊戲執行檔本身或備份檔是捷徑（符號連結）的話，<code>--apply</code> 與 <code>--restore</code> 直接停下來、結束碼不是 0</u>，請改用真檔的路徑；唯讀體檢與預覽只讀不寫，走在捷徑上照樣看得下去。</li>
+    <li><strong>安全網有三層</strong> 不加 <code>--apply</code> 只預覽，先講總共會改幾個位元組；<code>--apply</code> 先備份成 <code>mvp2005.exe.modernizebak</code>（已經有備份就沿用最早那一份，沿用前會先確認它對得上現在這顆執行檔）再改，改完自己複驗，不符就把還原指令印給你，照著立刻還原並回報；<code>--restore</code> 一行退回，兩份原版實測還原後跟動手前<strong>完全相同</strong>。寫到一半斷掉、按了 Ctrl-C、檔案是捷徑時它怎麼保護你的檔，見<a href="#how-it-works">這支腳本在做什麼</a>。</li>
     <li><strong>本站沒驗的</strong> 本站從來沒有量過遊戲執行時到底吃多少記憶體，所以不列任何分配數字，也答不出 4 GB 夠不夠、球場放多大才會當。<code>mvp2005fix</code> 本站只讀過原始碼、量過自己的執行檔，沒有實際跑過。Mac 那一節驗到的是「這台 Mac 能執行 32 位元 Windows 程式」，不是「遊戲全程順跑」。</li>
   </ul>
+
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p><a href="../../plan.html#b"><strong>② 急救班</strong></a> 第 2／5 堂</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../crash-diagnosis/index.html">← 上一堂：遊戲當掉了怎麼辦</a>
+      <a class="btn" href="../fix-chinese/index.html">下一堂：中文版配大球場就跳出 →</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
 
   <h2 id="how-it-works">這支腳本在做什麼</h2>
   <p>整支的流程是一條直線：<strong>把執行檔整份讀進記憶體 → 算出 PE 檔頭那幾個欄位在哪裡 →
@@ -864,7 +889,7 @@ Mac 的話：晶片是 Intel 還是 Apple Silicon
   <h2 id="source">完整原始碼</h2>
   <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。</p>
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1298 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1299 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -980,6 +1005,7 @@ mvp_modernize.py — 讓 MVP Baseball 2005 在今天的機器上跑得順
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -994,7 +1020,7 @@ mvp_modernize.py — 讓 MVP Baseball 2005 在今天的機器上跑得順
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 
 import datetime
@@ -2174,6 +2200,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

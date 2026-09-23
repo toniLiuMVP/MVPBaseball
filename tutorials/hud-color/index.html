@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/hud-color/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="改記分板的顏色 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="比賽畫面左上角記分板的顏色寫在版面檔的第 12-14 個欄位。這個位置是量出來的：拿元素名字當標準答案掃原版 44 個版面檔，1,057 個帶顏色名的元素有 1,028 個對得上。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/hud-color/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>改記分板的顏色 — toni的MVP模組補習班</title>
+<title>改記分板的顏色 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="比賽畫面左上角記分板的顏色寫在版面檔的第 12-14 個欄位。這個位置是量出來的：拿元素名字當標準答案掃原版 44 個版面檔，1,057 個帶顏色名的元素有 1,028 個對得上。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -20,7 +30,7 @@
   <a class="item" href="../../start.html">新手基本功</a>
   <a class="item" href="../../do.html">我想做什麼</a>
   <a class="item" href="../../plan.html">課表</a>
-  <a class="item" href="../../tutorials/index.html">教學</a>
+  <a class="item on" href="../../tutorials/index.html">教學</a>
   <a class="item" href="../../7min/index.html">七分鐘</a>
   <a class="item" href="../../reference/index.html">速查</a>
   <a class="item" href="../../coach/index.html">棒球教練</a>
@@ -29,35 +39,22 @@
 </div></nav>
 
 <div class="wrap" id="main" role="main" tabindex="-1">
-  <p class="crumb" style="margin-top:22px"><a href="../index.html">教學</a> › 外觀與畫面</p>
+  <p class="crumb" style="margin-top:22px"><a href="../index.html">教學</a> › 改記分板的顏色</p>
   <h1>改記分板的顏色</h1>
   <p class="lede">比賽畫面左上角那塊記分板，底色與數字顏色都寫在版面檔裡，
      是三個 0 到 255 的數字。這一課用一支小程式把它換掉 ——
      自動備份、自動複驗、一行指令還原。</p>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix" id="quick">
-    <p class="card-h">⚡ 只想趕快換個顏色？照這五步</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快換個顏色？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
       <li>下載 <a href="mvp_hud_color.py" download>mvp_hud_color.py</a>
           放到桌面，檔名必須正好是這個（瀏覽器多半直接丟進「下載」資料夾，要自己拖到桌面）。</li>
@@ -82,6 +79,7 @@
        <code>white</code> <code>red</code> <code>navy</code> 這些名字。
        想知道那三個數字為什麼在第 12-14 欄，往下讀；
        只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+    <p class="tail">照做卡住了？直接跳到<a href="#fail">❌ Fail 處理</a>（可以把畫面上印出來的那一行貼進那裡的搜尋框）；做完對照<a href="#pass">✅ Pass 條件</a>。</p>
   </div>
 
   <div class="grid">
@@ -173,6 +171,11 @@ RT:SCOREWHITE,0,0,67,35,152,50,1,1,1,1,1,<span class="hl">255,255,255</span>,0,1
        <span class="sk">3</span><strong>把它拖到桌面</strong></p>
     <p class="small">沒做這一步的話，後面 <code>cd</code> 到桌面再執行，
        畫面會出現 <code>can't open file</code> —— 那不是你打錯，是檔案還在「下載」裡。</p>
+  </div>
+
+  <div class="card blue">
+    <p class="card-h">指令裡的 python 與 python3</p>
+    <p>下面範例照 Mac 寫法用 <code>python3</code>；Windows 使用者把每行開頭改成 <code>python</code>。</p>
   </div>
 
   <p><strong>步驟 1</strong>：先看有哪些顏色可以改。這是唯讀，不會動到任何檔案。</p>
@@ -393,7 +396,7 @@ RT:SCOREWHITE,0,0,67,35,152,50,1,1,1,1,1,<span class="hl">255,255,255</span>,0,1
      這些在原始碼開頭的說明裡也各寫了一次。</p>
 
   <h2 id="src">完整原始碼</h2>
-  <p><a href="mvp_hud_color.py" download>mvp_hud_color.py</a>（1,832 行，零相依）。
+  <p><a href="mvp_hud_color.py" download>mvp_hud_color.py</a>（1,833 行，零相依）。
      跑 <code>--selftest</code> 可以在不碰任何遊戲檔的情況下驗證它自己
      —— 含 9 個反向餌與 11 個寫檔安全網的餌（故意餵壞資料，確認該擋的真的擋得下來），
      外加 4 個陰性對照（證明正常那條路真的會動）。
@@ -402,7 +405,7 @@ RT:SCOREWHITE,0,0,67,35,152,50,1,1,1,1,1,<span class="hl">255,255,255</span>,0,1
 <pre><code>python3 mvp_hud_color.py --selftest</code></pre>
 
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1832 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1833 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -498,6 +501,7 @@ RT(色塊矩形)的第 12-14 個欄位就是填色 RGB —— 這個位置是量
 無外部相依,Python 3.7 以上即可。
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -512,7 +516,7 @@ RT(色塊矩形)的第 12-14 個欄位就是填色 RGB —— 這個位置是量
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 
 import hashlib
@@ -2268,6 +2272,16 @@ if __name__ == '__main__':
         檔案層面全驗過，遊戲層面要你幫忙看。</li>
   </ul>
 
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p>這一課沒有排進任何一班。課表上寫的適合時機：「你想換記分板的配色」</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../../plan.html">看整張課表</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
+
   <footer>
     <p>本頁的數字都是實際跑出來的：原版 <code>ingame.big</code> 44 個項目全掃、
        1,057 個帶顏色名的元素逐一比對、兩份安裝各做一次完整的
@@ -2278,6 +2292,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

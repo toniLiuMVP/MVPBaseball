@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/exe-tuning/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="執行檔上的六個旋鈕 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="一顆調好的 MVP Baseball 2005 執行檔改了什麼:記憶體池、大位址、解析度、IAT 目錄、節區權限、檔頭檢查碼六個旋鈕。參考那顆用到其中四個,差的 10 個位元組一個一個講,附兩支腳本,每個位移都在兩顆真的執行檔上量過。不含任何保護措施相關內容。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/exe-tuning/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>執行檔上的六個旋鈕 — toni的MVP模組補習班</title>
+<title>執行檔上的六個旋鈕 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="一顆調好的 MVP Baseball 2005 執行檔改了什麼:記憶體池、大位址、解析度、IAT 目錄、節區權限、檔頭檢查碼六個旋鈕。參考那顆用到其中四個,差的 10 個位元組一個一個講,附兩支腳本,每個位移都在兩顆真的執行檔上量過。不含任何保護措施相關內容。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -20,7 +30,7 @@
   <a class="item" href="../../start.html">新手基本功</a>
   <a class="item" href="../../do.html">我想做什麼</a>
   <a class="item" href="../../plan.html">課表</a>
-  <a class="item" href="../../tutorials/index.html">教學</a>
+  <a class="item on" href="../../tutorials/index.html">教學</a>
   <a class="item" href="../../7min/index.html">七分鐘</a>
   <a class="item" href="../../reference/index.html">速查</a>
   <a class="item" href="../../coach/index.html">棒球教練</a>
@@ -30,7 +40,7 @@
 
 <div class="wrap" id="main" role="main" tabindex="-1">
 
-  <p class="eyebrow"><a href="../index.html">教學</a> › 執行檔上的六個旋鈕</p>
+  <p class="crumb" style="margin-top:22px"><a href="../index.html">教學</a> › 執行檔上的六個旋鈕</p>
   <h1>執行檔上的六個旋鈕</h1>
 
   <p class="lede">一顆調好的 <code>mvp2005.exe</code>，跟原本那顆只差
@@ -39,39 +49,28 @@
      每一個數字都是在兩顆真的檔案上量出來的。</p>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix">
-    <p class="card-h">⚡ 速解</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 速解（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
       <li>下載 <a href="mvp_exe_pe.py" download>mvp_exe_pe.py</a>（零相依，
-          <a href="#src">完整原始碼在這一頁下面</a>）放到桌面。
-      <div class="ifnot"><b>按了下載之後，檔案跑到哪裡去了？</b>
+          <a href="#src">完整原始碼在這一頁下面</a>）。
+      <div class="ifnot"><b>按了下載之後，檔案跑到哪裡去了？指令要在哪裡打？</b>
           <p><strong>瀏覽器多半不會問你要存哪裡</strong>，它會直接放進「下載」資料夾。
-             所以按完之後還有一步：</p>
-          <p><span class="sk">1</span>打開檔案總管（Mac 用 Finder），左邊點「<u>下載</u>」<br>
-             <span class="sk">2</span>找到那個 <code>.py</code> 檔<br>
-             <span class="sk">3</span><strong>把它拖到桌面</strong></p>
-          <p class="small">沒做這一步的話，後面 <code>cd</code> 到桌面再執行，
-             畫面會出現 <code>can't open file</code> —— 那不是你打錯，是檔案還在「下載」裡。</p>
+             所以命令視窗要從那裡開：</p>
+          <p><span class="sk">1</span>打開檔案總管，左邊點「<u>下載</u>」<br>
+             <span class="sk">2</span>點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code>，按 Enter<br>
+             <span class="sk">3</span>開出來的視窗<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打</p>
+          <p class="small">Mac：打開終端機，先打 <code>cd ~/Downloads</code> 按 Enter。</p>
+          <p class="small">第 5 步用到的 <code>mvp_modernize.py</code>
+             （在<a href="../run-in-2026/index.html">讓它在 2026 年跑起來</a>那一課下載）也要放在同一個資料夾。
+             沒照這樣開視窗的話，畫面會出現 <code>can't open file</code> —— 那不是你打錯，是視窗跟檔案不在同一個資料夾。</p>
         </div>
         <div class="ifnot"><b>如果檔名多了 .txt</b>
         <p>照<a href="../../start.html">第 0 課操作三</a>把副檔名顯示出來，右鍵重新命名刪掉 <code>.txt</code>。</p>
@@ -107,24 +106,29 @@
              「為什麼『調記憶體池』在你的遊戲上做不到」那一節
              （<u>那一段在同意閘後面，要先勾完那三項才會出現</u>）。</p></li>
       <li>後悔了就還原。<strong>兩支都套用過的話，順序是「後改的先還原」</strong>：
-          先還原 <code>mvp_exe_pe.py</code>，再還原 <code>mvp_modernize.py</code>。
+          照這一頁的順序做，最後改的是 <code>mvp_modernize.py</code>，
+          所以先還原 <code>mvp_modernize.py</code>，再還原 <code>mvp_exe_pe.py</code>。
       <p class="small">Windows:</p>
-<pre><code>python mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe" --restore
-python mvp_modernize.py "〔你的遊戲資料夾〕/mvp2005.exe" --restore</code></pre>
+<pre><code>python mvp_modernize.py "〔你的遊戲資料夾〕/mvp2005.exe" --restore
+python mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe" --restore</code></pre>
       <p class="small">Mac / Linux:</p>
-<pre><code>python3 mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe" --restore
-python3 mvp_modernize.py "〔你的遊戲資料夾〕/mvp2005.exe" --restore</code></pre>
-          <p class="small">⚠️ <strong>反過來做會卡住</strong>：先跑 <code>mvp_modernize.py --restore</code> 的話，
-             它會發現「現在這顆」多了 <code>mvp_exe_pe.py</code> 動過的位元組，
+<pre><code>python3 mvp_modernize.py "〔你的遊戲資料夾〕/mvp2005.exe" --restore
+python3 mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe" --restore</code></pre>
+          <p class="small">⚠️ <strong>反過來做會卡住</strong>：先跑 <code>mvp_exe_pe.py --restore</code> 的話，
+             檔案其實已經回到原本的樣子，但接著 <code>mvp_modernize.py --restore</code>
+             會發現它那份備份跟現在這顆差在 <code>mvp_exe_pe.py</code> 動過的那幾個位元組，
              印「這份備份跟現在這顆執行檔對不上,不敢拿它覆蓋」然後停下來，
              並建議你自己在檔案總管／Finder 裡複製備份 ——
-             照著做就會停在中間那個狀態。<u>照上面的順序跑就不會遇到。</u>
+             照著做反而會把 <code>mvp_exe_pe.py</code> 的修改帶回來。<u>照上面的順序跑就不會遇到。</u>
+             如果你是先上過<a href="../run-in-2026/index.html">讓它在 2026 年跑起來</a>那一課、才來做這一課，
+             後改的是 <code>mvp_exe_pe.py</code>，兩行就要倒過來跑。
              （只套用過其中一支的話，就只跑那一行。）</p>
           <p class="small">🛟 <strong>改到一半按 Ctrl-C 也沒關係。</strong>
              它會告訴你「換檔那一步」做了沒有：沒做過就是<u>一個位元組都沒有動到</u>，
              做過了它會把該跑的 <code>--restore</code> 指令印出來給你。
              這兩種情形都不是成功結束（結束碼 130），不會被誤當成做完了。</p></li>
     </ol>
+    <p class="tail">照做卡住了？直接跳到<a href="#oops">❌ 出錯處理</a>（可以把畫面上印出來的那一行貼進那裡的搜尋框）。想知道為什麼，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
   </div>
 
   <h2 id="scope">先講這一課的界線</h2>
@@ -319,9 +323,9 @@ python3 mvp_modernize.py "〔你的遊戲資料夾〕/mvp2005.exe" --restore</co
     <thead><tr><th style="width:34%">畫面上的訊息</th><th>原因</th><th>你要做的</th></tr></thead>
     <tbody>
       <tr class="hi"><td data-label="畫面上的訊息" class="mono">can't open file '…\mvp_exe_pe.py'</td>
-          <td data-label="原因"><strong>檔案還在「下載」資料夾，不在桌面。</strong>
+          <td data-label="原因"><strong>命令視窗跟腳本不在同一個資料夾</strong>，或檔名對不上（瀏覽器可能在檔名後面加了 <code>(1)</code>）。
               <u>這是本站最常見的第一個卡點。</u></td>
-          <td data-label="你要做的">開檔案總管左邊點「下載」，把那個 <code>.py</code> 拖到桌面，再跑一次</td></tr>
+          <td data-label="你要做的">打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）；檔名多了 <code>(1)</code> 就改成跟指令裡一模一樣</td></tr>
       <tr><td data-label="畫面上的訊息" class="mono">這顆的 IAT 資料目錄是空的,現在把節區改成唯讀,遊戲會開不起來。</td>
           <td data-label="原因">你只加了 <code>--sections</code> 沒加 <code>--iat</code>。
               <u>這兩項是一組的</u>，目錄空著又把節區設唯讀，載入器沒有範圍可以解鎖來填匯入位址</td>
@@ -414,7 +418,7 @@ python3 mvp_exe_pe.py   mvp2005.exe --iat --sections --apply</code></pre>
     <li><strong>④⑤ 兩項一起做完之後在真實 Windows 上有沒有副作用，本站沒驗。</strong>
         本站是在 Mac 上做二進位分析的，<u>④⑤ 都做完的那顆還沒有拿進 Windows 開過遊戲</u>。
         （<u>不是完全沒進過 Windows</u>：<a href="../../tc2026/index.html">中文版為什麼會跳出</a>那一課裡，
-        ① 記憶體池的四種大小是 Windows 與 macOS 兩邊都做的實機測試；
+        ① 記憶體池 64、128、512 MB 三種大小、四次實機測試，是 Windows 與 macOS 兩邊都做的；
         而「把三個區段改回唯讀」那一版<u>在 Wine 上過了、拿進真的 Windows 連開都開不起來</u> ——
         那正是上面那張卡在講的坑。）
         重現實驗證明的是「那 10 個位移跟參考那顆一樣」，
@@ -499,7 +503,7 @@ python3 mvp_exe_pe.py   mvp2005.exe --iat --sections --apply</code></pre>
      下面這一份跟你下載到的
      <strong>一個字都沒有不同</strong>。可以先看過再決定要不要跑。</p>
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1156 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1157 行）</summary>
     <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -559,6 +563,7 @@ PE 規格的第 13 個資料目錄(索引 12)叫 Import Address Table,
 無外部相依,Python 3.7 以上即可。
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -573,7 +578,7 @@ PE 規格的第 13 個資料目錄(索引 12)叫 Import Address Table,
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 import argparse
 import io
@@ -1687,8 +1692,19 @@ if __name__ == '__main__':
         4K 下介面會不會跑位、記憶體池的上限。</li>
   </ul>
 
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p>這一課沒有排進任何一班。課表上寫的適合時機：「你想自己動手調執行檔 —— 記憶體、解析度、大位址」</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../../plan.html">看整張課表</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
+
   <h2>接下來</h2>
   <ul class="plain">
+    <li><a href="../../7min/exe.html">七分鐘版</a> —— 只想快點調完看這個</li>
     <li><a href="../run-in-2026/index.html">讓它在 2026 年跑起來</a> —— 另外三個旋鈕在那裡</li>
     <li><a href="../../tc2026/index.html">中文版為什麼會跳出</a> —— 記憶體池是怎麼被找出來的</li>
     <li><a href="../../reference/hud-map.html">介面座標圖</a> —— 為什麼改解析度要留意版面</li>
@@ -1707,6 +1723,6 @@ if __name__ == '__main__':
   </footer>
 
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

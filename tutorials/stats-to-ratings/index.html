@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/stats-to-ratings/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="把真實成績換算成遊戲裡的能力值 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="這款遊戲出貨時同時附了每位球員的真實成績與 EA 給的能力值——所以「成績→能力值」有標準答案，不用猜。本站把公式配出來並量了誤差，也誠實說出哪幾欄配不出來。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/stats-to-ratings/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>把真實成績換算成遊戲裡的能力值 — toni的MVP模組補習班</title>
+<title>把真實成績換算成遊戲裡的能力值 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="這款遊戲出貨時同時附了每位球員的真實成績與 EA 給的能力值——所以「成績→能力值」有標準答案，不用猜。本站把公式配出來並量了誤差，也誠實說出哪幾欄配不出來。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -42,30 +52,17 @@
   </div>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix" id="quick">
-    <p class="card-h">⚡ 只想趕快做完？照這四步</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這四步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
-      <li>下載 <a href="mvp_ratings.py" download>mvp_ratings.py</a>，先看你那份遊戲的資料夠不夠：
+      <li>下載 <a href="mvp_ratings.py" download>mvp_ratings.py</a>。下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打（Mac 開終端機先打 <code>cd ~/Downloads</code>）。接著先看你那份遊戲的資料夠不夠：
       <p class="small">Windows：</p>
 <pre><code>python mvp_ratings.py --check "〔你的遊戲資料夾〕"</code></pre>
       <p class="small">Mac / Linux：</p>
@@ -75,7 +72,7 @@
 <pre><code>python mvp_ratings.py --demo</code></pre>
       <p class="small">Mac / Linux：</p>
 <pre><code>python3 mvp_ratings.py --demo</code></pre></li>
-      <li>把你的成績表換算成能力值（CSV 進、CSV 出）：
+      <li>把你的成績表換算成能力值（CSV 進、CSV 出；<code>stats.csv</code> 放在命令視窗所在的資料夾，<code>ratings.csv</code> 也會存在那裡）：
       <p class="small">Windows：</p>
 <pre><code>python mvp_ratings.py --convert stats.csv --out ratings.csv</code></pre>
       <p class="small">Mac / Linux：</p>
@@ -89,7 +86,12 @@
       <p class="small">Windows：</p>
 <pre><code>python mvp_ratings.py --write "〔你的遊戲資料夾〕" ratings.csv --apply</code></pre>
       <p class="small">Mac / Linux：</p>
-<pre><code>python3 mvp_ratings.py --write "〔你的遊戲資料夾〕" ratings.csv --apply</code></pre></li>
+<pre><code>python3 mvp_ratings.py --write "〔你的遊戲資料夾〕" ratings.csv --apply</code></pre>
+          不滿意，這一行把它改過的名單檔（最多四個）一起退回去：
+      <p class="small">Windows：</p>
+<pre><code>python mvp_ratings.py --restore-write "〔你的遊戲資料夾〕"</code></pre>
+      <p class="small">Mac / Linux：</p>
+<pre><code>python3 mvp_ratings.py --restore-write "〔你的遊戲資料夾〕"</code></pre></li>
     </ol>
     <p class="small">想先確認手上這份腳本是好的（<u>不碰任何遊戲檔</u>）：</p>
     <p class="small">Windows：</p>
@@ -105,6 +107,7 @@
        所以腳本遇到它會直接擋下來不讓你這樣跑。</p>
     <p class="tail">⚠️ 有些欄位<strong>本站配不出來，工具就不給你數字</strong>（守備、選球、守備範圍、臂力、耐久）。
        那不是還沒做完，是<u>給了就是編的</u>。理由在下面。</p>
+    <p class="tail">想知道為什麼，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
   </div>
 
   <h2>為什麼這件事有標準答案</h2>
@@ -206,6 +209,8 @@
 
   <h2>👉 你要做的事</h2>
 
+  <p class="small">先下載 <a href="mvp_ratings.py" download>mvp_ratings.py</a>。<strong>指令要在放腳本的那個資料夾打。</strong>瀏覽器下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter —— 開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。Mac：打開終端機，先打 <code>cd ~/Downloads</code> 按 Enter。</p>
+
   <div class="step"><div class="step-n">1</div><div>
     <p><strong>先確認你那份遊戲的資料夠不夠。</strong></p>
     <p class="small">Windows：</p>
@@ -239,6 +244,7 @@
 <pre><code>python mvp_ratings.py --convert stats.csv --out ratings.csv</code></pre>
     <p class="small">Mac / Linux：</p>
 <pre><code>python3 mvp_ratings.py --convert stats.csv --out ratings.csv</code></pre>
+    <p class="small"><code>stats.csv</code> 要放在命令視窗所在的資料夾（照上面從「下載」開的話，就是「下載」），換算出來的 <code>ratings.csv</code> 也會存在那裡。</p>
     <p class="seen">輸出的表裡，<strong>空白的格子代表守門沒過</strong> ——
        本站不給你猜的數字。</p>
   </div></div>
@@ -252,7 +258,11 @@
     <p class="seen">會列出要改幾個欄位、分佈在哪幾個檔、每一筆的「原本 → 要改成」。
        <u>這時候一個位元組都沒有寫</u>。</p>
     <p>確定了才加 <code>--apply</code>。寫完它會<strong>自己讀回來逐項比對</strong>。
-       要退回去：<code>--restore-write "〔遊戲資料夾〕"</code></p>
+       不滿意，這一行把它改過的名單檔（最多四個）一起退回去：</p>
+    <p class="small">Windows：</p>
+<pre><code>python mvp_ratings.py --restore-write "〔你的遊戲資料夾〕"</code></pre>
+    <p class="small">Mac / Linux：</p>
+<pre><code>python3 mvp_ratings.py --restore-write "〔你的遊戲資料夾〕"</code></pre>
     <p class="ifnot">CSV 裡只要有一個 <code>id</code> 對不上，或有一格<u>不是 0~100 的整數</u>，
        <strong>整批都不寫</strong>，並逐筆告訴你是哪一筆。這兩種情況<u>不會寫一半</u>。</p>
     <p class="small">⚠️ 「不會寫一半」只涵蓋上面那兩種擋在動手之前的情況。
@@ -285,16 +295,10 @@
     <li><strong>守門是硬的</strong> 同邊打席 &lt; 100、單季出賽 &lt; 10 一律拒絕。
         低於門檻時公式比亂猜還糟，而且會把替補灌成強打者。</li>
     <li><strong>寫回去的安全網</strong> 預覽在前、<code>--apply</code> 才寫、自動備份、
-        寫完自己讀回來逐項比對、<code>--restore-write</code> 退回去
-        （<u>還原本身也是原子的，而且換過去之前會先把整顆檔的 sha256 跟備份對過</u>）。
+        寫完自己讀回來逐項比對、<code>--restore-write</code> 退回去。
         CSV 有一個 id 對不上、或有一格不是 0~100 的整數，就整批不寫。
-        <u>名單檔或備份檔是符號連結就整個不寫</u>，暫存檔的名字也每次都不一樣，沒有人佔得住。
-        中途按 Ctrl-C 會照實講「什麼都沒有動到」、「哪幾個已經改了」、「哪幾個已經還原了」，
-        還是「中斷的時候正在替換哪一個」；跑 <code>--restore-write</code> 卻一個檔都還沒還原時，
-        講的是「這一趟沒有還原到任何檔，你的遊戲檔還停在改過的狀態」，
-        <u>不會反過來說「什麼都沒有動到」</u>，
-        <u>結束碼是 130 不是 0</u>。
-        <u>但四個檔之間沒有交易</u>：寫到一半失敗時，腳本會點名哪幾個已經改掉。</li>
+        <u>但四個檔之間沒有交易</u>：寫到一半失敗時，腳本會點名哪幾個已經改掉。
+        還原怎麼避免寫到一半、遇到捷徑怎麼辦、按 Ctrl-C 時它怎麼回報，見<a href="#how-it-works">這支腳本在做什麼</a>。</li>
     <li><strong>陷阱</strong> <code>lhattrib.dat</code> 少一欄，後面欄號整排位移 ——
         假設左右格式一樣會靜默寫壞六個欄位。要從表頭讀欄號。</li>
     <li><strong>本站沒驗的</strong> 沒有實機確認改完的能力值在遊戲裡的手感；
@@ -302,6 +306,17 @@
         會不會系統性偏移，本站沒有辦法驗</u>；也沒有測過投手以外的
         <code>pitcher.dat</code> 欄位。</li>
   </ul>
+
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p><a href="../../plan.html#d"><strong>④ 年度更新班</strong></a> 第 4／9 堂</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../make-a-player/index.html">← 上一堂：把一位球員改成你想要的球員</a>
+      <a class="btn" href="../swap-face/index.html">下一堂：幫球員換一張臉 →</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
 
   <h2 id="how-it-works">這支腳本在做什麼</h2>
   <p>四個指令走的是同一條路，只是走多遠不一樣：<strong>讀名冊 → 算 → 印 → （確定了才）寫回去</strong>。
@@ -356,6 +371,10 @@
           <td data-label="為什麼要有它">壞掉的備份寧可不用。原本只檢查「不是 0 bytes」，實測拿前 1/8 的半截備份去還原，把正本吃掉了還印「已還原」。後來又發現只加大小地板<u>擋不住截掉四成又剛好停在列界的備份</u>，所以改成量表頭欄數與資料列數；「不得小於一半」降級成<u>連現在那個檔的形狀都讀不出來時</u>才用的退路。備份列數比正本<strong>多</strong>不擋 —— 那代表壞的是正本，而那正是要還原的理由。換名之前還要對一次 sha256，是因為<u>還原是出事之後才會走的救命路徑</u>：換過去一顆看起來完整、內容卻不是備份的檔，使用者會以為自己救回來了。對不起來就不換，正本原封不動。</td></tr>
     </tbody>
   </table></div>
+  <p class="small">中途按 Ctrl-C 的話，它會照實講「什麼都沒有動到」、「哪幾個已經改了」、「哪幾個已經還原了」，
+     還是「中斷的時候正在替換哪一個」；跑 <code>--restore-write</code> 卻一個檔都還沒還原時，
+     講的是「這一趟沒有還原到任何檔，你的遊戲檔還停在改過的狀態」，
+     <u>不會反過來說「什麼都沒有動到」</u>，<u>結束碼是 130 不是 0</u>。</p>
   <p class="small">四個欄位寫得回去：力量對右投（<code>rhattrib.dat</code> 的 <code>lrattrib_power</code>）、
      力量對左投（<code>lhattrib.dat</code> 的 <code>lrattrib_power</code>）、
      投手續航力（<code>pitcher.dat</code> 的 <code>pitchattrib_stamina</code>）、
@@ -398,7 +417,7 @@
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 
 """
@@ -513,6 +532,7 @@ MVP Baseball 2005 出貨時同時附了每一位球員的真實成績與 EA 給�
 
 —— toni的MVP模組補習班
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 
 import argparse
 import csv
@@ -2438,6 +2458,6 @@ if __name__ == '__main__':
        <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

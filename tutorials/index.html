@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="課程地圖 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="MVP Baseball 2005 修改教學總覽：依難度分級，從新手基本功到進階格式逆向。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>課程地圖 — toni的MVP模組補習班</title>
+<title>課程地圖 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="MVP Baseball 2005 修改教學總覽：依難度分級，從新手基本功到進階格式逆向。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -31,8 +41,16 @@
 <div class="wrap" id="main" role="main" tabindex="-1">
   <p class="eyebrow" style="margin-top:36px">課程地圖</p>
   <h1>全部教學，依難度分級</h1>
-  <p class="lede">照順序走最穩;想直接跳某一課也可以，每課開頭會列需要的前置。<strong>目前每一課都可以看</strong>。</p>
+  <p class="lede">第一次來、想照順序上課，請走<a href="../plan.html#a">課表的入門班</a>；這一頁是全部課程的清單，想直接跳某一課也可以，每課開頭會列需要的前置。<strong>目前每一課都可以看</strong>。</p>
+  <p class="small">不只教學，想看站上各區有哪些頁：<a href="../pages.html">全站目錄</a>依區分組列出，每一頁附上那一頁自己的簡短說明。</p>
 
+  <div class="card blue">
+    <p class="card-h">📋 不知道從哪一課開始？</p>
+    <p>這一頁是<strong>照難度排</strong>的完整清單。如果你有明確的目的，
+       <a href="../plan.html">課表</a>那一頁把這些課排成六張<u>照順序上的表</u>，
+       每一堂都寫了為什麼排在那個位置；
+       只想快速找一件事怎麼做的話，去<a href="../do.html">我想做什麼</a>。</p>
+  </div>
 
   <div class="card grass">
     <p class="card-h">每一課上面那個標籤，先看一眼</p>
@@ -41,7 +59,7 @@
        第一次來、或是不確定的時候，從這些開始。</p>
     <p><span class="badge rw">會改你的檔案</span>
        這一課會<strong>真的改到遊戲資料夾裡的東西</strong>。
-      這一類目前有 <strong>29 張課程卡</strong>，就是下面掛著這個標籤的每一張
+      這一類目前有 <strong>31 張課程卡</strong>，就是下面掛著這個標籤的每一張
        （其中一張是同一課的手動改法）。
        <strong>本站附的腳本沒有例外</strong>：<u>先預覽、要加 <code>--apply</code> 才真的寫</u>，
        而且<u>第一次寫入前會自動備份</u>、都有 <code>--restore</code> 可以還原。
@@ -49,19 +67,29 @@
     <p class="small">沒有標籤的是總覽或還沒開的課。</p>
   </div>
 
-  <h2>Level 0 · 新手基本功</h2>
-    <div class="lesson">
-      <span class="t"><a href="exe-tuning/index.html">執行檔上的六個旋鈕</a></span>
-      <span class="d">一顆調好的 <code>mvp2005.exe</code> 跟原本那顆
-         <strong>只差 10 個位元組</strong>。這一課把六個旋鈕一個一個講完：
-         記憶體池、大位址旗標、解析度、IAT 目錄、節區權限、檔頭檢查碼
-         （那 10 個位元組落在其中四個上 —— 那顆對照檔沒有改解析度，檔頭檢查碼也剛好沒變）。
-         <u>六項裡只有一項真的會改變遊戲跑不跑得動</u>，其他五項的好處這一課講得很誠實
-         （<strong>本站沒有量到它們讓遊戲變快或變穩</strong>）。
-         ⛔ 不含任何保護措施相關內容。</span>
-      <span class="badge rw">會改你的檔案</span>
-      <span class="badge ok">✓ 可用</span>
-    </div>
+  <h2 id="lv0">Level 0 · 新手基本功</h2>
+  <div class="lesson">
+    <span class="t"><a href="controller-config/index.html">暖身課：打開一個遊戲的檔案</a></span>
+    <span class="d"><strong>不用工具、不用命令列、不用解壓縮。</strong>
+       用記事本打開遊戲資料夾裡的純文字設定檔，看懂它的結構，而且改壞了一定回得來。
+       順便發現 PC 版遊戲內部其實是一支 PlayStation 手把。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="../start.html">先學會六個基本操作</a></span>
+    <span class="d">開命令列、取路徑、顯示副檔名、備份觀念、裝 Python。後面每課都用得到。</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
+  <div class="lesson">
+    <span class="t"><a href="backup/index.html">備份與還原 SOP</a></span>
+    <span class="d">改任何東西之前的標準流程：<strong>先把整個遊戲資料夾完整備份一份</strong>，連同放存檔與設定的資料夾一起。
+       這一課也教精簡做法：只備份核心五檔（最常被動到的四個遊戲檔，加上暖身課打開的那個設定檔）。
+       但那五個只涵蓋一部分課程，其他課還要多備份哪個檔，這一課第二節有逐課的完整清單。
+       附一支全程唯讀的檢查腳本，會告訴你備份在不在、哪一份比較舊。</span>
+    <span class="badge ro">只看不動</span>
+    <span class="badge ok">✓ 可用</span>
+  </div>
     <div class="lesson">
       <span class="t"><a href="run-in-2026/index.html">2026 年的電腦怎麼跑得起 2005 年的遊戲</a></span>
       <span class="d">這款遊戲是二十一年前為 Windows XP 做的 <u>32 位元程式</u>。
@@ -74,23 +102,10 @@
   <div class="lesson">
     <span class="t"><a href="play-on-mac/index.html">在 Mac 上玩 MVP 2005</a></span>
     <span class="d">macOS 沒有 32 位元、Apple Silicon 不是 x86 ——<strong>兩道死牆疊起來反而通了</strong>。
-       從裝 Wine 到啟動遊戲逐步寫完。<u>本站第一次真的把遊戲在 Mac 上跑起來</u>：
+       從裝 Wine 到啟動遊戲逐步寫完。<u>本站第一次把 Mac 上的每一步量給你看</u>：
        兩次獨立測量常駐 201.5 MB 與 190.3 MB、繪圖音效手把三套都初始化完成，
-       並老實寫出卡住的那兩關與<strong>本站沒有看到畫面</strong>這件事。</span>
+       並老實寫出卡住的那兩關，以及<strong>那一組測試沒有看到畫面</strong>這件事。</span>
     <span class="badge ro">只看不動</span>
-    <span class="badge ok">✓ 可用</span>
-  </div>
-  <div class="lesson">
-    <span class="t"><a href="controller-config/index.html">暖身課：打開一個遊戲的檔案</a></span>
-    <span class="d"><strong>不用工具、不用命令列、不用解壓縮。</strong>
-       用記事本打開遊戲資料夾裡的純文字設定檔,看懂它的結構,而且改壞了一定回得來。
-       順便發現 PC 版遊戲內部其實是一支 PlayStation 手把。</span>
-    <span class="badge ro">只看不動</span>
-    <span class="badge ok">✓ 可用</span>
-  </div>
-  <div class="lesson">
-    <span class="t"><a href="../start.html">先學會六個基本操作</a></span>
-    <span class="d">開命令列、取路徑、顯示副檔名、備份觀念、裝 Python。後面每課都用得到。</span>
     <span class="badge ok">✓ 可用</span>
   </div>
 
@@ -136,7 +151,7 @@
     <span class="badge ok">✓ 可用</span>
   </div>
 
-  <h2>Level 1 · 第一次修改</h2>
+  <h2 id="lv1">Level 1 · 第一次修改</h2>
   <div class="lesson">
     <span class="t"><a href="change-schedule-year/index.html">把賽程換到任何年份</a></span>
     <span class="d">最快有感的一課：整季賽程搬到 2030 年，對戰組合全部保留。約 3 分鐘。</span>
@@ -220,14 +235,8 @@
     <span class="badge ro">只看不動</span>
     <span class="badge ok">✓ 可用</span>
   </div>
-  <div class="lesson">
-    <span class="t"><a href="backup/index.html">備份與還原 SOP</a></span>
-    <span class="d">改任何東西之前的標準流程：該備份的只有五個檔、合計 3.9 MB，不必複製整個遊戲。附一支全程唯讀的檢查腳本，會告訴你備份在不在、哪一份比較舊。</span>
-    <span class="badge ro">只看不動</span>
-    <span class="badge ok">✓ 可用</span>
-  </div>
 
-  <h2>Level 2 · 認識檔案格式（速查區）</h2>
+  <h2 id="lv2">Level 2 · 認識檔案格式（速查區）</h2>
   <div class="lesson">
     <span class="t"><a href="read-file-headers/index.html">五秒看穿一個檔案</a></span>
     <span class="d">逆向入門第一課：用檔案開頭判斷格式。<strong>副檔名會騙人</strong>，全程唯讀不改檔。</span>
@@ -274,7 +283,7 @@
     <span class="t"><a href="fel-recipes/index.html">介面實例集</a></span>
     <span class="d">十則現成配方：關打者之眼、球速數字、打者姓名，
        或<strong>把 EA 自己關掉的東西打開來看</strong>。每則的行數與文字都查過。</span>
-    <span class="badge ro">只看不動</span>
+    <span class="badge rw">會改你的檔案</span>
     <span class="badge ok">✓ 可用</span>
   </div>
   <div class="lesson">
@@ -285,7 +294,7 @@
     <span class="badge ok">✓ 可用</span>
   </div>
 
-  <h2>Level 3 · 球員資料</h2>
+  <h2 id="lv3">Level 3 · 球員資料</h2>
   <div class="lesson">
     <span class="t"><a href="../reference/player-data.html">認識球員資料檔：哪些欄位能安全改</a></span>
     <span class="d">誠實版：它其實是 CSV、每格帶索引前綴，而且大部分「能力值」不是 0-99。<strong>改能力前必讀</strong>。</span>
@@ -334,7 +343,7 @@
     <span class="badge ok">✓ 可用</span>
   </div>
 
-  <h2>🗓 整年更新（統籌）</h2>
+  <h2 id="yearly">🗓 整年更新（統籌）</h2>
   <p class="small">上面幾節是「怎麼改某一樣東西」。這一堂相反 ——
      它不教任何新技術，只回答<u>八堂課要照什麼順序上、每一步做完怎麼確認、
      卡住回哪一堂、全部做完怎麼一次退回去</u>。</p>
@@ -343,13 +352,13 @@
     <span class="d">名冊、能力值、臉、大頭照、語音、登入背景、賽程 ——
        <strong>七樣東西各自有課，這一堂只負責把它們串起來</strong>。
        依賴關係是從各支腳本實際讀寫哪個檔推出來的，可以自己驗；
-       附一張「全部退回去」的八行清單，還原順序不重要。
+       附一張「全部退回去」的還原清單，<strong>要倒著跑：最後做的那一堂先還原</strong>。
        <u>沒有自己的腳本</u>，所有指令都逐字取自對應的那一堂。約 8 分鐘看完，八堂全部做完約 113 分鐘。</span>
-    <span class="badge ro">只看不動</span>
+    <span class="badge rw">會改你的檔案</span>
     <span class="badge ok">✓ 可用</span>
   </div>
 
-  <h2>🎨 Level 4 · 外觀與畫面</h2>
+  <h2 id="lv4">🎨 Level 4 · 外觀與畫面</h2>
   <p class="small">這一節 2026-08-29 之前有 <strong>11 堂教學</strong>，是全站三分之一 ——
      裡面混了聲音、裝模組、工具清單，那不是分類，是垃圾桶。
      已經拆成三節，判準是<u>你動的是哪一種東西</u>，不是難度。
@@ -408,7 +417,7 @@
     <span class="badge rw">會改你的檔案</span>
     <span class="badge ok">✓ 可用</span>
   </div>
-  <h2>🔊 聲音</h2>
+  <h2 id="sound">🔊 聲音</h2>
   <p class="small">改完你<u>聽</u>得到 —— 跟上面那節分開的理由就這一條。</p>
   <div class="lesson">
     <span class="t"><a href="swap-chant/index.html">把應援曲指給別的球員</a></span>
@@ -431,7 +440,7 @@
     <span class="badge ok">✓ 可用</span>
   </div>
 
-  <h2>📦 模組：裝別人的、找現成的工具</h2>
+  <h2 id="mods">📦 模組：裝別人的、找現成的工具</h2>
   <p class="small">上面幾節都是<strong>你自己動手改</strong>。這兩課相反：
      一課是把別人做好的模組裝進去，一課是社群十幾年來寫過哪些工具。</p>
   <div class="lesson">
@@ -450,18 +459,10 @@
     <span class="badge ok">✓ 可用</span>
   </div>
 
-  <div class="card blue">
-    <p class="card-h">📋 不知道從哪一課開始？</p>
-    <p>這一頁是<strong>照難度排</strong>的完整清單。如果你有明確的目的，
-       <a href="../plan.html">課表</a>那一頁把這些課排成六張<u>照順序上的表</u>，
-       每一堂都寫了為什麼排在那個位置；
-       只想快速找一件事怎麼做的話，去<a href="../do.html">我想做什麼</a>。</p>
-  </div>
-
-  <h2>🔧 Level 5 · 進階：給想自己寫工具的人</h2>
+  <h2 id="lv5">🔧 Level 5 · 進階：給想自己寫工具的人</h2>
   <p class="small">這一節本來有 <strong>6 堂教學</strong>，其中 3 堂是「遊戲跑不動」的急救題，
      跟「寫工具」沒關係，已經搬到上面的<a href="#trouble">🚑 問題排除</a>。
-     剩下 3 堂教學才是真的在拆格式 —— 下面另外幾張卡片是速查條目，不是課。</p>
+     剩下 3 堂教學才是真的在拆格式，外加一堂調執行檔的課 —— 下面另外幾張卡片是速查條目，不是課。</p>
 
   <div class="lesson">
     <span class="t"><a href="unpack-big/index.html">封裝檔可以拆成散裝嗎</a></span>
@@ -472,9 +473,9 @@
 
   <div class="lesson">
     <span class="t"><a href="../tc2026/index.html">中文版為什麼會跳出，你能做到哪一步</a></span>
-    <span class="d"><strong>中文版一裝上大球場就跳出，真正的原因跟球場大小無關。</strong>
+    <span class="d"><strong>中文版一裝上大球場就跳出，真正的原因不是「球場檔不能超過 10MB」那回事。</strong>
        很多人是退而求其次玩英文版的 —— 中文版一裝上大球場就會在讀取條跑完的瞬間跳回桌面。
-       原因跟球場大小沒有關係：遊戲寫死一塊 <strong>64 MB</strong> 的記憶體池，
+       卡住的不是單一球場檔的大小：遊戲寫死一塊 <strong>64 MB</strong> 的記憶體池，
        而中文字型的字圖集是 Direct3D 8 吃不下的 4 位元格式，每張都要執行時展開，
        光字型就吃掉 <strong>13.5 MB</strong>（英文只要 0.37 MB）。
        <strong>兩個地方各改一個位元組就好，中文一個字都不用砍。</strong>
@@ -490,6 +491,18 @@
     <span class="badge ro">只看不動</span>
     <span class="badge ok">✓ 可用</span>
   </div>
+    <div class="lesson">
+      <span class="t"><a href="exe-tuning/index.html">執行檔上的六個旋鈕</a></span>
+      <span class="d">一顆調好的 <code>mvp2005.exe</code> 跟原本那顆
+         <strong>只差 10 個位元組</strong>。這一課把六個旋鈕一個一個講完：
+         記憶體池、大位址旗標、解析度、IAT 目錄、節區權限、檔頭檢查碼
+         （那 10 個位元組落在其中四個上 —— 那顆對照檔沒有改解析度，檔頭檢查碼保留舊值、沒有重算）。
+         <u>六項裡只有一項真的會改變遊戲跑不跑得動</u>，其他五項的好處這一課講得很誠實
+         （<strong>本站沒有量到它們讓遊戲變快或變穩</strong>）。
+         ⛔ 不含任何保護措施相關內容。</span>
+      <span class="badge rw">會改你的檔案</span>
+      <span class="badge ok">✓ 可用</span>
+    </div>
   <div class="lesson">
     <span class="t">寫自己的修改工具</span>
     <span class="d">格式規格已在速查區：<a href="../reference/bigf.html">BIGF</a> ·
@@ -507,7 +520,7 @@
     <p class="card-h">想先看哪一課?</p>
     <p><strong>想學的東西這裡還沒有？</strong>本站會依照大家的需求排優先順序 —— 新課上線會在
        <a href="https://tonimvp.blogspot.com" rel="noopener">toni的MVP</a> 公告，
-       <strong>那裡的留言區不用開帳號就能留</strong>；想要來回追蹤的話也可以到
+       <strong>那裡的留言區用 Google 帳號就能留，不用註冊 GitHub</strong>；想要來回追蹤的話也可以到
        <a href="../report.html">GitHub Issues</a> 許願。</p>
     <p class="small">⚠️ 貼腳本輸出之前，把路徑裡的使用者名稱改成 <code>XXX</code>
        （<code>C:\Users\<u>〔你的名字〕</u>\…</code>）——
@@ -520,6 +533,6 @@
        <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

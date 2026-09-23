@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/shrink-big/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="球場超過 10MB 就當機 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="社群傳了二十年的規矩：球場檔超過 10MB 中文版就跳出。本站量開檔案，找到球場檔越改越大的真正原因；中文版跳出另有真因，是一塊 64 MB 的記憶體池。附零相依腳本，18.44 MB 的球場變回 5.20 MB，內容一個位元組都不少。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/shrink-big/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>球場超過 10MB 就當機 — toni的MVP模組補習班</title>
-<meta name="description" content="社群傳了二十年的規矩：球場檔超過 10MB 中文版就跳出。本站把檔案量開發現真正的原因，而且它跟大家以為的完全不同。附零相依腳本，18.44 MB 的球場變回 5.20 MB，內容一個位元組都不少。">
+<title>球場超過 10MB 就當機 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
+<meta name="description" content="社群傳了二十年的規矩：球場檔超過 10MB 中文版就跳出。本站量開檔案，找到球場檔越改越大的真正原因；中文版跳出另有真因，是一塊 64 MB 的記憶體池。附零相依腳本，18.44 MB 的球場變回 5.20 MB，內容一個位元組都不少。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -44,31 +54,18 @@
   </div>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix" id="quick">
-    <p class="card-h">⚡ 只想趕快做完？照這五步</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
       <li>先做<a href="../backup/index.html">備份</a>。這一課會改檔案。</li>
-      <li>先量，完全唯讀。下載 <a href="mvp_shrink_big.py" download>mvp_shrink_big.py</a> 之後跑<br>
+      <li>先量，完全唯讀。下載 <a href="mvp_shrink_big.py" download>mvp_shrink_big.py</a>。下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打（Mac 開終端機先打 <code>cd ~/Downloads</code>）。然後跑<br>
   <p class="small">Windows:</p>
   <pre><code>python mvp_shrink_big.py "&lt;遊戲資料夾&gt;/data/stadium/skydnite.big"</code></pre>
   <p class="small">Mac / Linux:</p>
@@ -78,21 +75,24 @@
           「重排之後不會變小 —— 那些沒人指到的位元組排在第一筆資料之前……這個檔不用清」。）</li>
       <li>預覽會變多小<br>
   <p class="small">Windows:</p>
-  <pre><code>python mvp_shrink_big.py "&lt;...&gt;/skydnite.big" --shrink</code></pre>
+  <pre><code>python mvp_shrink_big.py "&lt;遊戲資料夾&gt;/data/stadium/skydnite.big" --shrink</code></pre>
   <p class="small">Mac / Linux:</p>
-  <pre><code>python3 mvp_shrink_big.py "&lt;...&gt;/skydnite.big" --shrink</code></pre></li>
+  <pre><code>python3 mvp_shrink_big.py "&lt;遊戲資料夾&gt;/data/stadium/skydnite.big" --shrink</code></pre></li>
       <li>確定了才真的清。要看到「複驗：N 個項目全部逐位元組相同，檔頭大小欄正確 ✅」<br>
   <p class="small">Windows:</p>
-  <pre><code>python mvp_shrink_big.py "&lt;...&gt;/skydnite.big" --shrink --apply</code></pre>
+  <pre><code>python mvp_shrink_big.py "&lt;遊戲資料夾&gt;/data/stadium/skydnite.big" --shrink --apply</code></pre>
   <p class="small">Mac / Linux:</p>
-  <pre><code>python3 mvp_shrink_big.py "&lt;...&gt;/skydnite.big" --shrink --apply</code></pre></li>
+  <pre><code>python3 mvp_shrink_big.py "&lt;遊戲資料夾&gt;/data/stadium/skydnite.big" --shrink --apply</code></pre></li>
       <li>進遊戲，開那座球場。<strong>這一步不能跳。</strong>不對就一行還原<br>
   <p class="small">Windows:</p>
-  <pre><code>python mvp_shrink_big.py "&lt;...&gt;/skydnite.big" --restore</code></pre>
+  <pre><code>python mvp_shrink_big.py "&lt;遊戲資料夾&gt;/data/stadium/skydnite.big" --restore</code></pre>
   <p class="small">Mac / Linux:</p>
-  <pre><code>python3 mvp_shrink_big.py "&lt;...&gt;/skydnite.big" --restore</code></pre></li>
+  <pre><code>python3 mvp_shrink_big.py "&lt;遊戲資料夾&gt;/data/stadium/skydnite.big" --restore</code></pre></li>
     </ol>
-    <p class="tail">第一步永遠是量，不是清。想知道為什麼，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+    <p class="tail">⚠️ <strong>中文版一進大球場就跳出的話</strong>，先看〈<a href="../fix-chinese/index.html">中文版配大球場就跳出</a>〉——
+       清球場救不了那一個。
+       <br>第一步永遠是量，不是清。想知道為什麼，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+    <p class="tail">照做卡住了？直接跳到<a href="#fix">❌ 出錯處理</a>（可以把畫面上印出來的那一行貼進那裡的搜尋框）；做完對照<a href="#ok">✅ 成功標準</a>。</p>
   </div>
 
   <h2>先看那條規矩本身</h2>
@@ -130,9 +130,9 @@
      把 <code>skydnite.big</code> 的目錄攤開來加總：</p>
   <div class="tablewrap"><table>
     <tbody>
-      <tr><td>檔案大小</td><td class="num">18.44 MB</td></tr>
-      <tr><td>目錄裡 88 個項目加起來</td><td class="num"><strong>5.19 MB</strong></td></tr>
-      <tr class="hi"><td><strong>目錄沒有指到的位元組</strong></td><td class="num"><strong>13.25 MB（71.9%）</strong></td></tr>
+      <tr><th scope="row">檔案大小</th><td class="num">18.44 MB</td></tr>
+      <tr><th scope="row">目錄裡 88 個項目加起來</th><td class="num"><strong>5.19 MB</strong></td></tr>
+      <tr class="hi"><th scope="row"><strong>目錄沒有指到的位元組</strong></th><td class="num"><strong>13.25 MB（71.9%）</strong></td></tr>
     </tbody>
   </table></div>
   <p><strong>這個檔有七成二是沒有人指向的垃圾。</strong>
@@ -432,7 +432,8 @@
     <div class="step-n">1</div>
     <div>
       <p class="step-t">下載腳本</p>
-      <p><a href="mvp_shrink_big.py" download>mvp_shrink_big.py</a>（1,468 行，零相依）</p>
+      <p><a href="mvp_shrink_big.py" download>mvp_shrink_big.py</a>（1,469 行，零相依）</p>
+      <p class="small"><strong>指令要在放腳本的那個資料夾打。</strong>瀏覽器下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter —— 開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。Mac：打開終端機，先打 <code>cd ~/Downloads</code> 按 Enter。</p>
     </div>
   </div>
 
@@ -457,9 +458,9 @@
     <div>
       <p class="step-t">預覽會變多小</p>
 <p class="small">Windows:</p>
-<pre><code>python mvp_shrink_big.py "&lt;...&gt;/skydnite.big" --shrink</code></pre>
+<pre><code>python mvp_shrink_big.py "&lt;遊戲資料夾&gt;/data/stadium/skydnite.big" --shrink</code></pre>
 <p class="small">Mac / Linux:</p>
-<pre><code>python3 mvp_shrink_big.py "&lt;...&gt;/skydnite.big" --shrink</code></pre>
+<pre><code>python3 mvp_shrink_big.py "&lt;遊戲資料夾&gt;/data/stadium/skydnite.big" --shrink</code></pre>
     </div>
   </div>
 
@@ -469,9 +470,9 @@
       <p class="step-t">確定了才真的清</p>
       <p class="step-why">會先備份，寫完把 88 個項目逐位元組跟原檔比對；<u>比不過會當場自動還原</u>。</p>
 <p class="small">Windows:</p>
-<pre><code>python mvp_shrink_big.py "&lt;...&gt;/skydnite.big" --shrink --apply</code></pre>
+<pre><code>python mvp_shrink_big.py "&lt;遊戲資料夾&gt;/data/stadium/skydnite.big" --shrink --apply</code></pre>
 <p class="small">Mac / Linux:</p>
-<pre><code>python3 mvp_shrink_big.py "&lt;...&gt;/skydnite.big" --shrink --apply</code></pre>
+<pre><code>python3 mvp_shrink_big.py "&lt;遊戲資料夾&gt;/data/stadium/skydnite.big" --shrink --apply</code></pre>
     </div>
   </div>
 
@@ -483,17 +484,21 @@
     </div>
   </div>
 
-  <h2>✅ 成功標準</h2>
+  <h2 id="ok">✅ 成功標準</h2>
   <ul class="plain">
     <li>「已備份 → ○○.big.shrinkbak」</li>
     <li><strong>「複驗：N 個項目全部逐位元組相同，檔頭大小欄正確 ✅」</strong></li>
     <li>進遊戲，那座球場開得起來而且看起來正常</li>
   </ul>
 
-  <h2>❌ 出錯處理</h2>
+  <h2 id="fix">❌ 出錯處理</h2>
   <div class="tablewrap"><table>
     <thead><tr><th>看到什麼</th><th>怎麼做</th></tr></thead>
     <tbody>
+      <tr class="hi"><td class="mono">can't open file '…mvp_*.py'</td>
+          <td><strong>命令視窗跟腳本不在同一個資料夾。</strong>
+              打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）。
+              還是一樣的話，是檔名對不上：瀏覽器可能在檔名後面加了 <code>(1)</code>，把它改成跟指令裡一模一樣</td></tr>
       <tr><td>這個檔很乾淨，清了也省不了什麼</td><td>正常。這個檔沒有孤兒問題，不是你的球場的原因</td></tr>
       <tr><td>沒人指到的只有 N 個位元組，清了也省不了什麼</td><td>正常。孤兒不到 1 KB，清了看不出差別</td></tr>
       <tr><td>重排之後不會變小 —— 那些沒人指到的位元組排在第一筆資料之前</td>
@@ -527,9 +532,9 @@
   <div class="card grass">
     <p class="card-h">一行就能還原</p>
 <p class="small">Windows:</p>
-<pre><code>python mvp_shrink_big.py "&lt;...&gt;/skydnite.big" --restore</code></pre>
+<pre><code>python mvp_shrink_big.py "&lt;遊戲資料夾&gt;/data/stadium/skydnite.big" --restore</code></pre>
 <p class="small">Mac / Linux:</p>
-<pre><code>python3 mvp_shrink_big.py "&lt;...&gt;/skydnite.big" --restore</code></pre>
+<pre><code>python3 mvp_shrink_big.py "&lt;遊戲資料夾&gt;/data/stadium/skydnite.big" --restore</code></pre>
     <p>本站實測：還原之後 SHA-256 與動手前<strong>完全相同</strong>。</p>
   </div>
 
@@ -560,6 +565,17 @@
     <li><strong>安全網</strong> 不加參數就是唯讀量測；<code>--apply</code> 會先備份成 <code>.shrinkbak</code>，寫完逐項比對位元組，<u>比不過就當場自動還原</u>；<code>--restore</code> 一行還原，而且還原本身是先寫暫存檔、比對 SHA-256 才換名（換名之前失敗，正本原封不動），本站實測還原後 SHA-256 與動手前完全相同。整包 87 個球場清過一遍是 647.6 MB 降到 <strong>406.8 MB</strong>（省 37.2%），超過 10 MB 的從 24 個變 <strong>2 個</strong>，而且實機玩過照常。（班主任清完之後另外留的那一份是 394.9 MB／0 個，因為裡面另有兩個檔是<u>換</u>成另一包社群球場的版本，不是清出來的 —— 見上面那張表底下的訂正。本站測試機的遊戲資料夾目前放的仍然是<u>未清理</u>的那一份。）</li>
     <li><strong>本站沒驗的</strong> 「為什麼檔案大會害到遊戲」在這一課只是推論，這一課沒有量遊戲執行時的記憶體，只能確定清完檔案變回 5.20 MB。（<a href="../fix-chinese/index.html">中文版配大球場就跳出</a>那一課後來量了：跳出的原因是一塊寫死的 64 MB 記憶體池，跟球場檔大小沒有關係 —— 把球場縮小並不會讓中文版不跳出。）實機測試是一個人、一台機器、一包球場，證明的是「這件事做得到」，不是「你那包一定沒問題」。</li>
   </ul>
+
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p><a href="../../plan.html#b"><strong>② 急救班</strong></a> 第 4／5 堂</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../fix-chinese/index.html">← 上一堂：中文版配大球場就跳出</a>
+      <a class="btn" href="../mount-disc/index.html">下一堂：不用每次放光碟 →</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
 
   <h2 id="how-it-works">這支腳本在做什麼</h2>
   <p>不想讀程式碼也沒關係，這一段把它的流程講完。</p>
@@ -686,7 +702,7 @@
   <h2 id="source">完整原始碼</h2>
   <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。</p>
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1468 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1469 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -800,6 +816,7 @@ mvp_shrink_big.py — 把封裝檔裡「目錄沒指到的位元組」清掉
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -814,7 +831,7 @@ mvp_shrink_big.py — 把封裝檔裡「目錄沒指到的位元組」清掉
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 
 import os
@@ -2166,6 +2183,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

@@ -1,4 +1,5 @@
 #!/bin/bash
+# TOOL_DATE = '2026-09-23'
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -15,7 +16,7 @@
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 # ═══════════════════════════════════════════════════════════════
 #  mvp_wine_log.sh — 用 Wine 啟動遊戲,並把「遊戲自己送出的除錯訊息」錄下來
@@ -41,8 +42,12 @@
 #  桌面不存在就改寫到家目錄,同一秒內跑第二次會自動加序號,不會蓋掉前一份。
 #  ⚠️ log 裡會有你的家目錄、帳號名稱與遊戲資料夾的完整路徑(Wine 自己印的)。
 #  所以跑完會**另外**產一份遮蔽版 mvp_debug_<...>_可回報.log:家目錄、帳號名稱、
-#  Windows 使用者資料夾都換成代號。要貼到網路上請貼那一份,原始那份留在自己電腦。
-#  遮蔽版產完會自己複驗,只要還找得到家目錄或帳號名稱就刪掉它並以非 0 離開。
+#  Windows 使用者資料夾都換成代號(名字裡有空白、路徑寫成大寫也一樣整段換掉)。
+#  要貼到網路上請貼那一份,原始那份留在自己電腦。
+#  遮蔽版產完會自己複驗,只要還找得到家目錄、帳號名稱,或是 Users、Home 資料夾
+#  (不分大小寫;前後的分隔符號是 \ 或 /,前面有沒有磁碟機代號都算)
+#  後面還接著沒換掉的名字,就刪掉它並以非 0 離開。
+#  複驗認不得的一種寫法,寫在下面 has_unmasked_user_dir 前面的說明裡。
 #
 #  想換 Wine 的除錯旗標,跑之前設 WINEDEBUG_MODE,例如
 #    WINEDEBUG_MODE=+seh bash mvp_wine_log.sh "<遊戲資料夾>"
@@ -369,14 +374,59 @@ sanitize_log() {
         user_esc=$(sed_escape "$user")
         set -- "$@" -e "s|${user_esc}|<使用者>|g"
     fi
+    # 使用者資料夾那一段要遮到下一個分隔符號為止,不可以遇到空白就停:
+    # 以前寫 [^\\ ]*,C:\Users\〔名〕 〔姓〕\ 只會變成 C:\Users\<使用者> 〔姓〕\,姓氏留在檔裡。
+    # 前兩條(Windows 的寫法):
+    #   · 遮到下一個 \ 或 / 為止,遇到雙引號也停。這三個字元都不可能出現在
+    #     Windows 的資料夾名稱裡,所以名字裡有空白也會整段遮掉。
+    #   · Users / Home 前後的分隔符號可以是 \ 也可以是 /,混用、連續好幾個都算:
+    #     Wine 印路徑時會把 \ 跳脫成 \\,再經過一層跳脫就變成四個;
+    #     C:\Users/〔名〕、C:/Users\〔名〕 這種混用的寫法也一樣遮得到。
+    #   · Users / Home 前面不要求磁碟機代號。同一行有兩條路徑、中間用 ; 或 , 隔開時,
+    #     前一條的名字會一路遮到下一個分隔符號為止,連下一條開頭的 D: 一起換掉;
+    #     如果要求 Users 前面一定要有代號,第二條就認不得、名字整段留在檔裡。
+    #     \\?\unix\Users\〔名〕 這種前面本來就沒有代號的寫法,也一樣遮得到。
+    #   · 代價是任何路徑裡的 \Users\、\Home\ 後面那一段都會被換掉,
+    #     就算它不是使用者資料夾 —— 寧可多遮。
+    # 後兩條(Mac / Linux 的寫法):資料夾名稱除了 / 什麼字都可以有。
+    #   前兩條遇到 \ 或雙引號就停,剩下的由這兩條接著遮到下一個 / 為止。
+    #   / 連續好幾個也算(/Users//〔名〕 也遮得到)。
+    # Users / Home 不分大小寫一個字母一個字母列出來(全大寫的 USERS、大小寫混雜的 uSeRs 都算):
+    # Windows 與 Mac 預設的檔案系統都不分大小寫,寫成 USERS 一樣找得到那個資料夾,
+    # 所以 log 裡哪一種寫法都可能出現。
+    # 不用 sed 的 I 旗標,是因為 POSIX 規定的 sed 沒有這個旗標,不是每一台都認得。
     set -- "$@" \
-        -e 's|\([A-Za-z]:\\[Uu]sers\\\)[^\\ ]*|\1<使用者>|g' \
-        -e 's|\([A-Za-z]:\\[Hh]ome\\\)[^\\ ]*|\1<使用者>|g' \
-        -e 's|/Users/[^/ ]*|/Users/<使用者>|g' \
-        -e 's|/home/[^/ ]*|/home/<使用者>|g'
+        -e 's|\([\\/]\{1,\}[Uu][Ss][Ee][Rr][Ss][\\/]\{1,\}\)[^\\/"]*|\1<使用者>|g' \
+        -e 's|\([\\/]\{1,\}[Hh][Oo][Mm][Ee][\\/]\{1,\}\)[^\\/"]*|\1<使用者>|g' \
+        -e 's|\(/\{1,\}[Uu][Ss][Ee][Rr][Ss]/\{1,\}\)[^/]*|\1<使用者>|g' \
+        -e 's|\(/\{1,\}[Hh][Oo][Mm][Ee]/\{1,\}\)[^/]*|\1<使用者>|g'
     # 目的檔在真正寫入之前再確認一次不是符號連結(寫入一律不跟著連結走)。
     assert_not_symlink "$dst" "遮蔽版" || return 1
     LC_ALL=C sed "$@" "$src" >> "$dst" 2>/dev/null
+}
+
+# 複驗用:遮蔽之後,每一個 Users、Home 資料夾(不分大小寫;前後的分隔符號是 \ 或 /,
+# 混用、連續好幾個都算,前面有沒有磁碟機代號都算)後面緊接的必須是
+# 「代號 <使用者>,然後馬上是分隔符號或行尾」。
+# 抓三種沒遮乾淨:
+#   · 資料夾後面直接是名字 —— 整段沒遮到(例如那台機器上的 sed 沒有照預期解讀規則)
+#   · 代號後面還黏著字 —— 只遮到一半(舊規則遇到空白就停,留下的就是這個樣子:
+#     C:\Users\<使用者> 〔姓〕\)
+#   · 同一行的第二條路徑整段沒遮到 —— 前一條的遮蔽吃掉了它的磁碟機代號,
+#     要求代號的規則就認不得它(留下的樣子:C:\Users\<使用者>\Home\〔名〕\)
+# 這一道用 grep -E 另外寫一次,不重用 sed 那幾條,兩邊才不會一起錯。
+# 認不得的一種:名字本身以 < 開頭。遮蔽那幾條照樣會把它換掉,
+# 但萬一遮蔽沒跑到,這一道會把它當成代號放過。
+# 回傳 0 = 找到沒遮乾淨的地方(grep 自己出錯也算這一種:沒驗到就不能當成乾淨);
+# 回傳 1 = 確定乾淨。
+has_unmasked_user_dir() {
+    local rc
+    LC_ALL=C grep -qE \
+        '[\\/]+([Uu][Ss][Ee][Rr][Ss]|[Hh][Oo][Mm][Ee])[\\/]+([^<\\/"]|<使用者>[^\\/"])|/+([Uu][Ss][Ee][Rr][Ss]|[Hh][Oo][Mm][Ee])/+([^</]|<使用者>[^/])' \
+        "$1" 2>/dev/null
+    rc=$?
+    [ "$rc" -eq 1 ] && return 1
+    return 0
 }
 
 # ═══ --selftest:每一道守門配一個餌,證明它真的會擋 ═══════════
@@ -405,7 +455,7 @@ src_line_no() {
 run_selftest() {
     local sb marker out rc real_wine n state
     local fakehome_real whisky_bin
-    local ln_guard ln_run ln_start ln_done ln_share ln_create
+    local ln_guard ln_run ln_start ln_done ln_share ln_create ln_ok1 ln_resid ln_created
     sb=$(mktemp -d "${TMPDIR:-/tmp}/mvp_wine_log_selftest.XXXXXX") || return 1
     echo ""
     echo "  ═══ mvp_wine_log.sh 自我測試 ═══"
@@ -579,6 +629,105 @@ run_selftest() {
         st_bad "遮蔽:行數對不上(有整行被吃掉)"
     else
         st_ok "遮蔽:家目錄、帳號名稱、使用者資料夾都不見了,行數一樣"
+    fi
+
+    # ── 餌 12:使用者資料夾的名字有空白、大小寫不一樣,都要整段遮掉
+    # 舊規則寫 [^\\ ]*、[Uu]sers:C:\Users\〔名〕 〔姓〕\ 會留下〔姓〕,全大寫的 C:\USERS\ 整條不認得。
+    # 後面五行是另外幾種漏法:Users 前面要求磁碟機代號的話,同一行用 ; 或 , 接著的第二條路徑
+    # (代號被前一條的遮蔽吃掉了)、\\?\unix\Users\ 開頭的路徑都認不得;
+    # 分隔符號只認 \ 的話,C:\Users/〔名〕 這種混用的寫法認不得;/ 只認一個的話,/Users//〔名〕 遮不到。
+    # 每一個餌的名字都不是這台 Mac 的帳號名稱,所以只能靠「使用者資料夾」那幾條規則遮到,
+    # 不會被「帳號名稱」那一條順手蓋掉而假通過。
+    # 名字用 %s 填進去、反斜線在格式字串裡一律寫兩個:原始碼裡就不會出現
+    # 一條看起來像真實使用者路徑的字串(printf 的格式把 \\ 印成一個 \)。
+    {
+        printf 'err C:\\Users\\%s\\AppData\\Local\\game.log\n' 'ZZfirstA ZZlastA'
+        printf 'err C:\\USERS\\%s\\Desktop\\game.log\n' 'ZZupperB'
+        printf 'err C:\\Home\\%s\\x.log\n' 'ZZhomeC'
+        printf 'err c:\\uSeRs\\%s\\y.log\n' 'ZZmixedD'
+        printf 'trace L"C:\\\\users\\\\%s\\\\AppData\\\\z.log"\n' 'ZZdoubleE'
+        printf 'quad C:\\\\\\\\USERS\\\\\\\\%s\\\\\\\\q.log\n' 'ZZquadI'
+        printf 'unix /Users/%s/Games\n' 'ZZunixF ZZunixG'
+        printf 'unix /HOME/%s/x\n' 'ZZunixH'
+        printf 'path=C:\\Users\\%s;D:\\Home\\%s\\y\n' 'ZZsemiL' 'ZZsemiM ZZsemiN'
+        printf 'list C:\\Users\\%s,C:\\Users\\%s\\x\n' 'ZZcommaO' 'ZZcommaP'
+        printf 'nt \\\\?\\unix\\Users\\%s\\x\n' 'ZZntQ ZZntR'
+        printf 'mix C:\\Users/%s\\x C:/Users\\%s\\x\n' 'ZZmixS' 'ZZmixT'
+        printf 'dbl /Users//%s/x\n' 'ZZdblU'
+    } > "$sb/raw12.log"
+    : > "$sb/clean12.log"
+    ( HOME="$sb/fakehome"; sanitize_log "$sb/raw12.log" "$sb/clean12.log" "$sb/game" )
+    for n in "含空白|ZZlastA" "含空白(前半)|ZZfirstA" "全大寫 USERS|ZZupperB" "C:\\Home|ZZhomeC" \
+             "混合大小寫 uSeRs|ZZmixedD" "反斜線寫成兩個|ZZdoubleE" "反斜線寫成四個|ZZquadI" \
+             "Mac 路徑含空白|ZZunixG" "全大寫 /HOME|ZZunixH" \
+             "同一行用 ; 接著的第二條|ZZsemiN" "同一行用 , 接著的第二條|ZZcommaP" \
+             "前面沒有磁碟機代號|ZZntR" "Users 後面接 /|ZZmixS" "Users 前面是 /|ZZmixT" \
+             "Mac 路徑連續兩個 /|ZZdblU"; do
+        if LC_ALL=C grep -qF "${n#*|}" "$sb/clean12.log"; then
+            st_bad "餌 12(${n%%|*}):名字「${n#*|}」還留在遮蔽版裡"
+        else
+            st_ok "餌 12(${n%%|*}):整段遮掉了"
+        fi
+    done
+    # 陰性對照:只遮名字那一段,後面的路徑要留著(不然「全部吃掉」也會讓上面全綠,
+    # 而那份 log 就沒有用了)。
+    if LC_ALL=C grep -qF 'C:\Users\<使用者>\AppData\Local\game.log' "$sb/clean12.log" \
+       && LC_ALL=C grep -qF 'C:\\users\\<使用者>\\AppData\\z.log"' "$sb/clean12.log" \
+       && LC_ALL=C grep -qF 'C:\\\\USERS\\\\<使用者>\\\\q.log' "$sb/clean12.log"; then
+        st_ok "陰性對照:名字後面的路徑還在,只換掉名字那一段"
+    else
+        st_bad "陰性對照:預期「只換掉名字」的那三行沒出現(遮過頭了,或是根本沒遮到)"
+    fi
+    # 同一行兩條路徑:兩個名字各自換成代號,第二條名字後面的 \y 還在。
+    # 第一條的名字會連同後面的 ;D: 一起換掉(遮到下一個分隔符號為止),這是預期的。
+    if LC_ALL=C grep -qF 'path=C:\Users\<使用者>\Home\<使用者>\y' "$sb/clean12.log" \
+       && LC_ALL=C grep -qF 'dbl /Users//<使用者>/x' "$sb/clean12.log"; then
+        st_ok "陰性對照:同一行兩條路徑、連續兩個 / 的那兩行,也是只換掉名字那一段"
+    else
+        st_bad "陰性對照:同一行兩條路徑、連續兩個 / 的那兩行,沒有變成預期的樣子(遮過頭了,或是根本沒遮到)"
+    fi
+
+    # ── 餌 13:複驗那一道(has_unmasked_user_dir)要認得出沒遮乾淨的檔
+    # 原始那份一定沒遮 → 必須被抓到;遮好的那份 → 必須放行。兩邊都要驗,
+    # 不然「永遠說有問題」或「永遠說乾淨」都會讓其中一邊假通過。
+    if has_unmasked_user_dir "$sb/raw12.log"; then
+        st_ok "餌 13:沒遮過的 log 被複驗抓到"
+    else
+        st_bad "餌 13:沒遮過的 log 通過了複驗"
+    fi
+    if has_unmasked_user_dir "$sb/clean12.log"; then
+        st_bad "陰性對照:遮蔽版沒通過複驗(遮蔽規則漏了名字,或是複驗誤判)"
+    else
+        st_ok "陰性對照:遮好的 log 通過複驗"
+    fi
+    # 只遮到一半的樣子(舊規則的產物):代號後面還黏著姓氏。兩種路徑各一份。
+    printf '%s\n' 'err C:\Users\<使用者> ZZleakJ\AppData\x.log' > "$sb/half13w.log"
+    printf '%s\n' 'unix /Users/<使用者> ZZleakK/Games' > "$sb/half13u.log"
+    if has_unmasked_user_dir "$sb/half13w.log" && has_unmasked_user_dir "$sb/half13u.log"; then
+        st_ok "餌 13:只遮到一半(代號後面還黏著名字)也被複驗抓到"
+    else
+        st_bad "餌 13:只遮到一半的 log 通過了複驗"
+    fi
+    # 同一行的第二條路徑整段沒遮到:這正是「Users 前面要求磁碟機代號」的舊規則,
+    # 對 C:\Users\〔名〕;D:\Home\〔名〕 〔姓〕\y 遮出來的樣子。
+    printf '%s\n' 'path=C:\Users\<使用者>\Home\ZZleakT ZZleakU\y' > "$sb/half13m.log"
+    if has_unmasked_user_dir "$sb/half13m.log"; then
+        st_ok "餌 13:同一行第二條路徑沒遮到(前面沒有磁碟機代號)也被複驗抓到"
+    else
+        st_bad "餌 13:同一行第二條路徑沒遮到的 log 通過了複驗"
+    fi
+    # 分隔符號混用、/ 連續兩個:這兩種整段沒遮到,複驗也要認得。
+    printf '%s\n' 'mix C:\Users/ZZleakV\x' > "$sb/half13x.log"
+    printf '%s\n' 'dbl /Users//ZZleakW/x' > "$sb/half13d.log"
+    if has_unmasked_user_dir "$sb/half13x.log" && has_unmasked_user_dir "$sb/half13d.log"; then
+        st_ok "餌 13:分隔符號混用、/ 連續兩個,沒遮到也被複驗抓到"
+    else
+        st_bad "餌 13:分隔符號混用或 / 連續兩個的 log 通過了複驗"
+    fi
+    if has_unmasked_user_dir "$sb/no_such_file.log"; then
+        st_ok "餌 13:讀不到的檔不會被當成乾淨"
+    else
+        st_bad "餌 13:讀不到的檔被當成乾淨了"
     fi
 
     # ── 餌 11:遮蔽版的目的檔被換成指向沙盒外的符號連結 → 一個位元組都不可以寫過去
@@ -870,6 +1019,18 @@ run_selftest() {
         else
             st_ok "主流程:建遮蔽版之前先登記 SHARE_STATE=creating(第 $ln_share 行)"
         fi
+        # 複驗裡「使用者資料夾後面要是代號」那一道,也在 --selftest 走不到的那條路上。
+        # 它的行為是餌 13 驗的;這裡驗它還在,而且排在「判定可以貼出去」之前。
+        ln_ok1=$(src_line_no '    SHARE_OK=1')
+        ln_resid=$(src_line_no '    if has_unmasked_user_dir "$SHARE"; then SHARE_OK=0; fi')
+        ln_created=$(src_line_no '    SHARE_STATE=created')
+        if [ -z "$ln_ok1" ] || [ -z "$ln_resid" ] || [ -z "$ln_created" ]; then
+            st_bad "主流程:找不到唯一一行複驗的起點、使用者資料夾那一道,或判定可以貼出去那一行(不見了,或變成兩行以上)"
+        elif [ "$ln_resid" -le "$ln_ok1" ] || [ "$ln_resid" -ge "$ln_created" ]; then
+            st_bad "主流程:使用者資料夾那一道在第 $ln_resid 行,沒有排在複驗起點(第 $ln_ok1 行)與判定(第 $ln_created 行)之間"
+        else
+            st_ok "主流程:複驗有檢查使用者資料夾(第 $ln_resid 行,在判定可以貼出去的第 $ln_created 行之前)"
+        fi
     fi
 
     rm -rf "$sb"
@@ -994,7 +1155,11 @@ if [ -z "$WINE_BIN" ]; then
     done
 fi
 if [ -z "$WINE_BIN" ] || [ ! -x "$WINE_BIN" ]; then
-    echo "  ✗ 找不到 Wine。請先跑過「啟動器.command」把 Wine 裝好。"
+    # 這裡不寫安裝指令:Mac 上的 Wine 裝法會變(2026 年就變過),
+    # 寫死在下載回去的腳本裡,變了也改不到讀者手上那一份。以課程頁為準。
+    echo "  ✗ 找不到 Wine。Wine 怎麼裝,請看本站「在 Mac 上玩 MVP 2005」那一課:"
+    echo "     https://toniliumvp.github.io/MVPBaseball/tutorials/play-on-mac/"
+    echo "     裝法以那一頁為準。"
     echo ""
     exit 1
 fi
@@ -1135,10 +1300,14 @@ fi
 SHARE_OK=0
 if [ -n "$SHARE" ] && [ -f "$SHARE" ] && [ "$SANITIZED" -eq 1 ]; then
     # 複驗:遮蔽版裡不可以再找得到家目錄或帳號名稱,行數也要跟原始那份一樣。
+    # 另外 Users、Home 資料夾後面都要是代號(認得哪些寫法見 has_unmasked_user_dir)——
+    # 前兩條只認得這台 Mac 自己的名字,
+    # log 裡如果出現別台電腦、別的帳號的路徑,要靠這一條。
     ME=$(id -un 2>/dev/null || true)
     SHARE_OK=1
     if LC_ALL=C grep -qF "$HOME" "$SHARE" 2>/dev/null; then SHARE_OK=0; fi
     if [ -n "$ME" ] && [ ${#ME} -ge 3 ] && LC_ALL=C grep -qF "$ME" "$SHARE" 2>/dev/null; then SHARE_OK=0; fi
+    if has_unmasked_user_dir "$SHARE"; then SHARE_OK=0; fi
     if [ "$(wc -l < "$SHARE" | tr -d ' ')" != "$TOTAL" ]; then SHARE_OK=0; fi
 fi
 if [ "$SHARE_OK" -eq 1 ]; then

@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/swap-splash/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="換掉開機畫面 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="遊戲的開機大圖、標題頁、讀取畫面各在哪、多大、什麼格式，全部現場量測。含本站自己寫的匯入工具，以及一份 2007 年說明書跟這台機器對不上、真正的位置怎麼查出來的過程。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/swap-splash/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>換掉開機畫面 — toni的MVP模組補習班</title>
+<title>換掉開機畫面 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="遊戲的開機大圖、標題頁、讀取畫面各在哪、多大、什麼格式，全部現場量測。含本站自己寫的匯入工具，以及一份 2007 年說明書跟這台機器對不上、真正的位置怎麼查出來的過程。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -49,35 +59,23 @@
   </div>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix" id="quick">
-    <p class="card-h">⚡ 只想趕快把畫面換掉？照這五步</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快把畫面換掉？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <p class="small"><strong>先說一句：<code>title</code>（標題頁）與 <code>loading</code>（讀取畫面）換得進去，
        <code>splash</code>（開機大圖）目前只匯得出來、匯不回去</strong>，所以下面拿 <code>title</code> 當例子。
        實測數字看<a href="#splash-blocked">開機大圖為什麼匯不回去</a>。</p>
     <ol>
-      <li>先看三個畫面在你這份裡各是什麼規格，數字以印出來的為準<br>
+      <li>先下載 <a href="mvp_swap_screen.py" download>mvp_swap_screen.py</a>，它會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打（Mac 開終端機先打 <code>cd ~/Downloads</code>）。<br>
+          先看三個畫面在你這份裡各是什麼規格，數字以印出來的為準<br>
   <pre><code>python mvp_swap_screen.py "〔你的遊戲資料夾〕" --info</code></pre></li>
-      <li>把現在那張匯出來當範本，代號可以是 <code>splash</code>、<code>title</code>、<code>loading</code>，三個都匯得出來。<strong>輸出檔名一律用 <code>.png</code></strong>——<code>--export</code> 這條路不做備份<br>
+      <li>把現在那張匯出來當範本，代號可以是 <code>splash</code>、<code>title</code>、<code>loading</code>，三個都匯得出來。<strong>輸出檔名一律用 <code>.png</code></strong>——<code>--export</code> 這條路不做備份。沒寫路徑的 <code>old.png</code> 會存在命令視窗所在的資料夾，改好的 <code>mine.png</code> 也放在那裡<br>
   <pre><code>python mvp_swap_screen.py "〔你的遊戲資料夾〕" --export title old.png</code></pre></li>
       <li>用繪圖軟體<strong>在匯出的那張上面直接改</strong>，存成 PNG。尺寸必須完全相同，不一樣就直接拒絕寫入，腳本不會幫你縮放。</li>
       <li>先預覽，這一步不會動到任何檔案<br>
@@ -98,6 +96,7 @@
 <pre><code>python mvp_swap_screen.py "〔你的遊戲資料夾〕" --restore</code></pre>
   <p class="tail">速解裡的 <code>python</code> 是 Windows 寫法，Mac / Linux 換成 <code>python3</code>（往下讀的正文已經是 <code>python3</code> 版）。遊戲開不起來就改用 <code>--restore</code>，三個封裝檔裡<strong>備份過得了檢查的就會還原</strong>，壞掉的那份會單獨列出來告訴你下一步。
        想知道這三個畫面是怎麼找出來的，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+    <p class="tail">照做卡住了？直接跳到<a href="#fix">❌ 出錯處理</a>（可以把畫面上印出來的那一行貼進那裡的搜尋框）。</p>
   </div>
 
   <h2>三個畫面在哪</h2>
@@ -140,9 +139,9 @@
     <p class="small">（2026-09-05 訂正：本站原本把這份說明書寫成「2008 年」，那是錯的。
        它就是<a href="../../reference/tools-archive.html">工具清冊</a>裡
        <code>initialsplashmaker</code> 那一支所附的說明書，署名 <code>compmaniac</code>；
-       壓縮包內記的檔案時間是 2007-01-13，同一包的執行檔是 2007-01-11 與 2007-01-13。
+       壓縮檔內記的檔案時間是 2007-01-13，同一包的執行檔是 2007-01-11 與 2007-01-13。
        本站另一頁<a href="../../story/tool-lineage/index.html">工具是誰做的</a>把同一組
-       11 個壓縮包整批量過，年份也是 2007。<u>說明書內文自己沒有寫年份</u>，
+       11 個壓縮檔整批量過，年份也是 2007。<u>說明書內文自己沒有寫年份</u>，
        所以這裡寫的是那份檔案本身的時間。）</p>
   </div>
 
@@ -187,6 +186,8 @@ DrawLoadingProgress: %d, %.3f @ %.3f seconds</code></pre>
 
   <h2>👉 你要做的事</h2>
 
+  <p class="small">先下載 <a href="mvp_swap_screen.py" download>mvp_swap_screen.py</a>。<strong>指令要在放腳本的那個資料夾打。</strong>瀏覽器下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter —— 開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。Mac：打開終端機，先打 <code>cd ~/Downloads</code> 按 Enter。</p>
+
   <div class="step">
     <div class="step-n">1</div>
     <div>
@@ -211,6 +212,7 @@ DrawLoadingProgress: %d, %.3f @ %.3f seconds</code></pre>
       <p>代號可以是 <code>splash</code>、<code>title</code>、<code>loading</code>，<strong>三個都匯得出來</strong>。
          但下一步要匯回去的話，目前只有 <code>title</code> 與 <code>loading</code> 走得通，
          見<a href="#splash-blocked">開機大圖為什麼匯不回去</a>。</p>
+      <p class="small"><code>old.png</code> 會存在命令視窗所在的資料夾（照上面從「下載」開的話，就在「下載」裡）；改好存成 <code>mine.png</code>，也放在同一個資料夾。</p>
     </div>
   </div>
 
@@ -305,10 +307,14 @@ DrawLoadingProgress: %d, %.3f @ %.3f seconds</code></pre>
        磁碟空間換正確性。介意的話，把備份留著、需要時 <code>--restore</code>。</p>
   </div>
 
-  <h2>❌ 出錯處理</h2>
+  <h2 id="fix">❌ 出錯處理</h2>
   <div class="tablewrap"><table>
     <thead><tr><th>症狀</th><th>怎麼辦</th></tr></thead>
     <tbody>
+      <tr class="hi"><td class="mono">can't open file '…mvp_*.py'</td>
+          <td><strong>命令視窗跟腳本不在同一個資料夾。</strong>
+              打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）。
+              還是一樣的話，是檔名對不上：瀏覽器可能在檔名後面加了 <code>(1)</code>，把它改成跟指令裡一模一樣</td></tr>
       <tr><td>說尺寸不對</td><td>用 <code>--export</code> 出來的那張當底圖，不要自己開新檔。
           <strong>換的是 <code>splash</code> 的話，換底圖也沒用</strong>：它現在匯不回去，
           見<a href="#splash-blocked">開機大圖為什麼匯不回去</a></td></tr>
@@ -349,19 +355,30 @@ DrawLoadingProgress: %d, %.3f @ %.3f seconds</code></pre>
   <h2 id="recap">📌 重點整理</h2>
   <ul class="recap">
     <li><strong>一句話</strong> 開機大圖、標題頁、讀取畫面三張分別躺在 <code>frontend/splash.big</code>、<code>frontend/sushared.big</code>、<code>frontend/suonly.big</code> 這三個封裝檔裡，三張都匯得出來，<strong>但目前只有標題頁（<code>title</code>）與讀取畫面（<code>loading</code>）匯得回去</strong>。</li>
-    <li><strong>三張圖的規格</strong> <code>splash</code> 是 <code>splash.fsh</code> 裡的 <code>firs</code>，DXT1（<code>0x60</code>），尺寸看你這份是哪一版（本站量得到的五份安裝裡，四份剛安裝好的或社群修補過的是 512 × 512，只有本站測試機那份 2023 模組版是 1024 × 1024。本頁下面那句「六份 <code>data</code> 資料夾」是另一個口徑：<u>測試機自己還留了一份備份 <code>data</code> 資料夾</u>，那一份也是 1024 × 1024，所以以 <code>data</code> 資料夾算，1024 × 1024 的是六份裡的兩份）；<code>title</code> 是 <code>license.fsh</code> 裡的 <code>lice</code>，32 位元（<code>0x7D</code>），1024 × 512；<code>loading</code> 是 <code>memcard.fsh</code> 裡的 <code>memc</code>，32 位元（<code>0x7D</code>），512 × 512。三張都被 QFS 壓縮過，用文字編輯器直接打開只會看到亂碼。</li>
-    <li><strong>開機大圖目前匯不回去</strong> <code>splash</code> 匯得出來、匯不回去，連 <code>--export</code> 出來的那張原封不動匯回去也會被擋，本站手上六份 <code>data</code> 資料夾都一樣（1024 × 1024 的兩份說「新像素有 524288 個位元組,原本是 524304」，512 × 512 的四份說「新像素有 131072 個位元組,原本是 131088」）。原因是 <code>splash.fsh</code> 那一筆記錄宣告的長度，比「16 個位元組的記錄檔頭 ＋ 寬 × 高 ÷ 2 的像素」多 16 個位元組，而多出來的那 16 個全是 0，本站沒查出它們是什麼。這不是「DXT1 一律寫不回去」：<code>models.big</code> 裡讀得出來的 889 張 DXT1 臉皮，889 張長度都是對的。</li>
+    <li><strong>三張圖的規格</strong> <code>splash</code> 是 <code>splash.fsh</code> 裡的 <code>firs</code>，DXT1（<code>0x60</code>），尺寸看你這份是哪一版（本站量得到的五份安裝裡，四份剛安裝好的或社群修補過的是 512 × 512，只有本站測試機那份 2023 模組版是 1024 × 1024。<a href="#splash-blocked">開機大圖那張紅卡</a>寫的「六份 <code>data</code> 資料夾」是另一個口徑：<u>測試機自己還留了一份備份 <code>data</code> 資料夾</u>，那一份也是 1024 × 1024，所以以 <code>data</code> 資料夾算，1024 × 1024 的是六份裡的兩份）；<code>title</code> 是 <code>license.fsh</code> 裡的 <code>lice</code>，32 位元（<code>0x7D</code>），1024 × 512；<code>loading</code> 是 <code>memcard.fsh</code> 裡的 <code>memc</code>，32 位元（<code>0x7D</code>），512 × 512。三張都被 QFS 壓縮過，用文字編輯器直接打開只會看到亂碼。</li>
     <li><strong>最容易踩的雷是尺寸</strong> 不一樣就直接拒絕寫入，腳本不會幫你縮放。這是刻意的，幫你猜只會把圖弄糊，而且你不會知道發生了什麼；最穩的做法是拿 <code>--export</code> 出來的那張當底圖，不要自己開新檔。</li>
-    <li><strong>開機大圖目前只出得來、進不去</strong> 本站量得到的五份安裝（剛安裝好的英文原版、剛安裝好的中文原版、本站測試機那份 2023 模組版，以及歷史資料裡的 PK 版與 NEW TC_PATCH123 版）的 <code>splash.fsh</code>，圖片記錄宣告的長度都比「記錄檔頭 16 + 像素」多出 16 個位元組（那 16 個都是零），長度守門員一律拒絕寫入，所以 <code>--import splash</code> 一定會被擋。<code>--info</code> 與 <code>--export</code> 不受影響；真的換得動的是 <code>title</code> 與 <code>loading</code> 那兩張 32 位元的圖，而那兩張是未壓縮的，匯出再匯回去逐位元組相同。DXT1 有損這件事只影響開機大圖的<strong>畫質</strong>：本站量它自己那張圖，解出來重編碼後三個色通道完全相同的像素比例，剛安裝好的原版是 89.2%、測試機那份 2023 模組版是 99.8%，兩張差很多，沒有通則。</li>
+    <li><strong>開機大圖目前只出得來、進不去</strong> <code>splash</code> 匯得出來、匯不回去，連 <code>--export</code> 出來的那張原封不動匯回去也會被擋，本站量得到的每一份安裝都一樣：<code>splash.fsh</code> 那一筆記錄宣告的長度，比「16 個位元組的記錄檔頭 ＋ 寬 × 高 ÷ 2 的像素」多 16 個位元組（全是 0，本站沒查出它們是什麼），長度對不上就拒絕寫入。這不是「DXT1 一律寫不回去」：<code>models.big</code> 裡讀得出來的 889 張 DXT1 臉皮，889 張長度都是對的。DXT1 有損只影響開機大圖的<strong>畫質</strong>：解出來重編碼後三個色通道完全相同的像素比例，剛安裝好的原版是 89.2%、測試機那份 2023 模組版是 99.8%，沒有通則。真的換得動的是 <code>title</code> 與 <code>loading</code> 那兩張 32 位元的圖，匯出再匯回去逐位元組相同。</li>
     <li><strong>那張表是怎麼查出來的</strong> 線索是執行檔裡的 <code>FSPLASH</code>／<code>LEGAL</code>／<code>LOADING</code> 這些符號，再從 <code>fes_title.fel</code> 的 <code>LS:license</code> 與 <code>lice</code> 對上圖集裡那張圖的名字。這是<strong>名字對上名字</strong>，不是「都有三個」那種數量吻合。順帶量到 <code>LEGAL</code> 那一行的顯示開關本來就是 0。</li>
     <li><strong>檔案會變大是刻意的取捨</strong> 封裝用的是不做壓縮比對的保守版，寫回去的那一項實測 1.2 MB 變 2.1 MB，封裝檔只增加 2,116,028 bytes、舊資料一個位元組沒動。換來的是解出來的資料逐位元組跟原本相同，加上附加模式本來就會讓檔案長大。磁碟空間換正確性。</li>
-    <li><strong>安全網與驗證方式</strong> <code>--import</code> 不加 <code>--apply</code> 只做預覽，預覽前後封裝檔的 md5 完全相同（<code>--restore</code> 是例外，它不吃 <code>--apply</code>，打下去就會還原，本站實測）；第一次寫入自動備份；<code>--restore</code> 三個封裝檔裡<strong>備份過得了檢查的就會還原</strong>，壞掉的那份單獨列出來說下一步，只要有一份沒還原成功結束碼就是 1。備份與還原都是<strong>先寫一個隨機命名的暫存檔、比到逐位元組相同才換上</strong>，
-      正本不會停在半截，遊戲檔或備份檔是符號連結則直接拒絕；
-      <strong>寫入之後還會照目錄表把那一項讀回來複驗</strong>，
-      解出來跟要寫進去的對不上就自動用備份還原，而且結束碼是 1 不是 0；
-      跑到一半按 Ctrl-C 會告訴你遊戲檔有沒有被動到，動到就把還原指令印給你，結束碼是 130；<code>--export</code> 則不覆蓋「已經存在而且不是 PNG」的檔案——那條路刻意不做備份，蓋掉就沒有東西救得回來。改動範圍是先預測再量測：先算出改 64 × 64 共 4,096 個像素、相同率應為 99.22%，再去量，量到 99.22%。</li>
+    <li><strong>安全網與驗證方式</strong> <code>--import</code> 不加 <code>--apply</code> 只做預覽，預覽前後封裝檔的 md5 完全相同（<code>--restore</code> 是例外，不必加 <code>--apply</code>，打下去就還原）；第一次寫入自動備份；<strong>寫入之後會把那一項讀回來複驗</strong>，對不上就自動用備份還原，結束碼是 1 不是 0；<code>--restore</code> 三個封裝檔裡備份過得了檢查的就會還原，只要有一份沒還原成功結束碼就是 1；<code>--export</code> 不覆蓋「已經存在而且不是 PNG」的檔案，那條路刻意不做備份。寫到一半被中斷、遇到捷徑、按 Ctrl-C 時它怎麼保護你的檔，見出錯處理那張表與<a href="#how-it-works">這支腳本在做什麼</a>。</li>
     <li><strong>本站沒驗的</strong> 換完之後遊戲畫面實際長什麼樣，本站沒看到，驗的是「檔案寫進去了而且內容正確」；腳本只處理 <code>0x60</code> 與 <code>0x7D</code> 兩種格式，其他一律拒絕不亂猜；那份 2007 年說明書講的 <code>00000000.256</code>，本站不能斷定它當年是錯的，只能說在這台機器上它不存在，而 <code>splash.fsh</code> 存在。</li>
   </ul>
+
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p><a href="../../plan.html#c"><strong>③ 外觀班</strong></a> 第 5／6 堂</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../install-uniform/index.html">← 上一堂：把一套球衣裝進遊戲</a>
+      <a class="btn" href="../new-face/index.html">下一堂：做一張新的球員臉皮 →</a>
+    </div>
+    <p><a href="../../plan.html#d"><strong>④ 年度更新班</strong></a> 第 8／9 堂</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../make-voice/index.html">← 上一堂：換掉遊戲的聲音</a>
+      <a class="btn" href="../change-schedule-year/index.html">下一堂：把賽程換到任何年份 →</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
 
   <h2 id="how-it-works">這支腳本在做什麼</h2>
   <p>流程是一條直線：<strong>在封裝檔的目錄裡找到那一張圖 → 解壓 →
@@ -473,7 +490,7 @@ DrawLoadingProgress: %d, %.3f @ %.3f seconds</code></pre>
      跟你按下載拿到的<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。</p>
   <p><a href="mvp_swap_screen.py" download>下載 mvp_swap_screen.py</a></p>
   <details data-src="mvp_swap_screen.py">
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1894 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1895 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -591,9 +608,10 @@ mvp_swap_screen.py —— 換掉遊戲的開機畫面 / 標題畫面 / 讀取畫
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 ─────────────────────────────────────────────────────────
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 
 import os
 import re
@@ -2388,6 +2406,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

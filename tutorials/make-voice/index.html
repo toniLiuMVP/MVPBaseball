@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/make-voice/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="換掉遊戲的聲音 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="EA 的聲音格式解開了：解碼對照 ffmpeg 兩千一百萬個取樣零差異，編碼來回 98.1 dB。純 Python 零相依，不需要任何二十年前的工具。含解不開的那一格與整個過程。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/make-voice/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>換掉遊戲的聲音 — toni的MVP模組補習班</title>
+<title>換掉遊戲的聲音 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="EA 的聲音格式解開了：解碼對照 ffmpeg 兩千一百萬個取樣零差異，編碼來回 98.1 dB。純 Python 零相依，不需要任何二十年前的工具。含解不開的那一格與整個過程。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -61,34 +71,22 @@
   </div>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix" id="quick">
-    <p class="card-h">⚡ 只想趕快做完？照這五步</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
+    <p class="small">下面照 Mac 寫法；Windows 把 <code>python3</code> 換成 <code>python</code>。</p>
     <ol>
-      <li>下載 <a href="mvp_audio.py" download>mvp_audio.py</a>，先看這個檔是什麼，它會告訴你編碼器、聲道、取樣率、裡面有幾段<br>
+      <li>下載 <a href="mvp_audio.py" download>mvp_audio.py</a>，先看這個檔是什麼，它會告訴你編碼器、聲道、取樣率、裡面有幾段。下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打（Mac 開終端機先打 <code>cd ~/Downloads</code>）。<br>
   <pre><code>python3 mvp_audio.py "〔聲音檔〕" --info</code></pre></li>
       <li>列出裡面每一段，一個檔裡常常串著上萬段<br>
   <pre><code>python3 mvp_audio.py "〔聲音檔〕" --list</code></pre></li>
-      <li>把要換的那一段匯出成 WAV，先聽聽看是不是那一句<br>
+      <li>把要換的那一段匯出成 WAV，先聽聽看是不是那一句（沒寫路徑的 <code>out.wav</code> 會存在命令視窗所在的資料夾，你做好的 <code>mine.wav</code> 也放在那裡）<br>
   <pre><code>python3 mvp_audio.py "〔聲音檔〕" --export 7 out.wav</code></pre></li>
       <li>做你自己的錄音，規格要跟匯出的那個一樣：<strong>聲道數一樣、16 位元的 WAV、取樣率照匯出的那個</strong>（長度可以不一樣，比較短會補靜音，比較長會被切掉）。<u>聲道數與位元深度不一樣工具一定擋，取樣率不一定</u>：檔頭沒寫取樣率的段那一關會跳過，<a href="#rate-gate">見下面那張卡</a></li>
       <li>先預覽，確認之後同一行加 <code>--apply</code> 才真的寫入，第一次寫入前會自動備份，換完不對就跑 <code>--restore</code><br>
@@ -98,7 +96,8 @@
 <pre><code>python3 mvp_audio.py "〔聲音檔〕" --restore</code></pre>
   <p class="tail">想先確認這支腳本本身沒壞，跑一次自我測試（不需要遊戲檔，全程只在系統暫存資料夾裡做）：</p>
 <pre><code>python3 mvp_audio.py --selftest</code></pre>
-  <p class="tail">Windows 把 <code>python3</code> 換成 <code>python</code>。想懂公式怎麼解出來的往下讀；只想複習跳到<a href="#recap">📌 重點整理</a>。</p>
+  <p class="tail">想懂公式怎麼解出來的往下讀；只想複習跳到<a href="#recap">📌 重點整理</a>。</p>
+    <p class="tail">照做卡住了？直接跳到<a href="#fix">❌ 出錯處理</a>（可以把畫面上印出來的那一行貼進那裡的搜尋框）。</p>
   </div>
 
   <h2>⭐ 為什麼這一格卡了那麼久</h2>
@@ -191,6 +190,8 @@
 
   <h2>👉 你要做的事</h2>
 
+  <p class="small">先下載 <a href="mvp_audio.py" download>mvp_audio.py</a>。<strong>指令要在放腳本的那個資料夾打。</strong>瀏覽器下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter —— 開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。Mac：打開終端機，先打 <code>cd ~/Downloads</code> 按 Enter。</p>
+
   <div class="step">
     <div class="step-n">1</div>
     <div>
@@ -222,6 +223,7 @@
 <pre><code>python mvp_audio.py "〔聲音檔〕" --export 7 out.wav</code></pre>
       <p class="small">Mac / Linux：</p>
 <pre><code>python3 mvp_audio.py "〔聲音檔〕" --export 7 out.wav</code></pre>
+      <p class="small"><code>out.wav</code> 會存在命令視窗所在的資料夾（照上面從「下載」開的話，就在「下載」裡）；第 5 步的 <code>mine.wav</code> 也要放在同一個資料夾。</p>
     </div>
   </div>
 
@@ -262,10 +264,14 @@
     </div>
   </div>
 
-  <h2>❌ 出錯處理</h2>
+  <h2 id="fix">❌ 出錯處理</h2>
   <div class="tablewrap"><table>
     <thead><tr><th>症狀</th><th>怎麼辦</th></tr></thead>
     <tbody>
+      <tr class="hi"><td class="mono">can't open file '…mvp_*.py'</td>
+          <td><strong>命令視窗跟腳本不在同一個資料夾。</strong>
+              打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）。
+              還是一樣的話，是檔名對不上：瀏覽器可能在檔名後面加了 <code>(1)</code>，把它改成跟指令裡一模一樣</td></tr>
       <tr><td>「這一段解不出取樣」</td>
           <td><strong>2026-08-30 之前，社群語音包每一個檔都會印這句</strong>
               （562 個檔 0 個解得出）。那是位元組序讀錯，已修 ——
@@ -416,13 +422,23 @@
     <li><strong>一句話</strong> 本站卡最久的一格解開了，EA 的聲音格式現在解得開也寫得回去，用一支純 Python、零相依的腳本，不需要任何二十年前流出的工具。</li>
     <li><strong>卡住的是沒有標準答案</strong> 過去一千種以上的參數組合最好只有 0.16 的相關，直到發現免費的 <code>ffmpeg</code> 解得開遊戲的選單音樂，1,024 種組合掃下來只有一組給出 100.00%，第二名 96.90%，第三名掉到 18.91%。</li>
     <li><strong>驗到什麼程度</strong> 解碼對照 <code>ffmpeg</code> 的 21,678,328 個取樣 0 個不同，編碼寫回去再讀出來 98.1 dB、66,286／66,640 逐取樣完全相同，預覽 md5 前後相同，還原 SHA-256 回到原檔。<u>2026-09-05 訂正</u>：98.1 dB 是修好立體聲起始狀態之前量的、整組還沒重量；修好之後拿剛安裝好的原版 <code>menu9.asf</code> 切出的 8 個區塊（31,360 個取樣）走一趟匯出、匯入、再用 <code>ffmpeg</code> 讀回來，0 個取樣不同。</li>
-    <li><strong>三種編碼器</strong> 檔頭標籤 <code>0x80</code> 是編碼器編號：1 是選單音樂（剛安裝好的原版是 29400 Hz，測試機那份被社群模組換成 44100 Hz）、2 是語音與音效、3 是社群語音包用的那種（大多裝在 <code>GSTR</code> 容器裡，本站測試機上另有 589 段裝在 <code>PT</code> 容器裡；<a href="#endian">2026-08-30 起解得開</a>，但不是每一段都解得開）。三種都走同一段解碼程式，差的是狀態怎麼傳遞（<u>看聲道數不是看編碼器編號</u>：立體聲每一塊開頭 4 bytes 是那一塊自己的起始狀態，單聲道跨區塊延續；剛安裝好的原版就有 296 段編碼器 2 是立體聲）、以及容器裡的數字用哪一種位元組序（<u>看容器標記</u>：<code>GSTR</code> 大端、<code>PT</code> 小端）。檔數量在<u>剛安裝好的原版</u>那份 <code>data\audio</code> 上是 <strong>9 / 24 / 0</strong>，編碼器 3 在原版只出現在 <code>data\frontend\movies\</code> 的影片裡；測試機那份裝過社群模組，量出來是 9 / 21 / 2。</li>
+    <li><strong>三種編碼器</strong> 檔頭標籤 <code>0x80</code> 是編碼器編號：1 是選單音樂、2 是語音與音效、3 是社群語音包用的那種（<a href="#endian">2026-08-30 起解得開</a>，但不是每一段都解得開）。三種都走同一段解碼程式，差在兩件事：狀態怎麼傳遞<u>看聲道數不是看編碼器編號</u>；容器裡的數字用哪一種位元組序<u>看容器標記</u>（<code>GSTR</code> 大端、<code>PT</code> 小端）。<u>剛安裝好的原版</u>那份 <code>data\audio</code> 裡三種是 <strong>9 / 24 / 0</strong> 個檔，編碼器 3 在原版只出現在 <code>data\frontend\movies\</code> 的影片裡。</li>
     <li><strong>公式</strong> 每 15 個位元組（1 表頭加 14 資料）對應 28 個取樣、兩個聲道各自連續不是交錯，係數表是 <code>[0, 240, 460, 392, 0, 0, -208, -220]</code>，位移是 20 減去表頭的低半位元組（寫成相反方向那一大類怎麼掃都不可能對）；編碼就是反過來，4 個係數乘 16 個位移共 64 種組合全掃一遍取誤差最小的。</li>
     <li><strong>換聲音時三件不能變</strong> 聲道數要一樣、16 位元的 WAV、取樣率要一樣（本工具不幫你重取樣），長度可以不一樣，比較短會補靜音、比較長會被切掉，因為格子是定長的。<u>但工具一定擋得住的只有前兩件</u>：取樣率那一關要那一段的檔頭有寫取樣率才會比對，剛安裝好的原版那份 <code>data/audio</code> 量到 31,034 段裡 30,824 段沒寫（99.3%），這些段只要聲道數對就照收，取樣率得自己顧。</li>
-    <li><strong>最容易踩的雷與安全網</strong> 匯出時若有區塊切不出相位會被跳過，那會讓 WAV 的第 0 個取樣其實對應到第 1 個區塊，再寫回去就整段錯位（本站實測來回訊噪比 −3.1 dB），所以「拒絕寫入」是保護不是故障；會動到遊戲檔的只有 <code>--import … --apply</code> 與 <code>--restore</code> 兩條路，<code>--restore</code> 不吃 <code>--apply</code>（本站實測），第一次寫入前自動備份。備份、寫回去、還原三條路都是原子的：先在同一個資料夾開一個<u>名字猜不到</u>的暫存檔、<code>fsync</code> 到磁碟、比對過才換名，正本與備份本身是符號連結就直接拒絕；換完再把檔案讀回磁碟逐位元組複驗，對不起來自動用備份換回去並以非 0 的離開碼收場，中途按 <kbd>Ctrl</kbd>+<kbd>C</kbd> 一律是 130 而且會明說遊戲檔換掉了沒有。想確認腳本本身沒壞可以跑 <code>--selftest</code>，它不碰任何遊戲檔。</li>
-    <li><strong>什麼都沒做卻印成功</strong> 2026-09-04 之前寫回去那一段還是無條件用小端讀取樣數，社群語音包的 <code>GSTR</code> 容器因此每一塊都被跳過，本站測試機上 967 個 <code>GSTR</code> 檔 0 個被改到一個位元組，畫面卻照樣印「✅ 寫好了」；修好之後過得了守門的 191 個裡 189 個真的寫進去、檔案大小全部不變、<code>--restore</code> 全部回得到原檔，並且加了一道網：一組都沒寫進去就拒絕印成功。</li>
-    <li><strong>本站沒驗的</strong> 換完之後遊戲裡真的會不會唸出來沒有驗，驗的是「檔案寫進去了、而且寫的內容正確」；另外檔頭沒寫取樣率的那些段（剛安裝好的原版量到單聲道 30,707 段、雙聲道 117 段）匯出時寫的 22050 是預設值不是量到的、編碼器 3 現在解得開但<u>不是每一段都解得開</u>（測試機那份 <code>data\audio</code> 的 8,909 段裡還有 586 段解不出）、有些段連對照工具也解不開，而 98.1 dB 是把本來就是這個格式的聲音再編一次的數字，全新錄音大約 35 dB；擋符號連結那一道只擋得住<u>目的檔與備份檔本身</u>，沒有擋「父資料夾是符號連結」（擋它會誤傷把整個遊戲資料夾做成連結這種正常用法），而 Windows 的 junction／reparse point 本站還沒實測。</li>
+    <li><strong>最容易踩的雷與安全網</strong> 匯出時有區塊切不出相位的話，再寫回去會整段錯位，所以「拒絕寫入」是保護不是故障。會動到遊戲檔的只有 <code>--import … --apply</code> 與 <code>--restore</code> 兩條路，<code>--restore</code> 不必加 <code>--apply</code>；第一次寫入前自動備份，寫完讀回來逐位元組複驗，對不起來自動用備份換回去；一組都沒寫進去就不會印成功（2026-09-04 之前社群語音包會什麼都沒寫卻印「✅ 寫好了」，已修好）。想確認腳本本身沒壞可以跑 <code>--selftest</code>，它不碰任何遊戲檔；寫到一半被中斷時它怎麼保護你的檔，見<a href="#how-it-works">這支腳本在做什麼</a>。</li>
+    <li><strong>本站沒驗的</strong> 換完之後遊戲裡真的會不會唸出來沒有驗，驗的是「檔案寫進去了、而且寫的內容正確」。另外：檔頭沒寫取樣率的那些段，匯出時寫的 22050 是預設值不是量到的；編碼器 3 <u>不是每一段都解得開</u>，有些段連對照工具也解不開；98.1 dB 是把本來就是這個格式的聲音再編一次的數字，全新錄音大約 35 dB；擋符號連結那一道沒有擋「父資料夾是符號連結」，Windows 的 junction／reparse point 本站還沒實測。</li>
   </ul>
+
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p><a href="../../plan.html#d"><strong>④ 年度更新班</strong></a> 第 7／9 堂</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../swap-portrait/index.html">← 上一堂：換球員大頭照</a>
+      <a class="btn" href="../swap-splash/index.html">下一堂：換掉開機畫面 →</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
 
   <h2 id="how-it-works">這支腳本在做什麼</h2>
   <p>沒讀過程式碼也看得懂的版本：遊戲的聲音不是 WAV，是 EA 自己的 4 位元壓縮格式，
@@ -534,7 +550,7 @@
   <p>這支<strong>會改你的檔案</strong>。會動你檔案的東西，你要能在跑之前先讀完它。</p>
   <p><a href="mvp_audio.py" download>下載 mvp_audio.py</a></p>
   <details data-src="mvp_audio.py">
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1654 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1655 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -651,6 +667,7 @@ SCHl → SCCl → 一連串 SCDl → SCEl 這種「一段接一段」的容器�
     而且寫的內容正確」。⚠️ 2026-09-04 訂正:這句話以前只在 PT 容器上成立,
     GSTR 容器根本沒寫進去,見 cmd_import 上面那段。
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -665,7 +682,7 @@ SCHl → SCCl → 一連串 SCDl → SCEl 這種「一段接一段」的容器�
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 
 import os
@@ -2208,6 +2225,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

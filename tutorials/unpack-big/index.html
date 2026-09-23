@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/unpack-big/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="封裝檔可以拆成散裝嗎 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="官方中文版沒有 datafile.big 與 anims.big，而是把內容整個拆成散裝檔出貨，遊戲照跑。如果這條路對其他封裝檔也成立，模組的做法可以整個簡化。這一頁講證據、講還缺什麼、以及你可以怎麼幫忙驗。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/unpack-big/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>封裝檔可以拆成散裝嗎 — toni的MVP模組補習班</title>
+<title>封裝檔可以拆成散裝嗎 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="官方中文版沒有 datafile.big 與 anims.big，而是把內容整個拆成散裝檔出貨，遊戲照跑。如果這條路對其他封裝檔也成立，模組的做法可以整個簡化。這一頁講證據、講還缺什麼、以及你可以怎麼幫忙驗。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -56,46 +66,33 @@
   </div>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix" id="quick">
-    <p class="card-h">⚡ 只想趕快做完？照這五步</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
       <li>先做<a href="../backup/index.html">完整備份</a>。這一步不能跳。</li>
-      <li>下載 <a href="mvp_unpack_big.py" download>mvp_unpack_big.py</a>，先預覽。不會動到任何東西
+      <li>下載 <a href="mvp_unpack_big.py" download>mvp_unpack_big.py</a>。下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打（Mac 開終端機先打 <code>cd ~/Downloads</code>）。接著先預覽。不會動到任何東西
   <p class="small">Windows:</p>
   <pre><code>python mvp_unpack_big.py "&lt;遊戲資料夾&gt;/data/datafile/datafile.big"</code></pre>
   <p class="small">Mac / Linux:</p>
   <pre><code>python3 mvp_unpack_big.py "&lt;遊戲資料夾&gt;/data/datafile/datafile.big"</code></pre></li>
       <li>確定了才真的解開。解完會把封裝檔改名藏起來，讓遊戲只能去讀散裝檔
   <p class="small">Windows:</p>
-  <pre><code>python mvp_unpack_big.py "&lt;...&gt;/datafile.big" --apply</code></pre>
+  <pre><code>python mvp_unpack_big.py "&lt;遊戲資料夾&gt;/data/datafile/datafile.big" --apply</code></pre>
   <p class="small">Mac / Linux:</p>
-  <pre><code>python3 mvp_unpack_big.py "&lt;...&gt;/datafile.big" --apply</code></pre></li>
+  <pre><code>python3 mvp_unpack_big.py "&lt;遊戲資料夾&gt;/data/datafile/datafile.big" --apply</code></pre></li>
       <li>開遊戲。<strong>進得去而且攝影機正常，這條路就通</strong>；進不去或有東西不見，就走下一步。</li>
       <li>還原，封裝檔改回來。想連解出來的散裝檔一起清掉，再加 <code>--clean</code>
   <p class="small">Windows:</p>
-  <pre><code>python mvp_unpack_big.py "&lt;...&gt;/datafile.big" --restore</code></pre>
+  <pre><code>python mvp_unpack_big.py "&lt;遊戲資料夾&gt;/data/datafile/datafile.big" --restore</code></pre>
   <p class="small">Mac / Linux:</p>
-  <pre><code>python3 mvp_unpack_big.py "&lt;...&gt;/datafile.big" --restore</code></pre></li>
+  <pre><code>python3 mvp_unpack_big.py "&lt;遊戲資料夾&gt;/data/datafile/datafile.big" --restore</code></pre></li>
     </ol>
     <p class="tail">這支工具自己寫明「給實驗用的，不是給一般玩家的」，跑完可以照本頁下面的回報範本回報。
        只有 <code>datafile.big</code> 與 <code>anims.big</code> 兩個能這樣做，球衣、臉皮、大頭照、隊徽那些一個都不行。
@@ -222,7 +219,8 @@
     <div class="step-n">2</div>
     <div>
       <p class="step-t">下載工具，先預覽</p>
-      <p><a href="mvp_unpack_big.py" download>mvp_unpack_big.py</a>（1,500 行，零相依）</p>
+      <p><a href="mvp_unpack_big.py" download>mvp_unpack_big.py</a>（1,503 行，零相依）</p>
+      <p class="small"><strong>指令要在放腳本的那個資料夾打。</strong>瀏覽器下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter —— 開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。Mac：打開終端機，先打 <code>cd ~/Downloads</code> 按 Enter。</p>
       <p class="small">Windows:</p>
 <pre>python mvp_unpack_big.py "&lt;遊戲資料夾&gt;/data/datafile/datafile.big"</pre>
       <p class="small">Mac / Linux:</p>
@@ -240,9 +238,9 @@
       <p class="step-why">解出來的是<u>解壓縮後</u>的內容，因為官方中文版的散裝檔就是那樣。
          解完會把封裝檔改名藏起來，讓遊戲只能去讀散裝檔 —— 那正是要驗的事。</p>
       <p class="small">Windows:</p>
-<pre>python mvp_unpack_big.py "&lt;...&gt;/datafile.big" --apply</pre>
+<pre>python mvp_unpack_big.py "&lt;遊戲資料夾&gt;/data/datafile/datafile.big" --apply</pre>
       <p class="small">Mac / Linux:</p>
-<pre>python3 mvp_unpack_big.py "&lt;...&gt;/datafile.big" --apply</pre>
+<pre>python3 mvp_unpack_big.py "&lt;遊戲資料夾&gt;/data/datafile/datafile.big" --apply</pre>
     </div>
   </div>
 
@@ -259,9 +257,9 @@
     <div>
       <p class="step-t">還原</p>
       <p class="small">Windows:</p>
-<pre>python mvp_unpack_big.py "&lt;...&gt;/datafile.big" --restore</pre>
+<pre>python mvp_unpack_big.py "&lt;遊戲資料夾&gt;/data/datafile/datafile.big" --restore</pre>
       <p class="small">Mac / Linux:</p>
-<pre>python3 mvp_unpack_big.py "&lt;...&gt;/datafile.big" --restore</pre>
+<pre>python3 mvp_unpack_big.py "&lt;遊戲資料夾&gt;/data/datafile/datafile.big" --restore</pre>
       <p>封裝檔改回來。想連解出來的散裝檔一起清掉，再加 <code>--clean</code>。
          <strong>清理只刪工具自己記錄過的那些檔</strong> —— 不是它寫的一個都不動。</p>
     </div>
@@ -315,11 +313,21 @@
     <li><strong>關鍵數字</strong> 英文版 224 個 <code>.big</code>、官方中文版 222 個，少的剛好就是那兩個；中文版把 <code>datafile</code> 拆成 466 個 <code>.txt</code>、<code>anims</code> 拆成 730 個檔（243 <code>.ord</code> + 243 <code>.orl</code> + 244 <code>.txt</code>），而那是 EA 出貨的零售版。</li>
     <li><strong>最容易踩的雷</strong> 拿「封裝內的副檔名」去篩會漏掉 <code>anims</code>。它裡面那些檔叫 <code>.axt</code>，散裝到磁碟上才是 <code>.txt</code>，本站第一次就只算出 1 個。</li>
     <li><strong>反例是實測過的</strong> <code>fonts.big</code> 拆完卡在讀取畫面當機、<code>logos.big</code> 拆完遊戲根本進不去，兩次都跟規則的預測一致。上一條規則（「資料夾名跟封裝檔同名就可以」）就是被 <code>fonts</code> 那次失敗推翻的。</li>
-    <li><strong>安全網</strong> 不加 <code>--apply</code> 就只是預覽，什麼都不動；工具實跑英文版 <code>datafile.big</code> 解出 460 個檔，拿去跟中文版自己出貨的散裝檔比對，其中 341 個檔位元組完全相同、119 個不同（那 119 個是英文版與中文版的內容差異，不是解錯）；<code>--restore</code> 之後封裝檔的 SHA-256 與原檔相同；
-        複驗只要有一個檔不對，它會自動把封裝檔改回原名再以非 0 結束碼停下（散裝檔不自動刪，指令印給你）；<code>--clean</code> 只刪清單裡那 460 個<u>而且指紋還對得上</u>的（實測動過兩個檔之後刪 458 個、那兩個保留並列名），不是它寫的、以及你自己改過的，一個都不動。
-        <u>預覽印的大小是壓縮後的長度</u>，不是會寫出來的大小（英文版 <code>datafile.big</code> 460 個項目登記的長度加總 2,839,757，解出來合計 14,095,446，4.96 倍；預覽第一行印的 2,857,593 是整個檔案的大小，不是那個加總；未壓縮的 <code>anims.big</code> 才會一樣）。</li>
+    <li><strong>安全網</strong> 不加 <code>--apply</code> 就只是預覽，什麼都不動；複驗只要有一個檔不對，它會自動把封裝檔改回原名再以非 0 結束碼停下（散裝檔不自動刪，指令印給你）；<code>--clean</code> 只刪它自己寫出來、而且你沒改過的那些，其他一個都不動；<code>--restore</code> 之後封裝檔跟原檔完全相同。
+        <u>預覽印的大小是壓縮後的長度</u>，不是會寫出來的大小。實測數字見上面「本站已經驗到哪裡」與<a href="#how-it-works">這支腳本在做什麼</a>。</li>
     <li><strong>本站沒驗的</strong> <code>anims.big</code> 還沒實測（規則預期會過，如果跑不動這條規則就要重寫）；其他封裝檔特別是圖檔類的還沒一個一個試，純文字的可行不保證圖檔也可行；「EA 為什麼只替那三個副檔名開路」是推論，本站量得到樣板存在，量不到當初的決定。</li>
   </ul>
+
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p><a href="../../plan.html#f"><strong>⑥ 拆解班</strong></a> 第 2／5 堂</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../read-file-headers/index.html">← 上一堂：五秒看穿一個檔案</a>
+      <a class="btn" href="../fel-toolkit/index.html">下一堂：介面萬用工具 →</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
 
   <h2 id="how-it-works">這支腳本在做什麼</h2>
   <p>不看程式碼也能知道它怎麼跑。它只做<strong>一個方向</strong>：把封裝檔拆開，
@@ -441,7 +449,7 @@
   <h2 id="source">完整原始碼</h2>
   <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。</p>
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1500 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1503 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -595,6 +603,7 @@ mvp_unpack_big.py — 把封裝檔解成資料夾(實驗性)
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -609,7 +618,7 @@ mvp_unpack_big.py — 把封裝檔解成資料夾(實驗性)
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 
 import os
@@ -1369,7 +1378,9 @@ def cleanup_hint():
 
 
 def safe_name(name):
-    """項目名稱要拿來當檔名,先擋掉任何會跳出目標資料夾的寫法。
+    # 說明字串開頭那個 r 不要拿掉:下面的例子 r'D:\game\data' 裡有反斜線,
+    # 少了 r,Python 3.12 起每次執行都會先印一行英文的 SyntaxWarning。
+    r"""項目名稱要拿來當檔名,先擋掉任何會跳出目標資料夾的寫法。
 
     封裝檔是別人給的檔案,裡面的名稱一律當成**不可信的輸入**。
     名稱裡塞路徑分隔符號就能讓解出來的檔落到別的資料夾去,
@@ -1952,6 +1963,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/official-chinese.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="EA 自己的繁體中文版是怎麼做的 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="2005 年 2 月,EA 出過官方繁體中文版。把它跟英文版逐檔比對:913 個共同檔案只有 65 個不同,中文被放進日文的槽位,字型檔脹大八倍。全部是量出來的。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/reference/official-chinese.html">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>EA 自己的繁體中文版是怎麼做的 — toni的MVP模組補習班</title>
+<title>EA 自己的繁體中文版是怎麼做的 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="2005 年 2 月,EA 出過官方繁體中文版。把它跟英文版逐檔比對:913 個共同檔案只有 65 個不同,中文被放進日文的槽位,字型檔脹大八倍。全部是量出來的。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -357,10 +367,10 @@
     <p>這一頁講的是<strong>EA 當年怎麼做的</strong>，那是兩份官方發行版的格式比對。</p>
     <p>但<a href="loc-strings.html">文字表那頁</a>列的兩塊技術缺口，<u>兩塊現在都讀得出來，只有一塊寫得回去</u>：
        寫回 <code>.LOC</code> 的工具<u>後來做了</u>（<a href="../tutorials/fix-chinese/index.html">中文版配大球場就跳出</a>那一課的 <code>mvp_fix_loc.py</code>，<code>--apply</code> 才真的寫、有 <code>--restore</code>）；
-       字型檔的字符點陣也<u>讀得出來了</u>（見<a href="fonts.html">字型檔那頁</a>的 2026-09-05 訂正：字圖集與整張字元表都讀開了），
+       字型檔的字形點陣也<u>讀得出來了</u>（見<a href="fonts.html">字型檔那頁</a>的 2026-09-05 訂正：字圖集與整張字元表都讀開了），
        但本站沒有<strong>從零產生一張新的字圖集與一張新的字元表、再寫回去</strong>的辦法 ——
        所以做不出新字型，也加不了原本沒有的字。
-       <strong>要「從零做一套中文」才需要把字型那塊也補齊;而本站的中文化教學是<u>搬官方現成的中文</u>,不必自己做字型,見<a href="../tutorials/make-chinese/index.html">把官方中文搬進英文版</a>。</strong><span class="badge wip">未解</span></p>
+       <strong>要「從零做一套中文」才需要把字型那塊也補齊；而本站的中文化教學是<u>搬官方現成的中文</u>，不必自己做字型，見<a href="../tutorials/make-chinese/index.html">把官方中文搬進英文版</a>。</strong><span class="badge wip">未解</span></p>
     <p>本站也<strong>不散布任何遊戲檔案</strong>，包括這兩份安裝裡的任何一個檔。
        這一頁只有結構、數字與對照，沒有可以拿去用的東西。</p>
   </div>
@@ -405,7 +415,7 @@
     <li><strong>繁中版是拆開來出貨的</strong> 英文版 1,191 個檔、繁中版 2,389 個。<code>anims.big</code> 與 <code>datafile.big</code> 在繁中版根本不存在，改成 730 個與 466 個未壓縮散檔（那 466 個裡含中文的是 <strong>0 個</strong>）。全遊戲 <code>.big</code> 因此英文版 224 個、繁中版 222 個。</li>
     <li><strong>本站訂正：只比大小是不夠的</strong> 原本寫「其餘 848 個位元組一模一樣」，真的逐位元組比之後有 23 個大小相同而內容有差。追下去確定是<u>本站手上這份繁中版備份壞掉</u>（某個球衣貼圖解出 8 張格式代號 <code>0x45</code>，其中一張寬度是 0），不是 EA 的中文版有問題。同一輪也訂正了文字表那頁：「中文化模組會換掉 <code>ENG</code> 那兩個檔」只描述了社群的做法，不是唯一的做法。</li>
     <li><strong>2008 年那條經驗法則後來解開了</strong> 班主任當年記著「中文版裝新球場一定會跳出，建議玩英文語系」。這一頁量到的是：球場檔兩邊是一樣的（87 個裡 83 個逐位元組相同），而<u>社群安裝程式要去改的那兩個封裝檔，在繁中版根本不存在</u>。<strong>跳出的真正原因</strong>是執行檔裡寫死的那塊 64 MB 記憶體池被中文字型展開的貼圖吃掉一大塊，改大就不再跳 —— 見<a href="../tutorials/fix-chinese/index.html">中文版配大球場就跳出</a>那一課。</li>
-    <li><strong>本站沒驗的</strong> 「拿整份官方繁中版安裝去裝大球場會不會跳出」本站還沒實測（<a href="../tutorials/fix-chinese/index.html">那一課</a>測的是把中文語系檔與字型蓋在英文版上），這一頁只是把兩件量到的事擺在一起。那 45 個損壞的位元組為什麼<u>全部落在 32 的倍數上、而且永遠是同一個位元</u>，仍然不知道。<code>mvp2005.exe</code> 兩版差 553 KB 差在哪、<code>minibat.big</code> 差在哪，本站沒有拆。寫回 <code>.LOC</code> 的工具<u>後來做了</u>,字型的字符點陣也<u>讀得出來了</u>;還沒解的是<strong>從零產生一張字圖集與一張字元表再寫回去</strong> —— 做不出新字型,也加不了原本沒有的字。但本站的中文化教學是<u>搬官方現成的中文</u>(繞過字型那塊),見<a href="../tutorials/make-chinese/index.html">把官方中文搬進英文版</a>。本站不散布任何遊戲檔案。</li>
+    <li><strong>本站沒驗的</strong> 「拿整份官方繁中版安裝去裝大球場會不會跳出」本站還沒實測（<a href="../tutorials/fix-chinese/index.html">那一課</a>測的是把中文語系檔與字型蓋在英文版上），這一頁只是把兩件量到的事擺在一起。那 45 個損壞的位元組為什麼<u>全部落在 32 的倍數上、而且永遠是同一個位元</u>，仍然不知道。<code>mvp2005.exe</code> 兩版差 553 KB 差在哪、<code>minibat.big</code> 差在哪，本站沒有拆。寫回 <code>.LOC</code> 的工具<u>後來做了</u>，字型的字形點陣也<u>讀得出來了</u>;還沒解的是<strong>從零產生一張字圖集與一張字元表再寫回去</strong> —— 做不出新字型,也加不了原本沒有的字。但本站的中文化教學是<u>搬官方現成的中文</u>(繞過字型那塊),見<a href="../tutorials/make-chinese/index.html">把官方中文搬進英文版</a>。本站不散布任何遊戲檔案。</li>
   </ul>
 
 <h2>接下來</h2>
@@ -423,6 +433,6 @@
        <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

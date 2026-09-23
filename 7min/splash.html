@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/7min/splash.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="七分鐘學會置換遊戲開始畫面並匯入遊戲 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="七分鐘把遊戲的開機大圖換成你自己的。尺寸看版本：剛安裝好的原版 512×512、本站測試機 1024×1024。含本站自己寫的匯入工具。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/7min/splash.html">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>七分鐘學會置換遊戲開始畫面並匯入遊戲 — toni的MVP模組補習班</title>
+<title>七分鐘學會置換遊戲開始畫面並匯入遊戲 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="七分鐘把遊戲的開機大圖換成你自己的。尺寸看版本：剛安裝好的原版 512×512、本站測試機 1024×1024。含本站自己寫的匯入工具。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -53,28 +63,15 @@
     <li>已安裝的 MVP Baseball 2005</li>
     <li>Python 3</li>
     <li>任何能存 PNG 的繪圖軟體</li>
-    <li>下載 <a href="../tutorials/swap-splash/mvp_swap_screen.py" download>mvp_swap_screen.py</a></li>
+    <li>下載 <a href="../tutorials/swap-splash/mvp_swap_screen.py" download>mvp_swap_screen.py</a>。下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打（Mac 開終端機先打 <code>cd ~/Downloads</code>）</li>
   </ul>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <h2>👉 你要做的事</h2>
@@ -101,6 +98,7 @@
 <pre><code>python3 mvp_swap_screen.py &quot;〔你的遊戲資料夾〕&quot; --export title old.png</code></pre>
       <p class="small">代號換成 <code>loading</code> 也可以。<code>splash</code> 也匯得出來，
          但它匯不回去，所以這一課不拿它當例子。</p>
+      <p class="small"><code>old.png</code> 會存在命令視窗所在的資料夾（照前置那樣從「下載」開的話，就在「下載」裡）；改好存成 <code>mine.png</code>，也放在同一個資料夾。</p>
     </div>
   </div>
 
@@ -136,6 +134,10 @@
   <div class="tablewrap"><table>
     <thead><tr><th>症狀</th><th>怎麼辦</th></tr></thead>
     <tbody>
+      <tr class="hi"><td class="mono">can't open file '…mvp_*.py'</td>
+          <td><strong>命令視窗跟腳本不在同一個資料夾。</strong>
+              打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）。
+              還是一樣的話，是檔名對不上：瀏覽器可能在檔名後面加了 <code>(1)</code>，把它改成跟指令裡一模一樣</td></tr>
       <tr><td>說尺寸不對</td><td>用匯出來的那張當底圖。<strong>換 <code>splash</code> 的話換底圖也沒用</strong>，它現在匯不回去</td></tr>
       <tr><td>圖變模糊</td><td><code>title</code> 與 <code>loading</code> 是 32 位元未壓縮，不會糊；會糊的是 DXT1 的 <code>splash</code>，而它目前匯不回去</td></tr>
       <tr><td>想還原</td><td><code>--restore</code></td></tr>
@@ -177,6 +179,6 @@
        <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

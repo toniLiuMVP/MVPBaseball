@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/do.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="我想做什麼 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="用「你想做到什麼」找路，不用先懂原理。每一條直接跳到那一課的速解，三到五步做完。做完想懂為什麼，同一頁往下讀就是。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/do.html">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>我想做什麼 — toni的MVP模組補習班</title>
+<title>我想做什麼 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="用「你想做到什麼」找路，不用先懂原理。每一條直接跳到那一課的速解，三到五步做完。做完想懂為什麼，同一頁往下讀就是。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -29,36 +39,24 @@
 </div></nav>
 
 <div class="wrap" id="main" role="main" tabindex="-1">
-  <p class="crumb" style="margin-top:22px">我想做什麼</p>
+  <p class="crumb" style="margin-top:22px"><a href="index.html">首頁</a> › 我想做什麼</p>
   <h1>我想做什麼</h1>
   <p class="lede">課程地圖是照<strong>難度</strong>排的，適合從頭學。
      這一頁反過來，照<strong>你想做到什麼</strong>排 ——
      每一條直接跳到那一課的<u>速解</u>，三到五步做完，不用先懂原理。
      做完想懂為什麼，同一頁往下讀就是。</p>
+  <p class="small">想直接看站上有哪些頁：<a href="pages.html">全站目錄</a>依區分組列出，每一頁附上那一頁自己的簡短說明。</p>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix">
-    <p class="card-h">⚡ 第一次來？先做這兩件事</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 第一次來？先做這兩件事</p>
     <ol>
       <li><a href="tutorials/backup/index.html#quick">備份</a> ——
           本站每一支腳本都會自己備份，但<strong>你自己也要有一份</strong>。</li>
@@ -125,6 +123,12 @@
       <tr><td data-label="我想…"><strong>跳過開場動畫</strong></td>
           <td data-label="去哪"><a href="7min/intro.html">七分鐘開場影片</a>（不用打指令，<u>但你這份遊戲要已經被前人換過空白檔</u>）·
               <a href="tutorials/skip-intro/index.html#quick">關掉開場動畫 · 速解</a>（原版走這條，要打指令）</td><td data-label="難度" class="num">★☆☆</td></tr>
+      <tr><td data-label="我想…">換某一隊的<strong>隊徽</strong></td>
+          <td data-label="去哪"><a href="tutorials/team-logo/index.html#quick">換球隊隊徽 · 速解</a></td><td data-label="難度" class="num">★★☆</td></tr>
+      <tr><td data-label="我想…">改<strong>主選單的文字</strong>（可以改成中文，但要先有中文字型）</td>
+          <td data-label="去哪"><a href="tutorials/menu-text/index.html#quick">改主選單的文字 · 速解</a></td><td data-label="難度" class="num">★☆☆</td></tr>
+      <tr><td data-label="我想…">改<strong>記分板的顏色</strong></td>
+          <td data-label="去哪"><a href="tutorials/hud-color/index.html#quick">改記分板的顏色 · 速解</a></td><td data-label="難度" class="num">★☆☆</td></tr>
     </tbody>
   </table></div>
 
@@ -190,6 +194,10 @@
       <tbody>
         <tr><td>加一個遊戲裡沒有的<strong>新球員</strong></td>
             <td>名冊沒有「新增一列」。改用<a href="tutorials/make-a-player/index.html">接收</a>的做法 —— 2009 年台灣社群也是這樣做的</td></tr>
+        <tr><td>加一支<strong>新球隊</strong>（例如把中職球隊當成第 31 隊）</td>
+            <td>加不了，只能把某一支大聯盟球隊整支換掉（隊名、隊徽、球衣、球員）—— 2008 年台灣社群的名冊也是這樣做的。
+                為什麼：<a href="reference/team-limit.html">為什麼你加不了新球隊</a>。
+                本站<strong>沒有</strong>現成的中職名單可以下載，也還沒有改隊名的課；隊徽有<a href="tutorials/team-logo/index.html">一課</a>可以換</td></tr>
         <tr><td>改<strong>打擊、守備</strong>這些能力值</td>
             <td>力量與投手續航力<strong>後來配出來了</strong>（見<a href="tutorials/stats-to-ratings/index.html">成績換算</a>）；守備、選球、臂力、耐久仍然配不出來，工具直接拒絕給數字</td></tr>
         <tr><td>把球員<strong>換到別隊</strong></td>
@@ -205,15 +213,16 @@
     <p>這一頁只列<strong>最常被問到的</strong>。完整清單在
        <a href="tutorials/index.html">課程地圖</a>（照難度排）與
        <a href="7min/index.html">下課七分鐘</a>（十三堂主題短課）。
-       想知道某個格式的細節，去<a href="reference/index.html">速查區</a>。</p>
+       想知道某個格式的細節，去<a href="reference/index.html">速查區</a>。
+       看不懂某個詞，查<a href="glossary.html">名詞小教室</a>。</p>
     <p class="small">⚠️ 本站不提供遊戲本體，也不提供任何第三方工具的下載。
        每一課用的都是本站自己寫、可以先讀完再跑的腳本。</p>
   </div>
 
   <h2 id="recap">📌 重點整理</h2>
   <ul class="recap">
-    <li><strong>一句話</strong> 這一頁照「你想做到什麼」排，
-        課程地圖照難度排，兩邊指向同一批課。</li>
+    <li><strong>一句話</strong> 這一頁照「你想做到什麼」排，只挑最常被問到的；
+        完整的課在課程地圖。</li>
     <li><strong>怎麼用</strong> 點進去直接落在那一課的<u>速解</u>，
         三到五步做完；想懂為什麼，同一頁往下讀。</li>
     <li><strong>共通的安全網</strong> 要打指令的課不加 <code>--apply</code> 就只是預覽
@@ -234,6 +243,6 @@
        <a href="changelog.html">更新紀錄</a> · <a href="index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="assets/site.js?v=4f2ad90011" defer></script>
+<script src="assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

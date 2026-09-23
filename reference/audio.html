@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/audio.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="播報與音訊系統 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="MVP Baseball 2005 的 13 個音訊分區：每區同一套六檔模板、.off 索引的加總驗證法、以及 .big 在這裡其實有三種不同格式。所有數字現場量測。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/reference/audio.html">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>播報與音訊系統 — toni的MVP模組補習班</title>
+<title>播報與音訊系統 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="MVP Baseball 2005 的 13 個音訊分區：每區同一套六檔模板、.off 索引的加總驗證法、以及 .big 在這裡其實有三種不同格式。所有數字現場量測。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -245,9 +255,9 @@ yil.6+.4                    251648</code></pre>
        裡面全是控制字串，其中三條寫著：</p>
     <div class="tablewrap"><table>
       <tbody>
-        <tr class="hi"><td class="mono">CgBatterDitty_Vol</td><td>打者上場音樂的音量</td></tr>
-        <tr><td class="mono">gBatdit_on_or_off</td><td>開關</td></tr>
-        <tr><td class="mono">gBatterditty_kill</td><td>中斷播放</td></tr>
+        <tr class="hi"><th scope="row" class="mono">CgBatterDitty_Vol</th><td>打者上場音樂的音量</td></tr>
+        <tr><th scope="row" class="mono">gBatdit_on_or_off</th><td>開關</td></tr>
+        <tr><th scope="row" class="mono">gBatterditty_kill</th><td>中斷播放</td></tr>
       </tbody>
     </table></div>
     <p><strong>「Batter Ditty」就是打者上場音樂</strong>，跟
@@ -441,7 +451,7 @@ pchant.0004.typ1.1.lg.01.wav     0</code></pre>
 
   <h3>EA 幫這 56 個人錄了專屬應援曲</h3>
   <p>編號小於 2000 的 <strong>43 位</strong>，是 2004 年當時的現役球員：</p>
-  <div class="tablewrap"><table>
+  <div class="tablewrap"><table role="presentation">
     <tbody>
       <tr><td class="num">4</td><td>Bobby Abreu</td><td class="num">24</td><td>Garret Anderson</td><td class="num">46</td><td>Jeff Bagwell</td></tr>
       <tr><td class="num">67</td><td>Carlos Beltran</td><td class="num">79</td><td>Lance Berkman</td><td class="num">95</td><td>Aaron Boone</td></tr>
@@ -461,7 +471,7 @@ pchant.0004.typ1.1.lg.01.wav     0</code></pre>
     </tbody>
   </table></div>
   <p>編號 2126 之後的 <strong>13 位</strong>，全部是<strong>傳奇球員</strong>：</p>
-  <div class="tablewrap"><table>
+  <div class="tablewrap"><table role="presentation">
     <tbody>
       <tr><td class="num">2126</td><td>Luis Aparicio</td><td class="num">2127</td><td>Richie Ashburn</td><td class="num">2128</td><td>Yogi Berra</td></tr>
       <tr><td class="num">2129</td><td>Lou Brock</td><td class="num">2130</td><td>Rod Carew</td><td class="num">2138</td><td>Reggie Jackson</td></tr>
@@ -512,7 +522,7 @@ pchant.0004.typ1.1.lg.01.wav     0</code></pre>
 
   <h3>26 支球隊有自己的隊呼</h3>
   <p>把 26 個 <code>tchants:NN</code> 對回球隊：</p>
-  <div class="tablewrap"><table>
+  <div class="tablewrap"><table role="presentation">
     <tbody>
       <tr><td class="num">1</td><td>Anaheim Angels</td><td class="num">2</td><td>Oakland Athletics</td><td class="num">3</td><td>Seattle Mariners</td></tr>
       <tr><td class="num">4</td><td>Texas Rangers</td><td class="num">5</td><td>Chicago White Sox</td><td class="num">6</td><td>Cleveland Indians</td></tr>
@@ -530,10 +540,10 @@ pchant.0004.typ1.1.lg.01.wav     0</code></pre>
     <p class="card-h">1 到 30 裡面，剛好缺四支</p>
     <div class="tablewrap"><table>
       <tbody>
-        <tr class="hi"><td class="num">11</td><td>Boston Red Sox</td></tr>
-        <tr class="hi"><td class="num">12</td><td>New York Yankees</td></tr>
-        <tr class="hi"><td class="num">26</td><td>Atlanta Braves</td></tr>
-        <tr class="hi"><td class="num">28</td><td>Washington Nationals</td></tr>
+        <tr class="hi"><th scope="row" class="num">11</th><td>Boston Red Sox</td></tr>
+        <tr class="hi"><th scope="row" class="num">12</th><td>New York Yankees</td></tr>
+        <tr class="hi"><th scope="row" class="num">26</th><td>Atlanta Braves</td></tr>
+        <tr class="hi"><th scope="row" class="num">28</th><td>Washington Nationals</td></tr>
       </tbody>
     </table></div>
     <p>而同一個索引檔裡，另外有<strong>七個不用編號、直接取名字</strong>的應援：</p>
@@ -917,6 +927,6 @@ menu2.asf   53 43 48 6c   SCHl
        <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

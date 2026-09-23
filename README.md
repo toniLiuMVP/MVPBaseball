@@ -2,7 +2,13 @@
 
 教人改 EA MVP Baseball 2005 的非營利教學網站，正體中文。
 
-站址：<https://toniliumvp.github.io/MVPBaseball/>
+👉 不用下載這個 repo 的任何檔案，直接開網站看教學：<https://toniliumvp.github.io/MVPBaseball/>
+
+新手從這裡開始：第 0 課 新手基本功 <https://toniliumvp.github.io/MVPBaseball/start.html>
+
+Step-by-step modding tutorials for EA's MVP Baseball 2005 (in Traditional Chinese) that you read on the website above, without downloading anything from this repository.
+
+回報問題與下架管道：<https://toniliumvp.github.io/MVPBaseball/report.html>（Issues 是公開的，貼腳本輸出之前，先把路徑裡的使用者名稱改成 XXX）
 
 ## 這個 repo 裝的是什麼
 

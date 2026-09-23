@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/crash-diagnosis/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="遊戲當掉了怎麼辦 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="MVP Baseball 2005 當機的常見原因與判斷方法。附唯讀診斷腳本，一鍵檢查記憶體上限、資料量與檔案完整性。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/crash-diagnosis/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>遊戲當掉了怎麼辦 — toni的MVP模組補習班</title>
+<title>遊戲當掉了怎麼辦 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="MVP Baseball 2005 當機的常見原因與判斷方法。附唯讀診斷腳本，一鍵檢查記憶體上限、資料量與檔案完整性。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -29,7 +39,7 @@
 </div></nav>
 
 <div class="wrap" id="main" role="main" tabindex="-1">
-  <p class="crumb" style="margin-top:22px"><a href="../index.html">教學</a> › 問題排除</p>
+  <p class="crumb" style="margin-top:22px"><a href="../index.html">教學</a> › 遊戲當掉了怎麼辦</p>
   <h1>遊戲當掉了怎麼辦</h1>
   <p class="lede">裝了模組之後遊戲開不起來、或玩到一半跳回桌面 ——
      這是這款遊戲最常見的問題。這頁教你<strong>先判斷是哪一種當機</strong>，
@@ -42,28 +52,15 @@
   </div>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix" id="quick">
-    <p class="card-h">⚡ 只想趕快做完？照這五步</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
       <li>下載這頁的診斷腳本，<strong>從「下載」資料夾拖到桌面</strong>，開命令提示字元切到桌面。
   <pre><code>cd %USERPROFILE%\Desktop</code></pre></li>
@@ -342,6 +339,15 @@
     <li>在執行檔上按右鍵 →「內容」→「相容性」，試試相容模式</li>
     <li>更新顯示卡驅動程式</li>
   </ul>
+  <p>上面四條都試過還是不行、或是根本開不起來的話，下一步看這兩課：</p>
+  <ul class="plain">
+    <li><a href="../run-in-2026/index.html">2026 年的電腦怎麼跑得起 2005 年的遊戲</a> ——
+        記憶體上限（大位址）、螢幕解析度、在 Windows 10 / 11 上要注意什麼都在這一課。
+        它改的是<u>你自己那一份</u>執行檔，改之前會先備份，一行指令就能還原。</li>
+    <li><a href="../mount-disc/index.html">不用每次放光碟</a> ——
+        這台電腦沒有光碟機、或每次都要放光碟才開得起來的話看這一課。它不改任何遊戲檔案。
+        但如果畫面出現的是<u>要求放入正確光碟的訊息</u>，那是防拷檢查，<strong>本站幫不上忙</strong>。</li>
+  </ul>
 
   <div class="report">
     <p class="card-h">📋 還是解決不了？照這個格式回報</p>
@@ -421,6 +427,16 @@
     <li><strong>一個假的安全訊號</strong> 這支腳本原本會提醒「球場檔超過 80 MB」，但本站掃過 692 個球場檔最大只有 18.44 MB（原版 87 個檔最大 3.99 MB），門檻是它的 4.3 倍，等於<strong>永遠不會亮</strong>。已改成超過 10 MB 才提醒，而 10 是社群傳了二十年的說法，不是本站量到的邊界。</li>
     <li><strong>本站沒驗的</strong> 大容量硬碟存不了名冊的成因只是推測、沒有實測驗證；「有檔頭沒聲音」會不會真的讓遊戲跳出也沒實測；老闆模式切主場觀眾席視角就當掉這一條，踩了十幾年<strong>至今無解</strong>。</li>
   </ul>
+
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p><a href="../../plan.html#b"><strong>② 急救班</strong></a> 第 1／5 堂</p>
+    <div class="btnrow">
+      <a class="btn" href="../run-in-2026/index.html">下一堂：2026 年的電腦怎麼跑得起 2005 年的遊戲 →</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
 
   <h2 id="how-it-works">這支腳本在做什麼</h2>
   <p>沒讀過程式碼也沒關係，這一段把它的流程講完。</p>
@@ -539,7 +555,7 @@
   <h2 id="source">完整原始碼</h2>
   <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。不必下載也能先看過一遍。</p>
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（541 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（542 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -600,6 +616,7 @@ mvp_check_setup.py
 無外部相依,Python 3.7 以上即可。
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -614,7 +631,7 @@ mvp_check_setup.py
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 
 import struct
@@ -1111,6 +1128,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

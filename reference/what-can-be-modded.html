@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/what-can-be-modded.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="什麼改得動、什麼還不行 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="MVP Baseball 2005 各項修改的難度與現況：哪些已經完全解開、哪些只解了一半、哪些短期內不會有解。誠實版。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/reference/what-can-be-modded.html">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>什麼改得動、什麼還不行 — toni的MVP模組補習班</title>
+<title>什麼改得動、什麼還不行 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="MVP Baseball 2005 各項修改的難度與現況：哪些已經完全解開、哪些只解了一半、哪些短期內不會有解。誠實版。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -144,6 +154,14 @@
     <span class="t">遊戲規則、AI 行為、數值公式</span>
     <span class="d">這些寫在程式裡，不在資料檔。本站<strong>不涉及修改程式碼</strong>。</span>
   </div>
+  <div class="lesson">
+    <span class="badge wip">未解</span>
+    <span class="t">在三十支大聯盟球隊之外<strong>再加一支</strong>（換掉一支可以）</span>
+    <span class="d">加新球隊 ❌：三十支球隊的縮寫直接寫在球隊檔的欄位名裡（<code>team_vs_*</code>），那張清單也一字不差地存在主程式裡，牆在主程式那一層。
+       換隊名 ✅：球隊檔 <code>team.dat</code> 是純文字，把某一支球隊整支換成別的球隊（隊名、隊徽、球衣、球員）做得到 ——
+       2008 年那份台灣名冊就是這樣把大聯盟球隊換成亞洲球隊的；
+       本站<u>還沒有改隊名的課</u>。兩件事都在<a href="team-limit.html">為什麼你加不了新球隊</a>。</span>
+  </div>
 
   <div class="card grass">
     <p class="card-h">務實的結論</p>
@@ -218,6 +236,6 @@
        <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

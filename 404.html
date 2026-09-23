@@ -2,13 +2,13 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-WaWtC+Gd03shQ4Ibe5PIt0orblDZnsDHMJIPXg+bfwY='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-LjtHAwoNBMETsTBYsWhEqv3/p20dosOntz0EwRkpXKA='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
 <meta name="description" content="找不到這一頁。toni的MVP模組補習班 —— MVP Baseball 2005 的檔案格式與模組教學。">
 <meta name="robots" content="noindex">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<title>404 — toni的MVP模組補習班</title>
+<title>404 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <style>
   body { background:#F4F6F1; color:#16241E; text-align:center; padding:80px 20px;
          font-family:"IBM Plex Sans","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif; }
@@ -16,18 +16,25 @@
   a { color:#8A5608; }
   footer { margin-top:34px; padding-top:14px; border-top:1px solid #C8D2C8;
            font-size:.86rem; color:#44534C; }
+  /* 出口與頁尾連結撐高到 24px 以上,手指比較好點 */
+  .go a, footer a { display:inline-block; padding:4px 2px; }
   /* 深色規則必須放在最後,否則會被上面同權重的 a 規則覆蓋 */
   @media (prefers-color-scheme:dark){
     body { background:#0E1A16; color:#E8EDE7; }
     a { color:#E0A346; }
     footer { border-top-color:#2C4038; color:#AEBBB3; }
   }
+  /* 分隔點跟著後面的連結一起換行,不會孤零零掛在行尾(2026-09-23) */
+  .go .nb{white-space:nowrap}
 </style>
 </head>
 <body>
   <h1>⚾ 404</h1>
   <p>找不到這個頁面 —— 可能是界外球。</p>
-  <p><a id="home" href="/MVPBaseball/">回首頁</a> · <a id="tut" href="/MVPBaseball/tutorials/">看教學列表</a></p>
+  <p class="go"><a id="home" href="/MVPBaseball/">回首頁</a> · <a id="tut" href="/MVPBaseball/tutorials/">看教學列表</a> · <a id="pages" href="/MVPBaseball/pages.html">全站目錄</a></p>
+  <p class="go">或者：<a id="do" href="/MVPBaseball/do.html">我想做什麼</a>
+     <span class="nb">·&nbsp;<a id="start" href="/MVPBaseball/start.html">第 0 課 新手基本功</a></span>
+     <span class="nb">·&nbsp;<a id="rpt" href="/MVPBaseball/report.html#bug">回報一個問題</a></span></p>
   <footer>
     <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 ·
        <a id="lgl" href="/MVPBaseball/legal.html">法律與版權說明</a></p>
@@ -46,9 +53,31 @@
   var base = (location.hostname.endsWith('github.io') && seg.length > 0)
              ? '/' + seg[0] + '/'
              : '/';
-  document.getElementById('home').href = base;
-  document.getElementById('tut').href = base + 'tutorials/';
-  document.getElementById('lgl').href = base + 'legal.html';
+  // 找不到某個 id 就跳過那一條:少一個出口不該讓後面的網址修正整段停掉。
+  function setHref(id, href) { var a = document.getElementById(id); if (a) a.href = href; }
+  setHref('home', base);
+  setHref('tut', base + 'tutorials/');
+  setHref('pages', base + 'pages.html');
+  setHref('do', base + 'do.html');
+  setHref('start', base + 'start.html');
+  setHref('rpt', base + 'report.html#bug');
+  setHref('lgl', base + 'legal.html');
+
+  // 網址修正:從聊天訊息複製網址時,後面有可能黏到中文或全形標點;站根後面的大小寫也可能打錯。
+  // 先把路徑尾端不屬於網址的字去掉,沒有可去的才改成小寫;跟原本不同就換過去再試一次。
+  // 每跳一次路徑只會變短或變小寫,所以最多跳兩次就停;目標一定是同一個站根底下的路徑。
+  // 只讀 location、不送任何東西出去。修不好的話讀者看到的還是這一頁,跟沒有這段一樣。
+  var rest;
+  try { rest = decodeURIComponent(location.pathname); } catch (e) { rest = location.pathname; }
+  if (rest.indexOf(base) !== 0) return;
+  rest = rest.slice(base.length);
+  var fixed = rest.replace(/[^A-Za-z0-9\/_-]+$/, '');
+  if (fixed === rest) fixed = rest.toLowerCase();
+  if (fixed === rest) return;
+  if (/(^|\/)\.\.?(\/|$)/.test(fixed)) return;   // 有 . 或 .. 這種段落就不動,免得跳出站根
+  var target = base + fixed.split('/').map(encodeURIComponent).join('/');
+  if (target.charAt(1) === '/') return;   // 絕不產生 // 開頭的網址(那會被當成別的網站)
+  location.replace(target + location.search + location.hash);
 })();
 </script>
 </body>

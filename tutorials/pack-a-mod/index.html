@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/pack-a-mod/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="把你改好的東西打包成一包 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="改完之後怎麼給朋友裝？本站每一支工具都會留備份，而那些備份就是「你改過什麼」的紀錄——照著它打包成 .mvpmod，對方一行指令就裝得起來，而且退得回去。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/pack-a-mod/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>把你改好的東西打包成一包 — toni的MVP模組補習班</title>
+<title>把你改好的東西打包成一包 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="改完之後怎麼給朋友裝？本站每一支工具都會留備份，而那些備份就是「你改過什麼」的紀錄——照著它打包成 .mvpmod，對方一行指令就裝得起來，而且退得回去。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -43,47 +53,38 @@
   </div>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix" id="quick">
-    <p class="card-h">⚡ 只想趕快做完？照這五步</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
-      <li>下載 <a href="mvp_pack.py" download>mvp_pack.py</a>，看你改過什麼：
+      <li>下載 <a href="mvp_pack.py" download>mvp_pack.py</a>。下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打（Mac 開終端機先打 <code>cd ~/Downloads</code>）。接著看你改過什麼：
       <p class="small">Windows:</p>
 <pre><code>python mvp_pack.py "〔你的遊戲資料夾〕" --scan</code></pre>
       <p class="small">Mac / Linux:</p>
 <pre><code>python3 mvp_pack.py "〔你的遊戲資料夾〕" --scan</code></pre></li>
-      <li>打包：
+      <li>打包（打出來的 <code>台灣之光.mvpmod</code> 會存在命令視窗所在的資料夾）：
       <p class="small">Windows:</p>
 <pre><code>python mvp_pack.py "〔你的遊戲資料夾〕" --build 台灣之光.mvpmod --name "台灣之光" --author "你的名字"</code></pre>
       <p class="small">Mac / Linux:</p>
 <pre><code>python3 mvp_pack.py "〔你的遊戲資料夾〕" --build 台灣之光.mvpmod --name "台灣之光" --author "你的名字"</code></pre></li>
-      <li>對方拿到之後，<strong>先預覽</strong>（不會寫任何東西）：
+      <li>對方拿到之後，把那個 <code>.mvpmod</code> 放在他跑指令的那個資料夾，<strong>先預覽</strong>（不會寫任何東西）：
       <p class="small">Windows:</p>
 <pre><code>python mvp_pack.py "〔他的遊戲資料夾〕" --install 台灣之光.mvpmod</code></pre>
       <p class="small">Mac / Linux:</p>
 <pre><code>python3 mvp_pack.py "〔他的遊戲資料夾〕" --install 台灣之光.mvpmod</code></pre></li>
       <li>確定了才加 <code>--apply</code>。要退回去就 <code>--restore</code> ——
           <u>驗不出完整性的備份預設不蓋</u>，那個遊戲檔一個位元組都不動、結束碼 1；
-          你自己確定它是完整的，再加 <code>--allow-unverified</code> 跑一次。</li>
+          你自己確定它是完整的，再加 <code>--allow-unverified</code> 跑一次。
+      <p class="small">Windows:</p>
+<pre><code>python mvp_pack.py "〔他的遊戲資料夾〕" --restore</code></pre>
+      <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_pack.py "〔他的遊戲資料夾〕" --restore</code></pre></li>
       <li>不放心可以先空跑一次自我測試，<u>它不吃遊戲資料夾</u>：
       <p class="small">Windows:</p>
 <pre><code>python mvp_pack.py --selftest</code></pre>
@@ -92,6 +93,7 @@
     </ol>
     <p class="tail">⚠️ 打出來的那一包裡面是<strong>被你改過的 EA 遊戲檔案</strong>。
        要不要給別人是你自己的判斷 —— 本站不提供散布管道，也不建議公開散布。</p>
+    <p class="tail">想知道為什麼，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
   </div>
 
   <h2>怎麼知道你改了什麼</h2>
@@ -141,6 +143,8 @@
 
   <h2>👉 你要做的事</h2>
 
+  <p class="small">先下載 <a href="mvp_pack.py" download>mvp_pack.py</a>。<strong>指令要在放腳本的那個資料夾打。</strong>瀏覽器下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter —— 開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。Mac：打開終端機，先打 <code>cd ~/Downloads</code> 按 Enter。</p>
+
   <div class="step"><div class="step-n">1</div><div>
     <p><strong>先看你改過什麼。</strong></p>
     <p class="small">Windows:</p>
@@ -161,6 +165,7 @@
     --name "台灣之光 2026" --author "你的名字" --note "旅外那批，接收小聯盟位置"</code></pre>
     <p class="seen">打完它會<strong>自己讀回來驗一次</strong>：
        把包裡每個檔的 SHA-256 跟原檔比對，對不上就當場停下來報錯。</p>
+    <p class="small">打出來的 <code>台灣之光.mvpmod</code> 會存在命令視窗所在的資料夾（照上面從「下載」開的話，就在「下載」裡）。對方裝的時候，也要把它放在他跑指令的那個資料夾。</p>
     <p class="small">✅ <strong>驗不過的時候，你指定的位置不會生出任何東西。</strong>
        腳本是<u>先寫一個名字猜不到的暫存檔、驗過雜湊才把它換到你指定的位置</u>，
        驗不過就把暫存檔丟掉。
@@ -195,6 +200,10 @@
        那是<strong>備份的收據</strong>（裡面是那份備份的大小與 SHA-256），
        <code>--restore</code> 靠它判斷備份完不完整，<u>不要刪它</u>。
        退回去：<code>--restore</code>。</p>
+    <p class="small">Windows:</p>
+<pre><code>python mvp_pack.py "〔他的遊戲資料夾〕" --restore</code></pre>
+    <p class="small">Mac / Linux:</p>
+<pre><code>python3 mvp_pack.py "〔他的遊戲資料夾〕" --restore</code></pre>
     <p class="small">⚠️ <strong>沒有收據、格式也驗不出證據的備份，<code>--restore</code> 預設不蓋。</strong>
        那個遊戲檔一個位元組都不動，整支的結束碼是 1，螢幕上會告訴你怎麼放行 ——
        你自己確定那一份是完整的，才加 <code>--allow-unverified</code> 再跑一次
@@ -328,12 +337,6 @@
         中途按 <kbd>Ctrl</kbd>+<kbd>C</kbd> 130（會告訴你有沒有檔案已經被換掉、
         換了哪幾個 —— 2026-09-05 之前兩種都印「中止了」然後結束碼 0，
         批次檔看到 0 會把一套半新半舊的遊戲當成裝好了）。</li>
-    <li><strong>打包驗不過就什麼都不會留下</strong> 腳本是<u>先寫暫存檔、驗過雜湊才改名</u>，
-        驗不過就把暫存檔丟掉，你指定的位置不會生出檔案
-        （<strong>2026-09-05 訂正</strong>：這一條原本寫「那一包還在，要自己刪」，
-        當時是先改名再驗雜湊；那一驗已經移到改名之前）。
-        就算真傳出去對方也裝不起來（本站實測：<code>--install --apply</code>
-        在寫第一個檔之前就被雜湊擋下，他的遊戲資料夾一個位元組都沒動）。</li>
     <li><strong>看不到的部分</strong> 只認得本站課程工具留下的那 24 種備份副檔名
         （2026-09-05 在 <code>site/tutorials/pack-a-mod/mvp_pack.py</code> 的
         <code>BAK_SUFFIXES</code> 上數的，其中一種是通用的 <code>.bak</code>，
@@ -350,21 +353,17 @@
         （<u>磁碟機代號那一項 2026-09-05 擴大成「任何位置的冒號都拒絕」</u>，
         連 NTFS 的另一條資料流 <code>data/x.dat:payload</code> 也一起擋掉），
         而且是<u>先把整包讀完、再一個一個試寫、最後才真的寫</u>。</li>
-    <li><strong>雜湊只驗得到有寫的</strong> <code>manifest.json</code> 上沒有
+    <li><strong>擋不住的</strong> 包裡內容本身。路徑安全 ≠ 檔案安全，
+        只裝你認識的人給你的包。雜湊也只驗得到有寫的：<code>manifest.json</code> 上沒有
         <code>sha256</code> 欄位的項目不比對就裝。本課 <code>--build</code> 每個檔都寫，
         launcher 的 <code>mod_package.py</code> 一個都不寫。</li>
-    <li><strong>擋不住的</strong> 包裡內容本身。路徑安全 ≠ 檔案安全，
-        只裝你認識的人給你的包。</li>
-    <li><strong>三條寫入的路現在都是原子的</strong> <code>--build</code>、
+    <li><strong>三條寫入的路都是原子的</strong> <code>--build</code>、
         <code>--install --apply</code> 與 <code>--restore</code> 都是
         先寫一個名字猜不到的暫存檔、讀回來比對，通過了才一次改名換上去。
-        本站 2026-09-05 在這台 Mac 上重新量了一次 <code>--restore</code>：
-        100 MB 的遊戲檔配一份 150 MB 的 <code>.packbak</code>，每 5 毫秒量一次大小，
-        54 個取樣點<u>只量到 104,857,600 與 157,286,400 兩個值</u>，中間沒有第三個。
-        （<strong>2026-09-05 訂正</strong>：這一條原本叫「寫入是原子的，還原不是」，
-        並寫著 <code>--restore</code> 會先把遊戲檔清成 0 再一段一段長回去 ——
-        那是改法之前量到的樣子，量測留在下面
-        <code>cmd_restore()</code> 那一列當史料。）</li>
+        所以打包驗不過就什麼都不會留下，你指定的位置不會生出檔案；
+        就算真傳出去，對方的 <code>--install --apply</code> 也會在寫第一個檔之前被雜湊擋下。
+        實測數字與兩則 2026-09-05 的訂正，見下面 <code>cmd_build()</code> 與
+        <code>cmd_restore()</code> 那兩列。</li>
     <li><strong>法律上</strong> 你打出來的包裡面是<u>被改過的 EA 遊戲檔案</u>。
         本站不提供散布管道，也不建議公開散布。</li>
     <li><strong>本站沒驗的</strong> 沒有測過超過 1 GB 的包、
@@ -374,6 +373,17 @@
         「試寫」那一關對應的是 Windows 的檔案鎖定，本站只在 Mac 上
         用唯讀資料夾模擬過，<u>還沒在 Windows 上實跑</u>。</li>
   </ul>
+
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p><a href="../../plan.html#e"><strong>⑤ 發布班</strong></a> 第 4／5 堂</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../make-a-player/index.html">← 上一堂：把一位球員改成你想要的球員</a>
+      <a class="btn" href="../auto-install/index.html">下一堂：一整包模組自動歸位 →</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
 
   <h2 id="how-it-works">這支腳本在做什麼</h2>
   <p>五個動作走的是同一條線：<strong>先在遊戲資料夾裡找出「旁邊有本站備份」的檔
@@ -575,7 +585,7 @@
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 
 """
@@ -784,6 +794,7 @@ mvp_pack.py —— 把你改好的東西打包成一包,給別人裝。
 
 —— toni的MVP模組補習班
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 
 import argparse
 import hashlib
@@ -2813,6 +2824,6 @@ if __name__ == '__main__':
        <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

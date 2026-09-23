@@ -1,4 +1,5 @@
 @echo off
+REM TOOL_DATE = '2026-09-23'
 REM  Double-click this file. A window will open and ask you questions.
 REM  (This file must stay ASCII: Windows reads .bat as cp950 and Chinese
 REM   comments can shift the decoder and break the script.)
@@ -19,7 +20,7 @@ if not defined PY (
   echo.
   echo   This computer does not have Python yet.
   echo   Get it from https://www.python.org/downloads/
-  echo   During install, tick "Add python.exe to PATH".
+  echo   If the installer shows "Add python.exe to PATH", tick it.
   echo.
   pause
   exit /b 1

@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/swap-chant/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="把應援曲指給別的球員 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="EA 錄了 57 組球員專屬應援曲。這一課教你把其中一首指給你想要的球員，只改一行純文字，不動 54 MB 的音檔。換掉音檔內容是另一課的事，這一課只做重新指派。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/swap-chant/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>把應援曲指給別的球員 — toni的MVP模組補習班</title>
+<title>把應援曲指給別的球員 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="EA 錄了 57 組球員專屬應援曲。這一課教你把其中一首指給你想要的球員，只改一行純文字，不動 54 MB 的音檔。換掉音檔內容是另一課的事，這一課只做重新指派。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -64,30 +74,17 @@
   </div>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix" id="quick">
-    <p class="card-h">⚡ 只想趕快做完？照這五步</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
-      <li>下載 <a href="mvp_swap_chant.py" download>mvp_swap_chant.py</a>（1,095 行，零相依），電腦裡要有 Python 3。</li>
+      <li>下載 <a href="mvp_swap_chant.py" download>mvp_swap_chant.py</a>（1,096 行，零相依），電腦裡要有 Python 3。下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打（Mac 開終端機先打 <code>cd ~/Downloads</code>）。</li>
       <li>看遊戲裡有哪些應援曲，會列出 57 首，挑一首你想搬走的
   <p class="small">Windows：</p>
   <pre><code>python mvp_swap_chant.py "&lt;遊戲資料夾&gt;" --list</code></pre>
@@ -113,6 +110,7 @@
     </ol>
     <p class="tail"><code>--give</code> 後面是「球員、來源編號」兩個參數。想知道應援曲為什麼會跑到別人身上往下讀；只想複習跳到<a href="#recap">📌 重點整理</a>。<br>
        想換的是<u>音檔內容</u>而不是「誰在用」，那是<a href="../make-voice/index.html">換掉遊戲的聲音</a>那一課。</p>
+    <p class="tail">照做卡住了？直接跳到<a href="#fix">❌ 出錯處理</a>（可以把畫面上印出來的那一行貼進那裡的搜尋框）；做完對照<a href="#ok">✅ 成功標準</a>。</p>
   </div>
 
   <h2>應援曲是怎麼接到球員身上的</h2>
@@ -139,9 +137,10 @@ data/audio/cd/chants/chantdat.big   真正的音檔，54 MB，EA 自家格式</p
   <p>應援曲的群組名是 <code>pchants:0304</code> 這種四位數，
      那是球員資料檔裡的 <code>playerattrib_audioid</code>。
      <strong>換一份名冊，號碼就會落到別人身上。</strong></p>
-  <p>本站測試機裝的是一份比較新的名冊，跑 <code>--list</code> 會看到：</p>
+  <div class="seen"><b>本站測試機裝的是一份比較新的名冊，跑 <code>--list</code> 會看到</b>
 <pre>0304  Shohei Ohtani
 0339  Vladimir Guerrero Jr.</pre>
+  </div>
   <p>那兩首應援曲是 <strong>EA 在 2004 年錄的</strong>，錄的時候這兩位還沒進大聯盟。
      他們只是後來拿到了同一個號碼，就繼承了前人的應援曲。</p>
   <p class="small">所以 <code>--list</code> 列出來的名字是「<u>現在誰在用這個號碼</u>」，
@@ -159,7 +158,8 @@ data/audio/cd/chants/chantdat.big   真正的音檔，54 MB，EA 自家格式</p
     <div class="step-n">1</div>
     <div>
       <p class="step-t">下載腳本</p>
-      <p><a href="mvp_swap_chant.py" download>mvp_swap_chant.py</a>（1,095 行，零相依）</p>
+      <p><a href="mvp_swap_chant.py" download>mvp_swap_chant.py</a>（1,096 行，零相依）</p>
+      <p class="small"><strong>指令要在放腳本的那個資料夾打。</strong>瀏覽器下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter —— 開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。Mac：打開終端機，先打 <code>cd ~/Downloads</code> 按 Enter。</p>
     </div>
   </div>
 
@@ -200,7 +200,7 @@ data/audio/cd/chants/chantdat.big   真正的音檔，54 MB，EA 自家格式</p
     </div>
   </div>
 
-  <h2>✅ 成功標準</h2>
+  <h2 id="ok">✅ 成功標準</h2>
   <ul class="plain">
     <li>「已備份 → spch_cht.txt.chantbak」</li>
     <li><strong>「複驗:群組 90 · 音檔 103 · 重複群組名 0 個 · 新群組名找得到 ✅」</strong></li>
@@ -214,10 +214,14 @@ data/audio/cd/chants/chantdat.big   真正的音檔，54 MB，EA 自家格式</p
        <strong>那要靠你的耳朵。</strong>本站沒有辦法自動測這件事，所以不會寫成「一定會生效」。</p>
   </div>
 
-  <h2>❌ 出錯處理</h2>
+  <h2 id="fix">❌ 出錯處理</h2>
   <div class="tablewrap"><table>
     <thead><tr><th>看到什麼</th><th>怎麼做</th></tr></thead>
     <tbody>
+      <tr class="hi"><td class="mono">can't open file '…mvp_*.py'</td>
+          <td><strong>命令視窗跟腳本不在同一個資料夾。</strong>
+              打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）。
+              還是一樣的話，是檔名對不上：瀏覽器可能在檔名後面加了 <code>(1)</code>，把它改成跟指令裡一模一樣</td></tr>
       <tr><td>索引裡沒有 pchants:NNNN</td><td>用 <code>--list</code> 看有哪些編號</td></tr>
       <tr><td>名字含「X」的有 N 位，請打長一點</td><td>照它列出來的挑，或直接給四位數</td></tr>
       <tr class="hi"><td><strong>他本來就有專屬應援曲</strong></td>
@@ -276,6 +280,17 @@ data/audio/cd/chants/chantdat.big   真正的音檔，54 MB，EA 自家格式</p
         複驗沒過也一樣是非零結束碼收場，並且直接把整句還原指令印出來。</li>
     <li><strong>本站沒驗的</strong> 腳本只驗得到「檔案改對了」，驗不到「遊戲會不會照這個索引播放」，那要靠你的耳朵，本站沒有辦法自動測這件事，所以不會寫成「一定會生效」。</li>
   </ul>
+
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p><a href="../../plan.html#a"><strong>① 入門班</strong></a> 第 6／6 堂（這一班的最後一堂）</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../swap-face/index.html">← 上一堂：幫球員換一張臉</a>
+      <a class="btn" href="../../plan.html">回課表挑下一班 →</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
 
   <h2 id="how-it-works">這支腳本在做什麼</h2>
   <p>不看程式碼也能知道它怎麼跑。它最後做的事只有一件：
@@ -375,7 +390,7 @@ data/audio/cd/chants/chantdat.big   真正的音檔，54 MB，EA 自家格式</p
   <h2 id="source">完整原始碼</h2>
   <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。</p>
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1095 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1096 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -502,6 +517,7 @@ EA 錄了 57 組球員專屬應援曲。這支腳本可以把其中一首指給�
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -516,7 +532,7 @@ EA 錄了 57 組球員專屬應援曲。這支腳本可以把其中一首指給�
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 
 import os
@@ -1482,6 +1498,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

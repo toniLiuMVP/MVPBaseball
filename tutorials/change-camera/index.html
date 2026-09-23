@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/change-camera/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="把打擊視角調成你喜歡的角度 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="MVP Baseball 2005 的 39 個攝影機全部寫在一個純文字檔裡。這一課教你改其中一個的位置與視野角度，附預覽、備份與一行還原。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/change-camera/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>把打擊視角調成你喜歡的角度 — toni的MVP模組補習班</title>
+<title>把打擊視角調成你喜歡的角度 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="MVP Baseball 2005 的 39 個攝影機全部寫在一個純文字檔裡。這一課教你改其中一個的位置與視野角度，附預覽、備份與一行還原。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -59,39 +69,28 @@
   </div>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix" id="quick">
-    <p class="card-h">⚡ 只想趕快做完？照這四步</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這四步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
-      <li>先把 39 個攝影機列出來，看它們現在的數字。<br>
-  <pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data\datafile\datafile.big --cameras</code></pre></li>
+      <li>命令視窗要在放著 <code>mvp_fel_toolkit.py</code> 的資料夾開：打開那個資料夾（剛下載的話就是檔案總管左邊的「下載」），點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter（Mac 開終端機，用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）。<br>
+          接著把 39 個攝影機列出來，看它們現在的數字。<br>
+  <pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data/datafile/datafile.big --cameras</code></pre></li>
       <li>挑一台先預覽，這一行不會動到任何檔案。<code>BattingView1</code> 到 <code>7</code> 對應遊戲設定裡的 Batting View 幾號。<br>
-  <pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data\datafile\datafile.big --camera BattingView1RightLow --set FOV=32</code></pre></li>
+  <pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data/datafile/datafile.big --camera BattingView1RightLow --set FOV=32</code></pre></li>
       <li>確定了，同一行最後加 <code>--apply</code>，它會先自動備份再寫，然後自己複驗一遍。<br>
-  <pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data\datafile\datafile.big --camera BattingView1RightLow --set FOV=32 --apply</code></pre></li>
+  <pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data/datafile/datafile.big --camera BattingView1RightLow --set FOV=32 --apply</code></pre></li>
       <li>進遊戲看一眼；不喜歡就還原，它會逐位元組比對。<br>
-  <pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data\datafile\datafile.big --restore-datafile</code></pre></li>
+  <pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data/datafile/datafile.big --restore-datafile</code></pre></li>
     </ol>
-    <p class="tail">起手一次只改一個數字，<code>FOV</code> 建議 ±3。左打右打是分開的兩筆，只改 <code>Right</code> 的話換左打者上場鏡頭還是舊的。官方中文版沒有 <code>datafile.big</code>，指令照打就好，工具會自動改用同一個資料夾裡的 <code>datafile.txt</code> 並告訴你。想知道為什麼，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+    <p class="tail">Mac / Linux 把開頭的 <code>python</code> 換成 <code>python3</code>，其餘一樣。起手一次只改一個數字，<code>FOV</code> 建議 ±3。左打右打是分開的兩筆，只改 <code>Right</code> 的話換左打者上場鏡頭還是舊的。官方中文版沒有 <code>datafile.big</code>，指令照打就好，工具會自動改用同一個資料夾裡的 <code>datafile.txt</code> 並告訴你。想知道為什麼，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+    <p class="tail">照做卡住了？直接跳到<a href="#fix">❌ 出錯處理</a>（可以把畫面上印出來的那一行貼進那裡的搜尋框）；做完對照<a href="#ok">✅ 成功標準</a>。</p>
   </div>
 
   <h2>為什麼要學這一課</h2>
@@ -109,6 +108,8 @@
     <li>知道你的遊戲資料夾在哪（裡面要有一個叫 <code>data</code> 的子資料夾）</li>
   </ul>
 
+  <p class="small"><strong>指令要在放著 <code>mvp_fel_toolkit.py</code> 的那個資料夾打。</strong>打開那個資料夾（剛下載的話在檔案總管左邊的「下載」；搬到桌面過的話就是桌面），點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter，開出來的命令提示字元就停在那裡（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。Mac：打開終端機，用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>。</p>
+
   <div class="card blue">
       <p class="card-h">這一課動的是哪個檔</p>
       <p><code>data\datafile\datafile.big</code>。
@@ -123,7 +124,7 @@
          它把整個 <code>data\datafile\</code> 散裝成 <strong>466 個 <code>.txt</code></strong>
          直接放在資料夾裡，<code>datafile.txt</code> 就躺在那裡。
          （<code>data\anims\</code> 也一樣：730 個散裝檔，沒有 <code>anims.big</code>。）</p>
-      <p><strong>工具已經處理好了</strong>：指令照樣打 <code>--big data\datafile\datafile.big</code>，
+      <p><strong>工具已經處理好了</strong>：指令照樣打 <code>--big data/datafile/datafile.big</code>，
          找不到的話它會自動改用同一個資料夾裡的 <code>datafile.txt</code>，並且告訴你它換了。</p>
       <p class="small">這件事講出來還有另一個意思：本站在此之前的<u>所有量測都是拿英文版做的</u>。
          中文版不只是「同一份加了翻譯」——它的檔案組織方式不一樣。
@@ -132,13 +133,18 @@
 
   <h2>👉 你要做的事</h2>
 
+  <div class="card blue">
+    <p class="card-h">指令裡的 python 與 python3</p>
+    <p>下面範例照 Windows 寫法用 <code>python</code>；Mac 使用者把每行開頭改成 <code>python3</code>。</p>
+  </div>
+
   <div class="step">
     <div class="step-n">1</div>
     <div>
       <p><strong>先把 39 個攝影機列出來，看它們現在的數字。</strong></p>
-      <p>把下面這行的「你的遊戲資料夾」換成你自己的路徑（可以直接把資料夾拖進命令提示字元）：</p>
-<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data\datafile\datafile.big --cameras</code></pre>
-      <p>會印出這樣的表：</p>
+      <p>把下面這行的「你的遊戲資料夾」換成你自己的路徑，外面那對引號留著（用拖的話，先把 <code>"你的遊戲資料夾"</code> 連同外面那對引號一起刪掉，再把遊戲資料夾拖進命令提示字元）：</p>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data/datafile/datafile.big --cameras</code></pre>
+      <div class="seen"><b>會印出這樣的表</b>
 <pre><code>這個檔裡有 39 個攝影機:
 
   名稱                                   X         Y         Z      FOV    Pitch   Heading
@@ -147,6 +153,7 @@
   BattingView1RightLow          -210.000    47.000  -210.000    25.00    0.020     0.000
   BattingView2LeftHi             -73.181    48.000  -111.557    43.05   -0.011     0.611
   ...</code></pre>
+      </div>
     </div>
   </div>
 
@@ -251,7 +258,7 @@
            <strong>前人走到哪裡、以及本站接著往前走了多遠</strong>。</p>
       </div>
       <p>想先看某一個攝影機的全部欄位：</p>
-<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data\datafile\datafile.big --camera BattingView1RightLow</code></pre>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data/datafile/datafile.big --camera BattingView1RightLow</code></pre>
       <p class="small">會列出它的 108 個欄位，可以改的那幾個右邊會標「←可改」。</p>
     </div>
   </div>
@@ -260,8 +267,8 @@
     <div class="step-n">3</div>
     <div>
       <p><strong>先預覽，不要直接改。</strong>下面這行<u>不會</u>動到任何檔案：</p>
-<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data\datafile\datafile.big --camera BattingView1RightLow --set FOV=32</code></pre>
-      <p>會印出：</p>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data/datafile/datafile.big --camera BattingView1RightLow --set FOV=32</code></pre>
+      <div class="seen"><b>會印出</b>
 <pre><code>【預覽】BattingView1RightLow
 
   欄位                     現在  →  改成
@@ -272,6 +279,7 @@
 
   以上只是預覽,沒有改到任何檔案。
   確定要改的話,在同一行指令最後加上 --apply</code></pre>
+      </div>
       <div class="card blue">
         <p class="card-h">哪個數字改什麼</p>
         <div class="tablewrap"><table class="stack">
@@ -299,7 +307,7 @@
     <div class="step-n">4</div>
     <div>
       <p><strong>確定了再加 <code>--apply</code>。</strong></p>
-<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data\datafile\datafile.big --camera BattingView1RightLow --set FOV=32 --apply</code></pre>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data/datafile/datafile.big --camera BattingView1RightLow --set FOV=32 --apply</code></pre>
       <p>它會<u>先自動備份</u>再寫，然後自己複驗一遍。</p>
     </div>
   </div>
@@ -349,7 +357,7 @@
        散裝版只把檔案讀回來跟算好的內容<strong>整份比對</strong>。
        它抓得到寫壞、寫半截、編碼跑掉，但抓不到「一開始就算錯欄位」那一類錯。</p>
     <p>所以散裝版改完，請再跑一次 <code>--cameras</code>，自己確認只有你要改的那一台、那一欄變了：</p>
-<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data\datafile\datafile.big --cameras</code></pre>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data/datafile/datafile.big --cameras</code></pre>
   </div>
 
   <div class="card grass">
@@ -375,16 +383,17 @@
        檔案 4,391,982 bytes 變成 4,391,979 bytes，差的就是少掉的那三個字。</p>
   </div>
 
-  <h2>❌ 出錯處理</h2>
+  <h2 id="fix">❌ 出錯處理</h2>
   <div class="tablewrap"><table>
     <thead><tr><th>你看到的</th><th>怎麼辦</th></tr></thead>
     <tbody>
       <tr class="hi"><td class="mono">can't open file '…\mvp_*.py'</td>
-          <td><strong>檔案還在「下載」資料夾，不在桌面。</strong>
-              開檔案總管左邊點「下載」，把那個 <code>.py</code> 拖到桌面，再跑一次。
+          <td><strong>命令視窗跟腳本不在同一個資料夾。</strong>
+              打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）。
+              還是一樣的話，是檔名對不上：瀏覽器可能在檔名後面加了 <code>(1)</code>，把它改成跟指令裡一模一樣。
               <u>這是本站最常見的第一個卡點。</u></td></tr>
       <tr><td class="mono">❌ 這個封裝檔裡沒有 datafile.txt</td>
-          <td><code>--big</code> 後面打錯了。要是 <code>data\datafile\datafile.big</code></td></tr>
+          <td><code>--big</code> 後面打錯了。要是 <code>data/datafile/datafile.big</code></td></tr>
       <tr><td class="mono">❌ 這個檔裡找不到任何攝影機。</td>
           <td><strong>你手上那份散裝的 <code>datafile.txt</code> 是壓縮過的。</strong>
               用記事本打開會是亂碼，開頭第二個位元組是 <code>0xFB</code>
@@ -413,7 +422,7 @@
   </table></div>
 
   <h3>還原</h3>
-<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data\datafile\datafile.big --restore-datafile</code></pre>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data/datafile/datafile.big --restore-datafile</code></pre>
   <p>它會把備份寫回去，然後<strong>逐位元組比對</strong>，印出「內容與備份相同 ✅」才算成功。</p>
   <p class="small">備份只做<u>第一次</u>那一份 —— 之後再改也不會覆蓋它。
      所以還原永遠是回到「你第一次動它之前」的樣子。</p>
@@ -458,17 +467,26 @@
     <li><strong>一句話</strong> 遊戲裡 39 個攝影機的位置與視野角度全部寫在一個純文字檔裡，正確心態是小幅度改、每次只改一個數字、進遊戲看一眼、不喜歡就還原。</li>
     <li><strong>動的是哪個檔</strong> <code>data\datafile\datafile.big</code>，它只裝設定值，不會影響你的名單或存檔。官方中文版<strong>沒有這個封裝檔</strong>，它把整個 <code>data\datafile\</code> 散成 466 個 <code>.txt</code>（<code>data\anims\</code> 也一樣，730 個散裝檔）。</li>
     <li><strong>左打跟右打是分開的兩筆</strong> 只改 <code>BattingView1RightLow</code>，換左打者上場時鏡頭還是舊的，要一致就兩筆都改。</li>
-    <li><strong>打擊與守備不是同一套欄位</strong> 這個檔裡有<strong>不只一張欄位名稱表</strong>，一張表管到下一張表為止。116 欄那張管後面 32 台 <code>BattingView*</code>，128 欄那張管 7 台 <code>FieldingView1</code>-<code>6</code> 與 <code>HeadViewer</code>。<strong>行號與欄位編號都跟著版本跑</strong>：打擊表兩種版本都在第 7,940 行，守備表在封裝版（有 <code>datafile.big</code>）是第 8,516 行、在散裝版（官方中文版）是第 9,216 行；同一個 <code>;53</code> 在打擊表兩組都叫 <code>FOV</code>，在守備表封裝版叫 <code>Pitch</code>、散裝版叫 <code>VerticalFraming</code>。守備視角沒有絕對座標，記的是位移。所以不要記編號，讓工具去讀表頭。</li>
-    <li><strong>「複驗通過」不保證你改對了欄位</strong> 工具原本只認第一張表，套到全部 39 台，下 <code>--set FOV=30</code> 會把數字寫進「取景高低」那一欄，畫面一動也不動而構圖被改壞，還照樣回報複驗通過，因為它只檢查<strong>寫進去的跟打算寫的一樣</strong>。2026-08-28 已修好，現在用每一台自己那張表，而且本來不是數字的格子一律拒絕寫入。</li>
+    <li><strong>打擊與守備不是同一套欄位</strong> 這個檔裡有<strong>不只一張欄位名稱表</strong>：打擊視角 32 台看一張、守備視角 7 台看另一張，行號與欄位編號還會跟著版本跑，所以不要記編號，讓工具去讀表頭。印出「✅ 複驗通過」只代表<strong>寫進去的跟打算寫的一樣</strong>，不代表欄位選對了；2026-08-28 修過一次這種錯，現在每一台用自己那張表，本來不是數字的格子一律拒絕寫入。</li>
     <li><strong>起手幅度</strong> <code>FOV</code> 一次 ±3（越小畫面越窄、越像拉近），<code>Y</code>（高度）一次 ±5，<code>X</code> / <code>Z</code> 一次 ±10，<code>Pitch</code> / <code>Heading</code> 一次 ±0.01，<code>Roll</code> 建議不要動。工具<strong>每一台只讓你改七個欄位</strong>，是刻意的；上面這七個是打擊視角那 32 台的，守備那張表管的 7 台是把 <code>X</code>／<code>Y</code>／<code>Z</code> 換成 <code>OffsetX</code>／<code>OffsetY</code>／<code>OffsetZ</code>。</li>
     <li><strong>安全網</strong> 不加 <code>--apply</code> 就只是預覽；<code>--apply</code> 會先建備份，備份檔名跟著你動的那個檔走：封裝版是 <code>datafile.big.datafilebak</code>，官方中文版走的散裝版是 <code>datafile.txt.datafilebak</code>，<code>--restore-datafile</code> 還原的也是同一份。備份只做<strong>第一次</strong>那一份、之後不覆蓋，所以還原永遠回到你第一次動它之前。看到任何一句「請立刻 --restore-datafile」就馬上照做。</li>
-    <li><strong>兩種版本的複驗嚴格程度不一樣</strong> 封裝版會<strong>逐台逐欄</strong>比對改前改後的攝影機表，驗收要看到「460 個項目全部讀得回」「攝影機 39 個」「只有你改的那個名字被改動」「檔頭寫的大小＝實際檔案大小」與「✅ 複驗通過」（460 與 39 是在剛安裝好的英文版那份 <code>datafile.big</code> 上量到的，模組不同時數字可能不一樣）。散裝版只印「複驗:讀回來的內容與預期相同 ✅」，<u>不會有</u>「✅ 複驗通過」那一行，因為它只把寫回去的檔案跟算好的內容整份比對、沒有逐台逐欄比，所以改完自己再跑一次 <code>--cameras</code> 看一眼。</li>
-    <li><strong>檔案會不會變大看你走哪一條</strong> 封裝版變大是正常的：剛安裝好的英文版那份 <code>datafile.big</code> 實測從 2,857,593 bytes 變成 7,288,995 bytes（約 2.8 MB 變約 7.3 MB），那是不做壓縮的合法編碼；<strong>而且每 <code>--apply</code> 一次就再長約 4.43 MB</strong>（連改五次實測 2,857,593 → 7,288,995 → 11,720,397 → 16,151,799 → 20,583,201 bytes），所以試完記得 <code>--restore-datafile</code> 回到原點再重來。散裝版是原地改字，剛安裝好的官方中文版那份 <code>datafile.txt</code> 實測 4,391,982 bytes 變成 4,391,979 bytes。</li>
-    <li><strong>本站沒驗的</strong> 四件。一、<strong>沒有進遊戲看過任何一個改動的畫面</strong>，檔案層面驗得很徹底、畫面層面一次都沒看。二、<code>X</code> 跟 <code>Z</code> 各自是哪個方向沒比對過，只知道是水平位置的兩個方向。三、數值改到極端（鏡頭跑到看台外、穿進地板、FOV 設 1 或 179）沒試，也不建議拿正式存檔去試。四、<strong>欄位數不同的攝影機共用同一張名稱表，這件事是推論。</strong>名稱表有兩張，39 台是用「往前找最近的表頭」這條位置規則分給它們的：32 台落在打擊表、7 台落在守備表，零例外。這 39 筆記錄分佈在 11 種欄位數（87 到 116，在本站測試機那份封裝的 <code>datafile.big</code> 上量的），其中真的有 116 欄的只有 4 筆，其餘是拿管到它那一段的名稱表去讀的。速查頁那份「9 項一致性檢查在剛安裝好的原版英文版上全中」<strong>不能拿來當證據</strong>（2026-09-05 訂正）：那一輪是訂正之前拿 116 欄那張表去讀全部 39 筆做的，正是本站當年把 7 台守備視角一起讀錯還不自知的原因，而且整張表刻意位移 +1 格，9 項裡照樣中 6 項。</li>
+    <li><strong>封裝版與散裝版不一樣</strong> 封裝版（有 <code>datafile.big</code>）逐台逐欄比對，要看到「✅ 複驗通過」；檔案變大是正常的，<strong>每 <code>--apply</code> 一次就再長約 4.43 MB</strong>，試完記得 <code>--restore-datafile</code> 回到原點再重來。散裝版（官方中文版）只印「複驗:讀回來的內容與預期相同 ✅」，<u>不會有</u>「✅ 複驗通過」那一行，改完自己再跑一次 <code>--cameras</code> 看一眼；它是原地改字，檔案大小幾乎不變。</li>
+    <li><strong>本站沒驗的</strong> 四件。一、<strong>沒有進遊戲看過任何一個改動的畫面</strong>，檔案層面驗得很徹底、畫面層面一次都沒看。二、<code>X</code> 跟 <code>Z</code> 各自是哪個方向沒比對過。三、數值改到極端（鏡頭跑到看台外、穿進地板、FOV 設 1 或 179）沒試，也不建議拿正式存檔去試。四、<strong>欄位數不同的攝影機共用同一張名稱表，這件事是推論</strong>，證據有多少、哪一份不能當證據，見上面「本站沒有驗的事」那一節。</li>
   </ul>
+
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p>這一課沒有排進任何一班。課表上寫的適合時機：「你想換視角」</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../../plan.html">看整張課表</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
 
   <h2>接下來</h2>
   <ul class="plain">
+    <li><a href="../../7min/camera.html">七分鐘版</a> —— 只想快點改完看這個</li>
     <li><a href="../../reference/datafile.html#camera">總設定檔：攝影機的 116 個欄位</a> —— 這一課的原理與完整欄位表</li>
     <li><a href="../../reference/datafile.html#lighting">同一個檔裡的燈光</a> —— PC 版裡裝著三台主機的設定</li>
     <li><a href="../backup/index.html">備份與還原</a> —— 動任何檔之前該有的習慣</li>
@@ -481,6 +499,6 @@
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/make-a-player/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="把一位球員改成你想要的球員 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="想把自己喜歡的球員放進遊戲？遊戲裡不能「加人」，但可以「接收」——挑一位你不在乎的球員，把他的名字、背號、跑壘速度改成你要的。雙擊就能用，不必打任何指令。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/make-a-player/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>把一位球員改成你想要的球員 — toni的MVP模組補習班</title>
+<title>把一位球員改成你想要的球員 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="想把自己喜歡的球員放進遊戲？遊戲裡不能「加人」，但可以「接收」——挑一位你不在乎的球員，把他的名字、背號、跑壘速度改成你要的。雙擊就能用，不必打任何指令。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -43,42 +53,32 @@
   </div>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix" id="quick">
-    <p class="card-h">⚡ 只想趕快做完？照這四步</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這四步</p>
     <ol>
       <li><strong>下載這一包</strong>：<a href="MVP換球員工具.zip" download>MVP換球員工具.zip</a>，
-          <u>雙擊它就會自己解開</u>。裡面有三個檔。</li>
+          再把它解開。<strong>Windows</strong>：在它上面按右鍵，選字樣裡同時有「全部」和「解壓」的那一項，照畫面按下去。
+          <strong>Mac</strong>：雙擊就會解開。裡面有三個檔。
+          <br><span class="small">⚠️ Windows 右鍵選單的字樣各版可能不同；這一步本站<strong>還沒在 Windows 上實測</strong>。</span></li>
       <li><strong>雙擊那個 ⚾ 檔案。</strong>會跳出一個黑色視窗，它會自己找到遊戲。</li>
       <li>照著它問的打：先打你要接收的球員名字（<u>英文</u>），
           再打新的名、姓、背號、跑壘速度。<strong>不想改的直接按 Enter 跳過。</strong></li>
       <li>它會先給你看<strong>預覽</strong>，確定了才打 <code>y</code>。
-          寫進去之前會自動備份，不喜歡再跑一次就能還原。</li>
+          寫進去之前會自動備份。不喜歡的話再雙擊一次那個 ⚾ 檔案，它問要不要還原時打 <code>r</code>。</li>
     </ol>
     <p class="tail">⚠️ 名字要打<strong>英文拼音</strong>。名冊裡存不了中文 ——
        陳金鋒在遊戲裡就叫 <code>Chin-Feng Chen</code>。
        <br>⚠️ <strong>一定要下載那個壓縮檔，不要分開抓。</strong>原因寫在下面第 2 步。
        <br>🛠 <strong>要做一整包模組(二三十個人)?</strong>
        別走互動問答 —— 看<a href="#batch">下面的 CSV 批次那一段</a>。</p>
+    <p class="tail">想知道為什麼，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
   </div>
 
   <h2>先講一件重要的事：遊戲不能「加人」</h2>
@@ -115,7 +115,11 @@
   </div></div>
 
   <div class="step"><div class="step-n">2</div><div>
-    <p><strong>下載 <a href="MVP換球員工具.zip" download>MVP換球員工具.zip</a>，雙擊解開。</strong></p>
+    <p><strong>下載 <a href="MVP換球員工具.zip" download>MVP換球員工具.zip</a>，解開（Windows：右鍵 →「全部解壓縮…」；Mac：雙擊）。</strong></p>
+    <p class="small">Windows 在壓縮檔上直接雙擊，是把它打開來讓你看裡面有什麼，<u>不是真的解開</u>，
+       所以要用右鍵那一項。選單上那一項的字樣各版 Windows 可能不太一樣
+       （微軟的中文說明頁寫的是「全部解壓...」），認明它同時有「全部」和「解壓」就對了；
+       這一段<u>本站還沒在 Windows 上實測</u>。</p>
     <p>裡面有三個檔：工具本體 <code>mvp_player.py</code>、Mac 用的
        <code>⚾ 換一位球員（Mac 雙擊）.command</code>、Windows 用的
        <code>⚾ 換一位球員(Windows 雙擊).bat</code>。
@@ -141,16 +145,19 @@
          所以它不可能跟原始碼不同步。</p>
     </div>
 
-    <p class="ifnot">🍎 Mac 雙擊跳出「無法打開，因為來自身分不明的開發者」，
+    <p class="ifnot">🍎 Mac 雙擊跳出警告說無法打開，
        <u>或是雙擊完全沒有反應</u>？兩種都是同一件事：從網頁下載的檔案帶著
        <code>quarantine</code> 標記，而<strong>壓縮檔保不住這個標記</strong>
        （壓縮檔保住的是執行權限，不是這個）。
-       在那個檔案上<strong>按右鍵 → 打開</strong>（不是雙擊），再按一次「打開」就會過，
-       之後就可以直接雙擊。
-       <br>比較新的 macOS 有時候<u>不跳問句、直接沒反應</u>，看到沒反應就照這一招做。
-       本站在 macOS 26.6.2 上量過解開之後的三個檔，都還帶著
-       <code>com.apple.quarantine</code>；「雙擊當下畫面上會不會跳問句」<u>本站還沒實測</u>。</p>
-    <p class="ifnot">連「右鍵 → 打開」都沒有用？那就開 <strong>終端機</strong>
+       <strong>macOS 15（Sequoia）以後</strong>：先雙擊一次讓它被擋，再打開
+       <strong>「系統設定 → 隱私權與安全性」</strong>，往下捲，按<strong>「強制打開」</strong>。
+       <strong>macOS 14 以前</strong>：在那個檔案上<strong>按右鍵 → 打開</strong>（不是雙擊），
+       再按一次「打開」就會過（Apple 從 macOS 15 起拿掉了右鍵這條路）。
+       放行一次之後就可以直接雙擊。
+       <br>按鈕字樣照 Apple 的說明寫。本站在 macOS 26.6.2 上量過解開之後的三個檔，都還帶著
+       <code>com.apple.quarantine</code>；但「雙擊當下畫面上會不會跳警告」、
+       「系統設定裡會不會出現那個按鈕」<u>本站還沒實測</u>。</p>
+    <p class="ifnot">系統設定裡找不到那個按鈕，或右鍵也沒有用？那就開 <strong>終端機</strong>
        （在「應用程式 → 工具程式」裡），把下面這一行的路徑換成
        <u>你剛解開的那個資料夾</u>，貼進去按 Enter，
        它會把整個資料夾裡的 <code>quarantine</code> 標記拿掉：</p>
@@ -165,22 +172,35 @@
     <p class="seen">你會看到一個黑色視窗，上面寫「⚾ 把一位球員改成你想要的球員」，
        然後是「找到遊戲了：…」跟「名冊讀好了，裡面有 3247 位球員」
        （螢幕上沒有千分位逗號，而且那個數字是<u>你自己那份名冊</u>的人數）。</p>
+    <p class="ifnot">🪟 Windows 雙擊 ⚾ 之後，先跳出一個問你要不要先解壓縮的視窗，
+       或是黑色視窗裡出現一行英文 <code>can't open file</code>，後面接著 <code>mvp_player.py</code>？
+       那是你在壓縮檔裡面直接雙擊了，旁邊的工具本體沒有跟著出來。
+       回到第 2 步用右鍵把整包解開，再去雙擊新資料夾裡的那個 ⚾。
+       （這兩個畫面<u>本站還沒在 Windows 上實測</u>。）</p>
     <p class="ifnot">說「找不到遊戲資料夾」？它會請你<strong>把遊戲資料夾拖進視窗</strong>再按 Enter。
        拖進去就好，不用自己打路徑。</p>
-    <p class="ifnot">說「這台電腦還沒有 Python」？照它給的網址去裝，
-       Windows 安裝時記得勾「Add python.exe to PATH」。裝完再雙擊一次。
-       <br>這支工具<strong>需要 Python 3.7 以上</strong>（它用到 <code>str.isascii</code>
+    <p class="ifnot">🍎 <strong>Mac</strong>：跳出要你安裝「開發者工具」的視窗？按「安裝」，裝完再雙擊一次。
+       雙擊開出來的那個視窗這時會印 <code>這台電腦還沒有能用的 Python(要 3.7 以上)。</code>，
+       意思是 Python 還沒裝好，不是工具壞了。不想裝開發者工具的話，照它給的網址去 python.org 下載 macOS 版也可以，
+       步驟在<a href="../../start.html">第 0 課操作五</a>。
+       <span class="small">（這一段是照雙擊檔的程式寫的；沒裝開發者工具的 Mac 上實際會不會跳那個視窗、視窗上的字長怎樣，<u>本站還沒實測</u>。）</span></p>
+    <p class="ifnot"><strong>Windows</strong>：視窗印出英文 <code>This computer does not have Python yet.</code>
+       （意思是「這台電腦還沒有 Python」）？照它給的網址去裝，
+       安裝畫面上如果有「Add python.exe to PATH」就記得勾。裝完再雙擊一次。</p>
+    <p class="ifnot">這支工具<strong>需要 Python 3.7 以上</strong>（它用到 <code>str.isascii</code>
        與 <code>sys.stdout.reconfigure</code>，兩個都是 3.7 才有的）。
        今天從 python.org 下載到的一定夠新；會不夠的情況是
-       <u>這台電腦本來就裝著一個很舊的 python</u> ——
-       那兩個雙擊檔只確認 python 叫得起來，<strong>不會比對版本號</strong>，
-       所以真的踩到的話，改用指令並把 <code>python3</code> 換成新的那一支。</p>
+       <u>這台電腦本來就裝著一個很舊的 python</u>。
+       Mac 那個雙擊檔會真的跑一次 <code>python3</code>，確認是 3.7 以上才用，不夠新就當成沒有；
+       Windows 那個雙擊檔只確認 python 叫得起來，<strong>不會比對版本號</strong>，
+       所以在 Windows 上真的踩到的話，改用指令並把 <code>python</code> 換成新的那一支。</p>
   </div></div>
 
   <div class="step"><div class="step-n">4</div><div>
     <p><strong>打你要接收的球員名字。</strong>打一部分就好，例如 <code>Chin-Feng</code>。</p>
-    <p class="seen">它會把符合的都列出來，前面有編號：</p>
+    <div class="seen"><b>它會把符合的都列出來，前面有編號</b>
     <pre><code>    1. Chin-Feng Chen           背號 52  跑壘速度 78</code></pre>
+    </div>
     <p>打那個編號，按 Enter。</p>
     <p class="ifnot">「找不到名字含 ○○ 的球員」→ 名冊是<strong>英文</strong>的，
        打中文一定找不到。換個拼法，或只打兩三個字母。</p>
@@ -379,11 +399,10 @@
         那是修補之前的狀況。）</li>
     <li><strong>能改三件、不能改的有理由</strong> 其他能力欄位不是 0-99 的刻度
         （守備最大 50、臂力最大 15），換球隊在遊戲裡做，加新球員做不到。</li>
-    <li><strong>第一格不是第 0 欄</strong> 每一行開頭是<u>這一列的識別碼</u>
-        （9 位十六進位字串，沒有欄號），它後面才是 46 個欄位。
-        <code>--export</code> 出來的 <code>id</code> 欄就是它，是配對用的鑰匙，絕對不要動。</li>
     <li><strong>要做整包模組走另一道門</strong> <code>--export</code> 成 CSV、
         用 Excel 改完 <code>--import</code> 回去。表裡有任何一格不合格<u>整張擋下，不會寫一半</u>。
+        CSV 的 <code>id</code> 欄是<u>這一列的識別碼</u>（每一行開頭那串 9 位十六進位字串，不是第 0 欄），
+        是配對用的鑰匙，絕對不要動。
         本站實際拿旅外名單接收過 12 個位置(見<a href="#batch">上面那一段</a>)。</li>
     <li><strong>這招不是本站發明的</strong> 2009 年的台灣名冊說明書寫著
         「移除 Aaron Sele 並給予臉皮編號」——
@@ -392,6 +411,27 @@
         沒測過既有王朝存檔、名字長度上限不是從遊戲程式量出來的
         （22 守的是單一欄位，而九份名冊裡單一欄位最長只有 15）。</li>
   </ul>
+
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p><a href="../../plan.html#a"><strong>① 入門班</strong></a> 第 4／6 堂</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../backup/index.html">← 上一堂：備份與還原 SOP</a>
+      <a class="btn" href="../swap-face/index.html">下一堂：幫球員換一張臉 →</a>
+    </div>
+    <p><a href="../../plan.html#d"><strong>④ 年度更新班</strong></a> 第 3／9 堂</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../backup/index.html">← 上一堂：備份與還原 SOP</a>
+      <a class="btn" href="../stats-to-ratings/index.html">下一堂：把真實成績換算成能力值 →</a>
+    </div>
+    <p><a href="../../plan.html#e"><strong>⑤ 發布班</strong></a> 第 3／5 堂</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../backup/index.html">← 上一堂：備份與還原 SOP</a>
+      <a class="btn" href="../pack-a-mod/index.html">下一堂：把你改好的東西打包成一包 →</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
 
   <h2 id="how-it-works">這支腳本在做什麼</h2>
   <p>不想讀程式碼也沒關係，這一段把它的流程講完。</p>
@@ -592,7 +632,7 @@
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 
 """
@@ -700,6 +740,7 @@ mvp_player.py —— 把遊戲裡的一位球員改成你想要的球員。
 
 —— toni的MVP模組補習班
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 
 import csv
 import io
@@ -2610,6 +2651,6 @@ if __name__ == '__main__':
        <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

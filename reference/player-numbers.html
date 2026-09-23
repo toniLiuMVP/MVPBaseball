@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/player-numbers.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="兩套球員編號 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="每位球員同時掛著兩個完全無關的號碼:4 位數決定大頭照與播報語音,c### 決定臉皮。而遊戲裡的臉皮檔只有 894 個,901 以上一個都不存在。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/reference/player-numbers.html">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>兩套球員編號 — toni的MVP模組補習班</title>
+<title>兩套球員編號 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="每位球員同時掛著兩個完全無關的號碼:4 位數決定大頭照與播報語音,c### 決定臉皮。而遊戲裡的臉皮檔只有 894 個,901 以上一個都不存在。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -98,7 +108,7 @@
   <p>拿十五位同時有大頭照、語音、臉皮三種素材的球員來看
      （<u>這十五組數字你重現不了</u> —— 它們量自本站測試機上那份 2009 年台灣之光名冊，
      遊戲現在裝著的那份名單裡已經沒有這些人）：</p>
-  <div class="tablewrap"><table class="stack">
+  <div class="tablewrap"><table class="keepgrid">
     <thead><tr><th>球員</th><th class="num">四位數<br><span class="small">大頭照 + 語音</span></th>
       <th class="num">臉皮</th></tr></thead>
     <tbody>
@@ -152,11 +162,11 @@
     <p>本站拿<u>剛安裝好的原版</u>對了一遍：</p>
     <div class="tablewrap"><table>
       <tbody>
-        <tr><td><code>portrait.big</code> 裡檔名是四位數字的圖</td><td class="num">1,487</td></tr>
-        <tr><td>名冊裡非 0 的 <code>audioid</code></td><td class="num">1,300</td></tr>
-        <tr class="hi"><td><strong>兩邊都有的</strong></td><td class="num"><strong>1,232</strong>（94.8%）</td></tr>
-        <tr><td>有號碼但沒有圖的</td><td class="num">68</td></tr>
-        <tr><td>有圖但沒有人用那個號碼的</td><td class="num">255</td></tr>
+        <tr><th scope="row"><code>portrait.big</code> 裡檔名是四位數字的圖</th><td class="num">1,487</td></tr>
+        <tr><th scope="row">名冊裡非 0 的 <code>audioid</code></th><td class="num">1,300</td></tr>
+        <tr class="hi"><th scope="row"><strong>兩邊都有的</strong></th><td class="num"><strong>1,232</strong>（94.8%）</td></tr>
+        <tr><th scope="row">有號碼但沒有圖的</th><td class="num">68</td></tr>
+        <tr><th scope="row">有圖但沒有人用那個號碼的</th><td class="num">255</td></tr>
       </tbody>
     </table></div>
     <p>所以「照片檔名 ＝ 球員的 <code>audioid</code>」<strong>不是推測，是對得起來的</strong>。
@@ -471,6 +481,6 @@ c695.fsh  → models.big  ✔</code></pre>
        <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

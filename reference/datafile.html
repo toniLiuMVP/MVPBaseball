@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/reference/datafile.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="總設定檔 datafile — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="MVP Baseball 2005 的 datafile.txt：4.2 MB 純文字、21,548 行、EA 自己把欄位名稱寫在檔案裡。攝影機、音量、打擊物理全在這一個檔。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/reference/datafile.html">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>總設定檔 datafile — toni的MVP模組補習班</title>
+<title>總設定檔 datafile — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="MVP Baseball 2005 的 datafile.txt：4.2 MB 純文字、21,548 行、EA 自己把欄位名稱寫在檔案裡。攝影機、音量、打擊物理全在這一個檔。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -46,16 +56,16 @@
   <h2>先看規模</h2>
   <div class="tablewrap"><table>
     <tbody>
-      <tr><td><code>data\datafile\datafile.big</code> 的大小</td><td class="num">2,857,593 bytes</td></tr>
-      <tr><td>裡面有幾個項目</td><td class="num">460</td></tr>
-      <tr class="hi"><td>全部解開之後合計</td><td class="num">14,095,446 bytes</td></tr>
-      <tr class="hi"><td>其中最大的 <code>datafile.txt</code></td><td class="num">4,392,183 bytes</td></tr>
-      <tr><td><code>datafile.txt</code> 有幾行</td><td class="num">21,548</td></tr>
+      <tr><th scope="row"><code>data\datafile\datafile.big</code> 的大小</th><td class="num">2,857,593 bytes</td></tr>
+      <tr><th scope="row">裡面有幾個項目</th><td class="num">460</td></tr>
+      <tr class="hi"><th scope="row">全部解開之後合計</th><td class="num">14,095,446 bytes</td></tr>
+      <tr class="hi"><th scope="row">其中最大的 <code>datafile.txt</code></th><td class="num">4,392,183 bytes</td></tr>
+      <tr><th scope="row"><code>datafile.txt</code> 有幾行</th><td class="num">21,548</td></tr>
     </tbody>
   </table></div>
   <p>460 個項目<strong>全部是 QFS 壓縮的純文字</strong>。解開之後總量是原檔的 4.9 倍
      —— 純文字壓得很好，這也是為什麼一個 2.8 MB 的檔裝得下 14 MB 的設定。</p>
-<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data\datafile\datafile.big --entries</code></pre>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data/datafile/datafile.big --entries</code></pre>
   <p class="small">會列出 460 個項目與每個項目解開後是什麼。工具在<a href="../tutorials/fel-toolkit/index.html">介面萬用工具</a>那一課。</p>
 
   <h2 id="format">一行長什麼樣</h2>
@@ -444,7 +454,7 @@ obj2.o  obj3.o  obj4.o  pla1.o  pla2.o  roof.o  <span class="hl">tran.o</span></
     <div class="step-n">1</div>
     <div>
       <p>先把 <code>datafile.big</code> 裡有什麼列出來：</p>
-<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data\datafile\datafile.big --entries</code></pre>
+<pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --big data/datafile/datafile.big --entries</code></pre>
     </div>
   </div>
   <div class="step">
@@ -505,6 +515,6 @@ obj2.o  obj3.o  obj4.o  pla1.o  pla2.o  roof.o  <span class="hl">tran.o</span></
        <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

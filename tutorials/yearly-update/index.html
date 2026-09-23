@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/yearly-update/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="一次更新整個年度 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="把整個遊戲換成新一年：名冊、能力值、臉、大頭照、語音、開機畫面、賽程。這一課不教任何新技術，只回答「先做哪一件、做完怎麼驗、卡住回哪一堂、全部做完怎麼一次還原」。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/yearly-update/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>一次更新整個年度 — toni的MVP模組補習班</title>
+<title>一次更新整個年度 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="把整個遊戲換成新一年：名冊、能力值、臉、大頭照、語音、開機畫面、賽程。這一課不教任何新技術，只回答「先做哪一件、做完怎麼驗、卡住回哪一堂、全部做完怎麼一次還原」。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -43,35 +53,25 @@
   </div>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix" id="quick">
-    <p class="card-h">⚡ 只想趕快做完？照這八步</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這個順序，每一步點進那一課（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
-      <li>先確認備份在（<strong>這一步不能跳</strong>）
+      <li><a href="../backup/index.html">先把整個遊戲資料夾複製一份</a>（做法看上面 🛟 那張卡，<strong>這一步不能跳</strong>），
+          再把遊戲資料夾和那份複本一起交給檢查腳本，【3】那一段列出的每一個檔都要是「內容一致」
   <p class="small">Windows：</p>
-  <pre><code>python mvp_check_backup.py "&lt;遊戲資料夾&gt;"</code></pre>
+  <pre><code>python mvp_check_backup.py "&lt;遊戲資料夾&gt;" "&lt;備份資料夾&gt;"</code></pre>
   <p class="small">Mac / Linux：</p>
-  <pre><code>python3 mvp_check_backup.py "&lt;遊戲資料夾&gt;"</code></pre></li>
-      <li>名冊：整批匯出成 CSV，用 Excel 改完再匯回去
+  <pre><code>python3 mvp_check_backup.py "&lt;遊戲資料夾&gt;" "&lt;備份資料夾&gt;"</code></pre>
+  <p class="small">這支檢查腳本只看幾個核心檔，這一輪要動的大頭照、開機畫面、語音檔它都看不到 ——
+     真正的保險是那一份整包複本。</p></li>
+      <li><a href="../make-a-player/index.html">名冊：整批匯出成 CSV，用 Excel 改完再匯回去</a>
   <p class="small">Windows：</p>
   <pre><code>python mvp_player.py "&lt;遊戲資料夾&gt;" --export players.csv</code></pre>
   <p class="small">Mac / Linux：</p>
@@ -80,49 +80,55 @@
   <pre><code>python mvp_player.py "&lt;遊戲資料夾&gt;" --import players.csv --apply</code></pre>
   <p class="small">Mac / Linux：</p>
   <pre><code>python3 mvp_player.py "&lt;遊戲資料夾&gt;" --import players.csv --apply</code></pre></li>
-      <li>能力值：用真實成績算，不要用手感填
+      <li><a href="../stats-to-ratings/index.html">能力值：用真實成績算，不要用手感填</a>
   <p class="small">Windows：</p>
-  <pre><code>python mvp_ratings.py --fit "&lt;遊戲資料夾&gt;"</code></pre>
+  <pre><code>python mvp_ratings.py --convert stats.csv --out ratings.csv</code></pre>
   <p class="small">Mac / Linux：</p>
-  <pre><code>python3 mvp_ratings.py --fit "&lt;遊戲資料夾&gt;"</code></pre>
+  <pre><code>python3 mvp_ratings.py --convert stats.csv --out ratings.csv</code></pre>
   <p class="small">Windows：</p>
   <pre><code>python mvp_ratings.py --write "&lt;遊戲資料夾&gt;" ratings.csv --apply</code></pre>
   <p class="small">Mac / Linux：</p>
   <pre><code>python3 mvp_ratings.py --write "&lt;遊戲資料夾&gt;" ratings.csv --apply</code></pre></li>
-      <li>臉：指到一張現成的臉
+      <li><a href="../swap-face/index.html">臉：指到一張現成的臉</a>
+          （要做全新的臉，改看<a href="../new-face/index.html">做一張全新的臉</a>）
   <p class="small">Windows：</p>
   <pre><code>python mvp_swap_face.py "&lt;遊戲資料夾&gt;" --find Ohtani</code></pre>
   <p class="small">Mac / Linux：</p>
-  <pre><code>python3 mvp_swap_face.py "&lt;遊戲資料夾&gt;" --find Ohtani</code></pre></li>
-      <li>大頭照：先查編號，再換圖
+  <pre><code>python3 mvp_swap_face.py "&lt;遊戲資料夾&gt;" --find Ohtani</code></pre>
+  <p class="small">這一行只查不改；真正換的那一步照那一課的速解做。</p></li>
+      <li><a href="../swap-portrait/index.html">大頭照：先查編號，再換圖</a>
   <p class="small">Windows：</p>
   <pre><code>python mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --find Ohtani</code></pre>
   <p class="small">Mac / Linux：</p>
-  <pre><code>python3 mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --find Ohtani</code></pre></li>
-      <li>語音：把播報員唸的名字換掉
+  <pre><code>python3 mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --find Ohtani</code></pre>
+  <p class="small">這一行只查不改；真正換的那一步照那一課的速解做。</p></li>
+      <li><a href="../make-voice/index.html">語音：把播報員唸的名字換掉</a>
   <p class="small">Windows：</p>
   <pre><code>python mvp_audio.py "&lt;聲音檔&gt;" --list</code></pre>
   <p class="small">Mac / Linux：</p>
-  <pre><code>python3 mvp_audio.py "&lt;聲音檔&gt;" --list</code></pre></li>
-      <li>開機畫面與賽程年份
+  <pre><code>python3 mvp_audio.py "&lt;聲音檔&gt;" --list</code></pre>
+  <p class="small">這一行只查不改；真正換的那一步照那一課的速解做。</p></li>
+      <li><a href="../swap-splash/index.html">開機畫面</a>與<a href="../change-schedule-year/index.html">賽程年份</a>
   <p class="small">Windows：</p>
   <pre><code>python mvp_swap_screen.py "&lt;遊戲資料夾&gt;" --info</code></pre>
   <p class="small">Mac / Linux：</p>
   <pre><code>python3 mvp_swap_screen.py "&lt;遊戲資料夾&gt;" --info</code></pre>
+  <p class="small">上面這一行只查不改，真正換開機畫面照那一課的速解做；下面賽程這一行就是真的改。</p>
   <p class="small">Windows：</p>
   <pre><code>python mvp_shift_schedule_year.py "&lt;路徑&gt;/schedule.big" 2040 --apply</code></pre>
   <p class="small">Mac / Linux：</p>
   <pre><code>python3 mvp_shift_schedule_year.py "&lt;路徑&gt;/schedule.big" 2040 --apply</code></pre></li>
-      <li>打包成一包給別人裝
+      <li><a href="../pack-a-mod/index.html">列出這一輪改了哪些檔</a>（要打包給別人，看那一課）
   <p class="small">Windows：</p>
   <pre><code>python mvp_pack.py "&lt;遊戲資料夾&gt;" --scan</code></pre>
   <p class="small">Mac / Linux：</p>
   <pre><code>python3 mvp_pack.py "&lt;遊戲資料夾&gt;" --scan</code></pre></li>
     </ol>
-    <p class="tail">會寫檔的那幾支都是<strong>不加 <code>--apply</code> 就只預覽</strong>、
+    <p class="tail">會動遊戲檔的那幾支都是<strong>不加 <code>--apply</code> 就只預覽</strong>、
        第一次寫入前自動備份、<code>--restore</code> 可以還原
-       （<u>第 3 步那一支是 <code>--restore-write</code></u>）。
-       第 1 步、以及第 8 步上面那一行 <code>--scan</code> 是<u>全程唯讀</u>的，
+       （<u>第 3 步那一支是 <code>--restore-write</code></u>；每一支各一行，<strong>要倒著跑</strong>，
+       清單在<a href="#undo">做到一半想全部退回去</a>）。
+       第 1 步的檢查腳本、以及第 8 步那一行 <code>--scan</code> 是<u>全程唯讀</u>的，
        不寫任何檔，也就沒有 <code>--apply</code> 要加、沒有東西要還原。
        每一條都給了兩種寫法：<strong>Windows 打 <code>python</code>、Mac 與 Linux 打 <code>python3</code></strong>，
        挑你那台的那一行複製就好。
@@ -137,7 +143,7 @@
        那個身分寫在名冊裡。名冊還沒改就先換大頭照，你換的是上一個球員的照片。</li>
     <li><strong>八個備份不等於一個備份。</strong> 每一支腳本各自備份自己動的檔，
        備份檔名也各不相同。做到第六堂想整個退回去的時候，
-       你需要知道有哪八個還原指令、以及要不要照相反的順序跑。</li>
+       你需要知道每一堂的還原指令，而且要照相反的順序跑。</li>
     <li><strong>「做完了」跟「真的成了」是兩件事。</strong> 腳本說寫入成功，
        不代表你進遊戲會看到。每一階段各有一個便宜的確認方式。</li>
   </ul>
@@ -169,7 +175,8 @@
         <td data-label="做什麼"><a href="../backup/index.html">備份與還原 SOP</a></td>
         <td data-label="動到的檔">不動任何檔（只檢查）</td>
         <td data-label="時間">10 分</td>
-        <td data-label="做完怎麼驗（不進遊戲）">腳本會列出<u>哪幾個檔已經有備份、哪幾個還沒有</u>。標著「沒有備份」的先處理完再往下</td></tr>
+        <td data-label="做完怎麼驗（不進遊戲）">把遊戲資料夾和你那份整包複本一起交給檢查腳本，
+            【3】那一段列出的每一個檔都要是「內容一致」。它只看幾個核心檔，<u>大頭照、開機畫面、語音檔它看不到</u></td></tr>
       <tr class="hi">
         <td data-label="第">2</td>
         <td data-label="做什麼"><a href="../make-a-player/index.html">把一位球員改成你想要的球員</a><br>
@@ -254,39 +261,50 @@
     </tbody>
   </table></div>
   <p><code>attrib.dat</code> 被四堂共用，是這一輪<u>最該小心的一個檔</u>。
-     好消息是那四堂各自留下不同檔名的備份，彼此不會蓋掉對方。</p>
+     好消息是會寫它的那三堂（名冊、能力值、臉）各自留下不同檔名的備份，彼此不會蓋掉對方；
+     但還原要倒著來，見下面。</p>
 
-  <h2>做到一半想全部退回去</h2>
-  <p>每一堂各一行，<strong>順序不重要</strong> —— 每支工具還原的是自己那個檔的備份，
-     互不干涉。只跑你真的做過的那幾行：</p>
+  <h2 id="undo">做到一半想全部退回去</h2>
+  <p><code>attrib.dat</code> 被三堂寫過（名冊、能力值、臉），每一支的還原都是把整份名冊退回
+     <u>它第一次動手之前</u>的樣子，所以<strong>要倒著跑：你最後做的那一堂先還原</strong>。
+     順序反了，前面那一堂的修改會被後面那一堂的備份帶回來，而且每一支都照樣說還原成功，不會提醒你。
+     下面已照這一課的順序倒過來排；如果你不是照這一課的順序做的，就照你自己做的順序倒過來（每一支以你第一次用它的時間為準）。
+     只跑你真的做過的那幾行：</p>
+  <p class="small">本站用一份四位球員的測試名冊實測過：名冊、能力值、臉三支都寫過之後，照做的順序還原，
+     三支都印還原成功，名冊卻還留著名冊與能力值那兩堂的修改；倒著跑，才逐位元組回到動手之前。</p>
   <p class="small">Windows：</p>
-  <pre><code>python mvp_player.py "&lt;遊戲資料夾&gt;" --restore</code></pre>
+  <pre><code>python mvp_shift_schedule_year.py "&lt;路徑&gt;/schedule.big" --restore</code></pre>
   <p class="small">Mac / Linux：</p>
-  <pre><code>python3 mvp_player.py "&lt;遊戲資料夾&gt;" --restore</code></pre>
-  <p class="small">Windows：</p>
-  <pre><code>python mvp_ratings.py --restore-write "&lt;遊戲資料夾&gt;"</code></pre>
-  <p class="small">Mac / Linux：</p>
-  <pre><code>python3 mvp_ratings.py --restore-write "&lt;遊戲資料夾&gt;"</code></pre>
-  <p class="small">Windows：</p>
-  <pre><code>python mvp_swap_face.py "&lt;遊戲資料夾&gt;" --restore</code></pre>
-  <p class="small">Mac / Linux：</p>
-  <pre><code>python3 mvp_swap_face.py "&lt;遊戲資料夾&gt;" --restore</code></pre>
-  <p class="small">Windows：</p>
-  <pre><code>python mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --restore</code></pre>
-  <p class="small">Mac / Linux：</p>
-  <pre><code>python3 mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --restore</code></pre>
-  <p class="small">Windows：</p>
-  <pre><code>python mvp_audio.py "&lt;聲音檔&gt;" --restore</code></pre>
-  <p class="small">Mac / Linux：</p>
-  <pre><code>python3 mvp_audio.py "&lt;聲音檔&gt;" --restore</code></pre>
+  <pre><code>python3 mvp_shift_schedule_year.py "&lt;路徑&gt;/schedule.big" --restore</code></pre>
   <p class="small">Windows：</p>
   <pre><code>python mvp_swap_screen.py "&lt;遊戲資料夾&gt;" --restore</code></pre>
   <p class="small">Mac / Linux：</p>
   <pre><code>python3 mvp_swap_screen.py "&lt;遊戲資料夾&gt;" --restore</code></pre>
   <p class="small">Windows：</p>
-  <pre><code>python mvp_shift_schedule_year.py "&lt;路徑&gt;/schedule.big" --restore</code></pre>
+  <pre><code>python mvp_audio.py "&lt;聲音檔&gt;" --restore</code></pre>
   <p class="small">Mac / Linux：</p>
-  <pre><code>python3 mvp_shift_schedule_year.py "&lt;路徑&gt;/schedule.big" --restore</code></pre>
+  <pre><code>python3 mvp_audio.py "&lt;聲音檔&gt;" --restore</code></pre>
+  <p class="small">Windows：</p>
+  <pre><code>python mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --restore</code></pre>
+  <p class="small">Mac / Linux：</p>
+  <pre><code>python3 mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --restore</code></pre>
+  <p class="small">Windows：</p>
+  <pre><code>python mvp_swap_face.py "&lt;遊戲資料夾&gt;" --restore</code></pre>
+  <p class="small">Mac / Linux：</p>
+  <pre><code>python3 mvp_swap_face.py "&lt;遊戲資料夾&gt;" --restore</code></pre>
+  <p class="small">下面這一組只有做了「做一張全新的臉」那個選配才需要（還原 <code>models.big</code>）。</p>
+  <p class="small">Windows：</p>
+  <pre><code>python mvp_new_face.py "&lt;遊戲資料夾&gt;" --restore</code></pre>
+  <p class="small">Mac / Linux：</p>
+  <pre><code>python3 mvp_new_face.py "&lt;遊戲資料夾&gt;" --restore</code></pre>
+  <p class="small">Windows：</p>
+  <pre><code>python mvp_ratings.py --restore-write "&lt;遊戲資料夾&gt;"</code></pre>
+  <p class="small">Mac / Linux：</p>
+  <pre><code>python3 mvp_ratings.py --restore-write "&lt;遊戲資料夾&gt;"</code></pre>
+  <p class="small">Windows：</p>
+  <pre><code>python mvp_player.py "&lt;遊戲資料夾&gt;" --restore</code></pre>
+  <p class="small">Mac / Linux：</p>
+  <pre><code>python3 mvp_player.py "&lt;遊戲資料夾&gt;" --restore</code></pre>
   <p class="small">⚠️ 注意能力值那一堂用的是 <code>--restore-write</code> 不是 <code>--restore</code>，
      因為它另外有一個唯讀的分析模式，兩個要分得開。</p>
 
@@ -330,18 +348,28 @@
     <li><strong>只有兩條硬性先後</strong> 備份要最先；名冊要在
         能力值／臉／大頭照／語音之前 —— 因為那四樣都是對著某一位球員做的。</li>
     <li><strong>開機畫面與賽程不依賴任何東西</strong>，卡住的時候可以先做這兩堂。</li>
-    <li><strong>每一支會寫檔的工具都是不加 <code>--apply</code> 就只預覽</strong>，
+    <li><strong>每一支會動遊戲檔的工具都是不加 <code>--apply</code> 就只預覽</strong>，
         第一次寫入前自動備份，各自有一行還原（能力值那一支是
-        <code>--restore-write</code>）；還原順序不重要。
+        <code>--restore-write</code>）；要全部退回去就倒著還原（最後做的先還原）。
         第 1 步的備份檢查與第 8 步的 <code>--scan</code> 全程唯讀，沒有東西要還原。</li>
     <li><strong>最該小心的檔是 <code>attrib.dat</code></strong>，四堂共用它，
-        但四堂的備份檔名不同，不會互相蓋掉。</li>
+        會寫它的那三堂備份檔名不同，不會互相蓋掉；但還原要倒著來，見上面。</li>
     <li><strong>每一階段都有不必進遊戲的驗證方式</strong>，語音那一堂還可以直接用耳朵聽。</li>
     <li><strong>最有用的一行是 <code>mvp_pack.py --scan</code></strong>，
         它掃出來的就是「你這一年到底改了什麼」。</li>
     <li><strong>本站沒驗的</strong> 這個順序是從各堂實際讀寫哪個檔推出來的，
         沒有找學生照著跑過；總時數 113 分是各堂標示時間的加總，不是計時量到的。</li>
   </ul>
+
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p><a href="../../plan.html#d"><strong>④ 年度更新班</strong></a> 第 1／9 堂</p>
+    <div class="btnrow">
+      <a class="btn" href="../backup/index.html">下一堂：備份與還原 SOP →</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
 
   <h2>接下來</h2>
   <p>整年做完想給別人裝，去<a href="../pack-a-mod/index.html">打包成一包</a>；
@@ -355,6 +383,6 @@
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

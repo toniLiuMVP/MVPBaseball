@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/fix-chinese/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="中文版配大球場就跳出 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="二十年來大家用英文版玩,因為中文版配大球場一定跳出。本站把執行檔反組譯到底,找出真正的原因:遊戲寫死了一塊 64 MB 的記憶體池,而中文字型光是展開成貼圖就吃掉 13.50 MB。兩個地方各改一個位元組就好了。含完整研究過程與十二條走錯的路。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/fix-chinese/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>中文版配大球場就跳出 — toni的MVP模組補習班</title>
+<title>中文版配大球場就跳出 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="二十年來大家用英文版玩,因為中文版配大球場一定跳出。本站把執行檔反組譯到底,找出真正的原因:遊戲寫死了一塊 64 MB 的記憶體池,而中文字型光是展開成貼圖就吃掉 13.50 MB。兩個地方各改一個位元組就好了。含完整研究過程與十二條走錯的路。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -34,9 +44,10 @@
   <p class="lede">很多人是<u>退而求其次玩英文版</u>的 —— 不是不想看中文，
      是中文版一裝上比較大的球場就會在讀取條跑完的那一瞬間跳出，沒有任何錯誤訊息。
      這件事卡了二十年，社群的結論是「球場檔不要超過 10MB」。
-     <strong>本站把執行檔反組譯到底，發現真正卡住的東西跟球場大小沒有關係，
+     <strong>本站把執行檔反組譯到底，發現真正卡住的不是「球場檔不能超過 10MB」那回事，
      而且兩個地方各改一個位元組就解決了。</strong>
-     這一頁把答案、完整的研究過程、以及我們走錯的十二條路全部寫出來。</p>
+     這一頁把答案、完整的研究過程、以及我們走錯的十二條路全部寫出來。
+     照原版光碟安裝的那一份做不到，第 2 步的唯讀檢查會直接告訴你。</p>
 
   <div class="grid">
     <div class="card"><p class="card-h">難度</p><p>★☆☆ 一行指令</p></div>
@@ -46,28 +57,16 @@
   </div>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix" id="quick">
-    <p class="card-h">⚡ 只想趕快做完？照這五步</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
+    <p class="small">下面照 Mac 寫法。Windows 的話：切到桌面改打 <code>cd %USERPROFILE%\Desktop</code>，<code>python3</code> 一律換成 <code>python</code>（說不是內部或外部命令就改打 <code>py -3</code>）。</p>
     <ol>
       <li>下載 <a href="../run-in-2026/mvp_modernize.py" download>mvp_modernize.py</a>，<strong>從「下載」資料夾拖到桌面</strong>（沒拖會出現 <code>can't open file</code>），然後切到桌面<br>
   <pre><code>cd ~/Desktop</code></pre></li>
@@ -82,8 +81,7 @@
     </ol>
     <p class="tail">後悔的話，這一行還原：</p>
 <pre><code>python3 mvp_modernize.py "〔路徑〕" --restore</code></pre>
-  <p class="tail">Windows 的話：切到桌面改打 <code>cd %USERPROFILE%\Desktop</code>，<code>python3</code> 一律換成 <code>python</code>（說不是內部或外部命令就改打 <code>py -3</code>）。
-       <strong>第一次建議只做 <code>--pool</code></strong>，三個參數一起改，萬一出事你分不出是哪一個造成的。
+  <p class="tail"><strong>第一次建議只做 <code>--pool</code></strong>，三個參數一起改，萬一出事你分不出是哪一個造成的。
        想知道那顆 64 MB 是怎麼找到的、以及本站走錯的十二條路，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
   </div>
 
@@ -98,7 +96,7 @@
      這個數字沒有任何理由還要維持。<strong>把 <code>04</code> 改成 <code>08</code> 就是 128 MB</strong>，
      中文版配大球場就再也不會跳出，而且中文一個字都不用砍。</p>
 
-  <div class="card" style="border-left:4px solid #2e7d32">
+  <div class="card grass">
     <p class="card-h">實測（2026-08-28，班主任的機器）</p>
     <div class="tablewrap"><table class="stack">
       <thead><tr><th>記憶體池</th><th>中文語系 + RFK 大球場</th><th>當機位址</th></tr></thead>
@@ -169,7 +167,7 @@
   </table></div>
   <p>門檻確實框出來了，方向也「有效」—— 砍到某個量以下就能玩。
      <strong>但砍字型就會缺字，而缺字正是大家不想玩中文版的原因之一。</strong></p>
-  <div class="card" style="border-left:4px solid #c62828">
+  <div class="card clay">
     <p class="card-h">轉折點：一句話問對了</p>
     <p>班主任問了一句：<strong>「為什麼一定要瘦身字型，而不能擴充該擴充的設定？」</strong></p>
     <p>那一刻整件事轉向。<u>砍字型是繞路，不是修好</u> ——
@@ -182,9 +180,9 @@
      跟中文語系檔真正用到的字對帳：</p>
   <div class="tablewrap"><table>
     <tbody>
-      <tr><td>語系檔用到的相異字元</td><td class="num">1,536</td></tr>
-      <tr><td>字型提供的字元</td><td class="num">1,529</td></tr>
-      <tr class="hi"><td><strong>語系檔要、字型沒有</strong></td><td class="num"><strong>8 個</strong></td></tr>
+      <tr><th scope="row">語系檔用到的相異字元</th><td class="num">1,536</td></tr>
+      <tr><th scope="row">字型提供的字元</th><td class="num">1,529</td></tr>
+      <tr class="hi"><th scope="row"><strong>語系檔要、字型沒有</strong></th><td class="num"><strong>8 個</strong></td></tr>
     </tbody>
   </table></div>
   <p>那 8 個是：不斷行空白、<code>©</code>、<code>®</code>、<code>™</code>，
@@ -243,7 +241,7 @@ Enable Stadium Memory Quota</pre>
   <p><strong>這個結論是錯的。</strong>那 297 行<u>全部是 Wine 自己的雜訊</u>，
      遊戲的訊息<u>一行都沒收到</u> —— 連開機就會印的都沒有。
      腳本的判斷只看「行數 &gt; 5」，所以把「什麼都沒抓到」判成了「抓到了但沒有問題」。</p>
-  <div class="card" style="border-left:4px solid #c62828">
+  <div class="card clay">
     <p class="card-h">一個測不到訊號的指標測出 0，是它自己的性質，不是資料的性質</p>
     <p>判斷邏輯後來改成：<u>先確認有沒有收到「遊戲開機一定會印」的那幾行</u>，
        沒有就判「這一輪不算數」，而不是判「沒問題」。
@@ -581,7 +579,7 @@ Enable Stadium Memory Quota</pre>
 
   <h2 id="recap">📌 重點整理</h2>
   <ul class="recap">
-    <li><strong>一句話</strong> 卡了二十年的不是球場大小，是遊戲開機時寫死跟系統要的<strong>一整塊 64 MB 記憶體池</strong>（<code>007736F0  push 0x4000000</code>），球場、字型、所有 <code>.big</code> 都從那裡面挖，把 <code>04</code> 改成 <code>08</code> 變 128 MB 就好了，中文一個字都不用砍。</li>
+    <li><strong>一句話</strong> 卡了二十年的不是「球場檔不能超過 10MB」那條線，是遊戲開機時寫死跟系統要的<strong>一整塊 64 MB 記憶體池</strong>（<code>007736F0  push 0x4000000</code>），球場、字型、所有 <code>.big</code> 都從那裡面挖，把 <code>04</code> 改成 <code>08</code> 變 128 MB 就好了，中文一個字都不用砍。</li>
     <li><strong>結論是靠對照實驗成立的</strong> 64 MB（原廠）兩次都當，而且當在同一個位址 <code>0x007D8423</code>；128 MB 可以玩、512 MB 也可以玩。兩個地方各改一個位元組、現象消失、兩個值都成立。當機那一段本身，是印完「記憶體不夠」之後<strong>沒有 <code>jmp</code> 跳走</strong>，直接拿 NULL 去填值，所以玩家看到的不是錯誤訊息，是直接回到桌面。</li>
     <li><strong>中文為什麼特別貴：13.50 MB vs 0.37 MB</strong> 中文字型的字圖集是 <strong>1024 × 512 的 4 位元圖</strong>（格式 <code>0x79</code>），而 Direct3D 8 沒有 4 位元的貼圖格式，每一張都要在執行的時候整張展開成 32 位元。展開後吃掉那顆池子的 <strong>21.1%</strong>，英文只有 0.37 MB / 0.6%，<strong>差 36.7 倍</strong>。這就是「中文單獨沒事、大球場單獨沒事、加起來才當」的真正原因。</li>
     <li><strong>4GB 補丁救不了這個當機</strong> 4GB 是 PE 檔頭的一個位元，管的是程式最多能用到多少位址空間；記憶體池是程式碼裡的一個 <code>push</code>，管的是遊戲實際跟系統要了多大一塊。塞不下是因為櫃子小，把房間從 2 坪擴到 4 坪，櫃子還是那個櫃子。兩件事都要做，但互不取代。</li>
@@ -590,6 +588,17 @@ Enable Stadium Memory Quota</pre>
     <li><strong>安全網</strong> 不加 <code>--apply</code> 就只是預覽，會把要改的每一個位元組位置列出來（本站量到 6 個：2 個記憶體池 + 4 個檔頭校驗值；換一顆執行檔總數會變，本站量到 3 到 6 都有，記憶體池那 2 個一定在）；<code>--apply</code> 會先備份成 <code>.modernizebak</code>，寫完再讀回來確認「改動的位元組剛好是預期那幾個，其他一個都沒動」；一行指令可以還原（<code>--restore</code>）；而且完全不動字型，所以中文不會缺字。改完開不起來就立刻還原並回報，<strong>不要重複嘗試更大的值</strong>。</li>
     <li><strong>本站沒驗的</strong> 沒有直接看到那行 <code>OUT OF MEMORY</code>，它走 <code>OutputDebugStringA</code>，本站在 Wine 底下沒有攔成功（真 Windows 上用 DebugView 應該看得到，但還沒實測）；分不出是「總量不夠」還是「最大的連續空塊不夠」，因為池子調大兩種都會改善；不知道 128 MB 是不是最省的值，只知道 64 不行、128 與 512 可以，門檻在那中間某處；<strong>13.50 MB 是算出來的，不是量到的</strong>，一條從字型檔量、一條從執行檔的程式碼推，兩邊在小數點後兩位對上，但都不是遊戲執行時的真實用量。</li>
   </ul>
+
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p><a href="../../plan.html#b"><strong>② 急救班</strong></a> 第 3／5 堂</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../run-in-2026/index.html">← 上一堂：2026 年的電腦怎麼跑得起 2005 年的遊戲</a>
+      <a class="btn" href="../shrink-big/index.html">下一堂：球場超過 10MB 就當機 →</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
 
   <h2 id="how-it-works">這支腳本在做什麼</h2>
   <p>這一課附了三支腳本。其中<strong>會動你檔案的是兩支</strong>（<code>mvp_font_swap.py</code> 與 <code>mvp_fix_loc.py</code>），流程是同一個形狀：<strong>先讀、再比、再預覽，你點頭了才寫</strong>。
@@ -699,7 +708,7 @@ Enable Stadium Memory Quota</pre>
      下面附的是本課自己的字型工具 <code>mvp_font_swap.py</code>，
      <strong>跟你剛才下載的那一支一個字都沒有不同</strong>（本站有自動檢查在守這件事）。</p>
   <details data-src="mvp_font_swap.py">
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（2007 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（2008 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
@@ -716,7 +725,7 @@ Enable Stadium Memory Quota</pre>
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 
 """
@@ -865,6 +874,7 @@ mvp_font_swap.py —— 一個一個換字型,找出到底是哪一個把記憶�
 
 MIT License · Copyright (c) 2026 toni · 無外部相依,Python 3.7 以上
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 
 import argparse
 import hashlib
@@ -2713,7 +2723,7 @@ if __name__ == '__main__':
   <p style="margin-top:26px">下面這一支<strong>會改你的遊戲檔</strong>（加上 <code>--fix</code> 之後）。
      本站的原則是：<strong>會動你檔案的東西，你要能在跑之前先讀完它。</strong>所以它也整支印在這裡。</p>
   <details data-src="mvp_fix_loc.py">
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1800 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1801 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
@@ -2730,7 +2740,7 @@ if __name__ == '__main__':
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 
 """
@@ -2905,6 +2915,7 @@ C 語言的 `printf` 遇到 `%s` 卻沒有對應的參數,會把**堆疊上的�
 
 MIT License · Copyright (c) 2026 toni · 無外部相依,Python 3.7 以上
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 
 import argparse
 import hashlib
@@ -4518,7 +4529,7 @@ if __name__ == '__main__':
   </details>
 
   <footer>
-    <p>本頁的每一個數字都是實際跑出來的：四種記憶體池大小的實機測試、
+    <p>本頁的每一個數字都是實際跑出來的：64、128、512 MB 三種記憶體池大小、四次實機測試、
        兩次當機的位址、24 個字型檔的字圖集格式與尺寸、1,536 vs 1,529 的字元對帳、
        四顆執行檔的熵與區段、以及改動後逐位元組的差異比對。
        推論的部分（13.50 MB 是算的、碎片化與總量分辨不出來）已在文中標明。</p>
@@ -4526,6 +4537,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

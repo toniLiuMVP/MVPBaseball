@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/edit-stance/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="換打擊姿勢與投球姿勢 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="只改一個數字,球員的打擊站姿或投球動作就換一組。而且那個數字剛好對到動作庫的組別編號,打擊 66 組對 66 組、投球 59 組對 59 組,一格不差。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/edit-stance/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>換打擊姿勢與投球姿勢 — toni的MVP模組補習班</title>
+<title>換打擊姿勢與投球姿勢 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="只改一個數字,球員的打擊站姿或投球動作就換一組。而且那個數字剛好對到動作庫的組別編號,打擊 66 組對 66 組、投球 59 組對 59 組,一格不差。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -44,30 +54,17 @@
   </div>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix" id="quick">
-    <p class="card-h">⚡ 只想趕快做完？照這五步</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
-      <li>下載 <code>mvp_edit_stance.py</code>，從「下載」資料夾拖到桌面（沒拖就會跳 <code>can't open file</code>，這是本站最常見的第一個卡點）。</li>
+      <li>下載 <code>mvp_edit_stance.py</code>。下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打（Mac 開終端機先打 <code>cd ~/Downloads</code>）。</li>
       <li>看打擊姿勢有哪些編號可以選（0 到 65）<br>
   <pre><code>python mvp_edit_stance.py "你的遊戲資料夾" --list</code></pre>
   想知道某一組到底是什麼動作，就改用 <code>--show</code><br>
@@ -79,7 +76,7 @@
       <li>確認無誤，同一行最後加 <code>--apply</code>，看到「<code>✓ 已備份原始檔:attrib.dat.bak</code>」就成了<br>
   <pre><code>python mvp_edit_stance.py "你的遊戲資料夾" --set Altuve 14 --apply</code></pre></li>
     </ol>
-    <p class="tail">改投球姿勢就加 <code>--pitch</code>（動的是 <code>pitcher.dat</code>，編號是 0 到 58）。不喜歡就還原，<code>--restore</code> 會把打擊與投球兩邊都還原，不用加 <code>--pitch</code>：</p>
+    <p class="tail">Mac / Linux 把開頭的 <code>python</code> 換成 <code>python3</code>，其餘一樣。改投球姿勢就加 <code>--pitch</code>（動的是 <code>pitcher.dat</code>，編號是 0 到 58）。不喜歡就還原，<code>--restore</code> 會把打擊與投球兩邊都還原，不用加 <code>--pitch</code>：</p>
   <pre><code>python mvp_edit_stance.py "你的遊戲資料夾" --restore</code></pre>
     <p class="tail">不放心的話，可以先讓腳本自己測自己 —— <u>不用給遊戲資料夾，也不會碰到任何遊戲檔</u>：</p>
   <pre><code>python mvp_edit_stance.py --selftest</code></pre>
@@ -87,6 +84,7 @@
        就代表這支腳本在你這台機器上是好的。
        「餌」是本站故意做出「該被擋下來」的情況，用來確認每一道把關真的會亮。</p>
     <p class="tail">想知道為什麼，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+    <p class="tail">照做卡住了？直接跳到<a href="#fix">❌ 出錯處理</a>（可以把畫面上印出來的那一行貼進那裡的搜尋框）；做完對照<a href="#ok">✅ 成功標準</a>。</p>
   </div>
 
   <h2>那個數字是什麼</h2>
@@ -136,7 +134,14 @@ SIGP%04d</code></pre>
         <span class="small">（零相依，只用 Python 內建功能，原始碼可以自己先看過）</span></li>
   </ul>
 
+  <p class="small"><strong>指令要在放腳本的那個資料夾打。</strong>瀏覽器下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter —— 開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。Mac：打開終端機，先打 <code>cd ~/Downloads</code> 按 Enter。</p>
+
   <h2>👉 你要做的事</h2>
+
+  <div class="card blue">
+    <p class="card-h">指令裡的 python 與 python3</p>
+    <p>下面範例照 Windows 寫法用 <code>python</code>；Mac 使用者把每行開頭改成 <code>python3</code>。</p>
+  </div>
 
   <p><strong>步驟 1</strong>：先看看有哪些姿勢可以選。</p>
 <pre><code>python mvp_edit_stance.py "你的遊戲資料夾" --list</code></pre>
@@ -212,20 +217,21 @@ SIGP%04d</code></pre>
      編號 0–9 那幾組的檔名是手臂角度的描述（<code>3q</code> = 四分之三、
      <code>hi</code>／<code>lo</code> = 高低），不是球員名字。</p>
 
-  <h2>✅ 成功標準</h2>
+  <h2 id="ok">✅ 成功標準</h2>
   <ul class="tick">
     <li><code>data\database\</code> 裡多了一個 <code>attrib.dat.bak</code>（跟被改的那個檔同一層，不在遊戲資料夾根目錄）</li>
     <li>再跑一次 <code>--find</code>，數字已經變成你設的那個</li>
     <li>進遊戲看那位球員打擊，站姿跟以前不一樣</li>
   </ul>
 
-  <h2>❌ 出錯處理</h2>
+  <h2 id="fix">❌ 出錯處理</h2>
   <div class="tablewrap"><table>
     <thead><tr><th>畫面說</th><th>怎麼辦</th></tr></thead>
     <tbody>
       <tr class="hi"><td class="mono">can't open file '…\mvp_*.py'</td>
-          <td><strong>檔案還在「下載」資料夾，不在桌面。</strong>
-              開檔案總管左邊點「下載」，把那個 <code>.py</code> 拖到桌面，再跑一次。
+          <td><strong>命令視窗跟腳本不在同一個資料夾。</strong>
+              打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）。
+              還是一樣的話，是檔名對不上：瀏覽器可能在檔名後面加了 <code>(1)</code>，把它改成跟指令裡一模一樣。
               <u>這是本站最常見的第一個卡點。</u></td></tr>
       <tr><td class="mono">對到 N 位球員，請打完整一點</td>
           <td><strong>這是保護，不是錯誤。</strong>名冊裡真的有同名的人
@@ -302,6 +308,17 @@ SIGP%04d</code></pre>
     <li><strong>安全網</strong> 不加 <code>--apply</code> 只是預覽，腳本只在第一次寫入時建 <code>.bak</code>、之後不覆蓋，<code>--restore</code> 會把 <code>attrib.dat</code> 與 <code>pitcher.dat</code> 兩邊都還原且不用加 <code>--pitch</code>，寫入後的複驗沒過會自動退回動手之前的樣子、並以非 0 的離開碼結束；本站在複本上測到換行符 3,248 個前後相同、混進去的裸換行 0 個、還原後與備份完全相同，而且測試期間真實遊戲檔的修改時間完全沒動。<strong>檔案大小會不會變要看位數</strong>：本站測試機那份 <code>attrib.dat</code> 的 3,247 個資料列裡有 2,368 列的姿勢值是一位數，把一位數改成兩位數，檔案就會多一個位元組（840,643 變 840,644），那是純文字名冊的正常現象、不是改壞，腳本自己會先印一行出來講。</li>
     <li><strong>本站沒驗的</strong> 這一頁自己列了三件，一是沒有進遊戲一組一組看過每個姿勢長什麼樣、只證明了數字對到那一組動作庫，二是本站測試機那份名冊裡，打擊姿勢有 4 個編號（32、53、57、62）、投球姿勢有 14 個編號沒有任何人在用（剛安裝好的原版不一樣：打擊只有 23 號沒人用、投球 59 個代號全部有人用），那些動作庫檔案都存在但設下去會不會正常沒試，三是同一組動作套在體型差很多的球員身上會不會怪，沒驗。</li>
   </ul>
+
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p><a href="../../plan.html#c"><strong>③ 外觀班</strong></a> 第 2／6 堂</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../swap-face/index.html">← 上一堂：幫球員換一張臉</a>
+      <a class="btn" href="../swap-portrait/index.html">下一堂：換球員大頭照 →</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
 
   <h2>想更進一步</h2>
   <ul class="plain">
@@ -485,7 +502,7 @@ SIGP%04d</code></pre>
   <h2 id="source">完整原始碼</h2>
   <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。不必下載也能先看過一遍。</p>
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1623 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1624 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """MVP Baseball 2005 —— 換打擊姿勢 / 投球姿勢
@@ -579,6 +596,7 @@ SIGP%04d</code></pre>
 無外部相依,Python 3.7 以上即可。
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -593,7 +611,7 @@ SIGP%04d</code></pre>
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 import argparse
 import hashlib
@@ -2122,6 +2140,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/backup/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="備份與還原 SOP — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="最常被動到的四個遊戲檔，加上暖身課請你打開的 controller.cfg，合計 3.87 MB，備份幾秒鐘就好。另外二十課還會寫到 models.big、datafile.big、mvp2005.exe、logos.big、開場動畫這些檔，本頁逐課列出。該備份哪些、放哪裡、怎麼確認備份與還原成功，附一支檢查腳本（檢查你的遊戲資料夾時全程唯讀）。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/backup/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>備份與還原 SOP — toni的MVP模組補習班</title>
+<title>備份與還原 SOP — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="最常被動到的四個遊戲檔，加上暖身課請你打開的 controller.cfg，合計 3.87 MB，備份幾秒鐘就好。另外二十課還會寫到 models.big、datafile.big、mvp2005.exe、logos.big、開場動畫這些檔，本頁逐課列出。該備份哪些、放哪裡、怎麼確認備份與還原成功，附一支檢查腳本（檢查你的遊戲資料夾時全程唯讀）。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -32,8 +42,10 @@
   <p class="crumb" style="margin-top:22px"><a href="../index.html">教學</a> › 備份與還原 SOP</p>
   <h1>備份與還原 SOP</h1>
   <p class="lede">本站三個承諾的第二條是「一定先教你備份」。這頁把那句話展開成一份可以照著做的流程。
-     先講一個量出來的結論：<strong>最常被動到的那四個遊戲檔</strong>，加上暖身課請你打開的 <code>controller.cfg</code>，一共<strong>五個</strong>，
-     合計 4,058,641 個位元組（3.87 MB），大約是遊戲 <code>data</code> 資料夾的五百分之一，備份它們比你想像的快很多。
+     <strong>主要的保險是把整個遊戲資料夾複製一份</strong>（<a href="#whole">第〇節</a>，只用滑鼠）。
+     另外有一個量出來的結論：<strong>最常被動到的那四個遊戲檔</strong>，加上暖身課請你打開的 <code>controller.cfg</code>，一共<strong>五個</strong>，
+     合計 4,058,641 個位元組（3.87 MB），大約是遊戲 <code>data</code> 資料夾的五百分之一，備份它們比你想像的快很多，
+     適合當<strong>精簡版</strong>多存一份。
      <strong>但那五個不是全部。</strong>本站有 <strong>39 課</strong>，其中 30 課會寫進遊戲檔（2026-09-05 數的）；
      核心五檔涵蓋其中 10 課，另外 20 課動的是別的檔（<code>models.big</code>、<code>datafile.big</code>、
      <code>mvp2005.exe</code>、<code>logos.big</code>、開場動畫 …）。第二節有<u>逐課的完整清單</u>，上到哪一課就照那一列多備份哪一個檔。</p>
@@ -45,10 +57,10 @@
   </div>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
        <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
+    <p><strong>「紀錄」是指這些</strong>（它們平常跟遊戲檔混在同一個資料夾裡；遊戲裝在 <code>Program Files</code> 底下時，Windows 可能把它們轉存到別處，<a href="#virtualstore">怎麼查</a>）：</p>
     <ul>
       <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
           裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
@@ -60,49 +72,160 @@
 <pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
 <pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
     <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
+       本站<u>會動到遊戲檔</u>的工具都會自己備份它要動的那一個檔
+       （純檢查用的那幾支不寫檔，沒有備份，也不需要還原），
        <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法就是你正在看的這一頁，往下讀就是。</p>
+       怎麼整包複製，看<a href="#whole">下面第〇節</a>。</p>
   </div>
 
   <div class="quickfix" id="quick">
-    <p class="card-h">⚡ 只想趕快做完？照這四步</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這五步</p>
     <ol>
-      <li>在桌面建一個<strong>帶日期</strong>的備份資料夾，裡面先開好兩層子資料夾。<br>
+      <li><strong>先把遊戲關掉，把整個遊戲資料夾複製一份</strong>到桌面或隨身碟，再把那一份改名、名字寫上今天的日期。
+          只要滑鼠跟兩個按鍵，做法與驗收看<a href="#whole">第〇節</a>。
+          <strong>這一份是主要的保險</strong>；下面第 2 到第 4 步是可以多存一份的精簡版。</li>
+      <li>精簡版：在桌面建一個<strong>帶日期</strong>的備份資料夾，裡面先開好兩層子資料夾。
+          指令裡標亮的日期換成你今天的；<strong>第二次備份一定要換日期</strong>，
+          Mac 的 <code>cp</code> 遇到同名檔會不問就直接蓋掉，第一次那份乾淨的就沒了。<br>
   <strong>Windows</strong>
-  <pre><code>mkdir "%USERPROFILE%\Desktop\MVP-backup-20260825\data\database"
-  mkdir "%USERPROFILE%\Desktop\MVP-backup-20260825\data\frontend"</code></pre>
+  <pre><code>mkdir "%USERPROFILE%\Desktop\MVP-backup-<span class="hl">20260825</span>\data\database"
+  mkdir "%USERPROFILE%\Desktop\MVP-backup-<span class="hl">20260825</span>\data\frontend"</code></pre>
   <strong>Mac</strong>
-  <pre><code>mkdir -p ~/Desktop/MVP-backup-20260825/data/database ~/Desktop/MVP-backup-20260825/data/frontend</code></pre></li>
+  <pre><code>mkdir -p ~/Desktop/MVP-backup-<span class="hl">20260825</span>/data/database ~/Desktop/MVP-backup-<span class="hl">20260825</span>/data/frontend</code></pre></li>
       <li>把五個檔複製進去，合計只有 3.87 MB。<br>
   <strong>Windows</strong>
-  <pre><code>copy "你的遊戲資料夾\controller.cfg" "%USERPROFILE%\Desktop\MVP-backup-20260825\"
-  copy "你的遊戲資料夾\data\database\attrib.dat" "%USERPROFILE%\Desktop\MVP-backup-20260825\data\database\"
-  copy "你的遊戲資料夾\data\database\pitcher.dat" "%USERPROFILE%\Desktop\MVP-backup-20260825\data\database\"
-  copy "你的遊戲資料夾\data\database\schedule.big" "%USERPROFILE%\Desktop\MVP-backup-20260825\data\database\"
-  copy "你的遊戲資料夾\data\frontend\ingame.big" "%USERPROFILE%\Desktop\MVP-backup-20260825\data\frontend\"</code></pre>
+  <pre><code>copy "你的遊戲資料夾\controller.cfg" "%USERPROFILE%\Desktop\MVP-backup-<span class="hl">20260825</span>\"
+  copy "你的遊戲資料夾\data\database\attrib.dat" "%USERPROFILE%\Desktop\MVP-backup-<span class="hl">20260825</span>\data\database\"
+  copy "你的遊戲資料夾\data\database\pitcher.dat" "%USERPROFILE%\Desktop\MVP-backup-<span class="hl">20260825</span>\data\database\"
+  copy "你的遊戲資料夾\data\database\schedule.big" "%USERPROFILE%\Desktop\MVP-backup-<span class="hl">20260825</span>\data\database\"
+  copy "你的遊戲資料夾\data\frontend\ingame.big" "%USERPROFILE%\Desktop\MVP-backup-<span class="hl">20260825</span>\data\frontend\"</code></pre>
   <strong>Mac</strong>
   <pre><code>cd "你的遊戲資料夾"
-  cp controller.cfg ~/Desktop/MVP-backup-20260825/
-  cp data/database/attrib.dat data/database/pitcher.dat data/database/schedule.big ~/Desktop/MVP-backup-20260825/data/database/
-  cp data/frontend/ingame.big ~/Desktop/MVP-backup-20260825/data/frontend/</code></pre></li>
-      <li>下載這頁的檢查腳本、<strong>拖到桌面</strong>，把遊戲資料夾跟備份資料夾一起交給它，五行都要顯示「內容一致」。<br>
+  cp controller.cfg ~/Desktop/MVP-backup-<span class="hl">20260825</span>/
+  cp data/database/attrib.dat data/database/pitcher.dat data/database/schedule.big ~/Desktop/MVP-backup-<span class="hl">20260825</span>/data/database/
+  cp data/frontend/ingame.big ~/Desktop/MVP-backup-<span class="hl">20260825</span>/data/frontend/</code></pre></li>
+      <li>下載這頁的檢查腳本 <a href="mvp_check_backup.py" download>mvp_check_backup.py</a>，瀏覽器會把它放進「下載」資料夾。
+          <strong>命令視窗要開在「下載」資料夾</strong>：Windows 打開「下載」資料夾，點一下網址列、把字刪掉改打 <code>cmd</code> 按 <span class="key">Enter</span>；
+          Mac 先打 <code>cd ~/Downloads</code>（第 3 步切進了遊戲資料夾，要先切回來）。
+          把遊戲資料夾跟備份資料夾一起交給它，五行都要顯示「內容一致」。<br>
   <strong>Windows</strong>
-  <pre><code>python mvp_check_backup.py "你的遊戲資料夾" "%USERPROFILE%\Desktop\MVP-backup-20260825"</code></pre>
+  <pre><code>python mvp_check_backup.py "你的遊戲資料夾" "%USERPROFILE%\Desktop\MVP-backup-<span class="hl">20260825</span>"</code></pre>
   <strong>Mac</strong>
-  <pre><code>python3 mvp_check_backup.py "你的遊戲資料夾" ~/Desktop/MVP-backup-20260825</code></pre></li>
-      <li>要還原：先試那一課工具的 <code>--restore</code>，不行就把備份複製回去覆蓋（<strong>先把遊戲關掉</strong>）。以還原 <code>ingame.big</code> 為例，其他檔同理換路徑。<br>
+  <pre><code>cd ~/Downloads
+  python3 mvp_check_backup.py "你的遊戲資料夾" ~/Desktop/MVP-backup-<span class="hl">20260825</span></code></pre></li>
+      <li>要還原：先試那一課工具的 <code>--restore</code>，不行就從你自己的備份放回去（<strong>先把遊戲關掉</strong>）。
+          整包備份照<a href="#restore-whole">整個資料夾換回去</a>那四步；
+          精簡版就把那個檔複製回去覆蓋，以還原 <code>ingame.big</code> 為例，其他檔同理換路徑。<br>
   <strong>Windows</strong>
-  <pre><code>copy /Y "%USERPROFILE%\Desktop\MVP-backup-20260825\data\frontend\ingame.big" "你的遊戲資料夾\data\frontend\"</code></pre>
+  <pre><code>copy /Y "%USERPROFILE%\Desktop\MVP-backup-<span class="hl">20260825</span>\data\frontend\ingame.big" "你的遊戲資料夾\data\frontend\"</code></pre>
   <strong>Mac</strong>
-  <pre><code>cp ~/Desktop/MVP-backup-20260825/data/frontend/ingame.big "你的遊戲資料夾"/data/frontend/</code></pre></li>
+  <pre><code>cp ~/Desktop/MVP-backup-<span class="hl">20260825</span>/data/frontend/ingame.big "你的遊戲資料夾"/data/frontend/</code></pre></li>
     </ol>
-    <p class="tail">指令裡的 <code>你的遊戲資料夾</code> 整段換成你自己的路徑，日期換成你今天的。
-       <strong>這五個檔只涵蓋 10 課</strong>：要上改視角、中文版修正、裝球衣、換臉皮、換大頭照、
+    <p class="tail">指令裡的 <code>你的遊戲資料夾</code> 整段換成你自己的路徑。
+       <strong>精簡版的五個檔只涵蓋 10 課</strong>：要上改視角、中文版修正、裝球衣、換臉皮、換大頭照、
        換開機畫面、換聲音、球場瘦身、關掉開場動畫、改主選單文字、換球隊隊徽、改執行檔這些課，還要多備份別的檔，
-       清單在<a href="#others">下面第二節的第二張表</a>。
+       清單在<a href="#others">下面第二節的第二張表</a>；第 1 步的整包備份沒有這個問題。
        想知道為什麼是這五個、為什麼工具自己那份備份只夠退一步，往下讀；
        只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+  </div>
+
+  <h2 id="whole">〇 · 整包複製（主要的保險）</h2>
+  <p>每一課最上面那張「先備份」卡說的就是這一件事：<strong>把整個遊戲資料夾複製一份到別的地方</strong>。
+     不用挑檔案、不用開命令視窗，也不用先讀懂後面幾節。
+     紀錄（王朝、名單、設定）叫什麼名字、放在哪一層，看<a href="#backup-first">本頁最上面那張卡</a>；
+     它們平常就在遊戲資料夾裡，整包複製會一起帶走。
+     遊戲裝在 <code>Program Files</code> 底下時可能有例外，見這一節最後那張
+     <a href="#virtualstore">「多看一個地方」</a>。
+     這一節的滑鼠步驟和視窗上的字，本站還沒在 Windows 與 Mac 上逐步實測，
+     數字對不上時怎麼辦，寫在第 4 步最後。</p>
+
+  <div class="step">
+    <div class="step-n">1</div>
+    <div>
+      <div class="step-t">先把遊戲關掉，走到遊戲資料夾的上一層</div>
+      <p class="step-why">遊戲開著的時候，可能正在寫紀錄或佔著檔案，這時複製出來的那一份不一定完整。
+         要複製的是「遊戲資料夾這個資料夾本身」，所以要站在它的上一層，才選得到它。</p>
+      <p>遊戲資料夾怎麼找，看<a href="../../start.html#findfolder">第 0 課操作零</a>
+         （找對的那一層，同時看得到 <code>data</code> 資料夾和 <code>mvp2005.exe</code>）。
+         找到之後<strong>往上退一層</strong>：Windows 按檔案總管網址列左邊的向上箭頭，
+         Mac 在 Finder 裡按 <span class="key">⌘ Cmd</span> + <span class="key">↑</span>。
+         現在看到的遊戲資料夾，就是一個資料夾圖示。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">2</div>
+    <div>
+      <div class="step-t">複製整個資料夾，貼到桌面或隨身碟</div>
+      <div class="substep">
+        <p><span class="sk">W</span><strong>Windows</strong>：在遊戲資料夾上點一下（把它選起來），按
+           <span class="key">Ctrl</span> + <span class="key">C</span>；
+           在檔案總管左邊點「桌面」（或隨身碟），在空白處點一下，按
+           <span class="key">Ctrl</span> + <span class="key">V</span>。
+           右鍵選單裡也有「複製」「貼上」，但 Windows 11 的右鍵選單長得跟 Windows 10 不一樣，用這兩個按鍵最不會找錯。</p>
+        <p><span class="sk">M</span><strong>Mac</strong>：在 Finder 裡點一下遊戲資料夾，按
+           <span class="key">⌘ Cmd</span> + <span class="key">C</span>；
+           到桌面（或隨身碟）點一下空白處，按 <span class="key">⌘ Cmd</span> + <span class="key">V</span>。
+           用右鍵選單的話是「<strong>拷貝</strong>」再「貼上項目」。
+           <u>不要選「複製」</u>：Finder 選單裡的「複製」是在原本的位置旁邊多做一份，不會放到你要的地方。</p>
+      </div>
+      <p>資料夾很大，要等一陣子（本站量過，剛安裝好的原版光是 <code>data</code> 資料夾就有 1.3 GB，
+         裝過模組的可能更大）。等複製的進度視窗自己關掉，再往下做。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">3</div>
+    <div>
+      <div class="step-t">把貼出來的那一份改名，名字寫日期</div>
+      <p class="step-why">你會做第二份、第三份。沒有日期，三個月後你分不出哪一份是「還沒裝模組之前」的。</p>
+      <p>把貼出來的資料夾選起來，Windows 按 <span class="key">F2</span>、Mac 按 <span class="key">Return</span>，名字就能改；
+         也可以按右鍵選「重新命名」（Windows 11 的新右鍵選單裡，它是一個圖示，不是文字）。
+         改成像 <code>MVP-full-20260825</code> 這樣，
+         日期換成你今天的。<u>不要改到原本那一個</u>，改的是桌面或隨身碟上新貼出來的那一份。</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-n">4</div>
+    <div>
+      <div class="step-t">驗收：兩個資料夾的大小和檔案數要一樣</div>
+      <p class="step-why">複製到一半被中斷、或是隨身碟滿了，都會留下一份看起來很像、其實不完整的備份。
+         這一步不用裝任何東西。</p>
+      <div class="substep">
+        <p><span class="sk">W</span><strong>Windows</strong>：原本的遊戲資料夾跟你貼出來的那一份，各按右鍵 →「內容」，
+           看「大小」那一行括號裡的位元組數，還有它下面寫的幾個檔案、幾個資料夾。</p>
+        <p><span class="sk">M</span><strong>Mac</strong>：兩個資料夾各選起來按 <span class="key">⌘ Cmd</span> + <span class="key">I</span>，
+           看「大小」那一行的位元組數與項目數。</p>
+      </div>
+      <p>兩份的數字要<strong>一模一樣</strong>，不是「差不多」。資料夾很大時，數字要算一下才會停，停下來的才是最後的數字。
+         本頁不寫你應該看到多少：每個人的遊戲資料夾裝過的東西不一樣，大小也不一樣。</p>
+      <div class="ifnot"><b>如果兩邊的數字不一樣</b>
+        <p>把貼出來的那一份刪掉，確認遊戲關著，從第 2 步重新複製一次。</p>
+        <p>這四步本站還沒在 Windows 與 Mac 上照著做過一次。重新複製之後，數字還是差一點點的話，
+           照頁尾「📋 回報範本」把兩邊的數字填上去，用<a href="../../report.html#bug">回報一個問題</a>那一頁寫的方式送出來。</p>
+      </div>
+      <p class="small">還想多存一份只有五個檔的精簡版、而且用腳本逐個位元組確認，第三、四節就是在教那一種；
+         不想做也沒關係，這一份整包備份就夠當退路了。</p>
+    </div>
+  </div>
+
+  <div class="card amber" id="virtualstore">
+    <p class="card-h">遊戲裝在 Program Files 底下的話，多看一個地方</p>
+    <p>Windows 對舊程式有一個相容機制：程式想把檔案寫進 <code>Program Files</code> 這種受保護的資料夾、
+       手上又沒有系統管理員權限時，Windows 會把那次寫入<strong>悄悄轉到你帳號底下的另一個資料夾</strong>。
+       微軟的說明文件寫著這個機制預設是開著的，而且只對 32 位元、沒有宣告要用哪一種權限執行、
+       也不是用系統管理員身分開的程式有效 ——
+       本站讀過 MVP 的執行檔，它正好是 32 位元、也沒有這種宣告。</p>
+    <p>所以遊戲裝在<a href="../../start.html#findfolder">第 0 課</a>說的 <code>C:\Program Files (x86)\EA SPORTS</code> 底下時，
+       <u>你的存檔和設定有可能不在遊戲資料夾裡</u>，整包複製會漏掉它們。
+       <strong>MVP 在你的電腦上會不會這樣，本站還沒在 Windows 上實測</strong>，所以請自己看一眼：
+       打開檔案總管，在網址列貼上這一行，按 <span class="key">Enter</span>：</p>
+<pre><code>%LOCALAPPDATA%\VirtualStore</code></pre>
+    <p>裡面如果有 <code>Program Files (x86)</code>（或 <code>Program Files</code>）資料夾，往下點，
+       找到跟你的遊戲資料夾同名的那一個，把它<strong>也整個複製一份</strong>，跟整包備份放在一起。
+       找不到跟遊戲同名的資料夾（或是檔案總管說找不到 <code>VirtualStore</code> 這個位置），
+       就代表沒有東西被轉走，不用管它。</p>
   </div>
 
   <h2>一 · 為什麼要備份</h2>
@@ -171,8 +294,7 @@
      <u>新增課程的人請回來更新這兩張表</u>，不然這頁會變成一份過期的安全網 ——
      這正是 2026-08-29 那次稽核抓到的問題：清單停在 10 課，而站上已經 29 課；
      2026-09-05 又抓到一次，那一次少了 10 課（其中三課動的正是核心五個檔）。
-     要自己數現在有幾課，在專案根目錄跑
-     <code>ls -1d site/tutorials/*/ | wc -l</code>。</p>
+     現在有幾課，以<a href="../index.html">教學列表</a>為準。</p>
 
   <div class="tablewrap"><table class="stack">
     <thead><tr><th>教學</th><th class="mono">會寫入的遊戲檔</th><th class="mono">工具留下的備份檔名</th></tr></thead>
@@ -235,7 +357,8 @@
     <p>五個檔的清單能用，前提是你只上上面那張表裡的課。
        只要你上了下面這張表裡的任何一課，<strong>五個檔的備份就接不住你</strong>：
        它動的檔根本不在那五個裡面，第四節的檢查腳本也不會去看它。
-       <u>上到哪一課，就照那一列多備份哪一個檔</u>，作法跟第三節完全一樣，只是換路徑。</p>
+       <u>上到哪一課，就照那一列多備份哪一個檔</u>，作法跟第三節完全一樣，只是換路徑。
+       有照<a href="#whole">第〇節</a>做整包備份的話，這些檔已經在那一份裡面了。</p>
   </div>
 
   <div class="tablewrap"><table class="stack">
@@ -370,7 +493,8 @@
        這頁採用比較保守的 0.19%，不拿使用者自己的備份夾把比例灌得更好看。</p>
     <p>換個講法更有感：光是 <code>models.big</code> 一個檔
        （561,891,312 bytes，535.9 MB），就是這五個檔加起來的 <strong>138 倍</strong>。
-       備份整個遊戲要等很久又佔空間，備份這五個檔<u>幾秒鐘就好</u>。</p>
+       所以分工是這樣：<strong>整包是主要的保險</strong>（<a href="#whole">第〇節</a>）；
+       這五個檔是空間不夠、或想多存一個時間點時的<strong>精簡版</strong>，<u>幾秒鐘就複製完</u>。</p>
   </div>
 
   <div class="card amber">
@@ -378,12 +502,13 @@
     <p>那就<strong>不只這五個檔</strong>。這張表涵蓋的是「你照本站教學自己改」的範圍。
        別人做的模組可能換掉球衣、球場、大頭照、語音，動到的檔案完全是另一批，
        <u>本站沒有實際量過任何一個社群模組動到哪些檔</u>。
-       裝第三方模組之前，最保險的做法是把<u>整個</u> <code>data</code> 資料夾複製一份，
+       裝第三方模組之前，最保險的做法是照<a href="#whole">第〇節</a>把<u>整個</u>遊戲資料夾複製一份，
        慢歸慢，但那是你唯一的退路。</p>
   </div>
 
   <h2>三 · 備份放哪</h2>
-  <p>三條規則，順序不能換：</p>
+  <p>這一節跟下一節做的是<strong>精簡版</strong>：只存五個檔。整包備份照<a href="#whole">第〇節</a>做，
+     下面三條規則一樣適用。三條規則，順序不能換：</p>
   <ul class="tick">
     <li><strong>不要放在遊戲資料夾裡面。</strong>放裡面的備份，會在你下次整理資料夾、
         重裝遊戲、或解壓縮某個模組時被一起處理掉。
@@ -398,7 +523,9 @@
     <div class="step-n">1</div>
     <div>
       <div class="step-t">在桌面建一個帶日期的備份資料夾</div>
-      <p class="step-why">名字用英數字、不要用中文，等一下的指令碰到中文資料夾名比較容易出錯。</p>
+      <p class="step-why">名字用英數字、不要用中文，等一下的指令碰到中文資料夾名比較容易出錯。
+         指令裡標亮的日期換成你今天的；<strong>第二次備份一定要換日期</strong>，
+         Mac 的 <code>cp</code> 遇到同名檔會不問就直接蓋掉，第一次那份乾淨的就沒了。</p>
       <div class="substep">
         <p><span class="sk">W</span><strong>Windows</strong>：在桌面空白處按右鍵 → 新增 → 資料夾，
            命名為 <code>MVP-backup-20260825</code>（日期換成今天）。</p>
@@ -408,10 +535,10 @@
       <p>再在裡面建兩層子資料夾：<code>data\database</code> 和 <code>data\frontend</code>。
          用指令一次建好比較快：</p>
       <p class="small"><strong>Windows</strong>（貼到命令提示字元）</p>
-<pre><code>mkdir "%USERPROFILE%\Desktop\MVP-backup-20260825\data\database"
-mkdir "%USERPROFILE%\Desktop\MVP-backup-20260825\data\frontend"</code></pre>
+<pre><code>mkdir "%USERPROFILE%\Desktop\MVP-backup-<span class="hl">20260825</span>\data\database"
+mkdir "%USERPROFILE%\Desktop\MVP-backup-<span class="hl">20260825</span>\data\frontend"</code></pre>
       <p class="small"><strong>Mac</strong>（貼到終端機）</p>
-<pre><code>mkdir -p ~/Desktop/MVP-backup-20260825/data/database ~/Desktop/MVP-backup-20260825/data/frontend</code></pre>
+<pre><code>mkdir -p ~/Desktop/MVP-backup-<span class="hl">20260825</span>/data/database ~/Desktop/MVP-backup-<span class="hl">20260825</span>/data/frontend</code></pre>
       <div class="ifnot"><b>如果那兩行報錯</b>
         <p>用滑鼠建也一樣：進備份資料夾建一個 <code>data</code>，
            進 <code>data</code> 再建 <code>database</code> 和 <code>frontend</code>。</p>
@@ -426,16 +553,16 @@ mkdir "%USERPROFILE%\Desktop\MVP-backup-20260825\data\frontend"</code></pre>
       <p class="step-why">滑鼠複製貼上也完全可以。下面的指令只是比較不會漏檔。</p>
       <p class="small"><strong>Windows</strong>：把指令裡的
          <code>你的遊戲資料夾</code> 整段換成你自己的路徑（用拖曳取得，見<a href="../../start.html">第 0 課操作二</a>）</p>
-<pre><code>copy "<span class="hl">你的遊戲資料夾</span>\controller.cfg" "%USERPROFILE%\Desktop\MVP-backup-20260825\"
-copy "<span class="hl">你的遊戲資料夾</span>\data\database\attrib.dat" "%USERPROFILE%\Desktop\MVP-backup-20260825\data\database\"
-copy "<span class="hl">你的遊戲資料夾</span>\data\database\pitcher.dat" "%USERPROFILE%\Desktop\MVP-backup-20260825\data\database\"
-copy "<span class="hl">你的遊戲資料夾</span>\data\database\schedule.big" "%USERPROFILE%\Desktop\MVP-backup-20260825\data\database\"
-copy "<span class="hl">你的遊戲資料夾</span>\data\frontend\ingame.big" "%USERPROFILE%\Desktop\MVP-backup-20260825\data\frontend\"</code></pre>
+<pre><code>copy "<span class="hl">你的遊戲資料夾</span>\controller.cfg" "%USERPROFILE%\Desktop\MVP-backup-<span class="hl">20260825</span>\"
+copy "<span class="hl">你的遊戲資料夾</span>\data\database\attrib.dat" "%USERPROFILE%\Desktop\MVP-backup-<span class="hl">20260825</span>\data\database\"
+copy "<span class="hl">你的遊戲資料夾</span>\data\database\pitcher.dat" "%USERPROFILE%\Desktop\MVP-backup-<span class="hl">20260825</span>\data\database\"
+copy "<span class="hl">你的遊戲資料夾</span>\data\database\schedule.big" "%USERPROFILE%\Desktop\MVP-backup-<span class="hl">20260825</span>\data\database\"
+copy "<span class="hl">你的遊戲資料夾</span>\data\frontend\ingame.big" "%USERPROFILE%\Desktop\MVP-backup-<span class="hl">20260825</span>\data\frontend\"</code></pre>
       <p class="small"><strong>Mac</strong></p>
 <pre><code>cd "<span class="hl">你的遊戲資料夾</span>"
-cp controller.cfg ~/Desktop/MVP-backup-20260825/
-cp data/database/attrib.dat data/database/pitcher.dat data/database/schedule.big ~/Desktop/MVP-backup-20260825/data/database/
-cp data/frontend/ingame.big ~/Desktop/MVP-backup-20260825/data/frontend/</code></pre>
+cp controller.cfg ~/Desktop/MVP-backup-<span class="hl">20260825</span>/
+cp data/database/attrib.dat data/database/pitcher.dat data/database/schedule.big ~/Desktop/MVP-backup-<span class="hl">20260825</span>/data/database/
+cp data/frontend/ingame.big ~/Desktop/MVP-backup-<span class="hl">20260825</span>/data/frontend/</code></pre>
       <div class="seen"><b>你會看到</b>
         <p>Mac 什麼都不印，<strong>沒有訊息就是成功</strong>，這是它的習慣。
            Windows 每一行會回一句表示複製了 1 個檔案的訊息，共五句
@@ -463,13 +590,19 @@ cp data/frontend/ingame.big ~/Desktop/MVP-backup-20260825/data/frontend/</code><
   <div class="card amber">
     <p class="card-h">按了下載之後，檔案跑到哪裡去了？</p>
     <p><strong>瀏覽器多半不會問你要存哪裡</strong>，它會直接放進「下載」資料夾。
-       開檔案總管（Mac 用 Finder）左邊點「<u>下載</u>」，找到那個 <code>.py</code>，
-       <strong>拖到桌面</strong>再往下做。</p>
-    <p class="small">沒做這一步的話，後面 <code>cd</code> 到桌面再執行，
-       畫面會出現 <code>can't open file</code> —— 那不是你打錯。</p>
+       不用搬它，<strong>命令視窗直接開在「下載」資料夾</strong>：</p>
+    <ul>
+      <li><strong>Windows</strong>：開檔案總管，左邊點「<u>下載</u>」，確認看得到 <code>mvp_check_backup.py</code>。
+          點一下最上面的<strong>網址列</strong>（整條會反白），把裡面的字刪掉改打 <code>cmd</code>，按 <span class="key">Enter</span>。
+          開出來的命令提示字元<strong>已經停在「下載」資料夾</strong>（就是<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。</li>
+      <li><strong>Mac</strong>：打開終端機，先打這一行，切到「下載」資料夾（第三節第 2 步切進過遊戲資料夾的話，這一行也會把你切回來）：</li>
+    </ul>
+<pre><code>cd ~/Downloads</code></pre>
+    <p class="small">下面兩步的 <code>python</code> 指令都要在這個視窗裡打。
+       命令視窗不在放腳本的那個資料夾，畫面就會出現 <code>can't open file</code> —— 那不是你打錯。</p>
   </div>
 
-  <p class="small">933 行、零相依、<strong>檢查你的遊戲資料夾與備份資料夾時全程唯讀，不會在裡面建立、修改或刪除任何檔案</strong>、附完整原始碼。
+  <p class="small">934 行、零相依、<strong>檢查你的遊戲資料夾與備份資料夾時全程唯讀，不會在裡面建立、修改或刪除任何檔案</strong>、附完整原始碼。
      唯一會寫檔的是它的自我測試（<code>--selftest</code>）：那些檔建在系統暫存資料夾裡，跑完自己刪掉，不碰你的遊戲。
      掃到一半想停就按 <code>Ctrl-C</code>：它會回一句「已中止」再停（結束碼 <code>130</code>），你的遊戲資料夾與備份資料夾一個位元組都沒有動到。
      掃描途中外接碟斷線、檔案被防毒鎖住這一類，它也會講一句人看得懂的話（結束碼 <code>2</code>），不會丟一串 Python 錯誤訊息給你自己猜。
@@ -480,6 +613,7 @@ cp data/frontend/ingame.big ~/Desktop/MVP-backup-20260825/data/frontend/</code><
     <div>
       <div class="step-t">只看遊戲資料夾</div>
       <p class="step-why">先確認該備份的五個檔都在、以及遊戲資料夾裡目前有哪些工具留下的備份。</p>
+      <p>在上面那個停在「下載」資料夾的命令視窗裡打（Mac 要先打過 <code>cd ~/Downloads</code>）：</p>
 <pre><code>python mvp_check_backup.py "<span class="hl">你的遊戲資料夾</span>"</code></pre>
       <p class="small">Mac 上把 <code>python</code> 換成 <code>python3</code>。</p>
       <div class="seen"><b>你會看到</b>
@@ -514,10 +648,11 @@ cp data/frontend/ingame.big ~/Desktop/MVP-backup-20260825/data/frontend/</code><
     <div>
       <div class="step-t">把你剛做的備份資料夾也交給它比對</div>
       <p class="step-why">這一步才是真正在驗「備份對不對」：它會逐個位元組比，不是只看檔名跟大小。</p>
+      <p>一樣在停在「下載」資料夾的那個命令視窗裡打。</p>
       <p class="small"><strong>Windows</strong></p>
-<pre><code>python mvp_check_backup.py "<span class="hl">你的遊戲資料夾</span>" "%USERPROFILE%\Desktop\MVP-backup-20260825"</code></pre>
+<pre><code>python mvp_check_backup.py "<span class="hl">你的遊戲資料夾</span>" "%USERPROFILE%\Desktop\MVP-backup-<span class="hl">20260825</span>"</code></pre>
       <p class="small"><strong>Mac</strong></p>
-<pre><code>python3 mvp_check_backup.py "<span class="hl">你的遊戲資料夾</span>" ~/Desktop/MVP-backup-20260825</code></pre>
+<pre><code>python3 mvp_check_backup.py "<span class="hl">你的遊戲資料夾</span>" ~/Desktop/MVP-backup-<span class="hl">20260825</span></code></pre>
       <div class="seen"><b>你會看到（剛備份完，五個都該是「內容一致」）</b>
 <pre style="margin:8px 0 0"><code>【3】外部備份資料夾
   ✅ data/database/attrib.dat         820.9 KB  2026-08-25 09:14  內容一致
@@ -569,7 +704,8 @@ cp data/frontend/ingame.big ~/Desktop/MVP-backup-20260825/data/frontend/</code><
   <div class="card">
     <p class="card-h">想先確認這支腳本自己沒壞？</p>
     <p>它內建一組自我測試，會自己造出上面那幾種情形，看該亮的字有沒有亮。
-       <strong>這一段不碰你的遊戲資料夾</strong>：測試檔全部建在系統暫存資料夾裡，跑完自己刪掉。</p>
+       <strong>這一段不碰你的遊戲資料夾</strong>：測試檔全部建在系統暫存資料夾裡，跑完自己刪掉。
+       一樣在停在「下載」資料夾的命令視窗裡打：</p>
 <pre><code>python3 mvp_check_backup.py --selftest</code></pre>
     <p class="small">Windows 上把 <code>python3</code> 換成 <code>python</code>。</p>
     <div class="seen"><b>你會看到（本站實跑）</b>
@@ -701,15 +837,20 @@ cp data/frontend/ingame.big ~/Desktop/MVP-backup-20260825/data/frontend/</code><
   </table></div>
   <p class="small">有的工具吃的是「檔案路徑」（換賽程年份、關掉跑壘者速度數值、
      <code>mvp_modernize.py</code>、<code>mvp_exe_pe.py</code>、<code>mvp_shrink_big.py</code>、
-     <code>mvp_unpack_big.py</code>、<code>mvp_audio.py</code>），有的吃的是「遊戲資料夾」，這不是筆誤，照表上抄就好。
-     Mac 上把 <code>python</code> 換成 <code>python3</code>。
+     <code>mvp_unpack_big.py</code>、<code>mvp_audio.py</code>），有的吃的是「遊戲資料夾」，這不是筆誤。
+     表上寫的是 <strong>Windows</strong> 的樣子，「…」那一段換成你的遊戲資料夾路徑。
+     <strong>Mac 上有兩件事要換</strong>：<code>python</code> 換成 <code>python3</code>；
+     路徑裡的 <code>\</code> 全部換成 <code>/</code>（例如 <code>data\datafile\datafile.big</code> 要寫成
+     <code>data/datafile/datafile.big</code>）。Mac 的終端機會把沒加引號的 <code>\</code> 吃掉，
+     <code>data\datafile\datafile.big</code> 會變成 <code>datadatafiledatafile.big</code>；
+     加了引號的 <code>\</code> 則會原封不動留在檔名裡。兩種情況都對不到你的檔。
      <code>--restore</code> 是拿第一次建立的那份備份蓋回去，所以會把該課做過的<u>所有</u>修改一次收回去，
      不是只收最後一次。</p>
 
   <div class="card clay">
     <p class="card-h">⚠ 跑過兩支動同一個檔的工具？先看清楚哪一份比較舊</p>
     <p>本站二十六支會寫遊戲檔的腳本一共留下<strong>二十五種</strong>備份副檔名
-       （2026-09-05 在 <code>site/tutorials/</code> 底下數的：30 支腳本裡有 4 支不寫遊戲檔，
+       （2026-09-05 在本站的教學資料夾底下數的：30 支腳本裡有 4 支不寫遊戲檔，
        剩下 26 支各自留備份，多一課會寫檔的教學通常就多一種。
        這 26 支裡有一支是打包工具自己。
        <a href="../pack-a-mod/index.html">打包那一課</a>數的是同一批二十六支、同樣是 25 種，
@@ -717,8 +858,7 @@ cp data/frontend/ingame.big ~/Desktop/MVP-backup-20260825/data/frontend/</code><
        單獨提出來講，因為那才是它的 <code>--scan</code> 要掃的、<u>別的課</u>留下的痕跡
        （<code>mvp_pack.py</code> 自己那份 <code>BAK_SUFFIXES</code> 就是 24 項）。
        <u>兩邊都對，只是清單口徑不同</u>。
-       <u>這個數字每加一課就會變</u>，要知道現在是幾種，跑
-       <code>.tools/site-check/selftest_backup_suffixes.py</code> 最準）：
+       <u>這個數字每加一課就會變</u>，請以這一頁寫的盤點日期為準）：
        <code>.bak</code> / <code>.speedbak</code> / <code>.facebak</code> / <code>.feltoolbak</code> /
        <code>.datafilebak</code> / <code>.facetexbak</code> / <code>.unibak</code> / <code>.portraitbak</code> /
        <code>.screenbak</code> / <code>.chantbak</code> / <code>.audiobak</code> / <code>.locbak</code> /
@@ -730,21 +870,23 @@ cp data/frontend/ingame.big ~/Desktop/MVP-backup-20260825/data/frontend/</code><
        但它們動的是不同的檔，所以還是不會互相覆蓋 —— 也因此看備份要連檔名一起看，不能只看副檔名。
        好處是備份不會被蓋掉，
        <strong>代價是同一個檔可能同時存在兩三份內容不同的備份</strong>。</p>
-        <p class="small">✅ <strong>下一節的檢查腳本這二十五種全部認得</strong>（原始碼裡的
-       <code>BAK_SUFFIXES</code> 就是同一份清單：2026-09-05 在
-       <code>site/tutorials/backup/mvp_check_backup.py</code> 上數到 25 個項目；
-       守門的是 <code>.tools/site-check/selftest_backup_suffixes.py</code>，
-       它把兩邊對一次，跑起來是綠的。<strong>不過它守得住的是這二十五種裡的二十三種</strong>：
-       2026-09-05 讀它的原始碼，它掃 <code>site/tutorials/</code> 時會跳過
-       <code>pack-a-mod</code>、<code>backup</code> 與 <code>crash-diagnosis</code> 這三課
+        <p class="small">✅ <strong>上一節的檢查腳本這二十五種全部認得</strong>（原始碼裡的
+       <code>BAK_SUFFIXES</code> 就是同一份清單：2026-09-05 在本頁這支
+       <code>mvp_check_backup.py</code> 上數到 25 個項目。
+       本站每次把網站推上網之前，都會跑一支<u>本站維護用的檢查</u>，把這份清單跟每一支腳本對一次；
+       那支檢查沒有跟著網站發布，你不用、也沒辦法自己跑。
+       <strong>它守得住的是這二十五種裡的二十三種</strong>：
+       讀它的原始碼，它會跳過「把你改好的東西打包成一包」、本頁、「遊戲當掉了怎麼辦」這三課
        （那幾份清單自己住的地方），
        而且它認副檔名的樣式要求點後面至少一個字母才接 <code>bak</code>，
        通用的 <code>.bak</code> 因此從頭到尾配不到。所以 <code>.bak</code> 與
-       <code>.packbak</code> 哪天從清單裡掉了它還是綠的，那兩種要自己看）。
+       <code>.packbak</code> 哪天從清單裡掉了它還是綠的，那兩種要人工看）。
        <span class="small">（2026-09-05 訂正：這裡原本寫「跟每一支腳本字面寫出的備份副檔名<u>一個不多、一個不少</u>」。
        那種全稱保證放兩天就會過期 —— 2026-09-04「關掉開場動畫」那一課上線，
        它留的 <code>.introbak</code> 當天就不在清單裡，守門腳本因此報紅；
-       2026-09-05 補進清單才恢復綠燈。所以這頁改成叫你自己跑守門腳本。）</span>
+       2026-09-05 補進清單才恢復綠燈。
+       2026-09-23 再訂正：那一次之後，這一頁改成叫你自己跑那支守門腳本，
+       但它是本站維護用的，沒有跟著網站發布，讀者拿不到，所以改成現在的寫法。）</span>
        <strong>但「認得」不等於「掃得到」</strong>：那支腳本只看核心五個檔旁邊有沒有備份，
        所以留在 <code>mvp2005.exe</code> 旁邊的 <code>.exepebak</code>（改執行檔那一課留的）
        與 <code>.modernizebak</code>（2026 年怎麼跑得起來那一課留的），
@@ -780,13 +922,34 @@ ingame.big（現在的）     2,828,256 bytes   <span class="cm">← 兩次都�
   </div>
 
   <h3>路線 B：從你自己的備份複製回去（退到你備份的那一刻）</h3>
-  <p>只要第三節那份備份還在，這條路就不受你中間跑過幾支工具、改過幾次、
+  <p>只要你自己那份備份還在（第〇節的整包，或第三節的精簡版），這條路就不受你中間跑過幾支工具、改過幾次、
      工具的備份檔被誰蓋掉影響。它把你按下複製那一刻的狀態放回去，
      <strong>不會比那個時間點更早</strong>。</p>
+
+  <div class="card blue" id="restore-whole">
+    <p class="card-h">手上是整包備份（第〇節那一份）：整個資料夾換回去</p>
+    <ol>
+      <li><strong>先把遊戲關掉。</strong></li>
+      <li>把現在這個遊戲資料夾<strong>改名</strong>，例如在名字後面加 <code>-壞掉</code>。<u>先不要刪</u>。</li>
+      <li>把整包備份複製回原本那一層（跟第〇節一樣，選起來複製、到那一層貼上），
+          再把它改回遊戲資料夾原本的名字。</li>
+      <li>開遊戲，確認能玩、紀錄都在，才把「壞掉」那一份刪掉。</li>
+    </ol>
+    <p class="small">為什麼不直接貼上去蓋掉：Windows 把同名的資料夾貼過去，不會整個換掉，而是把兩邊<strong>合在一起</strong>。
+       預設不會先問你要不要合併，只會問同名的檔要不要取代。
+       模組後來加進去、備份裡沒有的檔，會原封不動留在裡面。
+       先改名再放回去，就沒有這個問題。
+       遊戲資料夾在 <code>C:\Program Files (x86)</code> 底下時，改名和貼上可能會跳出要系統管理員權限的視窗，
+       按它的「繼續」（問取代與要權限的這兩種對話框，本站都還沒在 Windows 上實測）。
+       你照<a href="#virtualstore">第〇節「多看一個地方」</a>另外複製過 <code>VirtualStore</code> 裡的資料夾的話，
+       那一份也照同樣的方法換回原本的位置（這一段本站同樣還沒在 Windows 上實測）。</p>
+  </div>
+
+  <p>手上是<strong>精簡版</strong>（第三節那一份），就只把需要的那個檔複製回去：</p>
   <p class="small"><strong>Windows</strong>（以還原 <code>ingame.big</code> 為例，其他檔同理換路徑）</p>
-<pre><code>copy /Y "%USERPROFILE%\Desktop\MVP-backup-20260825\data\frontend\ingame.big" "<span class="hl">你的遊戲資料夾</span>\data\frontend\"</code></pre>
+<pre><code>copy /Y "%USERPROFILE%\Desktop\MVP-backup-<span class="hl">20260825</span>\data\frontend\ingame.big" "<span class="hl">你的遊戲資料夾</span>\data\frontend\"</code></pre>
   <p class="small"><strong>Mac</strong></p>
-<pre><code>cp ~/Desktop/MVP-backup-20260825/data/frontend/ingame.big "<span class="hl">你的遊戲資料夾</span>"/data/frontend/</code></pre>
+<pre><code>cp ~/Desktop/MVP-backup-<span class="hl">20260825</span>/data/frontend/ingame.big "<span class="hl">你的遊戲資料夾</span>"/data/frontend/</code></pre>
   <div class="seen"><b>你會看到</b>
     <p>Windows 回一句表示複製了 1 個檔案的訊息；Mac 一樣什麼都不印。</p>
   </div>
@@ -882,8 +1045,14 @@ ingame.big（現在的）     2,828,256 bytes   <span class="cm">← 兩次都�
     <thead><tr><th style="width:34%">畫面上的訊息</th><th>原因</th><th>你要做的</th></tr></thead>
     <tbody>
       <tr class="hi"><td data-label="畫面上的訊息" class="mono">can't open file '…\mvp_*.py'</td>
-          <td data-label="原因">檔案還在「下載」資料夾，不在桌面</td>
-          <td data-label="你要做的">開檔案總管左邊點「下載」，把那個 <code>.py</code> 拖到桌面，再跑一次。
+          <td data-label="原因">兩種：① 命令視窗不在放腳本的那個資料夾
+              （不是從「下載」資料夾的網址列開的；或是 Mac 沒先打 <code>cd ~/Downloads</code>，
+              還停在剛才切進去的遊戲資料夾）；② 腳本根本不在「下載」資料夾
+              （瀏覽器問過你要存哪裡，你存到別處了）</td>
+          <td data-label="你要做的">① Windows：關掉這個視窗，打開「下載」資料夾，在網址列打 <code>cmd</code> 按 Enter 重開一個；
+              Mac：先打 <code>cd ~/Downloads</code>，再跑一次。
+              ② 先找到 <code>mvp_check_backup.py</code> 在哪個資料夾，
+              就從那個資料夾的網址列開命令視窗（Mac 用 <code>cd</code> 切過去）。
               <u>這是本站最常見的第一個卡點。</u></td></tr>
       <tr><td data-label="畫面上的訊息" class="mono">✗ 找不到這個資料夾</td><td data-label="原因">路徑打錯，或路徑有空格卻沒加引號</td>
           <td data-label="你要做的">用拖曳取得路徑（<a href="../../start.html">第 0 課操作二</a>）</td></tr>
@@ -1018,10 +1187,10 @@ ingame.big（現在的）     2,828,256 bytes   <span class="cm">← 兩次都�
      也不會判斷備份內容合不合理，只回答「跟現在的檔一不一樣」。</p>
 
   <h2>附錄：檢查腳本原始碼</h2>
-  <p>零相依，只用 Python 內建功能。整份 933 行裡（程式碼到第 909 行，之後 23 行是 MIT 授權條款），
-     <strong>檢查那條路上只有一行在開檔（第 289 行同時開兩個檔做比對），
+  <p>零相依，只用 Python 內建功能。整份 934 行裡（程式碼到第 910 行，之後 23 行是 MIT 授權條款），
+     <strong>檢查那條路上只有一行在開檔（第 290 行同時開兩個檔做比對），
      而且兩個都是唯讀的 <code>'rb'</code></strong>。
-     會建檔、寫檔、刪檔的只有第 345 行開始的 <code>self_test()</code>
+     會建檔、寫檔、刪檔的只有第 346 行開始的 <code>self_test()</code>
      （要打 <code>--selftest</code> 才會跑），它用的是
      <code>tempfile.mkdtemp</code> 開在系統暫存資料夾裡的自己的測試檔，跑完自己刪掉。
      你可以自己搜尋 <code>open(</code> 確認再跑。</p>
@@ -1031,7 +1200,7 @@ ingame.big（現在的）     2,828,256 bytes   <span class="cm">← 兩次都�
 
   <div class="card">
     <details>
-      <summary><strong>展開 / 收合完整原始碼（933 行）</strong></summary>
+      <summary><strong>展開 / 收合完整原始碼（934 行）</strong></summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -1102,6 +1271,7 @@ mvp_check_backup.py
 無外部相依,Python 3.7 以上即可。
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -1116,7 +1286,7 @@ mvp_check_backup.py
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 
 import io
@@ -1973,7 +2143,8 @@ if __name__ == '__main__':
 
   <p>卡住或做成了，複製下面這段填一填：</p>
 <pre><code>備份 status: ✅ / ❌
-我備份了幾個檔: ___
+我做了哪一種備份: 整包 / 精簡版 / 兩種都有
+兩個資料夾的大小(整包那一份,位元組數): ___ / ___
 檢查腳本的結論那一行(整段複製): ___
 還原試過了嗎: 有 / 沒有
 還原後檢查腳本說一樣嗎: 一樣 / 不一樣
@@ -1982,16 +2153,37 @@ if __name__ == '__main__':
 
   <h2 id="recap">📌 重點整理</h2>
   <ul class="recap">
-    <li><strong>一句話</strong> 最常被動到的四個遊戲檔，加上暖身課請你打開的 <code>controller.cfg</code> 共五個、合計 4,058,641 個位元組（3.87 MB），備份它們幾秒鐘就好 —— <strong>但那五個不是全部</strong>，39 課裡有 30 課會寫檔（2026-09-05 數的），其中 20 課動的是這五個以外的檔。</li>
-    <li><strong>核心五個是哪五個</strong> <code>data\database\attrib.dat</code>、<code>pitcher.dat</code>、<code>schedule.big</code>、<code>data\frontend\ingame.big</code>，加上遊戲根目錄的 <code>controller.cfg</code>；前四個只佔 <code>data</code>（扣掉使用者自己的備份夾後 2.02 GB）的 <strong>0.19%</strong>，光 <code>models.big</code> 一個檔就是這五個加起來的 138 倍。
-        <br><strong>五個以外還要備份什麼</strong>：看第二節第二張表 —— <code>data\datafile\datafile.big</code>（改視角）、<code>mvp2005.exe</code>（中文版修正、2026 年跑起來、執行檔上的六個旋鈕、把官方中文版的中文搬進英文版）、<code>data\fonts\fonts.big</code>（中文版修正、把官方中文版的中文搬進英文版）、兩個 <code>.LOC</code>（中文版修正、改主選單文字、把官方中文版的中文搬進英文版）、<code>data\models.big</code>（新臉皮、裝球衣）、<code>uniforms.big</code>（裝球衣）、<code>logos.big</code>（裝球衣、換球隊隊徽）、<code>portrait.big</code>（大頭照）、開機畫面三個 <code>.big</code>、<code>spch_cht.txt</code>（應援曲）、<code>data\stadium\</code> 的球場檔、你指定的聲音檔、<code>data\frontend\movies\</code> 底下的 <code>.vp6</code>（關掉開場動畫）；以及<u>「一整包模組自動歸位」與「把你改好的東西打包成一包」</u>安裝時可能動到的任何同名檔。</li>
+    <li><strong>一句話</strong> 主要的保險是把<strong>整個遊戲資料夾</strong>複製一份（第〇節，只用滑鼠，還原時先把壞掉的那個改名再放回去）；最常被動到的四個遊戲檔，加上暖身課請你打開的 <code>controller.cfg</code> 共五個、合計 4,058,641 個位元組（3.87 MB），是幾秒鐘就能多存一份的精簡版 —— <strong>但那五個不是全部</strong>，39 課裡有 30 課會寫檔（2026-09-05 數的），其中 20 課動的是這五個以外的檔。</li>
+    <li><strong>核心五個是哪五個</strong> <code>data\database\attrib.dat</code>、<code>pitcher.dat</code>、<code>schedule.big</code>、<code>data\frontend\ingame.big</code>，加上遊戲根目錄的 <code>controller.cfg</code>。
+        <br><strong>五個以外還要備份什麼</strong>：改視角、執行檔、中文化、臉皮、球衣、隊徽、大頭照、開機畫面、應援曲、球場、聲音、拆封裝檔、開場動畫、主選單文字這些課動的是別的檔，上到哪一課，就把<a href="#others">第二節第二張表</a>那一列寫的檔也備份起來；「一整包模組自動歸位」與「把你改好的東西打包成一包」安裝別人的模組時，可能動到遊戲資料夾裡任何一個同名檔。</li>
     <li><strong>封裝檔只會長不會縮</strong> 寫 <code>.big</code> 的腳本都是把新資料接在檔尾（球場瘦身那一課除外，它反過來把目錄沒指到的位元組清掉），<code>schedule.big</code> 每換一次年份固定多 521,311 個位元組，連跑三次就從 130,514 長到 1,694,447。</li>
     <li><strong>最容易踩的雷</strong> 工具的備份只夠退一步。二十六支會改檔的腳本每一支都只在<strong>第一次</strong> <code>--apply</code> 時建備份，之後再改幾次都不覆蓋它；所以先後跑過兩支動同一個檔的工具，就會出現兩份內容不同的備份，<strong>最舊的那一份才是你動手之前的樣子</strong>。</li>
     <li><strong>備份放哪三條規則</strong> 不要放在遊戲資料夾裡面、保留原本的資料夾結構、資料夾名字寫日期。</li>
-    <li><strong>安全網</strong> 檢查腳本 933 行，檢查你的遊戲資料夾與備份資料夾時全程唯讀（唯一會寫檔的是它的 <code>--selftest</code>，那些檔建在系統暫存資料夾裡，跑完自己刪掉），【3】那一段五行都要是「內容一致」（如果那五行寫的是「這就是遊戲裡的那個檔本身」，代表你把遊戲資料夾自己當成備份資料夾了，等於沒有備份）；它只認得核心五個檔，備份副檔名 2026-09-05 數是 25 種（要知道現在缺不缺，跑 <code>.tools/site-check/selftest_backup_suffixes.py</code>，不要背這個數字。但「認得副檔名」不等於「畫面上列得出來」：<code>.exepebak</code> 留在 <code>mvp2005.exe</code> 旁邊、<code>.introbak</code> 留在 <code>movies</code> 資料夾的影片旁邊，那些檔不在核心五個裡，所以【2】那一段仍然不會列它們，<code>.modernizebak</code> 同理。新的一課產生的副檔名如果沒補進那份清單，那一支留的備份就會完全掃不到，而且不會有任何提示）；不裝 Python 就比檔案大小，但大小相同不代表內容相同（<code>attrib.dat</code> 改一位球員速度後 840,643 還是 840,643，只有 1 個位元組不同）。</li>
+    <li><strong>安全網</strong> 檢查腳本看你的遊戲資料夾與備份資料夾時全程唯讀；【3】那一段五行都要是「內容一致」，如果寫的是「這就是遊戲裡的那個檔本身」，代表你把遊戲資料夾自己當成備份資料夾了，等於沒有備份。它只看核心五個檔：留在 <code>mvp2005.exe</code> 旁邊的 <code>.exepebak</code>、<code>.modernizebak</code>，還有留在 <code>movies</code> 資料夾的 <code>.introbak</code>，都不會出現在【2】那一段。沒裝 Python 就比檔案大小，但大小相同不代表內容相同。</li>
     <li><strong>還原兩條路</strong> 先試該課工具的 <code>--restore</code>（只退一步），不行就從你自己的備份複製回去；二十六支工具全部都有還原指令（都叫 <code>--restore</code>，只有「把真實成績換算成遊戲裡的能力值」那一支叫 <code>--restore-write</code>），本站實跑過的那六支裡<strong>只有 <code>mvp_fel_toolkit.py</code> 一支</strong>會自己驗位元組，而且它只驗「複製有沒有成功」，不會告訴你有沒有回到動手之前。</li>
-    <li><strong>本站沒驗的</strong> <code>schedule.big</code> 疊三次年份之後還能不能玩，沒有真的開遊戲跑完一個球季；也沒有量過任何社群模組動到哪些檔（裝第三方模組前請整個 <code>data</code> 複製一份）；<code>controller.cfg</code> 什麼時候被建立、刪掉會不會自己長回來，同樣沒有實測；另外二十支會寫檔的工具，本站沒有逐支實跑過 <code>--restore</code> 把畫面抄下來。</li>
+    <li><strong>本站沒驗的</strong> <code>schedule.big</code> 疊三次年份之後還能不能玩，沒有真的開遊戲跑完一個球季；也沒有量過任何社群模組動到哪些檔（裝第三方模組前請把整個遊戲資料夾複製一份）；遊戲裝在 <code>Program Files</code> 底下時，存檔會不會被 Windows 轉存到 <code>VirtualStore</code>，還沒在 Windows 上實測；整包複製的滑鼠步驟，和兩邊「內容」「取得資訊」的數字比對，還沒在 Windows 與 Mac 上逐步實測；<code>controller.cfg</code> 什麼時候被建立、刪掉會不會自己長回來，同樣沒有實測；另外二十支會寫檔的工具，本站沒有逐支實跑過 <code>--restore</code> 把畫面抄下來。</li>
   </ul>
+
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p><a href="../../plan.html#a"><strong>① 入門班</strong></a> 第 3／6 堂</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../../start.html">← 上一堂：新手基本功</a>
+      <a class="btn" href="../make-a-player/index.html">下一堂：把一位球員改成你想要的球員 →</a>
+    </div>
+    <p><a href="../../plan.html#d"><strong>④ 年度更新班</strong></a> 第 2／9 堂</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../yearly-update/index.html">← 上一堂：一次更新整個年度</a>
+      <a class="btn" href="../make-a-player/index.html">下一堂：把一位球員改成你想要的球員 →</a>
+    </div>
+    <p><a href="../../plan.html#e"><strong>⑤ 發布班</strong></a> 第 2／5 堂</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../whats-original/index.html">← 上一堂：怎麼看出哪些檔還沒被動過</a>
+      <a class="btn" href="../make-a-player/index.html">下一堂：把一位球員改成你想要的球員 →</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
 
   <h2>接下來</h2>
   <ul class="plain">
@@ -2012,6 +2204,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

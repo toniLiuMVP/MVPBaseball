@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/swap-portrait/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="換球員大頭照 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="換掉名單畫面上球員的那張照片。本站第一課會真的產生新的遊戲圖檔：把 PNG 壓成遊戲用的 DXT3 格式再接回封裝檔。附零相依腳本，一行指令可還原。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/swap-portrait/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>換球員大頭照 — toni的MVP模組補習班</title>
+<title>換球員大頭照 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="換掉名單畫面上球員的那張照片。本站第一課會真的產生新的遊戲圖檔：把 PNG 壓成遊戲用的 DXT3 格式再接回封裝檔。附零相依腳本，一行指令可還原。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -41,30 +51,17 @@
   </div>
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix" id="quick">
-    <p class="card-h">⚡ 只想趕快做完？照這五步</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
-      <li>下載 <code>mvp_swap_portrait.py</code>，從「下載」資料夾拖到桌面。</li>
+      <li>下載 <code>mvp_swap_portrait.py</code>。下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打（Mac 開終端機先打 <code>cd ~/Downloads</code>）。</li>
       <li>查那位球員的大頭照編號
   <p class="small">Windows：</p>
   <pre><code>python mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --find Chin-Feng</code></pre>
@@ -72,14 +69,14 @@
   <pre><code>python3 mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --find Chin-Feng</code></pre></li>
       <li>把他現在那張照片匯出成 PNG
   <p class="small">Windows：</p>
-  <pre><code>python mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --export 5826 ~/Desktop/5826.png</code></pre>
+  <pre><code>python mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --export 5826 "%USERPROFILE%\Desktop\5826.png"</code></pre>
   <p class="small">Mac / Linux：</p>
   <pre><code>python3 mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --export 5826 ~/Desktop/5826.png</code></pre></li>
       <li>用修圖軟體<strong>在原圖上改</strong>：尺寸維持 256×256、存成 PNG、保留透明度，不要存 JPG。</li>
       <li>先預覽品質（不會動到遊戲），確定了在同一行最後加 <code>--apply</code> 才真的寫進去
   <p class="small">Windows：</p>
-  <pre><code>python mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --import 5826 ~/Desktop/5826.png</code></pre>
-  <pre><code>python mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --import 5826 ~/Desktop/5826.png --apply</code></pre>
+  <pre><code>python mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --import 5826 "%USERPROFILE%\Desktop\5826.png"</code></pre>
+  <pre><code>python mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --import 5826 "%USERPROFILE%\Desktop\5826.png" --apply</code></pre>
   <p class="small">Mac / Linux：</p>
   <pre><code>python3 mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --import 5826 ~/Desktop/5826.png</code></pre>
   <pre><code>python3 mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --import 5826 ~/Desktop/5826.png --apply</code></pre></li>
@@ -101,6 +98,7 @@
        怎麼一行分辨，看<a href="#argb32">下面那張卡</a>。</p>
     <p class="tail"><code>5826</code> 換成第 2 步查到的編號，<code>&lt;遊戲資料夾&gt;</code> 換成你自己的路徑。
        想知道為什麼，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+    <p class="tail">照做卡住了？直接跳到<a href="#fix">❌ 出錯處理</a>（可以把畫面上印出來的那一行貼進那裡的搜尋框）；做完對照<a href="#ok">✅ 成功標準</a>。</p>
   </div>
 
   <h2>這一課跟「換一張臉」差在哪</h2>
@@ -192,13 +190,14 @@
     <div class="step-n">1</div>
     <div>
       <p class="step-t">下載腳本</p>
-      <p class="step-why">放桌面就好，不必放進遊戲資料夾。</p>
-      <p><a href="mvp_swap_portrait.py" download>mvp_swap_portrait.py</a>（2,317 行，零相依）</p>
+      <p class="step-why">放在「下載」就好，不必放進遊戲資料夾。</p>
+      <p><a href="mvp_swap_portrait.py" download>mvp_swap_portrait.py</a>（2,408 行，零相依）</p>
       <div class="card amber">
-        <p class="card-h">按了下載之後，檔案跑到哪裡去了？</p>
+        <p class="card-h">按了下載之後，檔案跑到哪裡去了？指令要在哪裡打？</p>
         <p><strong>瀏覽器多半不會問你要存哪裡</strong>，它會直接放進「下載」資料夾。
-           開檔案總管（Mac 用 Finder）左邊點「<u>下載</u>」，找到那個 <code>.py</code>，
-           <strong>拖到桌面</strong>再往下做。</p>
+           打開檔案總管左邊的「<u>下載</u>」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter，
+           開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打。
+           Mac：打開終端機，先打 <code>cd ~/Downloads</code> 按 Enter。</p>
       </div>
     </div>
   </div>
@@ -212,10 +211,11 @@
 <pre>python mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --find Chin-Feng</pre>
       <p class="small">Mac / Linux：</p>
 <pre>python3 mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --find Chin-Feng</pre>
-      <p>會看到像這樣：</p>
+      <div class="seen"><b>會看到像這樣</b>
 <pre>在名單的第 16 欄找到 playerattrib_audioid（欄號是執行時從表頭查的，不是寫死的）
 命中 1 位：
   Chin-Feng Chen               大頭照編號 5826</pre>
+      </div>
       <p class="small">找不到人的話，名字打短一點（例如只打姓）。名單裡是英文名。</p>
     </div>
   </div>
@@ -226,10 +226,11 @@
       <p class="step-t">把現在那張照片匯出成 PNG</p>
       <p class="step-why">先拿到原圖，你才知道要對齊什麼：頭的位置、大小、背景怎麼去。</p>
       <p class="small">Windows：</p>
-<pre>python mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --export 5826 ~/Desktop/5826.png</pre>
+<pre>python mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --export 5826 "%USERPROFILE%\Desktop\5826.png"</pre>
       <p class="small">Mac / Linux：</p>
 <pre>python3 mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --export 5826 ~/Desktop/5826.png</pre>
       <p>桌面上會出現一張 256×256 的 PNG。</p>
+      <p class="small">Windows 那一行的 <code>%USERPROFILE%\Desktop</code> 是你帳號底下的「桌面」資料夾，加引號是為了帳號名稱有空白時不會被拆開（這一行的 Windows 寫法本站還沒在 Windows 上實測）。</p>
       <p class="small">如果印出來的是「是 ARGB32 格式」，就是<a href="#argb32">上面那張卡</a>講的事：
          這個編號那一張不是 DXT3，這支腳本目前換不了。<u>不代表你這一份一定是原版</u> ——
          被模組換過的封裝檔裡也還留著一部分 ARGB32 的編號。</p>
@@ -258,7 +259,7 @@
       <p class="step-t">先預覽（不會動到遊戲）</p>
       <p class="step-why">這一步會告訴你壓縮之後掉了多少品質，數字太差就回去改圖。</p>
       <p class="small">Windows：</p>
-<pre>python mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --import 5826 ~/Desktop/5826.png</pre>
+<pre>python mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --import 5826 "%USERPROFILE%\Desktop\5826.png"</pre>
       <p class="small">Mac / Linux：</p>
 <pre>python3 mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --import 5826 ~/Desktop/5826.png</pre>
       <p>會印出品質報告，倒數第二行是「以上是預覽，還沒有動到任何檔案」，最後一行告訴你加上 <code>--apply</code>。</p>
@@ -271,13 +272,13 @@
       <p class="step-t">確定了才真的寫進去</p>
       <p class="step-why">加 <code>--apply</code>。腳本會自動先備份，寫完會自己再讀一次確認。</p>
       <p class="small">Windows：</p>
-<pre>python mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --import 5826 ~/Desktop/5826.png --apply</pre>
+<pre>python mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --import 5826 "%USERPROFILE%\Desktop\5826.png" --apply</pre>
       <p class="small">Mac / Linux：</p>
 <pre>python3 mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --import 5826 ~/Desktop/5826.png --apply</pre>
     </div>
   </div>
 
-  <h2>✅ 成功標準</h2>
+  <h2 id="ok">✅ 成功標準</h2>
   <p>以下<strong>全部</strong>滿足才算成功：</p>
   <ul class="plain">
     <li>畫面出現「已備份 → portrait.big.portraitbak」</li>
@@ -288,16 +289,20 @@
   <p class="small">想在進遊戲之前先確認，可以再 <code>--export</code> 一次，
      匯出來的就是遊戲實際會讀到的圖。</p>
 
-  <h2>❌ 出錯處理</h2>
+  <h2 id="fix">❌ 出錯處理</h2>
   <div class="tablewrap"><table class="stack">
     <thead><tr><th>看到什麼</th><th>怎麼回事</th><th>怎麼做</th></tr></thead>
     <tbody>
+      <tr class="hi"><td data-label="看到什麼" class="mono">can't open file '…mvp_*.py'</td>
+          <td data-label="怎麼回事"><strong>命令視窗跟腳本不在同一個資料夾</strong>，或檔名對不上（瀏覽器可能在檔名後面加了 <code>(1)</code>）</td>
+          <td data-label="怎麼做">打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）。檔名多了 <code>(1)</code> 就改成跟指令裡一模一樣</td></tr>
       <tr><td data-label="看到什麼">是 ARGB32 格式，只處理 DXT3</td><td data-label="怎麼回事">這個編號那一張還不是 DXT3。可能是你這一份 <code>portrait.big</code> 還是剛安裝好的原版（三份原版量到的 2,391 張圖全是 ARGB32），也可能是模組只換掉一部分 —— 本站測試機那份 7,544 個項目的封裝檔裡，仍有 1,388 個四位數編號是 ARGB32，名冊上有 49 位球員指到它們（例如 <code>1613</code> Armando Alvarez）</td><td data-label="怎麼做">看<a href="#argb32">上面那張卡</a>。這一課目前只在已經被模組換成 DXT3 的那些編號上做得了，換一個編號還是有機會</td></tr>
       <tr><td data-label="看到什麼">尺寸不一樣，不能換</td><td data-label="怎麼回事">你的 PNG 不是 256×256</td><td data-label="怎麼做">回修圖軟體調成一樣大</td></tr>
       <tr><td data-label="看到什麼">不是 PNG 檔</td><td data-label="怎麼回事">存成 JPG 了</td><td data-label="怎麼做">另存為 PNG</td></tr>
       <tr><td data-label="看到什麼">只支援每色 8 位元的 PNG</td><td data-label="怎麼回事">存成 16 位元的了</td><td data-label="怎麼做">存檔時選 8 位元 / 一般 PNG</td></tr>
       <tr><td data-label="看到什麼">不支援交錯式 PNG</td><td data-label="怎麼回事">存檔時勾了「漸進式 / interlaced」</td><td data-label="怎麼做">取消那個勾選再存一次</td></tr>
       <tr><td data-label="看到什麼">找不到 portrait.big</td><td data-label="怎麼回事">遊戲資料夾給錯了</td><td data-label="怎麼做">回 <a href="../../start.html">新手基本功</a> 確認</td></tr>
+      <tr><td data-label="看到什麼"><code>停下來了:沒有權限寫入這個資料夾</code>（或 <code>停下來了:沒有權限讀寫</code>）</td><td data-label="怎麼回事">遊戲裝在 <code>C:\Program Files (x86)</code> 底下（這正是預設位置），一般開的命令提示字元在那裡建不了新檔，連備份都做不出來。「沒有權限讀寫」那一種也可能是 <code>portrait.big</code> 被設成唯讀，或遊戲正開著。<span class="small">（這兩句訊息本站是在 Mac 上把資料夾、檔案設成唯讀模擬出來的，<u>還沒在 Windows 上實測</u>。）</span></td><td data-label="怎麼做">先把遊戲關掉。在開始功能表找到「命令提示字元」，按右鍵選「以系統管理員身分執行」。新視窗一開是在 <code>C:\Windows\System32</code>，先打 <code>cd %USERPROFILE%\Downloads</code> 回到放腳本的「下載」資料夾（腳本搬去別處的話就 <code>cd</code> 到那裡），再跑同一行（路徑拖不進去的話，照<a href="../../start.html">第 0 課操作二</a>手動打，前後加雙引號）。畫面最後一段會說遊戲檔動了沒，寫「什麼都沒有動到」就不用還原</td></tr>
       <tr><td data-label="看到什麼">輸出路徑指到遊戲的 portrait.big 本身，拒絕覆蓋</td><td data-label="怎麼回事"><code>--export</code> 後面那個輸出檔名打成遊戲檔本身了</td><td data-label="怎麼做">改成一個 <code>.png</code> 的路徑。<u><code>--export</code> 不做備份</u>，這一道就是它全部的防線</td></tr>
       <tr><td data-label="看到什麼">是一個資料夾，不是檔名／資料夾不存在／已經存在，而且不是 PNG 檔 —— 不敢覆蓋它</td><td data-label="怎麼回事"><code>--export</code> 的輸出路徑不對，或那個位置已經有一個不是 PNG 的檔</td><td data-label="怎麼做">把檔名一起給上、先把資料夾建好，或換一個檔名。覆蓋自己剛才匯出的那張 PNG 是允許的</td></tr>
       <tr><td data-label="看到什麼">不是 SHPI 檔（開頭是 …）</td><td data-label="怎麼回事">那個編號不是圖。封裝檔裡有 2 個只有 1 個位元組的項目（都叫 <code>a2653.fsh</code>）</td><td data-label="怎麼做">換一個編號。<code>--info</code> 列出來的就是看起來是圖的那些</td></tr>
@@ -332,8 +337,12 @@
         一樣把 <code>--restore</code> 整行印出來</li>
   </ul>
   <p class="small">三種的<strong>結束碼都是 130</strong>（照慣例，被 Ctrl-C 中斷就是 128 + 2），
-     不會回 0 裝作成功。<strong>不是 Ctrl-C 而是出了別的錯</strong>（外接碟被拔掉、權限沒了）也照<u>同一筆紀錄</u>講話：畫面先印「<code>停下來了:……</code>」，
+     不會回 0 裝作成功。<strong>不是 Ctrl-C 而是出了別的錯</strong>，也照<u>同一筆紀錄</u>講話，分兩種：
+     讀不到檔（外接碟被拔掉、權限沒了）、寫不進去（遊戲裝在 <code>Program Files</code> 底下、檔案被設成唯讀）、
+     或是找不到你給的那張 PNG —— 畫面先印「<code>停下來了:……</code>」，
      再用上面那三種話告訴你遊戲檔動了沒，<strong>結束碼是 2</strong>。
+     真的沒預料到的錯（例如寫到一半磁碟滿了）則是先印「<code>出錯停下來了</code>」開頭的那三種話之一，
+     後面接一段英文錯誤訊息（回報時請整段貼上），<strong>結束碼是 1</strong>。
      備份本身也不怕中斷：它先寫進一個<u>名字猜不到的暫存檔</u>，
      完整寫完才改名上位，所以中斷不會留下半截的備份，也不會留下暫存垃圾。</p>
 
@@ -364,6 +373,22 @@
     <li><strong>成功長什麼樣</strong> 出現「已備份 → portrait.big.portraitbak」、出現「只改了目錄 8 bytes + 檔頭 4 bytes」、複驗那行的百分比大於 90%，進遊戲名單畫面照片換了。想先確認可以再 <code>--export</code> 一次，匯出來的就是遊戲實際會讀到的圖；複驗沒過就立刻 <code>--restore</code>。</li>
     <li><strong>本站沒驗的、還沒做的</strong> 這支腳本只處理 DXT3（代號 0x61）的大頭照，碰到別的格式會停下來不做 —— 而<strong>剛安裝好的原版 2,391 張圖全部是 ARGB32（代號 0x7D）128×128</strong>（本站在英文版、中文版、PK 版三份上各量一次，DXT3 都是 0 張），所以原版目前一張都換不了，<u>ARGB32 的寫回還沒做</u>。格式表裡的 0x7E（ARGB16_1555）是外部文件寫的，本站至今找不到樣本，無從實測。另外 FSHTOOL 說明書那條「代號加 0x80 代表這張圖本身是壓縮過的」，本站也沒有用到。</li>
   </ul>
+
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p><a href="../../plan.html#c"><strong>③ 外觀班</strong></a> 第 3／6 堂</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../edit-stance/index.html">← 上一堂：換打擊姿勢與投球姿勢</a>
+      <a class="btn" href="../install-uniform/index.html">下一堂：把一套球衣裝進遊戲 →</a>
+    </div>
+    <p><a href="../../plan.html#d"><strong>④ 年度更新班</strong></a> 第 6／9 堂</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../swap-face/index.html">← 上一堂：幫球員換一張臉</a>
+      <a class="btn" href="../make-voice/index.html">下一堂：換掉遊戲的聲音 →</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
 
   <h2 id="how-it-works">這支腳本在做什麼</h2>
   <p>整支腳本在做的事，可以看成<strong>把三層外殼一層一層打開，只換掉最裡面那一層，再原樣包回去</strong>。
@@ -441,7 +466,7 @@
   <h2 id="source">完整原始碼</h2>
   <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。</p>
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（2317 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（2408 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -508,6 +533,12 @@ mvp_swap_portrait.py — 換掉 MVP Baseball 2005 的球員大頭照
     (exists 會跟著連結去看,指到不存在檔案的連結會被它判成「沒有」)
   · 匯出的 PNG 也是先寫一個名字猜不到的暫存檔、fsync 之後才改名上位,
     所以中途被中斷不會把你原本那張圖變成半截的
+  · --apply 與 --restore 動手之前,先在 portrait.big 那個資料夾建一個空的試寫檔
+    (.mvp_probe-xxxxxxxxxxxx 這種)再馬上刪掉。沒有權限寫入(遊戲裝在 Program Files
+    底下的預設位置就會這樣)就印「停下來了:沒有權限寫入這個資料夾…」,
+    教你用系統管理員身分重跑,結束碼 2 —— 那時候遊戲檔跟備份都還沒被碰過。
+    試寫過了、後面才被拒絕寫入(例如那個檔被設成唯讀)則印「停下來了:沒有權限讀寫…」,
+    結束碼一樣是 2
   · 寫入走 append,舊資料一個位元組都不動
   · 寫完立刻重新開檔讀回來跟你的 PNG 比對,一致率低於 90% 就當成失敗:
     結束碼非 0,並把還原指令整行印出來
@@ -544,6 +575,7 @@ mvp_swap_portrait.py — 換掉 MVP Baseball 2005 的球員大頭照
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -558,7 +590,7 @@ mvp_swap_portrait.py — 換掉 MVP Baseball 2005 的球員大頭照
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 
 import os
@@ -619,6 +651,59 @@ def _new_temp_beside(dst, tag):
     folder = os.path.dirname(os.path.abspath(dst)) or '.'
     return tempfile.mkstemp(dir=folder,
                             prefix='.%s.%s-' % (os.path.basename(dst), tag))
+
+
+# ── 寫入之前先試一次(2026-09-23 加)──────────────────────────────────
+# 這個遊戲預設裝在 C:\Program Files (x86)\ 底下,那是受保護的資料夾:
+# 一般權限的命令提示字元在那裡建不了新檔。以前 --import --apply 要到做備份那一步
+# 才撞上,讀者先看到「出錯停下來了」再看到十幾行英文 traceback,結束碼 1 ——
+# 而課文寫的是「停下來了」、結束碼 2。
+# 現在 --apply / --restore 動手之前,先在同一個資料夾用 os.open(O_CREAT|O_EXCL)
+# 建一個空檔再刪掉;建不出來就丟 DataError,走「停下來了」那條路,結束碼 2。
+# ⚠️ 不拿 tempfile 來試:本站讀過 Python 3.9、3.11、3.12 的 tempfile 原始碼,
+#    它在 Windows 上碰到「拒絕存取」會換一個名字再試(3.14 改成最多試 20 次),
+#    所以最後丟出來的不一定是 PermissionError(可能是 FileExistsError),
+#    也可能要試很久才放棄(這一點是讀原始碼推論的,本站還沒在 Windows 上實測)。
+#    os.open 只試一次,結果立刻知道。
+def _probe_writable(folder):
+    """在 folder 建一個空檔再刪掉。寫得進去回傳 None,寫不進去回傳那個 OSError。"""
+    probe = os.path.join(folder, '.mvp_probe-%s' % os.urandom(6).hex())
+    try:
+        fd = os.open(probe, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    except OSError as e:
+        return e
+    os.close(fd)
+    try:
+        os.remove(probe)
+    except OSError:
+        print('  (提醒:試寫用的空檔 %s 刪不掉,可以自己刪;遊戲檔沒有被動到)' % os.path.basename(probe))
+    return None
+
+
+# 「怎麼辦」那一段。試寫失敗與 main() 最後那一道共用,兩邊講的話才不會分岔。
+_NO_PERMISSION_HOWTO = (
+    '  Windows:對「命令提示字元」按右鍵,選「以系統管理員身分執行」。\n'
+    '  新視窗一開是在 C:\\Windows\\System32,先 cd 回你放腳本的地方\n'
+    '  (放在「下載」的話是 cd %USERPROFILE%\\Downloads),再跑同一行。\n'
+    '  Mac / Linux 看到這一段,是你這個帳號沒有權限動上面那個路徑。')
+
+
+def _require_writable(bigpath):
+    """portrait.big 那個資料夾寫不進去就丟 DataError(→「停下來了」、結束碼 2)。
+
+    只有 PermissionError 才講「以系統管理員身分執行」那一套;
+    別的原因(唯讀的磁碟、磁碟滿……)那一套幫不上忙,就只照實說寫不進去。
+    """
+    folder = os.path.dirname(os.path.abspath(bigpath)) or '.'
+    err = _probe_writable(folder)
+    if err is None:
+        return
+    if isinstance(err, PermissionError):
+        raise DataError('沒有權限寫入這個資料夾:%s\n  (系統回的是:%s)\n'
+                        '  遊戲裝在 C:\\Program Files (x86) 或 C:\\Program Files 底下時會這樣,\n'
+                        '  而那正是這個遊戲的預設安裝位置。\n%s'
+                        % (folder, err.strerror or err, _NO_PERMISSION_HOWTO))
+    raise DataError('這個資料夾現在寫不進去:%s\n  (系統回的是:%s)' % (folder, err))
 
 
 def _sha256_of(path):
@@ -1617,8 +1702,20 @@ def png_write(path, rgba, w, h):
 
 def png_read(path):
     """回傳 (rgba bytes, w, h)。支援 8 位元的灰階/RGB/索引/灰階+透明/RGBA,不支援交錯。"""
-    with open(path, 'rb') as f:
-        data = f.read()
+    # 2026-09-23 補:路徑打錯是最常見的狀況,以前會噴 FileNotFoundError 的 traceback、
+    # 結束碼 1。改成 DataError,走「停下來了」那條路,結束碼 2。
+    try:
+        with open(path, 'rb') as f:
+            data = f.read()
+    except FileNotFoundError:
+        hint = ''
+        if str(path).startswith('~'):
+            # Windows 的命令提示字元不會把 ~ 換成家目錄;Mac 上把 ~ 包進引號裡也不會換。
+            hint = ('\n  路徑開頭的 ~ 沒有被換成你的家目錄。請寫完整路徑,'
+                    'Windows 例如 %USERPROFILE%\\Desktop\\5826.png。')
+        raise DataError('找不到這張 PNG:%s%s' % (path, hint))
+    except OSError as e:
+        raise DataError('讀不到這張 PNG:%s(%s)' % (path, e))
     if data[:8] != PNG_MAGIC:
         raise DataError('%s 不是 PNG 檔' % os.path.basename(path))
     # 從第 8 個位元組(魔術數字之後)開始逐塊走。認得的收下來,不認得的跳過就好。
@@ -2018,6 +2115,9 @@ def cmd_import(bigpath, number, pngpath, apply_it):
     #   · 判斷「備份在不在」要用 lexists 不是 exists。exists 會跟著連結去看,
     #     一個指到不存在檔案的連結會被它判成「不存在」。
     _refuse_symlink(backup, '備份檔')
+    # 備份與寫入都要在 portrait.big 那個資料夾動手。遊戲裝在 Program Files 底下時
+    # 這裡寫不進去 —— 在做備份之前先試一次,寫不進去就走「停下來了」那條路。
+    _require_writable(bigpath)
     if not os.path.lexists(backup):
         _atomic_copy(bigpath, backup)
         print()
@@ -2058,6 +2158,8 @@ def cmd_restore(bigpath):
     _refuse_symlink(backup, '備份檔')
     if not os.path.exists(backup):
         raise DataError('找不到備份 %s —— 沒有東西可以還原。' % os.path.basename(backup))
+    # 蓋回去要先在同一個資料夾寫一個暫存檔,寫不進去的話現在就停。
+    _require_writable(bigpath)
     _restore_from_backup(backup, bigpath)
     # 複驗:把還原完的遊戲檔跟備份從頭比到尾。不比就印成功,等於只證明
     # 「複製指令沒有丟例外」,不證明檔案真的一樣。
@@ -2144,8 +2246,22 @@ def main():
         # 沒動過才敢說「什麼都沒有動到」。兩種都是 130,不可以回 0。
         _interrupt_note()
         return 130
+    except (PermissionError, FileExistsError) as e:
+        # 2026-09-23 補:試寫(_require_writable)過了、後面才被拒絕寫入的情形
+        # (例如那個檔被設成唯讀)、--export 寫不進你指定的那個資料夾,
+        # 以及還原時讀不到備份這種少見的情形(所以訊息寫「讀寫」,不只寫「寫入」)。
+        # FileExistsError 也收在這裡:這支腳本只有 tempfile 會丟它,而 tempfile
+        # 在 Windows 上碰到「拒絕存取」一路重試到放棄時丟的就是它(見 _probe_writable 上面)。
+        # 這是可以預料的狀況,不該走下面那條「印 traceback 回報」的路:
+        # 跟 DataError 一樣印「停下來了」、照三態說遊戲檔動了沒、結束碼 2。
+        print('\n  停下來了:沒有權限讀寫:%s' % e)
+        print('  可能的原因:要寫的地方在 C:\\Program Files 這種受保護的資料夾裡'
+              '(遊戲的預設安裝位置),\n  那個檔被設成唯讀,或遊戲正開著。')
+        print(_NO_PERMISSION_HOWTO)
+        _interrupt_note('停下來了')
+        return 2
     except Exception:
-        # 沒預料到的錯(磁碟滿、權限、外接碟拔掉…)要走**同一條**誠實路徑:
+        # 沒預料到的錯(磁碟滿、寫到一半外接碟被拔掉…)要走**同一條**誠實路徑:
         # 只接 KeyboardInterrupt 的話,這條路上的讀者會看到一串 traceback,
         # 卻不知道自己的遊戲檔動了沒。說完再把原本的例外丟回去 ——
         # traceback 照樣印出來(回報的時候用得上),結束碼一樣非 0。
@@ -2770,6 +2886,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>

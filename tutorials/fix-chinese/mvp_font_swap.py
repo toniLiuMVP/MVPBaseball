@@ -14,7 +14,7 @@
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 
 """
@@ -163,6 +163,7 @@ mvp_font_swap.py —— 一個一個換字型,找出到底是哪一個把記憶�
 
 MIT License · Copyright (c) 2026 toni · 無外部相依,Python 3.7 以上
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 
 import argparse
 import hashlib

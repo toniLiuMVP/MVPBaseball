@@ -4,12 +4,22 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://toniliumvp.github.io/MVPBaseball/tutorials/hide-runner-speed/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="toni的MVP模組補習班">
+<meta property="og:title" content="關掉跑壘者速度數值 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
+<meta property="og:description" content="手把手教學：關掉 MVP Baseball 2005 轉播畫面右側的跑壘者速度數字。自動備份、自動複驗、一行指令還原。">
+<meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/hide-runner-speed/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
-<title>關掉跑壘者速度數值 — toni的MVP模組補習班</title>
+<title>關掉跑壘者速度數值 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="手把手教學：關掉 MVP Baseball 2005 轉播畫面右側的跑壘者速度數字。自動備份、自動複驗、一行指令還原。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=ea23aeaf05">
+<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -52,7 +62,7 @@
     <p><strong>所以：如果你是全新安裝，這一課現在還做不了。</strong>
        腳本會告訴你「你這一份是 EA 原版」然後停下來，不會動任何東西。</p>
     <p class="small">本站原本以為 47 個項目是遊戲原本就有的 —— 那是從這台裝過模組的機器量的。
-       站上其他頁提到「47 個版面檔」的地方也是同一個來源。<a href="../../reference/ingame-files.html">版面檔對照</a>、<a href="../../reference/fel.html">FEL 版面語法</a>、<a href="../../reference/fel-archives.html">版面檔裝在哪些封裝檔</a>、<a href="../../reference/original-vs-modded.html">原版與這台機器差在哪</a>都已在該頁寫明原版是 44 個；<a href="../../reference/hud-map.html">介面座標圖</a>與<a href="../../reference/file-map.html">檔案地圖</a>還沒補上這個註記（2026-09-05 訂正：這裡原本寫「已一併標注」，那是一句還沒做完的全稱句）。</p>
+       站上其他頁提到「47 個版面檔」的地方也是同一個來源。<a href="../../reference/ingame-files.html">版面檔對照</a>、<a href="../../reference/fel.html">FEL 版面語法</a>、<a href="../../reference/fel-archives.html">版面檔裝在哪些封裝檔</a>、<a href="../../reference/original-vs-modded.html">原版與這台機器差在哪</a>、<a href="../../reference/hud-map.html">介面座標圖</a>與<a href="../../reference/file-map.html">檔案地圖</a>都已在該頁寫明原版是 44 個（後兩頁是 2026-09-06 補齊的。2026-09-23 訂正：這裡之前還寫著它們「還沒補上」；再更早的版本寫「已一併標注」，那時其實還沒做完，2026-09-05 訂正過一次）。</p>
   </div>
 
   <div class="card amber">
@@ -62,49 +72,17 @@
     <p><strong>3.</strong> 動手前腳本會自動備份，改完自動複驗，隨時 <code>--restore</code> 還原。</p>
   </div>
 
-  <div class="card grass">
-    <p class="card-h">怎麼確定就是它，不是別的檔</p>
-    <p>同一個群組裡有三個文字元件，而<strong>這個檔本身已經關掉了其中兩個</strong>。三行放在一起看，答案就很明顯：</p>
-    <p class="small">⚠ 原本這裡寫「遊戲原廠自己已經關掉了」。這個檔不在 EA 原版裡（見上方警告），所以<u>不能說那是原廠的決定</u>，只能說這份檔案裡就是這樣。</p>
-<pre style="margin:8px 0 0"><code><span class="cm">fes_ingameinfobar.fel · GR:HOMEPLATE 群組內容（節錄）</span>
-TX:RATING,<span class="hl">1</span>,0,618,391,20,12,...        <span class="cm">← 開著，就是你看到的那個數字</span>
-TX:SPEED,<span class="nu">0</span>,0,5,80,54,11,...            <span class="cm">← 已關，本來要顯示「SPEED」字樣</span>
-TX:PLAYERNAME,<span class="nu">0</span>,0,396,398,122,12,...   <span class="cm">← 已關，本來要顯示跑者名字</span></code></pre>
-    <p style="margin-top:8px">逗號後的<strong>第一個數字就是顯示開關</strong>，1 是顯示、0 是隱藏（其餘欄位的意思見
-       <a href="../../reference/fel.html">FEL 版面語法速查</a>）。<strong>這份檔案裡</strong>就是用這個開關，把「SPEED」字樣和跑者名字關掉，
-       只留下那個數字。所以把 <code>RATING</code> 的 1 改成 0，走的是<u>這個檔案自己走過的那條路</u>，不是硬拆。</p>
-    <p>這種元件在<strong>本站測試機那份 <code>ingame.big</code></strong>（2,665,562 bytes、47 個項目）的這個版面檔裡一共 6 個，全部掛在 <code>GR:DIAMOND</code> → <code>GR:BASES</code> 底下：
-       本壘、三壘、二壘的群組各帶一個，而<strong>一壘的群組被宣告了兩次</strong>（第 782 行與第 791 行），前一個帶一個，後一個帶兩個
-       （其中一個跟前面那個一壘座標完全一樣，另一個畫在 <code>x=550, y=461</code>）。腳本不寫死數量，掃到幾個就關幾個，這份是 6 個全部關掉；換一份檔案不一定是 6 個，以預覽印出來的為準。
-       這也是壘上人多的時候右邊會出現一整排的原因 —— 不是一個東西在移動，是每個壘各畫一份。</p>
-    <p>順帶一提，為什麼是改開關、不是把整行刪掉：改開關每處<strong>只動 1 個字元，版面檔的總長度完全不變</strong>；
-       刪整行會改變檔案結構，遊戲讀到少一行會怎麼樣，我沒有實測過。</p>
-  </div>
-
 
   <div class="card clay" id="backup-first">
-    <p class="card-h">🛟 動手之前：先完整備份整個遊戲資料夾</p>
+    <p class="card-h" role="heading" aria-level="2">🛟 動手之前：先完整備份整個遊戲資料夾</p>
     <p><strong>把整個遊戲資料夾複製一份到別的地方</strong>，
-       <u>包括裡面存放紀錄的資料夾</u>。不要挑檔案，整包複製最省事也最保險。</p>
-    <p><strong>「紀錄」是指這些</strong>（它們跟遊戲檔混在同一個資料夾裡）：</p>
-    <ul>
-      <li><code>Support\MVP Baseball 2005\</code> —— 遊戲自己建的，
-          裡面是設定（<code>MVPOptions_Options.sav</code>）與手把設定
-          （<code>controller.cfg</code>）。<u>剛安裝好時沒有這個資料夾，玩過才出現。</u></li>
-      <li><strong>王朝、老闆模式、名單與玩家檔案的存檔</strong>（<code>*_Franchise.sav</code>、
-          <code>*_Owner Mode.sav</code>、<code>*_Rosters.sav</code>、<code>*_Profile.sav</code>）——
-          <u>沒有固定的資料夾名</u>，你或你裝的模組包叫它什麼它就叫什麼。找不到就用這一行找：</li>
-    </ul>
-<pre><code>dir /s /b "〔你的遊戲資料夾〕\*.sav"</code></pre>
-<pre><code>find "〔你的遊戲資料夾〕" -name "*.sav"</code></pre>
-    <p class="small">上面第一行 Windows、第二行 Mac。
-       本站每一支工具都會自己備份它要動的那一個檔，
-       <strong>但那只保得住那一個檔</strong> —— 整包備份保的是「你玩到現在的一切」。
-       完整做法看<a href="../../tutorials/backup/index.html">備份與還原 SOP</a>。</p>
+       <u>包括裡面存放紀錄的資料夾</u>。</p>
+    <p class="small">怎麼整包複製、紀錄（王朝、名單、設定）放在哪、找不到怎麼找：
+       看<a href="../../tutorials/backup/index.html#whole">備份與還原 SOP 的「整包複製」</a>。</p>
   </div>
 
   <div class="quickfix" id="quick">
-    <p class="card-h">⚡ 只想趕快關掉那個數字？照這五步</p>
+    <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快關掉那個數字？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
       <li>下載 <code>mvp_hide_runner_speed.py</code> 放到桌面，檔名必須正好是這個（瀏覽器多半直接丟進「下載」資料夾，要自己拖到桌面）。</li>
       <li>開命令提示字元切到桌面，Windows 打第一行、Mac 打第二行<br>
@@ -169,7 +147,7 @@ TX:PLAYERNAME,<span class="nu">0</span>,0,396,398,122,12,...   <span class="cm">
     <a class="btn" href="mvp_hide_runner_speed.py" download>⬇ 下載腳本 mvp_hide_runner_speed.py</a>
     <a class="btn ghost" href="manual.html">🔧 不用本站腳本，全手動改</a>
   </div>
-  <p class="small">腳本 73 KB、零相依。<strong>完整原始碼就在本頁最下方</strong>，不必下載也能先看過一遍。</p>
+  <p class="small">腳本零相依。<strong>完整原始碼就在本頁最下方</strong>，不必下載也能先看過一遍。</p>
 
   <div class="card blue">
     <p class="card-h">不想在自己電腦上跑別人寫的程式？</p>
@@ -248,6 +226,7 @@ TX:PLAYERNAME,<span class="nu">0</span>,0,396,398,122,12,...   <span class="cm">
     <div class="step-n">4</div>
     <div>
       <div class="step-t">看懂預覽結果</div>
+      <div class="seen"><b>你會看到類似這樣</b>
 <pre><code>內含    47 個項目
 目標    fes_ingameinfobar.fel       <span class="cm">← 要看這個</span>
         解壓後 84,183 bytes / 951 行
@@ -256,6 +235,7 @@ TX:PLAYERNAME,<span class="nu">0</span>,0,396,398,122,12,...   <span class="cm">
      769  三壘   x=618  y=348   顯示 1 → 0
      ...
 這是預覽,沒有改到任何檔案。</code></pre>
+      </div>
       <div class="seen"><b>只要這兩點成立就往下走</b>
         <p>有印出「目標 <code>fes_ingameinfobar.fel</code>」，而且「找到 N 個」至少是 1。
            行號、數量跟上面不同<strong>沒關係</strong> —— 代表你的檔案版本不同，腳本會照實際狀況處理。</p>
@@ -366,12 +346,18 @@ TX:PLAYERNAME,<span class="nu">0</span>,0,396,398,122,12,...   <span class="cm">
       <tr><td data-label="你遇到的狀況">畫面印出<code>這個 .big 裡沒有 fes_ingameinfobar.fel</code></td>
           <td data-label="為什麼會這樣">選錯 <code>.big</code> 了</td>
           <td data-label="你要做的">確認拖進去的是 <code>data\frontend\ingame.big</code></td></tr>
+      <tr><td data-label="你遇到的狀況">加了 <code>--apply</code> 或 <code>--restore</code> 之後畫面印出<code>沒有權限寫入這個資料夾</code>（或 <code>沒有權限讀寫</code>；比較早下載的舊版腳本，印的是一大段英文錯誤訊息）</td>
+          <td data-label="為什麼會這樣">遊戲裝在 <code>C:\Program Files (x86)</code> 底下（這正是預設位置），一般開的命令提示字元在那裡建不了新檔，連備份都做不出來。「沒有權限讀寫」那一種也可能是 <code>ingame.big</code> 被設成唯讀，或遊戲正開著。<span class="small">（這兩句訊息本站是在 Mac 上把資料夾設成唯讀、把檔案設成讀不到模擬出來的，<u>還沒在 Windows 上實測</u>。）</span></td>
+          <td data-label="你要做的">先把遊戲關掉。在開始功能表找到「命令提示字元」，按右鍵選「以系統管理員身分執行」。新視窗一開是在 <code>C:\Windows\System32</code>，先打步驟 2 那一行 <code>cd %USERPROFILE%\Desktop</code> 回到桌面，再跑同一行（路徑拖不進去的話，照<a href="../../start.html">第 0 課操作二</a>手動打，前後加雙引號）。畫面最後會說遊戲檔動了沒，寫「遊戲檔沒有被改到」就不用還原；印的是「沒有權限寫入這個資料夾」的話，這一次什麼檔案都還沒動到</td></tr>
       <tr><td data-label="你遇到的狀況" class="mono">檔頭前四碼不是 BIGF</td>
           <td data-label="為什麼會這樣">那個檔案不是 EA 封裝檔，或是已經損毀</td>
           <td data-label="你要做的">從遊戲光碟或安裝檔取回原始的 <code>ingame.big</code></td></tr>
       <tr><td data-label="你遇到的狀況" class="mono">python 不是內部或外部命令</td>
           <td data-label="為什麼會這樣">電腦裡沒裝 Python，或安裝時漏勾了那個選項 —— 命令提示字元根本不認得 <code>python</code> 這個字</td>
-          <td data-label="你要做的">回<a href="../../start.html">第 0 課操作五</a>重裝，安裝畫面最下面的「Add python.exe to PATH」<strong>一定要先打勾</strong>；或者改打 <code>py</code> 試試</td></tr>
+          <td data-label="你要做的">回<a href="../../start.html#python">第 0 課操作五</a>照著裝。用舊式安裝程式的話，安裝畫面最下面的「Add python.exe to PATH」<strong>一定要先打勾</strong>（新的 Python install manager 沒有這個勾選框）；或者改打 <code>py</code> 試試</td></tr>
+      <tr><td data-label="你遇到的狀況">印出一段 <code>Python was not found</code> 開頭的英文，或跳出 Microsoft Store</td>
+          <td data-label="為什麼會這樣">多半是這台電腦還沒裝 Python。跳出來的是 Windows 內建的轉接捷徑，不是 Python 本身</td>
+          <td data-label="你要做的">關掉它，回<a href="../../start.html#python">第 0 課操作五</a>裝 Python（這兩種畫面本站還沒在 Windows 上實測）</td></tr>
       <tr><td data-label="你遇到的狀況">雙擊 <code>.py</code> 檔，黑視窗<strong>一閃就沒了</strong></td>
           <td data-label="為什麼會這樣">雙擊不會把 <code>.big</code> 的路徑交給腳本；腳本收不到路徑，印完說明就結束了</td>
           <td data-label="你要做的">這支腳本必須<strong>從命令提示字元執行、而且要帶上 <code>.big</code> 的路徑</strong> —— 回步驟 2、3 重做</td></tr>
@@ -466,6 +452,25 @@ Python 版本:(python --version 印出來的那行)
 
 
 <h2>想知道原理？</h2>
+  <div class="card grass">
+    <p class="card-h">怎麼確定就是它，不是別的檔</p>
+    <p>同一個群組裡有三個文字元件，而<strong>這個檔本身已經關掉了其中兩個</strong>。三行放在一起看，答案就很明顯：</p>
+    <p class="small">⚠ 原本這裡寫「遊戲原廠自己已經關掉了」。這個檔不在 EA 原版裡（<a href="#has-file">見本頁開頭的警告</a>），所以<u>不能說那是原廠的決定</u>，只能說這份檔案裡就是這樣。</p>
+<pre style="margin:8px 0 0"><code><span class="cm">fes_ingameinfobar.fel · GR:HOMEPLATE 群組內容（節錄）</span>
+TX:RATING,<span class="hl">1</span>,0,618,391,20,12,...        <span class="cm">← 開著，就是你看到的那個數字</span>
+TX:SPEED,<span class="nu">0</span>,0,5,80,54,11,...            <span class="cm">← 已關，本來要顯示「SPEED」字樣</span>
+TX:PLAYERNAME,<span class="nu">0</span>,0,396,398,122,12,...   <span class="cm">← 已關，本來要顯示跑者名字</span></code></pre>
+    <p style="margin-top:8px">逗號後的<strong>第一個數字就是顯示開關</strong>，1 是顯示、0 是隱藏（其餘欄位的意思見
+       <a href="../../reference/fel.html">FEL 版面語法速查</a>）。<strong>這份檔案裡</strong>就是用這個開關，把「SPEED」字樣和跑者名字關掉，
+       只留下那個數字。所以把 <code>RATING</code> 的 1 改成 0，走的是<u>這個檔案自己走過的那條路</u>，不是硬拆。</p>
+    <p>這種元件在<strong>本站測試機那份 <code>ingame.big</code></strong>（2,665,562 bytes、47 個項目）的這個版面檔裡一共 6 個，全部掛在 <code>GR:DIAMOND</code> → <code>GR:BASES</code> 底下：
+       本壘、三壘、二壘的群組各帶一個，而<strong>一壘的群組被宣告了兩次</strong>（第 782 行與第 791 行），前一個帶一個，後一個帶兩個
+       （其中一個跟前面那個一壘座標完全一樣，另一個畫在 <code>x=550, y=461</code>）。腳本不寫死數量，掃到幾個就關幾個，這份是 6 個全部關掉；換一份檔案不一定是 6 個，以預覽印出來的為準。
+       這也是壘上人多的時候右邊會出現一整排的原因 —— 不是一個東西在移動，是每個壘各畫一份。</p>
+    <p>順帶一提，為什麼是改開關、不是把整行刪掉：改開關每處<strong>只動 1 個字元，版面檔的總長度完全不變</strong>；
+       刪整行會改變檔案結構，遊戲讀到少一行會怎麼樣，我沒有實測過。</p>
+  </div>
+
   <p>遊戲的選單和 HUD 其實都是<strong>純文字版面腳本</strong>，只是外面包了一層壓縮。
      搞懂之後，同一套方法可以改遊戲裡幾乎所有介面元素：</p>
   <ul class="plain">
@@ -678,7 +683,7 @@ Python 版本:(python --version 印出來的那行)
   </div>
 
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1473 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1554 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -716,6 +721,9 @@ mvp_hide_runner_speed.py
     然後就被改名掉的中繼檔。中繼檔的名字是執行當下才生出來的隨機名
     (.&lt;檔名&gt;.tmp-xxxxxx 這種),用 tempfile.mkstemp 以 O_EXCL 建立 ——
     撞不到你的檔案,也沒有人能事先把那個名字佔起來。
+    另外,--apply 與 --restore 在動任何檔案之前,會先在同一個資料夾建一個
+    空的試寫檔(.mvp_probe-xxxxxxxxxxxx 這種)再馬上刪掉,確認這個資料夾寫得進去。
+    寫不進去就印中文說明、回傳 1,遊戲檔與備份都還沒被碰過。
 
 輸出:
   · 不加旗標:把找到的每一個速度數值印成一張表(行號、壘包、座標),
@@ -781,6 +789,7 @@ mvp_hide_runner_speed.py
 無外部相依,Python 3.7 以上即可。
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
+TOOL_DATE = '2026-09-23'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -795,7 +804,7 @@ mvp_hide_runner_speed.py
 #  · 授權:MIT(見檔尾)。教學文字另採 CC BY 4.0。
 #  · 回報與下架:https://toniliumvp.github.io/MVPBaseball/report.html
 #    三條管道,其中「直接向 GitHub 提出」不需經過維護者;
-#    留言區那條不需要任何帳號。管道有變動只會改那一頁。
+#    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 
 import re
@@ -871,6 +880,54 @@ def _refuse_symlink(path, what):
             '  (%s)寫過去會動到它指向的那個檔,而那個檔可能根本不在這個資料夾裡。\n'
             '  請先把它移走或換成實體檔,再跑一次。(目前沒有動到任何檔案。)'
             % (path, what))
+
+
+# ── 寫入之前先試一次(2026-09-23 加)──────────────────────────────────
+# 這個遊戲預設裝在 C:\Program Files (x86)\ 底下,那是受保護的資料夾:
+# 一般權限的命令提示字元在那裡建不了新檔。以前這支腳本要到做備份那一步才撞上,
+# 讀者看到的是十幾行英文 traceback,而且排錯表查不到。
+# 現在 --apply / --restore 動手之前,先在同一個資料夾用 os.open(O_CREAT|O_EXCL)
+# 建一個空檔再刪掉;建不出來就講人話停下來,那時候遊戲檔與備份都還沒被碰過。
+# ⚠️ 不拿 tempfile 來試:本站讀過 Python 3.9、3.11、3.12 的 tempfile 原始碼,
+#    它在 Windows 上碰到「拒絕存取」會換一個名字再試(3.14 改成最多試 20 次),
+#    所以最後丟出來的不一定是 PermissionError,也可能要試很久才放棄
+#    (這一點是讀原始碼推論的,本站還沒在 Windows 上實測)。
+#    os.open 只試一次,結果立刻知道。
+def _probe_writable(folder):
+    """在 folder 建一個空檔再刪掉。寫得進去回傳 None,寫不進去回傳那個 OSError。"""
+    probe = os.path.join(folder, '.mvp_probe-%s' % os.urandom(6).hex())
+    try:
+        fd = os.open(probe, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    except OSError as e:
+        return e
+    os.close(fd)
+    try:
+        os.remove(probe)
+    except OSError:
+        print('  (提醒:試寫用的空檔 %s 刪不掉,可以自己刪;遊戲檔沒有被動到)' % os.path.basename(probe))
+    return None
+
+
+def _print_no_permission(folder, err):
+    """寫不進去時印給人看的那一段。離開碼由呼叫的人決定(這支是 1)。
+
+    只有 PermissionError 才講「以系統管理員身分執行」那一套;
+    別的原因(唯讀的磁碟、磁碟滿……)那一套幫不上忙,就只照實說寫不進去。
+    """
+    if not isinstance(err, PermissionError):
+        print(f'\n✗ 這個資料夾現在寫不進去:{folder}')
+        print(f'  (系統回的是:{err})')
+        print('  遊戲檔沒有被改到,這個資料夾裡也沒有多出任何檔案。')
+        return
+    print(f'\n✗ 沒有權限寫入這個資料夾:{folder}')
+    print(f'  (系統回的是:{getattr(err, "strerror", None) or err})')
+    print('  遊戲裝在 C:\\Program Files (x86) 或 C:\\Program Files 底下時會這樣,')
+    print('  而那正是這個遊戲的預設安裝位置。')
+    print('  Windows:對「命令提示字元」按右鍵,選「以系統管理員身分執行」。')
+    print('  新視窗一開是在 C:\\Windows\\System32,先 cd 回你放腳本的地方')
+    print('  (例如 cd %USERPROFILE%\\Desktop),再跑同一行。')
+    print('  Mac / Linux 看到這一句,代表你這個帳號不能寫這個資料夾。')
+    print('  遊戲檔沒有被改到,這個資料夾裡也沒有多出任何檔案。')
 
 # ── 備份的原子性(2026-08-29 上線前稽核加)────────────────────────────
 # 原本是直接 shutil.copy2(遊戲檔, .bak)。複製途中被中斷(磁碟滿、外接碟拔掉、
@@ -1568,6 +1625,12 @@ def main():
             print(f'✗ 這個備份裡沒有這一課要的項目:{backup.name}')
             print('  它可能是別的教學留下來的備份。')
             return 1
+        # 蓋回去要先在同一個資料夾寫一個中繼檔。寫不進去的話現在就停,
+        # 不要等到中繼檔那一步才噴 traceback(理由見 _probe_writable 上面)。
+        _err = _probe_writable(str(big.parent))
+        if _err is not None:
+            _print_no_permission(big.parent, _err)
+            return 1
         _restore_from_backup(backup, big)
         # 蓋回去之後再比一次。copy2 中途出錯會丟例外,但「磁碟寫到一半滿了」
         # 這種情形值得再確認一次:比長度,再比內容,不用 zip()。
@@ -1680,6 +1743,13 @@ def main():
         print(f'\n✗ 備份的名字是一個符號連結:{backup.name}')
         print('  本程式不跟著它寫 —— 它可能指到資料夾外面完全無關的檔。')
         print('  請先把它移走或換成實體檔,再跑一次。(目前沒有動到任何檔案。)')
+        return 1
+
+    # 備份與寫入都要在這個資料夾建新檔。遊戲裝在 Program Files 底下時這裡寫不進去,
+    # 在做備份之前先試一次,寫不進去就講人話停下來(理由見 _probe_writable 上面)。
+    _err = _probe_writable(str(big.parent))
+    if _err is not None:
+        _print_no_permission(big.parent, _err)
         return 1
 
     # ⚠️ 用 lexists 不用 exists:dangling 連結對 exists 回 False,
@@ -2103,6 +2173,22 @@ def selftest():
 if __name__ == '__main__':
     try:
         sys.exit(main())
+    except PermissionError as _pe:
+        # ⚠️ 2026-09-23 補:寫入前的試寫(_probe_writable)過了,後面才被拒的情形
+        #    (例如 Windows 上那個檔被設成唯讀,或正被別的程式開著),
+        #    以及連讀都不讓讀的情形(預覽也會走到這裡,所以不能只說「寫入」)。
+        #    一樣講人話、照 _STATE 說遊戲檔動了沒,不留一整片英文 traceback。
+        _paths = [a for a in sys.argv[1:] if not a.startswith('--')]
+        _who = _paths[0] if _paths else '&lt;那個 .big&gt;'
+        print(f'\n✗ 沒有權限讀寫:{_pe}')
+        print('  可能的原因:遊戲裝在 C:\\Program Files 底下、那個檔被設成唯讀,或遊戲正開著。')
+        print('  Windows 可以對「命令提示字元」按右鍵,選「以系統管理員身分執行」再跑一次。')
+        if _STATE['phase'] == 'idle':
+            print('  遊戲檔沒有被改到。')
+        else:
+            print('  遊戲檔可能已經被換過,請拿 .bak 跟它比對,或直接還原:')
+            print(f'  python3 {Path(sys.argv[0]).name} "{_who}" --restore')
+        sys.exit(1)
     except KeyboardInterrupt:
         # ⚠️ 2026-09-05 補:原本沒有接。Ctrl-C 會噴一整段 traceback,
         #    離開碼還是 1 —— 跟「複驗沒過」長得一模一樣,使用者分不出
@@ -2168,6 +2254,16 @@ if __name__ == '__main__':
     <li><strong>本站沒驗的</strong> 唯一沒被驗證的是遊戲實際跑起來的畫面。檔案層面全過了（寫入後自動複驗、還原逐位元組比對、47 / 47 解壓重壓一致），但「開一場比賽、確認那個數字真的不見了」只能你自己做，而且壘上沒人本來就不會顯示。</li>
   </ul>
 
+  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <nav class="card course-strip" aria-label="這一課在課表的位置">
+    <p class="card-h">📚 照課表上課的話</p>
+    <p>這一課沒有排進任何一班。課表上寫的適合時機：「你覺得那個數字礙眼」</p>
+    <div class="btnrow">
+      <a class="btn ghost" href="../../plan.html">看整張課表</a>
+    </div>
+  </nav>
+  <!-- course-strip:end -->
+
   <footer>
     <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯。</p>
     <p>本教學只修改你自己電腦裡的檔案，不散布任何遊戲檔案。本文採 CC BY 4.0、腳本採 MIT 授權（<strong>站內的點陣圖片、社群模組與第三方工具不在此授權範圍</strong>，詳見<a href="../../legal.html">法律頁</a>）。
@@ -2175,6 +2271,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=4f2ad90011" defer></script>
+<script src="../../assets/site.js?v=12835e693d" defer></script>
 </body>
 </html>
