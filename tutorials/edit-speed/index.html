@@ -19,7 +19,7 @@
 <title>修改球員跑壘速度 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="改球員能力值最安全的一個欄位。附零相依腳本與「這一欄能不能改」的自助體檢工具，一行指令可還原。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="../../assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -62,10 +62,8 @@
   <div class="quickfix" id="quick">
     <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
-      <li>下載 <a href="mvp_edit_speed.py" download>mvp_edit_speed.py</a>，<strong>從「下載」資料夾拖到桌面</strong>，再切到桌面。Windows：<br>
-  <pre><code>cd %USERPROFILE%\Desktop</code></pre>
-  Mac：<br>
-  <pre><code>cd ~/Desktop</code></pre></li>
+      <li>下載 <a href="mvp_edit_speed.py" download>mvp_edit_speed.py</a>。下載的檔會在「下載」資料夾，命令視窗要在那裡開。Windows：打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打。Mac：開終端機先打<br>
+  <pre><code>cd ~/Downloads</code></pre></li>
       <li>查出你要改的球員，記下他的識別碼。<br>
   <pre><code>python mvp_edit_speed.py "你的遊戲資料夾" --find Trout</code></pre></li>
       <li>先預覽，這一行不會改到任何檔案。<br>
@@ -193,17 +191,15 @@
   <div class="step">
     <div class="step-n">1</div>
     <div>
-      <div class="step-t">下載腳本，放到桌面，切到桌面</div>
-<pre><code>cd %USERPROFILE%\Desktop</code></pre>
-<pre><code>cd ~/Desktop</code></pre>
+      <div class="step-t">下載腳本，在「下載」資料夾開命令視窗</div>
+      <p class="small">Windows：這一步不用打指令。打開檔案總管，左邊點「<u>下載</u>」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter。開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。</p>
+      <p class="small">Mac：打開終端機，打這一行：</p>
+<pre><code>cd ~/Downloads</code></pre>
       <div class="ifnot"><b>按了下載之後，檔案跑到哪裡去了？</b>
-          <p><strong>瀏覽器多半不會問你要存哪裡</strong>，它會直接放進「下載」資料夾。
-             所以按完之後還有一步：</p>
-          <p><span class="sk">1</span>打開檔案總管（Mac 用 Finder），左邊點「<u>下載</u>」<br>
-             <span class="sk">2</span>找到那個 <code>.py</code> 檔<br>
-             <span class="sk">3</span><strong>把它拖到桌面</strong></p>
-          <p class="small">沒做這一步的話，後面 <code>cd</code> 到桌面再執行，
-             畫面會出現 <code>can't open file</code> —— 那不是你打錯，是檔案還在「下載」裡。</p>
+          <p><strong>瀏覽器多半不會問你要存哪裡</strong>，它會直接放進「下載」資料夾，
+             所以命令視窗就在「下載」裡開（上面那一段），<u>不用把檔案搬到別處</u>。</p>
+          <p class="small">命令視窗跟檔案不在同一個資料夾的話，
+             畫面會出現 <code>can't open file</code> —— 那不是你打錯。</p>
         </div>
         <div class="ifnot"><b>如果檔名多了 .txt</b>
         <p>照<a href="../../start.html">第 0 課操作三</a>把副檔名顯示出來，右鍵重新命名刪掉 <code>.txt</code>。</p>
@@ -356,9 +352,9 @@
     <thead><tr><th style="width:34%">畫面上的訊息</th><th>原因</th><th>你要做的</th></tr></thead>
     <tbody>
       <tr class="hi"><td data-label="畫面上的訊息" class="mono">can't open file '…\mvp_*.py'</td>
-          <td data-label="原因"><strong>檔案還在「下載」資料夾，不在桌面。</strong>
+          <td data-label="原因"><strong>命令視窗跟腳本不在同一個資料夾</strong>，或檔名對不上（瀏覽器可能在檔名後面加了 <code>(1)</code>）。
               <u>這是本站最常見的第一個卡點。</u></td>
-          <td data-label="你要做的">開檔案總管左邊點「下載」，把那個 <code>.py</code> 拖到桌面，再跑一次</td></tr>
+          <td data-label="你要做的">打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）；檔名多了 <code>(1)</code> 就改成跟指令裡一模一樣</td></tr>
       <tr><td data-label="畫面上的訊息" class="mono">找不到 …/attrib.dat</td><td data-label="原因">拖到的資料夾不對</td>
           <td data-label="你要做的">要拖<strong>遊戲安裝資料夾</strong></td></tr>
       <tr class="hi"><td data-label="畫面上的訊息" class="mono">沒有 CRLF 換行，可能已被編輯器改壞</td>
@@ -423,13 +419,13 @@ Python 版本: (python --version 印出來的那行)
     <li><strong>名字像能力，不等於值是分數</strong> <code>battingstance</code> 範圍 0-65 看起來像分數，其實是「第幾號打擊姿勢」，寫 85 進去只會讓他擺一個不存在的姿勢；<code>starpower</code> 只認得 0 到 4。</li>
     <li><strong>欄號不能記死</strong> 本站測試機的 speed 在第 22 欄，剛安裝好的原版在第 23 欄（原版第 22 欄是 <code>playerattrib_baserunning</code>）。腳本每次從表頭把欄號找出來，所以你不必背。</li>
     <li><strong>關鍵數字</strong> 3,247 列有 speed 值；範圍 0 到 97、88 種值、最常見的 43 佔 46.1%（那是預設值，將近一半的球員沒有被個別設定過速度）。腳本允許填 0 到 99，那是兩份名冊的<strong>聯集</strong>（剛安裝好的原版實際出現 39 到 99，本站測試機這份是 0 到 97）。</li>
-    <li><strong>最容易踩的雷</strong> 二刀流球員佔兩列，實測 <code>Shohei Ohtani</code> 打者那列 speed=83、投手那列還是預設值 43，改錯列就白改。另外本站最常見的第一個卡點是 <code>can't open file</code>，那不是你打錯，是 <code>.py</code> 還躺在「下載」資料夾。</li>
+    <li><strong>最容易踩的雷</strong> 二刀流球員佔兩列，實測 <code>Shohei Ohtani</code> 打者那列 speed=83、投手那列還是預設值 43，改錯列就白改。另外本站最常見的第一個卡點是 <code>can't open file</code>，那不是你打錯，是命令視窗跟 <code>.py</code> 不在同一個資料夾。</li>
     <li><strong>絕對不要用一般文字編輯器存 <code>attrib.dat</code></strong> 畫面出現「沒有 CRLF 換行，可能已被編輯器改壞」就代表換行符被改掉、檔案已壞，只能從備份還原。</li>
     <li><strong>安全網</strong> <code>--set</code> 不加 <code>--apply</code> 就只是預覽；備份是第一次 <code>--apply</code> 時建立的 <code>attrib.dat.speedbak</code>，之後再改幾次都<strong>不會覆蓋</strong>它；<code>--restore</code> 還原後位元組完全一致，<strong>但它退回的是「第一次 <code>--apply</code> 之前」那一整份名冊</strong> —— 本站另外三支工具（<code>mvp_player.py</code>、<code>mvp_ratings.py</code>、<code>mvp_edit_stance.py</code>）改的是同一個 <code>attrib.dat</code>，你在那之後用它們做的修改會被一起退掉。看到「複驗不通過」就立刻 <code>--restore</code>，然後回報。</li>
     <li><strong>本站沒驗的</strong> <code>--audit</code> 的形狀判定只能<strong>排除錯的</strong>、不能證明對的（拿第 2 欄「背號」去體檢，結果也是「寬而平均」）。投手的 <code>fastball_control</code> 與其他幾個 <code>control</code> 在統計上是同一個形狀、很可能也可以改，但本站未實機驗證，所以這支腳本連寫都不讓你寫。</li>
   </ul>
 
-  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <!-- course-strip:begin · 這一塊由產生器從 plan.html 產生，不要手改 -->
   <nav class="card course-strip" aria-label="這一課在課表的位置">
     <p class="card-h">📚 照課表上課的話</p>
     <p>這一課沒有排進任何一班。課表上寫的適合時機：「你只想單獨改一個能力值欄位 —— 這一課挑的是最安全的那一個」</p>
@@ -579,7 +575,7 @@ Python 版本: (python --version 印出來的那行)
     <p>這支腳本內建一份自我測試，<strong>不需要遊戲資料夾，也不會碰到你的任何檔案</strong> ——
        它在一個丟棄式的暫存資料夾裡自己造一份最小名冊來測：</p>
 <pre><code>python mvp_edit_speed.py --selftest</code></pre>
-    <p class="small">全過會印「自我測試:全部通過(55 項,含 14 個反向餌)」，結束代碼 0。
+    <p class="small">全過會印「自我測試:全部通過(57 項,含 15 個反向餌)」，結束代碼 0。
        「反向餌」是故意做壞了給它抓的：把備份截成半截、事先把暫存檔的名字佔住、
        把名冊換成一條指向外面的符號連結……抓不到就當場不通過，
        免得守門的程式其實是啞的。</p>
@@ -588,7 +584,7 @@ Python 版本: (python --version 印出來的那行)
   <h2 id="source">完整原始碼</h2>
   <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。不必下載也能先看過一遍。</p>
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1832 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1908 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -693,7 +689,7 @@ attrib.dat 長什麼樣：純文字、CRLF 換行、逗號分隔。
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -1898,10 +1894,16 @@ def main():
 # ─────────────────────────────────────────────────────────
 #  自我測試(--selftest):不碰任何遊戲檔,全部在一個丟棄式資料夾裡做
 #
-#  每一道新守門都配一個「餌」—— 先製造出那個守門要擋的情況,再確認它真的擋了,
+#  這一節替守門配「餌」—— 先製造出那個守門要擋的情況,再確認它真的擋了,
 #  而且該保住的東西一個位元組都沒少。沒有反向測試的檢查,分不出
 #  「沒問題」跟「根本沒跑」(本站 2026-08-29 就吃過這個虧:一整批檢查器
 #  看起來全綠,實際上是通過時不出聲)。
+#  ⚠️ 不是每一道守門都有餌。2026-09-24 把自我測試以外、條件成立就讓這支停下來的
+#     23 道守門逐一拆掉(那一個 if 改成永遠不成立)再跑 --selftest,會變紅的只有 2 道
+#     (還原時暫存檔讀回來跟備份對不上、寫進去之後的複驗沒過);其餘 21 道拆掉照樣全綠。
+#     例如 --restore 擋半截備份的那三道(最後一列不是 CRLF 收尾、每一列格數不一致、
+#     備份裡的球員比名冊少):三道一起拆掉也照樣全綠 —— 下面餌 3 餵的半截備份
+#     只有 40 bytes,在更前面的格式檢查就被擋下了,走不到這三道。
 # ─────────────────────────────────────────────────────────
 def _fake_roster(rows=6, speed=50):
     """造一份最小的名冊:表頭三欄 + 幾列球員,格式跟真的 attrib.dat 一樣。
@@ -1916,7 +1918,7 @@ def _fake_roster(rows=6, speed=50):
 
 
 def selftest():
-    """跑一次全部的守門,回傳 0 代表全綠。不需要遊戲資料夾,也不碰任何遊戲檔。
+    """跑一次下了餌的那幾道守門,回傳 0 代表全綠。不需要遊戲資料夾,也不碰任何遊戲檔。
 
     測試過程本身會呼叫 cmd_set / cmd_restore,它們會印一大堆東西,
     所以整段的輸出先收起來 —— 只有在有一條紅的時候才把它倒出來,
@@ -1930,9 +1932,11 @@ def selftest():
     # -O 拿不掉它 —— 但這道守門照樣要有:全站每一支的 --selftest 都得在 -O
     # 底下講同一句話,而且哪天有人在這裡補一句普通的 assert,
     # 沒有這道守門就會靜靜地變成假綠。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
 
     global SPEED_FIELD, _APPLIED
     import io as _io
@@ -1951,6 +1955,10 @@ def selftest():
         baits.append(what)
 
     try:
+        # 最上面那道 -O 守門自己的餌(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳)
+        bait('-O 守門:假裝開了 -O 就要拒跑')
+        check(_opt[0], '假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試竟然沒有拒跑')
+        check(_opt[1], '陰性對照:沒開 -O 守門也擋,或是換回原本那一支沒換成功')
         with contextlib.redirect_stdout(noise):
             _selftest_body(check, bait)
     except BaseException:
@@ -2363,6 +2371,70 @@ def _selftest_body(check, bait):
               '__main__ 接了 BaseException —— SystemExit 與 Ctrl-C 會被它吃掉')
 
 
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
+
+
 if __name__ == '__main__':
     # --selftest 要排在最前面判斷:它不需要遊戲資料夾,
     # 走進 main() 反而會因為「沒給路徑」被 argparse 擋下來。
@@ -2432,6 +2504,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=12835e693d" defer></script>
+<script src="../../assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

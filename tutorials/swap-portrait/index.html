@@ -19,7 +19,7 @@
 <title>換球員大頭照 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="換掉名單畫面上球員的那張照片。本站第一課會真的產生新的遊戲圖檔：把 PNG 壓成遊戲用的 DXT3 格式再接回封裝檔。附零相依腳本，一行指令可還原。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="../../assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -82,7 +82,7 @@
   <pre><code>python3 mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --import 5826 ~/Desktop/5826.png --apply</code></pre></li>
     </ol>
     <p class="tail"><strong>下載完先跑這一行</strong>，確認腳本本身沒壞：它不需要遊戲資料夾，
-       也不碰任何遊戲檔，裡面有 16 個反向餌（先證明「答案錯的時候它真的會叫」）。</p>
+       也不碰任何遊戲檔，裡面有 28 個反向餌（先證明「答案錯的時候它真的會叫」）。</p>
   <p class="small">Windows：</p>
   <pre><code>python mvp_swap_portrait.py --selftest</code></pre>
   <p class="small">Mac / Linux：</p>
@@ -92,6 +92,9 @@
   <pre><code>python mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --restore</code></pre>
   <p class="small">Mac / Linux：</p>
   <pre><code>python3 mvp_swap_portrait.py "&lt;遊戲資料夾&gt;" --restore</code></pre>
+    <p class="tail"><strong>硬碟要留空間</strong>：第一次 <code>--apply</code> 要在 <code>portrait.big</code> 旁邊同時多放兩份跟它一樣大的檔
+       （一份備份、一份動手用的工作複本；本站測試機那份 253.6 MB，兩份約 507 MB），之後再換只要一份。
+       不夠的話腳本會在動手之前就停下來，遊戲檔不會被碰到。</p>
     <p class="tail"><strong>⚠️ 先看你這一份換不換得了</strong>：這支腳本只吃 DXT3 格式的大頭照，
        而<u>剛安裝好的原版整包都是 ARGB32</u>，第 3 步就會停下來。
        換得了的是<strong>已經被模組換成 DXT3 的那些編號</strong>（模組只換一部分的話，同一份檔裡兩種都有）。
@@ -182,6 +185,11 @@
     <li>電腦裡有 Python 3（<a href="../../start.html">第 0 課</a>教怎麼確認、怎麼裝）</li>
     <li>一套會存 PNG 的修圖軟體。小畫家、Photoshop、GIMP、Photopea 都可以，
         <strong>只要能存成 256×256 的 PNG</strong></li>
+    <li><strong>硬碟要留得下兩份 <code>portrait.big</code></strong> —— 一份備份，
+        一份動手時的工作複本（腳本不直接改你的 <code>portrait.big</code>，是在旁邊的複本上做完、驗過才一次換上去）。
+        第一次 <code>--apply</code> 兩份同時存在，所以要抓 <code>portrait.big</code> 大小的兩倍：
+        本站測試機那份 253.6 MB，兩份約 507 MB；已經有備份的話只要一份。
+        <strong>硬碟快滿時會出現舊版沒有的失敗</strong> —— 失敗是安全的（在動手之前就停、遊戲檔沒動、畫面上會講要多少空間）</li>
   </ul>
 
   <h2>👉 你要做的事</h2>
@@ -191,7 +199,7 @@
     <div>
       <p class="step-t">下載腳本</p>
       <p class="step-why">放在「下載」就好，不必放進遊戲資料夾。</p>
-      <p><a href="mvp_swap_portrait.py" download>mvp_swap_portrait.py</a>（2,408 行，零相依）</p>
+      <p><a href="mvp_swap_portrait.py" download>mvp_swap_portrait.py</a>（3,023 行，零相依）</p>
       <div class="card amber">
         <p class="card-h">按了下載之後，檔案跑到哪裡去了？指令要在哪裡打？</p>
         <p><strong>瀏覽器多半不會問你要存哪裡</strong>，它會直接放進「下載」資料夾。
@@ -307,7 +315,9 @@
       <tr><td data-label="看到什麼">是一個資料夾，不是檔名／資料夾不存在／已經存在，而且不是 PNG 檔 —— 不敢覆蓋它</td><td data-label="怎麼回事"><code>--export</code> 的輸出路徑不對，或那個位置已經有一個不是 PNG 的檔</td><td data-label="怎麼做">把檔名一起給上、先把資料夾建好，或換一個檔名。覆蓋自己剛才匯出的那張 PNG 是允許的</td></tr>
       <tr><td data-label="看到什麼">不是 SHPI 檔（開頭是 …）</td><td data-label="怎麼回事">那個編號不是圖。封裝檔裡有 2 個只有 1 個位元組的項目（都叫 <code>a2653.fsh</code>）</td><td data-label="怎麼做">換一個編號。<code>--info</code> 列出來的就是看起來是圖的那些</td></tr>
       <tr><td data-label="看到什麼">…… 是一個符號連結</td><td data-label="怎麼回事">遊戲的封裝檔或那份備份，其中一個是符號連結。照著它寫會動到<u>資料夾外面</u>的檔案，所以腳本整個停下來</td><td data-label="怎麼做">把那個連結移走（或整包換一個資料夾）再跑一次。<strong>停在這裡的時候腳本一個檔案都還沒動</strong></td></tr>
-      <tr class="hi"><td data-label="看到什麼"><strong>複驗沒過</strong></td><td data-label="怎麼回事">寫進去的東西跟預期差太多</td>
+      <tr><td data-label="看到什麼"><code>停下來了:硬碟空間不夠:這一次要在 portrait.big 旁邊暫時多放 …</code></td><td data-label="怎麼回事">動手要多放一份跟 <code>portrait.big</code> 一樣大的工作複本，第一次 <code>--apply</code> 還要再加一份備份。腳本在做備份之前先量過那顆硬碟，放不下就停。本站測試機那份 253.6 MB，第一次要多放約 507 MB</td><td data-label="怎麼做">照畫面上印的數字清出空間，再跑同一行。畫面最後一段是「什麼都沒有動到」，<strong>不必還原</strong></td></tr>
+      <tr><td data-label="看到什麼"><code>工作複本的複驗沒過</code>（後面接「所以沒有換上去」）</td><td data-label="怎麼回事">寫進工作複本的東西跟預期差太多，腳本就不把它換上去，工作複本直接刪掉（刪不掉的話，畫面會多印一句「<code>旁邊留下一個沒刪掉的工作複本</code>」和那個檔名）</td><td data-label="怎麼做">你的 <code>portrait.big</code> 一個位元組都沒有動，<strong>不必還原</strong>。照下面的範本回報</td></tr>
+      <tr class="hi"><td data-label="看到什麼"><strong>複驗沒過</strong>（後面接「<code>遊戲檔已經被改過了,請馬上還原</code>」）</td><td data-label="怎麼回事">工作複本驗過、換上去了，換上去之後再讀一次 <code>portrait.big</code> 卻對不上（很少見）</td>
           <td data-label="怎麼做"><strong>立刻 <code>--restore</code></strong>（腳本會把這一行整行印出來給你複製），然後照下面的範本回報。<u>這種情形結束碼是非 0</u>，不會裝作沒事</td></tr>
     </tbody>
   </table></div>
@@ -326,9 +336,10 @@
   <p>不會只丟一句「已中斷」就跑掉。腳本一路記著<strong>遊戲檔到底動過沒有</strong>，
      中斷時照那筆紀錄講三種話：</p>
   <ul class="plain">
-    <li><strong>還沒動到</strong>（多半是停在讀檔、壓縮或印報告的階段）——
+    <li><strong>還沒動到</strong>（停在讀檔、壓縮、印報告、做備份、準備工作複本或往工作複本寫資料的階段 ——
+        換上去之前，遊戲檔一個位元組都沒被寫過）——
         印「<code>已中斷,什麼都沒有動到。</code>」</li>
-    <li><strong>已經動到了</strong>（新資料已經接進封裝檔，或還原已經換過正本）——
+    <li><strong>已經動到了</strong>（工作複本已經換上去了，或還原已經換過正本）——
         印「<code>已中斷 —— 但遊戲檔已經被改過了(portrait.big)。</code>」，
         並把 <code>--restore</code> 那一行<u>整行印出來</u>讓你複製</li>
     <li><strong>正好停在換的那一瞬間</strong>（很少見：換名跟登記本來是同一段不可中斷的動作，
@@ -341,10 +352,19 @@
      讀不到檔（外接碟被拔掉、權限沒了）、寫不進去（遊戲裝在 <code>Program Files</code> 底下、檔案被設成唯讀）、
      或是找不到你給的那張 PNG —— 畫面先印「<code>停下來了:……</code>」，
      再用上面那三種話告訴你遊戲檔動了沒，<strong>結束碼是 2</strong>。
-     真的沒預料到的錯（例如寫到一半磁碟滿了）則是先印「<code>出錯停下來了</code>」開頭的那三種話之一，
+     真的沒預料到的錯（例如準備工作複本的時候，硬碟剛好被別的程式塞滿 ——
+     空間不夠平常在動手之前就會被擋下來）則是先印「<code>出錯停下來了</code>」開頭的那三種話之一，
      後面接一段英文錯誤訊息（回報時請整段貼上），<strong>結束碼是 1</strong>。
      備份本身也不怕中斷：它先寫進一個<u>名字猜不到的暫存檔</u>，
-     完整寫完才改名上位，所以中斷不會留下半截的備份，也不會留下暫存垃圾。</p>
+     完整寫完才改名上位，所以中斷不會留下半截的備份，也不會留下暫存垃圾。
+     工作複本也一樣：出了錯或按了 Ctrl-C，沒換上去的一律刪掉；
+     刪不掉（例如外接碟被拔掉）的時候不會說已經刪掉，會印「<code>旁邊留下一個沒刪掉的工作複本</code>」和那個檔名。</p>
+  <p class="small">⚠️ 上面講的都是<u>腳本自己接得到</u>的狀況。命令視窗被關掉、斷電、程式被強制結束的時候，
+     腳本來不及收尾，<code>portrait.big</code> 旁邊可能留下一個 <code>.portrait.big.work-xxxxxxxx</code>
+     （後面 8 個字每次不一樣，最大會跟 <code>portrait.big</code> 差不多大；本站測試機那份 253.6 MB）。
+     <strong>遊戲檔沒有被它動到，遊戲也不會讀它</strong>，可以直接刪掉；下一次 <code>--apply</code> 不會替你清掉它。
+     Mac 上它的名字以點開頭，Finder 預設看不到。
+     （Mac 上用強制結束程式模擬過會留下這個檔；Windows 上關掉命令提示字元視窗那一種<u>還沒實測</u>。）</p>
 
   <h2>📋 回報範本</h2>
   <p>卡住的話，把下面複製起來填一填：</p>
@@ -369,12 +389,12 @@
     <li><strong>三層結構，只動最裡面一層</strong> <code>portrait.big</code>（本站測試機那份 7,544 個項目；三份剛安裝好的原版都是 2,393 個）裡的 <code>5826.fsh</code>（這個編號原版沒有）用 QFS 壓縮，解開是 SHPI 容器，再裡面才是 DXT3 像素。外面兩層的長度與位置全都不動，所以<strong>新圖尺寸一變就對不上</strong>，腳本會直接擋下來。</li>
     <li><strong>有一點誤差是正常的</strong> DXT3 把每個 4×4 方塊壓成 16 個位元組，一個方塊最多只能有四種顏色。本站拿遊戲裡 20 張現成圖來回測試，看得見的像素中位數 99.32% 完全相同（最低 95.79%），單一色階最大誤差 5 / 255，透明度 0 個像素對不上。大面積漸層最吃虧。</li>
     <li><strong>存檔最容易錯的四件事</strong> 尺寸不是 256×256、存成 JPG、存成 16 位元 PNG、勾了交錯（interlaced）。另外沒保留透明度的話，人像以外那圈會變成一塊實心色。</li>
-    <li><strong>安全網</strong> 不加 <code>--apply</code> 就不會動到遊戲檔（<code>--export</code> 例外，它會寫出你指定的那張 PNG）；寫入前自動備份成 <code>portrait.big.portraitbak</code>；新資料一律接到檔尾，只改目錄 8 bytes 加檔頭 4 bytes，舊資料一個位元組都不動；<code>--restore</code> 還原後與動手前位元組完全相同（本站用 SHA-256 驗過）。另外兩件事：<strong>遊戲檔或備份檔只要是符號連結就直接拒絕</strong>（那種連結會讓寫入落到資料夾外面的檔案上，所以停在這裡時一個檔案都還沒動）；<strong>複驗沒過會以非 0 結束</strong>，而且把 <code>--restore</code> 那一行整行印出來給你複製，不會印個叉就當沒事。</li>
-    <li><strong>成功長什麼樣</strong> 出現「已備份 → portrait.big.portraitbak」、出現「只改了目錄 8 bytes + 檔頭 4 bytes」、複驗那行的百分比大於 90%，進遊戲名單畫面照片換了。想先確認可以再 <code>--export</code> 一次，匯出來的就是遊戲實際會讀到的圖；複驗沒過就立刻 <code>--restore</code>。</li>
+    <li><strong>安全網</strong> 不加 <code>--apply</code> 就不會動到遊戲檔（<code>--export</code> 例外，它會寫出你指定的那張 PNG）；寫入前自動備份成 <code>portrait.big.portraitbak</code>；新資料一律接到檔尾，只改目錄 8 bytes 加檔頭 4 bytes，舊資料一個位元組都不動，而且是先在旁邊的工作複本上做、驗過才換上去 —— 所以<strong>第一次 <code>--apply</code> 硬碟要留得下兩份 <code>portrait.big</code></strong>（本站測試機那份 253.6 MB，兩份約 507 MB），不夠會在動手之前就停；<code>--restore</code> 還原後與動手前位元組完全相同（本站用 SHA-256 驗過）。另外兩件事：<strong>遊戲檔或備份檔只要是符號連結就直接拒絕</strong>（那種連結會讓寫入落到資料夾外面的檔案上，所以停在這裡時一個檔案都還沒動）；<strong>複驗沒過會以非 0 結束</strong>：換上去之前沒過就不換、不用還原；換上去之後才沒過，會把 <code>--restore</code> 那一行整行印出來給你複製，不會印個叉就當沒事。</li>
+    <li><strong>成功長什麼樣</strong> 出現「已備份 → portrait.big.portraitbak」、出現「只改了目錄 8 bytes + 檔頭 4 bytes」、複驗那行的百分比大於 90%，進遊戲名單畫面照片換了。想先確認可以再 <code>--export</code> 一次，匯出來的就是遊戲實際會讀到的圖；畫面叫你 <code>--restore</code> 才還原。</li>
     <li><strong>本站沒驗的、還沒做的</strong> 這支腳本只處理 DXT3（代號 0x61）的大頭照，碰到別的格式會停下來不做 —— 而<strong>剛安裝好的原版 2,391 張圖全部是 ARGB32（代號 0x7D）128×128</strong>（本站在英文版、中文版、PK 版三份上各量一次，DXT3 都是 0 張），所以原版目前一張都換不了，<u>ARGB32 的寫回還沒做</u>。格式表裡的 0x7E（ARGB16_1555）是外部文件寫的，本站至今找不到樣本，無從實測。另外 FSHTOOL 說明書那條「代號加 0x80 代表這張圖本身是壓縮過的」，本站也沒有用到。</li>
   </ul>
 
-  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <!-- course-strip:begin · 這一塊由產生器從 plan.html 產生，不要手改 -->
   <nav class="card course-strip" aria-label="這一課在課表的位置">
     <p class="card-h">📚 照課表上課的話</p>
     <p><a href="../../plan.html#c"><strong>③ 外觀班</strong></a> 第 3／6 堂</p>
@@ -402,6 +422,11 @@
   <p>寫回去的時候<u>不是覆蓋原本的位置</u>，而是把整份新資料<strong>接到檔案最後面</strong>，
      只改目錄裡那一項的 8 個位元組、加上檔頭的 4 個位元組。
      舊資料一個位元組都沒有動，這就是 <code>--restore</code> 一定救得回來的原因。</p>
+  <p>而且這些改動<u>不是直接做在 <code>portrait.big</code> 上</u>：腳本先把它整份複製成同一個資料夾裡的<strong>工作複本</strong>，
+     接資料、改目錄、改檔頭全在複本上做，重新讀回來驗過，才用一次原子換名換上去。
+     換上去之前不管出什麼事，<code>portrait.big</code> 一個位元組都沒被寫過；
+     換名本身不會停在一半，所以遊戲檔只有「原來那一份」跟「換好的那一份」兩種狀態。
+     代價是動手的那一刻硬碟要多一份跟 <code>portrait.big</code> 一樣大的空間。</p>
   <div class="tablewrap"><table class="stack">
     <thead><tr><th>哪一段</th><th>做什麼</th><th>為什麼要有它</th></tr></thead>
     <tbody>
@@ -425,8 +450,15 @@
               以及<u>那一項的位移欄位本身在檔案的哪個位置</u></td>
           <td data-label="為什麼要有它">最後一欄是關鍵：記住它，之後改檔就只寫那 8 個位元組，
               不必重排整份目錄</td></tr>
+      <tr><td data-label="哪一段"><code>_stage_copy()</code><br><code>_require_space()</code></td>
+          <td data-label="做什麼">動手之前先量硬碟放不放得下；再把 <code>portrait.big</code> 整份複製成旁邊的工作複本（名字每次不一樣），
+              讀回來比 SHA-256，對得上才拿它來改</td>
+          <td data-label="為什麼要有它">改動全做在複本上，出了錯或按了 Ctrl-C 就整份丟掉（丟不掉會印出留下的檔名）；
+              關掉視窗、斷電這類腳本接不到的狀況，複本會留在旁邊（見「中途按 Ctrl-C 會怎樣」最後一段）。
+              不管哪一種，遊戲檔都不會停在「目錄或檔頭只改了一半」的樣子。
+              空間不夠的話在做備份之前就停，不會做到一半才發現</td></tr>
       <tr><td data-label="哪一段"><code>append_entry()</code></td>
-          <td data-label="做什麼">把新資料接到檔尾，改目錄 8 個位元組加檔頭 4 個位元組</td>
+          <td data-label="做什麼">把新資料接到<strong>工作複本</strong>的檔尾，改目錄 8 個位元組加檔頭 4 個位元組</td>
           <td data-label="為什麼要有它">重新打包會弄丟目錄沒有指到的資料。接到檔尾是唯一
               「舊資料一個位元組都不動」的寫法</td></tr>
       <tr><td data-label="哪一段"><code>fsh_first_image()</code></td>
@@ -449,14 +481,15 @@
           <td data-label="做什麼">把所有會擋下來的理由先問完（編號在不在、格式對不對、尺寸一不一樣），
               再壓縮、印品質報告，最後才寫</td>
           <td data-label="為什麼要有它">沒加 <code>--apply</code> 時就停在印報告那一步。
-              寫完會重新開檔讀回來比對，一致率低於 90% 就當成失敗</td></tr>
+              寫完會重新開檔讀回來比對兩輪：換上去之前讀工作複本，一致率低於 90% 就不換上去；
+              換上去之後再讀一次 <code>portrait.big</code>，沒過才叫你 <code>--restore</code></td></tr>
       <tr><td data-label="哪一段"><code>cmd_restore()</code></td>
           <td data-label="做什麼">拿備份蓋回去，蓋之前先跑一次上面那些把關</td>
           <td data-label="為什麼要有它">備份檔<u>刻意不刪</u>，萬一還原也出事，你手上還有東西</td></tr>
     </tbody>
   </table></div>
   <p class="small">安全網集中在三個地方：<strong>不加 <code>--apply</code> 就不會動到遊戲檔</strong>（<code>--export</code> 例外，它會寫出你指定的那張 PNG，所以它的輸出路徑另外有四道把關）、
-     <strong>備份是原子的</strong>、<strong>寫完立刻讀回來複驗</strong>。
+     <strong>備份是原子的</strong>、<strong>改動做在工作複本上，換上去前後各讀回來複驗一次</strong>。
      <u>還原也是</u>：先寫進暫存檔、比對 SHA-256 對得上才換掉正本，
      所以中途失敗的話正本永遠是原來那一份。
      做不到的事也一起講清楚：只處理 DXT3（代號 <code>0x61</code>，<a href="#argb32">剛安裝好的原版整包不是這個格式</a>）、不能改尺寸、不能新增編號，
@@ -466,7 +499,7 @@
   <h2 id="source">完整原始碼</h2>
   <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。</p>
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（2408 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（3023 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -539,8 +572,20 @@ mvp_swap_portrait.py — 換掉 MVP Baseball 2005 的球員大頭照
     教你用系統管理員身分重跑,結束碼 2 —— 那時候遊戲檔跟備份都還沒被碰過。
     試寫過了、後面才被拒絕寫入(例如那個檔被設成唯讀)則印「停下來了:沒有權限讀寫…」,
     結束碼一樣是 2
-  · 寫入走 append,舊資料一個位元組都不動
-  · 寫完立刻重新開檔讀回來跟你的 PNG 比對,一致率低於 90% 就當成失敗:
+  · 寫入走 append,舊資料一個位元組都不動 —— 而且**不是直接寫在遊戲檔上**
+    (2026-09-24 改):先把 portrait.big 整份複製成同一個資料夾裡的工作複本
+    (.portrait.big.work-xxxxxxxx 這種,名字每次不一樣),接資料、改目錄 8 bytes、
+    改檔頭 4 bytes 全部做在複本上,驗過了才用一次原子換名換上去。
+    換名之前中途失敗或按 Ctrl-C,遊戲檔一個位元組都沒有被寫過,工作複本會被清掉;
+    清不掉(例如外接碟被拔掉)的話,畫面會印出留下的那個檔名。
+    關掉視窗、斷電、程式被強制結束的時候腳本來不及收尾,portrait.big 旁邊可能留下一個
+    .portrait.big.work-xxxxxxxx(最大跟 portrait.big 差不多大),遊戲不會讀它,可以自己刪
+  · 代價是硬碟空間:動手的那一刻要多放一份跟 portrait.big 一樣大的工作複本,
+    第一次 --apply 還要再加一份備份(兩份同時存在)。動手之前先量那顆硬碟還剩多少,
+    不夠就印「停下來了:硬碟空間不夠…」,結束碼 2 —— 那時候遊戲檔跟備份都還沒被碰過
+  · 複驗兩輪,兩輪都是重新開檔讀回來跟你的 PNG 比對:
+    換名之前驗工作複本,一致率低於 90% 就**不換上去**(遊戲檔沒動,結束碼 2);
+    換名之後再驗一次你真正的遊戲檔,這一輪沒過才是「已經改了」:
     結束碼非 0,並把還原指令整行印出來
   · 中途按 Ctrl-C:會照「檔案到底動了沒」講不同的話 —— 沒動過才說
     「什麼都沒有動到」,動過了就叫你 --restore。兩種的結束碼都是 130。
@@ -554,9 +599,10 @@ mvp_swap_portrait.py — 換掉 MVP Baseball 2005 的球員大頭照
     所以中途失敗或被中斷時,正本永遠是原來那一份(絕不用 copy2 直接蓋,
     那會在第一瞬間就把正本截成 0);
     還原完再把遊戲檔跟備份逐位元組比一次 —— 比對過了才說成功
-  · --selftest 不需要遊戲資料夾,也不碰任何遊戲檔:裡面有 16 個反向餌,
+  · --selftest 不需要遊戲資料夾,也不碰任何遊戲檔:裡面有 28 個反向餌,
     先證明「答案錯的時候它真的會叫」。它不接受 python -O(-O 會把 assert
-    全部拿掉,測試會在什麼都沒驗的情況下印「全部通過」)
+    全部拿掉,測試會在什麼都沒驗的情況下印「全部通過」);
+    這道拒跑的守門自己也有一個餌(第 22 個)
 
 做不到的事:
   · 只處理 DXT3(代號 0x61)的大頭照。碰到別的格式會停下來,不會硬做。
@@ -575,7 +621,7 @@ mvp_swap_portrait.py — 換掉 MVP Baseball 2005 的球員大頭照
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -854,8 +900,10 @@ def _safe_write_bytes(path, data, what):
 # ── 中斷的時候要說實話:遊戲檔到底動了沒 ────────────────────────────
 # 按 Ctrl-C 之後只印「已中斷」是不夠的 —— 讀者最需要知道的是
 # 「我的遊戲檔現在是好的還是壞的」。所以每一個真的會動到遊戲檔的地方
-# (接到檔尾的那一次寫入、還原時的 os.replace)都在這裡記一筆,
+# (把工作複本換上去的那一次 os.replace、還原時的 os.replace)都在這裡記一筆,
 # 中斷處理再照著它決定要說哪一句話。
+# (2026-09-24 以前,「接到檔尾的那一次寫入」也在這裡記一筆 —— 那時候是直接寫在
+#  遊戲檔上。現在接到檔尾寫的是工作複本,遊戲檔要到換名那一刻才會變,見 _stage_copy。)
 _GAME_FILE_CHANGED = []
 
 
@@ -1133,6 +1181,128 @@ def _same_bytes(a, b):
                 return True
 
 
+# ── 複本上做、最後一次換名(2026-09-24 改)─────────────────────────────
+# 以前 --apply 是直接對 portrait.big 用 'r+b' 往檔尾接資料、再改目錄與檔頭。
+# 舊資料確實沒被覆蓋,但那是三個動作:接資料 → 改目錄 8 bytes → 改檔頭 4 bytes。
+# 中間被打斷(斷電、外接碟被拔掉)的話,遊戲檔會停在「資料接上去了、目錄或檔頭
+# 還沒改完」的樣子,下一次跑會被 size_field_order 擋在門外,只能 --restore。
+# 本站「把一套球衣裝進遊戲」那一課早就改成下面這個寫法,這一支跟上:
+#   遊戲檔 → 同一個資料夾的工作複本(mkstemp,名字猜不到)→ 所有改動都在複本上做
+#   → 把複本重新讀一次驗過 → 一次 os.replace 換上去 → 再讀遊戲檔驗一次。
+# 換名之前任何一步失敗,遊戲檔一個位元組都沒有被寫過;
+# 換名本身是原子的,遊戲檔只有「原來那一份」與「換好的那一份」兩種狀態。
+# 代價:動手的時候硬碟要多一份跟 portrait.big 一樣大的空間(見 _require_space)。
+def _drop_work(path):
+    """把沒換上去的工作複本刪掉。刪不掉也不能蓋過原本要丟出去的那個錯誤,所以吞掉;
+    刪掉了沒有,交給 _leftover_note 去問磁碟。"""
+    try:
+        if os.path.lexists(path):
+            os.remove(path)
+    except OSError:
+        pass
+
+
+def _leftover_note(path, live):
+    """_drop_work 之後問磁碟:工作複本真的不在了嗎?不在回 None,還在(或問不到)回一段要印給讀者的話。
+
+    2026-09-24 加。以前錯誤訊息寫死「工作複本已經刪掉」,但刪除失敗會被吞掉 ——
+    外接碟被拔掉的時候正好刪不掉,畫面卻說已經刪了。
+    · 不用 os.path.lexists:它在「問不到」的時候也回 False,會把「碟不見了」讀成「刪掉了」。
+    · 找不到檔,而且它所在的資料夾還在,才算真的刪掉了。
+    """
+    folder = os.path.dirname(os.path.abspath(path))
+    name, live_name = os.path.basename(path), os.path.basename(live)
+    try:
+        os.lstat(path)
+    except OSError as e:
+        if isinstance(e, FileNotFoundError) and os.path.isdir(folder):
+            return None
+        return ('沒辦法確認 %s 旁邊的工作複本 %s 有沒有刪掉(那個資料夾現在讀不到)。\n'
+                '  碟接好之後看一下,還在的話可以自己刪掉它 —— 遊戲不會讀它。' % (live_name, name))
+    return ('%s 旁邊留下一個沒刪掉的工作複本:%s\n'
+            '  遊戲不會讀它,可以自己刪掉(外接碟被拔掉的話,接好之後再刪)。' % (live_name, name))
+
+
+def _stage_copy(live):
+    """把遊戲檔整份複製成它旁邊的工作複本,驗過之後回傳工作複本的路徑。
+
+    · 先擋符號連結,再用 'r+b' 把遊戲檔開一下就關 —— **一個位元組都不寫**。
+      這一下是為了讓「這個檔寫不進去」(被設成唯讀、遊戲正開著)在這裡就出事,
+      錯誤訊息指著讀者認得的 portrait.big,不是一個他沒見過的工作複本名字。
+    · 工作複本跟遊戲檔放同一個資料夾:最後那一步 os.replace 才是同一個檔案系統內
+      的改名(原子的)。名字是 mkstemp 取的,別人沒辦法先佔一個連結在那裡等。
+    · 複製完 fsync、權限對成遊戲檔原本的樣子,再**讀回來比 sha256**:
+      對不上就刪掉複本、丟 DataError —— 那時候遊戲檔還是原來那一份。
+    """
+    live = os.fspath(live)
+    _refuse_symlink(live, '遊戲的封裝檔')
+    with open(live, 'r+b'):
+        pass                                # 只開不寫:確認寫得進去,不動任何位元組
+    fd, tmp = _new_temp_beside(live, 'work')
+    reported = False                        # 工作複本的下落已經寫進錯誤訊息了
+    try:
+        want = hashlib.sha256()
+        with open(fd, 'wb') as out:
+            fd = None                       # 交給 with 關
+            with open(live, 'rb') as fin:
+                while True:
+                    chunk = fin.read(1 &lt;&lt; 20)
+                    if not chunk:
+                        break
+                    want.update(chunk)      # 邊寫邊算,不必為了算再讀一次遊戲檔
+                    out.write(chunk)
+            out.flush()
+            os.fsync(out.fileno())
+        # mkstemp 開出來的檔是 0600。換上去之後遊戲檔的權限要跟原本一樣。
+        shutil.copymode(live, tmp)
+        if (os.path.getsize(tmp) != os.path.getsize(live)
+                or _sha256_of(tmp) != want.hexdigest()):
+            # 先刪、再問磁碟刪掉了沒,才決定怎麼說(不可以先說「已經刪掉」)。
+            _drop_work(tmp)
+            note = _leftover_note(tmp, live)
+            reported = True
+            raise DataError('複製出來的工作複本跟 %s 對不上(多半是硬碟空間不夠或那顆碟有問題)。\n'
+                            % os.path.basename(live)
+                            + ('  工作複本已經刪掉。' if note is None else '  ' + note))
+    except BaseException:
+        # 連 KeyboardInterrupt 都要接:複製幾百 MB 要好幾秒,按 Ctrl-C 最可能落在這裡。
+        if fd is not None:
+            try:
+                os.close(fd)
+            except OSError:
+                pass
+        if not reported:
+            _drop_work(tmp)
+            note = _leftover_note(tmp, live)
+            if note:
+                print('  ⚠️ ' + note)
+        raise
+    return tmp
+
+
+def _require_space(bigpath, with_backup, extra):
+    """動手之前先看 portrait.big 那顆硬碟放不放得下,不夠就丟 DataError(結束碼 2)。
+
+    複本路線的代價就在這裡:工作複本跟遊戲檔一樣大,第一次 --apply 還要再加一份備份,
+    而且兩份同時存在。with_backup 是「這一次要不要做備份」(已經有備份就不做)。
+    量不到(shutil.disk_usage 丟例外)就不擋:量不到不等於不夠 ——
+    真的不夠的時候作業系統會報錯,那條路一樣會照實說遊戲檔動了沒。
+    """
+    folder = os.path.dirname(os.path.abspath(bigpath)) or '.'
+    size = os.path.getsize(bigpath)
+    need = size + extra + (size if with_backup else 0)
+    try:
+        free = shutil.disk_usage(folder).free
+    except (OSError, AttributeError):
+        return
+    if free &lt; need:
+        raise DataError('硬碟空間不夠:這一次要在 %s 旁邊暫時多放 %.1f MB(%s),\n'
+                        '  那顆硬碟現在只剩 %.1f MB。清出空間再跑一次同一行。'
+                        % (os.path.basename(bigpath), need / 1048576.0,
+                           '一份備份加一份工作複本' if with_backup else '一份工作複本',
+                           free / 1048576.0))
+
+
 
 
 # Windows 的主控台預設不是 UTF-8,不先切過去,底下的中文訊息會變亂碼或直接爆掉。
@@ -1359,44 +1529,34 @@ def append_entry(path, field_pos, blob):
 
     原本的資料一個位元組都不動 —— 所以就算新資料是壞的,舊資料還在檔案裡。
 
-    ── 兩件事的順序是刻意的(2026-09-06 第三輪稽核定的)────────────────
-    1. **先把新資料落到磁碟(fsync),再去改目錄。** 順序反過來的話,斷電時
-       目錄可能已經指到一段還沒落盤的資料 —— 那才是真的壞檔。照這個順序,
-       中途死掉的最壞結果是「檔尾多出一段沒有人指到的資料」:目錄還指著舊那一段,
-       遊戲照樣讀得到,而且 --restore 一行就回得去。
-    2. **目錄 8 bytes 與檔頭 4 bytes 是同一件事,中間不接受 Ctrl-C。**
-       只改了一半的話,目錄說的位置跟檔頭說的總長度會互相矛盾。
-    另外:「動過了」這一筆是在寫下第一個位元組**之前**就登記的,所以這條路上
-    不會出現「已經改了卻說沒動到」——(換名那條路的同一個問題,見 _replace_and_mark。)
+    ⚠️ **path 是工作複本,不是玩家的遊戲檔**(2026-09-24 改,見 _stage_copy 上面那段)。
+       以前這一支直接對 portrait.big 寫,所以要在寫下第一個位元組之前登記
+       「遊戲檔動過了」,還要把改目錄與改檔頭包成不可中斷的一段。
+       現在它只碰工作複本:中途出事就不換上去,遊戲檔根本沒有被寫過 ——
+       所以這裡**不登記**。真正會動到遊戲檔的那一刻是 _replace_and_mark 那一行。
+    順序照舊:先接資料、再改目錄、最後改檔頭,寫完 flush + fsync 才回來。
     """
     # 一定要在改檔案之前先量:寫完之後檔案大小就變了,那時再量會兩種都對不上。
     order = size_field_order(path)          # 一定要在改檔案之前先量
-    # 封裝檔本身是符號連結的話就停下來 —— 不然接到檔尾這一寫,
-    # 動到的是資料夾外面那個檔,而備份跟還原都以為自己在管這個名字。
-    _refuse_symlink(path, '遊戲的封裝檔')
+    # 要寫的這個名字本身是符號連結的話就停下來 —— 不然接到檔尾這一寫,
+    # 動到的是資料夾外面那個檔。工作複本是 mkstemp 開的,不會是連結;
+    # 這一道留著,是給拿這一支去改別的檔的人(見 _stage_copy 那一道,兩道都在)。
+    _refuse_symlink(path, '要寫入的封裝檔')
     # 新資料的位移就是「現在的檔案長度」,因為它要接在最後面。
     new_off = os.path.getsize(path)
     with open(path, 'r+b') as f:
         f.seek(0, os.SEEK_END)
-        # 從下一行開始,遊戲檔就真的被動過了。中斷處理要照著這一筆說實話,
-        # 不可以再印「什麼都沒有動到」。
-        _mark_game_file_changed(path)
         f.write(blob)
         total = f.tell()
-        # fsync 是刻意的,而且一定要在改目錄**之前**:254 MB 的檔要是只寫進快取
-        # 就斷電,目錄會指到一段根本還不在磁碟上的資料。
+        # 只改這一項的目錄欄位 8 個位元組:位移 4 + 長度 4。
+        f.seek(field_pos)
+        f.write(struct.pack('&gt;II', new_off, len(blob)))     # 目錄一律 big-endian
+        # 再改檔頭 +0x04 的總長度 4 個位元組,位元組序沿用原檔量到的那一種。
+        f.seek(4)
+        f.write(struct.pack(order + 'I', total))
+        # fsync:換名之前,工作複本要真的落到磁碟上,不能只在快取裡。
         f.flush()
         os.fsync(f.fileno())
-        # 目錄與檔頭這 12 個位元組是同一件事,中間不接受 Ctrl-C(理由見上面的說明)。
-        with _NoInterrupt():
-            # 只改這一項的目錄欄位 8 個位元組:位移 4 + 長度 4。
-            f.seek(field_pos)
-            f.write(struct.pack('&gt;II', new_off, len(blob)))     # 目錄一律 big-endian
-            # 再改檔頭 +0x04 的總長度 4 個位元組,位元組序沿用原檔量到的那一種。
-            f.seek(4)
-            f.write(struct.pack(order + 'I', total))
-            f.flush()
-            os.fsync(f.fileno())
     return new_off
 
 
@@ -1945,6 +2105,26 @@ def load_image(bigpath, item):
     return plain, code, w, h, start, end
 
 
+def _pixels_match(bigpath, number, rgba):
+    """重新開檔、重新走一次目錄,把那一張圖解回來跟 rgba 比。回傳 (對得上的像素, 全部像素)。
+
+    「對得上」= 三個色階的誤差都在 8 以內;透明度低於 128 的像素一律算對
+    (跟品質報告同一條線:幾乎看不見)。
+    拿記憶體裡的變數比對是不算數的,那只證明程式沒寫錯,不證明檔案寫對了。
+    --apply 會叫它兩次:換名之前讀工作複本,換名之後讀遊戲檔 —— 兩次都從磁碟重讀。
+    讀回來的那一張格式或大小不對,就全部算不對(不硬解)。
+    """
+    item2 = entry_for(big_entries(bigpath), number)
+    plain2, code2, w2, h2, s2, e2 = load_image(bigpath, item2)
+    total = len(rgba) // 4
+    if code2 != 0x61 or w2 * h2 != total:
+        return 0, total
+    back2 = dxt3_decode(plain2[s2:e2], w2, h2)
+    ok = sum(1 for i in range(0, len(rgba), 4)
+             if rgba[i + 3] &lt; 128 or max(abs(rgba[i + k] - back2[i + k]) for k in range(3)) &lt;= 8)
+    return ok, total
+
+
 def cmd_info(bigpath):
     """報告封裝檔裡有什麼。純唯讀,不動任何檔案,拿來確認路徑給對了。"""
     items = big_entries(bigpath)
@@ -2101,12 +2281,14 @@ def cmd_import(bigpath, number, pngpath, apply_it):
         print('  確定要換的話,在剛才那一行最後面加上 --apply')
         return
 
-    # 走到這裡才真的要動檔案。先換像素、再備份、再壓縮、最後接到檔尾。
+    # 走到這裡才真的要動檔案。先換像素、壓縮,再備份,
+    # 然後在工作複本上接到檔尾、驗過,最後才一次換上去。
     # 備份只在第一次做:第二次改的時候,最早那一份才是「還沒動過的原始檔」。
     newfsh = fsh_replace_pixels(plain, start, end, newpix)
-    # 封裝檔本身是符號連結的話,現在就停 —— 不要等到 append_entry 才擋。
+    blob = qfs_compress_literal(newfsh)
+    # 封裝檔本身是符號連結的話,現在就停 —— 不要等到 _stage_copy 才擋。
     # 那時候備份已經做出來了,擋下來只會在遊戲資料夾裡留一個沒有用處的備份檔。
-    # (append_entry 自己那一道留著當第二層,兩道都在。)
+    # (_stage_copy 與 append_entry 自己那兩道留著當後面的幾層。)
     _refuse_symlink(bigpath, '遊戲的封裝檔')
     backup = bigpath + BACKUP_SUFFIX
     # ⚠️ 兩件事都要做,而且順序不能反:
@@ -2118,6 +2300,13 @@ def cmd_import(bigpath, number, pngpath, apply_it):
     # 備份與寫入都要在 portrait.big 那個資料夾動手。遊戲裝在 Program Files 底下時
     # 這裡寫不進去 —— 在做備份之前先試一次,寫不進去就走「停下來了」那條路。
     _require_writable(bigpath)
+    # 檔頭大小欄位跟實際大小對不上的封裝檔(上一次寫到一半斷電留下的那種)現在就擋,
+    # 不要先把它備份起來、也不要複製一份工作複本才發現 —— 這一句訊息會把
+    # 「旁邊那份備份救得回來」一起講,而且指的是讀者認得的 portrait.big。
+    size_field_order(bigpath)
+    # 複本路線的代價:硬碟要同時放得下工作複本(第一次還有備份)。不夠就現在停,
+    # 那時候遊戲檔與備份都還沒被碰過。
+    _require_space(bigpath, not os.path.lexists(backup), len(blob))
     if not os.path.lexists(backup):
         _atomic_copy(bigpath, backup)
         print()
@@ -2125,19 +2314,44 @@ def cmd_import(bigpath, number, pngpath, apply_it):
     else:
         print()
         print('  備份已存在,保留最早那一份 → %s' % os.path.basename(backup))
-    blob = qfs_compress_literal(newfsh)
-    new_off = append_entry(bigpath, item[1], blob)
-    print('  已寫入:新資料接在第 %d 個位元組,只改了目錄 8 bytes + 檔頭 4 bytes' % new_off)
 
-    # 複驗:重新開檔讀回來,確認真的換成功了
-    # 拿記憶體裡的變數比對是不算數的,那只證明程式沒寫錯,不證明檔案寫對了。
-    items2 = big_entries(bigpath)
-    item2 = entry_for(items2, number)
-    plain2, code2, w2, h2, s2, e2 = load_image(bigpath, item2)
-    back2 = dxt3_decode(plain2[s2:e2], w2, h2)
-    ok = sum(1 for i in range(0, len(rgba), 4)
-             if rgba[i + 3] &lt; 128 or max(abs(rgba[i + k] - back2[i + k]) for k in range(3)) &lt;= 8)
-    total = len(rgba) // 4
+    # ── 從這裡開始,改動全部做在工作複本上 ──
+    print('  正在準備工作複本(%.1f MB)...' % (os.path.getsize(bigpath) / 1048576.0))
+    work = _stage_copy(bigpath)
+    try:
+        try:
+            new_off = append_entry(work, item[1], blob)
+            print('  已寫入工作複本:新資料接在第 %d 個位元組,只改了目錄 8 bytes + 檔頭 4 bytes'
+                  % new_off)
+            # 複驗(第一輪):換名之前,把工作複本重新讀一次。
+            ok, total = _pixels_match(work, number, rgba)
+        except DataError as e:
+            # 訊息裡可能夾著工作複本那個臨時名字,讀者手上沒有那個檔 —— 換回 portrait.big。
+            raise DataError(str(e).replace(os.path.basename(work), os.path.basename(bigpath)))
+        print('  換上去之前先驗工作複本:%.2f%% 的像素跟你給的圖一致' % (100.0 * ok / total))
+        if ok &lt; total * 0.9:
+            # 驗不過就不換。遊戲檔到這裡為止一個位元組都沒有被寫過,
+            # 所以這句話後面不必叫人還原(收尾那一句會照登記說「什麼都沒有動到」)。
+            raise DataError('工作複本的複驗沒過 —— 寫進去的東西跟預期差太多,所以沒有換上去。\n'
+                            '  請回報這個訊息。')
+        # 換名。到這一行為止,遊戲檔一個位元組都沒有被寫過;
+        # 換名與「登記已經換過了」綁在同一段不可中斷的動作裡(見 _replace_and_mark)。
+        _replace_and_mark(work, bigpath, '換圖')
+        work = None
+    finally:
+        # 沒換上去的工作複本一律清掉。**問磁碟,不問旗標**:換名成功之後 work 這個名字
+        # 就不存在了(Ctrl-C 剛好落在換名之後、下一行之前也一樣),所以不會誤刪。
+        # 刪不掉(外接碟被拔掉)就照實說留下了哪個檔,不讓它悄悄躺在那裡(2026-09-24 加)。
+        if work is not None:
+            _drop_work(work)
+            note = _leftover_note(work, bigpath)
+            if note:
+                print('  ⚠️ ' + note)
+    print('  已換上去 → %s' % os.path.basename(bigpath))
+
+    # 複驗(第二輪):這一次讀的是你真正的遊戲檔。
+    # 「工作複本是對的」跟「換上去的那一份是對的」是兩件事。
+    ok, total = _pixels_match(bigpath, number, rgba)
     print('  複驗:重新讀回來,%.2f%% 的像素跟你給的圖一致' % (100.0 * ok / total))
     if ok &lt; total * 0.9:
         # 走到這裡代表檔案已經寫進去了,而且寫出來的東西跟預期對不上。
@@ -2326,17 +2540,29 @@ def _no_leftovers(folder, dst):
     return [n for n in os.listdir(folder) if n.startswith(head)]
 
 
+# python -O 跑的時候回傳大於 0 的數字。抽成一支函式,是為了讓 --selftest 換得掉它、
+# 給「-O 拒跑」那道守門下一個餌(反向餌 22):sys.flags 是唯讀的,
+# 同一個行程裡切不了 -O,不抽出來就證明不了那道守門真的會擋。
+def _optimize_level():
+    return sys.flags.optimize
+
+
+# 反向餌 22 會在 --selftest 裡面再叫一次 selftest()。這一格記著「現在是不是那一次」:
+# 守門被拆掉的時候,裡面那一次會一路跑下去,沒有它就會一層套一層停不下來。
+_SELFTEST_NESTED = []
+
+
 def selftest():
     """不碰任何遊戲檔的自我測試,全部在系統暫存資料夾裡做(跑完不刪,方便你自己去看)。
 
-    重點不是「有沒有通過」,是**裡面有 16 個反向餌**:先證明「答案錯的時候
+    重點不是「有沒有通過」,是**裡面有 28 個反向餌**:先證明「答案錯的時候
     它真的會叫」。只驗正向的測試會一路綠燈,卻在功能整個壞掉時照樣綠燈,
     那種測試比沒有更危險(本站 2026-08-29 就被這種測試騙過)。
 
     (這一整套不接受 python -O:-O 會把下面每一個 assert 拿掉,
      整份測試會在什麼都沒驗的情況下印「全部通過」。進來第一行就擋掉。)
 
-    16 個反向餌:
+    28 個反向餌:
       1. 事先放一個「猜得到的名字」的符號連結指到資料夾外面 → 備份不可以動到外面那個檔
       2. 備份檔本身就是符號連結 → 要拒絕,而且外面那個檔不可以被動到
       3. 指到不存在檔案的連結,exists() 會說「沒有」→ 證明為什麼要用 islink / lexists
@@ -2354,14 +2580,35 @@ def selftest():
      13. _NoInterrupt 真的把 Ctrl-C 壓到區塊結束才丟(而且處理器有還回去)
      14. 換名剛做完就中斷 → 登記一定已經在了,收尾不可以說「什麼都沒有動到」;
          連 (a) 那道失效時由「正在替換」接手的那一句也一起驗
-     15. 接到檔尾之後讀不回來(外接碟被拔掉那一種)→「停下來了:…」這條路
+     15. 已經換上去之後讀不回來(外接碟被拔掉那一種)→「停下來了:…」這條路
          也要說遊戲檔動過了並印還原指令;而訊息自己已經帶著還原指令時只印一次
      16. 檔頭大小欄位跟實際檔案大小對不上 → 那句話要把「旁邊那份備份救得回來」講出來
+     ── 17 到 24 是 2026-09-24 改成「複本上做、最後換名」時加的 ──
+     17. 資料已經寫進工作複本、還沒換名就出事(假裝磁碟滿了)→ 遊戲檔原封不動
+         (同一個檔、同樣的位元組)、工作複本清掉、收尾說「什麼都沒有動到」
+     18. 工作複本的複驗沒過 → **不可以換上去**。把複驗搬到換名後面的話,這一個會紅
+     19. 硬碟空間不夠 → 在做備份之前就停,遊戲檔與備份都不可以被碰到
+     20. 遊戲檔本身是符號連結 → 準備工作複本那一步要拒絕,外面那個檔不可以被動到
+     21. 工作複本讀回來跟遊戲檔對不上 → 不可以拿它來改,而且不留暫存垃圾
+     22. 「-O 拒跑」這道守門自己:假裝在 -O 底下,--selftest 一定要拒跑(回 2)
+     23. append_entry 寫的是工作複本 → 不可以登記「遊戲檔動過了」
+         (不然 Ctrl-C 會叫讀者去做一次不必要的還原)
+     24. 工作複本換名之前重新讀回來**讀不動**(不是對不上,是根本解不開)
+         → 一樣不可以換上去;收尾說「什麼都沒有動到」、不叫人還原
+     ── 25 到 27 是 2026-09-24 再補的(上面那一輪加的守門有三道沒有餌)──
+     25. 檔頭大小欄位對不上、旁邊還沒有備份 → 在做備份之前就停,
+         不可以先把這份壞檔備份成「最早那一份」
+     26. portrait.big 被設成唯讀 → 「沒有權限讀寫」要指著 portrait.big,
+         不可以指著一個讀者沒見過的工作複本名字(權限擋不住的機器上跳過,並講出來)
+     27. 剩餘空間放得下一份、放不下兩份 → 還沒有備份時要停(要兩份),
+         已經有備份時要照常做完(只要一份)
+     28. 工作複本刪不掉(外接碟被拔掉)→ 準備工作複本對不上、--apply 中途出錯兩條路,
+         都不可以說「已經刪掉」,要印出留下的那個檔名(刪得掉的那一種當陰性對照)
     其餘是正向檢查,沒有算進來。
     """
     # ⚠️ 這一道要排在最前面。python -O 會把 assert 整個拿掉,底下每一個守門
     #    一句都不會執行,而畫面照樣印「全部通過」—— 那是最糟的一種綠燈。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠')
         return 2
 
@@ -2568,7 +2815,10 @@ def selftest():
     else:
         skipped.append('餌 8(這台機器不能建符號連結)')
 
-    # ── 正向:接到檔尾這一段真的會動到檔案,而且會被記下來 ────
+    # ── 正向 + 反向餌 23:接到檔尾這一段真的會改到它拿到的那個檔,而且**不登記** ────
+    # append_entry 現在拿到的永遠是工作複本(2026-09-24 改)。它如果還登記
+    # 「遊戲檔動過了」,Ctrl-C 的收尾會叫讀者去做一次不必要的還原 ——
+    # 而還原會把他之前換好的每一張大頭照一起退掉。登記的地方只有換名那一行。
     d9 = tempfile.mkdtemp(prefix='mvp_swap_portrait_append_')
     big9 = os.path.join(d9, 'portrait.big')
     field = _fake_big(big9, payload=b'HELLO')
@@ -2578,10 +2828,13 @@ def selftest():
     assert read_entry(big9, items[0][2], items[0][3]) == b'HELLO', '讀出來的內容不對'
     del _GAME_FILE_CHANGED[:]                        # 前面的還原測試會填它,先清空再驗
     append_entry(big9, field, b'WORLD!')
-    assert _GAME_FILE_CHANGED, '真的寫進去了,卻沒有記下「遊戲檔被動過」'
     items2 = big_entries(big9)
+    # 陰性對照在前:先證明這一次真的寫進去了,「沒登記」才不會是因為什麼都沒做。
     assert read_entry(big9, items2[0][2], items2[0][3]) == b'WORLD!', '接到檔尾之後讀不到新資料'
     assert size_field_order(big9) == '&lt;', '接完之後檔頭的總長度沒有跟著改'
+    assert not _GAME_FILE_CHANGED, \
+        '餌 23:append_entry 只寫工作複本,卻登記說遊戲檔被動過了(Ctrl-C 會叫人做不必要的還原)'
+    baits += 1
 
     # 大端的檔頭也要認得(本站測試機那份疊過模組的 portrait.big 就是大端)
     dbe = tempfile.mkdtemp(prefix='mvp_swap_portrait_be_')
@@ -2764,8 +3017,9 @@ def selftest():
         skipped.append('餌 14(這台機器發不了 SIGINT)')
 
     # ── 反向餌 15:「停下來了」這條路也要說遊戲檔動了沒 ─────────────────
-    # 咬的是 2026-09-06 覆驗重現的那一種:資料已經接到檔尾(遊戲檔真的變了),
-    # 下一步讀回來卻失敗(外接碟被拔掉、權限沒了)—— big_entries 把 OSError
+    # 咬的是 2026-09-06 覆驗重現的那一種:遊戲檔已經真的變了(2026-09-24 起是
+    # 「工作複本已經換上去」那一刻),下一步讀回來卻失敗(外接碟被拔掉、權限沒了)
+    # —— big_entries 把 OSError
     # 包成 DataError,以前畫面只印一行錯誤,一個字都沒提旁邊的備份救得回來。
     d15 = tempfile.mkdtemp(prefix='mvp_swap_portrait_bait15_')
     game15 = os.path.join(d15, 'game')
@@ -2773,8 +3027,11 @@ def selftest():
     big15 = os.path.join(game15, 'data', 'frontend', 'portrait.big')
     field15 = _fake_big(big15, payload=b'P' * 64)
     del _GAME_FILE_CHANGED[:]
-    append_entry(big15, field15, b'NEWDATA')         # 真的動過了(它自己會登記)
-    assert _GAME_FILE_CHANGED, '餌 15 的前提不成立:接到檔尾了卻沒登記'
+    # 照 --apply 真正的順序走一次:工作複本 → 接到檔尾 → 換上去(換名那一刻才登記)。
+    work15 = _stage_copy(big15)
+    append_entry(work15, field15, b'NEWDATA')
+    _replace_and_mark(work15, big15, '換圖')         # 真的換上去了
+    assert _GAME_FILE_CHANGED, '餌 15 的前提不成立:換上去了卻沒登記'
 
     def _read_back_fails(path):
         """模擬「寫完之後讀不回來」:big_entries 就是這樣把 OSError 包成 DataError 的。"""
@@ -2840,6 +3097,397 @@ def selftest():
         '餌 16:擋下來了,卻沒告訴讀者旁邊那份備份救得回來(%r)' % msg16
     baits += 1
 
+    # ── 17 到 22 與 24:「複本上做、最後一次換名」那一套的測試(2026-09-24 加)──────
+    # 這幾個都跑**真正的** main(),走的是讀者打 --import … --apply 的那一條路,
+    # 不是只呼叫裡面某一支函式 —— 要證明的是整條路接起來之後遊戲檔真的沒被碰到。
+    def _run_main(argv):
+        """跑一次 main(),收起畫面上的字。回傳 (結束碼或丟出來的例外, 畫面上的字)。"""
+        argv_save = sys.argv[:]
+        buf = _io.StringIO()
+        sys.argv = ['mvp_swap_portrait.py'] + list(argv)
+        try:
+            with _contextlib.redirect_stdout(buf):
+                try:
+                    rc = main()
+                except (Exception, SystemExit) as e:    # 丟出來的例外就是「結束碼非 0」那一條路
+                    rc = e
+        finally:
+            sys.argv = argv_save
+        return rc, buf.getvalue()
+
+    def _snap(p):
+        """這個檔「是不是同一個檔、內容一不一樣」。換名過的話 inode 會變,光比內容看不出來。"""
+        with open(p, 'rb') as f:
+            return f.read(), os.stat(p).st_ino
+
+    d17 = tempfile.mkdtemp(prefix='mvp_swap_portrait_bait17_')
+    game17 = os.path.join(d17, 'game')
+    front17 = os.path.join(game17, 'data', 'frontend')
+    os.makedirs(front17)
+    big17 = os.path.join(front17, 'portrait.big')
+    bak17 = big17 + BACKUP_SUFFIX
+    _fake_big(big17, name=b'0521.fsh', payload=qfs_compress_literal(_fake_fsh(8, 8)))
+    png17 = os.path.join(d17, 'mine.png')
+    with _contextlib.redirect_stdout(_io.StringIO()):
+        cmd_export(big17, '0521', png17)
+    apply17 = [game17, '--import', '0521', png17, '--apply']
+    orig17 = open(big17, 'rb').read()
+
+    # 陰性對照:沒有餌的時候,整條 --apply 真的會把圖換上去,兩輪複驗都過、不留暫存垃圾。
+    # 少了這一段,下面「遊戲檔沒變」有可能只是因為這條路本來就整個不通。
+    del _GAME_FILE_CHANGED[:]
+    rc0, out0 = _run_main(apply17)
+    assert rc0 == 0, '陰性對照:正常的 --apply 應該以 0 結束(得到 %r)\n%s' % (rc0, out0)
+    assert open(big17, 'rb').read() != orig17, '陰性對照:正常的 --apply 沒有改到 portrait.big'
+    assert '換上去之前先驗工作複本' in out0 and '複驗:重新讀回來' in out0, \
+        '陰性對照:兩輪複驗沒有都跑到(%r)' % out0
+    assert not _no_leftovers(front17, big17), '陰性對照:正常做完卻留下工作複本:%r' % _no_leftovers(front17, big17)
+    # 還原回動手之前,讓下面每一個餌都從同一個起點出發。
+    rc0r, out0r = _run_main([game17, '--restore'])
+    assert rc0r == 0 and open(big17, 'rb').read() == orig17, '陰性對照:還原不回動手之前(%r)' % out0r
+    os.remove(bak17)                                 # 讓下面從「還沒有備份」開始
+    del _GAME_FILE_CHANGED[:]
+
+    # ── 反向餌 17:資料已經寫進工作複本、還沒換名就出事 ──
+    real_append = globals()['append_entry']
+    hit17 = {}
+
+    def _append_then_boom(path, field_pos, blob):
+        real_append(path, field_pos, blob)          # 資料真的寫進去了(寫在工作複本上)
+        hit17['path'] = path
+        raise OSError(28, '磁碟沒有空間了(這是 --selftest 故意製造的)')
+
+    before17 = _snap(big17)
+    globals()['append_entry'] = _append_then_boom
+    try:
+        rc17, out17 = _run_main(apply17)
+    finally:
+        globals()['append_entry'] = real_append
+    assert hit17.get('path') and os.path.basename(hit17['path']) != 'portrait.big', \
+        '餌 17 根本沒被踩到,或 append_entry 拿到的是遊戲檔本身(%r)' % hit17
+    assert isinstance(rc17, OSError), '餌 17:工作複本寫到一半出事,竟然沒有往上報(%r)' % (rc17,)
+    assert _snap(big17) == before17, '餌 17:出事的是工作複本,遊戲檔卻被動到了'
+    assert not _no_leftovers(front17, big17), '餌 17:工作複本沒有清掉:%r' % _no_leftovers(front17, big17)
+    assert '什麼都沒有動到' in out17 and '已經被改過了' not in out17, \
+        '餌 17:遊戲檔沒動,收尾卻沒照實說(%r)' % out17
+    assert not _GAME_FILE_CHANGED, '餌 17:遊戲檔沒動,登記卻說動過了'
+    baits += 1
+
+    # ── 反向餌 18:工作複本的複驗沒過 → 不可以換上去 ──
+    # 寫進工作複本的是另一張圖(格式合法、顏色整個不一樣),複驗一定對不上。
+    # 把複驗搬到換名後面的話,遊戲檔會先被換掉 —— 這一個就會紅(inode 會變)。
+    def _append_wrong_picture(path, field_pos, blob):
+        return real_append(path, field_pos, qfs_compress_literal(_fake_fsh(8, 8, seed=128)))
+
+    before18 = _snap(big17)
+    globals()['append_entry'] = _append_wrong_picture
+    try:
+        rc18, out18 = _run_main(apply17)
+    finally:
+        globals()['append_entry'] = real_append
+    assert rc18 == 2, '餌 18:複驗沒過應該以 2 結束(得到 %r)\n%s' % (rc18, out18)
+    assert '沒有換上去' in out18, '餌 18:沒有說「沒有換上去」(%r)' % out18
+    assert _snap(big17) == before18, \
+        '餌 18:工作複本的複驗沒過,遊戲檔卻已經被換掉了 —— 複驗必須在換名之前'
+    assert not _no_leftovers(front17, big17), '餌 18:工作複本沒有清掉:%r' % _no_leftovers(front17, big17)
+    assert '什麼都沒有動到' in out18 and '--restore' not in out18, \
+        '餌 18:遊戲檔沒動,卻叫讀者去還原(或沒說沒動到)(%r)' % out18
+    baits += 1
+
+    # ── 反向餌 19:硬碟空間不夠 → 在做備份之前就停 ──
+    if os.path.lexists(bak17):
+        os.remove(bak17)                             # 餌 17 做過備份;這一個要從「還沒有備份」開始
+    before19 = _snap(big17)
+    real_du = shutil.disk_usage
+
+    class _NoRoom(object):
+        free = 0
+
+    shutil.disk_usage = lambda p: _NoRoom()
+    try:
+        rc19, out19 = _run_main(apply17)
+    finally:
+        shutil.disk_usage = real_du
+    assert rc19 == 2, '餌 19:空間不夠應該以 2 結束(得到 %r)\n%s' % (rc19, out19)
+    assert '硬碟空間不夠' in out19 and '一份備份加一份工作複本' in out19, \
+        '餌 19:沒有講清楚是空間不夠、要多放哪幾份(%r)' % out19
+    assert _snap(big17) == before19, '餌 19:空間不夠,遊戲檔卻被動到了'
+    assert not os.path.lexists(bak17), '餌 19:空間不夠,卻還是先做了一份備份'
+    assert not _no_leftovers(front17, big17), '餌 19:留下暫存垃圾:%r' % _no_leftovers(front17, big17)
+    assert '什麼都沒有動到' in out19, '餌 19:收尾沒有說「什麼都沒有動到」(%r)' % out19
+    baits += 1
+
+    # ── 反向餌 20:遊戲檔本身是符號連結 → 準備工作複本那一步要拒絕 ──
+    # 連結要指到一個**完全合法的**封裝檔(理由同餌 8:指到別的東西的話,
+    # 擋住它的可能是別的檢查,不是這一道守門)。
+    d20 = tempfile.mkdtemp(prefix='mvp_swap_portrait_bait20_')
+    outside_big20 = os.path.join(outside_dir, '別人的封裝檔20.big')
+    _fake_big(outside_big20, payload=b'J' * 200)
+    keep20 = open(outside_big20, 'rb').read()
+    link20 = os.path.join(d20, 'portrait.big')
+    if _can_symlink(link20, outside_big20):
+        try:
+            _stage_copy(link20)
+        except SystemExit:
+            pass
+        else:
+            raise AssertionError('餌 20:遊戲檔是符號連結,竟然照樣複製出工作複本')
+        assert open(outside_big20, 'rb').read() == keep20, '餌 20:連結指到的那個檔被動到了'
+        assert not _no_leftovers(d20, link20), '餌 20:留下暫存垃圾:%r' % _no_leftovers(d20, link20)
+        baits += 1
+    else:
+        skipped.append('餌 20(這台機器不能建符號連結)')
+
+    # ── 反向餌 21:工作複本讀回來跟遊戲檔對不上 → 不可以拿它來改 ──
+    d21 = tempfile.mkdtemp(prefix='mvp_swap_portrait_bait21_')
+    big21 = os.path.join(d21, 'portrait.big')
+    _fake_big(big21, payload=b'K' * 300)
+    # 陰性對照:沒有餌的時候,工作複本逐位元組跟遊戲檔一樣,權限也一樣。
+    w21 = _stage_copy(big21)
+    assert _same_bytes(w21, big21), '陰性對照:工作複本跟遊戲檔不一樣'
+    assert (os.stat(w21).st_mode &amp; 0o777) == (os.stat(big21).st_mode &amp; 0o777), \
+        '陰性對照:工作複本的權限跟遊戲檔不一樣(換上去之後權限會變)'
+    os.remove(w21)
+    before21 = _snap(big21)
+    real_sha21 = globals()['_sha256_of']
+    globals()['_sha256_of'] = lambda p: 'deadbeef'   # 假裝讀回來的內容不對
+    try:
+        try:
+            _stage_copy(big21)
+        except DataError:
+            pass
+        else:
+            raise AssertionError('餌 21:工作複本跟遊戲檔對不上,竟然照樣拿來用')
+    finally:
+        globals()['_sha256_of'] = real_sha21
+    assert _snap(big21) == before21, '餌 21:遊戲檔被動到了'
+    assert not _no_leftovers(d21, big21), '餌 21:對不上的工作複本沒有清掉:%r' % _no_leftovers(d21, big21)
+    baits += 1
+
+    # ── 反向餌 24:換名之前讀工作複本,**讀不動** → 不可以換上去 ──
+    # 餌 18 測的是「讀得回來,但像素對不上」;這一個測的是「根本讀不回來」。
+    # 寫進工作複本的是一段根本不是圖的位元組(不是 QFS、也不是 SHPI),目錄照樣指過去,
+    # 重新讀回來一定丟 DataError。把那個例外吞掉、當成「全部對得上」的話,
+    # 工作複本會被換上去(portrait.big 的 inode 會變)—— 這一個就會紅。
+    hit24 = {}
+
+    def _append_garbage(path, field_pos, blob):
+        hit24['path'] = path
+        return real_append(path, field_pos, b'\x00NOT-A-PICTURE\x00' * 8)
+
+    del _GAME_FILE_CHANGED[:]
+    before24 = _snap(big17)
+    globals()['append_entry'] = _append_garbage
+    try:
+        rc24, out24 = _run_main(apply17)
+    finally:
+        globals()['append_entry'] = real_append
+    assert hit24.get('path') and os.path.basename(hit24['path']) != 'portrait.big', \
+        '餌 24 根本沒被踩到,或 append_entry 拿到的是遊戲檔本身(%r)' % hit24
+    assert rc24 == 2, '餌 24:工作複本讀不動應該以 2 結束(得到 %r)\n%s' % (rc24, out24)
+    assert _snap(big17) == before24, \
+        '餌 24:工作複本讀不動,遊戲檔卻已經被換掉了 —— 讀不動必須當成沒過'
+    assert not _no_leftovers(front17, big17), '餌 24:工作複本沒有清掉:%r' % _no_leftovers(front17, big17)
+    assert '什麼都沒有動到' in out24 and '--restore' not in out24, \
+        '餌 24:遊戲檔沒動,卻叫讀者去還原(或沒說沒動到)(%r)' % out24
+    assert not _GAME_FILE_CHANGED, '餌 24:遊戲檔沒動,登記卻說動過了'
+    baits += 1
+
+    # ── 25 到 27:2026-09-24 再補的三道(一樣跑真正的 main())──
+    # 這三處是「複本上做、最後換名」那一輪加的,當時沒有餌:做備份之前的檔頭預檢、
+    # 準備工作複本之前那一下 'r+b' 試開、空間檢查裡「第一次要多算一份備份」那一項。
+    # 各自拿掉,上面每一項照樣是綠的(實測過)。
+    def _new_game(tag, pad=0):
+        """做一份迷你遊戲資料夾:portrait.big 裡有一張 DXT3 的 0521.fsh,並把它匯出成 PNG。
+
+        pad 是接在檔尾、目錄沒指到的位元組數(檔頭的總長度跟著改)。
+        回傳 (portrait.big 所在的資料夾, portrait.big, 那一行 --import … --apply 的參數)。
+        """
+        dd = tempfile.mkdtemp(prefix='mvp_swap_portrait_bait%s_' % tag)
+        game_ = os.path.join(dd, 'game')
+        front_ = os.path.join(game_, 'data', 'frontend')
+        os.makedirs(front_)
+        big_ = os.path.join(front_, 'portrait.big')
+        _fake_big(big_, name=b'0521.fsh', payload=qfs_compress_literal(_fake_fsh(8, 8)))
+        if pad:
+            with open(big_, 'r+b') as f:
+                f.seek(0, os.SEEK_END)
+                f.write(b'\xEE' * pad)
+                n_ = f.tell()
+                f.seek(4)
+                f.write(struct.pack('&lt;I', n_))
+        png_ = os.path.join(dd, 'mine.png')
+        with _contextlib.redirect_stdout(_io.StringIO()):
+            cmd_export(big_, '0521', png_)
+        return front_, big_, [game_, '--import', '0521', png_, '--apply']
+
+    # ── 反向餌 25:檔頭大小欄位對不上、旁邊還沒有備份 → 在做備份之前就停 ──
+    # 上一次寫到一半斷電留下的就是這種檔。做備份之前那一道預檢拿掉的話,
+    # 腳本會先把這份壞檔備份成「最早那一份」(以後 --restore 回去的就是壞的),
+    # 到工作複本那一步才被擋下來 —— 這一個就會紅。
+    front25, big25, apply25 = _new_game('25')
+    with open(big25, 'r+b') as f:
+        f.seek(4)
+        f.write(struct.pack('&lt;I', 123456))           # 檔頭宣稱的總長度改成假的
+    before25 = _snap(big25)
+    del _GAME_FILE_CHANGED[:]
+    rc25, out25 = _run_main(apply25)
+    assert rc25 == 2, '餌 25:檔頭對不上應該以 2 結束(得到 %r)\n%s' % (rc25, out25)
+    assert '對不上' in out25 and '--restore' in out25, \
+        '餌 25:沒有說檔頭對不上,或沒有給還原提示(%r)' % out25
+    assert not os.path.lexists(big25 + BACKUP_SUFFIX), \
+        '餌 25:檔頭對不上,卻先把這份壞檔做成了備份(以後還原回去的就是壞的)'
+    assert _snap(big25) == before25, '餌 25:遊戲檔被動到了'
+    assert not _no_leftovers(front25, big25), '餌 25:留下暫存垃圾:%r' % _no_leftovers(front25, big25)
+    baits += 1
+
+    # ── 反向餌 26:portrait.big 被設成唯讀 → 訊息要指著 portrait.big,不是工作複本 ──
+    # 準備工作複本之前那一下「只開不寫」的 'r+b' 拿掉的話,工作複本會照抄唯讀的權限,
+    # 出事的是 append_entry 開工作複本那一下 —— 畫面上的「沒有權限讀寫」就會指著一個
+    # 讀者從沒見過的 .portrait.big.work-xxxx。這一個就會紅。
+    front26, big26, apply26 = _new_game('26')
+    os.chmod(big26, 0o444)
+    try:
+        with open(big26, 'r+b'):
+            pass
+        ro_blocks = False                            # 權限擋不住(例如用 root 在跑)
+    except PermissionError:
+        ro_blocks = True
+    if ro_blocks:
+        before26 = _snap(big26)
+        del _GAME_FILE_CHANGED[:]
+        rc26, out26 = _run_main(apply26)
+        err26 = [ln for ln in out26.splitlines() if '沒有權限讀寫' in ln]
+        assert rc26 == 2, '餌 26:唯讀應該以 2 結束(得到 %r)\n%s' % (rc26, out26)
+        assert err26 and big26 in err26[0] and '.work-' not in out26, \
+            '餌 26:「沒有權限讀寫」指的不是 portrait.big(%r)' % (err26,)
+        assert _snap(big26) == before26, '餌 26:遊戲檔被動到了'
+        assert not _no_leftovers(front26, big26), '餌 26:留下暫存垃圾:%r' % _no_leftovers(front26, big26)
+        assert '什麼都沒有動到' in out26, '餌 26:遊戲檔沒動,收尾卻沒照實說(%r)' % out26
+        baits += 1
+    else:
+        skipped.append('餌 26(這台機器上唯讀擋不住寫入,例如用 root 在跑)')
+    # 權限改回來(備份會照抄唯讀),留下來的測試檔才刪得掉。
+    for p_ in (big26, big26 + BACKUP_SUFFIX):
+        if os.path.exists(p_):
+            os.chmod(p_, 0o644)
+
+    # ── 反向餌 27:硬碟剩的空間放得下一份、放不下兩份 ──
+    # 第一次 --apply 要同時放一份備份加一份工作複本,已經有備份就只要一份工作複本。
+    # 餌 19 用的是「一點空間都沒有」,兩種份數都會擋,分不出份數算得對不對 ——
+    # 這一個把剩餘空間卡在兩個門檻中間:沒有備份時一定要停,有備份時一定要照常做完。
+    # 檔尾補 64 KB 沒人指到的位元組,是為了讓兩個門檻差得夠開(要接上去的新資料只有一百多個位元組)。
+    front27, big27, apply27 = _new_game('27', pad=65536)
+    bak27 = big27 + BACKUP_SUFFIX
+    size27 = os.path.getsize(big27)
+
+    class _Between(object):
+        free = size27 + size27 // 2                  # 放得下一份、放不下兩份
+
+    real_du27 = shutil.disk_usage
+    before27 = _snap(big27)
+    del _GAME_FILE_CHANGED[:]
+    shutil.disk_usage = lambda p: _Between()
+    try:
+        rc27a, out27a = _run_main(apply27)           # 還沒有備份:要兩份
+    finally:
+        shutil.disk_usage = real_du27
+    assert rc27a == 2 and '硬碟空間不夠' in out27a and '一份備份加一份工作複本' in out27a, \
+        '餌 27:只放得下一份,第一次 --apply 卻沒有停下來(%r)\n%s' % (rc27a, out27a)
+    assert _snap(big27) == before27 and not os.path.lexists(bak27), \
+        '餌 27:空間不夠,遊戲檔或備份卻被動到了'
+    _atomic_copy(big27, bak27)                       # 現在旁邊有備份了:只要一份
+    del _GAME_FILE_CHANGED[:]
+    shutil.disk_usage = lambda p: _Between()
+    try:
+        rc27b, out27b = _run_main(apply27)
+    finally:
+        shutil.disk_usage = real_du27
+    assert rc27b == 0 and '硬碟空間不夠' not in out27b and '備份已存在' in out27b, \
+        '餌 27:已經有備份、空間也夠放一份工作複本,卻沒有照常做完(%r)\n%s' % (rc27b, out27b)
+    assert _snap(big27) != before27, '餌 27:照常做完了,portrait.big 卻沒有被換上去'
+    del _GAME_FILE_CHANGED[:]                        # 驗完了,不要污染後面
+    baits += 1
+
+    # ── 反向餌 28:工作複本刪不掉(外接碟被拔掉)→ 不可以說「已經刪掉」,要印出留下的檔名 ──
+    # 2026-09-24 加。以前「對不上」那句訊息寫死「工作複本已經刪掉」,刪除失敗卻被吞掉;
+    # --apply 中途出錯時 finally 也是默默吞掉。覆驗實測:_sha256_of 回錯的值、os.remove 對工作複本
+    # 丟 ENXIO → 畫面說已經刪掉,資料夾裡卻留著 .portrait.big.work-xxxxxxxx。
+    # 兩條路各驗一次,「刪得掉」那一種當陰性對照(照樣說已經刪掉、不留東西)。
+    real_remove28 = os.remove
+
+    def _remove_fails_on_work(path, *a, **k):
+        if '.work-' in os.path.basename(os.fspath(path)):
+            raise OSError(6, '假裝外接碟被拔掉了(這是 --selftest 故意製造的)')
+        return real_remove28(path, *a, **k)
+
+    def _boom_append28(path, field_pos, blob):
+        raise OSError(28, '磁碟沒有空間了(這是 --selftest 故意製造的)')
+
+    seen28 = {}
+    for bait_remove in (False, True):
+        front28, big28, apply28 = _new_game('28%s' % ('b' if bait_remove else 'c'))
+        before28 = _snap(big28)
+        # (a) 準備工作複本時讀回來對不上
+        real_sha28 = globals()['_sha256_of']
+        globals()['_sha256_of'] = lambda p: 'deadbeef'
+        if bait_remove:
+            os.remove = _remove_fails_on_work
+        msg28a = ''
+        try:
+            _stage_copy(big28)
+        except DataError as e:
+            msg28a = str(e)
+        finally:
+            os.remove = real_remove28
+            globals()['_sha256_of'] = real_sha28
+        left28a = _no_leftovers(front28, big28)
+        for n_ in left28a:
+            real_remove28(os.path.join(front28, n_))
+        # (b) --apply 往工作複本寫資料失敗(走真正的 main(),離開時 finally 要收工作複本)
+        real_append28 = globals()['append_entry']
+        globals()['append_entry'] = _boom_append28
+        if bait_remove:
+            os.remove = _remove_fails_on_work
+        del _GAME_FILE_CHANGED[:]
+        try:
+            rc28b, out28b = _run_main(apply28)
+        finally:
+            os.remove = real_remove28
+            globals()['append_entry'] = real_append28
+        left28b = _no_leftovers(front28, big28)
+        assert _snap(big28) == before28, '餌 28:出事的是工作複本,portrait.big 卻被動到了'
+        assert isinstance(rc28b, OSError) and '什麼都沒有動到' in out28b, \
+            '餌 28:往工作複本寫資料失敗,收尾沒照實說遊戲檔沒動(%r)\n%s' % (rc28b, out28b)
+        seen28[bait_remove] = (msg28a, left28a, out28b, left28b)
+        del _GAME_FILE_CHANGED[:]
+    msg28a, left28a, out28b, left28b = seen28[False]
+    assert '工作複本已經刪掉' in msg28a and not left28a and not left28b and '沒刪掉' not in out28b, \
+        '餌 28 的陰性對照:刪得掉的時候應該說已經刪掉、什麼都不留(%r 留下=%r / 留下=%r)' % (msg28a, left28a, left28b)
+    msg28a, left28a, out28b, left28b = seen28[True]
+    assert left28a and '已經刪掉' not in msg28a and left28a[0] in msg28a, \
+        '餌 28:準備工作複本時刪不掉,訊息卻沒照實說留下了哪個檔(%r 留下=%r)' % (msg28a, left28a)
+    assert left28b and left28b[0] in out28b and '已經刪掉' not in out28b, \
+        '餌 28:--apply 出錯後刪不掉工作複本,畫面卻沒印出留下的檔名(留下=%r)\n%s' % (left28b, out28b)
+    baits += 1
+
+    # ── 反向餌 22:「-O 拒跑」這道守門自己 ──
+    # sys.flags 是唯讀的,同一個行程裡切不了 -O,所以換掉的是 _optimize_level。
+    if not _SELFTEST_NESTED:                         # 裡面那一次不要再套一層(見 _SELFTEST_NESTED)
+        real_opt = globals()['_optimize_level']
+        buf22 = _io.StringIO()
+        globals()['_optimize_level'] = lambda: 1
+        _SELFTEST_NESTED.append(1)
+        try:
+            with _contextlib.redirect_stdout(buf22):
+                rc22 = selftest()
+        finally:
+            globals()['_optimize_level'] = real_opt
+            _SELFTEST_NESTED.pop()
+        assert rc22 == 2, '餌 22:假裝在 -O 底下,--selftest 竟然沒有拒跑(回 %r)' % (rc22,)
+        assert '-O' in buf22.getvalue(), '餌 22:拒跑了卻沒說為什麼(%r)' % buf22.getvalue()
+        baits += 1
+
     print('自我測試:全部通過(含 %d 個反向餌)' % baits)
     if skipped:
         # 誠實報告:跳過的餌等於沒驗到,不可以混在「全部通過」裡面裝作驗過了。
@@ -2886,6 +3534,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=12835e693d" defer></script>
+<script src="../../assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

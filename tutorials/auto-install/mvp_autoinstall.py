@@ -122,7 +122,7 @@ qfs_compress_literal / fsh_first_image / fsh_replace_pixels 與 FSH_FORMATS
 #    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 
 import os
 import sys
@@ -1816,7 +1816,7 @@ def selftest():
       附加寫入之後舊資料一個位元組都還在(專案鐵律)·
       備份與收據都做出來了而且對得上 · --restore 之後逐位元組回到原狀。
 
-    反向餌 12 塊,每一塊都是「故意做一件必須失敗的事」,失敗不了就是防線壞了:
+    反向餌 13 塊,每一塊都是「故意做一件必須失敗的事」,失敗不了就是防線壞了:
       1 事先把 <目標>.autobak.part 做成指向資料夾外面的符號連結 ——
         外面那個檔不可以被動到(舊版那個猜得到的暫存名就是死在這裡)
       2 <目標>.autobak 本身是符號連結 —— 要拒絕,外面那個檔不可以被動到
@@ -1830,14 +1830,18 @@ def selftest():
      10 模組裡有讀不到的檔 —— 整批中止,一個檔都不可以被裝
      11 還原的目的地是符號連結 —— 要拒絕,資料夾外面那個檔不可以被動到
      12 收據的位置是符號連結 —— 要拒絕,而且不可以留下一份沒有收據的備份
+     13 假裝開了 -O(把 _optimize_level 換成回傳 1)—— 自我測試必須拒跑;
+        換回來之後守門要照樣放行(陰性對照,2026-09-24 加)
     """
     # -O 會把 assert 整個拿掉。本檔的 ck() 是自己 raise AssertionError,
     # 所以不吃這一刀;守門加在這裡是為了跟本站其他腳本口徑一致 ——
     # 不該讀者換一支跑,有的擋、有的不擋。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,'
               '測試會假綠')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
 
     import io as _io
     import contextlib
@@ -1859,6 +1863,10 @@ def selftest():
     def leftovers(path):
         d = os.path.dirname(path)
         return [x for x in os.listdir(d) if x.startswith(TMP_PREFIX)]
+
+    # 餌 13:-O 守門(結果是開頭那一行 _optimize_bait() 量的,這裡記帳)
+    ck(_opt[0], '餌 13:假裝開了 -O,自我測試竟然沒有拒跑')
+    ck(_opt[1], '餌 13 陰性對照:沒開 -O 守門也擋,或是換回原本那一支沒換成功')
 
     root = tempfile.mkdtemp(prefix='mvpai-selftest-')
     try:
@@ -2087,7 +2095,7 @@ def selftest():
     finally:
         shutil.rmtree(root, ignore_errors=True)
 
-    print('自我測試:全部通過(%d 道檢查,其中 12 塊是反向餌)' % tally[0])
+    print('自我測試:全部通過(%d 道檢查,其中 13 塊是反向餌)' % tally[0])
     return 0
 
 
@@ -2168,6 +2176,70 @@ def main():
         print('\n  ⛔ 你按了 Ctrl-C。')
         _print_touch_state()
         return 130
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
+
 
 # ─────────────────────────────────────────────────────────
 #  MIT License

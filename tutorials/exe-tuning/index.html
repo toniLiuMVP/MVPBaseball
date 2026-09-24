@@ -19,7 +19,7 @@
 <title>執行檔上的六個旋鈕 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="一顆調好的 MVP Baseball 2005 執行檔改了什麼:記憶體池、大位址、解析度、IAT 目錄、節區權限、檔頭檢查碼六個旋鈕。參考那顆用到其中四個,差的 10 個位元組一個一個講,附兩支腳本,每個位移都在兩顆真的執行檔上量過。不含任何保護措施相關內容。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="../../assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -192,7 +192,7 @@ python3 mvp_exe_pe.py "〔你的遊戲資料夾〕/mvp2005.exe" --restore</code>
   <p><strong>為什麼要改：</strong>那塊池子是 2005 年照當時主機的額度切的。
      中文字型在執行時要展開成貼圖，光是這一項就吃掉 <strong>13.5 MB</strong>，
      再配一座大球場就滿了 —— <u>二十年來大家以為「中文版配大球場會跳出」是球場太大，
-     其實跟球場多大沒有關係</u>。完整的推導過程在
+     其實卡住的不是「球場檔不能超過 10MB」那條線</u>。完整的推導過程在
      <a href="../../tc2026/index.html">中文版為什麼會跳出</a>那一課。</p>
   <p><strong>好處：</strong>這是六項裡<u>唯一一項本站量到「有沒有做，結果不一樣」</u>的。
      對照實驗做過：64 MB 兩次都當、128 MB 與 512 MB 都能玩。</p>
@@ -486,12 +486,17 @@ python3 mvp_exe_pe.py   mvp2005.exe --iat --sections --apply</code></pre>
       <tr><td data-label="哪一段"><code>selftest()</code></td>
           <td data-label="做什麼">自己造一顆最小的 PE 出來，跑完整流程再驗結果。
               <code>python3 mvp_exe_pe.py --selftest</code>（Windows 打 <code>python</code>），
-              十項全過才會印「總判定: ✅ 全部通過」</td>
+              十三個區塊全過才會印「總判定: ✅ 全部通過」</td>
           <td data-label="為什麼要有它">不需要遊戲檔就能證明它是對的。
-              <u>包含十個區塊，每一道守門都下了餌</u> —— 把守門拆掉自我測試就會變紅。
+              <u>包含十三個區塊，但不是每一道守門都有餌</u>。
+              本站把自我測試以外、條件成立就讓腳本停下來的 17 道守門逐一拆掉再跑自我測試，
+              會變紅的只有「要寫的那個檔是符號連結就不寫」那一道；
+              其餘 16 道拆掉照樣全綠，包括上面講的「IAT 目錄是空的，只加 <code>--sections</code> 就不寫」那一道
+              （腳本本身會擋，但自我測試還沒有替它下餌）。
               除了原本兩個陰性對照（改過的檔再跑一次不該再動它、半截備份不可以蓋掉正本），
               還有還原原子性、符號連結守衛（含指向不存在目標的斷鏈）、
-              寫入原子性、Ctrl-C 記錄這四類</td></tr>
+              寫入原子性、Ctrl-C 記錄這四類；
+              最後一個區塊驗的是「在 <code>-O</code> 底下拒跑」那道守門自己（假裝開了 <code>-O</code> 必須拒跑、沒開就要放行）</td></tr>
     </tbody>
   </table></div>
   <p class="small">另外三個旋鈕（記憶體池、大位址、解析度）在
@@ -503,7 +508,7 @@ python3 mvp_exe_pe.py   mvp2005.exe --iat --sections --apply</code></pre>
      下面這一份跟你下載到的
      <strong>一個字都沒有不同</strong>。可以先看過再決定要不要跑。</p>
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1157 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1228 行）</summary>
     <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -563,7 +568,7 @@ PE 規格的第 13 個資料目錄(索引 12)叫 Import Address Table,
 無外部相依,Python 3.7 以上即可。
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -1280,9 +1285,11 @@ def selftest():
     # ⚠️ -O 會把 assert 整個拿掉。這一支的自我測試雖然走 chk() 不走 assert,
     #    但全站十幾支腳本共用同一條規矩:selftest 一律不在 -O 下跑,免得哪一天
     #    有人加了 assert 就變成假綠而沒人看得出來。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
     ok = True
 
     def chk(cond, msg):
@@ -1553,6 +1560,11 @@ def selftest():
         shutil.rmtree(d, ignore_errors=True)
         shutil.rmtree(outside_dir, ignore_errors=True)
 
+    # 【13】最上面那道 -O 守門自己的餌(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳)
+    print('\n【13】-O 守門:假裝開了 -O 要拒跑,沒開就要放行')
+    chk(_opt[0], '假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試拒跑、結束碼 2')
+    chk(_opt[1], '陰性對照:換回原本那一支之後,沒開 -O 的時候守門放行')
+
     print('\n' + '=' * 46)
     print('總判定: %s' % ('✅ 全部通過' if ok else '❌ 有問題'))
     return 0 if ok else 1
@@ -1617,6 +1629,70 @@ def main():
     except DataError as e:
         print('\n停下來了:%s' % e)
         return 1
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
 
 
 if __name__ == '__main__':
@@ -1692,7 +1768,7 @@ if __name__ == '__main__':
         4K 下介面會不會跑位、記憶體池的上限。</li>
   </ul>
 
-  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <!-- course-strip:begin · 這一塊由產生器從 plan.html 產生，不要手改 -->
   <nav class="card course-strip" aria-label="這一課在課表的位置">
     <p class="card-h">📚 照課表上課的話</p>
     <p>這一課沒有排進任何一班。課表上寫的適合時機：「你想自己動手調執行檔 —— 記憶體、解析度、大位址」</p>
@@ -1723,6 +1799,6 @@ if __name__ == '__main__':
   </footer>
 
 </div>
-<script src="../../assets/site.js?v=12835e693d" defer></script>
+<script src="../../assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

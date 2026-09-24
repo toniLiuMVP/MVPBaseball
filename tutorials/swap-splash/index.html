@@ -19,7 +19,7 @@
 <title>換掉開機畫面 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="遊戲的開機大圖、標題頁、讀取畫面各在哪、多大、什麼格式，全部現場量測。含本站自己寫的匯入工具，以及一份 2007 年說明書跟這台機器對不上、真正的位置怎麼查出來的過程。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="../../assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -364,7 +364,7 @@ DrawLoadingProgress: %d, %.3f @ %.3f seconds</code></pre>
     <li><strong>本站沒驗的</strong> 換完之後遊戲畫面實際長什麼樣，本站沒看到，驗的是「檔案寫進去了而且內容正確」；腳本只處理 <code>0x60</code> 與 <code>0x7D</code> 兩種格式，其他一律拒絕不亂猜；那份 2007 年說明書講的 <code>00000000.256</code>，本站不能斷定它當年是錯的，只能說在這台機器上它不存在，而 <code>splash.fsh</code> 存在。</li>
   </ul>
 
-  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <!-- course-strip:begin · 這一塊由產生器從 plan.html 產生，不要手改 -->
   <nav class="card course-strip" aria-label="這一課在課表的位置">
     <p class="card-h">📚 照課表上課的話</p>
     <p><a href="../../plan.html#c"><strong>③ 外觀班</strong></a> 第 5／6 堂</p>
@@ -476,8 +476,11 @@ DrawLoadingProgress: %d, %.3f @ %.3f seconds</code></pre>
     </tbody>
   </table></div>
   <p class="small">這一支的 <code>--selftest</code> <u>只驗檔案安全那幾道守門員</u>
-     （備份、還原、符號連結、輸出路徑），<strong>32 項，每一道都配一個餌</strong>，
-     不需要遊戲資料夾就跑得動。DXT1、QFS、SHPI 那些格式細節它驗不到，
+     （備份、還原、符號連結、輸出路徑），<strong>32 項</strong>，
+     不需要遊戲資料夾就跑得動。<u>那幾道也不是每一道都配到餌</u>：
+     本站把腳本裡條件成立就讓它停下來的守門逐一拆掉再跑自我測試，
+     檔案安全那一類 15 道裡會變紅的是 6 道，另外 9 道拆掉照樣全綠
+     （例如備份寫完讀回來對不上、還原的暫存檔長度對不上）。DXT1、QFS、SHPI 那些格式細節它驗不到，
      那幾項要有真的遊戲檔才驗得動，
      本站怎麼驗的寫在上面
      「✅ 本站怎麼驗這支腳本」那一節。做不到的事也全部寫在腳本開頭：
@@ -490,7 +493,7 @@ DrawLoadingProgress: %d, %.3f @ %.3f seconds</code></pre>
      跟你按下載拿到的<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。</p>
   <p><a href="mvp_swap_screen.py" download>下載 mvp_swap_screen.py</a></p>
   <details data-src="mvp_swap_screen.py">
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1895 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1901 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -580,8 +583,8 @@ mvp_swap_screen.py —— 換掉遊戲的開機畫面 / 標題畫面 / 讀取畫
     · 不縮放、不轉格式、不旋轉。尺寸不同就拒絕寫入
     · 不改圖在畫面上的位置與大小(那寫在版面檔 .fel 裡,不是這一支的事)
     · --selftest 只驗檔案安全那幾道守門員(備份 / 還原 / 符號連結 / 輸出路徑),
-      每一道都配一個餌。DXT1、QFS、SHPI 那些格式細節驗不到 ——
-      那要有真的遊戲檔才驗得動
+      而且那幾道也不是每一道都配到餌(數字見檔尾 selftest() 的說明)。
+      DXT1、QFS、SHPI 那些格式細節驗不到 —— 那要有真的遊戲檔才驗得動
     · DXT1 是有損壓縮,匯出成 PNG 再原封不動匯回去,像素不保證逐位元組相同
       (原因見 _endpoint_candidates 的說明)
     · **開機大圖目前根本匯不回去。** 本站量得到的五份安裝(剛安裝好的英文原版、
@@ -611,7 +614,7 @@ mvp_swap_screen.py —— 換掉遊戲的開機畫面 / 標題畫面 / 讀取畫
 #    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 ─────────────────────────────────────────────────────────
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 
 import os
 import re
@@ -2006,14 +2009,20 @@ def cmd_restore(gamedir):
 #  --selftest:不需要遊戲檔,只驗那幾道會決定「玩家的檔會不會壞」的守門員
 # ─────────────────────────────────────────────────────────
 def selftest():
-    """每一道守門員都配一個**餌**:先製造出它應該擋下來的那個情況,再看它有沒有擋。
+    """替守門員配**餌**:先製造出它應該擋下來的那個情況,再看它有沒有擋。
 
     ⚠️ 為什麼一定要下餌:一個永遠不會亮的檢查,跟一個好的檢查,在測試報告上
-       長得一模一樣(全綠)。所以每一項都成對出現 —— 先一個「正常流程真的做得成」
+       長得一模一樣(全綠)。所以每一組都成對出現 —— 先一個「正常流程真的做得成」
        的陰性對照,再一個「該擋的真的被擋住,而且旁邊那個檔一個位元組都沒被動到」。
 
     這裡驗的都是**檔案安全**那幾道,不驗 DXT1/QFS 那些格式細節 ——
     那些要有真的遊戲檔才驗得動(見檔頭「做不到的事」)。
+
+    ⚠️ 檔案安全那幾道也不是每一道都配到餌。2026-09-24 把這一段以外、條件成立就讓
+       這支停下來的 43 道守門逐一拆掉(那一個 if 改成永遠不成立)再跑一次,
+       會變紅的 6 道全在檔案安全那一類;那一類(備份、還原、符號連結、輸出路徑)
+       一共 15 道,另外 9 道拆掉照樣全綠,例如備份寫完讀回來對不上、
+       還原的暫存檔長度對不上、匯出路徑是一個資料夾。其餘 28 道是格式與參數的守門。
     """
     import random
     fails = []
@@ -2406,6 +2415,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=12835e693d" defer></script>
+<script src="../../assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

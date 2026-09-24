@@ -87,7 +87,10 @@
   --clay:#9B4A31; --clay-wash:#F5E4DC;
   --blue:#2C5A73; --blue-wash:#E2EDF3;
   --pre-bg:#122019; --pre-fg:#DCE6DE; --pre-line:#20342B;
-  --btn-bg:#8A5608; --btn-bg-hover:#B5720F; --btn-fg:#FFFFFF;
+  --btn-bg:#8A5608; --btn-bg-hover:#A4680E; --btn-fg:#FFFFFF;
+  /* 按鈕與導覽列亮燈上的白字:平常 6.15:1、滑過 4.60:1(內文字要 4.5:1)。
+     滑過色原本是 #B5720F,白字只有 3.90:1;2026-09-24 改成同一個色相往暗調,
+     仍然比平常的 --btn-bg 亮(兩色之間 1.34:1),只是變亮的幅度比以前小(以前 1.57:1) */
   --shadow:0 1px 2px rgba(15,30,25,.06),0 6px 20px rgba(15,30,25,.06);
   --nav-fade:rgba(22,36,30,.14);
   /* 螢光筆(<u> 與重點整理):半透明,疊在哪一種底色的卡片上都分得出來
@@ -718,7 +721,7 @@ h1, h2, h3 { overflow-wrap: break-word; }
    窄螢幕改成:一列 = 一張卡,每一格自己一行,欄名印在值上面。
    描述欄因此拿到整個 375px 寬,而不是 90px。
    只有 .stack 的表才這樣(有 thead、無 colspan/rowspan、三欄以上,
-   由 .tools/add_table_labels.py 標記,389 張)。 */
+   由站內一支標記工具加上,那支工具不在公開檔案裡)。 */
 @media (max-width:640px){
   .tablewrap:has(> table.stack){
     overflow-x:visible;border:0;background:none;border-radius:0;
@@ -819,8 +822,7 @@ h1, h2, h3 { overflow-wrap: break-word; }
      琥珀色的連結字疊上螢光,淺色模式最低只剩 4.0:1。目前全站沒有這種寫法,這條是先留著的。
    · 首頁公告(.hero-note)、棒球教練卡這種整塊可點的卡片有 class、而且拿掉了底線,
      裡面的 <u>(首頁 3 個)照樣畫螢光。不要把下面那條改回 a u —— 那會把這 3 處的重點整個抹掉。
-   · 包著連結的 <u>(全站 2 處)也不畫螢光,理由同上,連結自己的底線還在。
-     「關於本站」那一處的 <u> 還包著連結以外的幾個字,那幾個字只剩「比旁邊的小字深」這一點區別。
+   · 包著連結的 <u>(全站 1 處,tc2026)也不畫螢光,理由同上,連結自己的底線還在。
    · 列印與 Windows 高對比模式不畫背景 → 退回底線,重點才不會消失。 */
 u{
   text-decoration:none;color:var(--text);
@@ -1133,3 +1135,20 @@ button.term::after{content:"ᴱᴺ" / ""}
   .card.amber u,.card.clay u{--hl:rgba(224,163,70,.46)}
 }
 u code{background:linear-gradient(transparent 58%,var(--hl) 58%),var(--tint-2)}
+
+/* ── 2026-09-24 步驟打勾那一列的兩行說明(site.js 建的) ──
+   舊紀錄不再顯示的說明、「剛才那一下沒有存起來」的提示,各自獨佔一行。
+   後者平常是空的(高度 0),但一直留在頁面上 —— 它是報讀器的狀態列,拿掉再放回去,報讀器不一定聽得到。 */
+.stepbar .stepnote{display:block}
+
+/* ── 2026-09-24 編號對照清單(reference/audio 的應援曲球員、隊呼球隊) ──
+   原本是一列塞三組「編號/球員」的表格,手機上堆疊成卡片後一張卡混三個人、標題只剩一個編號。
+   這其實是一份「編號 → 名字」的清單,改用定義清單:報讀器唸成「4,Bobby Abreu」,
+   桌機一列三組(跟原本的表格一樣緊湊),手機一列一組。 */
+.pairs{display:grid;grid-template-columns:repeat(3,minmax(3.5em,auto) 1fr);gap:0 14px;
+  margin:12px 0 18px;padding:6px 14px;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+.pairs dt,.pairs dd{margin:0;padding:8px 0;border-bottom:1px solid var(--line-soft)}
+.pairs dt{text-align:right;font-variant-numeric:tabular-nums;color:var(--text-2)}
+@media (max-width:640px){
+  .pairs{grid-template-columns:minmax(3.5em,auto) 1fr}
+}

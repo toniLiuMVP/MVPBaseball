@@ -19,7 +19,7 @@
 <title>第 0 課 新手基本功 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="改遊戲之前先學會六個基本操作：找到遊戲資料夾、開命令提示字元、取得檔案路徑、顯示副檔名、備份觀念、安裝 Python。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -155,13 +155,13 @@
 
   <h2>先認識幾個名詞</h2>
   <div class="tablewrap"><table class="gloss">
-    <tr><td>命令提示字元</td><td>一個只有文字的視窗：你打字給電腦，電腦回你文字。Mac 上叫「終端機」。本站的指令都打在這裡。</td></tr>
-    <tr><td>路徑</td><td>檔案在電腦裡的完整位置，像門牌號碼。例如 <code>C:\Games\MVP\data\frontend\ingame.big</code>。</td></tr>
-    <tr><td>副檔名</td><td>檔名最後那一小段，例如 <code>.big</code>、<code>.py</code>。Windows 預設把它藏起來，這會害你存錯檔。</td></tr>
-    <tr><td>指令</td><td>你打進命令提示字元的那一行字。本站所有指令都可以整行複製貼上；
+    <tr><th scope="row">命令提示字元</th><td>一個只有文字的視窗：你打字給電腦，電腦回你文字。Mac 上叫「終端機」。本站的指令都打在這裡。</td></tr>
+    <tr><th scope="row">路徑</th><td>檔案在電腦裡的完整位置，像門牌號碼。例如 <code>C:\Games\MVP\data\frontend\ingame.big</code>。</td></tr>
+    <tr><th scope="row">副檔名</th><td>檔名最後那一小段，例如 <code>.big</code>、<code>.py</code>。Windows 預設把它藏起來，這會害你存錯檔。</td></tr>
+    <tr><th scope="row">指令</th><td>你打進命令提示字元的那一行字。本站所有指令都可以整行複製貼上；
         帶 <code>〔…〕</code>、<code>&lt;…&gt;</code>，或寫著「你的遊戲資料夾」的地方，要先換成你自己的（多半是路徑；括號連同裡面的字一起換掉）。
         <strong>用拖曳的話，如果那一段外面剛好包著一對引號（像 <code>"〔你的遊戲資料夾〕"</code>），把引號連同那一段一起刪掉，再把資料夾或檔案拖進來。</strong></td></tr>
-    <tr><td>備份</td><td>動手前先複製一份原始檔留著，做錯了就把它換回去。本站會動到遊戲檔的工具都會自動幫你做這件事。</td></tr>
+    <tr><th scope="row">備份</th><td>動手前先複製一份原始檔留著，做錯了就把它換回去。本站會動到遊戲檔的工具都會自動幫你做這件事。</td></tr>
   </table></div>
 
   <h2 id="findfolder">操作零：找到你的遊戲資料夾</h2>
@@ -401,7 +401,7 @@
     <li><strong>本站沒驗的</strong> 這一課本身沒有量測任何數字，頁面自己標了保留的有下面這幾處。一是常見安裝位置那條路徑，<u>舊機器或 32 位元系統可能是 <code>C:\Program Files\EA SPORTS</code>，自己改過安裝位置的話這一招完全沒用</u>，要改用前兩種找法；二是 <code>python</code> 印出 2.7 時，頁面寫的是「有可能是兩個版本都裝了，只是這個名字指到舊的那個」，那也是可能性，要靠 <code>py -3</code> 或 <code>python3</code> 實際試出來；三是操作一補的 PowerShell 那一段（內建 5.1 與自己裝的 7 之差、<code>$PSVersionTable.PSVersion</code> 這行看版本的指令）依據的是微軟官方文件，<u>還沒在 Windows 上實測</u>；四是 Windows 上的幾段操作畫面也<u>還沒實測</u>：操作五新的安裝方式（Python install manager）與舊式安裝程式那條退路、打 <code>python</code> 跳出 Microsoft Store 或印出 <code>Python was not found</code> 的畫面、開頭是 <code>PS</code> 時打 <code>cmd</code> 切回命令提示字元、從黑色視窗把字複製出來的按鍵，以及下載被瀏覽器擋下來時的按鈕字樣。</li>
   </ul>
 
-  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <!-- course-strip:begin · 這一塊由產生器從 plan.html 產生，不要手改 -->
   <nav class="card course-strip" aria-label="這一課在課表的位置">
     <p class="card-h">📚 照課表上課的話</p>
     <p><a href="plan.html#a"><strong>① 入門班</strong></a> 第 2／6 堂</p>
@@ -418,6 +418,6 @@
        <a href="changelog.html">更新紀錄</a> · <a href="index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="assets/site.js?v=12835e693d" defer></script>
+<script src="assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

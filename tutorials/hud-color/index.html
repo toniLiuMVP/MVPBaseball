@@ -19,7 +19,7 @@
 <title>改記分板的顏色 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="比賽畫面左上角記分板的顏色寫在版面檔的第 12-14 個欄位。這個位置是量出來的：拿元素名字當標準答案掃原版 44 個版面檔，1,057 個帶顏色名的元素有 1,028 個對得上。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="../../assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -56,11 +56,10 @@
   <div class="quickfix" id="quick">
     <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快換個顏色？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
-      <li>下載 <a href="mvp_hud_color.py" download>mvp_hud_color.py</a>
-          放到桌面，檔名必須正好是這個（瀏覽器多半直接丟進「下載」資料夾，要自己拖到桌面）。</li>
-      <li>開命令提示字元切到桌面，Windows 打第一行、Mac 打第二行<br>
-  <pre><code>cd %USERPROFILE%\Desktop</code></pre>
-  <pre><code>cd ~/Desktop</code></pre></li>
+      <li>下載 <a href="mvp_hud_color.py" download>mvp_hud_color.py</a>，
+          檔名必須正好是這個（瀏覽器多半直接丟進「下載」資料夾，不用搬）。</li>
+      <li>在「下載」資料夾開命令視窗：Windows 打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打；Mac 開終端機打這一行<br>
+  <pre><code>cd ~/Downloads</code></pre></li>
       <li>打下面這段，<strong>最後那個空格打完就停住不要按 Enter</strong>，
           接著把<u>整個遊戲資料夾</u>拖到視窗上放開，再按 Enter。
           這一步只是列清單，不會改任何檔案<br>
@@ -163,14 +162,14 @@ RT:SCOREWHITE,0,0,67,35,152,50,1,1,1,1,1,<span class="hl">255,255,255</span>,0,1
      腳本按這裡下載：<a href="mvp_hud_color.py" download>mvp_hud_color.py</a>。</p>
 
   <div class="card amber">
-    <p class="card-h">按了下載之後，檔案跑到哪裡去了？</p>
+    <p class="card-h">按了下載之後，檔案跑到哪裡去了？指令要在哪裡打？</p>
     <p><strong>瀏覽器多半不會問你要存哪裡</strong>，它會直接放進「下載」資料夾。
-       所以按完之後還有一步：</p>
-    <p><span class="sk">1</span>打開檔案總管（Mac 用 Finder），左邊點「<u>下載</u>」<br>
-       <span class="sk">2</span>找到那個 <code>.py</code> 檔<br>
-       <span class="sk">3</span><strong>把它拖到桌面</strong></p>
-    <p class="small">沒做這一步的話，後面 <code>cd</code> 到桌面再執行，
-       畫面會出現 <code>can't open file</code> —— 那不是你打錯，是檔案還在「下載」裡。</p>
+       所以命令視窗要從那裡開：</p>
+    <p><span class="sk">1</span>打開檔案總管，左邊點「<u>下載</u>」<br>
+       <span class="sk">2</span>點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code>，按 Enter<br>
+       <span class="sk">3</span>開出來的視窗<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打</p>
+    <p class="small">Mac：打開終端機，先打 <code>cd ~/Downloads</code> 按 Enter。</p>
+    <p class="small">沒照這樣開視窗的話，畫面會出現 <code>can't open file</code> —— 那不是你打錯，是視窗跟檔案不在同一個資料夾。</p>
   </div>
 
   <div class="card blue">
@@ -214,8 +213,9 @@ RT:SCOREWHITE,0,0,67,35,152,50,1,1,1,1,1,<span class="hl">255,255,255</span>,0,1
     <thead><tr><th>看到什麼</th><th>怎麼辦</th></tr></thead>
     <tbody>
       <tr class="hi"><td class="mono">can't open file '…\mvp_hud_color.py'</td>
-          <td><strong>檔案還在「下載」資料夾，不在桌面。</strong>
-              開檔案總管左邊點「下載」，把那個 <code>.py</code> 拖到桌面，再跑一次。
+          <td><strong>命令視窗跟腳本不在同一個資料夾。</strong>
+              打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）。
+              還是一樣的話，是檔名對不上：瀏覽器可能在檔名後面加了 <code>(1)</code>，把它改成跟指令裡一模一樣。
               <u>這是本站最常見的第一個卡點。</u></td></tr>
       <tr><td>「這個版面檔裡沒有這些元素」</td>
           <td>名字打錯了。不帶 <code>--set</code> 跑一次看正確的名字，大小寫沒關係</td></tr>
@@ -367,8 +367,8 @@ RT:SCOREWHITE,0,0,67,35,152,50,1,1,1,1,1,<span class="hl">255,255,255</span>,0,1
 
       <tr><td data-label="哪一段"><code>selftest()</code></td>
           <td data-label="做什麼">拿兩行真實的版面資料，
-              在記憶體裡把整條鏈跑一遍，含 <strong>9 個反向餌
-              ＋ 11 個寫檔安全網的餌 ＋ 4 個陰性對照</strong>。</td>
+              在記憶體裡把整條鏈跑一遍，含 <strong>10 個反向餌
+              ＋ 11 個寫檔安全網的餌 ＋ 5 個陰性對照</strong>。</td>
           <td data-label="為什麼要有它">只驗好例子的話，
               一個什麼都放行的程式也會全綠。餌就是故意餵壞資料，
               確認該擋的真的擋得下來；陰性對照反過來，
@@ -396,16 +396,16 @@ RT:SCOREWHITE,0,0,67,35,152,50,1,1,1,1,1,<span class="hl">255,255,255</span>,0,1
      這些在原始碼開頭的說明裡也各寫了一次。</p>
 
   <h2 id="src">完整原始碼</h2>
-  <p><a href="mvp_hud_color.py" download>mvp_hud_color.py</a>（1,833 行，零相依）。
+  <p><a href="mvp_hud_color.py" download>mvp_hud_color.py</a>（1,909 行，零相依）。
      跑 <code>--selftest</code> 可以在不碰任何遊戲檔的情況下驗證它自己
-     —— 含 9 個反向餌與 11 個寫檔安全網的餌（故意餵壞資料，確認該擋的真的擋得下來），
-     外加 4 個陰性對照（證明正常那條路真的會動）。
+     —— 含 10 個反向餌與 11 個寫檔安全網的餌（故意餵壞資料，確認該擋的真的擋得下來），
+     外加 5 個陰性對照（證明正常那條路真的會動）。
      建不了符號連結的系統（例如沒開開發者模式的 Windows）會少 6 個餌與 1 個陰性對照，
      腳本會在畫面上說它跳過了 —— 那是「沒測到」，不是「通過」。</p>
 <pre><code>python3 mvp_hud_color.py --selftest</code></pre>
 
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1833 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1909 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -501,7 +501,7 @@ RT(色塊矩形)的第 12-14 個欄位就是填色 RGB —— 這個位置是量
 無外部相依,Python 3.7 以上即可。
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -1760,7 +1760,11 @@ def main():
 
 # ─────────────────────────────────────────────────────────
 #  自我測試(--selftest):不碰遊戲檔,全部在記憶體裡做
-#  每一條都下餌 —— 沒有反向測試的檢查,分不出「沒問題」跟「根本沒跑」。
+#  要下餌 —— 沒有反向測試的檢查,分不出「沒問題」跟「根本沒跑」。
+#  ⚠️ 但不是每一道守門都有餌。2026-09-24 把自我測試以外、條件成立就讓這支停下來的
+#     33 道守門逐一拆掉(那一個 if 改成永遠不成立)再跑 --selftest,會變紅的是 5 道
+#     (兩道符號連結、顏色寫法的三道);其餘 28 道拆掉照樣全綠,
+#     例如 --restore 時找不到備份、備份開頭不是 BIGF 那兩道。
 # ─────────────────────────────────────────────────────────
 def _selftest_run(argv):
     """把 main() 當成使用者那樣跑一遍,把它印出來的東西收起來不要洗版。
@@ -1814,9 +1818,11 @@ def selftest():
     """
     # python -O 會把 assert 整個拿掉 —— 下面的餌有一大半是靠 assert 站著的,
     # 在 -O 下會一路走到「全部通過」而其實什麼都沒驗。寧可不跑也不要假綠。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
 
     RT = ('    RT:SCOREBLACK,0,0,67,35,152,50,1,1,1,1,1,'
           '000,000,000,0,1,1,000,000,000,0,0,255,-1,0,0')
@@ -1870,7 +1876,7 @@ def selftest():
     assert _width_preserving('255', 7) == '007', '三位數寬度沒保住'
 
     # 六、寫檔安全網。全部在系統暫存資料夾裡做完就刪,不碰任何遊戲檔。
-    #     這一節每一條都下餌 —— 沒有餌的話,把 mkstemp 換回 &lt;檔名&gt;.part、
+    #     這一節放的是寫檔安全網的餌(外加幾個陰性對照)—— 沒有餌的話,把 mkstemp 換回 &lt;檔名&gt;.part、
     #     把原子還原換回 shutil.copy2(bak, dst),上面五節照樣全綠。
     n_traps = 0
     n_neg = 0                      # 陰性對照的數量(建不了符號連結的系統會少一個)
@@ -2177,9 +2183,79 @@ def selftest():
         n_neg += 1
         _STATE.update(phase='idle', target=None, kind=None)      # 收乾淨再走
 
-    print('自我測試:全部通過(含 9 個反向餌 + %d 個寫檔安全網的餌,'
+    # 七、最上面那道 -O 守門自己的餌(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳)。
+    #     它算進最後那一行的「反向餌」(2026-09-24 起 9 變 10),它的陰性對照算進 n_neg。
+    assert _opt[0], '假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試竟然沒有拒跑'
+    assert _opt[1], '陰性對照:沒開 -O 守門也擋,或是換回原本那一支沒換成功'
+    n_neg += 1
+
+    print('自我測試:全部通過(含 10 個反向餌 + %d 個寫檔安全網的餌,'
           '外加 %d 個陰性對照)' % (n_traps, n_neg))
     return 0
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
 
 
 if __name__ == '__main__':
@@ -2272,7 +2348,7 @@ if __name__ == '__main__':
         檔案層面全驗過，遊戲層面要你幫忙看。</li>
   </ul>
 
-  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <!-- course-strip:begin · 這一塊由產生器從 plan.html 產生，不要手改 -->
   <nav class="card course-strip" aria-label="這一課在課表的位置">
     <p class="card-h">📚 照課表上課的話</p>
     <p>這一課沒有排進任何一班。課表上寫的適合時機：「你想換記分板的配色」</p>
@@ -2292,6 +2368,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=12835e693d" defer></script>
+<script src="../../assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

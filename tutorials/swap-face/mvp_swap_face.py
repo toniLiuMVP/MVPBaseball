@@ -99,7 +99,7 @@ mvp_swap_face.py — 幫 MVP Baseball 2005 的球員換一張臉
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -1232,10 +1232,14 @@ def selftest():
     """--selftest:自己造一份最小的名冊來測,完全不碰遊戲檔。
 
     測的是這支工具對讀者的承諾,一條一條驗。**正向與反向都要有** ——
-    2026-08-29 本站踩過「防線壞了測試照樣全綠」,所以每一道守門都先證明
-    「正常流程真的做得到」,再放一個餌證明「答案錯的時候它真的會叫」。
+    2026-08-29 本站踩過「防線壞了測試照樣全綠」,所以先證明
+    「正常流程真的做得到」,再放餌證明「答案錯的時候它真的會叫」。
+    ⚠️ 不是每一道守門都有餌。2026-09-24 把這一段以外、條件成立就讓這支停下來的
+       34 道守門逐一拆掉(那一個 if 改成永遠不成立)再跑一次,會變紅的是 7 道
+       (符號連結與斷掉的連結共 4 道、備份與暫存檔讀回來對不上共 2 道、寫入後的複驗沒過);
+       其餘 27 道拆掉照樣全綠,例如備份被截斷或列數比名冊少、找不到那位球員。
 
-    正向 9 道:
+    正向 10 道:
       · 造出來的名冊讀得出來、face 欄是第 10 欄
       · 沒加 --apply 一個位元組都不動、不產生備份、不記到任何一次換名
       · --apply 之後那一格真的是新值
@@ -1243,11 +1247,13 @@ def selftest():
       · 備份逐位元組等於動手之前的名冊
       · 換名有被記下來(Ctrl-C 的收尾訊息靠它)
       · --restore 之後逐位元組回到動手之前
+      · -O 守門換回原本那一支之後,沒開 -O 就放行(下面反向餌 L 的陰性對照)
 
     (--selftest 不接受 python -O:-O 會把下面每一個 assert 拿掉,
      整份測試會在什麼都沒驗的情況下印「全部通過」。進來第一行就擋掉。)
 
-    反向餌 13 組(2026-09-05 第二輪、2026-09-06 第三輪稽核補的守門,每一道各配一組):
+    反向餌 14 組(A 到 K 是替 2026-09-05 第二輪、2026-09-06 第三輪稽核補的守門配的,但那兩輪
+    補的守門不是每一道都配到,例如上面說的「備份被截斷或列數比名冊少」;L 是 2026-09-24 補的):
       A 事先把「備份名 + .part」放成指向資料夾外面的符號連結 → 跑 --apply,
         外面那個檔必須一個位元組都沒變(暫存檔的名字已經猜不到了)
       B 事先把「名冊名 + .tmp」放成同樣的連結 → 同上
@@ -1266,6 +1272,7 @@ def selftest():
         連 (a) 失效時由 _INFLIGHT 接手的「正在替換」那一句也一起驗
       K 名冊本身是符號連結 → 命令列那條路(main())一律停手、exit code 2,
         連結沒被換掉、它指到的那份名冊沒被動到、不產生備份
+      L 假裝開了 -O(把 _optimize_level 換成回傳 1)→ 自我測試必須拒跑、結束碼 2
 
     每一組都拿「把對應的那道守門改壞」驗過會亮 —— 餌會自己失效而沒有人發現,
     所以餌本身也要驗。(2026-09-05 那 10 組是 14 個突變體;2026-09-06 補的
@@ -1274,9 +1281,11 @@ def selftest():
     """
     # ⚠️ 這一道要排在最前面。python -O 會把 assert 整個拿掉,下面幾十道守門
     #    一句都不會執行,而畫面照樣印「全部通過」—— 那是最糟的一種綠燈。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
 
     import io as _io
     import contextlib
@@ -1306,6 +1315,11 @@ def selftest():
     def _quiet(fn, *a, **kw):
         with contextlib.redirect_stdout(_io.StringIO()):
             return fn(*a, **kw)
+
+    # 反向餌 L:最上面那道 -O 守門(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳)
+    assert _opt[0], '餌 L:假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試竟然沒有拒跑'
+    # 正向:它的陰性對照 —— 換回原本那一支之後,沒開 -O 就要放行
+    assert _opt[1], '餌 L 的陰性對照:沒開 -O 守門也擋,或是換回原本那一支沒換成功'
 
     raw, lines = _reload()
     FACE_FIELD = resolve_field(lines, FACE_NAME)
@@ -1596,7 +1610,7 @@ def selftest():
     assert open(p, 'rb').read() == before2, '餌 K:連結指到的那份名冊被動到了'
     assert not os.path.lexists(lp2 + '.facebak'), '餌 K:不該產生備份'
 
-    print('自我測試:全部通過(53 道檢查:9 道正向,44 道分在 13 組反向餌裡)')
+    print('自我測試:全部通過(55 道檢查:10 道正向,45 道分在 14 組反向餌裡)')
     print('  測試資料在 %s(跑完不刪,想自己看的話可以進去翻)' % d)
     return 0
 
@@ -1632,6 +1646,70 @@ def _interrupt_note():
         print('  只產生了備份(.facebak),名冊本身沒有被改到。')
     else:
         print('  沒有改到任何檔案。')
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
 
 
 if __name__ == '__main__':

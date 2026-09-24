@@ -98,7 +98,7 @@ aaa144_1~2 這五個小聯盟表也補,只有 mlbspr_1.dat 不補,而那個檔�
 無外部相依,Python 3.7 以上即可。
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -841,8 +841,15 @@ def shift_years(text: bytes, delta: int):
 #
 #  不碰任何遊戲檔:自己在系統暫存資料夾造一個最小但合法的 schedule.big,
 #  跑完預覽 / --apply / --restore 全程,再逐一「下餌」——
-#  先做出每一道守門要擋的那個情況,確認它真的擋得下來,
+#  先做出守門要擋的那個情況,確認它真的擋得下來,
 #  而且旁邊、外面的檔案一個位元組都沒被動到。
+#  ⚠️ 不是每一道守門都有餌。2026-09-24 把自我測試以外、條件成立就讓這支停下來的
+#     29 道守門逐一拆掉(那一個 if 改成永遠不成立)再跑 --selftest,會變紅的是 6 道,
+#     全在 main():要寫的路徑是符號連結、兩處備份是符號連結、還原時找不到備份、
+#     年份超出 1900-2999、寫出來那一份自己驗不過。其餘 23 道拆掉照樣全綠,
+#     例如封裝檔目錄讀到一半就沒了、--restore 時備份裡沒有 mlb162_1.dat。
+#     其中 _refuse_if_symlink 那一道拆掉也不紅,是因為 main() 更前面那三道
+#     符號連結檢查已經先擋了自我測試造的那幾種情況。
 #
 #  ⚠️ 只有正向測試會騙人。本站踩過:「半截備份被擋下來」那條測試一直是綠的,
 #     實際上是備份根本沒產生過(TypeError),所以永遠沒有東西可以擋。
@@ -866,9 +873,11 @@ def _selftest():
     # -O 會把 assert 整句拿掉。這一支的檢查是自己寫的 check(),-O 拿不掉它 ——
     # 但這道守門照樣要有:哪天有人在這裡補一句普通的 assert,
     # 沒有它就會靜靜地變成假綠,而且沒有任何人會發現。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(_selftest)
 
     import contextlib
     import io as _io
@@ -933,8 +942,14 @@ def _selftest():
     print('mvp_shift_schedule_year.py 自我測試')
     print('(不需要遊戲檔,全程只動系統暫存資料夾)\n')
 
+    # ── 0. 最上面那道 -O 守門自己的餌(2026-09-24 加)──────────────
+    # 結果是開頭那一行 _optimize_bait() 量好的,這裡只記帳。
+    print('零、-O 守門')
+    check('假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試拒跑、結束碼 2', _opt[0])
+    check('(陰性對照) 換回原本那一支之後,沒開 -O 的時候守門放行', _opt[1])
+
     # ── 1. QFS 壓縮 / 解壓來回 ────────────────────────────
-    print('一、QFS / RefPack')
+    print('\n一、QFS / RefPack')
     random.seed(20260905)
     ok = True
     for n in (0, 1, 3, 4, 5, 112, 113, 1000, 4096):
@@ -1850,6 +1865,70 @@ def main():
         print(f'  要回到那份備份的狀態:{_cmd}')
     print('  然後請回報給本站。')
     return 1
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
 
 
 if __name__ == '__main__':

@@ -47,6 +47,9 @@ EA 錄了 57 組球員專屬應援曲。這支腳本可以把其中一首指給�
   · --give 加 --apply:改 spch_cht.txt 裡**一行**的群組名,其餘每一行原封不動;
     動手之前先留一份 spch_cht.txt.chantbak。
   · --restore:把那份備份放回去(備份本身留著不刪)。
+  · --selftest:不需要遊戲資料夾。在系統暫存資料夾造一份假的遊戲資料夾,
+    把下面每一道安全網各下一個餌驗一次,跑完整個刪掉,不碰你的遊戲
+    (2026-09-24 加)。
 
 安全網在哪
 ---------
@@ -107,24 +110,27 @@ EA 錄了 57 組球員專屬應援曲。這支腳本可以把其中一首指給�
  它也用不到:要改的 data/audio/chants/spch_cht.txt 是純文字,翻名字用的
  data/database/attrib.dat 也是逗號分隔的純文字,而且是用唯讀模式讀進來的,
  從頭到尾沒有寫回去。
- 「不需要安裝任何套件」那半句是對的:本檔 import 的
+ 「不需要安裝任何套件」那半句是對的:本檔開頭 import 的
  argparse / os / re / shutil / signal / struct / sys / tempfile / zlib
- 全是 Python 自己就附的模組。
- 其中 zlib 在本檔一次都沒有用到(用語法樹數本檔的模組用法:zlib 0 次、os 50 次、
- struct 11 次、sys 6 次、shutil 4 次、signal 4 次、re 2 次、argparse 2 次、tempfile 1 次),
+ 全是 Python 自己就附的模組(--selftest 與它的 -O 守門在函式裡另外 import 了
+ contextlib / io / threading,也都是 Python 自己附的)。
+ 其中 zlib 在本檔一次都沒有用到(用語法樹數本檔的模組用法:zlib 0 次、os 112 次、
+ sys 12 次、signal 12 次、struct 11 次、shutil 6 次、re 2 次、argparse 2 次、tempfile 2 次),
  留著只是為了讓本站每一支腳本的檔頭長得一樣。
  (2026-09-05 訂正這幾個數字:那一輪把備份與還原改成原子的,os 從 35 次變 50 次、
   shutil 2→4、sys 4→6,還多了一個 tempfile。數字寫在說明裡就會過期,
   所以附上量法:用 ast 走一遍本檔,數 <模組>.<屬性> 這種用法出現幾次。
   2026-09-06 那一輪把換名包成不可中斷的一段,多了 signal 4 次,其餘沒變;
-  2026-09-10 那一輪只改說明文字與 main() 裡一個判斷,九個數字重數一次全部沒變。)
+  2026-09-10 那一輪只改說明文字與 main() 裡一個判斷,九個數字重數一次全部沒變;
+  2026-09-24 加了 --selftest,os 50→112、sys 6→12、signal 4→12、shutil 4→6、
+  tempfile 1→2,其餘四個沒變。)
  真的自己讀寫 PNG 的是「換球員大頭照」「做一張新的球員臉皮」「換掉開機畫面」
  「換球隊隊徽」這四課:site/tutorials/ 底下的 29 支腳本裡,找得到 png_read 與
  png_write 的就只有那四個檔。)
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -795,13 +801,17 @@ def cmd_give(gamedir, who, source_num, apply_it):
     already = [(i, n) for i, n in parse_groups(lines) if n == 'pchants:%04d' % target_id]
     print('  來源應援曲  pchants:%s%s' % (src, ('  (原本是 %s 的)' % players[int(src)]) if int(src) in players else ''))
     print('  要指給      %s  audioid %04d' % (target_name, target_id))
+    # 這一道要排在「本來就有專屬應援曲」前面:來源跟目標是同一個編號時,
+    # 目標當然「本來就有」那一組,排在後面的話永遠輪不到它,
+    # 讀者看到的會是下面那句「會出現兩個一樣的群組名」—— 而同一行換成同一個名字
+    # 並不會多出一個。(2026-09-24 對調;在那之前這一道走不到。)
+    if int(src) == target_id:
+        raise DataError('來源跟目標是同一個編號,不用改。')
     if already:
         print('  ⚠️ %s 本來就有專屬應援曲(pchants:%04d)。' % (target_name, target_id))
         print('     照做的話索引裡會出現兩個一樣的群組名,遊戲會用哪一個本站沒有測過。')
         raise DataError('為了不製造重複的群組名,這裡停下來。\n'
                         '  想換的話請挑一位還沒有專屬應援曲的球員。')
-    if int(src) == target_id:
-        raise DataError('來源跟目標是同一個編號,不用改。')
     # 群組名在這個檔裡是固定寬度的:本站量到的三份 spch_cht.txt(英文版原版、
     # 中文版原版、測試機那一份),90 個群組行**每一行都剛好 32 bytes**。
     # audioid 超過四位數會寫出 33 bytes 的一行,破壞這個檔唯一看得見的結構,
@@ -1001,6 +1011,8 @@ def main():
     按 Ctrl-C 的訊息會分兩種寫:遊戲檔還沒換過就說「一個位元組都沒有動到」,
     已經換過就叫你去 --restore —— 那句話得是真的,不能一律安慰。
     換名跟登記之間不留縫(_NoInterrupt),所以這兩句不會講反。
+    --selftest 不走這裡(在最底下就先攔下來了):全過回 0、有一道沒過回 1、
+    在 python3 -O 底下拒跑回 2。
     """
     EPILOG = (
         "\n例子(照順序做):\n\n"
@@ -1067,7 +1079,594 @@ def main():
     return 0
 
 
+# ─────────────────────────────────────────────────────────
+#  自我測試(--selftest,2026-09-24 加)
+# ─────────────────────────────────────────────────────────
+
+def selftest():
+    """--selftest:在系統暫存資料夾自己造一份最小的遊戲資料夾,把 main() 走得到的每一道守門各驗一次。
+
+    ⚠️ 不碰你的遊戲資料夾。造出來的索引檔與名冊都是假的,全部放在
+       tempfile.mkdtemp() 開的那一個資料夾裡,跑完整個刪掉。
+
+    這支走得到的每一道守門都有「餌」(故意做它該擋的事,沒擋就紅)與「陰性對照」
+    (做正常的事,它不該擋;少了這一半,一個什麼都擋的版本也會全綠)。
+    共用的還原函式 _restore_from_backup() 裡有幾道沒有餌:「找不到備份」與
+    「備份是 0 bytes」在 cmd_restore() 就先被擋下來了(後者被「備份看起來被截斷了」
+    那一道擋);BIGF、語系檔(LOCH)、執行檔(MZ)那三段要備份開頭剛好是那幾種
+    檔頭才會走到,這一課的索引檔是純文字,本站沒有替它們下餌。
+    符號連結的檢查多半有兩到三層(呼叫端一道、共用函式裡再一道),
+    餌驗的是幾層合起來的結果:只拆掉其中一層,別層照樣擋,這裡不會紅。
+      一、找不到索引檔、索引檔行數多得離譜、索引檔的名字是一個資料夾 → 停下來
+      二、預覽一個位元組都不寫;--apply 只換那一行、其他行逐位元組不變、
+          CRLF 照舊、長度剛好差「新舊群組名的長度差」、備份逐位元組等於原檔
+      三、來源不在索引裡、目標本來就有專屬應援曲、來源跟目標是同一個編號、
+          audioid 超過四位數、名冊裡找不到、名字撞到兩位、讀不到名冊
+          → 停下來,索引檔一個位元組都不動(比的是那一道自己丟出來的話)
+      四、寫出去之前的三道驗算(群組數與音檔數、重複群組名、總長度):
+          換成會報錯的替身,每一道都必須在動磁碟之前停下來
+      五、已經有一份不能用的備份(0 bytes、或是一個資料夾)→ 停下來,不在沒有還原點時動手
+      六、換檔那一步失敗(把 os.replace 換成一定丟例外的):索引檔換不上去、
+          連備份都換不上去 → 索引檔原封不動、不留暫存檔;索引檔還沒碰過的時候,
+          收尾那句話照實說「一個位元組都沒有動到」;寫完讀回來複驗沒過 → 回 2 並給還原指令
+      七、Ctrl-C:換檔之前按 → 說沒動到;換檔之後按 → 不可以說沒動到,要給還原指令;
+          換名那一段裡收到真的 SIGINT → 那一段跑完才丟出來;接到改指派與還原的
+          真流程上,換名做完才收到 → 要說「已經換過了」
+      八、還原:備份被截短(少一組)、結尾不是完整的一行、有重複群組名、找不到備份、
+          備份不到正本的一半、給的資料夾不對 → 停下來;還原換檔失敗、還原的暫存檔
+          讀回來跟備份對不起來 → 正本原封不動;換好之後讀回來跟備份不一樣 → 不印成功;
+          正常還原逐位元組回去;索引檔被刪掉也還原得回來
+      九、符號連結:索引檔、備份檔是指到資料夾外面的連結 → 改指派與還原都停下來,
+          外面那個檔不被動到(這台機器做不出符號連結就跳過,而且會印出來說跳過了)
+      十、命令列:給錯資料夾(DataError)印一句話回 2、--list 回 0
+      十一、最上面那道「-O 拒跑」守門自己的餌
+    在 python3 -O 底下拒跑,回 2。
+    """
+    # -O 會把 assert 整段拿掉。這一段的判斷是下面那個 check(),-O 拿不掉它 ——
+    # 守門照樣要有:哪天有人在這裡補一句 assert,沒有它就會靜靜地變成假綠。
+    if _optimize_level():
+        print('--selftest 不能在 python3 -O 底下跑:-O 會把 assert 整段拿掉,'
+              '測試會變成一片假的綠燈。請拿掉 -O 再跑一次。')
+        return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
+    global _REPLACE_STAGE
+    import contextlib
+    import io
+
+    print('自我測試(在系統暫存資料夾裡造假的遊戲資料夾,不碰你的遊戲)')
+    tally = {'n': 0, 'bait': 0, 'fail': 0}
+    skipped = []
+
+    def check(ok, what, bait=False):
+        tally['n'] += 1
+        tally['bait'] += 1 if bait else 0
+        tally['fail'] += 0 if ok else 1
+        print('   %s %s%s' % ('✅' if ok else '❌', '餌:' if bait else '', what))
+
+    def quiet(fn, *a):
+        """跑 fn,把它印的字收起來。回傳 (回傳值或它丟出來的例外, 印出來的字)。"""
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                r = fn(*a)
+        except (Exception, SystemExit, KeyboardInterrupt) as e:
+            r = e
+        return r, buf.getvalue()
+
+    def put(path, data):
+        with open(path, 'wb') as f:
+            f.write(data)
+
+    def get(path):
+        with open(path, 'rb') as f:
+            return f.read()
+
+    def junk(folder):
+        """換檔失敗之後留下來的暫存檔(名字是 .<檔名>.<用途>-xxxx)。"""
+        return [x for x in os.listdir(folder) if x.startswith('.spch_cht.txt.')]
+
+    def run_main(*argv):
+        real_argv = sys.argv
+        sys.argv = ['mvp_swap_chant.py'] + list(argv)
+        try:
+            return quiet(main)
+        finally:
+            sys.argv = real_argv
+
+    # 索引檔:4 個群組(一個通用的、兩個球員專屬、一個隊呼)、5 個音檔,CRLF 換行。
+    # 群組名那幾行照真的檔補空白到 32 bytes。
+    index = b''.join(x + b'\r\n' for x in (
+        b'tomahawk'.ljust(32), b'tomahawk01.wav 0',
+        b'pchants:0004'.ljust(32), b'pchant.0004a.wav 0',
+        b'pchants:0010'.ljust(32), b'pchant.0010a.wav 0', b'pchant.0010b.wav 1000',
+        b'tchants:01'.ljust(32), b'tchant.01.wav 0'))
+    # 名冊:表頭每一格是「欄號 欄位名」;資料列第 0 格是一串識別碼,不是欄位。
+    roster = b'\r\n'.join((
+        b'0 first_name,1 last_name,2 playerattrib_audioid',
+        b'0a1,0 Derek,1 Jeter,2 4',
+        b'0a2,0 Chin-Feng,1 Chen,2 1234',
+        b'0a3,0 Wang,1 Alpha,2 2001',
+        b'0a4,0 Wang,1 Beta,2 2002',
+        b'0a5,0 Big,1 Number,2 25028', b''))
+
+    root = tempfile.mkdtemp(prefix='mvp_swap_chant_selftest-')
+    try:
+        game = os.path.join(root, 'game')
+        chants = os.path.join(game, 'data', 'audio', 'chants')
+        db = os.path.join(game, 'data', 'database')
+        os.makedirs(chants)
+        os.makedirs(db)
+        idx = os.path.join(chants, 'spch_cht.txt')
+        bak = idx + BACKUP_SUFFIX
+        roster_p = os.path.join(db, 'attrib.dat')
+        put(idx, index)
+        put(roster_p, roster)
+
+        def fresh():
+            """每一塊測試都從同一個乾淨狀態開始:原本的索引、原本的名冊、沒有備份。"""
+            global _REPLACE_STAGE
+            _REPLACE_STAGE = 0
+            for p in (idx, bak):
+                if os.path.islink(p) or os.path.isfile(p):
+                    os.remove(p)
+                elif os.path.isdir(p):
+                    shutil.rmtree(p)
+            put(idx, index)
+            if not os.path.isfile(roster_p):
+                put(roster_p, roster)
+
+        print('\n一、找不到檔案、檔案大得離譜')
+        check(isinstance(quiet(chant_paths, os.path.join(root, '沒有這個資料夾'))[0], DataError),
+              '給的資料夾底下沒有索引檔 → 停下來', True)
+        check(quiet(chant_paths, game)[0] == idx, '陰性對照:給對了就找得到索引檔')
+        big = os.path.join(root, 'huge.txt')
+        put(big, b'x\r\n' * (MAX_LINES + 1))
+        check(isinstance(quiet(read_index, big)[0], DataError),
+              '索引檔有 %d 行(上限 %d)→ 停下來' % (MAX_LINES + 2, MAX_LINES), True)
+        r, _ = quiet(read_index, idx)
+        check(isinstance(r, tuple) and r[2] == b'\r\n' and r[0] == index,
+              '陰性對照:正常的索引檔讀得進來,換行認得是 CRLF')
+        r, _ = quiet(read_index, chants)
+        check(isinstance(r, DataError) and '讀不到' in str(r),
+              '索引檔的名字其實是一個資料夾(讀不進來)→ 收成一句「讀不到」,不噴作業系統的例外', True)
+
+        print('\n二、預覽與真的改')
+        fresh()
+        r, out = quiet(cmd_give, game, 'Chin-Feng', '0010', False)
+        check(r is None and get(idx) == index and not os.path.lexists(bak),
+              '陰性對照:沒加 --apply 一個位元組都不寫、不留備份')
+        r, out = quiet(cmd_give, game, 'Chin-Feng', '0010', True)
+        after = get(idx)
+        want = index.replace(b'pchants:0010', b'pchants:1234', 1)
+        check(r is None and after == want,
+              '陰性對照:--apply 只把那一行換成 pchants:1234,其他位元組全部一樣')
+        check(after.count(b'\r\n') == index.count(b'\r\n') and b'\n' not in after.replace(b'\r\n', b''),
+              '陰性對照:換行照舊是 CRLF,行數沒變')
+        check(os.path.isfile(bak) and get(bak) == index, '陰性對照:備份逐位元組等於動手之前的索引')
+
+        print('\n三、該停下來的指派')
+        # 每一種都要停在「它自己那一道」:最後一欄是那一道丟出來的例外裡的話。
+        # 只看有沒有停下來不夠 —— 例如目標本來就有應援曲那一種,就算那一道被拆掉,
+        # 後面「寫出去之前不可以有重複群組名」那一道也會擋住,只看結果分不出是誰擋的。
+        # 也只看例外、不看畫面:「本來就有專屬應援曲」那一句在丟例外之前就先印出來了,
+        # 連畫面一起比的話,那一道被拆掉也照樣是綠的。
+        for label, who, src, said in (
+                ('來源 pchants:0099 不在索引裡', 'Chin-Feng', '0099', '索引裡沒有 pchants:0099'),
+                ('目標(Jeter,audioid 4)本來就有專屬應援曲', 'Jeter', '0010', '為了不製造重複的群組名'),
+                ('來源跟目標是同一個編號(Jeter 的 pchants:0004 指給 Jeter)', 'Jeter', '0004',
+                 '來源跟目標是同一個編號'),
+                ('目標的 audioid 25028 超過四位數', 'Number', '0010', '超過四位數'),
+                ('名冊裡找不到名字含 Nobody 的球員', 'Nobody', '0010', '找不到名字含'),
+                ('名字含 Wang 的有兩位,不替你猜', 'Wang', '0010', '請打長一點')):
+            fresh()
+            r, out = quiet(cmd_give, game, who, src, True)
+            check(isinstance(r, DataError) and said in str(r)
+                  and get(idx) == index and not os.path.lexists(bak),
+                  label + ' → 停下來,索引檔不動、不留備份', True)
+        fresh()
+        os.remove(roster_p)
+        r, _ = quiet(cmd_give, game, 'Chin-Feng', '0010', True)
+        check(isinstance(r, DataError) and '讀不到名冊' in str(r) and get(idx) == index,
+              '讀不到名冊卻用名字查人 → 停下來(請你直接給四位數)', True)
+        put(roster_p, roster)
+        fresh()
+        r, _ = quiet(cmd_give, game, '1234', '0010', True)
+        check(r is None and get(idx) == want, '陰性對照:直接給四位數 1234 也改得對')
+
+        print('\n四、寫出去之前的自我檢查')
+        real_check = check_index
+        g = globals()
+        # cmd_give 在寫出去之前叫 check_index 兩次:第一次量原本的、第二次量改完的。
+        # 替身只在第二次動手腳,模擬「改完之後的內容不對」。
+        calls = []
+
+        def dup_after(lines):
+            calls.append(1)
+            n_g, n_f, dup = real_check(lines)
+            return (n_g, n_f, ['pchants:1234']) if len(calls) == 2 else (n_g, n_f, dup)
+
+        def more_after(lines):
+            calls.append(1)
+            n_g, n_f, dup = real_check(lines)
+            return (n_g + 1, n_f, dup) if len(calls) == 2 else (n_g, n_f, dup)
+
+        for label, fake, said in (('改完之後冒出重複的群組名', dup_after, '重複的群組名'),
+                                  ('改完之後群組數變了', more_after, '群組或音檔數變了')):
+            fresh()
+            del calls[:]
+            g['check_index'] = fake
+            try:
+                r, _ = quiet(cmd_give, game, 'Chin-Feng', '0010', True)
+            finally:
+                g['check_index'] = real_check
+            check(isinstance(r, DataError) and said in str(r)
+                  and get(idx) == index and not os.path.lexists(bak),
+                  label + ' → 在動磁碟之前停下來', True)
+        # 第三道(長度):把 read_index 換成「換行報錯成 LF」的替身。
+        # 群組數、音檔數都沒變,只有接回去的總長度少了幾個位元組 —— 只有這一道擋得到。
+        real_read = read_index
+
+        def wrong_newline(path):
+            raw, lines, _nl = real_read(path)
+            return raw, lines, b'\n'
+
+        fresh()
+        g['read_index'] = wrong_newline
+        try:
+            r, _ = quiet(cmd_give, game, 'Chin-Feng', '0010', True)
+        finally:
+            g['read_index'] = real_read
+        check(isinstance(r, DataError) and '檔案長度不符預期' in str(r)
+              and get(idx) == index and not os.path.lexists(bak),
+              '改完之後總長度不等於「原長度 + 新舊名字的長度差」→ 在動磁碟之前停下來', True)
+
+        print('\n五、已經有一份不能用的備份')
+        fresh()
+        put(bak, b'')
+        r, _ = quiet(cmd_give, game, 'Chin-Feng', '0010', True)
+        check(isinstance(r, DataError) and get(idx) == index, '備份是 0 bytes → 停下來,索引檔不動', True)
+        fresh()
+        os.mkdir(bak)
+        r, _ = quiet(cmd_give, game, 'Chin-Feng', '0010', True)
+        check(isinstance(r, DataError) and get(idx) == index, '備份的名字是一個資料夾 → 停下來', True)
+        fresh()
+        put(bak, index)
+        r, _ = quiet(cmd_give, game, 'Chin-Feng', '0010', True)
+        check(r is None and get(idx) == want and get(bak) == index,
+              '陰性對照:備份好好的就保留最早那一份,照樣改')
+
+        print('\n六、換檔那一步失敗')
+        real_replace = os.replace
+
+        def boom(*a, **k):
+            raise OSError(28, '(自我測試的替身)換檔失敗')
+
+        def boom_on_index(src, dst):
+            if dst == idx:
+                raise OSError(28, '(自我測試的替身)換檔失敗')
+            return real_replace(src, dst)
+
+        fresh()
+        os.replace = boom_on_index
+        try:
+            rc, out = run_main(game, '--give', 'Chin-Feng', '0010', '--apply')
+        finally:
+            os.replace = real_replace
+        check(rc == 2 and get(idx) == index and not junk(chants),
+              '索引檔換上去那一步失敗 → 回 2、索引檔原封不動、不留暫存檔', True)
+        fresh()
+        os.replace = boom
+        try:
+            rc, out = run_main(game, '--give', 'Chin-Feng', '0010', '--apply')
+        finally:
+            os.replace = real_replace
+        check(rc == 2 and get(idx) == index and not os.path.lexists(bak) and not junk(chants),
+              '連備份都換不上去 → 回 2、索引檔不動、不留半截的備份與暫存檔', True)
+        check('一個位元組都沒有動到' in out, '陰性對照:索引檔還沒碰過的時候,收尾照實說沒動到')
+
+        def replace_then_undo(src, dst):
+            real_replace(src, dst)
+            if dst == idx:
+                put(idx, index)             # 換上去之後,內容又變回原本那一份(新群組名不見了)
+
+        fresh()
+        os.replace = replace_then_undo
+        try:
+            rc, out = run_main(game, '--give', 'Chin-Feng', '0010', '--apply')
+        finally:
+            os.replace = real_replace
+        check(rc == 2 and '複驗沒過' in out and '--restore' in out,
+              '寫完重新讀回來,新群組名找不到 → 複驗沒過、回 2、給還原指令', True)
+
+        print('\n七、Ctrl-C')
+
+        def stop_before(*a, **k):
+            raise KeyboardInterrupt
+
+        fresh()
+        real_mk = g['_mkstemp_beside']
+        g['_mkstemp_beside'] = stop_before
+        try:
+            rc, out = run_main(game, '--give', 'Chin-Feng', '0010', '--apply')
+        finally:
+            g['_mkstemp_beside'] = real_mk
+        check(rc == 130 and '一個位元組都沒有動到' in out and get(idx) == index,
+              '陰性對照:還沒換檔就按 Ctrl-C → 130、說沒動到,而且真的沒動')
+
+        def replace_then_stop(src, dst):
+            real_replace(src, dst)
+            if dst == idx:
+                raise KeyboardInterrupt
+
+        fresh()
+        os.replace = replace_then_stop
+        try:
+            rc, out = run_main(game, '--give', 'Chin-Feng', '0010', '--apply')
+        finally:
+            os.replace = real_replace
+        check(rc == 130 and '一個位元組都沒有動到' not in out and '--restore' in out
+              and get(idx) == want,
+              '換檔之後才按 Ctrl-C → 不可以說沒動到,要給還原指令', True)
+        import threading
+        if hasattr(signal, 'raise_signal') and threading.current_thread() is threading.main_thread():
+            ran = []
+            got = None
+            before = signal.getsignal(signal.SIGINT)
+            try:
+                with _NoInterrupt():
+                    signal.raise_signal(signal.SIGINT)
+                    ran.append('這一段跑完了')
+            except KeyboardInterrupt:
+                got = 'KeyboardInterrupt'
+            check(got == 'KeyboardInterrupt' and ran == ['這一段跑完了']
+                  and signal.getsignal(signal.SIGINT) is before,
+                  '換名那一段裡收到真的 SIGINT → 那一段跑完才丟出來,處理器也裝回去', True)
+
+            # 接到真的流程上:換名一做完就收到真的 SIGINT。登記已經是「換過了」,
+            # 收尾要說「已經換過了」,不是「可能已經換過了」,更不是「沒動到」。
+            # 改指派與還原兩條路各驗一次(兩條路的登記是分開寫的)。
+            def replace_then_sigint(src, dst):
+                real_replace(src, dst)
+                if dst == idx:
+                    signal.raise_signal(signal.SIGINT)
+
+            for label, argv, prep in (
+                    ('改指派', ('--give', 'Chin-Feng', '0010', '--apply'), None),
+                    ('還原', ('--restore',), 'restore')):
+                fresh()
+                if prep:
+                    put(idx, index.replace(b'pchants:0010', b'pchants:1234', 1))
+                    put(bak, index)
+                os.replace = replace_then_sigint
+                try:
+                    rc, out = run_main(game, *argv)
+                finally:
+                    os.replace = real_replace
+                check(rc == 130 and '已經換過了' in out and '可能已經換過了' not in out
+                      and '一個位元組都沒有動到' not in out and '--restore' in out,
+                      label + '那條路:換名做完才收到真的 SIGINT → 130、照實說已經換過了', True)
+        else:
+            skipped.append('真的 SIGINT 那三道(這個 Python 沒有 signal.raise_signal,'
+                           '或不是在主執行緒裡跑)')
+
+        print('\n八、還原')
+        fresh()
+        quiet(cmd_give, game, 'Chin-Feng', '0010', True)
+        r, _ = quiet(cmd_restore, game)
+        check(r is None and get(idx) == index and os.path.isfile(bak),
+              '陰性對照:正常還原逐位元組回到原本的樣子,備份留著')
+        os.remove(idx)
+        r, _ = quiet(cmd_restore, game)
+        check(r is None and get(idx) == index, '陰性對照:索引檔被刪掉了也還原得回來')
+        cases = (
+            ('備份被截在行尾、少了最後一組', index[:index.index(b'tchants:01')], '備份只有'),
+            ('備份結尾不是完整的一行', index[:-2], '結尾不是完整的一行'),
+            ('備份裡有重複的群組名', index + b'pchants:0004'.ljust(32) + b'\r\n'
+             + b'pchant.x.wav 0\r\n', '重複的群組名'))
+        for label, data, said in cases:
+            fresh()
+            live = get(idx)
+            put(bak, data)
+            r, _ = quiet(cmd_restore, game)
+            check(isinstance(r, DataError) and said in str(r) and get(idx) == live,
+                  label + ' → 不拿它還原,正本不動', True)
+        fresh()
+        r, _ = quiet(cmd_restore, game)
+        check(isinstance(r, DataError) and '找不到備份' in str(r) and get(idx) == index,
+              '找不到備份 → 停下來', True)
+        fresh()
+        changed = index.replace(b'pchants:0010', b'pchants:1234', 1)
+        put(idx, changed)
+        put(bak, index)
+        os.replace = boom
+        try:
+            r, _ = quiet(cmd_restore, game)
+        finally:
+            os.replace = real_replace
+        check(isinstance(r, OSError) and get(idx) == changed and not junk(chants),
+              '還原換檔失敗 → 正本原封不動、不留暫存檔', True)
+
+        real_fsync = os.fsync
+
+        def fsync_then_scribble(fd):
+            real_fsync(fd)
+            os.lseek(fd, 0, os.SEEK_SET)    # 暫存檔已經寫完、落地之後,才把第一個位元組改掉
+            os.write(fd, b'X')
+
+        fresh()
+        put(idx, changed)
+        put(bak, index)
+        os.fsync = fsync_then_scribble      # --restore 這條路上只有 _do_copy 會呼叫 fsync
+        try:
+            r, _ = quiet(cmd_restore, game)
+        finally:
+            os.fsync = real_fsync
+        check(isinstance(r, SystemExit) and '寫出來的內容跟備份對不起來' in str(r)
+              and get(idx) == changed and not junk(chants),
+              '還原的暫存檔讀回來跟備份對不起來 → 不換上去、正本原封不動、不留暫存檔', True)
+
+        def replace_then_grow(src, dst):
+            real_replace(src, dst)
+            if dst == idx:
+                with open(idx, 'ab') as f:
+                    f.write(b'\r\n')
+
+        fresh()
+        put(idx, changed)
+        put(bak, index)
+        os.replace = replace_then_grow
+        try:
+            r, _ = quiet(cmd_restore, game)
+        finally:
+            os.replace = real_replace
+        check(isinstance(r, DataError) and '還原之後的檔案跟備份對不起來' in str(r),
+              '還原換好之後整份讀回來跟備份不一樣 → 停下來,不印「已還原」', True)
+
+        # 通用地板:正本的群組行被補得很長,備份的組數、音檔數都一樣,
+        # 大小卻不到正本的一半 —— 前面那幾道格式檢查都會放行,只剩這一道擋得到。
+        fresh()
+        padded = b''.join((x.ljust(200) if b'.wav' not in x and x else x) + b'\r\n'
+                          for x in index.split(b'\r\n')[:-1])
+        put(idx, padded)
+        put(bak, index)
+        r, _ = quiet(cmd_restore, game)
+        check(isinstance(r, SystemExit) and '不到一半' in str(r) and get(idx) == padded,
+              '備份不到正本的一半(組數、音檔數卻都一樣)→ 不拿它還原,正本不動', True)
+        r, _ = quiet(cmd_restore, os.path.join(root, '沒有這個資料夾'))
+        check(isinstance(r, DataError) and '請確認你給的是遊戲資料夾' in str(r),
+              '還原時給的資料夾底下連 data/audio/chants 都沒有 → 說路徑可能給錯了,不只說找不到備份', True)
+
+        print('\n九、符號連結')
+        outside = os.path.join(root, 'outside.txt')
+        can_link = True
+        try:
+            os.symlink(outside, os.path.join(root, 'probe'))
+            os.remove(os.path.join(root, 'probe'))
+        except (OSError, NotImplementedError, AttributeError):
+            can_link = False
+        if can_link:
+            fresh()
+            put(outside, index)
+            os.remove(idx)
+            os.symlink(outside, idx)
+            r, _ = quiet(cmd_give, game, 'Chin-Feng', '0010', True)
+            check(isinstance(r, SystemExit) and get(outside) == index and os.path.islink(idx)
+                  and not os.path.lexists(bak),
+                  '索引檔是指到資料夾外面的連結 → 停下來,外面那個檔不動、不留備份', True)
+            put(bak, index.replace(b'pchants:0010', b'pchants:1234', 1))
+            r, _ = quiet(cmd_restore, game)
+            check(isinstance(r, SystemExit) and get(outside) == index and os.path.islink(idx),
+                  '還原時索引檔是連結 → 停下來,不把備份寫到連結指的地方', True)
+            os.remove(bak)
+            os.remove(idx)
+            fresh()
+            put(outside, b'OUTSIDE\r\n')
+            os.symlink(outside, bak)
+            r, _ = quiet(cmd_give, game, 'Chin-Feng', '0010', True)
+            check(isinstance(r, SystemExit) and get(idx) == index and get(outside) == b'OUTSIDE\r\n',
+                  '備份的名字是指到外面的連結 → 停下來,索引檔與外面那個檔都不動', True)
+            r, _ = quiet(cmd_restore, game)
+            check(isinstance(r, SystemExit) and get(idx) == index,
+                  '還原時備份是連結 → 停下來,正本不動', True)
+            os.remove(bak)
+        else:
+            skipped.append('符號連結那 4 道(這台機器做不出符號連結)')
+
+        print('\n十、命令列')
+        fresh()
+        rc, out = run_main(game, '--list')
+        check(rc == 0 and '0004  Derek Jeter' in out,
+              '陰性對照:--list 回 0,列得出 0004 是 Jeter 的')
+        rc, out = run_main(os.path.join(root, '沒有這個資料夾'), '--list')
+        check(rc == 2 and '停下來了' in out and 'Traceback' not in out,
+              '給錯資料夾 → 印一句話、回 2、不噴 traceback', True)
+
+        print('\n十一、-O 守門')
+        check(_opt[0], '假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試拒跑、結束碼 2', True)
+        check(_opt[1], '陰性對照:換回原本那一支之後,沒開 -O 的時候守門放行')
+    finally:
+        _REPLACE_STAGE = 0
+        shutil.rmtree(root, ignore_errors=True)
+
+    print()
+    for why in skipped:
+        print('   ⚠️ 跳過(沒有測到,不算通過):%s' % why)
+    if tally['fail']:
+        print('自我測試:有 %d 道沒過(共 %d 道)' % (tally['fail'], tally['n']))
+        return 1
+    print('自我測試:全部通過(%d 道檢查,其中 %d 道是餌)' % (tally['n'], tally['bait']))
+    return 0
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。這支的 --selftest 跟這道守門是 2026-09-24 一起加的。
+#  守門不直接問 sys.flags.optimize:那是唯讀的,同一個程序裡沒辦法把 -O
+#  打開又關掉,直接問它的話這道守門就下不了餌 —— 哪天被拆掉,自我測試照樣全綠。
+#  所以守門問的是 _optimize_level(),自我測試可以暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
+
+
 if __name__ == '__main__':
+    # --selftest 不需要遊戲資料夾,所以在 argparse 之前就攔下來(argparse 會要求一定要給資料夾)。
+    if '--selftest' in sys.argv[1:]:
+        sys.exit(selftest())
     sys.exit(main())
 
 #

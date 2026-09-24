@@ -19,7 +19,7 @@
 <title>介面萬用工具 fel_toolkit — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="一支腳本搞定介面版面檔的列出、搜尋、檢視、取出、開關。不用再為每一個修改各寫一支程式。附完整原始碼,一行指令可還原。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="../../assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -55,12 +55,14 @@
     <a class="btn" href="mvp_fel_toolkit.py" download>⬇ 下載 mvp_fel_toolkit.py</a>
   </div>
   <div class="card amber">
-    <p class="card-h">按了下載之後，檔案跑到哪裡去了？</p>
+    <p class="card-h">按了下載之後，檔案跑到哪裡去了？指令要在哪裡打？</p>
     <p><strong>瀏覽器多半不會問你要存哪裡</strong>，它會直接放進「下載」資料夾。
-       開檔案總管（Mac 用 Finder）左邊點「<u>下載</u>」，找到那個 <code>.py</code>，
-       <strong>拖到桌面</strong>再往下做。</p>
-    <p class="small">沒做這一步的話，後面 <code>cd</code> 到桌面再執行，
-       畫面會出現 <code>can't open file</code> —— 那不是你打錯。</p>
+       所以命令視窗要從那裡開：</p>
+    <p><span class="sk">1</span>打開檔案總管，左邊點「<u>下載</u>」<br>
+       <span class="sk">2</span>點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code>，按 Enter<br>
+       <span class="sk">3</span>開出來的視窗<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打</p>
+    <p class="small">Mac：打開終端機，先打 <code>cd ~/Downloads</code> 按 Enter。</p>
+    <p class="small">沒照這樣開視窗的話，畫面會出現 <code>can't open file</code> —— 那不是你打錯，是視窗跟檔案不在同一個資料夾。</p>
   </div>
 
   <p class="small">零相依、預覽不改檔、自動備份與複驗、還原也是原子的（先寫在旁邊、驗過才換上，正本不會先被截斷）、不跟著符號連結走、附完整原始碼。腳本本身採 MIT 授權（條款寫在檔尾），本頁教學文字採 CC BY 4.0。</p>
@@ -76,10 +78,9 @@
   <div class="quickfix" id="quick">
     <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快關掉某個介面元素？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
-      <li>用本頁的下載按鈕拿到 <code>mvp_fel_toolkit.py</code>，再從「下載」資料夾<strong>拖到桌面</strong>（沒拖的話後面會出現 <code>can't open file</code>，那是本站最常見的第一個卡點）。</li>
-      <li>開命令提示字元切到桌面，Windows 打第一行、Mac 打第二行<br>
-  <pre><code>cd %USERPROFILE%\Desktop</code></pre>
-  <pre><code>cd ~/Desktop</code></pre></li>
+      <li>用本頁的下載按鈕拿到 <code>mvp_fel_toolkit.py</code>，瀏覽器會把它放進「下載」資料夾（命令視窗不在那個資料夾的話，後面會出現 <code>can't open file</code>，那是本站最常見的第一個卡點）。</li>
+      <li>在「下載」資料夾開命令視窗：Windows 打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打；Mac 開終端機打這一行<br>
+  <pre><code>cd ~/Downloads</code></pre></li>
       <li>用名字把元素找出來，最右邊那一欄會告訴你它現在是開還是關<br>
   <pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --find SPEED</code></pre></li>
       <li>先預覽，這一步不會改到任何檔案<br>
@@ -89,7 +90,7 @@
     </ol>
     <p class="tail">後悔的話，這一行還原，位元組完全一致：</p>
 <pre><code>python mvp_fel_toolkit.py "你的遊戲資料夾" --restore</code></pre>
-  <p class="tail">上面的 <code>python</code> 是 Windows 寫法，Mac 使用者改成 <code>python3</code>，其餘完全一樣（切到桌面那一步已經分成兩行）。
+  <p class="tail">上面的 <code>python</code> 是 Windows 寫法，Mac 使用者改成 <code>python3</code>，其餘完全一樣（開命令視窗那一步，Windows 與 Mac 已經分開寫）。
        想知道為什麼這樣改，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
     <p class="tail">照做卡住了？直接跳到<a href="#fix">❌ 出錯處理</a>（可以把畫面上印出來的那一行貼進那裡的搜尋框）；做完對照<a href="#ok">✅ 成功標準</a>。</p>
   </div>
@@ -98,7 +99,7 @@
   <div class="tablewrap"><table class="stack">
     <thead><tr><th class="mono">指令</th><th>做什麼</th><th>會改檔嗎</th></tr></thead>
     <tbody>
-      <tr><td data-label="指令" class="mono">--list</td><td data-label="做什麼">列出封裝檔裡有哪些版面檔、多大、幾行、幾個畫面。<u>預設看的是 <code>data\frontend\ingame.big</code></u>，要看主選單那一批得自己加 <code>--big data\frontend\frontend.big</code></td><td data-label="會改檔嗎">不會</td></tr>
+      <tr><td data-label="指令" class="mono">--list</td><td data-label="做什麼">列出封裝檔裡有哪些版面檔、多大、幾行、幾個畫面。<u>預設看的是 <code>data\frontend\ingame.big</code></u>，要看主選單那一批得自己加 <code>--big data/frontend/frontend.big</code></td><td data-label="會改檔嗎">不會</td></tr>
       <tr class="hi"><td data-label="指令" class="mono">--entries</td>
           <td data-label="做什麼"><strong>列出封裝檔裡的每一個項目</strong>，不限版面檔 ——
               圖片、模型、球場那些「一個版面檔都沒有」的封裝檔也看得到裡面，
@@ -107,7 +108,7 @@
           <td data-label="做什麼"><strong>掃出全遊戲的版面檔分別在哪些封裝檔</strong>（配 <code>--big</code> 換檔操作；本站測試機的六個封裝檔合計 332 個）</td><td data-label="會改檔嗎">不會</td></tr>
       <tr class="hi"><td data-label="指令" class="mono">--find</td><td data-label="做什麼"><strong>掃封裝檔裡的每一個版面檔</strong>，找名字含某個字的元素（<code>ingame.big</code> 在本站測試機是 47 個，<a href="../../reference/original-vs-modded.html">剛安裝好的原版是 44 個</a>）</td><td data-label="會改檔嗎">不會</td></tr>
       <tr><td data-label="指令" class="mono">--show</td><td data-label="做什麼">顯示某個版面檔的內容，可以只看某一個畫面。<u>不指定畫面時預設只印前 80 行</u>，要看完整份就加 <code>--lines 9999</code></td><td data-label="會改檔嗎">不會</td></tr>
-      <tr><td data-label="指令" class="mono">--extract</td><td data-label="做什麼">存成文字檔，用你習慣的編輯器慢慢看</td><td data-label="會改檔嗎">不動遊戲檔<br>（另外寫一個純文字檔）</td></tr>
+      <tr><td data-label="指令" class="mono">--extract</td><td data-label="做什麼">存成文字檔，用你習慣的編輯器慢慢看。輸出檔只寫檔名（例如 <code>out.txt</code>）的話，會存在命令視窗所在的資料夾（照本頁從「下載」開視窗的話，就在「下載」裡）</td><td data-label="會改檔嗎">不動遊戲檔<br>（另外寫一個純文字檔）</td></tr>
       <tr class="hi"><td data-label="指令" class="mono">--strings</td>
           <td data-label="做什麼"><strong>把字串編號換成真正的文字</strong> —— 不用開遊戲就知道每個元素寫什麼</td><td data-label="會改檔嗎">不會</td></tr>
       <tr class="hi"><td data-label="指令" class="mono">--where</td>
@@ -115,7 +116,7 @@
       <tr class="hi"><td data-label="指令" class="mono">--toggle</td><td data-label="做什麼"><strong>開關某個元素</strong>（加 <code>--apply</code> 才真的寫入）</td><td data-label="會改檔嗎">會（要 <code>--apply</code>）</td></tr>
       <tr class="hi"><td data-label="指令" class="mono">--cameras</td>
           <td data-label="做什麼"><strong>列出遊戲裡 39 個攝影機的位置與視野角度</strong>
-              （要搭配 <code>--big data\datafile\datafile.big</code>）</td><td data-label="會改檔嗎">不會</td></tr>
+              （要搭配 <code>--big data/datafile/datafile.big</code>）</td><td data-label="會改檔嗎">不會</td></tr>
       <tr class="hi"><td data-label="指令" class="mono">--camera</td>
           <td data-label="做什麼"><strong>看某一個攝影機的全部欄位</strong>，不加 <code>--set</code> 就只是印出來</td><td data-label="會改檔嗎">不會</td></tr>
       <tr class="hi"><td data-label="指令" class="mono">--camera --set</td>
@@ -145,7 +146,7 @@
   <p class="small">另外還有一個 <code>--selftest</code>，它<strong>不算在上面十四個模式裡</strong> ——
      它在最前面就被攔下來，連遊戲資料夾都不用給（所以 <code>--help</code> 的清單裡也看不到它）。
      它<u>不碰任何遊戲檔</u>，只在暫存資料夾裡自己造假資料驗自己，跑完會印
-     「自我測試:11 組全部通過」。想確認手上這一份沒被改壞，跑這一行：</p>
+     「自我測試:14 組全部通過」。想確認手上這一份沒被改壞，跑這一行：</p>
 <pre><code>python mvp_fel_toolkit.py --selftest</code></pre>
 
   <h2>前置</h2>
@@ -160,9 +161,10 @@
   <div class="step">
     <div class="step-n">1</div>
     <div>
-      <div class="step-t">下載腳本，切到桌面</div>
-<pre><code>cd %USERPROFILE%\Desktop</code></pre>
-<pre><code>cd ~/Desktop</code></pre>
+      <div class="step-t">下載腳本，在「下載」資料夾開命令視窗</div>
+      <p class="small">Windows：這一步不用打指令。打開檔案總管，左邊點「<u>下載</u>」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter。開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。</p>
+      <p class="small">Mac：打開終端機，打這一行：</p>
+<pre><code>cd ~/Downloads</code></pre>
     </div>
   </div>
 
@@ -363,9 +365,9 @@
     <thead><tr><th style="width:36%">畫面上的訊息</th><th>原因</th><th>你要做的</th></tr></thead>
     <tbody>
       <tr class="hi"><td data-label="畫面上的訊息" class="mono">can't open file '…\mvp_*.py'</td>
-          <td data-label="原因"><strong>檔案還在「下載」資料夾，不在桌面。</strong>
-              開檔案總管左邊點「下載」，把那個 <code>.py</code> 拖到桌面，再跑一次。
-              <u>這是本站最常見的第一個卡點。</u></td></tr>
+          <td data-label="原因"><strong>命令視窗跟腳本不在同一個資料夾</strong>，或檔名對不上（瀏覽器可能在檔名後面加了 <code>(1)</code>）。
+              <u>這是本站最常見的第一個卡點。</u></td>
+          <td data-label="你要做的">打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）；檔名多了 <code>(1)</code> 就改成跟指令裡一模一樣</td></tr>
       <tr><td data-label="畫面上的訊息" class="mono">檔頭前四碼不是 BIGF</td><td data-label="原因">指到的不是封裝檔</td><td data-label="你要做的">確認遊戲資料夾對不對</td></tr>
       <tr><td data-label="畫面上的訊息" class="mono">封裝檔裡沒有 XXX.fel</td><td data-label="原因">檔名打錯</td><td data-label="你要做的">先跑 <code>--list</code> 抄檔名</td></tr>
       <tr><td data-label="畫面上的訊息" class="mono">裡面沒有畫面「XXX」</td><td data-label="原因">畫面代號打錯</td><td data-label="你要做的">錯誤訊息會列出有哪些</td></tr>
@@ -428,12 +430,12 @@ Python 版本：(python --version 印出來的那行)
     <li><strong>先找再改</strong> <code>--find</code> 一次掃封裝檔裡的每一個版面檔並印出「顯示」欄（<code>ingame.big</code> 在本站測試機是 47 個，剛安裝好的原版 44 個）；<code>--strings</code> 把字串編號換成真正的文字，不用開遊戲就知道每個元素寫什麼；<code>--bigs</code> 掃得到全遊戲的版面檔分佈在哪些封裝檔（本站測試機的六個封裝檔是 332 個，<a href="../../reference/fel-archives.html">剛安裝好的原版是 329 個</a>）。<strong>你自己跑出來的數字可能比較大</strong> —— 它掃的是資料夾裡每一個封裝檔，你放在同一個資料夾裡的備份 <code>.big</code> 也會被算一次。</li>
     <li><strong>同名的會一起改，這通常正是你要的</strong> <code>fes_ingameinfobar.fel</code> 的 <code>RATING</code>，在本站測試機那份 <code>ingame.big</code>（2,665,562 bytes、47 個項目）上預覽會印「找到 6 行」：本壘、三壘、二壘各帶一份，而 <code>GR:FIRSTBASE</code> 這個群組被宣告了兩次，第一次那組帶一份、第二次那組帶兩份。<strong>這不是通則</strong>，本站另一份社群名冊模組的 <code>ingame.big</code>（380,483 bytes、48 個項目）就剛好是四個壘包各一份。只改一份的話，其他情境還是會冒出來。</li>
     <li><strong>檔案變大是對的</strong> 寫入是把新資料接到檔案最後面，只改目錄 8 bytes 加檔頭 4 bytes，原本的資料一個位元組都沒動（實測 2,665,562 變成 2,750,503）。這是這種封裝檔唯一安全的改法。<strong>每按一次 <code>--apply</code> 就再長一次</strong>（連做兩次是 2,665,562 → 2,750,503 → 2,835,444），<u>累積的是體積不是內容</u>；<code>--restore</code> 會回到原本的大小。</li>
-    <li><strong>最容易踩的雷</strong> <code>can't open file</code> 幾乎都不是你打錯，是 <code>.py</code> 還留在「下載」資料夾沒拖到桌面；<code>--toggle</code> 的第三個參數只能是 <code>on</code> 或 <code>off</code>；找不到元素時先用 <code>--find</code> 確認它到底在哪個檔。</li>
+    <li><strong>最容易踩的雷</strong> <code>can't open file</code> 幾乎都不是你打錯，是命令視窗跟 <code>.py</code> 不在同一個資料夾（從放著 <code>.py</code> 的那個資料夾的網址列打 <code>cmd</code> 開視窗，剛下載的話就是「下載」）；<code>--toggle</code> 的第三個參數只能是 <code>on</code> 或 <code>off</code>；找不到元素時先用 <code>--find</code> 確認它到底在哪個檔。</li>
     <li><strong>安全網</strong> 第一次 <code>--apply</code> 會在旁邊建 <code>ingame.big.feltoolbak</code>，之後再改幾次都不會覆蓋它，所以 <code>--restore</code> 永遠回到你第一次動手之前。看到「複驗不通過」立刻 <code>--restore</code> 再回報。<strong>還原本身也是原子的</strong>：先寫在旁邊一個名字隨機的暫存檔、跟備份比對過才換上，中途失敗或按了 Ctrl-C，正本都不會變成半截；還原後印「位元組完全一致:❌ 否」的話腳本會以結束碼 1 停下來，備份還在原地。</li>
     <li><strong>本站沒驗的</strong> 頁尾列出的驗證全在檔案層面（11 種畸形輸入皆不中斷、還原後位元組完全一致、還原途中失敗時正本原封不動、暫存檔不跟著符號連結走、重複執行不會累積改動、寫入後複驗 47 個項目仍可讀）。成功標準最後一條「進遊戲後畫面確實改變」是留給你自己確認的那一項。</li>
   </ul>
 
-  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <!-- course-strip:begin · 這一塊由產生器從 plan.html 產生，不要手改 -->
   <nav class="card course-strip" aria-label="這一課在課表的位置">
     <p class="card-h">📚 照課表上課的話</p>
     <p><a href="../../plan.html#f"><strong>⑥ 拆解班</strong></a> 第 3／5 堂</p>
@@ -537,7 +539,7 @@ Python 版本：(python --version 印出來的那行)
   <h2 id="source">完整原始碼</h2>
   <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。不必下載也能先看過一遍。</p>
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（2446 行，零相依）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（2523 行，零相依）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -641,7 +643,7 @@ mvp_fel_toolkit.py — MVP Baseball 2005 介面版面檔萬用工具
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -2556,8 +2558,12 @@ def cmd_restore(bigpath):
 #  自我測試(--selftest):不需要遊戲資料夾,也不碰任何遊戲檔。
 #  全部在一個丟得掉的暫存資料夾裡做。
 #
-#  每一道守門都下餌 —— 只驗「正常流程會過」的測試,分不出
+#  守門要下餌 —— 只驗「正常流程會過」的測試,分不出
 #  「擋住了」跟「這段程式根本沒跑到」。下面每一組都是一正一反。
+#  ⚠️ 但這一支還不是每一道守門都有餌。2026-09-24 把自我測試以外、條件成立就讓它
+#     停下來的 64 道守門逐一拆掉(那一個 if 改成永遠不成立)再跑 --selftest,
+#     會變紅的只有 2 道(寫檔對象是符號連結、還原時暫存檔跟備份對不起來);
+#     其餘 62 道拆掉照樣全綠,例如改攝影機、切換開關寫回之後那幾道複驗。
 # ─────────────────────────────────────────────────────────
 def selftest():
     """回傳 0 = 全過。任何一條不成立就丟 AssertionError,結束碼非 0。
@@ -2566,15 +2572,24 @@ def selftest():
        底下每一個餌的判斷句就一條都不執行,螢幕上照樣一路印「通過」——
        那是一片**假的綠燈**,比沒有測試更危險。所以第一件事就是把它擋掉。
     """
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python3 -O 底下跑:-O 會把 assert 整段拿掉,'
               '底下那些餌一個都不會執行,你會看到一片假的綠燈。'
               '請拿掉 -O 再跑一次。')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
     passed = []
 
     def ok(what):
         passed.append(what)
+
+    # ── 零、最上面那道 -O 守門自己的餌(2026-09-24 加)──────────────────
+    # 結果是開頭那一行 _optimize_bait() 量好的,這裡只記帳。
+    assert _opt[0], '假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試竟然沒有拒跑'
+    # 陰性對照:換回原本那一支之後,沒開 -O 就要放行
+    assert _opt[1], '陰性對照:沒開 -O 守門也擋,或是換回原本那一支沒換成功'
+    ok('-O 守門:假裝開了 -O 就拒跑,換回來之後照樣放行')
 
     # ── 一、純邏輯:壓縮解壓來回、顯示開關的認法 ──────────────────
     # 樣本照版面檔的真實長相寫:指令冒號、逗號分隔、CRLF 換行。
@@ -2912,6 +2927,70 @@ def main():
     return 0
 
 
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
+
+
 if __name__ == '__main__':
     # --selftest 排在最前面判斷:它不需要遊戲資料夾,
     # 走進 main() 反而會因為「沒給路徑」被 argparse 擋下來。
@@ -2995,6 +3074,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=12835e693d" defer></script>
+<script src="../../assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

@@ -48,11 +48,11 @@ mvp_pack.py —— 把你改好的東西打包成一包,給別人裝。
 .mvpmod 就是一個 ZIP:
     manifest.json   包的描述 + 檔案清單 + 每個檔的 SHA-256
     files/          你改過的檔,照遊戲資料夾的相對路徑擺
-跟 launcher 的 mod_package.py 是同一個格式,兩邊互通。
-⚠️ 但「互通」不代表兩邊寫進 manifest 的欄位一樣。2026-09-03 在本機這一份
-   mod_package.py(671 行)上讀到:它放進檔案清單的每一項只有
-   path / category / size 三個欄位,整支程式裡 sha256 出現 0 次。
-   所以那種包拿來 --install,一個雜湊都不會被比對,只會過路徑檢查。
+格式很單純,所以別的工具照這個格式打出來的包,這一支一樣讀得懂。
+⚠️ 但讀得懂不代表驗得到:雜湊要由打包的那一方寫進 manifest。
+   班主任自己另有一支沒有公開的打包工具就沒寫:它放進檔案清單的每一項只有
+   path / category / size 三個欄位,整支程式一次都沒有算 sha256。
+   那種包拿來 --install,一個雜湊都不會被比對,只會過路徑檢查。
    本站在暫存資料夾拿一個沒寫 sha256 的包實跑過,確認照樣裝得進去。
 
 【輸入與輸出】
@@ -74,8 +74,13 @@ mvp_pack.py —— 把你改好的東西打包成一包,給別人裝。
             檢查沒過的、以及「驗不出來的」那幾份都不蓋,
             那幾個遊戲檔一個位元組都不動,整支的結束碼是 1。
             加 --allow-unverified 才會連「驗不出來的」也蓋回去。
---selftest  不吃遊戲資料夾。在系統暫存區自己造一份假的,把每一道守門
-            各下一個餌測一次(見檔尾 _selftest),跑完就刪。全綠回 0。
+--selftest  不吃遊戲資料夾。在系統暫存區自己造一份假的,替守門下餌測一次
+            (見檔尾 _selftest),跑完就刪。全綠回 0。
+            ⚠️ 不是每一道守門都有餌。2026-09-24 把 _selftest 以外、條件成立就讓
+               這一支停下來的 23 道守門逐一拆掉再跑,只有 3 道會讓自我測試變紅
+               (打包時讀回來的雜湊不對、舊備份壞了不敢往上蓋、還原時有檔沒還原成功就回 1);
+               其餘 20 道拆掉照樣全綠,包括 --install 時「包裡的檔跟 manifest 寫的
+               SHA-256 對不上就不裝」那一道。
             ⚠️ 不可以加 python 的 -O:那個旗標會把 assert 整句拿掉,
                檔尾那十幾行「每次執行都會跑」的檢查一句都不會執行,
                測試就變成假綠燈。加了 -O 跑這一項會直接停下來、結束碼 2。
@@ -223,7 +228,7 @@ mvp_pack.py —— 把你改好的東西打包成一包,給別人裝。
 
 —— toni的MVP模組補習班
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 
 import argparse
 import hashlib
@@ -263,11 +268,11 @@ BAK_SUFFIXES = (
 #        attrib.dat 那一列,改過的執行檔整個不出現;補進清單之後同一個資料夾印出兩列。
 #      · 2026-09-05 漏了 .introbak(「關掉開場動畫」那一課 2026-09-04 上線時留的)。
 #        同樣的假資料夾實測:intro.vp6 旁邊放 intro.vp6.introbak,--scan 只印得出
-#        attrib.dat 一列;補進清單之後印出兩列。守門腳本從那一天起就一直在報紅,
-#        只是 prelaunch.sh 沒有跑它。
-#    守門的是 .tools/site-check/selftest_backup_suffixes.py,不是 verify_site.py
-#    (那一支沒有這項檢查)。它把教學腳本字面寫出的備份副檔名跟這份清單對一次,
-#    但配不到通用的 .bak,也跳過 pack-a-mod 與 backup 兩課,那幾種少了不會紅。
+#        attrib.dat 一列;補進清單之後印出兩列。下面那道站內檢查從那一天起就一直在報紅,
+#        只是發布前的總檢查當時沒有跑它。
+#    本站發布前另有一道檢查守著它(那是站內自用的檢查,不在下載包裡):把各課腳本
+#    用引號寫出的備份副檔名(像 '.speedbak')跟這份清單對一次。但它配不到通用的 .bak,
+#    也不看 pack-a-mod、backup、crash-diagnosis 三課,那幾種少了它發現不了。
 #
 # 補充兩件讀者看不出來的事:
 #   · 這裡面的 '.bak' 是通用副檔名(換賽程年份那一課留下的就是它)。
@@ -278,8 +283,8 @@ BAK_SUFFIXES = (
 #     在這份 mvp_pack.py 上把清單裡的 24 個項目兩兩互測 a.endswith(b),0 組重疊
 #     (每個都以點開頭、中間又沒有第二個點,所以 '.chantbak' 不會吻合 '.bak'),
 #     任何檔名最多只配得到一個,重排這個 tuple 掃出來的結果完全一樣。
-#     24 是這份清單自己的長度(含通用的 '.bak')。守門腳本
-#     selftest_backup_suffixes.py 印的「23 種」是另一個口徑:它的比對規則
+#     24 是這份清單自己的長度(含通用的 '.bak')。上面那道站內檢查
+#     印的「23 種」是另一個口徑:它的比對規則
 #     抓不到 '.bak',兩個數字不是在數同一件事,不要互相對照。
 #     ⚠️ 順序什麼時候才會開始有意義:哪天新增一個中間帶點的副檔名
 #     (例如 '.big.bak'),它會同時吻合 '.bak',那時就要把長的排在短的前面,
@@ -417,11 +422,11 @@ class Stop(Exception):
 
 
 # ── 路徑安全 ────────────────────────────────────────────────
-# 這一段的判斷抄自 launcher 的 mod_package.py(已審過),
-# 但補上一件當時它的 docstring 說有、程式碼裡沒有的:**Windows 保留檔名**。
+# 這一段的判斷,當初是照班主任自己另一支沒有公開的打包工具寫的,
+# 但補上一件當時它的說明寫著有、程式碼裡沒有的:**Windows 保留檔名**。
 # 2026-08-29 實測那支:CON / PRN / AUX / COM1 / LPT1 一個都沒擋。
-# ✅ 2026-08-30 那一支已經補上同一份清單(mod_package._WIN_RESERVED),
-#    而且它的註解寫著是抄這一支的做法。上面那句留著記錄當時量到的事實。
+# ✅ 2026-08-30 那一支已經照這一支的做法補上同一份清單。
+#    上面那句留著記錄當時量到的事實。
 WIN_RESERVED = {
     'con', 'prn', 'aux', 'nul',
     *('com%d' % i for i in range(1, 10)),
@@ -1162,8 +1167,8 @@ def cmd_install(game_root, mod, apply_it):
 
     ⚠️ 雜湊比對是**有條件**的:manifest 上那一項沒有 sha256 欄位就完全不驗,
        照樣寫進遊戲資料夾(見下面 f.get('sha256') 那一行)。
-       本腳本 --build 打的包每個檔都帶 sha256;launcher 的 mod_package.py
-       打的包一個都沒有,那種包等於只過路徑檢查。
+       本腳本 --build 打的包每個檔都帶 sha256;別的工具打的包不一定有寫,
+       沒寫的那種包等於只過路徑檢查。
 
     apply_it 是 False 時,整支到 --preview 為止就結束,一個位元組都不寫。
     """
@@ -1179,7 +1184,7 @@ def cmd_install(game_root, mod, apply_it):
     with zipfile.ZipFile(mod) as z:
         # 先全部讀進記憶體,全部讀完才開始寫,不會寫一半。
         # 但雜湊是有條件的:下一行 f.get('sha256') 為真才比對,
-        # manifest 沒寫 sha256 的項目不驗就收(launcher 打的包就是這種)。
+        # manifest 沒寫 sha256 的項目不驗就收(別的工具打的包可能就是這種)。
         blobs = {}
         for f in m['files']:
             data = z.read('files/' + f['path'])
@@ -1460,7 +1465,7 @@ def cmd_restore(game_root, allow_unverified=False):
 
 # ── 自我測試 ────────────────────────────────────────────────
 # 檔尾那幾行 assert 每次執行都會跑,但它們只驗得到「純函式」那一層。
-# 這一段是 --selftest 才跑的:每一道會動到磁碟的守門都下一個餌,
+# 這一段是 --selftest 才跑的:替會動到磁碟的守門下餌(不是每一道都有,見檔頭 --selftest 那一段),
 # 證明它真的會擋 —— 不是「看起來有寫」。
 # ⚠️ 反向測試沒有產生可見的變化,等於測試本身失敗:所以每個餌都要驗
 #    「不該被動的那個檔真的沒被動」,不是只驗「有丟例外」。
@@ -1531,7 +1536,7 @@ def _st_read(path):
 #    「陰性對照 2 項 + 餌 14 項」而真的跑過的只有 13 個 —— 多報一個。
 BAIT_NAMES = ('餌1', '餌2', '餌3', '餌4', '餌4b', '餌5', '餌6', '餌7',
               '餌8', '餌9b', '餌9', '餌10', '餌11', '餌12', '餌13', '餌15',
-              '餌14')
+              '餌14', '餌16')
 
 
 def _bait_tally(skipped):
@@ -1551,7 +1556,7 @@ def _bait_tally(skipped):
 
 def _selftest():
     """跑所有的餌。全綠回 0,任何一個沒抓到回 1,在 python -O 底下回 2。"""
-    if sys.flags.optimize:
+    if _optimize_level():
         # -O 會把 assert 整句拿掉:檔尾那十幾行「每次執行都會跑」的 assert
         # 一句都不會執行,自我測試就變成假綠燈 —— 什麼都沒測到卻印 ✅。
         # 2026-09-06 實測 2026-09-05 那一版:python3 -O mvp_pack.py --selftest
@@ -1562,9 +1567,18 @@ def _selftest():
         print('     把 -O 拿掉再跑一次(python3 mvp_pack.py --selftest)。')
         print()
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(_selftest)
     fails = []
     skips = []       # 這個 Python 版本做不到而跳過的餌:一個餌一筆 (餌名, 為什麼)。
     #                  一筆講兩個餌會讓下面的餌數多報一個,見 _bait_tally。
+    # ── 餌16:最上面那道 -O 守門(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳) ──
+    if not _opt[0]:
+        fails.append('餌16 沒抓到:假裝開了 -O(把 _optimize_level 換成回傳 1),'
+                     '自我測試竟然沒有拒跑')
+    # ── 陰性對照 3:換回原本那一支之後,沒開 -O 就要放行 ──────────
+    if not _opt[1]:
+        fails.append('陰性對照 3:沒開 -O 守門也擋,或是換回原本那一支沒換成功')
     ATT = b'data/database/attrib.dat'
     tmp = tempfile.mkdtemp(prefix='mvp_pack_selftest-')
     try:
@@ -2104,8 +2118,8 @@ def _selftest():
         return 1
     # 餌一共幾個看 BAIT_NAMES(那裡是唯一的真相來源);跳過的不算跑過,
     # 照**餌名**從總數扣掉,不可以拿「全綠」蓋過去。
-    print('  ✅ 自我測試全綠:陰性對照 2 項 + 餌 %d 項,'
-          '每一道守門都真的擋下了它該擋的東西。'
+    print('  ✅ 自我測試全綠:陰性對照 3 項 + 餌 %d 項,'
+          '每一個餌都擋下了它該擋的東西(不是每一道守門都有餌,見檔頭 --selftest 那一段)。'
           % _bait_tally([name for name, _why in skips]))
     for name, why in skips:
         print('  ⏭ 跳過:%s —— %s' % (name, why))
@@ -2193,6 +2207,70 @@ assert _pe_min_size(b'notanexe') is None, '不是 PE 的東西不可以被當成
 assert _looks_texty(b'0 first_name,1 last_name\r\n'), '純文字被誤判成二進位'
 assert not _looks_texty(b'BIGF\x00\x01\x02\x00'), '二進位被誤判成純文字'
 assert read_receipt(os.devnull) is None, '讀不到收據要回 None,不可以爆掉'
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
+
 
 if __name__ == '__main__':
     try:

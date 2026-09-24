@@ -68,7 +68,7 @@ mvp_check_backup.py
 無外部相依,Python 3.7 以上即可。
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -134,12 +134,12 @@ BORN_ON_FIRST_RUN = {'controller.cfg'}
 NO_TOOL_BACKUP = {'controller.cfg'}
 
 # ⚠️ 這份清單漏一個,那一支工具留的備份就完全看不見,而且不會有任何提示。
-#    守門的是 .tools/site-check/selftest_backup_suffixes.py,不是 verify_site.py
-#    (那一支沒有這項檢查)。它把教學腳本字面寫出的備份副檔名跟這份清單對一次,
-#    但配不到通用的 .bak,也跳過 pack-a-mod 與 backup 兩課,那幾種少了不會紅。
+#    本站發布前另有一道檢查守著它(那是站內自用的檢查,不在下載包裡):把各課腳本
+#    用引號寫出的備份副檔名(像 '.speedbak')跟這份清單對一次。但它配不到通用的 .bak,
+#    也不看 pack-a-mod、backup、crash-diagnosis 三課,那幾種少了它發現不了。
 # ⚠️ 這份清單的長度會一直變(多一課會寫檔的教學通常就多一種),所以這裡
 #    **不寫死「幾支、幾種」** —— 那種數字放兩天就過期,而且沒有人會回頭改。
-#    要知道現在缺不缺,跑上面那支檢查器,它會把兩邊對一次。
+#    想自己核對現在缺不缺:在各課腳本裡搜「bak」,把引號裡的 .xxxbak 挑出來跟這份清單比。
 #    歷史上補過兩次:2026-09-03 補 .exepebak(執行檔那一課),
 #    2026-09-05 補 .introbak(關掉開場動畫那一課,2026-09-04 才進站)。
 # ⚠️ 補進清單不等於畫面上看得到:.exepebak 留在 mvp2005.exe 旁邊、
@@ -344,12 +344,17 @@ def _run_cli(argv):
 
 
 def self_test():
-    """種餌自我測試:每一道守門各放一個餌,抓不到就紅。
+    """種餌自我測試:替「沒事時不出聲」的那幾道檢查各放餌,抓不到就紅。
 
     為什麼要有:下面這幾道檢查(備份其實是正本本身 / 指不到東西的連結 /
     讀不出來 / 備份放在遊戲資料夾裡面)都是「沒事的時候完全不出聲」的那種。
     沒有餌的話,它們壞掉跟正常運作在畫面上長得一模一樣 —— 本站踩過這個坑。
     每一個餌都先確認「不下餌時不會亮」,再確認「下了餌一定亮」。
+
+    ⚠️ 不是每一道檢查都有餌。2026-09-24 把 main() 裡的判斷逐一拆掉(那一個 if 改成永遠
+       不成立)再跑一次:條件成立就印 ✗ 或 ⚠、記進「值得注意」或提早收工的判斷裡,至少有
+       7 個拆掉照樣全綠,包括「遊戲資料夾裡那份備份讀不出來」記進「值得注意」的那一條、
+       外部備份資料夾缺檔、資料夾路徑打錯。
 
     ⚠️ 全程在系統暫存資料夾裡建自己的測試檔,跑完自己刪掉,
        不碰你的遊戲資料夾。這是整支腳本唯一會寫檔的地方。
@@ -364,10 +369,12 @@ def self_test():
     #    不必指望那時候有人記得補。
     #    這裡直接結束整支程式,不回傳 True/False ——「測試沒跑」跟「測試沒過」
     #    是兩回事,用 1(有一項紅了)會把它們混在一起。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python3 -O 底下跑:-O 會把 assert 整段拿掉,'
               '哪天這裡改用 assert 判斷就會變成一片假的綠燈。請拿掉 -O 再跑一次。')
         sys.exit(2)
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(self_test)
     import shutil
     import tempfile
 
@@ -389,6 +396,11 @@ def self_test():
             return True
         except (OSError, NotImplementedError, AttributeError):
             return False
+
+    # 上面那道 -O 守門自己的餌(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳)。
+    check('-O 守門的餌:假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試拒跑、結束碼 2',
+          _opt[0])
+    check('-O 守門的陰性對照:換回原本那一支之後,沒開 -O 的時候守門放行', _opt[1])
 
     td = tempfile.mkdtemp(prefix='mvp_check_backup_selftest_')
     try:
@@ -904,6 +916,70 @@ def cli():
         print('  關掉那些程式、確認碟還在,再跑一次。')
         print('  本次檢查全程唯讀,沒有建立、修改或刪除任何檔案。')
         return 2
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
 
 
 if __name__ == '__main__':

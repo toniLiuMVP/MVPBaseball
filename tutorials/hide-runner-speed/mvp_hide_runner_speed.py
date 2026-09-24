@@ -49,7 +49,7 @@ mvp_hide_runner_speed.py
   · --list:只把目錄裡每一項的名稱與長度印出來就停,不解壓、不改檔。
     「我這一份到底有沒有那個版面檔」用這個看最準 —— 項目數推不出來。
   · --selftest:自己造一個最小的封裝檔來把整條路跑一遍,完全不碰遊戲檔。
-    裡面有 11 個反向餌,先證明「事情錯掉的時候它真的會叫」。
+    裡面有 12 個反向餌,先證明「事情錯掉的時候它真的會叫」。
     在 python -O 下會拒絕跑並回傳 2:-O 會把 assert 全部拿掉,測試會假綠。
 
 安全網(八層):
@@ -103,7 +103,7 @@ mvp_hide_runner_speed.py
 無外部相依,Python 3.7 以上即可。
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -239,7 +239,7 @@ def _print_no_permission(folder, err):
     print('  而那正是這個遊戲的預設安裝位置。')
     print('  Windows:對「命令提示字元」按右鍵,選「以系統管理員身分執行」。')
     print('  新視窗一開是在 C:\\Windows\\System32,先 cd 回你放腳本的地方')
-    print('  (例如 cd %USERPROFILE%\\Desktop),再跑同一行。')
+    print('  (放在「下載」的話是 cd %USERPROFILE%\\Downloads),再跑同一行。')
     print('  Mac / Linux 看到這一句,代表你這個帳號不能寫這個資料夾。')
     print('  遊戲檔沒有被改到,這個資料夾裡也沒有多出任何檔案。')
 
@@ -1256,11 +1256,11 @@ def _selftest_run(argv):
 def selftest():
     """不碰任何遊戲檔的自我測試:自己造一個最小的封裝檔,把整條路跑一遍。
 
-    重點不是「有沒有通過」,是**裡面有 11 個反向餌** —— 先證明「事情錯掉的時候
+    重點不是「有沒有通過」,是**裡面有 12 個反向餌** —— 先證明「事情錯掉的時候
     它真的會叫」。只驗正向的測試會一路綠燈,卻在功能整個壞掉時照樣綠燈,
     那種測試比沒有更危險。
 
-    11 個反向餌:
+    12 個反向餌:
       1. 被截斷的 QFS 資料流不可以安靜地解出半截(要丟例外)
       2. 半截的檔不可以被 _same_bytes 判成「相同」(那是 zip() 的陷阱)
       3. 目的檔是符號連結 → _refuse_symlink 要擋下來
@@ -1277,14 +1277,18 @@ def selftest():
          而且不可以先去做備份
      11. 同一個連結下 --restore 也要停(備份故意放一份內容不同的,
          真的跟著連結蓋下去的話被指向的檔一定會變)
+     12. 假裝開了 -O(把 _optimize_level 換成回傳 1)→ 自我測試必須拒跑、結束碼 2;
+         換回原本那一支之後守門要照樣放行(陰性對照,2026-09-24 加)
 
     跑完會在系統暫存區留下幾個資料夾(不刪,方便出事時自己去看)。
     """
     # python -O 會把 assert 整個拿掉 —— 上面那些餌有一半是靠 assert 站著的,
     # 在 -O 下會一路走到「全部通過」而其實什麼都沒驗。寧可不跑也不要假綠。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
     ok = 0
 
     # ── 反向餌 1:截斷的 QFS 要丟例外 ─────────────────────────
@@ -1478,9 +1482,81 @@ def selftest():
         raise AssertionError('複驗沒過卻沒有自動還原成套用前的樣子')
     assert _STATE['replaced'] is False, '自動還原之後 Ctrl-C 的訊息會講錯話'
 
+    # ── 反向餌 12:最上面那道 -O 守門(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳)──
+    if _opt[0]:
+        ok += 1
+    else:
+        raise AssertionError('假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試竟然沒有拒跑')
+    # 它的陰性對照:換回原本那一支之後,沒開 -O 就要放行
+    assert _opt[1], '陰性對照:沒開 -O 守門也擋,或是換回原本那一支沒換成功'
+
     print('自我測試:全部通過(%d 個反向餌都如預期地叫了)' % ok)
-    assert ok == 11, '反向餌只跑到 %d 個' % ok
+    assert ok == 12, '反向餌只跑到 %d 個' % ok
     return 0
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
 
 
 # 離開碼:0 成功(含「本來就已經關掉」),1 任何一種沒做成的狀況,130 是 Ctrl-C。

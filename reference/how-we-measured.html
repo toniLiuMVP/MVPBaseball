@@ -19,7 +19,7 @@
 <title>本站怎麼量的 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="本站每個數字都寫著「量到的」。這一頁給出量測對象的指紋(檔數/大小/SHA-256)、名詞的精確定義、以及讓你自己重跑一次的腳本。附零相依的指紋工具,三十秒就能確認你手上那份跟本站量的是不是同一份。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="../assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -169,10 +169,12 @@
   <div class="step">
     <div class="step-n">1</div>
     <div>
-      <div class="step-t">下載腳本，放到桌面，切到桌面</div>
-      <p><a href="mvp_fingerprint.py" download>mvp_fingerprint.py</a>（725 行，零相依）</p>
-<pre><code>cd %USERPROFILE%\Desktop</code></pre>
-<pre><code>cd ~/Desktop</code></pre>
+      <div class="step-t">下載腳本，在「下載」資料夾開命令視窗</div>
+      <p><a href="mvp_fingerprint.py" download>mvp_fingerprint.py</a>（928 行，零相依）</p>
+      <p class="small">瀏覽器多半不會問你要存哪裡，會直接放進「下載」資料夾，所以指令要在「下載」裡打。</p>
+      <p class="small">Windows：這一步不用打指令。打開檔案總管，左邊點「<u>下載</u>」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter。開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../start.html">第 0 課</a>操作一的「資料夾法」）。</p>
+      <p class="small">Mac：打開終端機，打這一行：</p>
+<pre><code>cd ~/Downloads</code></pre>
     </div>
   </div>
 
@@ -318,7 +320,7 @@
      <u>量指紋那條路上沒有任何寫檔呼叫</u>；整支唯一的三處都在 <code>--selftest</code> 裡面，
      寫的是它在系統暫存資料夾裡造的假資料。你可以自己搜一次 <code>open(</code> 確認。</p>
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（725 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（928 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
@@ -380,11 +382,16 @@
   資料夾只印最後一層的名稱,讀不到的項目只印相對於它的路徑;
   給錯路徑時的錯誤訊息也一樣:只說找不到、或說那是一個檔案,不把你給的路徑印回來。
   路徑有空白卻沒用雙引號包起來、被拆成好幾段時,多出來的那幾段同樣不印。
+  選項後面多接了東西(例如把路徑接在 --all= 後面)、選項名稱只打一半這類
+  參數錯誤,也只印用法與一段中文說明,你打的那一串一樣不印回來。
   真的要完整路徑再加 --show-full-paths —— 那份輸出就不要直接公開。
+  把輸出導到檔案(例如 &gt; 指紋.txt)時,Python 在 Windows 繁體中文版上用的是 cp950,
+  而 cp950 存不下 ⚠️ 這類符號:存不下的字會換成問號,不會印到一半就中斷。
+  (本站是在 Mac 上用 PYTHONIOENCODING=cp950 模擬的,還沒在 Windows 上實測。)
   結束碼:0 = 跑完了,
          1 = 跑完了,但有檔案或資料夾讀不到,這份指紋不完整,不要拿去比對,
          2 = 給的路徑不是資料夾(參數本身給錯、或是根本沒給,也是 2;
-             路徑被空白拆成好幾段、多出參數,也是 2;
+             路徑被空白拆成好幾段、多出參數、選項後面多接了東西,也是 2;
              在 python3 -O 底下跑 --selftest 也是 2 —— 見下面「安全網在哪」),
        130 = 你自己按了 Ctrl-C。它只讀不寫,所以中途停掉什麼都不會少。
 
@@ -414,7 +421,7 @@
 
 MIT License · Copyright (c) 2026 toni · 無外部相依,Python 3.7 以上
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 
 import argparse
 import hashlib
@@ -541,7 +548,7 @@ def selftest():
       · 遮蔽真的有遮到 —— 預設輸出裡不可以出現完整路徑
       · 唯讀真的是唯讀 —— 跑完之後那份資料夾要一個位元組都沒變
 
-    二十三道檢查,其中十九道是餌(故意做一件「防線壞掉就會被印出來」的事):
+    三十道檢查,其中二十四道是餌(故意做一件「防線壞掉就會被印出來」的事):
       餌 1(1 道)把資料夾放在一層叫 ZZ_pretend_username 的路徑底下,
             預設輸出裡出現那個字就是漏了。
       餌 2(2 道)反向:加了 --show-full-paths 就**必須**印得出完整路徑,
@@ -567,25 +574,45 @@ def selftest():
       餌 9(2 道)反向:加了 --show-full-paths,找不到的那條路徑、
             被拆開的那一段都**必須**原樣印出來。少了這一組,
             「錯誤訊息整行沒印」也會讓餌 7、餌 8 通過。
-    另外四道是一般斷言:資料夾名稱有印出來(擋住餌 1 假通過)、
+      餌 10(1 道)同一道 -O 守門,改在這個程序裡驗:把 _optimize_level
+            暫時換成「回傳 1」再叫一次自我測試,它必須拒跑(結束碼 2)。
+            餌 6 在「這一次是上一層開的」時會略過,這一道不會。
+            (2026-09-24 加。這一道不是另開程序,是這個程序自己再叫一次。)
+      餌 11(2 道)argparse 自己先擋下來的參數錯誤:把假路徑接在 --all= 後面、
+            選項只打一半(--s=,同時對得上兩個選項)。結束碼要是 2、
+            要說「參數有錯」,而且假名字一個都不可以印出來。(2026-09-24 加)
+      餌 12(1 道)反向:同一個錯誤加了 --show-full-paths,就**必須**照原樣印出來。
+            少了這一道,「錯誤訊息整段沒印」也會讓餌 11 通過。(2026-09-24 加)
+      餌 13(1 道)子程序改用 cp1252 輸出(連中文都存不下的編碼)量同一份資料夾,
+            必須跑完:結束碼跟正常那一次一樣、清單雜湊印得出來、沒有 Traceback。
+            這是「輸出導到檔案、編碼存不下某些字」那條路。(2026-09-24 加)
+    另外六道是一般斷言:資料夾名稱有印出來(擋住餌 1 假通過)、
     加旗標不會改到結束碼、遮蔽沒有動到清單雜湊本身、
-    跑完之後那份資料夾一個位元組都沒變。
+    跑完之後那份資料夾一個位元組都沒變、
+    餌 10 換回原本那一支之後守門照樣放行(餌 10 的陰性對照)、
+    沒給路徑時自己寫的那句提醒照樣印得出來(餌 11 的陰性對照:攔截不可以連它一起吞掉)。
     做不出「讀不到的資料夾」的機器(以系統管理員身分跑、或 Windows)
     會少掉餌 3 那一組 4 道,畫面上會照實說是略過,不會假裝測過。
     餌 7 那三條假路徑萬一在這台機器上真的存在,那一道也照實說是略過。
 
     測試自己是另開一個 Python 程序跑真的命令列,不是呼叫內部函式 ——
-    要驗的就是「讀者打那一行下去看到什麼」。
+    要驗的就是「讀者打那一行下去看到什麼」。餌 5 與餌 10 那四道是例外(見上面)。
+    另開的程序一律明寫用 UTF-8 輸出(餌 13 除外):不寫的話,Windows 繁體中文版上
+    子程序會用 cp950 輸出,而這裡用 UTF-8 解,中文比對全部對不上 ——
+    那是測試自己的問題,不是腳本壞了(2026-09-24 在 Mac 上用 PYTHONIOENCODING=cp950
+    模擬過,Windows 上還沒實測)。
     """
     # -O 會把 assert 整段拿掉。這一支的判斷句不是用 assert 寫的(是下面那個
     # need()),但守門照樣要有:-O 不會傳給自我測試另開的那幾個程序
     # (這台機器上量過:父程序 sys.flags.optimize 是 1,子程序是 0),
     # 所以 -O 底下跑出來的綠燈,量的不是讀者這一次跑的條件。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('  --selftest 不能在 python3 -O 底下跑:-O 會把 assert 整段拿掉,'
               '而且它不會傳給自我測試另開的那幾個程序 —— '
               '量到的不是你這一次跑的條件,綠燈不算數。請拿掉 -O 再跑一次。')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
 
     import shutil
     import subprocess
@@ -597,12 +624,30 @@ def selftest():
         print('  自我測試要用到腳本檔本身,但找不到:%s' % os.path.basename(script))
         return 1
 
-    def cli(*extra):
-        """跑一次真的命令列,回傳 (結束碼, 畫面上的字)。"""
+    def child_env(enc='utf-8'):
+        """子程序的環境:明寫輸出編碼。
+
+        不寫的話,子程序接管線時用的是系統語系的編碼(Windows 繁體中文是 cp950),
+        而這裡是用 UTF-8 解它的輸出 —— 兩邊對不上,中文比對全部落空。
+        2026-09-24 在 Mac 上模擬過(只讓子程序用 PYTHONIOENCODING=cp950,這裡照樣用 UTF-8 解):
+        這一版 30 道裡 12 道因此變紅,全是這裡解碼對不上 —— 腳本本身沒壞,
+        子程序那邊有 main() 開頭那段處理,不會印到一半中斷。
+        餌 13 會另外傳別的編碼進來,驗的是另一件事。
+        """
+        env = dict(os.environ)
+        env['PYTHONIOENCODING'] = enc
+        return env
+
+    def cli(*extra, **kw):
+        """跑一次真的命令列,回傳 (結束碼, 畫面上的字)。
+
+        enc= 是子程序輸出用的編碼,只有餌 13 會改它。"""
+        enc = kw.get('enc', 'utf-8')
         pr = subprocess.Popen([sys.executable, script] + list(extra),
-                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                              env=child_env(enc))
         raw = pr.communicate()[0]
-        return pr.returncode, raw.decode('utf-8', 'replace')
+        return pr.returncode, raw.decode(enc, 'replace')
 
     def cli_opt(*extra):
         """同上,但加 -O 跑。專門用來驗「-O 底下要拒跑」那一道守門。
@@ -612,11 +657,11 @@ def selftest():
         它是給「哪天有人把守門拿掉」那種情況用的 —— 沒有它,
         那一次會一層開一層停不下來。
         """
-        child_env = dict(os.environ)
-        child_env[NESTED_ENV] = '1'
+        env = child_env()
+        env[NESTED_ENV] = '1'
         pr = subprocess.Popen([sys.executable, '-O', script] + list(extra),
                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                              env=child_env)
+                              env=env)
         raw = pr.communicate()[0]
         return pr.returncode, raw.decode('utf-8', 'replace')
 
@@ -799,6 +844,55 @@ def selftest():
         # 唯讀:跑完之後那份資料夾一個位元組都沒變
         need(snapshot(root) == before,
              '跑完之後資料夾的內容變了 —— 它應該只讀不寫', bait=False)
+        # 餌 10:同一道 -O 守門,改在這個程序裡驗(結果是開頭 _optimize_bait() 量的)。
+        # 餌 6 在子程序才有,這一次若是上一層開的就略過;這一組每一次都跑得到。
+        need(_opt[0], '餌 10:假裝開了 -O,--selftest 竟然沒有拒跑')
+        need(_opt[1], '餌 10 陰性對照:沒開 -O 的時候守門也擋了下來,'
+             '或是換回原本那一支沒換成功', bait=False)
+        # 餌 11:argparse 自己先擋下來的參數錯誤,也不可以把讀者打的字印回來(2026-09-24 加)。
+        # 兩種寫法各一道:路徑接在 --all= 後面、選項只打一半(--s= 同時對得上兩個選項)。
+        # 這兩種在 main() 的遮蔽之前就結束了,餌 7、餌 8 都碰不到。
+        arg_baits = [
+            ('--all=', '--all=/Users/%s %s/Games' % (canary, surname)),
+            ('--s=', '--s=/Users/%s %s/Games' % (canary, surname)),
+        ]
+        for label, bad_arg in arg_baits:
+            rc11, out11 = cli(bad_arg)
+            if rc11 != 2:
+                why11 = '結束碼是 %s(應該是 2)' % rc11
+            elif '參數有錯' not in out11:
+                why11 = '沒有說是參數有錯'
+            elif canary in out11 or surname in out11:
+                why11 = '把你打的那一串印出來了'
+            else:
+                why11 = None
+            need(why11 is None, '餌 11(%s):%s' % (label, why11))
+        # 餌 12(反向):加了 --show-full-paths 就**必須**照原樣印出來。
+        # 不然「錯誤訊息整段沒印」也會讓餌 11 通過。
+        _rc12, out12 = cli(arg_baits[0][1], '--show-full-paths')
+        need(canary in out12 and surname in out12,
+             '餌 12:加了 --show-full-paths,參數錯誤還是沒把收到的內容印出來')
+        # 陰性對照:我們自己寫的那一句(沒給路徑)照樣要印得出來,
+        # 不可以被上面那道攔截一起吞掉。
+        rc_np, out_np = cli()
+        need(rc_np == 2 and '請給一個資料夾路徑' in out_np,
+             '沒給路徑時,自己寫的那句提醒不見了(結束碼 %s)' % rc_np, bait=False)
+        # 餌 13:輸出的編碼存不下某些字時,不可以印到一半就中斷(2026-09-24 加)。
+        # 子程序改用 cp1252 輸出(西歐語系 Windows 用的編碼,連中文都存不下),
+        # 量同一份資料夾。main() 開頭那道處理拿掉的話,第二行就會丟 UnicodeEncodeError、
+        # 結束碼變 1、清單雜湊那一行印不出來。
+        rc13, out13 = cli(root, enc='cp1252')
+        hash_line = _line(out, '清單雜湊') or ''
+        manifest13 = hash_line.split()[-1] if hash_line.split() else ''
+        if 'Traceback' in out13:
+            why13 = '丟出了一整段 Python 錯誤訊息'
+        elif len(manifest13) != 64 or manifest13 not in out13:
+            why13 = '清單雜湊那一行沒印出來'
+        elif rc13 != rc:
+            why13 = '結束碼是 %s(正常那一次是 %s)' % (rc13, rc)
+        else:
+            why13 = None
+        need(why13 is None, '餌 13:輸出編碼存不下某些字時印到一半就停了 —— %s' % why13)
 
         for line in fails:
             print('  ❌ %s' % line)
@@ -836,9 +930,53 @@ def _line(out, key):
     return None
 
 
+class _QuietParser(argparse.ArgumentParser):
+    """argparse 自己擋下來的參數錯誤,預設也不把讀者打的那一串印回來。
+
+    argparse 在把參數交給 main() 之前,會先自己擋掉幾種錯,而它的錯誤訊息
+    會把讀者打的字原樣印出來。例如把路徑接在 --all= 後面,它印
+    「argument --all: ignored explicit argument '/Users/〔名〕 〔姓〕/…'」;
+    選項只打了一半又接了東西(--s=…),它印「ambiguous option: --s=… could match …」。
+    這些都發生在 parse_known_args() 回傳之前,main() 裡的遮蔽接不到,所以在這裡攔。
+    (2026-09-24 補:在這之前,這類寫法會把讀者打的那一串整段印出來。)
+
+    做法是 argparse 那一句整句不印,只印用法與一段中文。不去猜它哪一段是讀者打的 ——
+    argparse 換一版,訊息的樣子就可能不一樣,猜錯就漏。
+    加了 --show-full-paths(一字不差)才照 argparse 原本的樣子印,跟其他錯誤訊息同一個規則。
+    """
+
+    def error(self, message):
+        if '--show-full-paths' in sys.argv[1:]:
+            argparse.ArgumentParser.error(self, message)
+        self.print_usage(sys.stderr)
+        self.exit(2, '\n'.join((
+            '',
+            '  參數有錯,這支看不懂你打的那一串。',
+            '  最常見的原因:選項後面多接了東西(例如 --all=…),或選項名稱只打了一半。',
+            '  這支只認得 --all、--show-full-paths、--selftest,三個後面都不接任何東西;',
+            '  路徑請整條用雙引號包起來。',
+            '  (為了不把帳號名稱印出來,這裡不重複你打的內容;'
+            '要看它收到的是什麼,加 --show-full-paths。)',
+            '', '')))
+
+    def error_own(self, message):
+        """我們自己寫好的錯誤訊息(裡面沒有讀者打的字),照 argparse 原本的樣子印。"""
+        argparse.ArgumentParser.error(self, message)
+
+
 def main():
     """算完指紋印出來:資料夾摘要、清單雜湊、錨點雜湊,以及選配的逐檔清單。"""
-    ap = argparse.ArgumentParser(
+    # 輸出導到檔案或接管線時,Windows 上的 Python 用系統語系的編碼寫(繁體中文是 cp950),
+    # 而 ⚠️ ❌ ✅ 這幾個 cp950 沒有 —— 不處理的話,印到那一行就丟 UnicodeEncodeError
+    # 並以 1 結束,只留下半截輸出(2026-09-24 在 Mac 上用 PYTHONIOENCODING=cp950 重現過,
+    # Windows 上還沒實測)。
+    # 這裡不換編碼,只把「編不出來的那個字」換成問號,中文照舊。
+    # 直接看主控台的人不受影響(Python 3.6 起,Windows 主控台走 UTF-16 的寫法)。
+    try:
+        sys.stdout.reconfigure(errors='replace')
+    except (AttributeError, ValueError):
+        pass
+    ap = _QuietParser(
         description='幫一份遊戲資料夾算指紋,用來確認大家量的是同一份',
         epilog='量指紋時只讀不寫;--selftest 只在系統暫存資料夾造自己的假資料。')
     ap.add_argument('path', nargs='?', help='要量的資料夾')
@@ -852,6 +990,7 @@ def main():
     # 最常見的來源是路徑裡有空白卻沒加引號,一條路徑被拆成好幾段 ——
     # 交給 argparse 的話,它會用英文把多出來的那幾段原樣印出來,
     # 而那幾段通常就是帳號名稱的後半截(例如 /Users/〔名〕 〔姓〕/… 被拆開之後的「〔姓〕/…」)。
+    # argparse 自己先擋下來的那幾種錯,不會走到這裡,是 _QuietParser 在攔。
     args, extra = ap.parse_known_args()
 
     if extra:
@@ -878,7 +1017,8 @@ def main():
     root = args.path
     if root is None:
         # 少給路徑跟給錯路徑一樣算「參數有錯」,argparse 自己也是用 2。
-        ap.error('請給一個資料夾路徑（或用 --selftest 自我測試）')
+        # 這一句是我們自己寫的,裡面沒有讀者打的字,所以走 error_own 照原樣印。
+        ap.error_own('請給一個資料夾路徑（或用 --selftest 自我測試）')
     if not os.path.isdir(root):
         # 這裡回 2 不是 1:argparse 自己在參數有錯時用的也是 2,
         # 這樣「參數給錯了」跟「跑完但結果不如預期」在批次檔裡分得開。
@@ -1009,6 +1149,71 @@ def main():
     return 0
 
 
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。這支的守門原本就有餌:自我測試的餌 6 另外開一個
+#  python3 -O 的程序跑 --selftest,它必須拒跑。但餌 6 在「這一次本身就是上一層
+#  開的子程序」時會略過,而守門原本直接問 sys.flags.optimize —— 那是唯讀的,
+#  同一個程序裡沒辦法把 -O 打開又關掉。現在守門改問 _optimize_level(),
+#  自我測試就能在同一個程序裡暫時把它換掉,再驗一次(餌 10,附陰性對照)。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
+
+
 if __name__ == '__main__':
     try:
         sys.exit(main())
@@ -1070,6 +1275,6 @@ if __name__ == '__main__':
        <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../assets/site.js?v=12835e693d" defer></script>
+<script src="../assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

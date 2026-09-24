@@ -19,7 +19,7 @@
 <title>換球隊隊徽 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="隊徽在 logos.big，132 個檔。哪個編號是哪一隊？126 個檔剛好配 126 支球隊不算證據——本站是把圖匯出來親眼看，四個編號逐一確認才定案：artid N 對應 l(N-1).fsh。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="../../assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -57,19 +57,18 @@
   <div class="quickfix" id="quick">
     <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快換一張？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
-      <li>下載 <a href="mvp_team_logo.py" download>mvp_team_logo.py</a> 放到桌面。</li>
-      <li>開命令提示字元切到桌面，Windows 打第一行、Mac 打第二行<br>
-  <pre><code>cd %USERPROFILE%\Desktop</code></pre>
-  <pre><code>cd ~/Desktop</code></pre></li>
+      <li>下載 <a href="mvp_team_logo.py" download>mvp_team_logo.py</a>（瀏覽器會把它放進「下載」資料夾，不用搬）。</li>
+      <li>在「下載」資料夾開命令視窗：Windows 打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打；Mac 開終端機打這一行<br>
+  <pre><code>cd ~/Downloads</code></pre></li>
       <li>先看你的隊是幾號。<strong>規則是「名單裡的 artid 減 1」</strong>
           （小熊 artid 20 就是 <code>l019.fsh</code>），這一行會把規則跟<strong>前 6 支球隊</strong>
           印出來 —— <u>只印 6 支</u>，你的隊沒印到就自己把 <code>artid</code> 減 1<br>
   <pre><code>python mvp_team_logo.py "〔遊戲資料夾〕" --list</code></pre></li>
       <li>把那張匯出成 PNG，<strong>打開來看一眼確認是你要的那一隊</strong><br>
-  <pre><code>python mvp_team_logo.py "〔遊戲資料夾〕" --export 19 %USERPROFILE%\Desktop\l019.png</code></pre></li>
+  <pre><code>python mvp_team_logo.py "〔遊戲資料夾〕" --export 19 "%USERPROFILE%\Desktop\l019.png"</code></pre></li>
       <li>用修圖軟體改那張 PNG（<u>尺寸不能變、要保留透明度</u>），再換回去。
           先不加 <code>--apply</code> 預覽一次，沒問題再加<br>
-  <pre><code>python mvp_team_logo.py "〔遊戲資料夾〕" --import 19 %USERPROFILE%\Desktop\l019.png --apply</code></pre></li>
+  <pre><code>python mvp_team_logo.py "〔遊戲資料夾〕" --import 19 "%USERPROFILE%\Desktop\l019.png" --apply</code></pre></li>
     </ol>
     <p class="tail">後悔的話，這一行還原：</p>
 <pre><code>python mvp_team_logo.py "〔遊戲資料夾〕" --restore</code></pre>
@@ -196,16 +195,18 @@
 
   <div class="card blue">
     <p class="card-h">指令裡的 python 與 python3</p>
-    <p>下面範例照 Mac 寫法用 <code>python3</code>；Windows 使用者把每行開頭改成 <code>python</code>，<code>~/Desktop/l019.png</code> 改成速解裡那種 <code>%USERPROFILE%\Desktop\l019.png</code>（這個 Windows 路徑寫法本站還沒在 Windows 上實測）。</p>
+    <p>下面範例照 Mac 寫法用 <code>python3</code>；Windows 使用者把每行開頭改成 <code>python</code>，<code>~/Desktop/l019.png</code> 改成速解裡那種 <code>"%USERPROFILE%\Desktop\l019.png"</code>（前後的雙引號要留著，帳號名稱有空白時才不會被拆開；這個 Windows 路徑寫法本站還沒在 Windows 上實測）。</p>
   </div>
 
   <div class="card amber">
-    <p class="card-h">按了下載之後，檔案跑到哪裡去了？</p>
+    <p class="card-h">按了下載之後，檔案跑到哪裡去了？指令要在哪裡打？</p>
     <p><strong>瀏覽器多半不會問你要存哪裡</strong>，它會直接放進「下載」資料夾。
-       開檔案總管（Mac 用 Finder）左邊點「<u>下載</u>」，找到那個 <code>.py</code>，
-       <strong>拖到桌面</strong>再往下做。</p>
-    <p class="small">沒做這一步的話，後面 <code>cd</code> 到桌面再執行，
-       畫面會出現 <code>can't open file</code> —— 那不是你打錯。</p>
+       所以命令視窗要從那裡開：</p>
+    <p><span class="sk">1</span>打開檔案總管，左邊點「<u>下載</u>」<br>
+       <span class="sk">2</span>點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code>，按 Enter<br>
+       <span class="sk">3</span>開出來的視窗<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打</p>
+    <p class="small">Mac：打開終端機，先打 <code>cd ~/Downloads</code> 按 Enter。</p>
+    <p class="small">沒照這樣開視窗的話，畫面會出現 <code>can't open file</code> —— 那不是你打錯，是視窗跟檔案不在同一個資料夾。</p>
   </div>
 
   <p><strong>步驟 1</strong>：看封裝檔裡有什麼，以及球隊對照。唯讀。</p>
@@ -250,9 +251,10 @@
     <thead><tr><th>看到什麼</th><th>怎麼辦</th></tr></thead>
     <tbody>
       <tr class="hi"><td><code>can't open file '…\mvp_team_logo.py'</code></td>
-          <td><strong>檔案還在「下載」資料夾，不在桌面。</strong>
-              <u>這是本站最常見的第一個卡點。</u>
-              開檔案總管左邊點「下載」，把那個 <code>.py</code> 拖到桌面，再跑一次</td></tr>
+          <td><strong>命令視窗跟腳本不在同一個資料夾。</strong>
+              打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）。
+              還是一樣的話，是檔名對不上：瀏覽器可能在檔名後面加了 <code>(1)</code>，把它改成跟指令裡一模一樣。
+              <u>這是本站最常見的第一個卡點。</u></td></tr>
       <tr><td>「尺寸不合」</td>
           <td>修圖時把尺寸改掉了。<code>--export</code> 重來一張當底稿</td></tr>
       <tr><td>「像素後面…不是全部都是 0」</td>
@@ -458,7 +460,7 @@
               <strong>還原完再跟備份逐位元組比一次完整長度</strong>，對得上才印成功。</td></tr>
       <tr><td data-label="哪一段"><code>selftest()</code></td>
           <td data-label="做什麼">不碰任何遊戲檔的自我測試，在記憶體與系統暫存資料夾裡跑（跑一次會在系統暫存區留下幾個資料夾，跑完不刪）</td>
-          <td data-label="為什麼要有它">重點不是「有沒有通過」，是裡面有 20 個反向餌，
+          <td data-label="為什麼要有它">重點不是「有沒有通過」，是裡面有 21 個反向餌，
               先證明<u>答案錯的時候它真的會叫</u>；其餘的是正向檢查。
               只驗正向的測試會在功能整個壞掉時照樣綠燈。</td></tr>
     </tbody>
@@ -491,7 +493,7 @@
      這一課另外多一道 <code>png_size()</code>：先只讀檔頭，把尺寸不合擋在讀圖之前。
      要知道現在是幾比幾，<u>腳本開頭附了可以直接複製去跑的量法</u>。）
      跑 <code>--selftest</code> 可以在不碰任何遊戲檔的情況下驗證它自己，
-     在同一支腳本上數到 20 個反向餌：壞的編號寫法四種
+     在同一支腳本上數到 21 個反向餌：壞的編號寫法四種
      （<code>abc</code>、<code>l</code>、空字串、<code>l04x</code>）、DXT3 來回之後不可以整片同色、
      名單欄位順序換掉照樣要讀得出來、沒有 <code>data\database\team.dat</code> 時要回空的，
      再加 2026-09-05 覆驗補上的七個：<code>--export</code> 不可以蓋掉已經在那裡的非 PNG 檔、
@@ -506,16 +508,17 @@
      <code>png_write()</code> 自己的目的地是符號連結要擋；
      再加 2026-09-11 補的兩個（都跟「壞掉的 PNG 不可以吐一整片 Python 堆疊」有關）：
      尺寸正確、<code>zlib</code> 也解得開、但影像資料<u>少了幾列</u>的 PNG 要講人話、
-     檔頭尺寸離譜的 PNG 要在<u>配置記憶體之前</u>被擋掉。
+     檔頭尺寸離譜的 PNG 要在<u>配置記憶體之前</u>被擋掉；
+     再加 2026-09-24 補的一個：假裝開了 <code>-O</code>，自我測試必須拒跑。
      其餘的檢查是正向的（檔名組法、編號解析、編解碼長度、名單解析結果），沒有算進來。
      其中四個跟符號連結有關的，<u>要這台機器建得了符號連結才跑得動</u>
      （Windows 沒開開發人員模式就建不了），跑不動時會被跳過並在最後一行講明，
-     印出來的數字變成 16。
+     印出來的數字變成 17。
      其中「名單欄位順序換了也要讀得出來」那一條，是因為<u>欄號寫死是本站踩過的坑</u>。</p>
 <pre><code>python3 mvp_team_logo.py --selftest</code></pre>
 
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（2307 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（2387 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -642,8 +645,8 @@ l000.fsh 到 l125.fsh 共 126 個沒有缺號,外加 l994-l999 六個特殊標�
   · 換名跟「登記已經換過」是綁在一起的一段,Ctrl-C 剛好落在中間也不會
     讓收尾說謊。真的中斷時的訊息分三種:沒動到 / 正在換 / 已換好
   · 寫完立刻重讀正本,把像素段逐位元組比對回去;對不上就要你 --restore
-  · --selftest 裡有 20 個反向餌,先證明「答案錯的時候它真的會叫」;其餘是正向檢查
-    (建不了符號連結的機器會少跑四個,印出來的數字會變成 16,不會假裝跑過)
+  · --selftest 裡有 21 個反向餌,先證明「答案錯的時候它真的會叫」;其餘是正向檢查
+    (建不了符號連結的機器會少跑四個,印出來的數字會變成 17,不會假裝跑過)
 
 做不到的事(先講清楚,省得你找)
   · 只處理 DXT3(格式代號 0x61)。別的格式會被擋下來,不會硬幹
@@ -660,7 +663,7 @@ l000.fsh 到 l125.fsh 共 126 個沒有缺號,外加 l994-l999 六個特殊標�
 無外部相依,Python 3.7 以上即可。
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -2379,16 +2382,21 @@ def main():
 
 
 # ─────────────────────────────────────────────────────────
-#  自我測試:不碰任何遊戲檔,但會用到系統暫存資料夾。每一條都下餌。
+#  自我測試:不碰任何遊戲檔,但會用到系統暫存資料夾。裡面有 21 個反向餌。
+#  ⚠️ 不是每一道守門都有餌。2026-09-24 把自我測試以外、條件成立就讓這支停下來的
+#     47 道守門逐一拆掉(那一個 if 改成永遠不成立)再跑 --selftest,會變紅的是 4 道
+#     (目的檔是符號連結、PNG 宣稱的尺寸超出範圍、PNG 影像資料不完整、
+#     匯出檔名上已經有一個不是 PNG 的檔);其餘 43 道拆掉照樣全綠,
+#     例如 --restore 時備份開頭不是 BIGF、換上去之前的複驗沒過。
 # ─────────────────────────────────────────────────────────
 def selftest():
     """不碰任何遊戲檔的自我測試,在記憶體與系統暫存資料夾裡做(會開幾個,其中一個寫測試用的 team.dat、一個是空的,跑完都不刪)。
 
-    重點不是「檢查有沒有通過」,是**裡面有 20 個反向餌**:
+    重點不是「檢查有沒有通過」,是**裡面有 21 個反向餌**:
     先確認「答案錯的時候它真的會叫」。只驗正向的測試會一路綠燈,
     卻在功能整個壞掉時照樣綠燈,那種測試比沒有更危險。
 
-    這 20 個反向餌是:壞的編號寫法要被擋(四種各算一個:abc、l、空字串、l04x)、
+    這 21 個反向餌是:壞的編號寫法要被擋(四種各算一個:abc、l、空字串、l04x)、
     DXT3 來回之後不可以整片同色、名單欄位順序換掉照樣要讀得出來(防止寫死欄號)、
     沒有名單檔時要回空的而不是爆掉,再加 2026-09-05 補的三個:
     --export 不可以蓋掉已經在那裡的非 PNG 檔、不可以寫到封裝檔上面、
@@ -2399,7 +2407,7 @@ def selftest():
     **還原到一半失敗時遊戲正本必須原封不動**(把 os.replace 換成會丟例外的假貨來測)。
     ⚠️ 這三個,加上下面第三輪那第四個,都要建符號連結 ——
        Windows 沒開開發人員模式的話建不了,那四個會被跳過並在最後一行講明,
-       不會假裝跑過(印出來的數字會變成 16)。
+       不會假裝跑過(印出來的數字會變成 17)。
     其餘的檢查是正向的,沒有算進來。
 
     2026-09-06 第三輪再補四個(前三個一定會跑,第四個要符號連結):
@@ -2415,14 +2423,25 @@ def selftest():
         像素寬的 PNG → 要被寬高上限擋掉。這個餌的資料是**塞滿的**,
         上面那道長度檢查放它過,所以它真的測得到寬高上限;而且會先確認
         png_size 認不出這個檔,不然餌就下在沒有繞過守門的那條路上了
+
+    2026-09-24 第五輪再補一個(一定會跑,只在記憶體裡):
+      · 假裝開了 -O(把 _optimize_level 換成回傳 1)→ 自我測試必須拒跑、結束碼 2。
+        換回原本那一支之後守門要照樣放行,那是它的陰性對照(算正向,沒有算進來)
     """
     # ⚠️ 這一段要排在所有檢查前面。python3 -O 會把 assert 整個拿掉,
     #    而這支自我測試幾乎每一條都是 assert —— 在 -O 底下跑會一路綠燈,
     #    卻什麼都沒驗到。假綠比沒測更危險,所以直接不給跑。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠。\n'
               '  請改用:python3 mvp_team_logo.py --selftest')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
+
+    # 反向餌:最上面那道 -O 守門(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳)
+    assert _opt[0], '假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試竟然沒有拒跑'
+    # 正向:它的陰性對照 —— 換回原本那一支之後,沒開 -O 就要放行
+    assert _opt[1], '陰性對照:沒開 -O 守門也擋,或是換回原本那一支沒換成功'
 
     assert logo_name(0) == 'l000.fsh' and logo_name(125) == 'l125.fsh', '檔名組錯'
     for s, want in (('42', 42), ('l042', 42), ('l042.fsh', 42), ('  7 ', 7)):
@@ -2788,11 +2807,75 @@ def selftest():
         raise AssertionError('宣稱自己 5000 個像素寬的 PNG 竟然讀得過去')
 
     print('自我測試:全部通過(含 %d 個反向餌)%s'
-          % (20 if can_link else 16,
+          % (21 if can_link else 17,
              '' if can_link else
              '\n  ⚠️ 這台機器不給建符號連結(Windows 要開開發人員模式),'
              '跟符號連結有關的那四個餌跳過了。'))
     return 0
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
 
 
 if __name__ == '__main__':
@@ -2860,7 +2943,7 @@ if __name__ == '__main__':
         而且<strong>沒有在遊戲裡看過換好的隊徽</strong>。</li>
   </ul>
 
-  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <!-- course-strip:begin · 這一塊由產生器從 plan.html 產生，不要手改 -->
   <nav class="card course-strip" aria-label="這一課在課表的位置">
     <p class="card-h">📚 照課表上課的話</p>
     <p>這一課沒有排進任何一班。課表上寫的適合時機：「你想換隊徽」</p>
@@ -2885,6 +2968,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=12835e693d" defer></script>
+<script src="../../assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

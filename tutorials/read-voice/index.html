@@ -19,7 +19,7 @@
 <title>拆開一個語音檔 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="播報語音的外殼、聲道怎麼擺、每 15 個位元組一組怎麼切，全部量給你看。附零相依腳本。也記下本站當時沒解開的那一格（後來解開了，見〈換掉遊戲的聲音〉），以及過程中一個差點推翻正確結論的假紅燈。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="../../assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -66,7 +66,7 @@
   <div class="quickfix" id="quick">
     <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這四步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
-      <li>把腳本存到你的電腦：<a href="mvp_read_voice.py" download>mvp_read_voice.py</a>（707 行，零相依，只讀不寫）。下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打（Mac 開終端機先打 <code>cd ~/Downloads</code>）。</li>
+      <li>把腳本存到你的電腦：<a href="mvp_read_voice.py" download>mvp_read_voice.py</a>（1,079 行，零相依，只讀不寫）。下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打（Mac 開終端機先打 <code>cd ~/Downloads</code>）。</li>
       <li>看看你的遊戲裡有哪些語音封裝檔。把引號裡換成你的遊戲資料夾，要指到<strong>下一層就是 <code>data</code> 的那一層</strong>。
   <p class="small">Windows:</p>
   <pre><code>python mvp_read_voice.py "你的遊戲資料夾" --list</code></pre>
@@ -359,7 +359,7 @@
 
   <h2>👉 自己跑一次</h2>
   <p><strong>步驟 1</strong>：把腳本存到你的電腦。</p>
-  <p><a href="mvp_read_voice.py" download>mvp_read_voice.py</a>（707 行，零相依，只讀不寫）</p>
+  <p><a href="mvp_read_voice.py" download>mvp_read_voice.py</a>（1,079 行，零相依，只讀不寫）</p>
   <p class="small"><strong>指令要在放腳本的那個資料夾打。</strong>瀏覽器下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter —— 開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。Mac：打開終端機，先打 <code>cd ~/Downloads</code> 按 Enter。</p>
   <p><strong>步驟 2</strong>：看看你的遊戲裡有哪些語音封裝檔。把引號裡換成你的遊戲資料夾。</p>
   <p class="small">Windows:</p>
@@ -451,7 +451,7 @@
     <li><strong>本站沒驗的</strong> 這一課量到的是<u>外殼、聲道擺法、切法</u>，不含還原成聲音的那一步 —— 那一步在<a href="../make-voice/index.html">換掉遊戲的聲音</a>解開並驗證，本課自己沒有驗過任何一段還原出來的波形。另外「取樣率 48,000 Hz」<strong>還沒定案</strong>：那批檔自己標的是 22,050 Hz（8,767 個裡 7,841 個），跟 48,000 Hz 最多只能對一個，本站沒量出哪一個對。</li>
   </ul>
 
-  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <!-- course-strip:begin · 這一塊由產生器從 plan.html 產生，不要手改 -->
   <nav class="card course-strip" aria-label="這一課在課表的位置">
     <p class="card-h">📚 照課表上課的話</p>
     <p><a href="../../plan.html#f"><strong>⑥ 拆解班</strong></a> 第 4／5 堂</p>
@@ -594,12 +594,16 @@
      （那兩件事在<a href="../make-voice/index.html">換掉遊戲的聲音</a>那一課），
      只認 <code>SCHl</code> 開頭的語音檔，
      而聲音資料的切法<u>只在 <code>GSTR</code> 容器的編碼 3 上驗過</u>。</p>
+  <p class="small">想先確認這支腳本本身沒壞，可以跑 <code>python3 mvp_read_voice.py --selftest</code>
+     （Windows 打 <code>python</code>）。它不需要遊戲檔：拿程式裡拼出來的假語音檔，
+     把這支的每一道守門各下一個餌驗一次，全程在記憶體裡，一樣不寫檔、不建資料夾。
+     全過回 <code>0</code>，有一道沒過回 <code>1</code>。</p>
 
   <h2>完整原始碼</h2>
   <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。
      它<u>完全不會寫入任何檔案</u> —— 沒有任何寫檔呼叫，你可以自己搜一次確認。</p>
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（707 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1079 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
@@ -625,6 +629,7 @@ mvp_read_voice.py —— 讀懂 MVP Baseball 2005 的語音檔（唯讀，不會
     列出遊戲裡的語音   python3 mvp_read_voice.py "&lt;遊戲資料夾&gt;" --list
     看單一語音檔       python3 mvp_read_voice.py "&lt;某個 .dat&gt;"
     看內部區塊切法     python3 mvp_read_voice.py "&lt;某個 .dat&gt;" --blocks
+    自我測試           python3 mvp_read_voice.py --selftest    （不需要遊戲檔）
 
 ⚠️ 這支腳本**不會**把語音變成 WAV —— 這一課只負責讀懂結構。
    要匯出 WAV 或把你自己的聲音寫回去，用 make-voice 那一課的 mvp_audio.py。
@@ -654,6 +659,8 @@ mvp_read_voice.py —— 讀懂 MVP Baseball 2005 的語音檔（唯讀，不會
     整支腳本開檔一律是 'rb'，沒有任何 open(..., 'w')，你可以自己搜一次確認。
   · 回傳值：讀得懂是 0；讀不懂、找不到檔案、或路徑給的是資料夾卻沒加 --list，
     這三種都印一句人話然後回 2（不丟 traceback）。
+  · --selftest（2026-09-24 加）：在記憶體裡拿自己拼的假語音檔，把每一道守門驗一次，
+    一樣只印字、不開你的任何檔案。全過回 0，有一道沒過回 1，在 python3 -O 底下拒跑回 2。
 
 安全網
   · 唯讀是它的預設，也是它唯一的模式：沒有 --apply、沒有備份、也沒有還原功能，
@@ -712,7 +719,7 @@ mvp_read_voice.py —— 讀懂 MVP Baseball 2005 的語音檔（唯讀，不會
         —— 它比較像「PT 容器的記號」，不是「EA 原版的記號」。
 
 驗證方式很硬：**標籤解析消耗的長度必須等於檔頭宣告的長度** ——
-原版 6,995 個檔全部落在檔頭宣告長度的 1 個位元組容差內（程式第 460 行就是這樣判的：2,556 個剛好相等、4,439 個差 1）。
+原版 6,995 個檔全部落在檔頭宣告長度的 1 個位元組容差內（程式第 463 行就是這樣判的：2,556 個剛好相等、4,439 個差 1）。
 
 ─────────────────────────────────────────────────────────
  二、聲音資料怎麼擺（完全解開）
@@ -800,7 +807,7 @@ mvp_audio.py（--export / --import）。
 
 MIT License · Copyright (c) 2026 toni · 無外部相依，Python 3.7 以上
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 
 import argparse
 import os
@@ -1280,7 +1287,376 @@ def main():
         return 2
 
 
+# ─────────────────────────────────────────────────────────
+#  自我測試(--selftest,2026-09-24 加)
+# ─────────────────────────────────────────────────────────
+
+def selftest():
+    """--selftest:拿程式裡拼出來的假語音檔,把這支的每一道守門各驗一次。全過回 0。
+
+    ⚠️ 全程在記憶體裡。假資料是下面拼出來的位元組;要「開檔」的那兩條路
+       (--list 走資料夾、單一檔案讀進來)是暫時把 os.walk 與這支腳本用的 open
+       換成讀這些位元組的替身,跑完就換回去 —— 所以它跟這支腳本平常一樣:
+       不寫檔、不建資料夾,也不讀你電腦上的任何檔案。
+
+    每一道守門都有「餌」(故意餵它該擋的東西,沒擋就紅)與「陰性對照」
+    (餵正常的東西,它不該擋;少了這一半,一個什麼都擋的版本也會全綠):
+      一、外殼:開頭不是 SCHl、短到放不下一個區塊、區塊長度小於 8、
+          區塊長度超過檔尾 —— 四種都要停下來(DataError),不可以噴 traceback
+      二、沒有長度的那三個標籤:夾一個 0xFD 在中間,後面的聲道與取樣數照樣讀對
+      三、檔頭的硬驗證:標籤讀完的位置對不上宣告的長度時要打 ❌
+      四、取樣數的位元組序跟著容器走(PT 小端、GSTR 大端):各段加總要等於標籤
+      五、封裝檔目錄被截斷時只列得出來的那幾項、不丟例外;不是 BIGF 就回 None
+      六、聲道數小於 1 要停;兩聲道要切成一樣長的兩段
+      七、掃相位:連一組都放不下的聲道要回「量不出來」、畫面上不可以印成 -100%;
+          剛好一組的聲道要算得出來(2026-09-05 修掉的「少算最後一組」)
+      八、--blocks 只對 GSTR 容器的編碼 3 套擺法:PT 容器、編碼 2 都要停手
+      九、「若是 48000 Hz」那句推論只對 GSTR 容器的編碼 3 印
+      十、區塊鏈之後的尾巴:裡面還有 SCHl 就要說「後面還有語音」,不可以說成補齊
+      十一、--list:讀不懂的那一項跳過、不是 BIGF 的 .big 與一段語音都沒有的
+          封裝檔都不列,清單照樣列完;一個封裝檔都沒有時要說找不到
+      十二、命令列:讀不懂、找不到、給了資料夾卻沒加 --list(用替身丟出那個例外)
+          —— 三種都印一句話、回 2、不噴 traceback
+      十三、最上面那道「-O 拒跑」守門自己的餌
+    在 python3 -O 底下拒跑,回 2。
+    """
+    # -O 會把 assert 整段拿掉。這一段的判斷是下面那個 check(),-O 拿不掉它 ——
+    # 守門照樣要有:哪天有人在這裡補一句 assert,沒有它就會靜靜地變成假綠。
+    if _optimize_level():
+        print('--selftest 不能在 python3 -O 底下跑:-O 會把 assert 整段拿掉,'
+              '測試會變成一片假的綠燈。請拿掉 -O 再跑一次。')
+        return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
+    import contextlib
+    import io
+
+    print('自我測試(全程在記憶體裡,不開你的任何檔案、不建資料夾)')
+    tally = {'n': 0, 'bait': 0, 'fail': 0}
+
+    def check(ok, what, bait=False):
+        tally['n'] += 1
+        tally['bait'] += 1 if bait else 0
+        tally['fail'] += 0 if ok else 1
+        print('   %s %s%s' % ('✅' if ok else '❌', '餌:' if bait else '', what))
+
+    def quiet(fn, *a):
+        """跑 fn,把它印的字收起來。回傳 (回傳值,或它丟出來的例外, 印出來的字)。"""
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                r = fn(*a)
+        except Exception as e:
+            r = e
+        return r, buf.getvalue()
+
+    def stops(fn, *a):
+        """fn 有沒有照規矩停下來(丟 DataError,不是別的例外)。"""
+        return isinstance(quiet(fn, *a)[0], DataError)
+
+    def line_of(text, key):
+        return ''.join(x for x in text.splitlines() if key in x)
+
+    def tags(*pairs):
+        """把 (標籤, 值的位元組) 串成檔頭那串標籤;值是 None 的是沒有長度的那三種。"""
+        out = b''
+        for t, v in pairs:
+            out += bytes([t]) if v is None else bytes([t, len(v)]) + v
+        return out + b'\xff'
+
+    def voice(sub, tag_bytes, chunks, hdr_pad=0):
+        """拼一個語音檔:SCHl(檔頭)+ SCCl + 每一段一個 SCDl + SCEl。
+
+        sub 是第 8 到 11 個位元組;GSTR 的標籤從第 16 個開始、PT 從第 12 個開始
+        (跟 parse_voice 同一條規則)。chunks 是 [(取樣數, 內容)],取樣數照容器
+        選位元組序。hdr_pad 是故意多宣告的檔頭長度(給第三道的餌用)。
+        """
+        gstr = sub[:4] == b'GSTR'
+        body = sub + (b'\x00' * 4 if gstr else b'') + tag_bytes + b'\x00' * hdr_pad
+        out = b'SCHl' + struct.pack('&lt;I', 8 + len(body)) + body
+        out += b'SCCl' + struct.pack('&lt;II', 12, len(chunks))
+        for n, data in chunks:
+            out += (b'SCDl' + struct.pack('&lt;I', 12 + len(data))
+                    + struct.pack(('&gt;' if gstr else '&lt;') + 'I', n) + data)
+        return out + b'SCEl' + struct.pack('&lt;I', 8)
+
+    def groups(n, lead=b''):
+        """一個聲道:前置 lead + n 組 15 bytes(表頭 0x21,高半位元組是 2;其餘 0xF7)。"""
+        return lead + (b'\x21' + b'\xf7' * 14) * n
+
+    def stereo(left, right):
+        """兩聲道:起點表(大端序,0 與左聲道長度)+ 左聲道一整段 + 右聲道一整段。"""
+        return struct.pack('&gt;II', 0, len(left)) + left + right
+
+    def tg(codec, ch=None, samples=None, rate=None):
+        pairs = [(0x80, bytes([codec]))]
+        if ch is not None:
+            pairs.append((0x82, bytes([ch])))
+        if rate is not None:
+            pairs.append((0x84, rate.to_bytes(3, 'big')))
+        if samples is not None:
+            pairs.append((0x85, samples.to_bytes(4, 'big')))
+        return tags(*pairs)
+
+    good = voice(b'GSTR', tg(3, 2, 56), [(56, stereo(groups(2), groups(2)))])
+    pt3 = voice(b'PT\x00\x00', tg(3, None, 480), [(480, b'\x00' * 30)])
+
+    print('\n一、外殼')
+    v, _ = quiet(parse_voice, good)
+    check(isinstance(v, dict) and (v['codec'], v['channels'], v['samples']) == (3, 2, 56),
+          '陰性對照:拼好的 GSTR 語音檔讀得懂(編碼 3、2 聲道、56 取樣)')
+    # 餌用 SC 開頭但不是 SCHl 的(SCxl):區塊鏈走得下去,只有「開頭要是 SCHl」這一道擋得住它。
+    # 換成 RIFF 的話,下一道「一個區塊都走不出來」也會擋,這個餌就測不到它要測的那一道。
+    check(stops(parse_voice, b'SCxl' + good[4:]), '開頭是 SC 開頭的別的區塊(不是 SCHl)要停下來', True)
+    check(stops(parse_voice, b'SCHl\x00\x00'),
+          '只有 6 個位元組、一個區塊都放不下要停下來(不可以丟 IndexError)', True)
+    check(stops(parse_voice, b'SCHl' + struct.pack('&lt;I', 4) + good[8:]),
+          '區塊長度小於 8 要停下來(不然會停在原地打轉)', True)
+    check(stops(parse_voice, b'SCHl' + struct.pack('&lt;I', len(good) + 100) + good[8:]),
+          '區塊長度超過檔尾要停下來', True)
+
+    print('\n二、沒有長度的那三個標籤')
+    nov = voice(b'GSTR', tags((0x80, b'\x03'), (0xFD, None), (0x82, b'\x02'),
+                              (0x85, (56).to_bytes(4, 'big'))),
+                [(56, stereo(groups(2), groups(2)))])
+    v, _ = quiet(parse_voice, nov)
+    check(isinstance(v, dict) and (v['channels'], v['samples']) == (2, 56)
+          and v['tag_end'] == v['hdr_len'],
+          '0xFD 夾在中間(沒有長度也沒有值),後面的聲道數與取樣數照樣讀對', True)
+
+    print('\n三、檔頭的硬驗證')
+    _, out = quiet(describe, voice(b'GSTR', tg(3, 2, 56), [(56, stereo(groups(2), groups(2)))],
+                                   hdr_pad=5), 'pad.dat')
+    check('❌' in line_of(out, '標籤解析到'), '檔頭多宣告了 5 個位元組,要打 ❌', True)
+    _, out = quiet(describe, good, 'good.dat')
+    check('✅' in line_of(out, '標籤解析到'), '陰性對照:剛好對得上就打 ✅')
+
+    print('\n四、取樣數的位元組序跟著容器走')
+    _, out = quiet(describe, voice(b'PT\x00\x00', tg(3, None, 300),
+                                   [(100, b'\x00' * 30), (200, b'\x00' * 30)]), 'pt.dat')
+    check('各段取樣加總 300 = 標籤說的 300' in out, 'PT 容器的各段照小端讀,加總等於標籤的 300', True)
+    _, out = quiet(describe, voice(b'GSTR', tg(3, 1, 300),
+                                   [(100, b'\x00' * 30), (200, b'\x00' * 30)]), 'gs.dat')
+    check('各段取樣加總 300 = 標籤說的 300' in out, '陰性對照:GSTR 容器照大端讀,一樣對得上')
+
+    print('\n五、封裝檔目錄')
+
+    def bigf(items, count=None):
+        """拼一個 BIGF:檔頭 16 bytes + 目錄(位移、大小、名稱 + 0x00)+ 資料。"""
+        dlen = sum(8 + len(n) + 1 for n, _ in items)
+        d, blob = b'', b''
+        for n, data in items:
+            d += struct.pack('&gt;II', 16 + dlen + len(blob), len(data)) + n + b'\x00'
+            blob += data
+        return (b'BIGF' + struct.pack('&lt;I', 16 + dlen + len(blob))
+                + struct.pack('&gt;II', len(items) if count is None else count, dlen) + d + blob)
+
+    three = bigf([(b'a.dat', good), (b'b.dat', good), (b'c.dat', good)])
+    r, _ = quiet(big_entries, three)
+    check(isinstance(r, list) and [x[0] for x in r] == ['a.dat', 'b.dat', 'c.dat'],
+          '陰性對照:完整的目錄三項都列得出來')
+    cut = 16 + (8 + 6) + 8 + 3          # 第二項的名稱切在一半,沒有結尾的 0x00
+    r, _ = quiet(big_entries, three[:cut])
+    check(isinstance(r, list) and [x[0] for x in r] == ['a.dat'],
+          '目錄在名稱中間被截斷時,只列出完整的那一項,不丟例外', True)
+    cut = 16 + (8 + 6) + 4              # 第二項的位移與大小那 8 個位元組只剩一半
+    r, _ = quiet(big_entries, three[:cut])
+    check(isinstance(r, list) and [x[0] for x in r] == ['a.dat'],
+          '目錄在位移與大小那一欄被截斷時,一樣只列出完整的那一項', True)
+    check(quiet(big_entries, b'BIGX' + three[4:])[0] is None, '開頭不是 BIGF 就回 None', True)
+
+    print('\n六、聲道')
+    check(stops(split_channels, b'\x00' * 16, 0), '聲道數 0 要停下來', True)
+    r, _ = quiet(split_channels, stereo(groups(1), groups(1)), 2)
+    check(isinstance(r, list) and [len(x[1]) for x in r] == [15, 15],
+          '陰性對照:兩聲道切成一樣長的兩段(各 15 bytes)')
+
+    print('\n七、掃相位')
+    check(find_phase(b'\x21' * 10)[1] &lt; 0, '不到一組(10 bytes)要回「量不出來」', True)
+    check(find_phase(groups(1)) == (0, 1.0), '剛好一組(15 bytes)要算得出來,不可以漏掉最後一組', True)
+    check(find_phase(groups(4, lead=b'\xf7' * 3)) == (3, 1.0),
+          '陰性對照:前面有 3 個位元組前置時,相位掃到第 3 格、100%')
+    tiny = parse_voice(voice(b'GSTR', tg(3, 2, 0), [(0, stereo(b'\x21' * 10, b'\x21' * 10))]))
+    _, out = quiet(show_blocks, tiny)
+    check('量不出來' in out and '-100' not in out,
+          '--blocks 遇到不到一組的聲道,印「量不出來」而不是 -100%', True)
+
+    print('\n八、--blocks 只對 GSTR 容器的編碼 3 套擺法')
+    _, out = quiet(show_blocks, parse_voice(pt3))
+    check('不套上去' in out and '表頭高半位元組' not in out, 'PT 容器的編碼 3 停手,不套擺法', True)
+    _, out = quiet(show_blocks, parse_voice(voice(b'GSTR', tg(2, 2, 56),
+                                                  [(56, stereo(groups(2), groups(2)))])))
+    check('本站只解開了' in out and '表頭高半位元組' not in out, '編碼 2 停手,不套擺法', True)
+    _, out = quiet(show_blocks, parse_voice(good))
+    check('切法正確' in out and '✅' in out, '陰性對照:GSTR 容器的編碼 3 照套,印「切法正確」')
+
+    print('\n九、48000 Hz 那句推論')
+    _, out = quiet(describe, pt3, 'pt3.dat')
+    check('48000' not in out and '不換算秒數' in out, 'PT 容器的編碼 3 沒標取樣率,不替它換算秒數', True)
+    _, out = quiet(describe, voice(b'GSTR', tg(3, 1, 48000), [(48000, b'\x00' * 30)]), 'g.dat')
+    check('若是 48000 Hz 則為 1.00 秒' in out, '陰性對照:GSTR 容器的編碼 3 才印那句推論')
+
+    print('\n十、區塊鏈之後的尾巴')
+    _, out = quiet(describe, good + good, 'two.dat')
+    check('後面還沒讀的語音' in out, '尾巴裡還有一段 SCHl,要說「後面還有語音」,不可以說成補齊', True)
+    _, out = quiet(describe, good + b'\x00' * 16, 'pad2.dat')
+    check('補齊' in out and '後面還沒讀的語音' not in out, '陰性對照:尾巴只有 0,才說是補齊')
+
+    # 下面兩道要「開檔」,所以暫時換上替身:os.walk 只回報下面這張表裡的名字,
+    # 這支腳本用的 open 只從這張表拿位元組。finally 一定換回去。
+    table = {}
+
+    def fake_walk(top, *a, **k):
+        yield top, [], sorted(table)
+
+    def fake_open(path, mode='r', *a, **k):
+        name = os.path.basename(path)
+        if isinstance(table.get(name), BaseException):
+            raise table[name]
+        if name not in table:
+            raise FileNotFoundError(2, '(自我測試的替身)沒有這個檔', path)
+        return io.BytesIO(table[name])
+
+    def with_fakes(fn, *a):
+        g = globals()
+        real_walk = os.walk
+        os.walk = fake_walk
+        g['open'] = fake_open
+        try:
+            return quiet(fn, *a)
+        finally:
+            os.walk = real_walk
+            del g['open']
+
+    def run_main(*argv):
+        real_argv = sys.argv
+        sys.argv = ['mvp_read_voice.py'] + list(argv)
+        try:
+            return with_fakes(main)
+        finally:
+            sys.argv = real_argv
+
+    fake_dir = os.path.join('自我測試用的假資料夾', '不會真的去讀')
+    broken = b'SCHl' + struct.pack('&lt;I', 4) + b'\x00' * 12
+    print('\n十一、--list')
+    table.update({'voice.big': bigf([(b'a.dat', good), (b'b.dat', broken), (b'c.txt', b'hello')]),
+                  'other.big': b'NOTBIGF' + b'\x00' * 20,
+                  'nothing.big': bigf([(b'x.txt', b'hello')]), 'notes.txt': b'x'})
+    _, out = with_fakes(cmd_list, fake_dir)
+    check('2 個語音' in line_of(out, 'voice.big') and '3×1' in line_of(out, 'voice.big'),
+          '讀不懂的那一項跳過,清單照樣列完(2 個語音、讀得懂的 1 個是編碼 3)', True)
+    check('other.big' not in out, '不是 BIGF 的 .big 跳過,不列出來', True)
+    check('nothing.big' not in out, '是 BIGF 但裡面一段語音都沒有的,也不列出來', True)
+    table.clear()
+    table.update({'voice.big': bigf([(b'a.dat', good), (b'b.dat', good)])})
+    _, out = with_fakes(cmd_list, fake_dir)
+    check('3×2' in line_of(out, 'voice.big'), '陰性對照:兩項都讀得懂時兩項都算進去(3×2)')
+    table.clear()
+    table.update({'notes.txt': b'x'})
+    _, out = with_fakes(cmd_list, fake_dir)
+    check('沒有找到語音封裝檔' in out, '陰性對照:一個封裝檔都沒有時,說找不到')
+
+    print('\n十二、命令列')
+    table.clear()
+    table.update({'good.dat': good, 'bad.dat': b'RIFF' + b'\x00' * 20,
+                  '一個資料夾': IsADirectoryError(21, '(自我測試的替身)這是資料夾')})
+    rc, out = run_main('good.dat')
+    check(rc == 0 and '✅' in line_of(out, '標籤解析到'), '陰性對照:讀得懂的檔回 0')
+    rc, out = run_main('bad.dat')
+    check(rc == 2 and '停下來了' in out and 'Traceback' not in out,
+          '讀不懂的檔印一句話、回 2、不噴 traceback', True)
+    rc, out = run_main('沒有這個檔.dat')
+    check(rc == 2 and '找不到檔案' in out, '找不到檔案時印一句話、回 2', True)
+    rc, out = run_main('一個資料夾')
+    check(rc == 2 and '--list' in out, '給了資料夾卻沒加 --list,提示要加 --list、回 2', True)
+    table.clear()
+
+    print('\n十三、-O 守門')
+    check(_opt[0], '假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試拒跑、結束碼 2', True)
+    check(_opt[1], '陰性對照:換回原本那一支之後,沒開 -O 的時候守門放行')
+
+    print()
+    if tally['fail']:
+        print('自我測試:有 %d 道沒過(共 %d 道)' % (tally['fail'], tally['n']))
+        return 1
+    print('自我測試:全部通過(%d 道檢查,其中 %d 道是餌)' % (tally['n'], tally['bait']))
+    return 0
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。這支的 --selftest 跟這道守門是 2026-09-24 一起加的。
+#  守門不直接問 sys.flags.optimize:那是唯讀的,同一個程序裡沒辦法把 -O
+#  打開又關掉,直接問它的話這道守門就下不了餌 —— 哪天被拆掉,自我測試照樣全綠。
+#  所以守門問的是 _optimize_level(),自我測試可以暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
+
+
 if __name__ == '__main__':
+    # --selftest 不需要路徑,所以在 argparse 之前就攔下來(argparse 會要求一定要給路徑)。
+    if '--selftest' in sys.argv[1:]:
+        # 跟 main() 開頭那一段同一個理由:輸出導到檔案或管線時,cp950 編不出 ✅ ❌,
+        # 不處理就會在第二行丟 UnicodeEncodeError。一樣只把編不出來的字換成問號。
+        try:
+            sys.stdout.reconfigure(errors='replace')
+        except (AttributeError, ValueError):
+            pass
+        sys.exit(selftest())
     sys.exit(main())
 
 
@@ -1326,6 +1702,6 @@ if __name__ == '__main__':
   </footer>
 </div>
 
-<script src="../../assets/site.js?v=12835e693d" defer></script>
+<script src="../../assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

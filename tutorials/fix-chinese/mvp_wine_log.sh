@@ -1,5 +1,5 @@
 #!/bin/bash
-# TOOL_DATE = '2026-09-23'
+# TOOL_DATE = '2026-09-24'
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -8,7 +8,7 @@
 #    MVP Baseball 2005 為 Electronic Arts 之作品與商標。
 #  · 本工具為原創程式碼,**不含任何 EA 的程式碼或資產**。
 #  · 本工具不提供、不教學、也不包含任何規避技術保護措施的功能。
-#    它只設兩個環境變數(WINEDEBUG 與 WINEPREFIX)並把畫面訊息錄成一份 log,
+#    它只設一個環境變數(WINEDEBUG;WINEPREFIX 沿用你自己設的)並把畫面訊息錄成一份 log,
 #    腳本自己不寫入遊戲資料夾裡的任何檔案。
 #  · 使用者應僅對自己合法取得的遊戲副本使用本工具,並自行承擔風險。
 #    使用前請自行確認你與遊戲發行商之間的使用者授權合約(EULA)。
@@ -29,7 +29,7 @@
 #  而真正實作 OutputDebugStringA 的是 kernelbase.dll。
 #  所以這支腳本現在的用處是收 +seh 的當機現場,不要指望它讀得到字串內容。
 #
-#  平常的啟動腳本設的是 WINEDEBUG="-all"(全部關掉),所以連 seh 都看不到。
+#  照「在 Mac 上玩 MVP 2005」那一課啟動時沒有設 WINEDEBUG,Wine 預設只開 err 與 fixme,seh 的追蹤訊息(trace:seh)不會印出來。
 #  這支腳本只設環境變數並把訊息錄成一份 log,自己不寫入遊戲資料夾裡的任何檔案。
 #
 #  用法(遊戲資料夾是必填,把資料夾拖進終端機就會自動填):
@@ -47,25 +47,44 @@
 #  遮蔽版產完會自己複驗,只要還找得到家目錄、帳號名稱,或是 Users、Home 資料夾
 #  (不分大小寫;前後的分隔符號是 \ 或 /,前面有沒有磁碟機代號都算)
 #  後面還接著沒換掉的名字,就刪掉它並以非 0 離開。
+#  刪不掉(權限、唯讀)時會照實說,只印那一份的檔名,請你自己刪。
 #  複驗認不得的一種寫法,寫在下面 has_unmasked_user_dir 前面的說明裡。
 #
 #  想換 Wine 的除錯旗標,跑之前設 WINEDEBUG_MODE,例如
 #    WINEDEBUG_MODE=+seh bash mvp_wine_log.sh "<遊戲資料夾>"
-#  啟動遊戲時會先 cd 進遊戲資料夾(跟本站啟動器同一個條件),
-#  而且只有遊戲資料夾底下懶人包那一層裡真的有 wineprefix 時,才設 WINEPREFIX。
+#  啟動遊戲時會先 cd 進遊戲資料夾(跟「在 Mac 上玩 MVP 2005」那一課第 5 步同一個做法)。
 #
-#  安全:遊戲資料夾裡懶人包那一層的 .wine_path 是「別人做的懶人包也可能夾帶」的設定檔,
-#  它的內容會被當成程式執行。所以這裡不只看檔名,還要求解開符號連結之後的
+#  Wine 環境(WINEPREFIX)沿用你自己設的,這支腳本不另外指定:
+#  照那一課 export 過 WINEPREFIX 的話,在同一個終端機視窗裡跑,用的就是同一個環境;
+#  沒設就是 Wine 的預設環境(~/.wine)。
+#  設了卻指到不存在的資料夾、或不是 / 開頭的完整路徑,就停下來不跑。兩種情況不一樣:
+#  · 指到不存在的資料夾:Wine 會試著在那裡另外建一個全新的環境,
+#    量到的就不是你平常玩的那一個。
+#  · 不是 / 開頭(相對路徑):Wine 自己就會拒絕,遊戲根本跑不起來
+#    (它只印一句英文 invalid directory ... in WINEPREFIX: not an absolute path 就結束)。
+#    這支腳本先在這裡擋下來、用中文講清楚,桌面上也不會多一份沒量到東西的 log。
+#
+#  Wine 在哪裡:有設 MVP_WINE 就用它指的那一支,沒設就照腳本自己寫死的清單依序找
+#  (Homebrew / MacPorts / CrossOver / Whisky / /usr/bin)。清單找不到你的 Wine 時,
+#  在指令前面加 MVP_WINE="<Wine 的完整路徑>"。完整路徑可以在 wine --version
+#  跑得起來的終端機視窗裡打 which wine 看。
+#  遊戲資料夾裡的任何檔,都不會被拿來決定要用哪一支 Wine ——
+#  別人做的懶人包夾帶什麼,都不會被當成 Wine 跑起來。
+#  (TOOL_DATE 2026-09-24 之前的版本會讀遊戲資料夾裡一個叫 .wine_path 的設定檔。
+#   那是班主任自己的啟動工具寫的,讀者手上不會有,所以拿掉了。)
+#
+#  安全:MVP_WINE 指到的東西會被當成程式執行。所以這裡不只看檔名,還要求解開符號連結之後的
 #  絕對路徑落在下面那張白名單裡(Homebrew / MacPorts / /usr/bin /
 #  Wine 或 CrossOver 或 Whisky 的 app 套件 / Linux 的 wine 套件目錄),
 #  而且那個檔必須是「一般檔案、有執行位元」。
 #  腳本自己寫死的那張自動搜尋清單走的是同一道關卡 —— 不是「寫死的就免驗」。
-#  .wine_path 不合格就整條忽略,改用自動搜尋清單。
+#  MVP_WINE 不合格就停下來,不會默默改用清單裡的另一支:
+#  你指定了一支、實際跑的卻是另一支,量到的就不是你以為的那一個。
 #
 #  ⚠️ 這道關卡只看三件事:路徑前綴、檔名、是不是可以執行的一般檔案。
 #     它**不驗簽章、也不看檔案內容**。如果有人有辦法把東西放進
 #     /opt/homebrew/bin/ 並且取名叫 wine,這裡照樣會執行它。
-#     它擋的是「別人做的懶人包夾帶一個 .wine_path」,不是「系統已經被入侵」。
+#     它擋的是「路徑打錯、指到來路不明的程式」,不是「系統已經被入侵」。
 #
 #  寫檔:這支腳本只在桌面(桌面不在就家目錄)建兩個檔 —— 原始 log 與遮蔽版。
 #  兩個都用 O_EXCL 新建,不覆蓋既有檔;目的檔如果是符號連結就直接停下來,
@@ -97,6 +116,8 @@ CREATE_FAIL_REASON=""
 # 是兩個動作,Ctrl+C 剛好落在中間的話,收尾就會照舊的登記說「什麼都還沒建立」——
 # 那是說謊,桌面上其實已經多了一個檔。所以每個檔各有三態,
 # 而且「建檔 + 登記」整段包在不可中斷區裡(begin_uninterruptible)。
+# 遮蔽版另外多一態 kept_failed:複驗跑完了、沒過,而且刪不掉(見 discard_share)。
+# 它不可以跟 unverified 共用 —— 那一態收尾會說「還沒跑完複驗」,這時說就是假話。
 LOG=""
 LOG_CAND=""
 LOG_STATE=none
@@ -122,9 +143,11 @@ end_uninterruptible() {
     fi
 }
 
-# 中斷時要講的話。三態各有各的說法,不可以一律說「什麼都還沒動」。
+# 中斷時要講的話。每一態各有各的說法,不可以一律說「什麼都還沒動」。
 # 順序有意義:「正在建遮蔽版」要排在「遊戲已經啟動」前面 ——
 # 遮蔽版是遊戲跑完才建的,兩個條件會同時成立,排錯就永遠說不到遮蔽版那一句。
+# kept_failed(沒通過複驗、刪不掉)同理,要排在 GAME_DONE 前面;
+# 它只印檔名不印完整路徑,理由跟 discard_share 一樣。
 interrupt_report() {
     echo ""
     echo "  ⚠️  你按了 Ctrl+C,這一輪中斷。"
@@ -140,6 +163,11 @@ interrupt_report() {
         echo "     中斷時正在建立遮蔽版:$SHARE_CAND"
         echo "     那個檔可能已經建好了(內容可能只有一半),自己看一眼再決定要不要刪。"
         echo "     原始 log 在:$LOG"
+    elif [ "$SHARE_STATE" = "kept_failed" ]; then
+        echo "     遊戲已經結束了,log 收完整了(檔名 ${LOG##*/})。"
+        echo "     遮蔽版沒有通過複驗,而且刪不掉,那一份還留著,檔名是 ${SHARE##*/}"
+        echo "     它跟原始 log 在同一個資料夾。裡面可能還有家目錄或帳號名稱,"
+        echo "     請自己把它刪掉,不要貼出去。"
     elif [ "$GAME_DONE" -eq 1 ]; then
         echo "     遊戲已經結束了,log 收完整了:$LOG"
         echo "     被中斷的是後面的整理,所以還沒有可以貼出去的遮蔽版 ——"
@@ -429,7 +457,42 @@ has_unmasked_user_dir() {
     return 0
 }
 
-# ═══ --selftest:每一道守門配一個餌,證明它真的會擋 ═══════════
+# 丟掉沒通過複驗的遮蔽版($SHARE)。刪掉了沒有,要看刪完之後檔案還在不在,
+# 不可以只看有沒有下 rm:檔案被鎖、資料夾變成唯讀、外接碟出問題,rm 都會失敗,
+# 而那一份正是「沒驗過、裡面可能還留著帳號名稱」的檔 —— 說成已經刪掉,讀者會以為安全。
+# (2026-09-24 之前主流程只下 rm、不看結果,刪不掉也照樣印「已經刪掉」。)
+# 刪不掉時只印檔名,不印完整路徑:完整路徑裡就有帳號名稱,而這一段常被整段貼出去問人。
+# rm 自己的錯誤訊息也會帶著完整路徑,所以丟掉不印。
+# 回傳 0 = 刪掉了(SHARE 清空、SHARE_STATE=none);
+# 回傳 1 = 刪不掉(SHARE 留著、SHARE_STATE=kept_failed)。
+# 刪不掉時不可以沿用 unverified:那一態的收尾說的是「還沒跑完複驗就被中斷了」,
+# 而這時複驗已經跑完、沒過,那句是假話,而且它會印完整路徑。
+# kept_failed 的收尾照實說「沒通過複驗、刪不掉」,只印檔名(--selftest 的餌 18b、18c、18d 測它)。
+# 登記要在 end_uninterruptible 之前改好:Ctrl+C 若落在 rm 那一段,
+# end_uninterruptible 會當場收尾並離開,後面那幾行 echo 根本輪不到 ——
+# 讀者看到的只有收尾那一段,所以那一段本身就要把話說完整。
+discard_share() {
+    local p="$SHARE"
+    begin_uninterruptible
+    rm -f -- "$p" 2>/dev/null
+    if [ -e "$p" ] || [ -L "$p" ]; then
+        SHARE_STATE=kept_failed
+        end_uninterruptible
+        echo "  ❌ 遮蔽版沒有通過複驗,而且刪不掉(可能是權限、唯讀或磁碟的問題)。"
+        echo "     那一份還留著,檔名是 ${p##*/}"
+        echo "     它跟原始 log 在同一個資料夾。裡面可能還有家目錄或帳號名稱,"
+        echo "     請自己把它刪掉,不要貼出去。"
+        return 1
+    fi
+    SHARE=""
+    SHARE_STATE=none
+    end_uninterruptible
+    echo "  ❌ 遮蔽版沒有通過複驗,已經刪掉,不留一份「以為安全」的檔。"
+    return 0
+}
+
+# ═══ --selftest:替守門下餌,證明它真的會擋(不是每一道都有) ═══════════
+# 例如「執行檔是符號連結就不跑」那一道沒有餌:2026-09-24 把它拆掉,自我測試照樣全綠。
 # 這支是 shell,不是 Python:沒有 assert,也沒有「會把 assert 整個拿掉」的最佳化模式,
 # 所以不存在「換個旗標跑就變假綠」的情況,也就沒有對應的守門可以加。
 # 每一項都是明寫的 if / else,結果各自呼叫 st_ok / st_bad 累加 selftest_fail,
@@ -452,10 +515,29 @@ src_line_no() {
     printf '%s\n' "$hits"
 }
 
+# 餌 18b、18c、18d 共用:「沒通過複驗、刪不掉」之後被中斷時,收尾那一段說的話對不對。
+# $1 = 收尾印出來的字,$2 = 不可以出現的路徑(沙盒),$3 = 一定要印出來的檔名。
+# 印出第一個不對的地方;全部對就什麼都不印。
+kept_report_why() {
+    local out="$1" dir="$2" name="$3"
+    if printf '%s' "$out" | grep -q "還沒跑完複驗"; then
+        echo "說成「還沒跑完複驗」(其實跑完了,是沒過)"
+    elif printf '%s' "$out" | grep -qF "$dir"; then
+        echo "印出了完整路徑(只該印檔名)"
+    elif ! printf '%s' "$out" | grep -q "刪不掉"; then
+        echo "沒有說刪不掉"
+    elif ! printf '%s' "$out" | grep -qF "$name"; then
+        echo "沒印出是哪一個檔"
+    elif ! printf '%s' "$out" | grep -q "不要貼出去"; then
+        echo "沒提醒不要貼出去"
+    fi
+}
+
 run_selftest() {
-    local sb marker out rc real_wine n state
+    local sb marker out rc real_wine n state why
     local fakehome_real whisky_bin
-    local ln_guard ln_run ln_start ln_done ln_share ln_create ln_ok1 ln_resid ln_created
+    local self_abs game_real rec_ok rec_bad want mvp_wine_ok _ld
+    local ln_guard ln_run ln_start ln_done ln_share ln_create ln_ok1 ln_resid ln_created ln_discard
     sb=$(mktemp -d "${TMPDIR:-/tmp}/mvp_wine_log_selftest.XXXXXX") || return 1
     echo ""
     echo "  ═══ mvp_wine_log.sh 自我測試 ═══"
@@ -749,25 +831,176 @@ run_selftest() {
         st_bad "陰性對照:一般檔也寫不出遮蔽版"
     fi
 
-    # ── 端到端:整支腳本吃一個夾帶 .wine_path 的假遊戲資料夾
+    # ── 端到端:整支腳本真的跑一次,在沙盒裡
+    # 假 HOME 用解過符號連結的那一個(理由同餌 4b:Whisky 那條白名單是拿 $HOME 比的)。
+    # 白名單裡放兩支假 wine:它們被執行時只把「收到的 WINEPREFIX | 工作目錄 | 第一個參數」
+    # 寫進一個紀錄檔,不做別的事。有沒有那個紀錄檔,就是「它有沒有被跑起來」。
+    # ⚠️ 每一次都把 MVP_WINE 設成白名單裡那支假 wine(不然會照清單找到這台真的 Wine),
+    #    只有餌 14、15 例外 —— 那兩次遊戲資料夾裡還沒有執行檔,走不到啟動那一步。
+    #    放了執行檔之後的那四項,要先過一道安全閥(下面那個陰性對照)才會跑。
     if [ -r "$0" ]; then
-        mkdir -p "$sb/game/launcher" "$sb/fakehome"
-        _ld="$sb/game/launcher"; printf '%s\n' "$sb/evil/wine-helper" > "$_ld/.wine_path"
+        self_abs="$(cd "$(dirname "$0")" && pwd -P)/$(basename "$0")"
+        mkdir -p "$sb/game" "$sb/fakehome" "$sb/prefix_ok"
+        fakehome_real=$(cd "$sb/fakehome" && pwd -P)
+        game_real=$(cd "$sb/game" && pwd -P)
+        whisky_bin="$fakehome_real/Library/Application Support/Whisky/Libraries/Wine/bin"
+        mkdir -p "$whisky_bin"
+        rec_ok="$sb/ran_mvp_wine"
+        rec_bad="$sb/ran_wine_path"
+        cat > "$whisky_bin/wine64" <<EOF
+#!/bin/sh
+printf '%s|%s|%s\n' "\${WINEPREFIX-<unset>}" "\$(pwd -P)" "\$1" > "$rec_ok"
+EOF
+        cat > "$whisky_bin/wine" <<EOF
+#!/bin/sh
+printf '%s\n' "\$1" > "$rec_bad"
+EOF
+        chmod 755 "$whisky_bin/wine64" "$whisky_bin/wine"
+
+        # ── 餌 14:MVP_WINE 指到沙盒裡一支自製程式 → 停下來、講理由、不執行、也不改用別的 Wine
         rm -f "$marker"
-        out=$(HOME="$sb/fakehome" bash "$0" "$sb/game" 2>&1); rc=$?
+        out=$(HOME="$fakehome_real" WINEPREFIX="" MVP_WINE="$sb/evil/wine-helper" \
+              bash "$self_abs" "$sb/game" 2>&1); rc=$?
         if [ -e "$marker" ]; then
-            st_bad "端到端:夾帶的程式被執行了"
-        elif [ "$rc" -eq 0 ]; then
-            st_bad "端到端:應該非 0 離開,實際是 0"
+            st_bad "餌 14:MVP_WINE 指到的自製程式被執行了"
+        elif [ "$rc" -ne 1 ]; then
+            st_bad "餌 14:應該以 1 離開,實際是 $rc"
         elif ! printf '%s' "$out" | grep -q "不執行它"; then
-            st_bad "端到端:離開碼 $rc,但沒印出「不執行它」"
+            st_bad "餌 14:離開碼 $rc,但沒印出「不執行它」"
         elif ! printf '%s' "$out" | grep -q "不合格:..*"; then
             # 冒號後面必須真的有理由。理由存在全域變數裡,一旦有人把呼叫改回
             # WINE_BIN=$(validate_wine_bin ...),函式就跑在子行程,理由會消失,
             # 畫面上只剩一個冒號 —— 這個坑實際踩過,所以留一個餌守著。
-            st_bad "端到端:被拒了,但沒說理由(冒號後面是空的)"
+            st_bad "餌 14:被拒了,但沒說理由(冒號後面是空的)"
+        elif printf '%s' "$out" | grep -q "找不到 Wine\|找不到執行檔"; then
+            st_bad "餌 14:被拒之後還繼續往下找(應該當場停下來,不改用別的 Wine)"
         else
-            st_ok "端到端:夾帶的 .wine_path 被拒(有寫理由),離開碼 $rc,餌沒被執行"
+            st_ok "餌 14:MVP_WINE 指到沙盒裡的程式被拒(有寫理由),離開碼 $rc,沒有改用別的 Wine,餌沒被執行"
+        fi
+
+        # ── 餌 15:遊戲資料夾裡夾帶舊版會讀的 .wine_path → 現在一個字都不讀
+        # 這一條是絆線:有人把「讀 .wine_path」加回來,它指的那條路徑會被驗、被拒,
+        # 畫面上就會出現那條路徑。加回來、默默放行、而且排在 MVP_WINE 前面的那一種,
+        # 要靠下面的端到端(乙)抓;排在 MVP_WINE 後面又默默放行的那一種,這兩項都抓不到。
+        _ld="$sb/game/launcher"; mkdir -p "$_ld"
+        printf '%s\n' "$sb/evil/wine-helper" > "$_ld/.wine_path"
+        printf '%s\n' "$sb/evil/wine-helper" > "$sb/game/.wine_path"
+        rm -f "$marker"
+        out=$(HOME="$fakehome_real" WINEPREFIX="" MVP_WINE="" bash "$self_abs" "$sb/game" 2>&1); rc=$?
+        if [ -e "$marker" ]; then
+            st_bad "餌 15:遊戲資料夾裡夾帶的程式被執行了"
+        elif printf '%s' "$out" | grep -qF "$sb/evil/wine-helper"; then
+            st_bad "餌 15:遊戲資料夾裡的 .wine_path 被讀了(畫面上出現它寫的那條路徑)"
+        elif [ "$rc" -eq 0 ]; then
+            st_bad "餌 15:遊戲資料夾裡沒有執行檔,卻以 0 離開"
+        else
+            st_ok "餌 15:遊戲資料夾裡夾帶的 .wine_path 一個字都沒被讀,離開碼 $rc"
+        fi
+
+        # ── 陰性對照:MVP_WINE 指到白名單裡正常的一支 → 要被採用(停在找執行檔那一步)
+        # 這一項也是後面四項的安全閥:後面那四項的遊戲資料夾裡有執行檔,
+        # MVP_WINE 萬一沒被採用,腳本會照清單找到這台真的 Wine,把它跑起來。
+        rm -f "$rec_ok" "$rec_bad"
+        out=$(HOME="$fakehome_real" WINEPREFIX="" MVP_WINE="$whisky_bin/wine64" \
+              bash "$self_abs" "$sb/game" 2>&1); rc=$?
+        mvp_wine_ok=0
+        if [ "$rc" -ne 1 ]; then
+            st_bad "陰性對照:MVP_WINE 正常、沒有執行檔,應該以 1 離開,實際是 $rc"
+        elif ! printf '%s' "$out" | grep -qF "使用你指定的 Wine(MVP_WINE):$whisky_bin/wine64"; then
+            st_bad "陰性對照:白名單裡正常的 MVP_WINE 沒有被採用"
+        elif ! printf '%s' "$out" | grep -q "找不到執行檔"; then
+            st_bad "陰性對照:MVP_WINE 採用之後沒有走到找執行檔那一步"
+        elif [ -e "$rec_ok" ]; then
+            st_bad "陰性對照:沒有執行檔,那支假 wine 卻被跑了"
+        else
+            st_ok "陰性對照:白名單裡正常的 MVP_WINE 被採用,停在找執行檔那一步,離開碼 $rc"
+            mvp_wine_ok=1
+        fi
+
+        if [ "$mvp_wine_ok" -ne 1 ]; then
+            st_bad "餌 16、17 與端到端(甲)(乙)沒有跑:MVP_WINE 沒被採用,跑下去會啟動這台真的 Wine"
+        else
+            # 從這裡開始遊戲資料夾裡有一支(空的)執行檔:守門沒擋住的話,假 wine 會真的被跑起來。
+            : > "$sb/game/mvp2005.exe"
+
+            # ── 餌 16:WINEPREFIX 指到不存在的資料夾 → 啟動之前就停下來
+            rm -f "$rec_ok" "$rec_bad"
+            out=$(HOME="$fakehome_real" WINEPREFIX="$sb/no_such_prefix" MVP_WINE="$whisky_bin/wine64" \
+                  bash "$self_abs" "$sb/game" 2>&1); rc=$?
+            if [ -e "$rec_ok" ]; then
+                st_bad "餌 16:WINEPREFIX 不存在,遊戲還是被啟動了"
+            elif [ "$rc" -ne 1 ]; then
+                st_bad "餌 16:應該以 1 離開,實際是 $rc"
+            elif ! printf '%s' "$out" | grep -q "WINEPREFIX 指到的資料夾不存在"; then
+                st_bad "餌 16:離開碼 1,但沒說是 WINEPREFIX 不存在"
+            elif [ -e "$sb/no_such_prefix" ]; then
+                st_bad "餌 16:那個不存在的資料夾被建出來了"
+            elif ls "$fakehome_real"/mvp_debug_*.log >/dev/null 2>&1; then
+                st_bad "餌 16:擋下來之前已經建了 log 檔"
+            else
+                st_ok "餌 16:WINEPREFIX 指到不存在的資料夾被擋,離開碼 1,遊戲沒啟動、一個檔都沒建"
+            fi
+
+            # ── 餌 17:WINEPREFIX 是相對路徑 → Wine 自己會拒絕啟動,腳本要先擋下來、用中文講清楚
+            # 從沙盒裡跑,讓 prefix_ok 這個相對路徑「在當下是存在的」——
+            # 不然沒有這一道,後面那道「資料夾不存在」也會把它擋掉,這個餌就亮不起來。
+            rm -f "$rec_ok" "$rec_bad"
+            out=$(cd "$sb" && HOME="$fakehome_real" WINEPREFIX="prefix_ok" MVP_WINE="$whisky_bin/wine64" \
+                  bash "$self_abs" "$sb/game" 2>&1); rc=$?
+            if [ -e "$rec_ok" ]; then
+                st_bad "餌 17:WINEPREFIX 是相對路徑,遊戲還是被啟動了"
+            elif [ "$rc" -ne 1 ]; then
+                st_bad "餌 17:應該以 1 離開,實際是 $rc"
+            elif ! printf '%s' "$out" | grep -q "WINEPREFIX 要寫完整路徑"; then
+                st_bad "餌 17:離開碼 1,但沒說是相對路徑"
+            else
+                st_ok "餌 17:WINEPREFIX 是相對路徑被擋,離開碼 1,遊戲沒啟動"
+            fi
+
+            # ── 端到端(甲):MVP_WINE 與 WINEPREFIX 都正常 → 從頭跑到尾
+            # 驗四件事:跑起來的是 MVP_WINE 那一支、WINEPREFIX 原樣傳給它、
+            # 工作目錄是遊戲資料夾、第一個參數是遊戲資料夾裡的那支執行檔。
+            # 這也是餌 14、16、17 的陰性對照:守門全部打開的時候,正常的設定要跑得完。
+            rm -f "$rec_ok" "$rec_bad" "$_ld/.wine_path" "$sb/game/.wine_path"
+            out=$(HOME="$fakehome_real" WINEPREFIX="$sb/prefix_ok" MVP_WINE="$whisky_bin/wine64" \
+                  bash "$self_abs" "$sb/game" 2>&1); rc=$?
+            want="$sb/prefix_ok|$game_real|$game_real/mvp2005.exe"
+            if [ "$rc" -ne 0 ]; then
+                st_bad "端到端(甲):正常的設定卻以 $rc 離開"
+            elif [ ! -f "$rec_ok" ]; then
+                st_bad "端到端(甲):MVP_WINE 指的那一支沒有被跑起來"
+            elif [ "$(cat "$rec_ok")" != "$want" ]; then
+                st_bad "端到端(甲):傳給 Wine 的東西不對(收到 $(cat "$rec_ok"),應該是 $want)"
+            elif ! printf '%s' "$out" | grep -qF "Wine 環境: $sb/prefix_ok(你設的 WINEPREFIX)"; then
+                st_bad "端到端(甲):畫面上沒有照實說用的是哪一個 Wine 環境"
+            elif ! ls "$fakehome_real"/mvp_debug_*_可回報.log >/dev/null 2>&1; then
+                st_bad "端到端(甲):跑完了,但沒有產出遮蔽版"
+            else
+                st_ok "端到端(甲):跑的是 MVP_WINE 那一支,WINEPREFIX 原樣傳過去,工作目錄是遊戲資料夾,離開碼 0"
+            fi
+
+            # ── 端到端(乙):WINEPREFIX 設成空字串 + 遊戲資料夾裡夾帶一個指向白名單內另一支 wine 的 .wine_path
+            # 空字串要當成沒設(Wine 拿到的是「沒有這個變數」),而且畫面上要提醒你這一輪用的是預設環境。
+            # 夾帶的那一支在白名單裡、可以執行 —— 萬一有人把讀 .wine_path 加回來而且優先於 MVP_WINE,
+            # 被跑起來的就會是它,這一項就會紅(這是餌 15 抓不到的那一種)。
+            rm -f "$rec_ok" "$rec_bad"
+            printf '%s\n' "$whisky_bin/wine" > "$_ld/.wine_path"
+            printf '%s\n' "$whisky_bin/wine" > "$sb/game/.wine_path"
+            out=$(HOME="$fakehome_real" WINEPREFIX="" MVP_WINE="$whisky_bin/wine64" \
+                  bash "$self_abs" "$sb/game" 2>&1); rc=$?
+            want="<unset>|$game_real|$game_real/mvp2005.exe"
+            if [ -e "$rec_bad" ]; then
+                st_bad "端到端(乙):遊戲資料夾裡 .wine_path 指的那一支被跑起來了"
+            elif [ "$rc" -ne 0 ]; then
+                st_bad "端到端(乙):以 $rc 離開,不是 0"
+            elif [ ! -f "$rec_ok" ] || [ "$(cat "$rec_ok")" != "$want" ]; then
+                st_bad "端到端(乙):空的 WINEPREFIX 沒有當成沒設(Wine 收到的是 $(cat "$rec_ok" 2>/dev/null))"
+            elif ! printf '%s' "$out" | grep -q "你沒有設 WINEPREFIX"; then
+                st_bad "端到端(乙):用了預設環境,畫面上卻沒有提醒"
+            else
+                st_ok "端到端(乙):空的 WINEPREFIX 當成沒設、有提醒,夾帶的 .wine_path 沒被用上,離開碼 0"
+            fi
+            rm -f "$_ld/.wine_path" "$sb/game/.wine_path"
         fi
 
         # CLI 沒有被改壞
@@ -960,6 +1193,114 @@ run_selftest() {
         fi
     fi
 
+    # ── 餌 18:沒通過複驗的遮蔽版刪不掉 → 要照實說、只印檔名、登記改成 kept_failed(2026-09-24 加)
+    # 用唯讀的資料夾做出「刪不掉」:資料夾沒有寫入權限,裡面的檔就刪不掉。
+    # 以系統管理員身分跑的時候唯讀擋不住,那就照實說是略過 —— 先試著在裡面建一個檔來判斷。
+    mkdir -p "$sb/ro18"
+    printf 'x\n' > "$sb/ro18/b18_可回報.log"
+    chmod 555 "$sb/ro18"
+    if ( : > "$sb/ro18/probe18" ) 2>/dev/null; then
+        rm -f "$sb/ro18/probe18"
+        st_skip "餌 18:這台機器上唯讀資料夾擋不住刪檔(可能是以系統管理員身分跑),跳過"
+    else
+        out=$( ( SHARE="$sb/ro18/b18_可回報.log"; SHARE_CAND="$SHARE"; SHARE_STATE=unverified
+                 discard_share; n=$?
+                 printf 'STATUS18|%s|%s|%s\n' "$n" "$SHARE_STATE" "${SHARE:+kept}" ) 2>&1 )
+        state=$(printf '%s\n' "$out" | grep '^STATUS18|')
+        out=$(printf '%s\n' "$out" | grep -v '^STATUS18|')
+        if [ ! -f "$sb/ro18/b18_可回報.log" ]; then
+            st_bad "餌 18 佈置錯了:唯讀資料夾裡的檔還是被刪掉了"
+        elif printf '%s' "$out" | grep -q "已經刪掉"; then
+            st_bad "餌 18:刪不掉,卻說「已經刪掉」"
+        elif ! printf '%s' "$out" | grep -q "刪不掉"; then
+            st_bad "餌 18:刪不掉,但沒有說刪不掉"
+        elif ! printf '%s' "$out" | grep -qF "b18_可回報.log"; then
+            st_bad "餌 18:刪不掉,但沒印出是哪一個檔"
+        elif printf '%s' "$out" | grep -qF "$sb"; then
+            st_bad "餌 18:刪不掉時把完整路徑印出來了(只該印檔名)"
+        elif [ "$state" != "STATUS18|1|kept_failed|kept" ]; then
+            st_bad "餌 18:刪不掉,登記卻不對($state,應該是 1|kept_failed|kept)"
+        else
+            st_ok "餌 18:遮蔽版刪不掉時照實說、只印檔名,登記改成「沒過、刪不掉」"
+        fi
+        # ── 餌 18c:Ctrl+C 剛好落在 discard_share 刪檔那一段(不可中斷區裡)
+        # 那一下會被押後,到 end_uninterruptible 才收尾並離開,discard_share 後面那幾行
+        # 「刪不掉、請自己刪」根本印不出來 —— 讀者看到的只有收尾那一段,所以那一段要把話說完整。
+        # 做法:把 rm 換成「照樣刪,刪完再像 trap 一樣叫一次 on_interrupt」。
+        # 這一下落在不可中斷區裡,on_interrupt 只會記著;真正的收尾是 end_uninterruptible 觸發的。
+        # 只在子行程裡換,不影響外面。
+        out=$( ( LOG="$sb/ro18/b18.log"; LOG_CAND="$LOG"; LOG_STATE=created; LOG_CREATED=1
+                 GAME_STARTED=1; GAME_DONE=1; INT_DEFER=0; INT_PENDING=0
+                 SHARE="$sb/ro18/b18_可回報.log"; SHARE_CAND="$SHARE"; SHARE_STATE=unverified
+                 rm() { command rm "$@"; on_interrupt; }
+                 discard_share
+                 printf 'NOT_REACHED\n' ) 2>&1 ); rc=$?
+        why=$(kept_report_why "$out" "$sb" "b18_可回報.log")
+        if [ "$rc" -ne 130 ] || printf '%s' "$out" | grep -q "NOT_REACHED"; then
+            st_bad "餌 18c:刪檔那一段按了 Ctrl+C,卻沒有收尾離開(離開碼 ${rc})"
+        elif [ -n "$why" ]; then
+            st_bad "餌 18c:刪檔那一段按了 Ctrl+C,收尾${why}"
+        else
+            st_ok "餌 18c:刪檔那一段按 Ctrl+C,收尾照實說「沒過、刪不掉」,只印檔名"
+        fi
+        # ── 餌 18d:discard_share 已經回來、主流程還在整理時才按 Ctrl+C
+        out=$( ( LOG="$sb/ro18/b18.log"; LOG_CAND="$LOG"; LOG_STATE=created; LOG_CREATED=1
+                 GAME_STARTED=1; GAME_DONE=1; INT_DEFER=0; INT_PENDING=0
+                 SHARE="$sb/ro18/b18_可回報.log"; SHARE_CAND="$SHARE"; SHARE_STATE=unverified
+                 discard_share >/dev/null
+                 on_interrupt
+                 printf 'NOT_REACHED\n' ) 2>&1 ); rc=$?
+        why=$(kept_report_why "$out" "$sb" "b18_可回報.log")
+        if [ "$rc" -ne 130 ] || printf '%s' "$out" | grep -q "NOT_REACHED"; then
+            st_bad "餌 18d:刪不掉之後按了 Ctrl+C,卻沒有收尾離開(離開碼 ${rc})"
+        elif [ -n "$why" ]; then
+            st_bad "餌 18d:刪不掉之後按 Ctrl+C,收尾${why}"
+        else
+            st_ok "餌 18d:刪不掉之後才按 Ctrl+C,收尾一樣照實說,只印檔名"
+        fi
+    fi
+    chmod 755 "$sb/ro18"
+    # 陰性對照:資料夾可以寫的時候,要真的刪掉、說刪掉了、登記清成 none(不然餌 18 的綠可能是「永遠說刪不掉」)
+    mkdir -p "$sb/rw18"
+    printf 'x\n' > "$sb/rw18/c18_可回報.log"
+    out=$( ( SHARE="$sb/rw18/c18_可回報.log"; SHARE_CAND="$SHARE"; SHARE_STATE=unverified
+             discard_share; n=$?
+             printf 'STATUS18|%s|%s|%s\n' "$n" "$SHARE_STATE" "${SHARE:+kept}" ) 2>&1 )
+    state=$(printf '%s\n' "$out" | grep '^STATUS18|')
+    if [ -e "$sb/rw18/c18_可回報.log" ]; then
+        st_bad "陰性對照:可以寫的資料夾裡,沒通過複驗的遮蔽版沒有被刪掉"
+    elif ! printf '%s' "$out" | grep -q "已經刪掉"; then
+        st_bad "陰性對照:刪掉了,卻沒有說已經刪掉"
+    elif [ "$state" != "STATUS18|0|none|" ]; then
+        st_bad "陰性對照:刪掉了,登記卻不對($state,應該是 0|none|)"
+    else
+        st_ok "陰性對照:資料夾可以寫的時候真的刪掉,並說已經刪掉"
+    fi
+    # ── 餌 18b:登記是 kept_failed 時的收尾(不需要唯讀資料夾,以系統管理員身分跑也測得到)
+    # 18c、18d 驗的是「discard_share 有沒有登記成這一態」,這一道驗的是「這一態的收尾說什麼」。
+    out=$( ( LOG="$sb/desk/a.log"; LOG_CAND="$LOG"; LOG_STATE=created; LOG_CREATED=1
+             GAME_STARTED=1; GAME_DONE=1
+             SHARE="$sb/desk/b18b_可回報.log"; SHARE_CAND="$SHARE"; SHARE_STATE=kept_failed
+             interrupt_report ) 2>&1 )
+    why=$(kept_report_why "$out" "$sb" "b18b_可回報.log")
+    if [ -n "$why" ]; then
+        st_bad "餌 18b:沒通過複驗、刪不掉之後被中斷,收尾${why}"
+    else
+        st_ok "餌 18b:沒通過複驗、刪不掉之後被中斷,收尾照實說,只印檔名"
+    fi
+    # 陰性對照:同一個情況改用 unverified 收尾(2026-09-24 之前刪不掉時就是這樣登記),
+    # 同一個檢查必須挑得出毛病 —— 挑不出來的話,18b、18c、18d 的綠都不算數。
+    out=$( ( LOG="$sb/desk/a.log"; LOG_CAND="$LOG"; LOG_STATE=created; LOG_CREATED=1
+             GAME_STARTED=1; GAME_DONE=1
+             SHARE="$sb/desk/b18b_可回報.log"; SHARE_CAND="$SHARE"; SHARE_STATE=unverified
+             interrupt_report ) 2>&1 )
+    why=$(kept_report_why "$out" "$sb" "b18b_可回報.log")
+    if [ -z "$why" ]; then
+        st_bad "陰性對照:改用 unverified 收尾,檢查竟然挑不出毛病(18b、18c、18d 的檢查是瞎的)"
+    else
+        st_ok "陰性對照:改用 unverified 收尾時,檢查挑得出毛病(${why})"
+    fi
+
     # ── 中斷處理:trap 有沒有裝在原始碼裡(這一條是靜態檢查,不是實際按 Ctrl+C)
     # 樣式錨在行首 —— 不錨的話,這一行自己就含著那串字,grep 會抓到自己而永遠是綠的
     # (反向測試證過:把真正那一行 trap 拿掉,不錨的版本照樣全綠)。
@@ -1031,6 +1372,18 @@ run_selftest() {
         else
             st_ok "主流程:複驗有檢查使用者資料夾(第 $ln_resid 行,在判定可以貼出去的第 $ln_created 行之前)"
         fi
+        # 沒通過複驗的遮蔽版要交給 discard_share 刪(它的行為是餌 18 驗的)。
+        # 這裡驗主流程真的叫它、叫的位置在判定之後,而且主流程沒有另外一行自己下 rm、不看結果。
+        ln_discard=$(src_line_no '        discard_share')
+        if [ -z "$ln_discard" ]; then
+            st_bad "主流程:找不到唯一一行 discard_share(不見了,或變成兩行以上)—— 少了它,遮蔽版刪不掉也會說成已經刪掉"
+        elif [ -n "$ln_created" ] && [ "$ln_discard" -le "$ln_created" ]; then
+            st_bad "主流程:discard_share 在第 $ln_discard 行,沒有排在判定可以貼出去(第 $ln_created 行)後面"
+        elif grep -qE '^[[:space:]]*rm -f "[$]SHARE"' "$0"; then
+            st_bad "主流程:還有一行直接 rm 遮蔽版、不看刪掉了沒有"
+        else
+            st_ok "主流程:沒通過複驗的遮蔽版交給 discard_share 刪(第 $ln_discard 行)"
+        fi
     fi
 
     rm -rf "$sb"
@@ -1070,6 +1423,9 @@ if [ $# -lt 1 ] || [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
     echo "  Wine 只認標準安裝位置(Homebrew / MacPorts / /usr/bin / Wine 系 app 套件),"
     echo "  而且只看路徑前綴與檔名、是不是可執行的一般檔案 —— 不驗簽章、不看內容。"
     echo "  想換除錯旗標:WINEDEBUG_MODE=+seh bash mvp_wine_log.sh \"<遊戲資料夾>\""
+    echo "  腳本自己找不到你的 Wine:MVP_WINE=\"<Wine 的完整路徑>\" bash mvp_wine_log.sh \"<遊戲資料夾>\""
+    echo "  (那條路徑一樣要落在上面那些標準安裝位置,不然不會執行)"
+    echo "  Wine 環境沿用你設的 WINEPREFIX;沒設就是 Wine 的預設環境(~/.wine)。"
     echo "  只驗守門不啟動遊戲:bash mvp_wine_log.sh --selftest"
     echo ""
     # 沒給參數是「用錯了」,--help 是「問對了」,離開碼要分開。
@@ -1101,8 +1457,6 @@ if ! validate_exe_name "$EXE_NAME"; then
     exit 1
 fi
 
-LAUNCHER_DIR="$GAME_DIR/launcher"
-WINE_PATH_FILE="$LAUNCHER_DIR/.wine_path"
 # log 放桌面;有些人把桌面關掉或改名,那就退到家目錄。
 LOG_DIR="$HOME/Desktop"
 [ -d "$LOG_DIR" ] || LOG_DIR="$HOME"
@@ -1117,28 +1471,31 @@ echo ""
 trap on_interrupt INT
 
 # ── 找 Wine ────────────────────────────────────────────────
+# 只從兩個地方來:你自己設的 MVP_WINE,或下面那張寫死的清單。
+# 遊戲資料夾裡的檔一律不拿來找 Wine —— 別人做的懶人包夾帶什麼,都不會被當成 Wine 跑起來。
 WINE_BIN=""
-if [ -f "$WINE_PATH_FILE" ]; then
-    # 這個純文字檔是啟動器寫的,而它的內容會被當成執行檔跑起來。
-    # 別人做的懶人包只要夾帶一個 .wine_path,就等於夾帶了「要跑哪支程式」。
-    # 所以只取第一行,而且解開符號連結之後的絕對路徑必須落在白名單裡
+if [ -n "${MVP_WINE:-}" ]; then
+    # MVP_WINE 指到的東西會被當成執行檔跑起來,所以走跟清單同一道關卡:
+    # 解開符號連結之後的絕對路徑必須落在白名單裡
     # (Homebrew / MacPorts / /usr/bin / Wine 系 app 套件 / Linux 的 wine 目錄),
     # 檔名也要完全等於 wine、wine64 這一類 —— 光是「wine 開頭」不算。
-    CLAIMED=$(head -1 "$WINE_PATH_FILE" | tr -d "\r")
-    if [ -n "$CLAIMED" ]; then
-        if validate_wine_bin "$CLAIMED"; then
-            WINE_BIN="$WINE_VALIDATED"
-        else
-            WINE_BIN=""
-            echo "  ⚠️  $WINE_PATH_FILE 這條路徑不合格:$WINE_REJECT_REASON"
-            echo "     它指的是:$CLAIMED"
-            echo "     為了安全起見不執行它,改用自動搜尋。"
-            echo ""
-        fi
+    # 不合格就停,不改用清單裡的另一支:你指定了一支、跑的卻是另一支,量到的就對不上。
+    if validate_wine_bin "${MVP_WINE}"; then
+        WINE_BIN="$WINE_VALIDATED"
+        echo "  使用你指定的 Wine(MVP_WINE):${WINE_BIN}"
+        echo ""
+    else
+        echo "  ✗ MVP_WINE 這條路徑不合格:${WINE_REJECT_REASON}"
+        echo "     它指的是:${MVP_WINE}"
+        echo "     為了安全起見不執行它,也不會改用別的 Wine。"
+        echo "     Wine 只認標準安裝位置(Homebrew / MacPorts / /usr/bin / Wine 系 app 套件);"
+        echo "     不設 MVP_WINE 的話,腳本會自己到這些地方找。"
+        echo ""
+        exit 1
     fi
 fi
 if [ -z "$WINE_BIN" ]; then
-    # 這張清單是腳本自己寫死的(跟本站啟動器同一份),不吃遊戲資料夾裡的設定。
+    # 這張清單是腳本自己寫死的,不吃遊戲資料夾裡的任何設定。
     for p in /opt/homebrew/bin/wine64 /usr/local/bin/wine64 \
              /opt/homebrew/bin/wine /usr/local/bin/wine \
              /opt/local/bin/wine64 /opt/local/bin/wine \
@@ -1160,8 +1517,43 @@ if [ -z "$WINE_BIN" ] || [ ! -x "$WINE_BIN" ]; then
     echo "  ✗ 找不到 Wine。Wine 怎麼裝,請看本站「在 Mac 上玩 MVP 2005」那一課:"
     echo "     https://toniliumvp.github.io/MVPBaseball/tutorials/play-on-mac/"
     echo "     裝法以那一頁為準。"
+    echo "     已經裝好、只是這支腳本找不到的話,在指令前面加"
+    echo "     MVP_WINE=\"<Wine 的完整路徑>\" 指給它(完整路徑可以用 which wine 看)。"
     echo ""
     exit 1
+fi
+
+# ── Wine 環境(WINEPREFIX)────────────────────────────────────
+# 沿用你自己設的,這支腳本不另外指定。照「在 Mac 上玩 MVP 2005」那一課
+# export 過 WINEPREFIX 的話,在同一個終端機視窗裡跑,用的就是你平常玩的那一個。
+# 排在找執行檔之前:這兩道擋下來的時候,桌面上還一個檔都沒建。
+if [ -z "${WINEPREFIX:-}" ]; then
+    # 設成空字串跟沒設當成同一件事,交給 Wine 用它的預設環境。
+    unset WINEPREFIX
+    PREFIX_DESC="Wine 的預設環境(~/.wine)"
+else
+    case "${WINEPREFIX}" in
+        /*) ;;
+        *)
+            # Wine 自己會拒絕相對路徑的 WINEPREFIX(invalid directory ... not an absolute path),
+            # 先在這裡擋下來、用中文講清楚,桌面上也不會多一份沒量到東西的 log。
+            echo "  ✗ WINEPREFIX 要寫完整路徑(/ 開頭),現在是:${WINEPREFIX}"
+            echo "     Wine 只接受 / 開頭的完整路徑,相對路徑它自己就會拒絕啟動。"
+            echo ""
+            exit 1
+            ;;
+    esac
+    if [ ! -d "${WINEPREFIX}" ]; then
+        # 硬指到一個不存在的路徑,Wine 會試著在那裡另外建一個全新的環境,
+        # 那就不是你平常玩的那個,量到的也對不上。
+        echo "  ✗ WINEPREFIX 指到的資料夾不存在:${WINEPREFIX}"
+        echo "     照這樣跑,Wine 會試著在那裡另外建一個全新的環境,那不是你平常玩的那一個。"
+        echo "     先確認路徑沒打錯;還沒建過環境的話,照「在 Mac 上玩 MVP 2005」那一課第 3 步建好再跑:"
+        echo "     https://toniliumvp.github.io/MVPBaseball/tutorials/play-on-mac/"
+        echo ""
+        exit 1
+    fi
+    PREFIX_DESC="${WINEPREFIX}(你設的 WINEPREFIX)"
 fi
 
 EXE="$GAME_DIR/$EXE_NAME"
@@ -1197,9 +1589,17 @@ case $? in
 esac
 
 echo "  Wine    : $WINE_BIN"
+echo "  Wine 環境: $PREFIX_DESC"
 echo "  執行檔  : $EXE_NAME"
 echo "  記錄到  : $LOG"
 echo ""
+if [ -z "${WINEPREFIX:-}" ]; then
+    echo "  ⚠️  你沒有設 WINEPREFIX,這一輪用的是 Wine 的預設環境(~/.wine)。"
+    echo "     照「在 Mac 上玩 MVP 2005」那一課建了自己的環境的話,先關掉遊戲,"
+    echo "     在同一個視窗裡打 export WINEPREFIX=\"\$HOME/mvp-wine\" 再跑一次,"
+    echo "     不然量到的不是你平常玩的那一個。"
+    echo ""
+fi
 echo "  遊戲要開起來了。請照平常的方式進到會當機的那個組合"
 echo "  (中文語系 + 大球場),讓它當給我們看。"
 echo ""
@@ -1207,20 +1607,11 @@ echo "  當機或關掉遊戲之後,這個視窗會自己整理結果。"
 echo "  ──────────────────────────────────────────────"
 echo ""
 
-# wineprefix 不存在就不要設 —— 本站的啟動器也是這樣做的:它同樣先確認
-# 那個資料夾在不在,不在就不設,讓 Wine 用預設環境。硬指到一個不存在的
-# 路徑,Wine 會另外開一個全新環境,那就不是你平常玩的那個,量到的也對不上。
-if [ -d "$LAUNCHER_DIR/wineprefix" ]; then
-    export WINEPREFIX="$LAUNCHER_DIR/wineprefix"
-else
-    echo "  ⚠️  找不到 $LAUNCHER_DIR/wineprefix,這一輪會用 Wine 的預設環境。"
-    echo "     那跟你平常玩的環境不一樣,結果不一定對得上。"
-    echo ""
-fi
+# WINEPREFIX 在上面找 Wine 之後就決定了(沿用你設的,不另外指定);這裡只設除錯旗標。
 export WINEDEBUG="${WINEDEBUG_MODE:-+seh,+debugstr}"
 
 # cd 進遊戲資料夾再啟動:遊戲是用相對路徑去找 data\ 的,
-# 本站啟動器的兩個啟動點也都把工作目錄設成遊戲資料夾。
+# 「在 Mac 上玩 MVP 2005」那一課第 5 步也是先 cd 進遊戲資料夾再 wine mvp2005.exe。
 # 工作目錄不一樣,重現的就不是同一個當機。
 # 遊戲的除錯訊息走 stderr,兩條都收。
 # 這裡用 >> 不用 > :log 檔剛剛才用 O_EXCL 建好,再用 > 去截斷等於把守門白做了。
@@ -1329,12 +1720,8 @@ else
             echo "     (可能已經有同名的檔佔著,那種檔一律不覆蓋)。"
         fi
     else
-        begin_uninterruptible
-        rm -f "$SHARE"
-        SHARE=""
-        SHARE_STATE=none
-        end_uninterruptible
-        echo "  ❌ 遮蔽版沒有通過複驗,已經刪掉,不留一份「以為安全」的檔。"
+        # 刪掉、登記、照實說刪掉了沒有,都在 discard_share 裡(--selftest 的餌 18 測它)。
+        discard_share
     fi
     echo "     log 本身沒事(在 $LOG),但裡面有你的家目錄與帳號名稱,"
     echo "     要貼出去請自己先把那些換掉。"

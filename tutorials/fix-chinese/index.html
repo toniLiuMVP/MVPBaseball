@@ -7,7 +7,7 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="toni的MVP模組補習班">
 <meta property="og:title" content="中文版配大球場就跳出 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
-<meta property="og:description" content="二十年來大家用英文版玩,因為中文版配大球場一定跳出。本站把執行檔反組譯到底,找出真正的原因:遊戲寫死了一塊 64 MB 的記憶體池,而中文字型光是展開成貼圖就吃掉 13.50 MB。兩個地方各改一個位元組就好了。含完整研究過程與十二條走錯的路。">
+<meta property="og:description" content="二十年來大家用英文版玩，因為中文版配大球場一定跳出。本站把執行檔反組譯到底，找出真正的原因：遊戲寫死了一塊 64 MB 的記憶體池，而中文字型光是展開成貼圖就吃掉 13.50 MB。照原版光碟安裝的那一份做不到；做得到的，兩個地方各改一個位元組就好了。含完整研究過程與十二條走錯的路。">
 <meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tutorials/fix-chinese/">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
@@ -17,9 +17,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
 <title>中文版配大球場就跳出 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
-<meta name="description" content="二十年來大家用英文版玩,因為中文版配大球場一定跳出。本站把執行檔反組譯到底,找出真正的原因:遊戲寫死了一塊 64 MB 的記憶體池,而中文字型光是展開成貼圖就吃掉 13.50 MB。兩個地方各改一個位元組就好了。含完整研究過程與十二條走錯的路。">
+<meta name="description" content="二十年來大家用英文版玩，因為中文版配大球場一定跳出。本站把執行檔反組譯到底，找出真正的原因：遊戲寫死了一塊 64 MB 的記憶體池，而中文字型光是展開成貼圖就吃掉 13.50 MB。照原版光碟安裝的那一份做不到；做得到的，兩個地方各改一個位元組就好了。含完整研究過程與十二條走錯的路。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="../../assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -66,10 +66,10 @@
 
   <div class="quickfix" id="quick">
     <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
-    <p class="small">下面照 Mac 寫法。Windows 的話：切到桌面改打 <code>cd %USERPROFILE%\Desktop</code>，<code>python3</code> 一律換成 <code>python</code>（說不是內部或外部命令就改打 <code>py -3</code>）。</p>
+    <p class="small">下面照 Mac 寫法。Windows 的話：第 1 步不用打 <code>cd</code>，改成打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，在開出來的視窗裡打後面的指令；<code>python3</code> 一律換成 <code>python</code>（說不是內部或外部命令就改打 <code>py -3</code>）。</p>
     <ol>
-      <li>下載 <a href="../run-in-2026/mvp_modernize.py" download>mvp_modernize.py</a>，<strong>從「下載」資料夾拖到桌面</strong>（沒拖會出現 <code>can't open file</code>），然後切到桌面<br>
-  <pre><code>cd ~/Desktop</code></pre></li>
+      <li>下載 <a href="../run-in-2026/mvp_modernize.py" download>mvp_modernize.py</a>，瀏覽器會把它放進「下載」資料夾。終端機切到「下載」（沒切會出現 <code>can't open file</code>）<br>
+  <pre><code>cd ~/Downloads</code></pre></li>
       <li>先唯讀看你手上那顆是什麼。這一行<strong>最後空一格就停住</strong>，把 <code>mvp2005.exe</code> 拖進終端機視窗再按 Enter<br>
   <pre><code>python3 mvp_modernize.py </code></pre>
         看到「<code>記憶體池 64 MB</code>」就代表這顆可以改；看到「找不到」就是光碟原版，這一項做不到</li>
@@ -83,6 +83,7 @@
 <pre><code>python3 mvp_modernize.py "〔路徑〕" --restore</code></pre>
   <p class="tail"><strong>第一次建議只做 <code>--pool</code></strong>，三個參數一起改，萬一出事你分不出是哪一個造成的。
        想知道那顆 64 MB 是怎麼找到的、以及本站走錯的十二條路，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+    <p class="tail">照做卡住了？直接跳到<a href="#fix">❌ 出錯處理</a>。</p>
   </div>
 
   <h2>答案先講</h2>
@@ -399,17 +400,15 @@ Enable Stadium Memory Quota</pre>
   <div class="step">
     <div class="step-n">1</div>
     <div>
-      <div class="step-t">下載腳本，放到桌面，切到桌面</div>
+      <div class="step-t">下載腳本，在「下載」資料夾開命令視窗</div>
       <p><a href="../run-in-2026/mvp_modernize.py" download>mvp_modernize.py</a>（零相依，同一支也管 4GB 與解析度）</p>
-<pre><code>cd %USERPROFILE%\Desktop</code></pre>
-<pre><code>cd ~/Desktop</code></pre>
+      <p class="small">Windows：這一步不用打指令。打開檔案總管，左邊點「<u>下載</u>」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter。開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。</p>
+      <p class="small">Mac：打開終端機，打這一行：</p>
+<pre><code>cd ~/Downloads</code></pre>
       <div class="ifnot"><b>按了下載之後，檔案跑到哪裡去了？</b>
-        <p>瀏覽器多半會直接放進「下載」資料夾，所以按完之後還有一步：</p>
-        <p><span class="sk">1</span>打開檔案總管（Mac 用 Finder），左邊點「<u>下載</u>」<br>
-           <span class="sk">2</span>找到 <code>mvp_modernize.py</code><br>
-           <span class="sk">3</span><strong>把它拖到桌面</strong></p>
-        <p class="small">沒做這一步的話，後面執行會出現 <code>can't open file</code> ——
-           那不是你打錯，是檔案還在「下載」裡。</p>
+        <p>瀏覽器多半會直接放進「下載」資料夾，所以命令視窗就在「下載」裡開（上面那一段），<u>不用把檔案搬到別處</u>。</p>
+        <p class="small">命令視窗跟檔案不在同一個資料夾的話，後面執行會出現 <code>can't open file</code> ——
+           那不是你打錯。</p>
       </div>
     </div>
   </div>
@@ -494,7 +493,7 @@ Enable Stadium Memory Quota</pre>
     <li>中文<strong>完整</strong>，沒有缺字（因為完全沒有動到字型）</li>
   </ul>
 
-  <h3>❌ 出錯處理</h3>
+  <h3 id="fix">❌ 出錯處理</h3>
   <div class="tablewrap"><table>
     <thead><tr><th>看到什麼</th><th>怎麼做</th></tr></thead>
     <tbody>
@@ -502,7 +501,9 @@ Enable Stadium Memory Quota</pre>
       <tr><td>「開頭不是 MZ / 找不到 PE 檔頭」</td><td>路徑要指到 <code>mvp2005.exe</code> <u>本身</u>，不是資料夾</td></tr>
       <tr><td><code>python</code> 不是內部或外部命令</td><td>Windows 改打 <code>py -3 mvp_modernize.py ...</code>。兩個都不行就照
           <a href="../../start.html">新手基本功</a>裝 Python</td></tr>
-      <tr><td><code>can't open file</code></td><td>腳本還在「下載」資料夾，沒拖到桌面</td></tr>
+      <tr><td><code>can't open file</code></td><td><strong>命令視窗跟腳本不在同一個資料夾。</strong>
+              打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）。
+              還是一樣的話，是檔名對不上：瀏覽器可能在檔名後面加了 <code>(1)</code>，把它改成跟指令裡一模一樣。</td></tr>
       <tr><td>改完遊戲開不起來</td><td>立刻 <code>--restore</code>，然後回報。<u>不要重複嘗試更大的值</u></td></tr>
       <tr><td>128 MB 還是會當</td><td>試 <code>--pool 256</code>。還是當就回報 —— 那代表不只這一個原因</td></tr>
     </tbody>
@@ -548,7 +549,8 @@ Enable Stadium Memory Quota</pre>
         （字型一個都不少；至於檔案少多少要看是哪一份 <code>fonts.big</code>：本站量到中文那 3 份少 28.8%，
         2009 台灣模組那 2 份英文的少 52.8%，因為後者還會一起丟掉目錄指不到的那一大段）。<br>
         想先確認這一支在你的機器上是好的，跑 <code>python3 mvp_font_swap.py --selftest</code> ——
-        它<u>不需要遊戲資料夾，也不碰任何遊戲檔</u>，自己造一份最小的封裝檔把每一道把關正反各測一次</li>
+        它<u>不需要遊戲資料夾，也不碰任何遊戲檔</u>，自己造一份最小的封裝檔替把關正反各測一次
+        （不是每一道把關都有餌：本站把條件成立就讓它停下來的 20 道逐一拆掉再跑自我測試，會變紅的是 5 道）</li>
     <li><a href="mvp_fix_loc.py" download>mvp_fix_loc.py</a> ——
         修中文語系檔裡格式符數量對不上的字串（168 條）。
         實測：修完 0 條殘留、中文字元<u>一個都沒被改動</u>。<br>
@@ -562,8 +564,12 @@ Enable Stadium Memory Quota</pre>
         <strong>要貼到網路上或傳給別人，請用它另外產的那一份</strong>
         <code>mvp_debug_&lt;...&gt;_可回報.log</code>：家目錄、帳號名稱、遊戲資料夾都換成代號，
         原始那一份留在自己電腦。第二個參數（執行檔）<u>只能是檔名，不可以帶路徑</u>。
-        另外，遊戲資料夾裡懶人包那一層的 <code>.wine_path</code> 設定檔指到的程式
-        <u>只有落在標準 Wine 安裝位置才會被執行</u>，別人做的懶人包夾帶的一律忽略。
+        另外，它<u>不讀遊戲資料夾裡的任何設定檔</u>：Wine 在哪裡，它自己到標準安裝位置找；
+        找不到你的 Wine 時，在指令前面加 <code>MVP_WINE="&lt;Wine 的完整路徑&gt;"</code> 指給它
+        （完整路徑可以用 <code>which wine</code> 看），那條路徑<u>一樣要落在標準 Wine 安裝位置才會被執行</u>，
+        不合格就停下來，不會改用別的 Wine。
+        Wine 環境沿用你自己設的 <code>WINEPREFIX</code>：照<a href="../play-on-mac/index.html">在 Mac 上玩 MVP 2005</a>那一課設過的話，
+        在同一個終端機視窗裡跑就好；它指到不存在的資料夾時，腳本會停下來，不讓 Wine 另外建一個新環境。
         想確認腳本自己的守門有沒有壞掉，跑 <code>bash mvp_wine_log.sh --selftest</code> ——
         它不會啟動遊戲，也不會碰遊戲資料夾。<br>
         <strong>Windows 上要看同一批訊息</strong>，用微軟自家的
@@ -584,12 +590,12 @@ Enable Stadium Memory Quota</pre>
     <li><strong>中文為什麼特別貴：13.50 MB vs 0.37 MB</strong> 中文字型的字圖集是 <strong>1024 × 512 的 4 位元圖</strong>（格式 <code>0x79</code>），而 Direct3D 8 沒有 4 位元的貼圖格式，每一張都要在執行的時候整張展開成 32 位元。展開後吃掉那顆池子的 <strong>21.1%</strong>，英文只有 0.37 MB / 0.6%，<strong>差 36.7 倍</strong>。這就是「中文單獨沒事、大球場單獨沒事、加起來才當」的真正原因。</li>
     <li><strong>4GB 補丁救不了這個當機</strong> 4GB 是 PE 檔頭的一個位元，管的是程式最多能用到多少位址空間；記憶體池是程式碼裡的一個 <code>push</code>，管的是遊戲實際跟系統要了多大一塊。塞不下是因為櫃子小，把房間從 2 坪擴到 4 坪，櫃子還是那個櫃子。兩件事都要做，但互不取代。</li>
     <li><strong>不是每顆執行檔都改得動</strong> 記憶體池是一行程式碼，光碟原版的程式碼是加密的（熵 7.999、帶 <code>stxt774</code> <code>stxt371</code> 保護區段），找不到就改不了；社群 2023 版熵 6.575 是明碼的，改得到。4GB（檔頭的一個位元）與解析度（一張資料表）則任何版本都改得到。工具會自己判斷並拒絕，不會亂改。</li>
-    <li><strong>最容易踩的雷：改了 A 卻跑 B</strong> 如果你平常會多開幾顆執行檔（<code>mvp2005 - 4GB.exe</code> 之類），你實際雙擊的是哪一顆就改哪一顆，這是最常見的白工。另一個是腳本還留在「下載」資料夾，那會出現 <code>can't open file</code>，不是你打錯。</li>
+    <li><strong>最容易踩的雷：改了 A 卻跑 B</strong> 如果你平常會多開幾顆執行檔（<code>mvp2005 - 4GB.exe</code> 之類），你實際雙擊的是哪一顆就改哪一顆，這是最常見的白工。另一個是命令視窗跟腳本不在同一個資料夾，那會出現 <code>can't open file</code>，不是你打錯。</li>
     <li><strong>安全網</strong> 不加 <code>--apply</code> 就只是預覽，會把要改的每一個位元組位置列出來（本站量到 6 個：2 個記憶體池 + 4 個檔頭校驗值；換一顆執行檔總數會變，本站量到 3 到 6 都有，記憶體池那 2 個一定在）；<code>--apply</code> 會先備份成 <code>.modernizebak</code>，寫完再讀回來確認「改動的位元組剛好是預期那幾個，其他一個都沒動」；一行指令可以還原（<code>--restore</code>）；而且完全不動字型，所以中文不會缺字。改完開不起來就立刻還原並回報，<strong>不要重複嘗試更大的值</strong>。</li>
     <li><strong>本站沒驗的</strong> 沒有直接看到那行 <code>OUT OF MEMORY</code>，它走 <code>OutputDebugStringA</code>，本站在 Wine 底下沒有攔成功（真 Windows 上用 DebugView 應該看得到，但還沒實測）；分不出是「總量不夠」還是「最大的連續空塊不夠」，因為池子調大兩種都會改善；不知道 128 MB 是不是最省的值，只知道 64 不行、128 與 512 可以，門檻在那中間某處；<strong>13.50 MB 是算出來的，不是量到的</strong>，一條從字型檔量、一條從執行檔的程式碼推，兩邊在小數點後兩位對上，但都不是遊戲執行時的真實用量。</li>
   </ul>
 
-  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <!-- course-strip:begin · 這一塊由產生器從 plan.html 產生，不要手改 -->
   <nav class="card course-strip" aria-label="這一課在課表的位置">
     <p class="card-h">📚 照課表上課的話</p>
     <p><a href="../../plan.html#b"><strong>② 急救班</strong></a> 第 3／5 堂</p>
@@ -697,8 +703,10 @@ Enable Stadium Memory Quota</pre>
      <u>2026-09-05 還多了兩件事，兩支都有</u>：<strong>中途按 Ctrl-C 會明確告訴你遊戲檔有沒有被動到</strong> ——
      程式記著 <code>os.replace</code> 到底做過幾次，所以它講的是「什麼都沒動」還是「已經改了，用 <code>--restore</code>」，
      離開碼一律 <strong>130</strong>；<code>mvp_fix_loc.py</code> 以前這條路是安靜地結束、還回 0 的。
-     另一件是 <code>--selftest</code>：它自己造一份最小的檔案，把上面每一道把關<u>正反各測一次</u>
+     另一件是 <code>--selftest</code>：它自己造一份最小的檔案，替把關<u>正反各測一次</u>
      （反向的那些是「故意做一件必須失敗的事」），不需要遊戲資料夾也不碰任何遊戲檔。
+     但<u>不是每一道把關都有餌</u>：本站把兩支裡條件成立就讓它停下來的守門逐一拆掉再跑自我測試，
+     <code>mvp_font_swap.py</code> 20 道裡會變紅的是 5 道、<code>mvp_fix_loc.py</code> 20 道裡是 6 道，其餘拆掉照樣全綠。
      <code>mvp_font_swap.py</code> 的遊戲資料夾因此變成選填，所以它「什麼參數都不給」的離開碼是 <strong>1</strong>（印用法），
      跟「檔案或參數有問題」的 2 分開；<code>mvp_fix_loc.py</code> 的遊戲資料夾仍是必填，那一支不給參數還是 2。</p>
 
@@ -708,7 +716,7 @@ Enable Stadium Memory Quota</pre>
      下面附的是本課自己的字型工具 <code>mvp_font_swap.py</code>，
      <strong>跟你剛才下載的那一支一個字都沒有不同</strong>（本站有自動檢查在守這件事）。</p>
   <details data-src="mvp_font_swap.py">
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（2008 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（2081 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
@@ -749,7 +757,7 @@ mvp_font_swap.py —— 一個一個換字型,找出到底是哪一個把記憶�
 **同一個球場檔(清到 8.51 MB,逐位元組相同),英文版進得去,中文版讀取條讀完就當。**
 
 → 「球場超過 10MB 就當」這條傳了二十年的規矩 **被這一場實驗推翻了**。
-   清到 8.51 MB 照樣當,所以問題不在檔案大小。
+   清到 8.51 MB 照樣當,所以卡住的不是「球場檔不能超過 10MB」那條線。
 
 → 而中英文的差別被壓縮到 **三個檔**:`FEENG.LOC`、`IGENG.LOC`、`fonts.big`。
    兩個文字檔中文版還比較**小**,只有字型檔變大:
@@ -874,7 +882,7 @@ mvp_font_swap.py —— 一個一個換字型,找出到底是哪一個把記憶�
 
 MIT License · Copyright (c) 2026 toni · 無外部相依,Python 3.7 以上
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 
 import argparse
 import hashlib
@@ -2270,6 +2278,8 @@ def selftest():
          「還沒有換過任何檔案」、正本逐位元組不變、不留「正在換」的登記
          (14/15/16 在送不出 SIGINT 的環境會跳過,而且會印出來說跳過,
           不會默默當成通過;所以最後那一行的餌數是算出來的,不是寫死的)
+     17. 假裝開了 -O(把 _optimize_level 換成回傳 1)→ 自我測試必須拒跑、結束碼 2;
+         換回原本那一支之後守門要照樣放行(陰性對照,2026-09-24 加)
 
     ⚠️ 這一段在 python3 -O 底下**直接拒絕跑**:-O 會把 assert 全部拿掉,
        而下面的檢查幾乎都是 assert,跑下去會一路印到「全部通過」——
@@ -2285,9 +2295,11 @@ def selftest():
     #    幾乎都是 assert(ck() 就是包了一層的 assert)。拿掉之後這一段會
     #    一路跑到最後印「全部通過」—— 那個綠燈是假的,比沒有測試更糟。
     #    所以 -O 直接拒絕跑,不留這個假綠的窗口。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
     import contextlib
     import io
     import shutil as _shutil
@@ -2676,6 +2688,11 @@ def selftest():
             del _WRITTEN[:]
             del _REPLACING[:]
 
+        # 17. 最上面那道 -O 守門自己的餌(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳)
+        ck(_opt[0], '餌 17 沒咬到:假裝開了 -O,自我測試竟然沒有拒跑')
+        ck(_opt[1], '餌 17 的陰性對照:沒開 -O 守門也擋,或是換回原本那一支沒換成功')
+        baits += 1
+
         print('自我測試:全部通過(%d 道檢查,涵蓋 %d 組反向餌)' % (n_checks, baits))
         return 0
     finally:
@@ -2688,6 +2705,70 @@ def io_write(root, name, data):
     with open(p, 'wb') as f:
         f.write(data)
     return p
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
 
 
 if __name__ == '__main__':
@@ -2723,7 +2804,7 @@ if __name__ == '__main__':
   <p style="margin-top:26px">下面這一支<strong>會改你的遊戲檔</strong>（加上 <code>--fix</code> 之後）。
      本站的原則是：<strong>會動你檔案的東西，你要能在跑之前先讀完它。</strong>所以它也整支印在這裡。</p>
   <details data-src="mvp_fix_loc.py">
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1801 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1876 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
@@ -2897,8 +2978,11 @@ C 語言的 `printf` 遇到 `%s` 卻沒有對應的參數,會把**堆疊上的�
     按了 Ctrl-C)的時候第一個已經改好了。這時候會先逐檔印「已改 / 沒改」
     再印還原指令,判斷方式是**當場拿每個檔跟它自己的 .locbak 比一次**,
     不是靠記帳(記帳會漏:複驗沒過那條路會先改檔、再自動還原回去)。
-  · `--selftest` 不需要遊戲資料夾:它自己造一份最小的語系檔,把上面每一道
-    把關**正反各測一次**(反向的那些是「故意做一件必須失敗的事」)。
+  · `--selftest` 不需要遊戲資料夾:它自己造一份最小的語系檔,替上面的把關
+    **正反各測一次**(反向的那些是「故意做一件必須失敗的事」)。
+    但不是每一道把關都有餌:2026-09-24 把自我測試以外、條件成立就讓這支停下來的
+    20 道逐一拆掉(那一個 if 改成永遠不成立)再跑 --selftest,會變紅的是 6 道,
+    其餘 14 道拆掉照樣全綠,例如檔頭不是 LOCH、還原之後大小或內容跟備份對不上。
     ⚠️ 它在 `python3 -O` 底下會**拒跑**並回 exit code 2:-O 會把 assert
     整句拿掉,測試工具寧可拒跑,也不要印一行沒有根據的「全部通過」。
 
@@ -2915,7 +2999,7 @@ C 語言的 `printf` 遇到 `%s` 卻沒有對應的參數,會把**堆疊上的�
 
 MIT License · Copyright (c) 2026 toni · 無外部相依,Python 3.7 以上
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 
 import argparse
 import hashlib
@@ -4107,7 +4191,9 @@ def selftest():
               **Ctrl-C 落在「換名之後、登記之前」不可以說「什麼都沒有動到」**、
               **狀態真的不明的時候要照實說「正在替換」**、
               **兩個檔只改到一半要逐檔講「已改 / 沒改」**,
-              而且一個位元組都沒寫的時候**不可以誣賴自己改過檔**
+              而且一個位元組都沒寫的時候**不可以誣賴自己改過檔**、
+              假裝開了 -O(把 _optimize_level 換成回傳 1)自我測試必須拒跑
+              (2026-09-24 加,換回來之後守門要照樣放行是它的陰性對照)
 
     ⚠️ 這個函式在 `python3 -O` 底下會拒跑並回 exit code 2(見開頭第一段)。
     """
@@ -4115,10 +4201,12 @@ def selftest():
     #    AssertionError(不是 assert 句),所以 -O 底下**這一版**其實還是真的在測;
     #    但只要以後有人補一行 assert 進來,-O 就會讓它變成假綠而沒有人發現。
     #    測試工具寧可拒跑,也不要印一行沒有根據的「全部通過」。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python -O 下跑:'
               '-O 會把 assert 全部拿掉,測試會假綠。請拿掉 -O 再跑一次。')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
 
     import contextlib
     import io as _io
@@ -4135,6 +4223,10 @@ def selftest():
     def quiet(fn, *a):
         with contextlib.redirect_stdout(_io.StringIO()):
             return fn(*a)
+
+    # 【餌】最上面那道 -O 守門自己的餌(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳)
+    ck(_opt[0], '假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試竟然沒有拒跑', True)
+    ck(_opt[1], '陰性對照:沒開 -O 守門也擋,或是換回原本那一支沒換成功')
 
     # 英文基準不帶格式符,中文那兩條分別多要 2 個與 4 個參數 ——
     # 就是檔頭講的 23484 / 23505 那兩條的縮影。
@@ -4498,6 +4590,70 @@ def selftest():
     return 0
 
 
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
+
+
 if __name__ == '__main__':
     sys.exit(main())
 
@@ -4537,6 +4693,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=12835e693d" defer></script>
+<script src="../../assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

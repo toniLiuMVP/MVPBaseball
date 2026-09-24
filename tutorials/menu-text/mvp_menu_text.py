@@ -94,7 +94,7 @@ data/ 底下的 .LOC 字串表(UTF-16LE)。所以改選單文字**不必動版�
 無外部相依,Python 3.7 以上即可。
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -1502,6 +1502,9 @@ def selftest():
         不然「長度必須相同」那一道會先攔下來,餌就咬不到連結那一道
       · python -O 會把 assert 全部拿掉,這一段的正向檢查幾乎都是 assert ——
         真的跑下去會一路印到「全部通過」。所以 -O 直接拒絕,離開碼 2
+    2026-09-24 再加一組(兩道):上面那道 -O 守門自己的餌 ——
+      · 把 _optimize_level 換成「回傳 1」(假裝開了 -O),自我測試必須拒跑,
+        這一道算反向餌;換回原本那一支之後守門要照樣放行,這一道是它的陰性對照
 
     符號連結那幾道在建不了連結的系統(Windows 沒開開發者模式)上會跳過,
     而且**會印出來說跳過了**,不會默默當成通過。所以總道數是算出來的,
@@ -1513,12 +1516,18 @@ def selftest():
     # ⚠️ python -O 會把整支程式裡的 assert **全部拿掉**。這一段的正向檢查
     #    幾乎都是 assert,拿掉之後測試會一路跑到最後印「全部通過」——
     #    綠燈是假的。所以 -O 直接拒絕跑,不留這個假綠的窗口。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
     import io
     import contextlib
     total, baits = 17, 10          # 上面 docstring 說的那一段,下面才開始加
+    # 最上面那道 -O 守門自己的餌(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳)
+    assert _opt[0], '假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試竟然沒有拒跑'
+    assert _opt[1], '陰性對照:沒開 -O 守門也擋,或是換回原本那一支沒換成功'
+    total += 2; baits += 1
     pairs = [(12, 'Play Now'), (627, 'Quit'), (13, 'Game Modes')]
     blob = _fake_loc(pairs)
     d = tempfile.mkdtemp()
@@ -1732,6 +1741,70 @@ def selftest():
 
     print('自我測試:全部通過(%d 道檢查,其中 %d 道是反向餌)' % (total, baits))
     return 0
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
 
 
 if __name__ == '__main__':

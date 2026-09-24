@@ -19,7 +19,7 @@
 <title>遊戲當掉了怎麼辦 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="MVP Baseball 2005 當機的常見原因與判斷方法。附唯讀診斷腳本，一鍵檢查記憶體上限、資料量與檔案完整性。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="../../assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -62,8 +62,7 @@
   <div class="quickfix" id="quick">
     <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
-      <li>下載這頁的診斷腳本，<strong>從「下載」資料夾拖到桌面</strong>，開命令提示字元切到桌面。
-  <pre><code>cd %USERPROFILE%\Desktop</code></pre></li>
+      <li>下載這頁的診斷腳本。下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打（Mac 開終端機先打 <code>cd ~/Downloads</code>）。</li>
       <li>打下面這行，<strong>結尾留一個空格</strong>，再把<strong>遊戲安裝資料夾</strong>拖進來（不是 <code>data</code> 資料夾，是它的上一層），然後按 Enter。
   <pre><code>python mvp_check_setup.py </code></pre></li>
       <li>看【1】：印「<code>⚠ 只有 2 GB(未開啟大位址支援)</code>」而你又裝了不少模組，這是候選原因之一 —— 但本站量到成因的那次跳出（中文版配大球場）卡的不是這道 2 GB 的牆，是遊戲自己切的那塊 <strong>64 MB 記憶體池</strong>，單獨開大位址旗標照樣跳出（見<a href="../exe-tuning/index.html">執行檔上的六個旋鈕</a>）。再看【2】列出最大的幾個檔。</li>
@@ -71,7 +70,8 @@
       <li>照本站教學改壞的，一行還原；手動改的就把當初的 <code>.bak</code> 改名回原檔名。
   <pre><code>python mvp_hide_runner_speed.py "…\ingame.big" --restore</code></pre></li>
     </ol>
-    <p class="tail">Mac 把 <code>python</code> 換成 <code>python3</code>。診斷腳本全程唯讀，不會修改任何檔案。
+    <p class="tail">照做卡住了？直接跳到<a href="#errors">出錯了？對照這張表</a>，拿畫面上印出來的那一行去對。
+       Mac 把 <code>python</code> 換成 <code>python3</code>。診斷腳本全程唯讀，不會修改任何檔案。
        想知道 2 GB 上限是怎麼回事、為什麼要先驗下載的那包完不完整，往下讀；
        只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
   </div>
@@ -85,10 +85,9 @@
   <p class="small">零相依、<strong>全程唯讀不修改任何檔案</strong>、附完整原始碼。需要 Python 3.7 以上（見<a href="../../start.html">第 0 課</a>）。</p>
 
   <div class="substep">
-    <p class="small"><strong>⚠️ 按了下載之後，檔案多半在「下載」資料夾不是桌面</strong> ——
-         開檔案總管左邊點「下載」，把那個 <code>.py</code> 拖到桌面再往下做。
-         沒做的話會看到 <code>can't open file</code>。</p>
-      <p><span class="sk">a</span>把腳本放到桌面，開命令提示字元切到桌面（<code>cd %USERPROFILE%\Desktop</code>）。</p>
+    <p class="small"><strong>⚠️ 按了下載之後，檔案多半在「下載」資料夾</strong> ——
+         命令視窗要在那裡開，不然會看到 <code>can't open file</code>。</p>
+      <p><span class="sk">a</span>打開檔案總管左邊的「下載」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter，開出來的命令提示字元已經停在「下載」裡（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。Mac：打開終端機，先打 <code>cd ~/Downloads</code> 按 Enter。</p>
     <p><span class="sk">b</span>打下面這段，然後把<strong>遊戲安裝資料夾</strong>拖進來（不是 data 資料夾，是它的上一層）：</p>
   </div>
 <pre><code>python mvp_check_setup.py </code></pre>
@@ -124,9 +123,9 @@
     <thead><tr><th style="width:34%">畫面上的訊息</th><th>原因</th><th>你要做的</th></tr></thead>
     <tbody>
       <tr class="hi"><td data-label="畫面上的訊息" class="mono">can't open file '…\mvp_check_setup.py'</td>
-          <td data-label="原因">檔案還在「下載」資料夾，不在桌面</td>
-          <td data-label="你要做的">開檔案總管左邊點「下載」，把那個 <code>.py</code> 拖到桌面，再跑一次。
-              <u>這是本站最常見的第一個卡點。</u></td></tr>
+          <td data-label="原因"><strong>命令視窗跟腳本不在同一個資料夾</strong>，或檔名對不上（瀏覽器可能在檔名後面加了 <code>(1)</code>）。
+              <u>這是本站最常見的第一個卡點。</u></td>
+          <td data-label="你要做的">打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）；檔名多了 <code>(1)</code> 就改成跟指令裡一模一樣</td></tr>
       <tr><td data-label="畫面上的訊息">印出一整段說明就停住，沒有【1】</td>
           <td data-label="原因">指令後面沒有接資料夾（結束碼 <code>1</code>）</td>
           <td data-label="你要做的">打完 <code>python mvp_check_setup.py</code> <strong>結尾留一個空格</strong>，
@@ -428,7 +427,7 @@
     <li><strong>本站沒驗的</strong> 大容量硬碟存不了名冊的成因只是推測、沒有實測驗證；「有檔頭沒聲音」會不會真的讓遊戲跳出也沒實測；老闆模式切主場觀眾席視角就當掉這一條，踩了十幾年<strong>至今無解</strong>。</li>
   </ul>
 
-  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <!-- course-strip:begin · 這一塊由產生器從 plan.html 產生，不要手改 -->
   <nav class="card course-strip" aria-label="這一課在課表的位置">
     <p class="card-h">📚 照課表上課的話</p>
     <p><a href="../../plan.html#b"><strong>② 急救班</strong></a> 第 1／5 堂</p>
@@ -546,16 +545,17 @@
   <p class="small"><strong>想先確認【4】那一段可不可信</strong>，多打一個旗標就好：
 <pre style="margin:8px 0 0"><code>python mvp_check_setup.py --selftest</code></pre>
      它<u>不讀你的遊戲資料夾</u>，只在記憶體裡拿假的路徑字串把「哪些檔算備份」那條規則驗一次，
-     不建暫存檔、也不碰磁碟。四項全綠才代表【4】的判斷還照著那份清單走；
+     不建暫存檔、也不碰磁碟。一共六項：規則那四項全綠才代表【4】的判斷還照著那份清單走，
+     最後兩項驗的是「在 <code>python -O</code> 底下拒跑」那道守門（假裝開了 <code>-O</code> 必須拒跑、沒開就要放行）；
      有一項紅了它會用結束碼 <code>1</code> 收場。
-     四項裡有兩項是<u>故意種下的餌</u>（清單砍短之後 <code>.ratingsbak</code> 必須立刻看不見、
+     規則那四項裡有兩項是<u>故意種下的餌</u>（清單砍短之後 <code>.ratingsbak</code> 必須立刻看不見、
      原廠那一個連反斜線與大寫的寫法都要挑得出來），
      沒有餌的話，一條「什麼都算備份」的爛規則也會全綠。</p>
 
   <h2 id="source">完整原始碼</h2>
   <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。不必下載也能先看過一遍。</p>
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（542 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（624 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -580,7 +580,8 @@ mvp_check_setup.py
   以 -- 開頭的參數一律當旗標略過,所以路徑排在旗標後面也讀得到。
   唯一認得的旗標是 --selftest:不讀你的遊戲資料夾,只在記憶體裡把
   【4】那條「哪些檔算備份」的規則驗一次(含兩個故意種下的餌)。
-  它拒絕在 python3 -O 底下跑,理由寫在 self_test() 的說明裡。
+  它拒絕在 python3 -O 底下跑,理由寫在 self_test() 的說明裡;
+  那道拒跑的守門自己也有一個餌與一個陰性對照(2026-09-24 加)。
 
 ── 輸出 ─────────────────────────────────────────────
   只印到畫面,不產生任何檔案:
@@ -616,7 +617,7 @@ mvp_check_setup.py
 無外部相依,Python 3.7 以上即可。
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -776,7 +777,9 @@ def self_test():
     """把【4】那條「哪些檔算備份」的規則當場驗一次,全綠回 True。
 
     全程只在記憶體裡跑假路徑:不建檔、不刪檔、也不讀你的遊戲資料夾。
-    四項裡有兩項是餌 —— 沒有餌的話,一個「什麼都算備份」的爛規則也會全綠。
+    規則那四項裡有兩項是餌 —— 沒有餌的話,一個「什麼都算備份」的爛規則也會全綠。
+    最後兩項驗的是最上面那道 -O 守門:一個餌、一個陰性對照(2026-09-24 加),
+    一共六項。
 
     在 python3 -O 底下不跑,直接以結束碼 2 收工(不回傳 True/False)。
     """
@@ -788,10 +791,12 @@ def self_test():
     #    不必指望那時候有人記得補。
     #    這裡直接結束整支程式,不回傳 —— 「測試沒跑」跟「測試沒過」是兩回事,
     #    用 1(有一項紅了)會把它們混在一起。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python3 -O 底下跑:-O 會把 assert 整段拿掉,'
               '哪天這裡改用 assert 判斷就會變成一片假的綠燈。請拿掉 -O 再跑一次。')
         sys.exit(2)
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(self_test)
     print('【0】自我測試(不碰任何檔案)')
     ok = True
 
@@ -836,6 +841,19 @@ def self_test():
     else:
         ok = False
         print(f'   ❌ 餌二失敗(原廠={len(shipped)} 個 / 你的={len(mine)} 個)')
+
+    # 五、餌:最上面那道 -O 守門(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳)。
+    if _opt[0]:
+        print('   ✅ 餌三:假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試拒跑、結束碼 2')
+    else:
+        ok = False
+        print('   ❌ 餌三沒抓到:假裝開了 -O,自我測試竟然沒有拒跑')
+    # 六、陰性對照:換回原本那一支之後,沒開 -O 就要放行。
+    if _opt[1]:
+        print('   ✅ 陰性對照:換回原本那一支之後,沒開 -O 的時候守門放行')
+    else:
+        ok = False
+        print('   ❌ 陰性對照失敗:沒開 -O 守門也擋,或是換回原本那一支沒換成功')
 
     print('   全綠' if ok else '   有項目沒過')
     return ok
@@ -1055,6 +1073,70 @@ def main():
     return 0
 
 
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
+
+
 if __name__ == '__main__':
     try:
         sys.exit(main())
@@ -1128,6 +1210,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=12835e693d" defer></script>
+<script src="../../assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

@@ -19,7 +19,7 @@
 <title>把真實成績換算成遊戲裡的能力值 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="這款遊戲出貨時同時附了每位球員的真實成績與 EA 給的能力值——所以「成績→能力值」有標準答案，不用猜。本站把公式配出來並量了誤差，也誠實說出哪幾欄配不出來。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="../../assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -307,7 +307,7 @@
         <code>pitcher.dat</code> 欄位。</li>
   </ul>
 
-  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <!-- course-strip:begin · 這一塊由產生器從 plan.html 產生，不要手改 -->
   <nav class="card course-strip" aria-label="這一課在課表的位置">
     <p class="card-h">📚 照課表上課的話</p>
     <p><a href="../../plan.html#d"><strong>④ 年度更新班</strong></a> 第 4／9 堂</p>
@@ -532,7 +532,7 @@ MVP Baseball 2005 出貨時同時附了每一位球員的真實成績與 EA 給�
 
 —— toni的MVP模組補習班
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 
 import argparse
 import csv
@@ -1946,8 +1946,12 @@ def _interrupt_report():
 def selftest():
     """--selftest:不碰任何遊戲檔,在系統暫存資料夾裡把會動檔案的那幾條路走一遍。
 
-    重點不是「跑得完」,是**每一道守門都下了餌** —— 先證明守門壞掉的時候它真的會叫。
+    重點不是「跑得完」,是**下了餌** —— 先證明守門壞掉的時候它真的會叫。
     只驗正向的測試會在功能整個壞掉時照樣全綠,那種測試比沒有更危險。
+    ⚠️ 但不是每一道守門都有餌。2026-09-24 把這一段以外、條件成立就讓這支停下來的
+       25 道守門逐一拆掉(那一個 if 改成永遠不成立)再跑 --selftest,會變紅的只有 5 道:
+       兩道符號連結、--out 指到遊戲檔的副檔名、還原時讀回來跟備份對不起來、成績低於公式門檻。
+       其餘 20 道拆掉照樣全綠,例如「CSV 少了欄位」「找不到遊戲資料夾」「本站配不出這一欄」。
 
     九個餌(1~7 對應 2026-09-05 那一輪,8、9 是 2026-09-11 補的):
       1. 事先擺一顆叫「&lt;名單&gt;.ratingsbak.part」的符號連結指到資料夾外面 ——
@@ -2458,6 +2462,6 @@ if __name__ == '__main__':
        <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=12835e693d" defer></script>
+<script src="../../assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

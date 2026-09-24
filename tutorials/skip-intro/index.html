@@ -19,7 +19,7 @@
 <title>關掉開場動畫 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="遊戲一開就是一段十八 MB 的動畫。這一課教你把它改短，不是刪檔也不是換一個現成的短片：拿你自己那一份，只留開頭幾格畫面、聲音整段丟掉，照原格式組回去。四份剛安裝好的安裝逐檔量過。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="../../assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -57,11 +57,10 @@
   <div class="quickfix" id="quick">
     <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快把開場動畫關掉？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
-      <li>下載 <a href="mvp_skip_intro.py" download>mvp_skip_intro.py</a>
-          放到桌面，檔名必須正好是這個（瀏覽器多半直接丟進「下載」資料夾，要自己拖到桌面）。</li>
-      <li>開命令提示字元切到桌面，Windows 打第一行、Mac 打第二行<br>
-<pre><code>cd %USERPROFILE%\Desktop</code></pre>
-<pre><code>cd ~/Desktop</code></pre></li>
+      <li>下載 <a href="mvp_skip_intro.py" download>mvp_skip_intro.py</a>，
+          檔名必須正好是這個（瀏覽器多半直接丟進「下載」資料夾，不用搬）。</li>
+      <li>在「下載」資料夾開命令視窗：Windows 打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打；Mac 開終端機打這一行<br>
+<pre><code>cd ~/Downloads</code></pre></li>
       <li>先看一眼你那一份有什麼（<u>這一步不會動任何檔案</u>）：
 <pre><code>python mvp_skip_intro.py "〔你的遊戲資料夾〕" --info</code></pre>
 <pre><code>python3 mvp_skip_intro.py "〔你的遊戲資料夾〕" --info</code></pre>
@@ -197,26 +196,24 @@
      那一頁用的是<u>你這份遊戲裡前人留下的空白檔</u>，不用下載腳本也不用打指令。
      <strong>剛安裝好的原版沒有那種檔，那一頁對你不成立</strong>，請照這一課做。</p>
 
-  <p><strong>步驟 1</strong>：下載腳本放到桌面，再把命令列切到桌面。
-     瀏覽器多半直接丟進「下載」資料夾，<u>要自己拖到桌面</u>，
+  <p><strong>步驟 1</strong>：下載腳本，在「下載」資料夾開命令視窗。
+     瀏覽器多半直接丟進「下載」資料夾，<u>命令視窗要在那裡開</u>，
      不然下一步會看到 <code>can't open file</code>。</p>
   <p><a class="btn" href="mvp_skip_intro.py" download>下載 mvp_skip_intro.py</a>
-     <span class="small">（1328 行，零相依，只用 Python 內建模組）</span></p>
+     <span class="small">（1,409 行，零相依，只用 Python 內建模組）</span></p>
 
   <div class="card amber">
-    <p class="card-h">按了下載之後，檔案跑到哪裡去了？</p>
+    <p class="card-h">按了下載之後，檔案跑到哪裡去了？指令要在哪裡打？</p>
     <p><strong>瀏覽器多半不會問你要存哪裡</strong>，它會直接放進「下載」資料夾。
-       所以按完之後還有一步：</p>
-    <p><span class="sk">1</span>打開檔案總管（Mac 用 Finder），左邊點「<u>下載</u>」<br>
-       <span class="sk">2</span>找到那個 <code>.py</code> 檔<br>
-       <span class="sk">3</span><strong>把它拖到桌面</strong></p>
-    <p class="small">沒做這一步的話，後面 <code>cd</code> 到桌面再執行，
-       畫面會出現 <code>can't open file</code> —— 那不是你打錯，是檔案還在「下載」裡。</p>
+       所以命令視窗要從那裡開（Windows 照下面三小步，Mac 看這張卡下面那一行）：</p>
+    <p><span class="sk">1</span>打開檔案總管，左邊點「<u>下載</u>」<br>
+       <span class="sk">2</span>點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code>，按 Enter<br>
+       <span class="sk">3</span>開出來的視窗<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打</p>
+    <p class="small">沒照這樣開視窗的話，畫面會出現 <code>can't open file</code> —— 那不是你打錯，是視窗跟檔案不在同一個資料夾。</p>
   </div>
 
-  <p class="small">切到桌面：Windows 打第一行、Mac 打第二行。</p>
-<pre><code>cd %USERPROFILE%\Desktop</code></pre>
-<pre><code>cd ~/Desktop</code></pre>
+  <p class="small">Mac：打開終端機，打這一行：</p>
+<pre><code>cd ~/Downloads</code></pre>
 
   <p><strong>步驟 2</strong>：先看你那一份有什麼。這一步不會動任何檔案。</p>
 <pre><code>python mvp_skip_intro.py "〔你的遊戲資料夾〕" --info</code></pre>
@@ -252,8 +249,9 @@
   <h2 id="fix">❌ 沒過的話</h2>
   <ul>
     <li><strong>印出 <code>can't open file '…\mvp_skip_intro.py'</code></strong> ——
-        檔案還在「下載」資料夾，不在桌面。
-        開檔案總管左邊點「下載」，把那個 <code>.py</code> 拖到桌面，再跑一次。
+        命令視窗跟腳本不在同一個資料夾。
+        打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）。
+        還是一樣的話，是檔名對不上：瀏覽器可能在檔名後面加了 <code>(1)</code>，把它改成跟指令裡一模一樣。
         <u>這是本站最常見的第一個卡點</u>，那不是你打錯。</li>
     <li><strong>印出「這不是 .vp6」</strong> —— 你指的資料夾對嗎？
         腳本會自己往 <code>data\frontend\movies\</code> 找，
@@ -339,7 +337,7 @@
       <tr><td data-label="那一段"><code>refuse_symlink</code></td>
           <td data-label="在做什麼">目標或備份是符號連結就不碰。<u>本站沒驗過改連結會怎樣</u>，跟著連結出去有可能改到資料夾外面的檔</td></tr>
       <tr><td data-label="那一段"><code>_selftest</code></td>
-          <td data-label="在做什麼">自己造假檔測試：1 個陰性對照 ＋ <strong>18 個反向餌</strong>（不是 <code>MVhd</code>／區塊長度越界／影格數對不上／音訊沒丟乾淨／第一格不是關鍵影格／備份是 0 bytes／備份剛好截在區塊邊界／備份尾巴多出走不完的位元組／三種符號連結／換檔那一步失敗／換名與登記的先後／換名之後才被 Ctrl+C 打斷／一批檔裡有一個讀不動／還原之後讀不回來／沒預料到的錯誤／同一個檔換兩次只登記一次）。不碰任何遊戲檔，符號連結那幾個在系統暫存區現開的拋棄式資料夾裡跑；<u>建不出符號連結的環境會少跑那三個，畫面上會說跳過了哪幾個</u></td></tr>
+          <td data-label="在做什麼">自己造假檔測試：2 個陰性對照 ＋ <strong>19 個反向餌</strong>（不是 <code>MVhd</code>／區塊長度越界／影格數對不上／音訊沒丟乾淨／第一格不是關鍵影格／備份是 0 bytes／備份剛好截在區塊邊界／備份尾巴多出走不完的位元組／三種符號連結／換檔那一步失敗／換名與登記的先後／換名之後才被 Ctrl+C 打斷／一批檔裡有一個讀不動／還原之後讀不回來／沒預料到的錯誤／同一個檔換兩次只登記一次／假裝開了 <code>-O</code> 必須拒跑）。不碰任何遊戲檔，符號連結那幾個在系統暫存區現開的拋棄式資料夾裡跑；<u>建不出符號連結的環境會少跑那三個，畫面上會說跳過了哪幾個</u></td></tr>
     </tbody>
   </table></div>
 
@@ -347,7 +345,7 @@
 <pre><code>python3 mvp_skip_intro.py --selftest</code></pre>
 
   <details>
-    <summary>完整原始碼（1328 行）</summary>
+    <summary>完整原始碼（1409 行）</summary>
 <pre>#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """mvp_skip_intro.py —— 關掉 MVP Baseball 2005 的開場動畫。
@@ -482,7 +480,7 @@
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -1122,13 +1120,21 @@ def cmd_restore(game_dir):
 
 
 def _selftest():
-    """反向測試:自己造一份假的 .vp6,證明每一道檢查真的會擋。
+    """反向測試:自己造一份假的 .vp6,證明下了餌的那幾道檢查真的會擋。
+
+    ⚠️ 不是每一道檢查都有餌。2026-09-24 把這一段以外、條件成立就讓這支停下來的
+       21 道守門逐一拆掉(那一個 if 改成永遠不成立)再跑一次,會變紅的是 9 道;
+       其餘 12 道拆掉照樣全綠,例如檔頭長度不是 32、寫出來的暫存檔讀回來對不上、
+       Python 版本低於 3.7(那一道在模組最上面,自我測試能跑起來就代表它已經放行了)。
 
     ⚠️ 不碰任何遊戲檔。前八個餌只用記憶體;餌 9-18 要驗的是檔案系統上的行為
        (符號連結、換檔失敗、換名與登記的先後、換名之後才被 Ctrl+C 打斷、
        一批檔裡有一個讀不動、還原之後讀不回來、沒預料到的錯誤、同一個檔換兩次),
        所以在系統暫存區用 mkdtemp 現開一個拋棄式資料夾,跑完整個刪掉。
        路徑是當場生出來的,不可能指到你的遊戲。
+    餌 19(2026-09-24 加)驗的是最上面那道 -O 守門自己:把 _optimize_level 換成
+    「回傳 1」(假裝開了 -O),自我測試必須拒跑;換回原本那一支之後守門要照樣放行,
+    那是它的陰性對照(第 2 個陰性對照)。兩道都只在記憶體裡。
 
     在 python3 -O 底下不跑,直接回 2。
     """
@@ -1136,12 +1142,21 @@ def _selftest():
     #    assert,所以 -O 還不會讓它假綠;擋掉是為了跟全站的自我測試一致,
     #    而且哪天這裡改寫成 assert,守門已經在了,不必指望那時候有人記得補。
     #    回 2 不回 1:「測試沒跑」跟「測試沒過」是兩回事,混在一起會看不出來。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('  🔴 --selftest 不能在 python3 -O 底下跑:-O 會把 assert 全部拿掉,'
               '測試會變成一片假的綠燈。請拿掉 -O 再跑一次。')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(_selftest)
     fails = []
     skipped = []
+    # 餌19:最上面那道 -O 守門(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳)
+    if not _opt[0]:
+        fails.append('餌19 沒抓到:假裝開了 -O(把 _optimize_level 換成回傳 1),'
+                     '自我測試竟然沒有拒跑')
+    # 陰性對照 2:換回原本那一支之後,沒開 -O 就要放行
+    if not _opt[1]:
+        fails.append('陰性對照 2:沒開 -O 守門也擋,或是換回原本那一支沒換成功')
 
     def mk(frames, chunks):
         h = bytearray(HDR_LEN)
@@ -1596,7 +1611,7 @@ def _selftest():
             print('  🔴 %s' % x)
         print('  總判定: ❌ 自我測試沒過')
         return 1
-    print('  ✅ 自我測試通過(1 個陰性對照 + %d 個反向餌全部抓到)' % (18 - len(skipped)))
+    print('  ✅ 自我測試通過(2 個陰性對照 + %d 個反向餌全部抓到)' % (19 - len(skipped)))
     if skipped:
         print('  ⚠️ 這個環境跳過了:%s' % '、'.join(skipped))
     return 0
@@ -1647,6 +1662,70 @@ def main(argv):
         say_file_state(a.game_dir, '')
         print('     請把整段輸出帶到回報頁。')
         return 1
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
 
 
 if __name__ == '__main__':
@@ -1704,7 +1783,7 @@ if __name__ == '__main__':
         <u>遊戲層面要你幫忙看</u>。測試機那份是社群 2008 年換的，不是本站驗的。</li>
   </ul>
 
-  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <!-- course-strip:begin · 這一塊由產生器從 plan.html 產生，不要手改 -->
   <nav class="card course-strip" aria-label="這一課在課表的位置">
     <p class="card-h">📚 照課表上課的話</p>
     <p>這一課沒有排進任何一班。課表上寫的適合時機：「你不想每次開遊戲都等那段開場動畫」</p>
@@ -1726,6 +1805,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=12835e693d" defer></script>
+<script src="../../assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

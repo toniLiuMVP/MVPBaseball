@@ -45,6 +45,10 @@ mvp_unpack_big.py — 把封裝檔解成資料夾(實驗性)
     --restore 靠它認出哪些散裝檔是自己寫的,
     --clean 再靠指紋確認那些檔現在**還是**自己寫的那一份。
 
+--selftest(2026-09-24 加):不需要封裝檔。在系統暫存資料夾造假的封裝檔,
+  把下面每一道安全網各下一個餌驗一次,跑完整個刪掉,不碰你的遊戲。
+  全過回 0、有一道沒過回 1、在 python3 -O 底下拒跑回 2。
+
 安全網在哪
 ---------
 · 預設只預覽。沒加 --apply 一個位元組都不寫,先讓你看清楚會發生什麼事。
@@ -113,8 +117,9 @@ mvp_unpack_big.py — 把封裝檔解成資料夾(實驗性)
 (上面這一段是本站每一支會動封裝檔的腳本共用的紀律。**這一支不寫回封裝檔**:
  它只把內容讀出來、再把封裝檔改名。所以下面 append_entry()、read_entry()、
  qfs_compress_literal() 與那兩個 fsh_ 開頭的函式,
- 在本支從頭到尾沒有被叫到,留著是為了跟其他課的腳本長得一樣,
- 你要對照的時候比較好認。
+ 在 main() 那條路上從頭到尾沒有被叫到,留著是為了跟其他課的腳本長得一樣,
+ 你要對照的時候比較好認。(2026-09-24 起 --selftest 會叫 qfs_compress_literal()
+ 造壓縮過的假項目;那是另一個入口 selftest(),不在 main() 那條路上,下面的數字不含它。)
  上面這五個是在本檔上用 Python 的語法樹從 main() 一路追呼叫追出來的:
  真的走得到的函式是 big_entries / cleanup_hint / cmd_plan / cmd_restore / main /
  manifest_text / plan_unpack / qfs_decompress / read_manifest / refuse_symlink /
@@ -136,11 +141,13 @@ mvp_unpack_big.py — 把封裝檔解成資料夾(實驗性)
    整個檔就只有這一段訂正會命中。它也不需要,因為這一支不讀也不寫圖,
    只把封裝檔目錄裡的每一項解出來寫成散裝檔。
    (前面提到的那兩個 fsh_ 開頭的函式碰的是 EA 自己的 SHPI/FSH 圖片格式,不是 PNG。)
-   「自包含、不需要安裝套件」那半句是對的:在本檔上用 Python 語法樹掃到 10 個 import,
+   「自包含、不需要安裝套件」那半句是對的:在本檔開頭用 Python 語法樹掃到 10 個 import,
    argparse / hashlib / os / re / shutil / signal / struct / sys / tempfile / zlib,
-   全是 Python 自己就附的模組。
-   其中 re、shutil、zlib 被當成模組屬性使用的次數都是 0,跟上面那五個走不到的函式一樣,
-   留著是為了跟其他課的腳本長得一樣;tempfile 是 2026-09-05 加的,
+   全是 Python 自己就附的模組(--selftest 與它的 -O 守門另外在函式裡 import 了
+   contextlib、io 與 threading,也都是 Python 自己附的)。
+   其中 re、zlib 被當成模組屬性使用的次數都是 0,跟上面那五個走不到的函式一樣,
+   留著是為了跟其他課的腳本長得一樣;shutil 在 2026-09-24 之前也是 0,
+   現在只有 --selftest 用到它 2 次(清掉自己造的暫存資料夾);tempfile 是 2026-09-05 加的,
    清單那個檔就是靠它的 mkstemp() 拿到一個「同資料夾、名字不會撞、也不可能是既有符號連結」
    的暫存檔,寫完再原子換上去 —— 2026-09-06 起每一個散裝檔也是這樣寫的。
    hashlib 與 signal 是 2026-09-06 加的:前者算清單裡那一欄指紋,
@@ -151,7 +158,7 @@ mvp_unpack_big.py — 把封裝檔解成資料夾(實驗性)
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -1418,6 +1425,8 @@ def main():
      這一個相位說得出口,而 idle 的意思就是「還沒寫、也還沒刪」)。
     「自己停下來」一律印成「停下來了:…」,不噴一長串堆疊訊息,
     因為這支是給人看的工具,不是給程式接的。
+    --selftest 不走這裡(在最底下就先攔下來了):全過回 0、有一道沒過回 1、
+    在 python3 -O 底下拒跑回 2。
     2026-09-05 訂正:舊版只接 DataError 與 KeyboardInterrupt,所以上面這兩句
     在壞檔上並不成立 —— 一個被截斷的 QFS 串流會讓 qfs_decompress() 丟 IndexError,
     當場噴一整串堆疊訊息、結束碼是 1(實測)。下面補了一段把那一族收進結束碼 2。
@@ -1474,7 +1483,696 @@ def main():
     return 0
 
 
+# ─────────────────────────────────────────────────────────
+#  自我測試(--selftest,2026-09-24 加)
+# ─────────────────────────────────────────────────────────
+
+def selftest():
+    """--selftest:在系統暫存資料夾造假的封裝檔,把 main() 走得到的每一道守門各驗一次。全過回 0。
+
+    ⚠️ 不碰你的遊戲資料夾。封裝檔、散裝檔、清單全部放在 tempfile.mkdtemp()
+       開的那一個資料夾裡,跑完整個刪掉。壓縮過的假項目是 qfs_compress_literal() 造的
+       (這支平常用不到它,只有這裡用)。
+
+    main() 走得到的每一道守門都有「餌」(故意做它該擋的事,沒擋就紅)與「陰性對照」
+    (做正常的事,它不該擋;少了這一半,一個什麼都擋的版本也會全綠)。
+    檔頭說明裡那五個 main() 走不到的函式(append_entry、read_entry、
+    qfs_compress_literal 與兩個 fsh_ 開頭的)裡面的守門沒有餌 —— 這支用不到它們。
+    有幾道背後還站著另一道(拿掉它,下一道照樣會擋),那幾個餌比的是
+    「它自己丟出來的那句話」,不只看有沒有停下來。
+    清單的符號連結檢查是兩層(cmd_plan() 先擋,write_text_atomic() 寫檔前再擋一次),
+    餌驗的是兩層合起來的結果:只拆掉裡面那一層,這裡不會紅。
+      一、QFS 解壓:檔頭不完整(短的、長的兩種)、宣稱的解壓大小超過上限、往回參照越界、
+          解出來超過宣稱的大小 → 停下來;截斷的串流走命令列要回 2、不噴 traceback
+      二、封裝檔目錄:不是 BIGF、項目數是 0、目錄被截斷、名稱沒有結尾的 0x00、
+          目錄長得離譜、給的路徑讀不進來 → 停下來;名稱很長的 200 項要一項不少地讀完
+      三、項目名稱:路徑分隔符號、冒號、以點開頭、控制字元、結尾是點或空白、
+          Windows 保留裝置名 → 拒絕;一般檔名放行
+      四、同名的項目(連只差在大小寫的也算)→ 在寫任何東西之前停下來
+      五、預覽一個位元組都不寫;--apply 解出來的內容、清單的指紋、封裝檔改名都對;
+          --restore 改回來、--restore --clean 把自己寫的清掉,封裝檔逐位元組跟原本一樣
+      六、資料夾裡已經有同名的檔、上一次的清單、備份名被佔住 → 停下來,什麼都不寫
+      七、解完複驗對不上(內容的指紋不對、檔不見了)→ 自動把封裝檔改回原名,回 2
+      八、寫到一半出狀況:讀回來對不上 → 清掉暫存檔、清單照實補上已經寫出去的那幾個,
+          封裝檔不改名;目錄說的長度讀不足、散裝檔的暫存檔開不起來、清單換不上去
+          → 停下來,封裝檔不改名
+      九、Ctrl-C 與改名失敗:還沒動就說沒動;解到一半、改名那一步出事,都不可以說「什麼都還沒有動到」;
+          改名一做完就收到真的 SIGINT → 那一段跑完才丟出來、說已經改名;
+          還原改名的半路被打斷 → 說還原還沒做完;「換名 + 登記」的保險裝不上時
+          中斷落在縫裡 → 說「換好了沒有無法確定」
+      十、還原:正本與備份同時在、備份不是 BIGF、備份被截斷、備份小到連檔頭都不完整、
+          兩個都找不到 → 停下來;兩個都找不到時不可以捏造一段沒發生過的中斷
+      十一、--clean:你改過的檔、舊版沒有指紋的清單、欄位數不對或名稱可疑的清單 → 一個都不刪;
+          刪到一半出事要說已經刪掉幾個
+      十二、符號連結:散裝檔的名字、清單、備份、還原時的正本名字、--clean 時的清單是連結
+          → 停下來,外面那個檔不被動到;解完之後散裝檔被換成內容相同的連結 → 複驗不算數
+          (這台機器做不出符號連結就跳過,而且會印出來說跳過了)
+      十三、最上面那道「-O 拒跑」守門自己的餌
+    在 python3 -O 底下拒跑,回 2。
+    """
+    # -O 會把 assert 整段拿掉。這一段的判斷是下面那個 check(),-O 拿不掉它 ——
+    # 守門照樣要有:哪天有人在這裡補一句 assert,沒有它就會靜靜地變成假綠。
+    if _optimize_level():
+        print('--selftest 不能在 python3 -O 底下跑:-O 會把 assert 整段拿掉,'
+              '測試會變成一片假的綠燈。請拿掉 -O 再跑一次。')
+        return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
+    import contextlib
+    import io
+
+    print('自我測試(在系統暫存資料夾裡造假的封裝檔,不碰你的遊戲)')
+    tally = {'n': 0, 'bait': 0, 'fail': 0}
+    skipped = []
+
+    def check(ok, what, bait=False):
+        tally['n'] += 1
+        tally['bait'] += 1 if bait else 0
+        tally['fail'] += 0 if ok else 1
+        print('   %s %s%s' % ('✅' if ok else '❌', '餌:' if bait else '', what))
+
+    def quiet(fn, *a):
+        """跑 fn,把它印的字收起來。回傳 (回傳值或它丟出來的例外, 印出來的字)。"""
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                r = fn(*a)
+        except (Exception, SystemExit, KeyboardInterrupt) as e:
+            r = e
+        return r, buf.getvalue()
+
+    def stops(fn, *a):
+        return isinstance(quiet(fn, *a)[0], DataError)
+
+    def put(path, data):
+        with open(path, 'wb') as f:
+            f.write(data)
+
+    def get(path):
+        with open(path, 'rb') as f:
+            return f.read()
+
+    def reset():
+        PROGRESS.update({'wrote': 0, 'manifest': None, 'target': None,
+                         'phase': 'idle', 'inflight': None, 'deleted': 0})
+
+    def run_main(*argv):
+        reset()
+        real_argv = sys.argv
+        sys.argv = ['mvp_unpack_big.py'] + list(argv)
+        try:
+            return quiet(main)
+        finally:
+            sys.argv = real_argv
+
+    def bigf(entries, count=None):
+        """拼一個 BIGF:檔頭 16 bytes(總大小小端序)+ 目錄(位移、大小大端序 + 名稱 + 0x00)+ 資料。"""
+        dlen = sum(8 + len(n) + 1 for n, _ in entries)
+        d, blob = b'', b''
+        for n, data in entries:
+            d += struct.pack('>II', 16 + dlen + len(blob), len(data)) + n + b'\x00'
+            blob += data
+        return (b'BIGF' + struct.pack('<I', 16 + dlen + len(blob))
+                + struct.pack('>II', len(entries) if count is None else count, dlen) + d + blob)
+
+    PLAIN = {'a.txt': b'hello a\r\n', 'b.txt': b'B' * 300, 'c.ord': bytes(range(256))}
+    ENTRIES = [(b'a.txt', PLAIN['a.txt']),
+               (b'b.txt', qfs_compress_literal(PLAIN['b.txt'])),   # 這一項是壓縮過的
+               (b'c.ord', PLAIN['c.ord'])]
+    ORIGINAL = bigf(ENTRIES)
+
+    root = tempfile.mkdtemp(prefix='mvp_unpack_big_selftest-')
+    try:
+        folder = os.path.join(root, 'game', 'data', 'datafile')
+        outside = os.path.join(root, 'outside')
+        os.makedirs(folder)
+        os.makedirs(outside)
+        big = os.path.join(folder, 'datafile.big')
+        bak = big + BACKUP_SUFFIX
+        man = os.path.join(folder, MANIFEST)
+
+        def fresh(data=ORIGINAL):
+            """每一塊測試都從同一個乾淨狀態開始:資料夾裡只有那一個封裝檔。"""
+            reset()
+            for x in os.listdir(folder):
+                p = os.path.join(folder, x)
+                if os.path.isdir(p) and not os.path.islink(p):
+                    shutil.rmtree(p)
+                else:
+                    os.remove(p)
+            put(big, data)
+
+        def loose():
+            return sorted(x for x in os.listdir(folder)
+                          if x not in ('datafile.big', 'datafile.big' + BACKUP_SUFFIX, MANIFEST))
+
+        print('\n一、QFS 解壓')
+        ok = all(qfs_decompress(qfs_compress_literal(x)) == x
+                 for x in (b'', b'a', b'abcd', b'q' * 113, bytes(range(256)) * 3))
+        check(ok and qfs_decompress(b'hello') == b'hello',
+              '陰性對照:壓了再解回來一模一樣;不是 QFS 的資料原樣回傳')
+        check(stops(qfs_decompress, b'\x10\xfb\x00'), '短檔頭不完整(只有 3 bytes)→ 停下來', True)
+        r, _ = quiet(qfs_decompress, b'\x11\xfb' + b'\x00' * 5)
+        check(isinstance(r, DataError) and '檔頭不完整' in str(r),
+              '長檔頭(10 bytes 那一種)只有 7 bytes → 停下來', True)
+        check(stops(qfs_decompress, b'\x11\xfb' + b'\x00' * 4 + struct.pack('>I', 0xFFFFFFFF)),
+              '宣稱解開有 4 GB(超過 64 MB 上限)→ 停下來', True)
+        check(stops(qfs_decompress, b'\x10\xfb\x00\x00\x0a' + b'\x00\x05'),
+              '一開頭就往回參照(輸出還是空的)→ 停下來', True)
+        check(stops(qfs_decompress, b'\x10\xfb\x00\x00\x04' + b'\xe0ABCD' + b'\x04\x03' + b'\xfc'),
+              '宣稱解開 4 bytes,往回參照卻吐出更多 → 停下來', True)
+        fresh(bigf([(b'a.txt', PLAIN['a.txt']), (b'bad.txt', b'\x10\xfb\x00\x00\x40\x05')]))
+        rc, out = run_main(big, '--apply')
+        check(rc == 2 and '讀寫或解壓時出錯' in out and 'Traceback' not in out,
+              '截斷的 QFS 串流走命令列:回 2、印一句話、不噴 traceback', True)
+
+        print('\n二、封裝檔目錄')
+        p = os.path.join(root, 'probe.big')
+
+        def entries_of(data):
+            put(p, data)
+            return quiet(big_entries, p)[0]
+
+        r = entries_of(ORIGINAL)
+        check(isinstance(r, list) and [x[0] for x in r] == ['a.txt', 'b.txt', 'c.ord'],
+              '陰性對照:完整的目錄三項都讀得出來')
+        check(isinstance(entries_of(b'BIGX' + ORIGINAL[4:]), DataError), '開頭不是 BIGF → 停下來', True)
+        check(isinstance(entries_of(ORIGINAL[:8] + b'\x00' * 4 + ORIGINAL[12:]), DataError),
+              '項目數是 0 → 停下來', True)
+        # 比的是那一道自己講的話:拿掉「讀到第 N 項就沒有了」那一道,後面「名稱沒有結尾」
+        # 那一道一定會替它擋(位移已經走到檔尾,後面找不到 0x00)—— 截在哪裡都一樣,
+        # 所以只看「有沒有停下來」分不出是哪一道擋的。
+        r = entries_of(ORIGINAL[:16 + 14 + 4])
+        check(isinstance(r, DataError) and '讀到第 2 項就沒有了' in str(r),
+              '目錄說有 3 項,讀到第 2 項就沒了 → 停下來,說是讀到第幾項斷掉', True)
+        # 用兩項的封裝檔、切在最後一項的名稱中間:這樣「名稱沒有結尾」這一道被拆掉的話,
+        # 後面沒有第三項可以讓「讀到第 N 項就沒有了」那一道替它擋下來。
+        two = bigf(ENTRIES[:2])
+        check(isinstance(entries_of(two[:16 + 14 + 8 + 3]), DataError),
+              '最後一項的名稱沒有結尾的 0x00(檔案在那裡斷掉)→ 停下來', True)
+        r = entries_of(b'BIGF' + struct.pack('<I', 0) + struct.pack('>II', 1, 0)
+                       + struct.pack('>II', 0, 0) + b'x' * 20000)
+        check(isinstance(r, DataError) and '長得離譜' in str(r),
+              '名稱 2 萬個位元組都沒有結尾(超過合理長度)→ 不再往下讀、停下來', True)
+        r = quiet(big_entries, folder)[0]
+        check(isinstance(r, DataError) and '讀不到' in str(r),
+              '給的路徑其實是一個資料夾(讀不進來)→ 收成一句「讀不到」,不噴作業系統的例外', True)
+        many = [(('%03d' % i).encode() + b'n' * 121, b'') for i in range(200)]
+        r = entries_of(bigf(many))
+        check(isinstance(r, list) and len(r) == 200,
+              '200 項、每個名稱 124 bytes(超過第一次讀進來的估計)要一項不少地讀完', True)
+
+        print('\n三、項目名稱')
+        bad_names = ['', '.', '..', 'a/b.txt', 'a\\b.txt', 'C:evil.txt', 'foo.txt:ads', '.hidden',
+                     'line\nbreak.txt', 'dot.', 'space ', 'NUL', 'CON.txt', 'com1.fsh']
+        blocked = [n for n in bad_names if stops(safe_name, n)]
+        check(blocked == bad_names, '%d 種會跳出資料夾或寫錯地方的名稱全部拒絕' % len(bad_names), True)
+        good_names = ['a.txt', 'title.ico', 'CONX.fsh', '01day.txt', 'NULL.txt']
+        check(all(safe_name(n) == n for n in good_names),
+              '陰性對照:一般檔名放行(連 CONX、NULL 這種長得像保留名的也放行)')
+
+        print('\n四、同名的項目')
+        fresh(bigf([(b'a.txt', b'1'), (b'a.txt', b'2')]))
+        r, _ = quiet(cmd_plan, big, True)
+        # 比訊息:拿掉「兩項都叫」那一道的話,下一道「只差在大小寫」也會擋(兩個名字的鍵一樣),
+        # 只是講的話不對。
+        check(isinstance(r, DataError) and '兩項都叫' in str(r) and loose() == []
+              and not os.path.lexists(man),
+              '兩項同名 → 在寫任何東西之前停下來', True)
+        fresh(bigf([(b'A.FSH', b'1'), (b'a.fsh', b'2')]))
+        r, _ = quiet(cmd_plan, big, True)
+        check(isinstance(r, DataError) and '大小寫' in str(r) and loose() == [],
+              '只差在大小寫(A.FSH 與 a.fsh)→ 一樣停下來', True)
+
+        print('\n五、預覽、--apply、--restore、--clean')
+        fresh()
+        r, _ = quiet(cmd_plan, big, False)
+        check(r is None and os.listdir(folder) == ['datafile.big'],
+              '陰性對照:預覽一個位元組都不寫(資料夾裡還是只有封裝檔)')
+        rc, out = run_main(big, '--apply')
+        rows, legacy = read_manifest(man) if os.path.isfile(man) else ([], True)
+        check(rc == 0 and not os.path.lexists(big) and get(bak) == ORIGINAL
+              and all(get(os.path.join(folder, n)) == d for n, d in PLAIN.items()),
+              '陰性對照:--apply 解出三個檔(壓縮過的那一項解開了),封裝檔改名成備份')
+        check(not legacy and len(rows) == 3 and all(
+            sha == hashlib.sha256(PLAIN[n]).hexdigest() for n, _s, sha in rows),
+            '陰性對照:清單記了三個檔,每一個的指紋都對')
+        rc, out = run_main(big, '--restore')
+        check(rc == 0 and get(big) == ORIGINAL and loose() == sorted(PLAIN),
+              '陰性對照:--restore 把封裝檔改回原名,散裝檔先留著')
+        rc, out = run_main(big, '--restore', '--clean')
+        check(rc == 0 and loose() == [] and not os.path.lexists(man) and get(big) == ORIGINAL,
+              '陰性對照:--restore --clean 把自己寫的散裝檔與清單清掉,封裝檔逐位元組一樣')
+
+        print('\n六、該停下來的 --apply')
+        for label, setup in (
+                ('資料夾裡已經有一個同名的 b.txt', lambda: put(os.path.join(folder, 'b.txt'), b'MINE')),
+                ('上一次留下的清單還在', lambda: put(man, b'# old\n')),
+                ('備份名 datafile.big.unpackbak 已經被佔住', lambda: put(bak, b'OLD ORIGINAL'))):
+            fresh()
+            setup()
+            before = dict((x, get(os.path.join(folder, x))) for x in os.listdir(folder))
+            r, _ = quiet(cmd_plan, big, True)
+            after = dict((x, get(os.path.join(folder, x))) for x in os.listdir(folder))
+            check(isinstance(r, DataError) and before == after, label + ' → 停下來,什麼都不寫', True)
+
+        print('\n七、解完複驗對不上')
+        fresh()
+        real_sha = sha256_file
+        g = globals()
+        # 寫的時候比的是暫存檔(名字裡有 .tmp-),複驗比的是換上去之後的正式名字。
+        # 替身只在複驗那一步對 c.ord 說謊,模擬「換上去之後內容變了」。
+        g['sha256_file'] = lambda path: ('0' * 64 if os.path.basename(path) == 'c.ord'
+                                         else real_sha(path))
+        try:
+            rc, out = run_main(big, '--apply')
+        finally:
+            g['sha256_file'] = real_sha
+        check(rc == 2 and get(big) == ORIGINAL and not os.path.lexists(bak),
+              '複驗抓到 c.ord 對不上 → 回 2,封裝檔自動改回原名', True)
+
+        # 封裝檔改名那一步之後、複驗之前,c.ord 不見了(被別的程式搬走之類)。
+        # 複驗要說它不在,並且照樣把封裝檔改回原名 —— 不可以變成一個作業系統錯誤就收工。
+        real_replace = os.replace
+
+        def rename_then_lose(src, dst):
+            real_replace(src, dst)
+            if src == big:
+                os.remove(os.path.join(folder, 'c.ord'))
+
+        fresh()
+        os.replace = rename_then_lose
+        try:
+            rc, out = run_main(big, '--apply')
+        finally:
+            os.replace = real_replace
+        check(rc == 2 and '檔不在' in out and get(big) == ORIGINAL and not os.path.lexists(bak),
+              '複驗時 c.ord 不見了 → 說它不在、回 2,封裝檔自動改回原名', True)
+
+        print('\n八、寫到一半出狀況')
+        fresh()
+        g['sha256_file'] = lambda path: ('0' * 64 if os.path.basename(path).startswith('b.txt.tmp-')
+                                         else real_sha(path))
+        try:
+            rc, out = run_main(big, '--apply')
+        finally:
+            g['sha256_file'] = real_sha
+        rows = read_manifest(man)[0] if os.path.isfile(man) else []
+        fp = dict((n, sha) for n, _s, sha in rows)
+        check(rc == 2 and get(big) == ORIGINAL and loose() == ['a.txt']
+              and fp.get('a.txt') == hashlib.sha256(PLAIN['a.txt']).hexdigest()
+              and fp.get('b.txt') is None,
+              'b.txt 讀回來對不上 → 暫存檔清掉、封裝檔不改名、清單補上 a.txt 的指紋', True)
+        rc, out = run_main(big, '--restore', '--clean')
+        check(rc == 0 and loose() == [] and not os.path.lexists(man),
+              '陰性對照:半途而廢那一次,--restore --clean 收拾得掉')
+
+        def manifest_junk():
+            return [x for x in os.listdir(folder) if x.startswith(MANIFEST + '.tmp-')]
+
+        # 目錄說最後一項(c.ord)有 256 + 10 個位元組,檔案裡其實只剩 256 個。
+        # c.ord 沒有壓縮過,拿掉這一道的話短了 10 個位元組的內容會被當成完整的寫出去,
+        # 後面的複驗也是拿那份短的算指紋 —— 沒有別的東西擋得住。
+        short = bytearray(ORIGINAL)
+        c_field = 16 + 14 + 14 + 4                  # c.ord 那一項的「長度」欄位
+        struct.pack_into('>I', short, c_field, len(PLAIN['c.ord']) + 10)
+        fresh(bytes(short))
+        rc, out = run_main(big, '--apply')
+        check(rc == 2 and '只讀到' in out and get(big) == bytes(short) and not os.path.lexists(bak)
+              and 'c.ord' not in loose(),
+              '目錄說的長度比檔案裡剩下的多(讀不足)→ 停下來,封裝檔不改名、不寫半截的檔', True)
+
+        real_mkstemp = tempfile.mkstemp
+
+        def no_tmp_for_entries(*a, **k):
+            if not k.get('prefix', '').startswith(MANIFEST):
+                raise OSError(28, '(自我測試的替身)No space left on device')
+            return real_mkstemp(*a, **k)
+
+        fresh()
+        tempfile.mkstemp = no_tmp_for_entries
+        try:
+            rc, out = run_main(big, '--apply')
+        finally:
+            tempfile.mkstemp = real_mkstemp
+        check(rc == 2 and '開不了暫存檔' in out and get(big) == ORIGINAL and loose() == [],
+              '散裝檔的暫存檔開不起來(磁碟滿了)→ 說清楚是開不了暫存檔,封裝檔不改名', True)
+
+        def refuse_manifest(src, dst):
+            if dst == man:
+                raise OSError(28, '(自我測試的替身)清單換不上去')
+            return real_replace(src, dst)
+
+        real_replace = os.replace
+        fresh()
+        os.replace = refuse_manifest
+        try:
+            rc, out = run_main(big, '--apply')
+        finally:
+            os.replace = real_replace
+        check(rc == 2 and loose() == [] and not os.path.lexists(man) and not manifest_junk()
+              and get(big) == ORIGINAL,
+              '清單換不上去 → 回 2、一個散裝檔都不寫、不留清單的暫存檔,封裝檔不改名', True)
+
+        print('\n九、Ctrl-C 與改名失敗')
+        real_plan = plan_unpack
+
+        def stop_now(*a, **k):
+            raise KeyboardInterrupt
+
+        fresh()
+        g['plan_unpack'] = stop_now
+        try:
+            rc, out = run_main(big, '--apply')
+        finally:
+            g['plan_unpack'] = real_plan
+        check(rc == 130 and '什麼都還沒有動到' in out and os.listdir(folder) == ['datafile.big'],
+              '陰性對照:還沒動就按 Ctrl-C → 130、說什麼都還沒有動到,而且真的沒動')
+        real_qfs = qfs_decompress
+        seen = []
+
+        def stop_second(data):
+            seen.append(1)
+            if len(seen) == 2:
+                raise KeyboardInterrupt
+            return real_qfs(data)
+
+        fresh()
+        g['qfs_decompress'] = stop_second
+        try:
+            rc, out = run_main(big, '--apply')
+        finally:
+            g['qfs_decompress'] = real_qfs
+        check(rc == 130 and '什麼都還沒有動到' not in out and '--restore --clean' in out
+              and get(big) == ORIGINAL,
+              '解到一半按 Ctrl-C → 不可以說沒動到,要說封裝檔還在原位並給清理指令', True)
+        real_replace = os.replace
+
+        def refuse_rename(src, dst):
+            if src == big:
+                raise PermissionError(13, '(自我測試的替身)封裝檔被別的程式握著')
+            return real_replace(src, dst)
+
+        fresh()
+        os.replace = refuse_rename
+        try:
+            rc, out = run_main(big, '--apply')
+        finally:
+            os.replace = real_replace
+        check(rc == 2 and '什麼都還沒有動到' not in out and '已經留下一份清單與 3 個散裝檔' in out
+              and get(big) == ORIGINAL,
+              '散裝檔都寫好了、封裝檔改名被擋 → 回 2,照實說資料夾裡已經留下清單與散裝檔', True)
+
+        # 「換名 + 登記」那一段收到真的 SIGINT:要等那一段跑完、登記成「已經改名」
+        # 之後才丟出來。拿掉延後丟出的那一行的話,訊號就被吞掉,程式一路做完回 0。
+        import threading
+        if hasattr(signal, 'raise_signal') and threading.current_thread() is threading.main_thread():
+            def rename_then_sigint(src, dst):
+                real_replace(src, dst)
+                if src == big:
+                    signal.raise_signal(signal.SIGINT)   # 真的訊號,不是自己丟例外
+
+            fresh()
+            os.replace = rename_then_sigint
+            try:
+                rc, out = run_main(big, '--apply')
+            finally:
+                os.replace = real_replace
+            check(rc == 130 and '什麼都還沒有動到' not in out and '--restore' in out
+                  and get(bak) == ORIGINAL and not os.path.lexists(big),
+                  '封裝檔改名一做完就收到真的 SIGINT → 130,照實說已經改名、給還原指令', True)
+        else:
+            skipped.append('真的 SIGINT 那一道(這個 Python 沒有 signal.raise_signal,或不是在主執行緒)')
+
+        # 還原改名的半路被打斷(改名本身還沒做成):要說「還原還沒做完」、叫你再跑一次,
+        # 不可以說成「封裝檔已經改名」那一句 —— 方向是反的。
+        def stop_on_restore(src, dst):
+            if dst == big:
+                raise KeyboardInterrupt
+            return real_replace(src, dst)
+
+        fresh()
+        run_main(big, '--apply')
+        os.replace = stop_on_restore
+        try:
+            rc, out = run_main(big, '--restore')
+        finally:
+            os.replace = real_replace
+        check(rc == 130 and '還原還沒做完' in out and get(bak) == ORIGINAL,
+              '還原改名的半路按 Ctrl-C → 130,說還原還沒做完、叫你再跑一次', True)
+
+        # 「換名 + 登記」的保險裝不上的時候(例如不是在主執行緒):
+        # 換名做完、登記還沒做,中斷就落在縫裡。這時候要說「換好了沒有無法確定」,
+        # 不可以假裝知道。用一個一定會失敗的 signal.signal 替身模擬「保險裝不上」。
+        real_signal = signal.signal
+
+        def cannot_install(*a, **k):
+            raise ValueError('(自我測試的替身)signal only works in main thread')
+
+        def replace_then_stop(src, dst):
+            real_replace(src, dst)
+            if os.path.basename(dst) == 'a.txt':
+                raise KeyboardInterrupt
+
+        fresh()
+        signal.signal = cannot_install
+        os.replace = replace_then_stop
+        try:
+            rc, out = run_main(big, '--apply')
+        finally:
+            os.replace = real_replace
+            signal.signal = real_signal
+        check(rc == 130 and '換好了沒有無法確定' in out and '什麼都還沒有動到' not in out
+              and get(big) == ORIGINAL,
+              '保險裝不上、換名做完才收到 Ctrl-C → 照實說「換好了沒有無法確定」', True)
+
+        print('\n十、還原')
+        for label, setup, want in (
+                ('正本與備份同時存在', lambda: put(bak, ORIGINAL), '同時存在'),
+                ('備份的開頭不是 BIGF', lambda: (os.remove(big), put(bak, b'JUNK' * 10)), '不是 BIGF'),
+                ('備份被截斷(檔頭大小對不上)',
+                 lambda: (os.remove(big), put(bak, ORIGINAL[:-10])), '對不上'),
+                # 只有 6 bytes:開頭是 BIGF 過得了第一道,連「檔案總大小」那一欄都讀不完整。
+                # 拿掉「太小」那一道的話會變成 struct.error,另一句話、另一條路。
+                ('備份只剩 6 bytes(開頭是 BIGF,後面沒了)',
+                 lambda: (os.remove(big), put(bak, ORIGINAL[:6])), '太小')):
+            fresh()
+            setup()
+            before = dict((x, get(os.path.join(folder, x))) for x in os.listdir(folder))
+            r, _ = quiet(cmd_restore, big, False)
+            after = dict((x, get(os.path.join(folder, x))) for x in os.listdir(folder))
+            check(isinstance(r, DataError) and want in str(r) and before == after,
+                  label + ' → 不還原,什麼都不動', True)
+        fresh()
+        os.remove(big)
+        rc, out = run_main(big, '--restore')
+        check(rc == 2 and '都找不到' in out and '換名那一步' not in out,
+              '正本與備份都找不到 → 回 2,而且不捏造一段沒發生過的中斷', True)
+
+        print('\n十一、--clean')
+        fresh()
+        run_main(big, '--apply')
+        put(os.path.join(folder, 'a.txt'), b'I EDITED THIS')
+        rc, out = run_main(big, '--restore', '--clean')
+        check(rc == 0 and loose() == ['a.txt'] and get(os.path.join(folder, 'a.txt')) == b'I EDITED THIS'
+              and os.path.isfile(man),
+              '你改過的 a.txt 保留,清單也留著(它是唯一認得出 a.txt 的東西)', True)
+        fresh()
+        run_main(big, '--apply')
+        run_main(big, '--restore')
+        put(man, b'# old\na.txt\t9\nb.txt\t300\nc.ord\t256\n')
+        rc, out = run_main(big, '--restore', '--clean')
+        check(rc == 0 and loose() == sorted(PLAIN) and '舊版解出的' in out,
+              '舊版清單(只有兩欄,沒有指紋)→ 認得出是舊版,一個都不刪', True)
+        for label, text, want in (
+                ('清單有一行是四欄', b'a.txt\t9\tx\ty\n', '格式'),
+                ('清單裡有一個往上跳的名字', b'../escape.txt\t9\t' + b'0' * 64 + b'\n', '不像單純檔名')):
+            fresh()
+            run_main(big, '--apply')
+            run_main(big, '--restore')
+            put(man, text)
+            r, _ = quiet(cmd_restore, big, True)
+            check(isinstance(r, DataError) and want in str(r) and loose() == sorted(PLAIN),
+                  label + ' → 不照著它刪任何東西', True)
+        fresh()
+        run_main(big, '--apply')
+        run_main(big, '--restore')
+        real_remove = os.remove
+        gone = []
+
+        def remove_one_then_fail(path):
+            if os.path.basename(path) in PLAIN:
+                gone.append(path)
+                if len(gone) == 2:
+                    raise PermissionError(13, '(自我測試的替身)這個檔被遊戲握著')
+            return real_remove(path)
+
+        os.remove = remove_one_then_fail
+        try:
+            rc, out = run_main(big, '--restore', '--clean')
+        finally:
+            os.remove = real_remove
+        check(rc == 2 and '已經刪掉 1 個' in out and '什麼都還沒有動到' not in out,
+              '刪到第二個被擋下來 → 照實說已經刪掉 1 個,不說沒動到', True)
+
+        print('\n十二、符號連結')
+        can_link = True
+        try:
+            os.symlink(os.path.join(outside, 'x'), os.path.join(root, 'probe-link'))
+            os.remove(os.path.join(root, 'probe-link'))
+        except (OSError, NotImplementedError, AttributeError):
+            can_link = False
+        if can_link:
+            victim = os.path.join(outside, 'precious.sav')
+            fresh()
+            os.symlink(victim, os.path.join(folder, 'b.txt'))       # 指到還不存在的地方
+            r, _ = quiet(cmd_plan, big, True)
+            check(isinstance(r, DataError) and '符號連結' in str(r) and not os.path.lexists(victim),
+                  '散裝檔的名字是一條指到資料夾外面的連結 → 停下來,外面沒有憑空多一個檔', True)
+            fresh()
+            os.symlink(victim, man)
+            r, _ = quiet(cmd_plan, big, True)
+            check(isinstance(r, DataError) and '符號連結' in str(r) and not os.path.lexists(victim),
+                  '清單的名字是連結 → 停下來,說清楚是連結', True)
+            fresh()
+            os.symlink(victim, bak)
+            r, _ = quiet(cmd_plan, big, True)
+            check(isinstance(r, DataError) and '符號連結' in str(r) and not os.path.lexists(victim)
+                  and get(big) == ORIGINAL,
+                  '備份名是連結 → 停下來,說清楚是連結,封裝檔不改名', True)
+            fresh()
+            put(os.path.join(outside, 'real.big'), ORIGINAL)
+            os.remove(big)
+            os.symlink(os.path.join(outside, 'real.big'), bak)
+            r, _ = quiet(cmd_restore, big, False)
+            check(isinstance(r, DataError) and os.path.islink(bak) and not os.path.lexists(big),
+                  '還原時備份是一條連結 → 停下來,不把連結搬回遊戲要讀的位置', True)
+            fresh()
+            put(bak, ORIGINAL)
+            os.remove(big)
+            os.symlink(victim, big)
+            r, _ = quiet(cmd_restore, big, False)
+            check(isinstance(r, DataError) and '符號連結' in str(r) and not os.path.lexists(victim),
+                  '還原時正本的名字被一條連結佔住 → 停下來,說清楚是連結', True)
+            # 清單被換成一條連結:讀到的是連結另一頭那份名單。拿掉這一道的話,
+            # --clean 會照著它把指紋對得上的散裝檔刪掉 —— 名單是別人決定的。
+            fresh()
+            run_main(big, '--apply')
+            elsewhere = os.path.join(outside, MANIFEST)
+            os.replace(man, elsewhere)
+            os.symlink(elsewhere, man)
+            r, _ = quiet(cmd_restore, big, True)
+            check(isinstance(r, DataError) and '符號連結' in str(r) and loose() == sorted(PLAIN),
+                  '--clean 時清單是一條連結 → 不照著它刪任何東西', True)
+            os.remove(man)
+            # 解完、複驗之前,c.ord 被換成一條指到外面、內容一模一樣的連結。
+            # 指紋照樣對得上,只有「是不是一般檔案」那一條擋得到。
+            twin = os.path.join(outside, 'c.ord')
+
+            def rename_then_link(src, dst):
+                real_replace(src, dst)
+                if src == big:
+                    p = os.path.join(folder, 'c.ord')
+                    put(twin, get(p))
+                    os.remove(p)
+                    os.symlink(twin, p)
+
+            fresh()
+            os.replace = rename_then_link
+            try:
+                rc, out = run_main(big, '--apply')
+            finally:
+                os.replace = real_replace
+            check(rc == 2 and '符號連結' in out and get(big) == ORIGINAL and not os.path.lexists(bak),
+                  '複驗時 c.ord 變成一條內容相同的連結 → 不算數、回 2,封裝檔自動改回原名', True)
+        else:
+            skipped.append('符號連結那 7 道(這台機器做不出符號連結)')
+
+        print('\n十三、-O 守門')
+        check(_opt[0], '假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試拒跑、結束碼 2', True)
+        check(_opt[1], '陰性對照:換回原本那一支之後,沒開 -O 的時候守門放行')
+    finally:
+        reset()
+        shutil.rmtree(root, ignore_errors=True)
+
+    print()
+    for why in skipped:
+        print('   ⚠️ 跳過(沒有測到,不算通過):%s' % why)
+    if tally['fail']:
+        print('自我測試:有 %d 道沒過(共 %d 道)' % (tally['fail'], tally['n']))
+        return 1
+    print('自我測試:全部通過(%d 道檢查,其中 %d 道是餌)' % (tally['n'], tally['bait']))
+    return 0
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。這支的 --selftest 跟這道守門是 2026-09-24 一起加的。
+#  守門不直接問 sys.flags.optimize:那是唯讀的,同一個程序裡沒辦法把 -O
+#  打開又關掉,直接問它的話這道守門就下不了餌 —— 哪天被拆掉,自我測試照樣全綠。
+#  所以守門問的是 _optimize_level(),自我測試可以暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
+
+
 if __name__ == '__main__':
+    # --selftest 不需要封裝檔,所以在 argparse 之前就攔下來(argparse 會要求一定要給路徑)。
+    if '--selftest' in sys.argv[1:]:
+        sys.exit(selftest())
     sys.exit(main())
 
 #

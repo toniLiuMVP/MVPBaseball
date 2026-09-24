@@ -171,8 +171,11 @@ C 語言的 `printf` 遇到 `%s` 卻沒有對應的參數,會把**堆疊上的�
     按了 Ctrl-C)的時候第一個已經改好了。這時候會先逐檔印「已改 / 沒改」
     再印還原指令,判斷方式是**當場拿每個檔跟它自己的 .locbak 比一次**,
     不是靠記帳(記帳會漏:複驗沒過那條路會先改檔、再自動還原回去)。
-  · `--selftest` 不需要遊戲資料夾:它自己造一份最小的語系檔,把上面每一道
-    把關**正反各測一次**(反向的那些是「故意做一件必須失敗的事」)。
+  · `--selftest` 不需要遊戲資料夾:它自己造一份最小的語系檔,替上面的把關
+    **正反各測一次**(反向的那些是「故意做一件必須失敗的事」)。
+    但不是每一道把關都有餌:2026-09-24 把自我測試以外、條件成立就讓這支停下來的
+    20 道逐一拆掉(那一個 if 改成永遠不成立)再跑 --selftest,會變紅的是 6 道,
+    其餘 14 道拆掉照樣全綠,例如檔頭不是 LOCH、還原之後大小或內容跟備份對不上。
     ⚠️ 它在 `python3 -O` 底下會**拒跑**並回 exit code 2:-O 會把 assert
     整句拿掉,測試工具寧可拒跑,也不要印一行沒有根據的「全部通過」。
 
@@ -189,7 +192,7 @@ C 語言的 `printf` 遇到 `%s` 卻沒有對應的參數,會把**堆疊上的�
 
 MIT License · Copyright (c) 2026 toni · 無外部相依,Python 3.7 以上
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 
 import argparse
 import hashlib
@@ -1381,7 +1384,9 @@ def selftest():
               **Ctrl-C 落在「換名之後、登記之前」不可以說「什麼都沒有動到」**、
               **狀態真的不明的時候要照實說「正在替換」**、
               **兩個檔只改到一半要逐檔講「已改 / 沒改」**,
-              而且一個位元組都沒寫的時候**不可以誣賴自己改過檔**
+              而且一個位元組都沒寫的時候**不可以誣賴自己改過檔**、
+              假裝開了 -O(把 _optimize_level 換成回傳 1)自我測試必須拒跑
+              (2026-09-24 加,換回來之後守門要照樣放行是它的陰性對照)
 
     ⚠️ 這個函式在 `python3 -O` 底下會拒跑並回 exit code 2(見開頭第一段)。
     """
@@ -1389,10 +1394,12 @@ def selftest():
     #    AssertionError(不是 assert 句),所以 -O 底下**這一版**其實還是真的在測;
     #    但只要以後有人補一行 assert 進來,-O 就會讓它變成假綠而沒有人發現。
     #    測試工具寧可拒跑,也不要印一行沒有根據的「全部通過」。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python -O 下跑:'
               '-O 會把 assert 全部拿掉,測試會假綠。請拿掉 -O 再跑一次。')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
 
     import contextlib
     import io as _io
@@ -1409,6 +1416,10 @@ def selftest():
     def quiet(fn, *a):
         with contextlib.redirect_stdout(_io.StringIO()):
             return fn(*a)
+
+    # 【餌】最上面那道 -O 守門自己的餌(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳)
+    ck(_opt[0], '假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試竟然沒有拒跑', True)
+    ck(_opt[1], '陰性對照:沒開 -O 守門也擋,或是換回原本那一支沒換成功')
 
     # 英文基準不帶格式符,中文那兩條分別多要 2 個與 4 個參數 ——
     # 就是檔頭講的 23484 / 23505 那兩條的縮影。
@@ -1770,6 +1781,70 @@ def selftest():
         print('           這個 Python 沒有 signal.raise_signal(3.8 以前),'
               '%d 塊 Ctrl-C 的餌跳過了 —— 沒有測到,不算通過。' % ctrlc_skipped)
     return 0
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
 
 
 if __name__ == '__main__':

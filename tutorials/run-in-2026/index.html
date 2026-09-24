@@ -19,7 +19,7 @@
 <title>2026 年的電腦怎麼跑得起 2005 年的遊戲 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="MVP Baseball 2005 是 32 位元的 Windows XP 時代遊戲。這一課講它在今天的 Windows 與 Apple Silicon Mac 上會遇到什麼、怎麼檢查你手上那份，以及「球場不能超過 20MB」那條老規矩本站實際量到的結果（那個數字站不住）。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="../../assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -450,7 +450,7 @@
     <div class="step-n">1</div>
     <div>
       <p class="step-t">下載腳本</p>
-      <p><a href="mvp_modernize.py" download>mvp_modernize.py</a>（1,299 行，零相依）</p>
+      <p><a href="mvp_modernize.py" download>mvp_modernize.py</a>（1,868 行，零相依）</p>
       <p class="small"><strong>指令要在放腳本的那個資料夾打。</strong>瀏覽器下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter —— 開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。Mac：打開終端機，先打 <code>cd ~/Downloads</code> 按 Enter。</p>
     </div>
   </div>
@@ -730,7 +730,7 @@ Mac 的話：晶片是 Intel 還是 Apple Silicon
     <li><strong>本站沒驗的</strong> 本站從來沒有量過遊戲執行時到底吃多少記憶體，所以不列任何分配數字，也答不出 4 GB 夠不夠、球場放多大才會當。<code>mvp2005fix</code> 本站只讀過原始碼、量過自己的執行檔，沒有實際跑過。Mac 那一節驗到的是「這台 Mac 能執行 32 位元 Windows 程式」，不是「遊戲全程順跑」。</li>
   </ul>
 
-  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <!-- course-strip:begin · 這一塊由產生器從 plan.html 產生，不要手改 -->
   <nav class="card course-strip" aria-label="這一課在課表的位置">
     <p class="card-h">📚 照課表上課的話</p>
     <p><a href="../../plan.html#b"><strong>② 急救班</strong></a> 第 2／5 堂</p>
@@ -885,11 +885,15 @@ Mac 的話：晶片是 Intel 還是 Apple Silicon
      而這支腳本不會、也不打算去碰那一層；改完解析度表畫面還是被拉伸，
      那是<a href="#aspect">遊戲內部投影比例</a>的事，不在這支的範圍；
      本站也沒有量過遊戲執行時實際吃多少記憶體，所以它不會回答你「球場可以放多大」。</p>
+  <p class="small">想先確認腳本本身沒壞，可以跑 <code>python3 mvp_modernize.py --selftest</code>
+     （Windows 打 <code>python</code>）。它不需要執行檔：在系統暫存資料夾照 PE 格式拼一顆 8 KB 的假執行檔，
+     把上面每一道安全網各下一個餌驗一次，跑完整個刪掉，不碰你的遊戲。
+     全過回 <code>0</code>，有一道沒過回 <code>1</code>。</p>
 
   <h2 id="source">完整原始碼</h2>
   <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。</p>
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1299 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1868 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -939,6 +943,9 @@ mvp_modernize.py — 讓 MVP Baseball 2005 在今天的機器上跑得順
       量到 17 個，畫面就只列得出前 16 個）。
   · 加了 --apply 才真的寫。全部是原地覆寫，檔案大小前後一模一樣。
   · --restore 把備份蓋回去。
+  · --selftest（2026-09-24 加）不需要執行檔：在系統暫存資料夾造一顆 8 KB 的假執行檔，
+    把下面每一道安全網各下一個餌驗一次，跑完整個刪掉，不碰你的遊戲。
+    全過回 0、有一道沒過回 1、在 python3 -O 底下拒跑回 2。
 
 四個旋鈕各自動到哪裡（沒有插入也沒有刪除，都是原地換掉幾個位元組）：
   --4gb         PE 檔頭 Characteristics 裡的 1 個位元（0x0020）
@@ -1005,7 +1012,7 @@ mvp_modernize.py — 讓 MVP Baseball 2005 在今天的機器上跑得順
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -2086,6 +2093,7 @@ def main():
     Ctrl-C 回傳 130,那是慣例。
     傳進來的路徑如果本身是符號連結(捷徑),要寫的那兩條路(--apply / --restore)
     直接停下來,不跟著連結寫;唯讀體檢與預覽只讀不寫,照樣看得下去。
+    --selftest 不走這裡(在最底下就先攔下來了)。
     """
     EPILOG = (
         "\n例子(照順序做):\n\n"
@@ -2162,7 +2170,572 @@ def main():
     return 0
 
 
+# ─────────────────────────────────────────────────────────
+#  自我測試(--selftest,2026-09-24 加)
+# ─────────────────────────────────────────────────────────
+
+def selftest():
+    """--selftest:在系統暫存資料夾自己造一顆最小的假執行檔,把 main() 走得到的每一道守門各驗一次。全過回 0。
+
+    ⚠️ 不碰你的遊戲。那顆假執行檔只有 8 KB,是下面照 PE 格式拼出來的
+       (MZ 檔頭、PE 檔頭、一個節區、一張解析度表、兩處記憶體池),不是 EA 的程式;
+       全部放在 tempfile.mkdtemp() 開的那一個資料夾裡,跑完整個刪掉。
+
+    這支走得到的每一道守門都有「餌」(故意做它該擋的事,沒擋就紅)與「陰性對照」
+    (做正常的事,它不該擋;少了這一半,一個什麼都擋的版本也會全綠)。
+    共用的還原函式 _restore_from_backup() 裡有幾道這支走不到,所以沒有餌:
+    「找不到備份」與「備份是 0 bytes」在 cmd_restore() 就先被擋下來了;
+    BIGF 與語系檔(LOCH)那兩段是給別種檔案用的;「備份不到正本的一半」那道地板
+    要正本還在才比,而正本還在時 cmd_restore() 已經先要求兩份一樣大。
+      一、認不得的檔:路徑不存在、開頭不是 MZ、找不到 PE 檔頭、檔頭讀到一半就沒了 → 停下來
+      二、用內容找東西:解析度表找不到或找到兩處 → 停下來;記憶體池只認
+          「1 MB 的整數倍、落在 64 到 1024 MB 之間」的那一種;
+          找不到記憶體池的檔給 --pool → 停下來
+      三、參數:--pool、--resolution、--timestamp 超出範圍或寫法不對 → 停下來;
+          --pool 0 不可以安靜地掉回唯讀體檢
+      四、預覽一個位元組都不寫;--apply 只動該動的那幾格、檔案大小不變、備份等於原檔、
+          原本有填的 CheckSum 會重算、原本是 0 的維持 0;同一件事再做一次不會再寫
+      五、找不到解析度表時,只有 --resolution 停下來,--4gb 照樣做得到
+      六、旁邊躺著一份「別顆執行檔」的備份 → --apply 與 --restore 都停下來
+      七、換檔那一步失敗 → 執行檔原封不動、不留暫存檔、收尾不說假話
+      八、Ctrl-C:還沒換就按 → 說沒動到;換好之後才收到真的 SIGINT → 修改那條路要說
+          已經換好了並給還原指令,還原那條路要說還原已經做完了、不叫人再還原一次
+      九、還原:找不到備份、備份不是 MZ、正本不見了而備份又是半截的(或 PE 簽章不見了、
+          節區表被截斷)→ 停下來;還原換檔失敗 → 正本原封不動、收尾不說假話;
+          正常還原逐位元組回去
+      十、符號連結:執行檔、備份是連結 → --apply 與 --restore 停下來,不跟著連結寫
+          (這台機器做不出符號連結就跳過,而且會印出來說跳過了)。
+          四個餌裡有三個擋在兩層(呼叫端一道、真正寫檔的函式裡一道;只有「--apply 時
+          執行檔是連結」是一層),餌驗的是兩層合起來的結果:只拆掉其中一層,
+          另一層照樣擋,這裡不會紅
+      十一、寫檔途中與寫完之後:備份只複製了一半 → 不當成備份、不動執行檔;
+          寫進去之後讀回來大小變了、或多動了一個位元組 → 回 2 並給還原指令;
+          設不了權限的檔案系統 → 印一行照樣寫完;還原的暫存檔讀回來跟備份
+          對不起來 → 不換上去;還原換好之後讀回來跟備份不一樣 → 回 2
+      十二、最上面那道「-O 拒跑」守門自己的餌
+    在 python3 -O 底下拒跑,回 2。
+    """
+    # -O 會把 assert 整段拿掉。這一段的判斷是下面那個 check(),-O 拿不掉它 ——
+    # 守門照樣要有:哪天有人在這裡補一句 assert,沒有它就會靜靜地變成假綠。
+    if _optimize_level():
+        print('--selftest 不能在 python3 -O 底下跑:-O 會把 assert 整段拿掉,'
+              '測試會變成一片假的綠燈。請拿掉 -O 再跑一次。')
+        return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
+    import contextlib
+    import io
+    import threading
+
+    print('自我測試(在系統暫存資料夾裡造一顆假的執行檔,不碰你的遊戲)')
+    tally = {'n': 0, 'bait': 0, 'fail': 0}
+    skipped = []
+
+    def check(ok, what, bait=False):
+        tally['n'] += 1
+        tally['bait'] += 1 if bait else 0
+        tally['fail'] += 0 if ok else 1
+        print('   %s %s%s' % ('✅' if ok else '❌', '餌:' if bait else '', what))
+
+    def quiet(fn, *a):
+        """跑 fn,把它印的字收起來。回傳 (回傳值或它丟出來的例外, 印出來的字)。"""
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                r = fn(*a)
+        except (Exception, SystemExit, KeyboardInterrupt) as e:
+            r = e
+        return r, buf.getvalue()
+
+    def stops(fn, *a):
+        return isinstance(quiet(fn, *a)[0], DataError)
+
+    def put(path, data):
+        with open(path, 'wb') as f:
+            f.write(data)
+
+    def get(path):
+        with open(path, 'rb') as f:
+            return f.read()
+
+    def reset():
+        _PROGRESS.update({'stage': 'idle', 'target': None, 'action': None})
+
+    def run_main(*argv):
+        reset()
+        real_argv = sys.argv
+        sys.argv = ['mvp_modernize.py'] + list(argv)
+        try:
+            return quiet(main)
+        finally:
+            sys.argv = real_argv
+
+    PE = 0x80
+    TABLE = 0x800
+    POOLS = (0x1000, 0x1100)
+
+    def fake_exe(checksum=0, tables=1, pool_mb=64):
+        """拼一顆 8 KB 的假執行檔。tables 是解析度表放幾份(0、1、2)。"""
+        b = bytearray(0x2000)
+        b[0:2] = b'MZ'
+        struct.pack_into('&lt;I', b, 0x3C, PE)
+        b[PE:PE + 4] = b'PE\x00\x00'
+        struct.pack_into('&lt;HH', b, PE + 4, MACHINE_I386, 1)          # 架構、節區數
+        struct.pack_into('&lt;I', b, PE + 8, 1107216000)                # 2005-02-01 的時間戳
+        struct.pack_into('&lt;HH', b, PE + 20, 0xE0, 0x010F)            # Optional Header 長度、Characteristics
+        struct.pack_into('&lt;H', b, PE + 24, 0x10B)
+        struct.pack_into('&lt;I', b, PE + 24 + 64, checksum)
+        sec = PE + 24 + 0xE0
+        b[sec:sec + 8] = b'.text\x00\x00\x00'
+        struct.pack_into('&lt;II', b, sec + 16, 0x2000 - 0x400, 0x400)  # 資料長度、資料位移
+        rows = [(640, 480), (800, 600), (1024, 768), (1280, 1024)]
+        for t in range(tables):
+            base = TABLE + t * 0x100
+            for k, (w, h) in enumerate(rows):
+                for j, depth in enumerate((16, 32)):
+                    struct.pack_into('&lt;IIII', b, base + (2 * k + j) * RECORD, w, h, depth, 0)
+        for off in POOLS:
+            b[off] = 0x68
+            struct.pack_into('&lt;I', b, off + 1, pool_mb * 1024 * 1024)
+            b[off + 5] = 0xE8
+            b[off + 10:off + 12] = b'\x59\xc3'
+        return bytes(b)
+
+    root = tempfile.mkdtemp(prefix='mvp_modernize_selftest-')
+    try:
+        folder = os.path.join(root, 'game')
+        outside = os.path.join(root, 'outside')
+        os.makedirs(folder)
+        os.makedirs(outside)
+        exe = os.path.join(folder, 'mvp2005.exe')
+        bak = exe + BACKUP_SUFFIX
+        ORIGINAL = fake_exe()
+
+        def fresh(data=ORIGINAL):
+            reset()
+            for x in os.listdir(folder):
+                os.remove(os.path.join(folder, x))
+            put(exe, data)
+
+        def junk():
+            return [x for x in os.listdir(folder) if x.startswith('.mvp2005.exe')]
+
+        print('\n一、認不得的檔')
+        check(isinstance(quiet(pe_offsets, ORIGINAL)[0], tuple), '陰性對照:拼出來的假執行檔讀得出 PE 檔頭')
+        check(stops(pe_offsets, b'ZM' + ORIGINAL[2:]), '開頭不是 MZ → 停下來', True)
+        check(stops(pe_offsets, ORIGINAL[:PE] + b'XX' + ORIGINAL[PE + 2:]), '找不到 PE 簽章 → 停下來', True)
+        check(stops(pe_offsets, ORIGINAL[:PE + 40]), '檔頭讀到一半就沒了(讀不到 CheckSum)→ 停下來', True)
+        gone = os.path.join(folder, 'no-such.exe')
+        rc, out = run_main(gone)
+        # 比「找不到 &lt;那個路徑&gt;」整句:拿掉這道守門的話,open() 會丟作業系統的錯誤,
+        # main() 一樣回 2,只是講的是另一句話 —— 只看結束碼分不出來。
+        check(rc == 2 and ('找不到 %s' % gone) in out, '路徑不存在 → 停下來,說找不到哪一個檔', True)
+
+        print('\n二、用內容找東西')
+        check(quiet(find_table, ORIGINAL)[0] == TABLE, '陰性對照:解析度表找得到,而且在它真的在的地方')
+        check(stops(find_table, fake_exe(tables=0)), '找不到解析度表 → 停下來,不猜位址', True)
+        check(stops(find_table, fake_exe(tables=2)), '找到兩張解析度表 → 停下來,不挑第一個湊答案', True)
+        check([v for _o, v in find_pool(ORIGINAL)] == [64 &lt;&lt; 20, 64 &lt;&lt; 20],
+              '陰性對照:兩處 64 MB 的記憶體池都找得到')
+        check(find_pool(fake_exe(pool_mb=32)) == [], '32 MB(比 64 MB 小)不認', True)
+        odd = bytearray(ORIGINAL)
+        for off in POOLS:
+            struct.pack_into('&lt;I', odd, off + 1, (64 &lt;&lt; 20) + 1)
+        check(find_pool(bytes(odd)) == [], '不是 1 MB 整數倍的數字不認(只是長得像指令而已)', True)
+        no_pool = fake_exe(pool_mb=32)
+        fresh(no_pool)
+        rc, out = run_main(exe, '--pool', '128', '--apply')
+        check(rc == 2 and '找不到記憶體池' in out and get(exe) == no_pool and not os.path.lexists(bak),
+              '找不到記憶體池的檔(例如有光碟保護的原版)給 --pool → 停下來,不寫也不備份', True)
+
+        print('\n三、參數')
+        for label, argv, said in (
+                ('--pool 63(小於 64)', ('--pool', '63'), '64 到 1024'),
+                ('--pool 1025(大於 1024)', ('--pool', '1025'), '64 到 1024'),
+                ('--pool 0 不可以安靜地掉回唯讀體檢', ('--pool', '0'), '64 到 1024'),
+                ('--resolution 100x100(小於 640x480)', ('--resolution', '100x100'), '超出合理範圍'),
+                ('--resolution 1920*1080(寫法不對)', ('--resolution', '1920*1080'), '寬x高'),
+                ('--timestamp 1969-12-31(早於 1970)', ('--timestamp', '1969-12-31'), '無號 32 位元'),
+                ('--timestamp 2106-02-08(晚於 2106-02-07)', ('--timestamp', '2106-02-08'), '無號 32 位元'),
+                ('--timestamp 2026/08/29(寫法不對)', ('--timestamp', '2026/08/29'), 'YYYY-MM-DD')):
+            fresh()
+            rc, out = run_main(exe, *argv)
+            check(rc == 2 and said in out and get(exe) == ORIGINAL and not os.path.lexists(bak),
+                  label + ' → 停下來,回 2', True)
+        fresh()
+        rc, out = run_main(exe)
+        check(rc == 0 and '唯讀' in out and get(exe) == ORIGINAL,
+              '陰性對照:什麼旋鈕都不加 → 唯讀體檢,回 0')
+
+        print('\n四、預覽與 --apply')
+        fresh()
+        rc, out = run_main(exe, '--4gb', '--pool', '128', '--resolution', '1920x1080')
+        check(rc == 0 and get(exe) == ORIGINAL and os.listdir(folder) == ['mvp2005.exe'],
+              '陰性對照:沒加 --apply 一個位元組都不寫、不留備份')
+        rc, out = run_main(exe, '--4gb', '--pool', '128', '--resolution', '1920x1080', '--apply')
+        new = get(exe)
+        allowed = set()
+        for off, ln in edit_regions(ORIGINAL):
+            allowed.update(range(off, off + ln))
+        diff = [i for i in range(len(new)) if new[i] != ORIGINAL[i]]
+        ch = struct.unpack_from('&lt;H', new, PE + 22)[0]
+        check(rc == 0 and len(new) == len(ORIGINAL) and diff and set(diff) &lt;= allowed
+              and ch &amp; LARGE_ADDRESS_AWARE and find_pool(new)[0][1] == 128 &lt;&lt; 20
+              and read_table(new, TABLE)[0][:2] == (1920, 1080),
+              '陰性對照:--apply 只動該動的那幾格,大小不變,三件事都改到了')
+        check(get(bak) == ORIGINAL, '陰性對照:備份逐位元組等於動手之前的執行檔')
+        check(struct.unpack_from('&lt;I', new, PE + 24 + 64)[0] == 0,
+              '陰性對照:CheckSum 原本是 0(沒填)就維持 0')
+        rc, out = run_main(exe, '--4gb', '--pool', '128', '--apply')
+        check(rc == 0 and get(exe) == new and '沒有事情要做' in out,
+              '陰性對照:同一件事再做一次 → 沒有事情要做,不會再寫一次')
+        fresh(fake_exe(checksum=0x1234))
+        rc, out = run_main(exe, '--4gb', '--apply')
+        got = get(exe)
+        ck_off = PE + 24 + 64
+        check(rc == 0 and struct.unpack_from('&lt;I', got, ck_off)[0] == pe_checksum(got, ck_off) != 0x1234,
+              'CheckSum 原本有填 → 改完跟著重算(不會留著舊的那個值)', True)
+
+        print('\n五、找不到解析度表')
+        fresh(fake_exe(tables=0))
+        rc, out = run_main(exe, '--resolution', '1920x1080', '--apply')
+        check(rc == 2 and get(exe) == fake_exe(tables=0), '找不到解析度表時 --resolution 停下來', True)
+        fresh(fake_exe(tables=0))
+        rc, out = run_main(exe, '--4gb', '--apply')
+        check(rc == 0 and struct.unpack_from('&lt;H', get(exe), PE + 22)[0] &amp; LARGE_ADDRESS_AWARE,
+              '陰性對照:同一顆檔,--4gb 照樣做得到')
+
+        print('\n六、別顆執行檔的備份')
+        other = bytearray(ORIGINAL)
+        other[0x1800] = 0x77                       # 落在這支會動的那幾格以外
+        fresh()
+        put(bak, bytes(other))
+        rc, out = run_main(exe, '--4gb', '--apply')
+        check(rc == 2 and '對不上' in out and get(exe) == ORIGINAL,
+              '旁邊的備份是別顆執行檔的 → --apply 停下來,不在沒有正確備份時動手', True)
+        rc, out = run_main(exe, '--restore')
+        check(rc == 2 and '對不上' in out and get(exe) == ORIGINAL,
+              '同一份別顆的備份 → --restore 也停下來,不蓋掉現在這一顆', True)
+
+        print('\n七、換檔那一步失敗')
+        real_replace = os.replace
+
+        def boom_on_exe(src, dst):
+            if dst == exe:
+                raise OSError(28, '(自我測試的替身)換檔失敗')
+            return real_replace(src, dst)
+
+        fresh()
+        os.replace = boom_on_exe
+        try:
+            rc, out = run_main(exe, '--4gb', '--apply')
+        finally:
+            os.replace = real_replace
+        check(rc == 2 and get(exe) == ORIGINAL and not junk() and _PROGRESS['stage'] == 'idle'
+              and '可能已經被換掉' not in out,
+              '換檔失敗 → 回 2、執行檔原封不動、不留暫存檔,也不嚇人說「可能已經被換掉」', True)
+
+        print('\n八、Ctrl-C')
+
+        def stop_now(*a, **k):
+            raise KeyboardInterrupt
+
+        fresh()
+        real_mk = _mkstemp_beside
+        g = globals()
+        g['_mkstemp_beside'] = stop_now
+        try:
+            rc, out = run_main(exe, '--4gb', '--apply')
+        finally:
+            g['_mkstemp_beside'] = real_mk
+        check(rc == 130 and '一個位元組都沒有動到' in out and get(exe) == ORIGINAL,
+              '陰性對照:還沒換檔就按 Ctrl-C → 130、說沒動到,而且真的沒動')
+        if hasattr(signal, 'raise_signal') and threading.current_thread() is threading.main_thread():
+            def replace_then_sigint(src, dst):
+                real_replace(src, dst)
+                if dst == exe:
+                    signal.raise_signal(signal.SIGINT)   # 真的訊號,不是自己丟例外
+
+            fresh()
+            os.replace = replace_then_sigint
+            try:
+                rc, out = run_main(exe, '--4gb', '--apply')
+            finally:
+                os.replace = real_replace
+            check(rc == 130 and '已經換好了' in out and '--restore' in out
+                  and '一個位元組都沒有動到' not in out and get(exe) != ORIGINAL,
+                  '換好之後才收到真的 SIGINT → 說已經換好了並給還原指令', True)
+            # 同一件事換到還原那條路上:要說「還原那一步已經做完了」,
+            # 不可以再叫人跑一次 --restore,也不可以說什麼都沒動到。
+            fresh()
+            run_main(exe, '--4gb', '--apply')
+            os.replace = replace_then_sigint
+            try:
+                rc, out = run_main(exe, '--restore')
+            finally:
+                os.replace = real_replace
+            check(rc == 130 and '還原那一步在這之前就已經做完了' in out and '--restore' not in out
+                  and '一個位元組都沒有動到' not in out and get(exe) == ORIGINAL,
+                  '還原換好之後才收到真的 SIGINT → 說還原已經做完了,不叫人再還原一次', True)
+        else:
+            skipped.append('真的 SIGINT 那兩道(這個 Python 沒有 signal.raise_signal,或不是在主執行緒)')
+
+        print('\n九、還原')
+        fresh()
+        run_main(exe, '--4gb', '--apply')
+        rc, out = run_main(exe, '--restore')
+        check(rc == 0 and get(exe) == ORIGINAL, '陰性對照:正常還原逐位元組回到原本的樣子')
+        os.remove(exe)
+        rc, out = run_main(exe, '--restore')
+        check(rc == 0 and get(exe) == ORIGINAL, '陰性對照:執行檔被刪掉了也還原得回來')
+        fresh()
+        rc, out = run_main(exe, '--restore')
+        check(rc == 2 and '找不到備份' in out, '找不到備份 → 停下來', True)
+        fresh()
+        put(bak, b'JUNK' * 100)
+        rc, out = run_main(exe, '--restore')
+        check(rc == 2 and '不是 MZ' in out and get(exe) == ORIGINAL, '備份開頭不是 MZ → 停下來', True)
+        fresh()
+        os.remove(exe)
+        put(bak, ORIGINAL[:0x2000 // 8])
+        rc, out = run_main(exe, '--restore')
+        check(isinstance(rc, SystemExit) and '壞的' in str(rc) and not os.path.lexists(exe),
+              '正本不見了、備份又是半截的(只剩八分之一)→ 不拿它還原', True)
+        # 下面兩個也是「正本不見了」(正本還在的話,前面那道「對不對得上」會先擋),
+        # 而且比的是那一道自己講的話:拿掉「節區表被截斷」那一道的話,後面「讀不出
+        # 執行檔的結構」那一道照樣會擋,只看「有沒有停下來」分不出是哪一道擋的。
+        for label, broken, said in (
+                ('備份的 PE 簽章不見了', ORIGINAL[:PE] + b'XX' + ORIGINAL[PE + 2:], 'PE 檔頭不在'),
+                ('備份在節區表中間被截斷', ORIGINAL[:PE + 24 + 0xE0 + 20], '節區表被截斷')):
+            fresh()
+            os.remove(exe)
+            put(bak, broken)
+            rc, out = run_main(exe, '--restore')
+            check(isinstance(rc, SystemExit) and said in str(rc) and not os.path.lexists(exe),
+                  '正本不見了、' + label + ' → 不拿它還原', True)
+        fresh()
+        run_main(exe, '--4gb', '--apply')
+        changed = get(exe)
+        os.replace = boom_on_exe
+        try:
+            rc, out = run_main(exe, '--restore')
+        finally:
+            os.replace = real_replace
+        check(rc == 2 and get(exe) == changed and not junk() and _PROGRESS['stage'] == 'idle'
+              and '可能已經被換掉' not in out,
+              '還原換檔失敗 → 正本維持還原之前那一份、不留暫存檔,也不嚇人說「可能已經被換掉」', True)
+
+        print('\n十、符號連結')
+        can_link = True
+        try:
+            os.symlink(os.path.join(outside, 'x'), os.path.join(root, 'probe-link'))
+            os.remove(os.path.join(root, 'probe-link'))
+        except (OSError, NotImplementedError, AttributeError):
+            can_link = False
+        if can_link:
+            real = os.path.join(outside, 'real.exe')
+            fresh()
+            os.remove(exe)
+            put(real, ORIGINAL)
+            os.symlink(real, exe)
+            rc, out = run_main(exe, '--4gb', '--apply')
+            check(isinstance(rc, SystemExit) and '符號連結' in str(rc) and get(real) == ORIGINAL
+                  and os.path.islink(exe),
+                  '執行檔是一條指到資料夾外面的連結 → --apply 停下來,外面那顆不動', True)
+            rc, out = run_main(exe)
+            check(rc == 0, '陰性對照:同一條連結,唯讀體檢照樣看得下去')
+            # 備份放一份「開過 4 GB」的版本:它對得上外面那顆(差的位元組落在會動的那幾格裡),
+            # 所以守門要是沒擋,還原就會真的把外面那顆改掉,下面那個比對才會亮。
+            flagged = bytearray(ORIGINAL)
+            chars = struct.unpack_from('&lt;H', flagged, PE + 22)[0]
+            struct.pack_into('&lt;H', flagged, PE + 22, chars | LARGE_ADDRESS_AWARE)
+            put(bak, bytes(flagged))
+            rc, out = run_main(exe, '--restore')
+            check(isinstance(rc, SystemExit) and '符號連結' in str(rc) and get(real) == ORIGINAL
+                  and os.path.islink(exe),
+                  '執行檔是一條連結 → --restore 也停下來,不把備份寫到連結指的地方', True)
+            fresh()
+            victim = os.path.join(outside, 'victim.bak')
+            os.symlink(victim, bak)
+            rc, out = run_main(exe, '--4gb', '--apply')
+            check(isinstance(rc, SystemExit) and get(exe) == ORIGINAL and not os.path.lexists(victim),
+                  '備份的名字是連結 → --apply 停下來,外面沒有憑空多一個檔', True)
+            rc, out = run_main(exe, '--restore')
+            check(isinstance(rc, SystemExit) and get(exe) == ORIGINAL,
+                  '備份是連結 → --restore 也停下來', True)
+        else:
+            skipped.append('符號連結那 5 道(這台機器做不出符號連結)')
+
+        print('\n十一、寫檔途中與寫完之後')
+        # 這一段的替身都只在「那一個動作」上動手腳,其他照真的跑。
+        real_cfo = shutil.copyfileobj
+        real_copymode = shutil.copymode
+        real_fsync = os.fsync
+
+        def half_copy(fsrc, fdst, *a, **k):
+            data = fsrc.read()
+            fdst.write(data[:len(data) // 2])
+
+        fresh()
+        shutil.copyfileobj = half_copy
+        try:
+            rc, out = run_main(exe, '--4gb', '--apply')
+        finally:
+            shutil.copyfileobj = real_cfo
+        check(rc == 2 and '只複製了一部分' in out and get(exe) == ORIGINAL
+              and not os.path.lexists(bak) and not junk(),
+              '備份只複製了一半(磁碟滿之類)→ 不當成備份、執行檔不動、不留暫存檔', True)
+
+        def replace_then_grow(src, dst):
+            real_replace(src, dst)
+            if dst == exe:
+                with open(exe, 'ab') as f:
+                    f.write(b'\x00')
+
+        def replace_then_flip(src, dst):
+            real_replace(src, dst)
+            if dst == exe:
+                with open(exe, 'r+b') as f:
+                    f.seek(0x1800)             # 落在這支會動的那幾格以外
+                    f.write(b'\x77')
+
+        for label, fake, said in (
+                ('寫進去之後讀回來,檔案大小變了', replace_then_grow, '寫入後檔案大小變了'),
+                ('寫進去之後讀回來,多動了一個不該動的位元組', replace_then_flip,
+                 '實際改動的位元組跟預期不符')):
+            fresh()
+            os.replace = fake
+            try:
+                rc, out = run_main(exe, '--4gb', '--apply')
+            finally:
+                os.replace = real_replace
+            check(rc == 2 and said in out and '--restore' in out,
+                  label + ' → 回 2,要你立刻還原,並給還原指令', True)
+
+        def no_chmod(*a, **k):
+            raise OSError(1, '(自我測試的替身)這個檔案系統不讓你設權限')
+
+        fresh()
+        shutil.copymode = no_chmod
+        try:
+            rc, out = run_main(exe, '--4gb', '--apply')
+        finally:
+            shutil.copymode = real_copymode
+        check(rc == 0 and '不讓我設定權限' in out
+              and struct.unpack_from('&lt;H', get(exe), PE + 22)[0] &amp; LARGE_ADDRESS_AWARE,
+              '陰性對照:設不了權限的檔案系統 → 印一行告訴你,照樣把改好的內容寫下去')
+
+        def fsync_then_scribble(fd):
+            real_fsync(fd)
+            os.lseek(fd, 0x1800, os.SEEK_SET)  # 暫存檔已經寫完、落地之後才去改一個位元組
+            os.write(fd, b'\x77')
+
+        fresh()
+        run_main(exe, '--4gb', '--apply')
+        changed = get(exe)
+        os.fsync = fsync_then_scribble         # --restore 這條路上只有 _do_copy 會呼叫 fsync
+        try:
+            rc, out = run_main(exe, '--restore')
+        finally:
+            os.fsync = real_fsync
+        check(rc == 2 and '寫出來的暫存檔跟備份對不起來' in out and get(exe) == changed and not junk(),
+              '還原寫出來的暫存檔讀回來跟備份對不起來 → 不換上去、正本維持原樣、不留暫存檔', True)
+
+        fresh()
+        run_main(exe, '--4gb', '--apply')
+        os.replace = replace_then_flip
+        try:
+            rc, out = run_main(exe, '--restore')
+        finally:
+            os.replace = real_replace
+        check(rc == 2 and '還原後內容跟備份不一樣' in out,
+              '還原換好之後讀回來跟備份不一樣 → 回 2、要你手動檢查,不印成功', True)
+
+        print('\n十二、-O 守門')
+        check(_opt[0], '假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試拒跑、結束碼 2', True)
+        check(_opt[1], '陰性對照:換回原本那一支之後,沒開 -O 的時候守門放行')
+    finally:
+        reset()
+        shutil.rmtree(root, ignore_errors=True)
+
+    print()
+    for why in skipped:
+        print('   ⚠️ 跳過(沒有測到,不算通過):%s' % why)
+    if tally['fail']:
+        print('自我測試:有 %d 道沒過(共 %d 道)' % (tally['fail'], tally['n']))
+        return 1
+    print('自我測試:全部通過(%d 道檢查,其中 %d 道是餌)' % (tally['n'], tally['bait']))
+    return 0
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。這支的 --selftest 跟這道守門是 2026-09-24 一起加的。
+#  守門不直接問 sys.flags.optimize:那是唯讀的,同一個程序裡沒辦法把 -O
+#  打開又關掉,直接問它的話這道守門就下不了餌 —— 哪天被拆掉,自我測試照樣全綠。
+#  所以守門問的是 _optimize_level(),自我測試可以暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
+
+
 if __name__ == '__main__':
+    # --selftest 不需要執行檔,所以在 argparse 之前就攔下來(argparse 會要求一定要給路徑)。
+    if '--selftest' in sys.argv[1:]:
+        sys.exit(selftest())
     sys.exit(main())
 
 #
@@ -2200,6 +2773,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=12835e693d" defer></script>
+<script src="../../assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

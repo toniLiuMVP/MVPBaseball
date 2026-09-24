@@ -22,7 +22,8 @@ mvp_check_setup.py
   以 -- 開頭的參數一律當旗標略過,所以路徑排在旗標後面也讀得到。
   唯一認得的旗標是 --selftest:不讀你的遊戲資料夾,只在記憶體裡把
   【4】那條「哪些檔算備份」的規則驗一次(含兩個故意種下的餌)。
-  它拒絕在 python3 -O 底下跑,理由寫在 self_test() 的說明裡。
+  它拒絕在 python3 -O 底下跑,理由寫在 self_test() 的說明裡;
+  那道拒跑的守門自己也有一個餌與一個陰性對照(2026-09-24 加)。
 
 ── 輸出 ─────────────────────────────────────────────
   只印到畫面,不產生任何檔案:
@@ -58,7 +59,7 @@ mvp_check_setup.py
 無外部相依,Python 3.7 以上即可。
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -218,7 +219,9 @@ def self_test():
     """把【4】那條「哪些檔算備份」的規則當場驗一次,全綠回 True。
 
     全程只在記憶體裡跑假路徑:不建檔、不刪檔、也不讀你的遊戲資料夾。
-    四項裡有兩項是餌 —— 沒有餌的話,一個「什麼都算備份」的爛規則也會全綠。
+    規則那四項裡有兩項是餌 —— 沒有餌的話,一個「什麼都算備份」的爛規則也會全綠。
+    最後兩項驗的是最上面那道 -O 守門:一個餌、一個陰性對照(2026-09-24 加),
+    一共六項。
 
     在 python3 -O 底下不跑,直接以結束碼 2 收工(不回傳 True/False)。
     """
@@ -230,10 +233,12 @@ def self_test():
     #    不必指望那時候有人記得補。
     #    這裡直接結束整支程式,不回傳 —— 「測試沒跑」跟「測試沒過」是兩回事,
     #    用 1(有一項紅了)會把它們混在一起。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python3 -O 底下跑:-O 會把 assert 整段拿掉,'
               '哪天這裡改用 assert 判斷就會變成一片假的綠燈。請拿掉 -O 再跑一次。')
         sys.exit(2)
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(self_test)
     print('【0】自我測試(不碰任何檔案)')
     ok = True
 
@@ -278,6 +283,19 @@ def self_test():
     else:
         ok = False
         print(f'   ❌ 餌二失敗(原廠={len(shipped)} 個 / 你的={len(mine)} 個)')
+
+    # 五、餌:最上面那道 -O 守門(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳)。
+    if _opt[0]:
+        print('   ✅ 餌三:假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試拒跑、結束碼 2')
+    else:
+        ok = False
+        print('   ❌ 餌三沒抓到:假裝開了 -O,自我測試竟然沒有拒跑')
+    # 六、陰性對照:換回原本那一支之後,沒開 -O 就要放行。
+    if _opt[1]:
+        print('   ✅ 陰性對照:換回原本那一支之後,沒開 -O 的時候守門放行')
+    else:
+        ok = False
+        print('   ❌ 陰性對照失敗:沒開 -O 守門也擋,或是換回原本那一支沒換成功')
 
     print('   全綠' if ok else '   有項目沒過')
     return ok
@@ -495,6 +513,70 @@ def main():
             print(f'  {i}. {p}')
     print('\n本次檢查全程唯讀,沒有修改任何檔案。')
     return 0
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
 
 
 if __name__ == '__main__':

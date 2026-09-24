@@ -94,7 +94,7 @@ mvp_install_uniform.py — 把一套球衣裝進 MVP Baseball 2005
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -1588,7 +1588,14 @@ def main():
 #  自我測試(--selftest)
 #
 #  ⚠️ 這一段一個遊戲檔都不碰。它在系統暫存資料夾裡自己造一個最小的封裝檔,
-#     然後**故意去踩**每一道守門,看它有沒有真的擋下來。
+#     然後**故意去踩**下面那 17 個反向餌寫著的情況,看它有沒有真的擋下來。
+#  ⚠️ 這不等於每一道守門都有餌。2026-09-24 把自我測試以外、條件成立就讓這支
+#     停下來的 29 道守門逐一拆掉(那一個 if 改成永遠不成立)再跑 --selftest,
+#     單拆一道就會紅的只有 1 道(目的檔是符號連結)。其餘 28 道裡,12 道在這一課
+#     根本不會呼叫的共用函式裡(qfs_decompress、read_entry、fsh_ 開頭那兩支);
+#     有的是背後還站著另一道 —— 例如對半截的檔,_verify_same 的「長度不同」與
+#     「內容不同」單拆哪一道都不紅,兩道一起拆,反向餌 4 就紅了;但長度相同、內容不同的檔
+#     只有「內容不同」擋得到,這種情況還沒有餌。其餘幾道沒有逐一分辨是哪一種。
 # ─────────────────────────────────────────────────────────
 class _Mute(object):
     """把一段程式的 print 吃掉,只給 --selftest 用。
@@ -1691,16 +1698,16 @@ _WHY_NO_SIGNAL = '這台裝不上 Ctrl-C 的訊號處理器(要在主執行緒�
 def selftest():
     """不碰任何遊戲檔的自我測試,全部在系統暫存資料夾裡做(跑完不刪,方便自己進去看)。
 
-    重點不是「有沒有通過」,是裡面有 **16 個反向餌**:先證明「答案錯的時候它
+    重點不是「有沒有通過」,是裡面有 **17 個反向餌**:先證明「答案錯的時候它
     真的會叫」。只驗正向的測試會一路綠燈,卻在功能整個壞掉時照樣綠燈,
     那種測試比沒有更危險(這是本站 2026-08-29 那一輪的教訓)。
 
     ⚠️ 其中 5 個有機器做不到:餌 1、2、8 要做得出符號連結(Windows 沒開
        開發人員模式就做不出來),餌 10、13 要裝得上 Ctrl-C 的訊號處理器
        (要在主執行緒)。做不到就整段跳過,**而且畫面上會講出來**——
-       所以最後那一行的數字在有些機器上會小於 16,那不是壞掉。
+       所以最後那一行的數字在有些機器上會小於 17,那不是壞掉。
 
-    16 個反向餌:
+    17 個反向餌:
       1. 目的檔是符號連結 → 要拒絕,而且連結指到的那個檔不可以被動到
       2. 固定暫存名被先佔(事先放一個 <目的檔>.part 連結指到資料夾外面)
          → 正常備份照樣要成功,而外面那個檔要原封不動
@@ -1725,6 +1732,8 @@ def selftest():
          讀者手上沒有那個檔
      16. Ctrl-C 落在「換名回來了、旗標還沒設起來」那一瞬間 → 收尾要去問磁碟
          (暫存檔還在不在),不可以問旗標而說出「還沒有動到任何檔案」
+     17. 假裝開了 -O(把 _optimize_level 換成回傳 1)→ 自我測試必須拒跑、結束碼 2;
+         換回原本那一支之後守門要照樣放行(陰性對照)。2026-09-24 補的
     ⚠️ 第 9 個是 2026-09-05 補的,補的理由值得寫下來:前 8 個餌都在的時候,
        我把「逐位元組比對」搬到 os.replace **後面**去,自我測試照樣全綠 ——
        一個測不到「驗在換之前」的測試,等於沒有在測這件事。
@@ -1739,10 +1748,16 @@ def selftest():
     """
     # python -O 會把 assert 整個拿掉 —— 上面那些餌有一大半是靠 assert 站著的,
     # 在 -O 下會一路走到「全部通過」而其實什麼都沒驗。寧可不跑也不要假綠。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
     _BAIT_LOG['ran'], _BAIT_LOG['skipped'] = [], []
+    # ── 反向餌 17:最上面那道 -O 守門(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳) ──
+    assert _opt[0], '假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試竟然沒有拒跑'
+    assert _opt[1], '陰性對照:沒開 -O 守門也擋,或是換回原本那一支沒換成功'
+    _bait_ran(17)
     d = tempfile.mkdtemp(prefix='mvp_install_uniform_selftest_')
     big = os.path.join(d, 'uniforms.big')
     body = _fake_big([('001.fsh', b'\x10\xfb' + b'A' * 30),
@@ -2201,6 +2216,70 @@ def selftest():
         print(_line)
     print('  測試用的檔留在 %s' % d)
     return 0
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
 
 
 if __name__ == '__main__':

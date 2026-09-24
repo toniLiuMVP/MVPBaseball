@@ -19,7 +19,7 @@
 <title>幫球員換一張臉 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="讓某位球員改用另一張 3D 臉皮。只要改一個 800 KB 的純文字檔，完全不必改動 535.9 MB 的 models.big。附零相依腳本，一行指令可還原。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="../../assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -61,11 +61,10 @@
   <div class="quickfix" id="quick">
     <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
-      <li>下載 <code>mvp_swap_face.py</code>，<strong>記得從「下載」資料夾拖到桌面</strong>（沒拖就會跳 <code>can't open file</code>，這是本站最常見的第一個卡點）。</li>
-      <li>開命令提示字元，切到桌面<br>
-  <pre><code>cd %USERPROFILE%\Desktop</code></pre>
-  Mac 是<br>
-  <pre><code>cd ~/Desktop</code></pre></li>
+      <li>下載 <code>mvp_swap_face.py</code>，瀏覽器會把它放進「下載」資料夾（命令視窗不在那個資料夾的話就會跳 <code>can't open file</code>，這是本站最常見的第一個卡點）。</li>
+      <li>在「下載」資料夾開命令視窗：Windows 打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打<br>
+  Mac 是開終端機打<br>
+  <pre><code>cd ~/Downloads</code></pre></li>
       <li>查那位球員，把最左邊那串識別碼抄下來（<code>"你的遊戲資料夾"</code> 換成拖進視窗的路徑）<br>
   <pre><code>python mvp_swap_face.py "你的遊戲資料夾" --find Ohtani</code></pre></li>
       <li>先預覽，不會改到任何檔案（臉皮編號填 1 到 900）<br>
@@ -73,7 +72,7 @@
       <li>確定了，同一行最後加 <code>--apply</code>；印出「改動行數 = 1」跟「✅ 複驗通過」就成了<br>
   <pre><code>python mvp_swap_face.py "你的遊戲資料夾" --set 0fff0f536 123 --apply</code></pre></li>
     </ol>
-    <p class="tail">不放心的話，先跑這一行 —— 它自己造一份假名冊來測 39 道檢查，一個遊戲檔都不碰：</p>
+    <p class="tail">不放心的話，先跑這一行 —— 它自己造一份假名冊來測 55 道檢查，一個遊戲檔都不碰：</p>
 <pre><code>python mvp_swap_face.py --selftest</code></pre>
     <p class="tail">後悔的話，這一行還原：</p>
 <pre><code>python mvp_swap_face.py "〔你的遊戲資料夾〕" --restore</code></pre>
@@ -129,16 +128,13 @@
   <div class="step">
     <div class="step-n">1</div>
     <div>
-      <div class="step-t">下載腳本，放到桌面</div>
+      <div class="step-t">下載腳本</div>
       <p class="step-why">用上面的按鈕存檔。檔名必須正好是 <code>mvp_swap_face.py</code>。</p>
       <div class="ifnot"><b>按了下載之後，檔案跑到哪裡去了？</b>
           <p><strong>瀏覽器多半不會問你要存哪裡</strong>，它會直接放進「下載」資料夾。
-             所以按完之後還有一步：</p>
-          <p><span class="sk">1</span>打開檔案總管（Mac 用 Finder），左邊點「<u>下載</u>」<br>
-             <span class="sk">2</span>找到那個 <code>.py</code> 檔<br>
-             <span class="sk">3</span><strong>把它拖到桌面</strong></p>
-          <p class="small">沒做這一步的話，後面 <code>cd</code> 到桌面再執行，
-             畫面會出現 <code>can't open file</code> —— 那不是你打錯，是檔案還在「下載」裡。</p>
+             <u>不用搬</u>，下一步就在「下載」裡開命令視窗。</p>
+          <p class="small">命令視窗跟檔案不在同一個資料夾的話，
+             畫面會出現 <code>can't open file</code> —— 那不是你打錯。</p>
         </div>
         <div class="ifnot"><b>如果檔名多了 .txt</b>
         <p>照<a href="../../start.html">第 0 課操作三</a>把副檔名顯示出來，右鍵重新命名，刪掉結尾的 <code>.txt</code>。</p>
@@ -149,12 +145,12 @@
   <div class="step">
     <div class="step-n">2</div>
     <div>
-      <div class="step-t">開命令提示字元，切換到桌面</div>
-      <p class="small">Windows：</p>
-<pre><code>cd %USERPROFILE%\Desktop</code></pre>
-      <p class="small">Mac / Linux：</p>
-<pre><code>cd ~/Desktop</code></pre>
-      <div class="seen"><b>你會看到</b><p>游標前那串字結尾變成 <code>\Desktop&gt;</code>（Mac 是 <code>Desktop %</code>）。</p></div>
+      <div class="step-t">在「下載」資料夾開命令提示字元</div>
+      <p class="small">Windows：這一步不用打指令。打開檔案總管，左邊點「<u>下載</u>」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter。開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。</p>
+      <p class="small">Mac：打開終端機，打這一行：</p>
+<pre><code>cd ~/Downloads</code></pre>
+      <div class="seen"><b>你會看到</b><p>游標前那串字的結尾是 <code>\Downloads&gt;</code>（Mac 是 <code>Downloads %</code>）。
+         <span class="small">（Windows 這個畫面本站<u>還沒實測</u>。檔案總管裡顯示成「下載」的那個資料夾，在磁碟上的名字是英文的 <code>Downloads</code>，所以視窗裡看到的是英文。）</span></p></div>
     </div>
   </div>
 
@@ -358,9 +354,9 @@
     <thead><tr><th style="width:34%">畫面上的訊息</th><th>原因</th><th>你要做的</th></tr></thead>
     <tbody>
       <tr class="hi"><td data-label="畫面上的訊息" class="mono">can't open file '…\mvp_*.py'</td>
-          <td data-label="原因"><strong>檔案還在「下載」資料夾，不在桌面。</strong>
+          <td data-label="原因"><strong>命令視窗跟腳本不在同一個資料夾</strong>，或檔名對不上（瀏覽器可能在檔名後面加了 <code>(1)</code>）。
               <u>這是本站最常見的第一個卡點。</u></td>
-          <td data-label="你要做的">開檔案總管左邊點「下載」，把那個 <code>.py</code> 拖到桌面，再跑一次。</td></tr>
+          <td data-label="你要做的">打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）；檔名多了 <code>(1)</code> 就改成跟指令裡一模一樣</td></tr>
       <tr><td data-label="畫面上的訊息" class="mono">找不到 …/attrib.dat</td><td data-label="原因">拖到的資料夾不對</td>
           <td data-label="你要做的">要拖<strong>遊戲安裝資料夾</strong>（它的下一層才是 <code>data</code>）</td></tr>
       <tr><td data-label="畫面上的訊息" class="mono">開頭不像欄位表</td><td data-label="原因">檔案不是 <code>attrib.dat</code>，或已損壞</td>
@@ -446,7 +442,7 @@ attrib.dat 檔案大小：___ bytes</code></pre>
     <li><strong>本站沒驗的</strong> 有球員指向不存在的臉皮時，這一頁寫的是遊戲「通常」會退回顯示通用臉，用的就是「通常」兩個字，沒有附任何實機數字；「臉沒變」時列的三個原因（改到二刀流的另一列、存檔快取、那張臉根本不存在）也是排查清單，同樣沒有數字。至於做一張遊戲裡本來沒有的新臉，那要動 <code>models.big</code>，不在這一頁的量測範圍，做法見〈<a href="../new-face/index.html">做一張新的球員臉皮</a>〉那一課。</li>
   </ul>
 
-  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <!-- course-strip:begin · 這一塊由產生器從 plan.html 產生，不要手改 -->
   <nav class="card course-strip" aria-label="這一課在課表的位置">
     <p class="card-h">📚 照課表上課的話</p>
     <p><a href="../../plan.html#a"><strong>① 入門班</strong></a> 第 5／6 堂</p>
@@ -574,7 +570,7 @@ attrib.dat 檔案大小：___ bytes</code></pre>
   <h2 id="source">完整原始碼</h2>
   <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。不必下載也能先看過一遍。</p>
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1679 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1757 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -676,7 +672,7 @@ mvp_swap_face.py — 幫 MVP Baseball 2005 的球員換一張臉
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -1809,10 +1805,14 @@ def selftest():
     """--selftest:自己造一份最小的名冊來測,完全不碰遊戲檔。
 
     測的是這支工具對讀者的承諾,一條一條驗。**正向與反向都要有** ——
-    2026-08-29 本站踩過「防線壞了測試照樣全綠」,所以每一道守門都先證明
-    「正常流程真的做得到」,再放一個餌證明「答案錯的時候它真的會叫」。
+    2026-08-29 本站踩過「防線壞了測試照樣全綠」,所以先證明
+    「正常流程真的做得到」,再放餌證明「答案錯的時候它真的會叫」。
+    ⚠️ 不是每一道守門都有餌。2026-09-24 把這一段以外、條件成立就讓這支停下來的
+       34 道守門逐一拆掉(那一個 if 改成永遠不成立)再跑一次,會變紅的是 7 道
+       (符號連結與斷掉的連結共 4 道、備份與暫存檔讀回來對不上共 2 道、寫入後的複驗沒過);
+       其餘 27 道拆掉照樣全綠,例如備份被截斷或列數比名冊少、找不到那位球員。
 
-    正向 9 道:
+    正向 10 道:
       · 造出來的名冊讀得出來、face 欄是第 10 欄
       · 沒加 --apply 一個位元組都不動、不產生備份、不記到任何一次換名
       · --apply 之後那一格真的是新值
@@ -1820,11 +1820,13 @@ def selftest():
       · 備份逐位元組等於動手之前的名冊
       · 換名有被記下來(Ctrl-C 的收尾訊息靠它)
       · --restore 之後逐位元組回到動手之前
+      · -O 守門換回原本那一支之後,沒開 -O 就放行(下面反向餌 L 的陰性對照)
 
     (--selftest 不接受 python -O:-O 會把下面每一個 assert 拿掉,
      整份測試會在什麼都沒驗的情況下印「全部通過」。進來第一行就擋掉。)
 
-    反向餌 13 組(2026-09-05 第二輪、2026-09-06 第三輪稽核補的守門,每一道各配一組):
+    反向餌 14 組(A 到 K 是替 2026-09-05 第二輪、2026-09-06 第三輪稽核補的守門配的,但那兩輪
+    補的守門不是每一道都配到,例如上面說的「備份被截斷或列數比名冊少」;L 是 2026-09-24 補的):
       A 事先把「備份名 + .part」放成指向資料夾外面的符號連結 → 跑 --apply,
         外面那個檔必須一個位元組都沒變(暫存檔的名字已經猜不到了)
       B 事先把「名冊名 + .tmp」放成同樣的連結 → 同上
@@ -1843,6 +1845,7 @@ def selftest():
         連 (a) 失效時由 _INFLIGHT 接手的「正在替換」那一句也一起驗
       K 名冊本身是符號連結 → 命令列那條路(main())一律停手、exit code 2,
         連結沒被換掉、它指到的那份名冊沒被動到、不產生備份
+      L 假裝開了 -O(把 _optimize_level 換成回傳 1)→ 自我測試必須拒跑、結束碼 2
 
     每一組都拿「把對應的那道守門改壞」驗過會亮 —— 餌會自己失效而沒有人發現,
     所以餌本身也要驗。(2026-09-05 那 10 組是 14 個突變體;2026-09-06 補的
@@ -1851,9 +1854,11 @@ def selftest():
     """
     # ⚠️ 這一道要排在最前面。python -O 會把 assert 整個拿掉,下面幾十道守門
     #    一句都不會執行,而畫面照樣印「全部通過」—— 那是最糟的一種綠燈。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
 
     import io as _io
     import contextlib
@@ -1883,6 +1888,11 @@ def selftest():
     def _quiet(fn, *a, **kw):
         with contextlib.redirect_stdout(_io.StringIO()):
             return fn(*a, **kw)
+
+    # 反向餌 L:最上面那道 -O 守門(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳)
+    assert _opt[0], '餌 L:假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試竟然沒有拒跑'
+    # 正向:它的陰性對照 —— 換回原本那一支之後,沒開 -O 就要放行
+    assert _opt[1], '餌 L 的陰性對照:沒開 -O 守門也擋,或是換回原本那一支沒換成功'
 
     raw, lines = _reload()
     FACE_FIELD = resolve_field(lines, FACE_NAME)
@@ -2173,7 +2183,7 @@ def selftest():
     assert open(p, 'rb').read() == before2, '餌 K:連結指到的那份名冊被動到了'
     assert not os.path.lexists(lp2 + '.facebak'), '餌 K:不該產生備份'
 
-    print('自我測試:全部通過(53 道檢查:9 道正向,44 道分在 13 組反向餌裡)')
+    print('自我測試:全部通過(55 道檢查:10 道正向,45 道分在 14 組反向餌裡)')
     print('  測試資料在 %s(跑完不刪,想自己看的話可以進去翻)' % d)
     return 0
 
@@ -2209,6 +2219,70 @@ def _interrupt_note():
         print('  只產生了備份(.facebak),名冊本身沒有被改到。')
     else:
         print('  沒有改到任何檔案。')
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
 
 
 if __name__ == '__main__':
@@ -2264,6 +2338,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=12835e693d" defer></script>
+<script src="../../assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

@@ -122,7 +122,7 @@ mvp_player.py —— 把遊戲裡的一位球員改成你想要的球員。
 
 —— toni的MVP模組補習班
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 
 import csv
 import io
@@ -1162,7 +1162,7 @@ def selftest():
       5. `--restore` 之後逐位元組回到原狀
       6. `set_field` 只換那一格,同一行其他格不動
 
-    反向餌(每一道新守門各一個,失敗不了才是問題):
+    反向餌(失敗不了才是問題;不是每一道守門都有,數字見列表下面):
       A. `<備份>.part` 先被放成指向資料夾外的符號連結 → 外面那個檔不可以被動到
          (這一條是 2026-09-05 真的重現出來的洞,舊版會把外面那個檔寫成整份名冊)
       B. 名冊本身是符號連結 → 兩道門都要被擋下,連結指到的檔不可以被動到,
@@ -1185,21 +1185,38 @@ def selftest():
       K. **沒有人預料到的例外**(不是 Stop、也不是 Ctrl-C)不可以只丟一片英文
          traceback:名冊換過了就要說換過了、要印還原的路,原本那個例外也不可以
          被吞掉;一個位元組都沒寫的時候則要說「什麼都沒有動到」。結束碼都是 1
+      L. 假裝開了 -O(把 _optimize_level 換成回傳 1)→ 自我測試必須拒跑、結束碼 2;
+         換回原本那一支之後守門要照樣放行(陰性對照,算正向)。2026-09-24 補的
+
+    ⚠️ 不是每一道守門都有餌。2026-09-24 把自我測試以外、條件成立就讓這支停下來的
+       31 道守門逐一拆掉(那一個 if 改成永遠不成立)再跑 --selftest,會變紅的是 7 道
+       (名字太長、名字用了「英文字母、空白、點、連字號、撇號」以外的字、數字欄不是純數字、
+       數字超出範圍、符號連結、換名之前暫存檔讀回來對不上、寫檔時作業系統出錯要翻成人話);
+       其餘 24 道拆掉照樣全綠,例如 --restore 時「備份的球員人數跟名冊對不上」
+       「還原寫進去之後讀回來跟備份不一樣」這兩道。
 
     ⚠️ 這支測試靠 `assert` 站著,所以 `python -O` 底下**拒跑**(見第一行)——
        -O 會把 assert 整個拿掉,每一道餌都會安靜地「通過」。
     """
     # -O 會把 assert 全部拿掉,上面那些餌有一半是靠 assert 站著的,
     # 在 -O 下會一路走到「全部通過」而其實什麼都沒驗。寧可不跑也不要假綠。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
     # 兩個數字分開數(正向 / 反向餌),不要寫死在最後那句話裡 ——
     # 寫死的數字加了一道測試就過期,而沒有人會發現。
     n = {'fwd': 0, 'rev': 0}
 
     def eq(a, b, msg):
         assert a == b, '%s(得到 %r,應該是 %r)' % (msg, a, b)
+
+    # ── 反向餌 L:最上面那道 -O 守門(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳) ──
+    eq(_opt[0], True, '餌 L:假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試竟然沒有拒跑')
+    n['rev'] += 1
+    eq(_opt[1], True, '餌 L 的陰性對照:沒開 -O 守門也擋,或是換回原本那一支沒換成功')
+    n['fwd'] += 1
 
     d = tempfile.mkdtemp(prefix='mvp_player_selftest_')
     gd = os.path.join(d, 'game')
@@ -1985,6 +2002,70 @@ def _cli_entry(argv):
         print()
         _print_interrupt_state()
         return 130
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
 
 
 if __name__ == '__main__':

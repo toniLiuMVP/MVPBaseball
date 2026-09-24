@@ -21,11 +21,15 @@
     return n;
   }
 
-  function store(key, val) {          // 寫入;失敗就算了,不影響功能
+  // 寫入。成功回傳 true;失敗(停用儲存、存放空間滿了)回傳 false,功能照常,由呼叫的人決定要不要講。
+  // 2026-09-24 以前不回傳:兩把鍵合併時寫新的那一把失敗,照樣刪掉舊的那一把,讀者唯一的紀錄就沒了。
+  // 規則:任何「寫新的、刪舊的」一律先看寫新的有沒有成功,成功才刪。
+  function store(key, val) {
     try {
       if (val === null) localStorage.removeItem(key);
       else localStorage.setItem(key, val);
-    } catch (e) { /* 無痕視窗 / 停用儲存 */ }
+      return true;
+    } catch (e) { return false; }
   }
 
   function load(key) {
@@ -153,6 +157,38 @@
   // 43 頁、195 個 .step-n(2026-09-05 重數)。只加一個勾,**不遮住任何內容**:
   // 全站有 61 個「你會看到」(2026-09-05 重數;原本寫的「44 個沒看到該怎麼辦」量不到,拿掉),
   // 讀者卡住時就是要回頭對照上一步 —— 把做完的步驟弄淡是幫倒忙。
+  //
+  // 2026-09-24:紀錄改成記「哪一步」,不再記「第幾顆」。
+  // 以前存的是步驟在頁面上的排列序號(0,1,2…)。備份那一課 2026-09-23 在原本四步前面
+  // 插了四個「整包複製」的新步驟,舊紀錄 0,1,2,3 就把從沒做過的新步驟顯示成已勾 ——
+  // 偏偏那是備份。現在每一步的代號從它的標題算出來(stepTitle),前後插幾步都對得上;
+  // 標題一改,那一步的勾就不再顯示 —— 寧可少一個勾,也不要勾錯一步。
+  // 同一頁兩步標題一模一樣時,第二個起加 ~2、~3。步驟上寫了 data-step-id 的,用它。
+  // 鍵還是 mvp:step:<頁面路徑>,值改成 v2: 開頭。不是 v2: 開頭的是舊的序號紀錄,
+  // 沒辦法知道它記下來的時候那一頁長什麼樣子,所以一律不套,在這一頁說一次。
+  function stepTitle(step, n) {
+    var t = step.querySelector('.step-t');
+    if (!t) {
+      // 沒有 .step-t 的頁,標題是步驟內容的第一段(通常是 <p><strong>…</strong></p>)。
+      // 不找「第一個 <strong>」:有一步的第一個粗體是內文裡的「絕對不要動」。
+      var body = null;
+      for (var c = step.firstElementChild; c; c = c.nextElementSibling) {
+        if (c !== n) { body = c; break; }
+      }
+      t = body && (body.firstElementChild || body);
+    }
+    return t ? (t.textContent || '').replace(/\s+/g, ' ').trim() : '';
+  }
+
+  function stepCode(s) {              // 32 位元 FNV-1a,寫成 36 進位;只用來分辨同一頁的步驟
+    var h = 0x811c9dc5;
+    for (var i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 0x01000193) >>> 0;
+    }
+    return h.toString(36);
+  }
+
   function addStepChecks() {
     var steps = document.querySelectorAll('.step > .step-n');
     if (!steps.length) return;
@@ -162,26 +198,48 @@
     // 既有的紀錄多半本來就存在那把鍵底下。
     var path = location.pathname.replace(/\/$/, '/index.html');
     var key = 'mvp:step:' + path;
-    var alt = 'mvp:step:' + path.replace(/\/index\.html$/, '/');   // 舊版在資料夾網址存的那一把
-    var saved = ((load(key) || '') + ',' + (alt !== key ? (load(alt) || '') : ''))
-                  .split(',').filter(Boolean);
+    var alt = 'mvp:step:' + path.replace(/\/index\.html$/, '/');   // 舊版在資料夾網址存的那一把(只會是舊的序號紀錄)
+    var V = 'v2:';
+
+    var ids = [];
+    var dup = {};
+    Array.prototype.forEach.call(steps, function (n) {
+      var step = n.parentNode;
+      var id = step.getAttribute('data-step-id');
+      if (!id || !/^[A-Za-z0-9_-]{1,40}$/.test(id)) {
+        var t = stepTitle(step, n);
+        dup[t] = (dup[t] || 0) + 1;
+        id = stepCode(t) + (dup[t] > 1 ? '~' + dup[t] : '');
+      }
+      ids.push(id);
+    });
+
     var state = {};
-    saved.forEach(function (i) { state[i] = 1; });
+    var legacy = [];                  // 還存著舊序號紀錄的鍵
+    var raw = load(key) || '';
+    if (raw.slice(0, V.length) === V) {
+      raw.slice(V.length).split(',').forEach(function (id) {
+        if (id && ids.indexOf(id) >= 0) state[id] = 1;    // 標題改掉的那幾步,舊代號對不到,不顯示
+      });
+    } else if (raw) {
+      legacy.push(key);
+    }
+    if (alt !== key && load(alt)) legacy.push(alt);
 
     var boxes = [];
     Array.prototype.forEach.call(steps, function (n, i) {
-      var num = n.textContent;
-      var b = el('button', 'step-n step-btn', num);
+      var id = ids[i];
+      var b = el('button', 'step-n step-btn', n.textContent);
       b.type = 'button';
-      b.setAttribute('aria-pressed', state[i] ? 'true' : 'false');
+      b.setAttribute('aria-pressed', state[id] ? 'true' : 'false');
       b.title = '點一下記錄「這一步我做完了」';
-      if (state[i]) b.classList.add('is-done');
+      if (state[id]) b.classList.add('is-done');
       n.parentNode.replaceChild(b, n);
       boxes.push(b);
       b.addEventListener('click', function () {
-        if (state[i]) { delete state[i]; b.classList.remove('is-done'); b.setAttribute('aria-pressed', 'false'); }
-        else { state[i] = 1; b.classList.add('is-done'); b.setAttribute('aria-pressed', 'true'); }
-        save();
+        if (state[id]) { delete state[id]; b.classList.remove('is-done'); b.setAttribute('aria-pressed', 'false'); }
+        else { state[id] = 1; b.classList.add('is-done'); b.setAttribute('aria-pressed', 'true'); }
+        save(true);
       });
     });
 
@@ -190,30 +248,58 @@
     var clear = el('button', 'linkbtn', '清除這一頁的紀錄');
     clear.type = 'button';
     var note = el('span', 'small', '這個紀錄只存在你自己的瀏覽器,不會送到任何地方。');
+    // 存不進去時才有字。一直留在頁面上(空的時候高度是 0),報讀器才聽得到它變了。
+    var warn = el('span', 'small stepnote');
+    warn.setAttribute('role', 'status');
     bar.appendChild(cnt);
     bar.appendChild(document.createTextNode(' '));
     bar.appendChild(clear);
     bar.appendChild(document.createElement('br'));
     bar.appendChild(note);
+    if (legacy.length) {
+      bar.appendChild(el('span', 'small stepnote',
+        '這一頁之前的勾選不再顯示：舊的紀錄是照步驟的排列順序記的，' +
+        '步驟有增減時會勾到別的步驟上。請照現在的步驟重新勾一次。'));
+    }
+    bar.appendChild(warn);
 
-    var anchor = document.querySelector('.quickfix') || steps[0].closest('.step');
-    if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(bar, anchor.nextSibling);
+    // 有速解的頁放在速解後面;沒有速解的頁放在第一步前面。
+    // 2026-09-24 以前第二種寫成 steps[0].closest('.step'),而 steps[0] 在上面已經換成按鈕、
+    // 離開頁面了,closest 找不到東西 —— 沒有速解的頁(七分鐘那一系列等,2026-09-24 數是 15 頁)一直沒有這一列。
+    var qf = document.querySelector('.quickfix');
+    var first = boxes[0].closest('.step');
+    if (qf && qf.parentNode) qf.parentNode.insertBefore(bar, qf.nextSibling);
+    else if (first && first.parentNode) first.parentNode.insertBefore(bar, first);
 
     clear.addEventListener('click', function () {
       state = {};
       boxes.forEach(function (b) { b.classList.remove('is-done'); b.setAttribute('aria-pressed', 'false'); });
-      save();
+      save(true);
     });
 
-    function save() {
-      var on = Object.keys(state);
-      store(key, on.length ? on.join(',') : null);
-      if (alt !== key) store(alt, null);        // 兩把合成一把;清除這一頁時兩把一起清
+    function count() {
+      var on = ids.filter(function (id) { return state[id]; });
       // 用字紀律:不可以寫「已完成」,更不可以寫「遊戲已經改好了」
       cnt.textContent = '你勾了 ' + on.length + ' / ' + boxes.length +
                         ' 步(只是你自己勾的,本站沒有幫你驗)。';
+      return on;
     }
-    save();
+
+    // byUser:讀者按了東西才講「沒存起來」;開頁時的整理失敗不講(讀者什麼都還沒做)。
+    function save(byUser) {
+      var on = count();
+      var ok = store(key, on.length ? V + on.join(',') : null);
+      // 新紀錄寫成功,才刪舊的序號紀錄(key 本身已經被新紀錄蓋掉)。
+      // 寫失敗就什麼都不刪,下次開這一頁再試 —— 不可以先刪再寫。
+      if (ok) legacy = legacy.filter(function (k) { return k !== key && !store(k, null); });
+      if (byUser) {
+        warn.textContent = ok ? '' :
+          '剛才那一下沒有存起來：這個瀏覽器不讓網頁存東西，或是存放空間滿了。' +
+          '重新整理之後，勾選會回到上一次存成功的樣子。';
+      }
+    }
+    count();
+    if (legacy.length) save(false);
   }
 
   // ── 3. 大表搜尋 ───────────────────────────────────────────
@@ -710,13 +796,16 @@
     pop.id = 'termpop';
     pop.setAttribute('role', 'dialog');
     pop.setAttribute('aria-labelledby', 'termpop-h');
+    pop.setAttribute('aria-describedby', 'termpop-d');
+    // 開框時焦點會移到框本身(見 show()),所以它要能拿焦點;-1 表示不排進 Tab 的順序裡
+    pop.setAttribute('tabindex', '-1');
     pop.hidden = true;
     var x = document.createElement('button');
     x.className = 'tp-x'; x.type = 'button';
     x.setAttribute('aria-label', '關閉'); x.textContent = '×';
     var h = document.createElement('p'); h.className = 'tp-h'; h.id = 'termpop-h';
     var en = document.createElement('span'); en.className = 'tp-en';
-    var zh = document.createElement('p');
+    var zh = document.createElement('p'); zh.id = 'termpop-d';
     var sci = document.createElement('p'); sci.className = 'tp-sci';
     // more 是可選的「再深入一點」——放量到的數字與細節。
     // 2026-08-29 訂正:原本以為彈出框只能放一行,所以把兩格科普寫成
@@ -756,7 +845,9 @@
     // 2026-08-29 第一版沒排除 .crumb，於是「教學 › 封裝檔可以拆成散裝嗎」
     // 那行麵包屑被插了一顆按鈕進去。
     // gl-term 是 glossary.html 的條目 —— 那一頁本來就在解釋這些詞，不必再標一次。
-    var SKIPCLASS = /(^|\s)(crumb|badge|nav-in|copybtn|swipehint|recap|gl-term|card-h)(\s|$)/;
+    // 2026-09-24:sr-only 也跳過 —— 那是只給報讀器唸的字(例如搜尋框的 label),
+    // 標在那裡會插進一顆看不見、卻按 Tab 停得到的按鈕,還占掉這個詞在正文裡的標記名額。
+    var SKIPCLASS = /(^|\s)(crumb|badge|nav-in|copybtn|swipehint|recap|gl-term|card-h|sr-only)(\s|$)/;
     var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode: function (n) {
         for (var p = n.parentNode; p && p !== document.body; p = p.parentNode) {
@@ -788,6 +879,19 @@
         ui.x.addEventListener('click', function () { hide(true); });
         // 點框裡面的字不要關框(document 那一層的 click 會關框)
         ui.pop.addEventListener('click', function (e) { e.stopPropagation(); });
+        // 框掛在 body 最後面。在框裡按 Tab 走出最後一個,下一站就是頁面外面(網址列);
+        // 按 Shift+Tab 走出第一個,會跳到頁尾最後一個連結(框前面最後一個能按的東西),離名詞很遠。
+        // 所以兩個方向走出框的那一下都改成:關框,焦點回到名詞本身,讀者從名詞接著往下或往回走。
+        // × 與「看全部」之間照瀏覽器原本的順序走。
+        ui.pop.addEventListener('keydown', function (e) {
+          if (e.key !== 'Tab') return;
+          var a = document.activeElement;
+          var last = ui.all.hidden ? ui.x : ui.allA;
+          if (e.shiftKey ? (a === ui.pop || a === ui.x) : a === last) {
+            e.preventDefault();
+            hide(true);
+          }
+        });
       }
       if (owner && owner !== btn) owner.setAttribute('aria-expanded', 'false');
       var t = TERMS[w];
@@ -814,19 +918,42 @@
       btn.setAttribute('aria-controls', 'termpop');
       ui.pop.dataset.owner = w;
       owner = btn;
+      // 2026-09-24:開框之後把焦點移到框本身。框有名稱(標題)與說明(第一句解釋),
+      // 報讀器在焦點移到這種元素時,一般會唸出這兩個(本站沒有用報讀器實測);
+      // 鍵盤的下一個 Tab 也就進到框裡的 × 與「看全部」。
+      // 2026-09-23 那一版沒做,理由兩個:
+      //   (1) 當時的提案只在「用鍵盤開框」時才移(看 click 事件的 detail 是不是 0),
+      //       當時的判斷是 iOS VoiceOver 點兩下產生的 click 不一定是 0,會漏掉用報讀器的人;
+      //   (2) 框掛在 body 最後面,焦點進去之後再按 Tab 就走出整個頁面。
+      // 現在:(1) 不分滑鼠、觸控、鍵盤一律移,不必判斷是哪一種;
+      //       (2) 走出框的那一下由上面的 keydown 接住,焦點回到名詞。
+      // 不把框搬到名詞按鈕後面:名詞可能在表格、小字、粗體或不斷行(.nobr)的包裝裡,
+      // 框會跟著繼承那些字型與換行規則,在表格裡還可能被捲動框切掉。
+      // preventScroll:移焦點時不捲動畫面,跟 2026-09-24 以前(開框不移焦點)一樣。
+      // 手機上框固定在畫面底部;桌機上框開在名詞正下方,名詞靠近畫面底部時,框可能有一截在畫面外
+      // (以前也是這樣,這一版沒有改)。不支援這個選項的舊瀏覽器頂多捲一下讓框露出來。
+      // 焦點外框用的是全站的 :focus-visible,瀏覽器一般只在鍵盤操作之後才畫;
+      // 滑鼠或觸控開框時框上會不會出現外框,本站還沒逐一實測。
+      ui.pop.focus({ preventScroll: true });
     }
-    // returnFocus:只有按 Esc 或 × 關框時才把焦點還給剛才那顆名詞。
+    // returnFocus:只有按 Esc、按 ×、或用 Tab 走出框時,才把焦點還給剛才那顆名詞。
     // 點畫面別的地方關框時不碰焦點 —— 不然讀者點搜尋框要打字,焦點會被搶回名詞,
     // 手機上鍵盤剛跳出來就被收回去;畫面也會被捲回那個名詞的位置。
+    // 保險:關框的當下焦點如果還在框裡(例如輔助科技直接觸發點擊、沒有經過滑鼠按下那一步;
+    // 本站還沒實測),也還給名詞 —— 不然框一藏起來,焦點就掉到頁面最後面。
+    // 這條保險路徑不捲動畫面(preventScroll);只有 Esc、×、Tab 走出框這三種情況才允許捲回名詞。
     function hide(returnFocus) {
       if (!ui) return;
       var wasOpen = !ui.pop.hidden;
+      var inside = ui.pop.contains(document.activeElement);
       ui.pop.hidden = true;
       var b = owner;
       owner = null;
       if (b) {
         b.setAttribute('aria-expanded', 'false');
-        if (wasOpen && returnFocus === true) b.focus();
+        if (wasOpen && (returnFocus === true || inside)) {
+          b.focus(returnFocus === true ? undefined : { preventScroll: true });
+        }
       }
     }
 
@@ -850,7 +977,9 @@
         (function (b, word) {
           b.addEventListener('click', function (e) {
             e.stopPropagation();
-            // 焦點本來就在這顆按鈕上,關框不必再搬焦點
+            // 再點同一顆名詞關框:Chrome 在按下滑鼠時焦點已經移到這顆按鈕上,不必再搬;
+            // 有些瀏覽器(例如 Safari、Mac 上的 Firefox)按鈕不會因為滑鼠點擊拿到焦點,
+            // 焦點若還留在框裡,由 hide() 的保險路徑接住(這兩個瀏覽器本站還沒實測)。
             if (owner === b && !ui.pop.hidden) hide(false); else show(b, word);
           });
         })(btn, w);

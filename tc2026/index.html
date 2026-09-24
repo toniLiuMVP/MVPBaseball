@@ -7,7 +7,7 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="toni的MVP模組補習班">
 <meta property="og:title" content="中文版為什麼會跳出 — MVP Baseball 2005 教學 · toni的MVP模組補習班">
-<meta property="og:description" content="二十年來中文版一裝上大球場就跳出，所以很多人退而求其次玩英文版。原因找到了：遊戲寫死一塊 64 MB 的記憶體池，而中文字型光展開成貼圖就吃掉 13.5 MB。兩個地方各改一個位元組就解決了。本頁含完整做法、我們走錯的十條路，以及台美日三個法域的依據。">
+<meta property="og:description" content="二十年來中文版一裝上大球場就跳出，所以很多人退而求其次玩英文版。原因找到了：遊戲寫死一塊 64 MB 的記憶體池，而中文字型光展開成貼圖就吃掉 13.5 MB。照原版光碟安裝的那一份做不到；做得到的，兩個地方各改一個位元組就解決了。本頁含完整做法、我們走錯的十條路，以及台美日三個法域的依據。">
 <meta property="og:url" content="https://toniliumvp.github.io/MVPBaseball/tc2026/">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:image" content="https://toniliumvp.github.io/MVPBaseball/assets/og-card-v1.png">
@@ -17,9 +17,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="strict-origin">
 <title>中文版為什麼會跳出 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
-<meta name="description" content="二十年來中文版一裝上大球場就跳出，所以很多人退而求其次玩英文版。原因找到了：遊戲寫死一塊 64 MB 的記憶體池，而中文字型光展開成貼圖就吃掉 13.5 MB。兩個地方各改一個位元組就解決了。本頁含完整做法、我們走錯的十條路，以及台美日三個法域的依據。">
+<meta name="description" content="二十年來中文版一裝上大球場就跳出，所以很多人退而求其次玩英文版。原因找到了：遊戲寫死一塊 64 MB 的記憶體池，而中文字型光展開成貼圖就吃掉 13.5 MB。照原版光碟安裝的那一份做不到；做得到的，兩個地方各改一個位元組就解決了。本頁含完整做法、我們走錯的十條路，以及台美日三個法域的依據。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="../assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -183,9 +183,8 @@
       <li>用檔案總管（Mac 用 Finder）把你的 <code>mvp2005.exe</code> 複製一份放旁邊，
           改名成 <code>mvp2005.exe.我的備份</code>。<strong>這一步不能跳。</strong></li>
       <li>下載 <a href="../tutorials/run-in-2026/mvp_modernize.py" download>mvp_modernize.py</a>，
-          <strong>從「下載」資料夾拖到桌面</strong>，再切到桌面。
-  <pre><code>cd %USERPROFILE%\Desktop</code></pre>
-  <pre><code>cd ~/Desktop</code></pre></li>
+          瀏覽器會把它放進「下載」資料夾。在「下載」開命令視窗：Windows 打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打；Mac 開終端機打這一行
+  <pre><code>cd ~/Downloads</code></pre></li>
       <li>先唯讀看一眼：下面這行<strong>最後空一格就停住</strong>，把遊戲的
           <code>mvp2005.exe</code> 拖進視窗，再按 Enter。
           看到「<code>記憶體池 64 MB</code>」就代表可以改；看到「<code>找不到</code>」
@@ -202,6 +201,7 @@
     <p class="tail">改完<strong>一定要用完整的中文語系加上你最大的那座球場，打一場完整的比賽</strong>
        —— 本站驗得到「檔案是對的」，驗不到「遊戲讀得動」。
        想懂為什麼會跳出，往下讀；只想複習，跳到<a href="#recap">📌 重點整理</a>。</p>
+    <p class="tail">照做卡住了？直接跳到<a href="#fix">❌ 出錯了怎麼辦</a>。</p>
   </div>
 
   <h2>路線 A：改你自己那顆（本站建議）</h2>
@@ -221,14 +221,14 @@
   <div class="step">
     <div class="step-n">2</div>
     <div>
-      <div class="step-t">下載腳本，放到桌面，切到桌面</div>
+      <div class="step-t">下載腳本，在「下載」資料夾開命令視窗</div>
       <p><a href="../tutorials/run-in-2026/mvp_modernize.py" download>mvp_modernize.py</a>（零相依，不用安裝任何東西）</p>
-<pre><code>cd %USERPROFILE%\Desktop</code></pre>
-<pre><code>cd ~/Desktop</code></pre>
+      <p class="small">Windows：這一步不用打指令。打開檔案總管，左邊點「<u>下載</u>」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter。開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../start.html">第 0 課</a>操作一的「資料夾法」）。</p>
+      <p class="small">Mac：打開終端機，打這一行：</p>
+<pre><code>cd ~/Downloads</code></pre>
       <div class="ifnot"><b>按了下載之後檔案跑到哪去了？</b>
-        <p>瀏覽器多半直接放進「下載」資料夾。打開檔案總管（Finder）左邊點「下載」，
-           把那個 <code>.py</code> <strong>拖到桌面</strong>。
-           沒做這步後面會出現 <code>can't open file</code>。</p>
+        <p>瀏覽器多半直接放進「下載」資料夾，所以命令視窗就在「下載」裡開（上面那一段），
+           <u>不用把檔案搬到別處</u>。視窗跟檔案不在同一個資料夾的話，後面會出現 <code>can't open file</code>。</p>
       </div>
     </div>
   </div>
@@ -286,13 +286,15 @@
     <li>中文語系 + 大球場<strong>進得去比賽</strong>，而且<strong>中文一個字都沒少</strong>（完全沒動字型）</li>
   </ul>
 
-  <h3>❌ 出錯了怎麼辦</h3>
+  <h3 id="fix">❌ 出錯了怎麼辦</h3>
   <div class="tablewrap"><table>
     <thead><tr><th>看到什麼</th><th>怎麼做</th></tr></thead>
     <tbody>
       <tr><td>「找不到記憶體池的樣態」</td><td>你這顆是光碟原版，程式碼加密，做不到</td></tr>
       <tr><td><code>python</code> 不是內部或外部命令</td><td>Windows 改打 <code>py -3 mvp_modernize.py …</code></td></tr>
-      <tr><td><code>can't open file</code></td><td>腳本還在「下載」資料夾，沒拖到桌面</td></tr>
+      <tr><td><code>can't open file</code></td><td><strong>命令視窗跟腳本不在同一個資料夾。</strong>
+              打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）。
+              還是一樣的話，是檔名對不上：瀏覽器可能在檔名後面加了 <code>(1)</code>，把它改成跟指令裡一模一樣。</td></tr>
       <tr><td>改完遊戲開不起來</td><td>立刻 <code>--restore</code>，或把第 1 步的備份複製回去</td></tr>
       <tr><td>128 MB 還是會當</td><td>試 <code>--pool 256</code>。還是當就回報 —— 那代表不只這一個原因</td></tr>
     </tbody>
@@ -513,6 +515,6 @@
   sync();
 })();
 </script>
-<script src="../assets/site.js?v=12835e693d" defer></script>
+<script src="../assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

@@ -132,7 +132,7 @@
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -772,13 +772,21 @@ def cmd_restore(game_dir):
 
 
 def _selftest():
-    """反向測試:自己造一份假的 .vp6,證明每一道檢查真的會擋。
+    """反向測試:自己造一份假的 .vp6,證明下了餌的那幾道檢查真的會擋。
+
+    ⚠️ 不是每一道檢查都有餌。2026-09-24 把這一段以外、條件成立就讓這支停下來的
+       21 道守門逐一拆掉(那一個 if 改成永遠不成立)再跑一次,會變紅的是 9 道;
+       其餘 12 道拆掉照樣全綠,例如檔頭長度不是 32、寫出來的暫存檔讀回來對不上、
+       Python 版本低於 3.7(那一道在模組最上面,自我測試能跑起來就代表它已經放行了)。
 
     ⚠️ 不碰任何遊戲檔。前八個餌只用記憶體;餌 9-18 要驗的是檔案系統上的行為
        (符號連結、換檔失敗、換名與登記的先後、換名之後才被 Ctrl+C 打斷、
        一批檔裡有一個讀不動、還原之後讀不回來、沒預料到的錯誤、同一個檔換兩次),
        所以在系統暫存區用 mkdtemp 現開一個拋棄式資料夾,跑完整個刪掉。
        路徑是當場生出來的,不可能指到你的遊戲。
+    餌 19(2026-09-24 加)驗的是最上面那道 -O 守門自己:把 _optimize_level 換成
+    「回傳 1」(假裝開了 -O),自我測試必須拒跑;換回原本那一支之後守門要照樣放行,
+    那是它的陰性對照(第 2 個陰性對照)。兩道都只在記憶體裡。
 
     在 python3 -O 底下不跑,直接回 2。
     """
@@ -786,12 +794,21 @@ def _selftest():
     #    assert,所以 -O 還不會讓它假綠;擋掉是為了跟全站的自我測試一致,
     #    而且哪天這裡改寫成 assert,守門已經在了,不必指望那時候有人記得補。
     #    回 2 不回 1:「測試沒跑」跟「測試沒過」是兩回事,混在一起會看不出來。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('  🔴 --selftest 不能在 python3 -O 底下跑:-O 會把 assert 全部拿掉,'
               '測試會變成一片假的綠燈。請拿掉 -O 再跑一次。')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(_selftest)
     fails = []
     skipped = []
+    # 餌19:最上面那道 -O 守門(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳)
+    if not _opt[0]:
+        fails.append('餌19 沒抓到:假裝開了 -O(把 _optimize_level 換成回傳 1),'
+                     '自我測試竟然沒有拒跑')
+    # 陰性對照 2:換回原本那一支之後,沒開 -O 就要放行
+    if not _opt[1]:
+        fails.append('陰性對照 2:沒開 -O 守門也擋,或是換回原本那一支沒換成功')
 
     def mk(frames, chunks):
         h = bytearray(HDR_LEN)
@@ -1246,7 +1263,7 @@ def _selftest():
             print('  🔴 %s' % x)
         print('  總判定: ❌ 自我測試沒過')
         return 1
-    print('  ✅ 自我測試通過(1 個陰性對照 + %d 個反向餌全部抓到)' % (18 - len(skipped)))
+    print('  ✅ 自我測試通過(2 個陰性對照 + %d 個反向餌全部抓到)' % (19 - len(skipped)))
     if skipped:
         print('  ⚠️ 這個環境跳過了:%s' % '、'.join(skipped))
     return 0
@@ -1297,6 +1314,70 @@ def main(argv):
         say_file_state(a.game_dir, '')
         print('     請把整段輸出帶到回報頁。')
         return 1
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
 
 
 if __name__ == '__main__':

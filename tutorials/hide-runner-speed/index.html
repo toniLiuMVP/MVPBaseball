@@ -19,7 +19,7 @@
 <title>關掉跑壘者速度數值 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="手把手教學：關掉 MVP Baseball 2005 轉播畫面右側的跑壘者速度數字。自動備份、自動複驗、一行指令還原。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="../../assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -84,10 +84,9 @@
   <div class="quickfix" id="quick">
     <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快關掉那個數字？照這五步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
-      <li>下載 <code>mvp_hide_runner_speed.py</code> 放到桌面，檔名必須正好是這個（瀏覽器多半直接丟進「下載」資料夾，要自己拖到桌面）。</li>
-      <li>開命令提示字元切到桌面，Windows 打第一行、Mac 打第二行<br>
-  <pre><code>cd %USERPROFILE%\Desktop</code></pre>
-  <pre><code>cd ~/Desktop</code></pre></li>
+      <li>下載 <code>mvp_hide_runner_speed.py</code>，檔名必須正好是這個（瀏覽器多半直接丟進「下載」資料夾，不用搬）。</li>
+      <li>在「下載」資料夾開命令視窗：Windows 打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打；Mac 開終端機打這一行<br>
+  <pre><code>cd ~/Downloads</code></pre></li>
       <li>打下面這段，<strong>最後那個空格打完就停住不要按 Enter</strong>，接著把遊戲裡的 <code>data\frontend\ingame.big</code> 拖到視窗上放開，再按 Enter。這一步是預覽，不會改任何檔案<br>
   <pre><code>python mvp_hide_runner_speed.py </code></pre></li>
       <li>預覽印出「找到 N 個」而且 N 至少是 1，就按鍵盤 ↑ 把那一行叫回來，到行尾加一個空格和 <code>--apply</code> 按 Enter。印出來的「殘留未關」<strong>一定要是 0</strong>。</li>
@@ -172,16 +171,13 @@
   <div class="step">
     <div class="step-n">1</div>
     <div>
-      <div class="step-t">把腳本放到桌面</div>
-      <p class="step-why">用上面的下載按鈕存檔，放到桌面。檔名必須正好是 <code>mvp_hide_runner_speed.py</code>。</p>
+      <div class="step-t">下載腳本</div>
+      <p class="step-why">用上面的下載按鈕存檔。檔名必須正好是 <code>mvp_hide_runner_speed.py</code>。</p>
       <div class="ifnot"><b>按了下載之後，檔案跑到哪裡去了？</b>
           <p><strong>瀏覽器多半不會問你要存哪裡</strong>，它會直接放進「下載」資料夾。
-             所以按完之後還有一步：</p>
-          <p><span class="sk">1</span>打開檔案總管（Mac 用 Finder），左邊點「<u>下載</u>」<br>
-             <span class="sk">2</span>找到那個 <code>.py</code> 檔<br>
-             <span class="sk">3</span><strong>把它拖到桌面</strong></p>
-          <p class="small">沒做這一步的話，後面 <code>cd</code> 到桌面再執行，
-             畫面會出現 <code>can't open file</code> —— 那不是你打錯，是檔案還在「下載」裡。</p>
+             <u>不用搬</u>，下一步就在「下載」裡開命令視窗。</p>
+          <p class="small">命令視窗跟檔案不在同一個資料夾的話，
+             畫面會出現 <code>can't open file</code> —— 那不是你打錯。</p>
         </div>
         <div class="ifnot"><b>如果檔名變成 mvp_hide_runner_speed.py.txt</b>
         <p>照<a href="../../start.html">第 0 課操作三</a>把副檔名顯示出來，對檔案按右鍵「重新命名」，刪掉結尾的 <code>.txt</code>。</p>
@@ -192,14 +188,13 @@
   <div class="step">
     <div class="step-n">2</div>
     <div>
-      <div class="step-t">開命令提示字元，切換到桌面</div>
-      <p class="step-why">告訴電腦「我要用的腳本在桌面」。複製下面整行貼上，按 <span class="key">Enter</span>（Windows 第一行，Mac 第二行）：</p>
-<pre><code>cd %USERPROFILE%\Desktop</code></pre>
-<pre><code>cd ~/Desktop</code></pre>
-      <div class="seen"><b>你會看到</b><p>游標前那串字的結尾變成 <code>\Desktop&gt;</code>（Mac 是 <code>Desktop %</code>）。</p></div>
-      <div class="ifnot"><b>如果顯示「系統找不到指定的路徑」</b>
-        <p>你的桌面可能被搬進 OneDrive，改試 <code>cd %USERPROFILE%\OneDrive\Desktop</code>。</p>
-      </div>
+      <div class="step-t">在「下載」資料夾開命令提示字元</div>
+      <p class="step-why">讓命令視窗跟腳本待在同一個資料夾。</p>
+      <p class="small">Windows：這一步不用打指令。打開檔案總管，左邊點「<u>下載</u>」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter。開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。</p>
+      <p class="small">Mac：打開終端機，打這一行：</p>
+<pre><code>cd ~/Downloads</code></pre>
+      <div class="seen"><b>你會看到</b><p>游標前那串字的結尾是 <code>\Downloads&gt;</code>（Mac 是 <code>Downloads %</code>）。
+         <span class="small">（Windows 這個畫面本站<u>還沒實測</u>。檔案總管裡顯示成「下載」的那個資料夾，在磁碟上的名字是英文的 <code>Downloads</code>，所以視窗裡看到的是英文。）</span></p></div>
     </div>
   </div>
 
@@ -348,10 +343,14 @@
           <td data-label="你要做的">確認拖進去的是 <code>data\frontend\ingame.big</code></td></tr>
       <tr><td data-label="你遇到的狀況">加了 <code>--apply</code> 或 <code>--restore</code> 之後畫面印出<code>沒有權限寫入這個資料夾</code>（或 <code>沒有權限讀寫</code>；比較早下載的舊版腳本，印的是一大段英文錯誤訊息）</td>
           <td data-label="為什麼會這樣">遊戲裝在 <code>C:\Program Files (x86)</code> 底下（這正是預設位置），一般開的命令提示字元在那裡建不了新檔，連備份都做不出來。「沒有權限讀寫」那一種也可能是 <code>ingame.big</code> 被設成唯讀，或遊戲正開著。<span class="small">（這兩句訊息本站是在 Mac 上把資料夾設成唯讀、把檔案設成讀不到模擬出來的，<u>還沒在 Windows 上實測</u>。）</span></td>
-          <td data-label="你要做的">先把遊戲關掉。在開始功能表找到「命令提示字元」，按右鍵選「以系統管理員身分執行」。新視窗一開是在 <code>C:\Windows\System32</code>，先打步驟 2 那一行 <code>cd %USERPROFILE%\Desktop</code> 回到桌面，再跑同一行（路徑拖不進去的話，照<a href="../../start.html">第 0 課操作二</a>手動打，前後加雙引號）。畫面最後會說遊戲檔動了沒，寫「遊戲檔沒有被改到」就不用還原；印的是「沒有權限寫入這個資料夾」的話，這一次什麼檔案都還沒動到</td></tr>
+          <td data-label="你要做的">先把遊戲關掉。在開始功能表找到「命令提示字元」，按右鍵選「以系統管理員身分執行」。新視窗一開是在 <code>C:\Windows\System32</code>，先打 <code>cd %USERPROFILE%\Downloads</code> 回到放腳本的「下載」資料夾（腳本搬去別處的話就 <code>cd</code> 到那裡），再跑同一行（路徑拖不進去的話，照<a href="../../start.html">第 0 課操作二</a>手動打，前後加雙引號）。畫面最後會說遊戲檔動了沒，寫「遊戲檔沒有被改到」就不用還原；印的是「沒有權限寫入這個資料夾」的話，這一次什麼檔案都還沒動到</td></tr>
       <tr><td data-label="你遇到的狀況" class="mono">檔頭前四碼不是 BIGF</td>
           <td data-label="為什麼會這樣">那個檔案不是 EA 封裝檔，或是已經損毀</td>
           <td data-label="你要做的">從遊戲光碟或安裝檔取回原始的 <code>ingame.big</code></td></tr>
+      <tr class="hi"><td data-label="你遇到的狀況" class="mono">can't open file '…\mvp_hide_runner_speed.py'</td>
+          <td data-label="為什麼會這樣"><strong>命令視窗跟腳本不在同一個資料夾</strong>，或檔名對不上（瀏覽器可能在檔名後面加了 <code>(1)</code>）。
+              <u>這是本站最常見的第一個卡點。</u></td>
+          <td data-label="你要做的">打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）；檔名多了 <code>(1)</code> 就改成跟指令裡一模一樣</td></tr>
       <tr><td data-label="你遇到的狀況" class="mono">python 不是內部或外部命令</td>
           <td data-label="為什麼會這樣">電腦裡沒裝 Python，或安裝時漏勾了那個選項 —— 命令提示字元根本不認得 <code>python</code> 這個字</td>
           <td data-label="你要做的">回<a href="../../start.html#python">第 0 課操作五</a>照著裝。用舊式安裝程式的話，安裝畫面最下面的「Add python.exe to PATH」<strong>一定要先打勾</strong>（新的 Python install manager 沒有這個勾選框）；或者改打 <code>py</code> 試試</td></tr>
@@ -403,9 +402,9 @@ Python 版本:(python --version 印出來的那行)
   <p>上面那些是本站在自己的檔案上量的。腳本自己也帶了一支自我測試，
      <strong>不碰任何遊戲檔</strong> —— 它當場造一個最小的封裝檔，把整條路跑一遍：</p>
 <pre><code>python3 mvp_hide_runner_speed.py --selftest</code></pre>
-  <p class="small">重點不是「有沒有通過」，是裡面有 <strong>9 個反向餌</strong>：
+  <p class="small">重點不是「有沒有通過」，是裡面有 <strong>12 個反向餌</strong>：
      先證明事情錯掉的時候它真的會叫（被截斷的壓縮資料、半截的檔、符號連結、
-     還原途中失敗、寫出去的內容跟預期不符⋯）。印出「全部通過」就代表這 9 個都如預期地叫了。
+     還原途中失敗、寫出去的內容跟預期不符⋯）。印出「全部通過」就代表這 12 個都如預期地叫了。
      這一支不需要路徑，也不會建備份。</p>
 
 
@@ -683,7 +682,7 @@ TX:PLAYERNAME,<span class="nu">0</span>,0,396,398,122,12,...   <span class="cm">
   </div>
 
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1554 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1630 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -735,7 +734,7 @@ mvp_hide_runner_speed.py
   · --list:只把目錄裡每一項的名稱與長度印出來就停,不解壓、不改檔。
     「我這一份到底有沒有那個版面檔」用這個看最準 —— 項目數推不出來。
   · --selftest:自己造一個最小的封裝檔來把整條路跑一遍,完全不碰遊戲檔。
-    裡面有 11 個反向餌,先證明「事情錯掉的時候它真的會叫」。
+    裡面有 12 個反向餌,先證明「事情錯掉的時候它真的會叫」。
     在 python -O 下會拒絕跑並回傳 2:-O 會把 assert 全部拿掉,測試會假綠。
 
 安全網(八層):
@@ -789,7 +788,7 @@ mvp_hide_runner_speed.py
 無外部相依,Python 3.7 以上即可。
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -925,7 +924,7 @@ def _print_no_permission(folder, err):
     print('  而那正是這個遊戲的預設安裝位置。')
     print('  Windows:對「命令提示字元」按右鍵,選「以系統管理員身分執行」。')
     print('  新視窗一開是在 C:\\Windows\\System32,先 cd 回你放腳本的地方')
-    print('  (例如 cd %USERPROFILE%\\Desktop),再跑同一行。')
+    print('  (放在「下載」的話是 cd %USERPROFILE%\\Downloads),再跑同一行。')
     print('  Mac / Linux 看到這一句,代表你這個帳號不能寫這個資料夾。')
     print('  遊戲檔沒有被改到,這個資料夾裡也沒有多出任何檔案。')
 
@@ -1942,11 +1941,11 @@ def _selftest_run(argv):
 def selftest():
     """不碰任何遊戲檔的自我測試:自己造一個最小的封裝檔,把整條路跑一遍。
 
-    重點不是「有沒有通過」,是**裡面有 11 個反向餌** —— 先證明「事情錯掉的時候
+    重點不是「有沒有通過」,是**裡面有 12 個反向餌** —— 先證明「事情錯掉的時候
     它真的會叫」。只驗正向的測試會一路綠燈,卻在功能整個壞掉時照樣綠燈,
     那種測試比沒有更危險。
 
-    11 個反向餌:
+    12 個反向餌:
       1. 被截斷的 QFS 資料流不可以安靜地解出半截(要丟例外)
       2. 半截的檔不可以被 _same_bytes 判成「相同」(那是 zip() 的陷阱)
       3. 目的檔是符號連結 → _refuse_symlink 要擋下來
@@ -1963,14 +1962,18 @@ def selftest():
          而且不可以先去做備份
      11. 同一個連結下 --restore 也要停(備份故意放一份內容不同的,
          真的跟著連結蓋下去的話被指向的檔一定會變)
+     12. 假裝開了 -O(把 _optimize_level 換成回傳 1)→ 自我測試必須拒跑、結束碼 2;
+         換回原本那一支之後守門要照樣放行(陰性對照,2026-09-24 加)
 
     跑完會在系統暫存區留下幾個資料夾(不刪,方便出事時自己去看)。
     """
     # python -O 會把 assert 整個拿掉 —— 上面那些餌有一半是靠 assert 站著的,
     # 在 -O 下會一路走到「全部通過」而其實什麼都沒驗。寧可不跑也不要假綠。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
     ok = 0
 
     # ── 反向餌 1:截斷的 QFS 要丟例外 ─────────────────────────
@@ -2164,9 +2167,81 @@ def selftest():
         raise AssertionError('複驗沒過卻沒有自動還原成套用前的樣子')
     assert _STATE['replaced'] is False, '自動還原之後 Ctrl-C 的訊息會講錯話'
 
+    # ── 反向餌 12:最上面那道 -O 守門(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳)──
+    if _opt[0]:
+        ok += 1
+    else:
+        raise AssertionError('假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試竟然沒有拒跑')
+    # 它的陰性對照:換回原本那一支之後,沒開 -O 就要放行
+    assert _opt[1], '陰性對照:沒開 -O 守門也擋,或是換回原本那一支沒換成功'
+
     print('自我測試:全部通過(%d 個反向餌都如預期地叫了)' % ok)
-    assert ok == 11, '反向餌只跑到 %d 個' % ok
+    assert ok == 12, '反向餌只跑到 %d 個' % ok
     return 0
+
+
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
 
 
 # 離開碼:0 成功(含「本來就已經關掉」),1 任何一種沒做成的狀況,130 是 Ctrl-C。
@@ -2254,7 +2329,7 @@ if __name__ == '__main__':
     <li><strong>本站沒驗的</strong> 唯一沒被驗證的是遊戲實際跑起來的畫面。檔案層面全過了（寫入後自動複驗、還原逐位元組比對、47 / 47 解壓重壓一致），但「開一場比賽、確認那個數字真的不見了」只能你自己做，而且壘上沒人本來就不會顯示。</li>
   </ul>
 
-  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <!-- course-strip:begin · 這一塊由產生器從 plan.html 產生，不要手改 -->
   <nav class="card course-strip" aria-label="這一課在課表的位置">
     <p class="card-h">📚 照課表上課的話</p>
     <p>這一課沒有排進任何一班。課表上寫的適合時機：「你覺得那個數字礙眼」</p>
@@ -2271,6 +2346,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=12835e693d" defer></script>
+<script src="../../assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

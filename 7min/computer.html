@@ -19,7 +19,7 @@
 <title>七分鐘從電腦小白到可以修改模組 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="完全不會電腦也能跟著做：開命令列、認路徑、拖資料夾、跑腳本、還原。Windows 與 Mac 並列。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="../assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -84,7 +84,7 @@
     <div class="step-n">2</div>
     <div>
       <p><strong>搞懂「路徑」。</strong></p>
-      <div class="card"><p class="card-h">一句話</p><p>路徑就是<strong>一個檔案或資料夾的完整住址</strong>。本站的指令裡寫「〔你的遊戲資料夾〕」的地方，你要換成自己電腦上那個住址。</p></div><p>住址長這樣：</p><pre><code>C:\Program Files (x86)\EA SPORTS\MVP Baseball 2005</code></pre><pre><code>/Users/〔你的名字〕/Games/MVP Baseball 2005</code></pre><p><strong>有空白的路徑一定要用引號包起來</strong>，不然電腦會以為是兩個東西。</p>
+      <div class="card"><p class="card-h">一句話</p><p>路徑就是<strong>一個檔案或資料夾的完整住址</strong>。本站的指令裡寫「〔你的遊戲資料夾〕」的地方，你要換成自己電腦上那個住址。</p></div><p>住址長這樣：</p><pre data-nocopy><code>C:\Program Files (x86)\EA SPORTS\MVP Baseball 2005</code></pre><pre data-nocopy><code>/Users/〔你的名字〕/Games/MVP Baseball 2005</code></pre><p><strong>有空白的路徑一定要用引號包起來</strong>，不然電腦會以為是兩個東西。</p>
     </div>
   </div>
 
@@ -119,11 +119,10 @@
     <div class="step-n">5</div>
     <div>
       <p><strong>跑第一個真的有用的指令：檢查你的備份。</strong></p>
-      <p>下載 <a href="../tutorials/backup/mvp_check_backup.py" download>mvp_check_backup.py</a> 放到桌面，然後：</p>
-      <p class="small">Windows:</p>
-<pre><code>cd %USERPROFILE%\Desktop</code></pre>
-      <p class="small">Mac / Linux:</p>
-<pre><code>cd ~/Desktop</code></pre>
+      <p>下載 <a href="../tutorials/backup/mvp_check_backup.py" download>mvp_check_backup.py</a>。瀏覽器多半不會問你要存哪裡，會直接放進「下載」資料夾，所以指令要在「下載」裡打：</p>
+      <p class="small">Windows：打開檔案總管，左邊點「下載」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter。開出來的是<strong>新的</strong>命令提示字元，已經停在「下載」裡，下面標 Windows 的那一行在這個新視窗打（第 3 步那個視窗停在遊戲資料夾，在那裡打會找不到腳本）。</p>
+      <p class="small">Mac：在終端機先打這一行：</p>
+<pre><code>cd ~/Downloads</code></pre>
       <p class="small">Windows:</p>
 <pre><code>python mvp_check_backup.py &quot;〔你的遊戲資料夾〕&quot;</code></pre>
       <p class="small">Mac / Linux:</p>
@@ -143,13 +142,17 @@
   <div class="tablewrap"><table>
     <thead><tr><th>症狀</th><th>怎麼辦</th></tr></thead>
     <tbody>
+      <tr class="hi"><td class="mono">can't open file '…mvp_*.py'</td>
+          <td><strong>命令視窗跟腳本不在同一個資料夾。</strong>
+              打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）。
+              還是一樣的話，是檔名對不上：瀏覽器可能在檔名後面加了 <code>(1)</code>，把它改成跟指令裡一模一樣。</td></tr>
       <tr><td>說找不到 <code>python</code></td><td>Windows 上用舊式安裝程式裝的話，八成是安裝時沒勾「Add python.exe to PATH」，重新安裝並勾起來；新的 Python install manager 沒有這個勾選框，照<a href="../start.html#python">第 0 課操作五</a>的 e 步驟檢查</td></tr>
       <tr><td>印出一段 <code>Python was not found</code> 開頭的英文，或跳出 Microsoft Store</td><td>多半是這台電腦還沒裝 Python，跳出來的是 Windows 內建的轉接捷徑，不是 Python 本身。關掉它，照上面第 4 步裝（這兩種畫面本站還沒在 Windows 上實測）</td></tr>
       <tr><td>印出的是 <code>Python 2.7.x</code></td><td>版本太舊。Windows 改打 <code>py -3 --version</code>（<code>py</code> 只有 Windows 有），Mac 改打 <code>python3 --version</code>；哪一個印出 3.x，就把本站指令開頭的 <code>python</code> 換成它</td></tr>
       <tr><td>說找不到檔案</td><td>路徑打錯了。<strong>用拖的</strong>，不要用打的</td></tr>
       <tr><td>路徑有空白就出錯</td><td>整個路徑用雙引號包起來</td></tr>
       <tr><td>視窗一閃就關掉</td><td>不要雙擊 <code>.py</code> 檔。要先開命令列，再在裡面打指令</td></tr>
-      <tr><td>按下載之後，瀏覽器說檔案被擋下來、「可能有害」或「不常下載」</td><td>那是瀏覽器對程式檔的預防，不代表檔案有問題。怎麼放行看<a href="../start.html#download-blocked">第 0 課這一張卡片</a></td></tr>
+      <tr><td>按下載之後，瀏覽器說檔案被擋下來、「可能有害」或「不常下載」</td><td>那是瀏覽器對程式檔的預防，不代表檔案有問題。怎麼放行看<a href="../start.html#download-blocked">第 0 課這一張卡片</a>（這些訊息的字樣本站還沒在 Windows 上實測）</td></tr>
     </tbody>
   </table></div>
 
@@ -173,6 +176,6 @@
        <a href="../changelog.html">更新紀錄</a> · <a href="../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../assets/site.js?v=12835e693d" defer></script>
+<script src="../assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

@@ -42,6 +42,11 @@ mvp_shrink_big.py — 把封裝檔裡「目錄沒指到的位元組」清掉
     --apply             跟上面同一件事(單獨給 --apply 也會清,不必再加 --shrink)
     --restore           拿 `.shrinkbak` 蓋回原檔
 
+另外有一個 --selftest(2026-09-24 加):不需要遊戲檔,也不碰任何遊戲檔,
+只在系統暫存資料夾裡造幾個迷你的假封裝檔,替下面的守門下餌踩一次(不是每一道都有,
+數字見檔尾 selftest() 的說明),證明「答案錯的時候它真的會擋」,跑完整個暫存資料夾刪掉。
+它不接受 python -O(-O 會把 assert 拿掉,測試有機會假綠),加了會直接拒跑。
+
 安全網在哪(四層,由外往內)
 --------------------------
 1. **預設唯讀。** 不給參數就只是量。要動到檔案得自己打 --apply,不會誤觸。
@@ -105,13 +110,15 @@ mvp_shrink_big.py — 把封裝檔裡「目錄沒指到的位元組」清掉
    全是 Python 自己就附的模組。
    (2026-09-06 補:這一行原本漏列 hashlib 與 tempfile 兩個,那時候它們就已經在
     import 了;signal 是這一輪為了「換名那一段不可中斷」新加的。)
+   (2026-09-24 補:--selftest 另外在函式裡面 import 了 io 與 contextlib,
+    用來收起真正跑一次 main() 時印在畫面上的字 —— 同樣是 Python 自己就附的模組。)
    真的自己讀寫 PNG 的,是「換球員大頭照」「做一張新的球員臉皮」「換掉開機畫面」
    「換球隊隊徽」這四課的腳本。2026-09-03 在 site/tutorials/ 底下 29 支腳本上量,
    找得到 png_read 與 png_write 的就只有那四個檔。
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -443,6 +450,9 @@ def _do_copy(bak, dst):
     _refuse_if_symlink(bak, '備份')
     folder = os.path.dirname(os.path.abspath(dst)) or '.'
     fd, tmp = tempfile.mkstemp(dir=folder, prefix='.' + os.path.basename(dst) + '.restore-')
+    # 進來之前的登記。複驗沒過時的自動還原也走這一支,那時候登記是「已經換成清過的那一版」;
+    # 還原沒換成的話,要收回的是**這個樣子**,不是「沒動過」(見下面 except 那一段)。
+    before = dict(_REPLACED)
     try:
         want = hashlib.sha256()
         with os.fdopen(fd, 'wb') as f_out:
@@ -489,12 +499,16 @@ def _do_copy(bak, dst):
             os.remove(tmp)
         except OSError:
             pass
-        # 只有在「確定沒換成」的時候才可以把「正在換」收回「還沒動」。
+        # 只有在「確定沒換成」的時候才可以把「正在換」收回去。
         # os.replace 自己丟例外就是那種情形:它要嘛整個做完、要嘛完全沒做。
         # 撤銷一樣是一次寫完:分兩行寫的話,Ctrl-C 落在中間會留下
         # what=None 而 phase 還是 'replacing',收尾就印「正在替換 None」。
+        # ⚠️ 2026-09-24 改:收回的是**進來之前的登記**,不是一律「還沒動」。
+        #    直接跑 --restore 的時候兩者一樣;但複驗沒過、自動還原又沒換成的時候,
+        #    正本已經是清過的那一版 —— 登記一旦被改成「還沒動」,
+        #    接下來按一下 Ctrl-C,收尾就會說「你的遊戲檔一個位元組都沒有動到」。
         if _REPLACED['phase'] == 'replacing' and isinstance(_e, OSError):
-            _REPLACED.update(what=None, path=None, phase='idle')
+            _REPLACED.update(before)
         raise
 
 
@@ -776,6 +790,19 @@ def read_entry(path, off, size):
     return data
 
 
+# ⚠️ 2026-09-24:要抄下面這一支去改別的封裝檔之前,先看這一段。
+#    它是**原地追加的舊寫法**:直接對你給的那個檔用 'r+b' 往檔尾接資料、再改目錄
+#    8 bytes、再改檔頭 4 bytes。三個動作中間被打斷(斷電、外接碟被拔掉)的話,
+#    那個檔會停在「資料接上去了、目錄或檔頭還沒改完」的樣子:檔頭寫的總長度
+#    跟實際大小對不上,下一次連 size_field_order 都過不了,只能還原。
+#    本站「把一套球衣裝進遊戲」「換球員大頭照」「做一張新的球員臉皮」「換球隊隊徽」
+#    「一整包模組自動歸位」這幾課真正在用的,已經是另一種寫法:
+#    先把封裝檔複製一份工作複本到同一個資料夾 → 接資料、改目錄、改檔頭全做在複本上
+#    → 讀回來驗過 → 最後一次原子換名換上去。中途出事,原本那個檔一個位元組都沒被寫過。
+#    範本在 tutorials/install-uniform/mvp_install_uniform.py:
+#    _stage_copy()(做工作複本)與 cmd_install() 換名那一段。
+#    這一支留在這裡,是為了用程式碼講清楚「孤兒資料從哪裡來」(見下面的說明);
+#    這一課自己沒有呼叫它。
 def append_entry(path, field_pos, blob):
     """把 blob 接到檔尾,只改該項目的目錄 8 bytes 與檔頭的 4 bytes。
 
@@ -785,7 +812,8 @@ def append_entry(path, field_pos, blob):
     舊的那一份還躺在原地,只是沒有人再指向它。這裡把它寫成程式碼,
     是為了讓讀者看清楚「安全的改法」跟「檔案越變越大」其實是同一件事的兩面。
 
-    (共用區塊。這一課是重排整個檔,不走接到檔尾這條路,所以沒有呼叫它。)
+    (共用區塊。這一課是重排整個檔,不走接到檔尾這條路,所以沒有呼叫它。
+     這是原地追加的舊寫法,要拿去真的改檔請看上面那段註解指的範本。)
     """
     order = size_field_order(path)          # 一定要在改檔案之前先量
     # 新資料的起點就是現在的檔尾。先問大小,再開檔寫。
@@ -1267,9 +1295,13 @@ def cmd_shrink(path, apply_it):
             print('  ✓ 已自動還原 ← %s（檔案回到動手前的樣子）' % os.path.basename(backup))
             raise DataError('複驗有 %d 項沒過。已經自動從備份還原了，請把這件事回報給本站。' % bad)
         print('  ⚠️ 自動還原沒有成功:%s' % why)
-        print('  請自己跑一次:')
-        print('    python3 %s "%s" --restore' % (os.path.basename(__file__), path))
-        raise DataError('複驗有 %d 項沒過，而且自動還原也失敗了 —— 見上面那一行。' % bad)
+        # 還原指令放進錯誤訊息本身,不另外印(2026-09-24 改):main() 看到訊息裡
+        # 已經有 --restore,就不會再補一段「已經換成清過的那一版」—— 同一行指令
+        # 印兩次,讀者會以為要跑兩遍。
+        raise DataError('複驗有 %d 項沒過，而且自動還原也失敗了。\n'
+                        '  檔案現在還是剛才換上去、複驗沒過的那一版。請自己跑一次:\n'
+                        '    python3 %s "%s" --restore'
+                        % (bad, os.path.basename(__file__), path))
     # 兩次複驗都零問題才走到這裡。項目數用 items —— 數量對不上的話
     # _verify_pack 第一件事就是回報「項目數變了」,根本走不到這一行。
     print('  複驗：%d 個項目全部逐位元組相同，檔頭大小欄正確 ✅' % len(items))
@@ -1315,6 +1347,32 @@ def cmd_restore(path):
         raise DataError('還原後內容跟備份不一樣，請手動檢查。')
 
 
+def _replaced_note():
+    """「正本現在是哪一版」—— 換過了或正在換才有話要說,回傳要印的那一段(沒有就回空字串)。
+
+    main() 的兩條「停下來了」都用這一支(2026-09-24 抽出來):作業系統不讓讀寫(OSError),
+    以及腳本自己認出來的問題(DataError)。以前只有 OSError 那一條會照登記說話 ——
+    而換名之後外接碟被拔掉的時候,big_entries 會把那個 OSError 包成
+    DataError('讀不到 …'),走的是另一條路:畫面只印一行「停下來了:讀不到 …」,
+    一個字都沒提「檔案已經換成清過的那一版」,也沒給 --restore。
+    兩條路要說的是同一件事,寫在同一個地方,就不會一邊有、一邊漏。
+    """
+    p = _REPLACED['path']
+    if _REPLACED['phase'] == 'replacing':
+        # 換名那一段被包成不可中斷的區塊之後,這一格幾乎不可能亮 ——
+        # 它是保險,而保險亮的時候要說不確定,不可以猜一個好聽的。
+        return ('  ⚠️ 出事的時候**正在換名**,換好了沒有沒辦法確定。\n'
+                '  請拿旁邊那份 .shrinkbak 跟它比對,或直接還原(還原一定回得去):\n'
+                '    python3 %s "%s" --restore\n'
+                % (os.path.basename(__file__), p))
+    if _REPLACED['what'] == 'shrink':
+        return ('  ⚠️ 不過檔案**已經**換成清過的那一版了(換名那一步已經做完)。\n'
+                '  要回到動手前的樣子:\n'
+                '    python3 %s "%s" --restore\n'
+                % (os.path.basename(__file__), p))
+    return ''
+
+
 def main():
     """看參數決定走哪一條路,並且把所有錯誤收在同一個地方。
 
@@ -1323,6 +1381,7 @@ def main():
     DataError、「備份是壞的所以拒絕還原」(cmd_restore 轉成 DataError)、
     「你指的那個名字是符號連結,而這一次會寫檔」(2026-09-06 加,一樣是 DataError),
     以及作業系統不讓讀寫這個檔(OSError)。
+    --selftest 另外算:0 全部通過、1 有一項沒過、2 是在 python -O 底下拒跑。
 
     DataError 一律印成一句人話而不是丟 traceback —— 這一課的讀者不是工程師,
     看到一整片紅字只會嚇到,而每一個 DataError 的訊息都已經寫清楚該怎麼辦。
@@ -1336,8 +1395,14 @@ def main():
         "  3. 確定了才真的清\n"
         "     python3 mvp_shrink_big.py \"<...>/skydnite.big\" --shrink --apply\n\n"
         "  4. 出問題就還原\n"
-        "     python3 mvp_shrink_big.py \"<...>/skydnite.big\" --restore\n"
+        "     python3 mvp_shrink_big.py \"<...>/skydnite.big\" --restore\n\n"
+        "  想確認這支腳本本身沒被改壞(不需要遊戲檔,也不碰任何遊戲檔):\n"
+        "     python3 mvp_shrink_big.py --selftest\n"
     )
+    # --selftest 要在 argparse 之前處理:bigfile 是必填的位置參數,
+    # 而自我測試根本不需要遊戲檔。
+    if '--selftest' in sys.argv[1:]:
+        return selftest()
     ap = argparse.ArgumentParser(
         description='把封裝檔裡目錄沒指到的位元組清掉（內容一個位元組都不少）',
         formatter_class=argparse.RawDescriptionHelpFormatter, epilog=EPILOG)
@@ -1346,6 +1411,8 @@ def main():
     ap.add_argument('--apply', action='store_true',
                     help='真的寫入（單獨用就會清,不必再加 --shrink）')
     ap.add_argument('--restore', action='store_true', help='從備份還原')
+    ap.add_argument('--selftest', action='store_true',
+                    help='自我測試(不需要遊戲檔,也不碰任何遊戲檔;不要加 -O)')
     args = ap.parse_args()
 
     # 符號連結:**會寫檔的那兩條路一律拒絕,唯讀那兩條照樣跟著走。**
@@ -1384,6 +1451,16 @@ def main():
             cmd_check(target)
     except DataError as e:
         print('\n  停下來了：%s\n' % e)
+        # 照實說有沒有換過(2026-09-24 補)。DataError 大多發生在動手之前,
+        # 但換名之後的複驗讀不到檔(外接碟被拔掉)也是 DataError —— big_entries
+        # 把 OSError 包成「讀不到 …」丟出來。那時候檔案已經是清過的那一版,
+        # 讀者需要的是那一行 --restore,不是只有一句「讀不到」。
+        # 訊息自己已經帶著 --restore(自動還原也失敗的那一句)就不再印一次:
+        # 同一行指令印兩次,讀者會以為要跑兩遍。
+        if '--restore' not in str(e):
+            note = _replaced_note()
+            if note:
+                print(note)
         return 2
     except OSError as e:
         # 遊戲裝在 C:\Program Files\ 之類寫不進去的地方、磁碟滿了、外接碟被拔掉、
@@ -1395,18 +1472,10 @@ def main():
               '  或那個檔正被遊戲開著。' % e)
         # 照實說有沒有換過(2026-09-05 加)。這種錯誤**多半**發生在還沒開始寫的階段,
         # 但「多半」不是「一定」—— 換名之後的複驗也會讀檔,那時候外接碟被拔一樣走這裡。
-        if _REPLACED['phase'] == 'replacing':
-            # 換名那一段被包成不可中斷的區塊之後,這一格幾乎不可能亮 ——
-            # 它是保險,而保險亮的時候要說不確定,不可以猜一個好聽的。
-            print('  ⚠️ 出事的時候**正在換名**,換好了沒有沒辦法確定。\n'
-                  '  請拿旁邊那份 .shrinkbak 跟它比對,或直接還原(還原一定回得去):\n'
-                  '    python3 %s "%s" --restore\n'
-                  % (os.path.basename(__file__), _REPLACED['path']))
-        elif _REPLACED['what'] == 'shrink':
-            print('  ⚠️ 不過換名那一步**已經**做完了,檔案現在是清過的那一版。\n'
-                  '  要回到動手前的樣子:\n'
-                  '    python3 %s "%s" --restore\n'
-                  % (os.path.basename(__file__), _REPLACED['path']))
+        # 「正在換」與「已經換成清過的那一版」那兩段跟 DataError 共用 _replaced_note()。
+        note = _replaced_note()
+        if note:
+            print(note)
         elif _REPLACED['what'] == 'restore':
             print('  ⚠️ 不過還原那一步**已經**做完了,檔案現在就是備份的那一份。\n')
         else:
@@ -1437,6 +1506,980 @@ def main():
             print('\n  已中斷。你的遊戲檔一個位元組都沒有動到\n'
                   '  (旁邊可能留下一個看不太懂的隱藏暫存檔,刪掉就好)。\n')
         return 130
+    return 0
+
+
+# ─────────────────────────────────────────────────────────
+#  自我測試(--selftest,2026-09-24 加):不需要遊戲檔,全部在系統暫存資料夾裡做
+#
+#  這一支以前沒有自我測試,守門有沒有在工作只能靠講。現在替守門配了「餌」
+#  (不是每一道都有,見 selftest() 的說明):先擺一個會咬人的東西,再看腳本有沒有真的擋下來。而且先做陰性對照 ——
+#  證明沒有餌的時候那件事真的做得成,免得「整支腳本罷工」被誤讀成「保護有效」。
+#  用的封裝檔全是當場造的迷你假檔,跑完整個暫存資料夾刪掉。
+# ─────────────────────────────────────────────────────────
+
+# python -O 跑的時候回傳大於 0 的數字。抽成一支函式,是為了讓 --selftest 換得掉它、
+# 給「-O 拒跑」那道守門下一個餌(最後一項):sys.flags 是唯讀的,
+# 同一個行程裡切不了 -O,不抽出來就證明不了那道守門真的會擋。
+def _optimize_level():
+    return sys.flags.optimize
+
+
+# 最後一項會在 --selftest 裡面再叫一次 selftest()。這一格記著「現在是不是那一次」:
+# 守門被拆掉的時候,裡面那一次會一路跑下去,沒有它就會一層套一層停不下來。
+_SELFTEST_NESTED = []
+
+
+def _st_big(path, parts, order='<'):
+    """造一個迷你封裝檔寫到 path,只給 --selftest 用。回傳整份位元組。
+
+    parts 依序排在目錄後面:('entry', 名字, 內容) 是目錄會指到的一項,
+    ('junk', 位元組) 是沒有人指到的一段(也就是孤兒)。
+    目錄照 entry 出現的順序寫,每一項的位移與長度一律大端;
+    檔頭 +4 的總長度照 order 寫('<' 小端、'>' 大端,兩種本檔都認)。
+    """
+    names = [p[1] for p in parts if p[0] == 'entry']
+    first = 16 + sum(8 + len(n) + 1 for n in names)
+    pos, body, toc = first, b'', b''
+    for p in parts:
+        if p[0] == 'junk':
+            body += p[1]
+            pos += len(p[1])
+        else:
+            toc += struct.pack('>II', pos, len(p[2])) + p[1].encode('latin-1') + b'\x00'
+            body += p[2]
+            pos += len(p[2])
+    raw = (b'BIGF' + struct.pack(order + 'I', first + len(body))
+           + struct.pack('>I', len(names)) + struct.pack('>I', first) + toc + body)
+    with open(path, 'wb') as f:
+        f.write(raw)
+    return raw
+
+
+def selftest():
+    """替這支腳本的守門下餌踩一次。全綠回 0,任何一項紅就回 1,在 -O 底下回 2 並拒跑。
+
+    ⚠️ 不是每一道守門都有餌。2026-09-24 把這一段以外、條件成立就讓這支停下來的
+       28 道守門逐一拆掉(那一個 if 改成永遠不成立)再跑一次,會變紅的是 13 道。
+       拆掉照樣全綠的 15 道裡,12 道在這一課的正式流程根本不會呼叫的共用函式裡
+       (qfs_decompress、read_entry、fsh_first_image、fsh_replace_pixels);
+       另外 3 道是:共用還原函式裡的「找不到備份」(cmd_restore 自己先擋了這件事)、
+       封裝檔小於 8 個位元組、目錄是空的。
+
+    第一件事是擋掉 python -O:-O 會把 assert 整個拿掉,原本會紅的項目有機會
+    靜靜地變綠 —— 一份假的綠燈比沒有測試更糟。(這一版每一項用的是 check()
+    不是 assert,所以今天 -O 不會讓它變綠;這道守門擋的是「以後有人在這裡加一行
+    assert」那一天。)這道守門自己也有一個餌,在最後一項。
+
+    有兩類項目這台機器可能做不到,做不到就跳過,而且畫面上會講出來:
+    要建符號連結的(Windows 沒開開發人員模式就建不了),
+    以及要裝 Ctrl-C 訊號處理器的(要在主執行緒)。
+    """
+    if _optimize_level():
+        print('  --selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠。')
+        print('  請拿掉 -O 再跑一次:')
+        print('    python3 %s --selftest' % os.path.basename(sys.argv[0]))
+        return 2
+    import io as _io
+    import contextlib as _contextlib
+    fails, skipped = [], []
+
+    def check(name, ok, detail=''):
+        print('  %s %s%s' % ('✅' if ok else '❌', name, ('  —— ' + detail) if detail else ''))
+        if not ok:
+            fails.append(name)
+
+    def skip(name, why):
+        print('  ⏭ %s  —— 跳過:%s' % (name, why))
+        skipped.append(name)
+
+    def can_symlink(link, target):
+        try:
+            os.symlink(target, link)
+            return True
+        except (OSError, NotImplementedError, AttributeError):
+            return False
+
+    def run_main(argv):
+        """跑一次**真正的** main(),收起畫面上的字。回傳 (結束碼或丟出來的例外, 畫面上的字)。"""
+        argv_save = sys.argv[:]
+        buf = _io.StringIO()
+        sys.argv = ['mvp_shrink_big.py'] + list(argv)
+        try:
+            with _contextlib.redirect_stdout(buf):
+                try:
+                    rc = main()
+                except (Exception, SystemExit) as e:
+                    rc = e
+        finally:
+            sys.argv = argv_save
+        return rc, buf.getvalue()
+
+    def snap(p):
+        """這個檔「是不是同一個檔、內容一不一樣」。換名過的話 inode 會變,光比內容看不出來。"""
+        with open(p, 'rb') as f:
+            return f.read(), os.stat(p).st_ino
+
+    def reset():
+        _REPLACED.update(what=None, path=None, phase='idle')
+
+    def grab(path, it):
+        """照目錄那一項的位移與長度把內容讀出來(不借用 read_entry:這一課的正式流程沒有用它)。"""
+        with open(path, 'rb') as f:
+            f.seek(it[2])
+            return f.read(it[3])
+
+    # 一個「清得掉」的球場檔:兩項各 400 個位元組,中間夾 3,000、尾巴 2,000 個沒人指的位元組。
+    fat = [('entry', 'a.fsh', b'A' * 400), ('junk', b'\xEE' * 3000),
+           ('entry', 'b.fsh', b'B' * 400), ('junk', b'\xEE' * 2000)]
+    print('  自我測試(不需要遊戲檔,全部在暫存資料夾裡做)')
+    print()
+    tmp_root = tempfile.mkdtemp(prefix='mvp_shrink_big_selftest_')
+    try:
+        d = tmp_root
+
+        # ── 1. 陰性對照:造出來的假檔讀得懂 ──
+        big = os.path.join(d, 'stadium.big')
+        raw = _st_big(big, fat)
+        try:
+            ok1 = (size_field_order(big) == '<' and [it[0] for it in big_entries(big)] == ['a.fsh', 'b.fsh'])
+        except DataError:
+            ok1 = False
+        check('陰性對照:造出來的假封裝檔讀得出 2 項,檔頭大小欄位也認得出來', ok1)
+
+        # ── 2. 陰性對照:整條 --apply 真的清得掉、兩輪複驗都過、--restore 回得去 ──
+        # 少了這一項,下面每一個「沒動到」都有可能只是因為這條路本來就不通。
+        reset()
+        rc, out = run_main([big, '--apply'])
+        left = sorted(n for n in os.listdir(d) if n.startswith('.'))
+        after = open(big, 'rb').read()
+        check('陰性對照:沒有餌的時候 --apply 真的把檔變小、做了備份、複驗通過、不留暫存檔',
+              rc == 0 and len(after) < len(raw) and os.path.exists(big + BACKUP_SUFFIX)
+              and '複驗：2 個項目全部逐位元組相同' in out and not left,
+              'rc=%r %d → %d bytes 留下=%r' % (rc, len(raw), len(after), left))
+        items2 = {it[0]: it for it in big_entries(big)}
+        check('  清完之後兩項的內容逐位元組跟原本一樣',
+              grab(big, items2['a.fsh']) == b'A' * 400 and grab(big, items2['b.fsh']) == b'B' * 400)
+        reset()
+        rc, out = run_main([big, '--restore'])
+        check('陰性對照:--restore 逐位元組回到清之前', rc == 0 and open(big, 'rb').read() == raw,
+              'rc=%r' % (rc,))
+        os.remove(big + BACKUP_SUFFIX)
+        reset()
+
+        # ── 3. 餌:換名之前的複驗沒過 → 不可以換上去 ──
+        # 讓「驗暫存檔」那一次說有問題。把複驗搬到換名後面的話,正本會先被換掉
+        # (inode 會變)—— 這一項就會紅。
+        real_vp = globals()['_verify_pack']
+
+        def vp_tmp_bad(check_path, items, raw_):
+            if os.path.basename(check_path).startswith('.'):
+                return ['  ❌ 假的問題(這是 --selftest 故意製造的)']
+            return real_vp(check_path, items, raw_)
+
+        before = snap(big)
+        globals()['_verify_pack'] = vp_tmp_bad
+        try:
+            rc, out = run_main([big, '--apply'])
+        finally:
+            globals()['_verify_pack'] = real_vp
+        left = sorted(n for n in os.listdir(d) if n.startswith('.'))
+        check('餌:換名之前的複驗沒過 → 沒有換上去,正本還是同一個檔、同樣的位元組,暫存檔清掉',
+              rc == 2 and '沒有被換上去' in out and snap(big) == before and not left
+              and _REPLACED['phase'] == 'idle',
+              'rc=%r 留下=%r' % (rc, left))
+        reset()
+
+        # ── 4. 餌:換名之後的複驗沒過 → 當場自動從備份還原 ──
+        calls = []
+
+        def vp_second_bad(check_path, items, raw_):
+            calls.append(os.path.basename(check_path))
+            if len(calls) >= 2:
+                return ['  ❌ 假的問題(這是 --selftest 故意製造的)']
+            return real_vp(check_path, items, raw_)
+
+        globals()['_verify_pack'] = vp_second_bad
+        try:
+            rc, out = run_main([big, '--apply'])
+        finally:
+            globals()['_verify_pack'] = real_vp
+        check('餌:換名之後的複驗沒過 → 當場自動從備份還原,正本逐位元組回到清之前',
+              len(calls) == 2 and calls[1] == 'stadium.big' and rc == 2
+              and '已自動還原' in out and open(big, 'rb').read() == raw,
+              'rc=%r 驗了=%r' % (rc, calls))
+        reset()
+
+        # ── 5. 餌:換名那一步失敗(假裝磁碟滿了)→ 沒換成,登記要收回來 ──
+        # ⚠️ 只對「換到正本身上」那一次動手腳:備份自己也走 os.replace。
+        real_replace = os.replace
+
+        def replace_boom(a, b):
+            if os.path.basename(os.fspath(b)) == 'stadium.big':
+                raise OSError(28, '假裝磁碟滿了(這是 --selftest 故意製造的)')
+            return real_replace(a, b)
+
+        before = snap(big)
+        os.replace = replace_boom
+        try:
+            rc, out = run_main([big, '--apply'])
+        finally:
+            os.replace = real_replace
+        left = sorted(n for n in os.listdir(d) if n.startswith('.'))
+        check('餌:換名那一步失敗 → 正本原封不動、暫存檔清掉、畫面說遊戲檔一個位元組都沒動',
+              rc == 2 and snap(big) == before and not left and _REPLACED['phase'] == 'idle'
+              and '一個位元組都沒動' in out,
+              'rc=%r 留下=%r 登記=%r' % (rc, left, _REPLACED['phase']))
+        reset()
+
+        # ── 6. 不可中斷段:段內跑完、離開後照丟、處理器換回來 ──
+        # ⚠️ 刻意不用 os.kill 送真的訊號:Windows 的 os.kill 收到 SIGINT 是直接砍掉行程。
+        #    改成直接叫那個裝上去的處理器,效果一樣,到哪一台都能跑。
+        # 先問「這台機器裝不裝得上訊號處理器」,跟 _NoInterrupt 本身分開問:
+        # 不分開的話,_NoInterrupt 壞掉(沒裝上去)會被誤報成「這台做不到」而跳過。
+        try:
+            _prev = signal.getsignal(signal.SIGINT)
+            signal.signal(signal.SIGINT, _prev if _prev is not None else signal.default_int_handler)
+            sig_ok = True
+        except (ValueError, OSError, TypeError, AttributeError):
+            sig_ok = False
+        if sig_ok:
+            before_h = signal.getsignal(signal.SIGINT)
+            wired = ran_to_end = raised_after = False
+            try:
+                with _NoInterrupt() as ni:
+                    wired = signal.getsignal(signal.SIGINT) == ni._remember
+                    if wired:
+                        signal.getsignal(signal.SIGINT)(signal.SIGINT, None)
+                    ran_to_end = True
+            except KeyboardInterrupt:
+                raised_after = True
+            restored = signal.getsignal(signal.SIGINT) == before_h
+            check('不可中斷段:Ctrl-C 先記著、段內那幾行照樣跑完、離開後照丟、處理器換回來',
+                  wired and ran_to_end and raised_after and restored,
+                  '裝上了=%s 段內跑完=%s 離開後照丟=%s 處理器換回來=%s'
+                  % (wired, ran_to_end, raised_after, restored))
+        else:
+            skip('不可中斷段', '這台裝不上 Ctrl-C 的訊號處理器(要在主執行緒才裝得上)')
+
+        # ── 7. 餌:Ctrl-C 落在「換名剛做完、登記還沒做完」那一瞬間 ──
+        # 收尾不可以說「一個位元組都沒動到」,要照實說已經換成清過的那一版、印還原指令。
+        if sig_ok:
+            def replace_then_ctrl_c(a, b):
+                r = real_replace(a, b)
+                if os.path.basename(os.fspath(b)) == 'stadium.big':
+                    signal.getsignal(signal.SIGINT)(signal.SIGINT, None)   # 等於在這裡按了 Ctrl-C
+                return r
+
+            os.replace = replace_then_ctrl_c
+            try:
+                rc, out = run_main([big, '--apply'])
+            finally:
+                os.replace = real_replace
+            check('餌:Ctrl-C 落在換名剛做完那一瞬間 → 結束碼 130、照實說已經換過了、印出 --restore',
+                  rc == 130 and '換成清過的那一版' in out and '--restore' in out
+                  and _REPLACED['phase'] == 'replaced' and os.path.getsize(big) < len(raw),
+                  'rc=%r 登記=%r' % (rc, _REPLACED['phase']))
+            reset()
+            run_main([big, '--restore'])
+            reset()
+            if open(big, 'rb').read() != raw:
+                check('  (餌 7 之後沒能還原回起點,下面的項目不可信)', False)
+        else:
+            skip('餌:Ctrl-C 落在換名剛做完那一瞬間', '這台裝不上 Ctrl-C 的訊號處理器')
+        if os.path.exists(big + BACKUP_SUFFIX):
+            os.remove(big + BACKUP_SUFFIX)
+
+        # ── 8. 餌:孤兒排在第一筆資料之前(重排不會變小)→ 不寫、不做備份 ──
+        front = os.path.join(d, 'front.big')
+        _st_big(front, [('entry', 'a.fsh', b'A' * 400), ('entry', 'b.fsh', b'B' * 400)])
+        # 把目錄那兩項的位移往後推 5,000,前面塞沒人指的位元組 —— 就是 igonly.big 那種長相
+        fr = bytearray(open(front, 'rb').read())
+        first = struct.unpack('>I', bytes(fr[16:20]))[0]
+        fr = fr[:first] + bytearray(b'\xEE' * 5000) + fr[first:]
+        struct.pack_into('>I', fr, 16, first + 5000)
+        struct.pack_into('>I', fr, 16 + 8 + 6, first + 5000 + 400)
+        struct.pack_into('<I', fr, 4, len(fr))
+        with open(front, 'wb') as f:
+            f.write(bytes(fr))
+        before = snap(front)
+        rc, out = run_main([front, '--apply'])
+        check('餌:孤兒全排在第一筆資料之前 → 說「不會變小」,不寫、連備份都不做',
+              rc == 0 and '不會變小' in out and snap(front) == before
+              and not os.path.exists(front + BACKUP_SUFFIX), 'rc=%r' % (rc,))
+
+        # ── 9. 餌:孤兒不到 1 KB → 不寫、不做備份 ──
+        tiny = os.path.join(d, 'tiny.big')
+        _st_big(tiny, [('entry', 'a.fsh', b'A' * 400), ('junk', b'\xEE' * 100),
+                       ('entry', 'b.fsh', b'B' * 400)])
+        before = snap(tiny)
+        rc, out = run_main([tiny, '--apply'])
+        check('餌:沒人指到的不到 1 KB → 說「不用清」,不寫、不做備份',
+              rc == 0 and '不用清' in out and snap(tiny) == before
+              and not os.path.exists(tiny + BACKUP_SUFFIX), 'rc=%r' % (rc,))
+
+        # ── 10. 反向:名字重複的封裝檔 → 寫得完全正確的檔不可以被誤判成失敗 ──
+        dup = os.path.join(d, 'dup.big')
+        _st_big(dup, [('entry', 'dup.fsh', b'A' * 400), ('junk', b'\xEE' * 2000),
+                      ('entry', 'other.fsh', b'B' * 400), ('junk', b'\xEE' * 2000),
+                      ('entry', 'dup.fsh', b'C' * 400)])
+        rc, out = run_main([dup, '--apply'])
+        got = [grab(dup, it)[:1] for it in big_entries(dup)]
+        check('反向:名字重複的項目照位置配對 → 清得乾淨、複驗通過,不會被誤判成失敗',
+              rc == 0 and got == [b'A', b'B', b'C'] and '已自動還原' not in out,
+              'rc=%r 內容=%r' % (rc, got))
+
+        # ── 11. 餌:目錄指到檔案外面 → 不敢動 ──
+        oob = os.path.join(d, 'oob.big')
+        ob = bytearray(_st_big(oob, fat))
+        struct.pack_into('>I', ob, 20, 999999)          # 第一項的長度改成比檔案還大
+        with open(oob, 'wb') as f:
+            f.write(bytes(ob))
+        before = snap(oob)
+        rc, out = run_main([oob, '--apply'])
+        check('餌:目錄有一項指到檔案外面 → 停下來(結束碼 2),不寫、不做備份',
+              rc == 2 and '超出檔案大小' in out and snap(oob) == before
+              and not os.path.exists(oob + BACKUP_SUFFIX), 'rc=%r' % (rc,))
+
+        # ── 12. 餌:目錄宣告的筆數比解析得出來的多 → 不敢動 ──
+        short = os.path.join(d, 'short.big')
+        sb = (b'BIGF' + b'\x00' * 4 + struct.pack('>I', 2) + b'\x00' * 4
+              + struct.pack('>II', 40, 4) + b'a.fsh\x00'
+              + struct.pack('>II', 44, 4) + b'bbbb' + b'XY' * 20)   # 第二個名字沒有結尾的 0
+        sb = sb[:4] + struct.pack('<I', len(sb)) + sb[8:]
+        with open(short, 'wb') as f:
+            f.write(sb)
+        try:
+            big_entries(short)
+            blocked = False
+        except DataError as e:
+            blocked = '只解析得出 1 筆' in str(e)
+        check('餌:目錄宣告 2 筆只解析得出 1 筆 → 停下來,不回傳半份目錄', blocked)
+
+        # ── 13. 餌:開頭不是 BIGF、項目數是 0 → 不當成封裝檔 ──
+        # 「開頭不是 BIGF」那一個,後面照抄一份完整合法的封裝檔 ——
+        # 只改招牌,擋住它的才只會是招牌那一道,不會是別的檢查順便擋掉。
+        notbig = os.path.join(d, 'notbig.big')
+        with open(notbig, 'wb') as f:
+            f.write(b'NOPE' + raw[4:])
+        zero = os.path.join(d, 'zero_items.big')
+        with open(zero, 'wb') as f:
+            f.write(b'BIGF' + struct.pack('<I', 16) + struct.pack('>I', 0) + b'\x00' * 4)
+        bad = 0
+        for p in (notbig, zero):
+            try:
+                big_entries(p)
+            except DataError:
+                bad += 1
+        check('餌:開頭不是 BIGF / 目錄項目數是 0 → 兩種都停下來', bad == 2, '擋下 %d / 2' % bad)
+
+        # ── 14. 餌:檔頭大小欄位跟實際檔案大小對不上 → 停下來 ──
+        # 陰性對照一起做:大端的檔頭要認得出來(本站測試機真的有這種檔)。
+        mis = os.path.join(d, 'mismatch.big')
+        mb = bytearray(_st_big(mis, fat))
+        struct.pack_into('<I', mb, 4, 123)
+        with open(mis, 'wb') as f:
+            f.write(bytes(mb))
+        be = os.path.join(d, 'bigendian.big')
+        _st_big(be, fat, order='>')
+        try:
+            size_field_order(mis)
+            blocked = False
+        except DataError:
+            blocked = True
+        check('餌:檔頭大小欄位對不上 → 停下來;陰性對照:大端的檔頭認得出來',
+              blocked and size_field_order(be) == '>')
+
+        # ── 15. 餌:複驗自己要抓得到「內容被換掉」與「檔頭大小不對」 ──
+        # 陰性對照:一模一樣的檔 → 零個問題(不然上面那些「複驗通過」都不算數)。
+        vp_raw = open(big, 'rb').read()
+        vp_items = big_entries(big)
+        same = real_vp(big, vp_items, vp_raw)
+        vp1 = os.path.join(d, 'vp_content.big')
+        with open(vp1, 'wb') as f:
+            f.write(vp_raw)
+        it_a = vp_items[0]
+        with open(vp1, 'r+b') as f:
+            f.seek(it_a[2])
+            f.write(b'Z')
+        vp2 = os.path.join(d, 'vp_header.big')
+        with open(vp2, 'wb') as f:
+            f.write(vp_raw + b'\x00\x00\x00\x00')       # 多 4 個位元組,檔頭沒跟著改
+        p1 = real_vp(vp1, vp_items, vp_raw)
+        p2 = real_vp(vp2, vp_items, vp_raw)
+        check('餌:複驗抓得到「某一項內容不一樣」與「檔頭大小欄對不上」;一模一樣的檔零問題',
+              same == [] and any('內容跟原本不同' in x for x in p1)
+              and any('檔頭的大小欄' in x for x in p2),
+              '一樣=%d 內容=%d 檔頭=%d' % (len(same), len(p1), len(p2)))
+
+        # ── 16. 餌:備份要放的位置是符號連結 → 拒絕,外面那個檔不可以被動到 ──
+        outside = os.path.join(d, 'outside')
+        os.makedirs(outside)
+        victim = os.path.join(outside, '別人的檔.txt')
+        with open(victim, 'wb') as f:
+            f.write(b'DO-NOT-TOUCH' * 50)
+        keep = open(victim, 'rb').read()
+        if can_symlink(big + BACKUP_SUFFIX, victim):
+            before = snap(big)
+            rc, out = run_main([big, '--apply'])
+            check('餌:備份的位置是符號連結 → 停下來(結束碼 2),正本與連結指到的檔都沒被動到',
+                  rc == 2 and '備份 是一個符號連結' in out and snap(big) == before
+                  and open(victim, 'rb').read() == keep, 'rc=%r' % (rc,))
+            # 第二層:備份那一支自己也要擋(上面那一層被拿掉時,靠的就是這一層)
+            try:
+                _atomic_copy(big, big + BACKUP_SUFFIX)
+                blocked = False
+            except DataError:
+                blocked = True
+            check('  備份那一支自己也擋:直接叫它寫到連結上 → 拒絕,外面那個檔沒被動到',
+                  blocked and open(victim, 'rb').read() == keep)
+            os.remove(big + BACKUP_SUFFIX)
+        else:
+            skip('餌:備份的位置是符號連結', '這台做不出符號連結(Windows 要開發人員模式或系統管理員)')
+
+        # ── 17. 餌:猜得到的暫存名(<備份>.part)先被做成連結 → 備份照樣做、外面不動 ──
+        part = big + BACKUP_SUFFIX + '.part'
+        if can_symlink(part, victim):
+            _atomic_copy(big, big + BACKUP_SUFFIX)
+            check('餌:<備份>.part 先被做成指到外面的連結 → 備份照樣做成,外面那個檔沒被動到',
+                  open(victim, 'rb').read() == keep
+                  and open(big + BACKUP_SUFFIX, 'rb').read() == open(big, 'rb').read())
+            for _p in (part, big + BACKUP_SUFFIX):
+                if os.path.lexists(_p):
+                    os.remove(_p)
+        else:
+            skip('餌:<備份>.part 先被做成連結', '這台做不出符號連結')
+
+        # ── 18. 餌:你指的那個 .big 本身是符號連結 → 會寫檔的兩條路拒絕,只量的照樣走 ──
+        real_big = os.path.join(outside, '真正的球場.big')
+        _st_big(real_big, fat)
+        link_big = os.path.join(d, 'link.big')
+        if can_symlink(link_big, real_big):
+            before = snap(real_big)
+            rc_a, out_a = run_main([link_big, '--apply'])
+            rc_r, out_r = run_main([link_big, '--restore'])
+            rc_c, out_c = run_main([link_big])
+            check('餌:.big 是符號連結 → --apply 與 --restore 都拒絕(結束碼 2),連結指到的檔沒被動到',
+                  rc_a == 2 and rc_r == 2 and snap(real_big) == before
+                  and not os.path.exists(real_big + BACKUP_SUFFIX)
+                  and not os.path.exists(link_big + BACKUP_SUFFIX),
+                  'apply=%r restore=%r' % (rc_a, rc_r))
+            check('  陰性對照:只量(不加參數)照樣跟著連結走到本體去量',
+                  rc_c == 0 and '實際處理的是' in out_c, 'rc=%r' % (rc_c,))
+            # 第二層:清檔那一支自己也要擋(main 那一層被拿掉時,靠的就是這一層)
+            try:
+                with _contextlib.redirect_stdout(_io.StringIO()):
+                    cmd_shrink(link_big, True)
+                blocked = False
+            except DataError:
+                blocked = True
+            check('  清檔那一支自己也擋:直接叫它清一個連結 → 拒絕,連結指到的檔沒被動到',
+                  blocked and snap(real_big) == before
+                  and not os.path.exists(real_big + BACKUP_SUFFIX))
+        else:
+            skip('餌:.big 是符號連結', '這台做不出符號連結')
+
+        # ── 19. 餌:備份寫到一半失敗 → 不留暫存檔,備份的名字上也不會出現半截的檔 ──
+        def replace_boom_any(a, b):
+            raise OSError(28, '假裝磁碟滿了(這是 --selftest 故意製造的)')
+
+        os.replace = replace_boom_any
+        try:
+            try:
+                _atomic_copy(big, big + BACKUP_SUFFIX)
+                blew = False
+            except OSError:
+                blew = True
+        finally:
+            os.replace = real_replace
+        left = sorted(n for n in os.listdir(d) if n.startswith('.'))
+        check('餌:備份最後一步失敗 → 往上報、不留暫存檔、備份的名字上沒有半截的檔',
+              blew and not left and not os.path.lexists(big + BACKUP_SUFFIX), '留下=%r' % (left,))
+
+        # ── 20 到 24. 餌:壞掉的備份不可以拿來蓋正本(五道各一個)──
+        # 每一種都拿「完整的那一份」先做陰性對照:完整的要還原得了,截斷的要被擋下來。
+        def restore_blocked(bak_bytes, target_bytes, name):
+            t = os.path.join(d, name)
+            with open(t, 'wb') as f:
+                f.write(target_bytes)
+            b = t + '.selftest-backup'
+            with open(b, 'wb') as f:
+                f.write(bak_bytes)
+            try:
+                _restore_from_backup(b, t)
+                blocked_ = False
+            except SystemExit:
+                blocked_ = True
+            return blocked_, open(t, 'rb').read() == target_bytes
+
+        # 20. 0 bytes —— 兩種情況都要擋:目標還在(後面那道「不到一半」也擋得住),
+        #     以及目標已經不見了(那時候只剩這一道擋得住,少了它會生出一個 0 bytes 的遊戲檔)
+        blk, untouched = restore_blocked(b'', raw, 'r0.big')
+        gone = os.path.join(d, 'r0_gone.big')
+        with open(gone + '.selftest-backup', 'wb') as f:
+            pass
+        try:
+            _restore_from_backup(gone + '.selftest-backup', gone)
+            blk_gone = False
+        except SystemExit:
+            blk_gone = True
+        check('餌:0 bytes 的備份 → 擋下來,正本沒被動到;目標已經不見的時候也不會生出一個空檔',
+              blk and untouched and blk_gone and not os.path.exists(gone))
+
+        # 21. BIGF 被截斷(檔頭還宣稱原本的長度)
+        blk, untouched = restore_blocked(raw[:len(raw) // 2], raw, 'r1.big')
+        ok_blk, _u = restore_blocked(raw, raw + b'\x00' * 8, 'r1ok.big')
+        check('餌:截成一半的封裝檔備份 → 擋下來;陰性對照:完整的那一份還原得了',
+              blk and untouched and not ok_blk)
+
+        # 22. 語系檔(LOCH)被截斷
+        L = 20
+        strs = [b'A\x00B\x00\x00\x00\x00\x00', b'C\x00D\x00\x00\x00\x00\x00', b'E\x00F\x00\x00\x00\x00\x00']
+        loch = (b'LOCH' + b'\x00' * 12 + struct.pack('<I', L)
+                + b'LOCL' + b'\x00' * 8 + struct.pack('<I', 3)
+                + struct.pack('<III', 28, 36, 44) + b''.join(strs))
+        blk, untouched = restore_blocked(loch[:60], loch, 'r2.loc')
+        ok_blk, _u = restore_blocked(loch, loch[:-1] + b'\x01', 'r2ok.loc')
+        check('餌:最後一條字串被截掉的語系檔備份 → 擋下來;陰性對照:完整的那一份還原得了',
+              blk and untouched and not ok_blk)
+
+        # 23. 執行檔(MZ)被截斷
+        mz = bytearray(0x200)
+        mz[0:2] = b'MZ'
+        struct.pack_into('<I', mz, 0x3C, 0x40)
+        mz[0x40:0x44] = b'PE\x00\x00'
+        struct.pack_into('<H', mz, 0x46, 1)             # 一個節區
+        struct.pack_into('<H', mz, 0x54, 0)             # 選用檔頭長度 0
+        struct.pack_into('<II', mz, 0x58 + 16, 0x100, 0x100)   # 節區在 0x100,長 0x100
+        mz = bytes(mz)
+        blk, untouched = restore_blocked(mz[:0x180], mz, 'r3.exe')
+        ok_blk, _u = restore_blocked(mz, mz[:-1] + b'\x01', 'r3ok.exe')
+        check('餌:節區被截掉的執行檔備份 → 擋下來;陰性對照:完整的那一份還原得了',
+              blk and untouched and not ok_blk)
+
+        # 24. 認不出格式的備份,不到正本的一半
+        blk, untouched = restore_blocked(b'x' * 100, b'y' * 1000, 'r4.dat')
+        ok_blk, _u = restore_blocked(b'x' * 600, b'y' * 1000, 'r4ok.dat')
+        check('餌:認不出格式、而且不到正本一半的備份 → 擋下來;陰性對照:夠大的還原得了',
+              blk and untouched and not ok_blk)
+
+        # ── 25. 餌:還原寫出來的那一份跟備份對不上 → 不換上去 ──
+        # 在「寫完、讀回來比對之前」把暫存檔改掉一個位元組(模擬磁碟寫錯了)。
+        t = os.path.join(d, 'r5.big')
+        with open(t, 'wb') as f:
+            f.write(raw + b'\x00' * 8)
+        with open(t + '.selftest-backup', 'wb') as f:
+            f.write(raw)
+        before = snap(t)
+        real_cm = shutil.copymode
+
+        def copymode_then_corrupt(src, dst):
+            with open(dst, 'r+b') as f:
+                f.write(b'Z')
+
+        shutil.copymode = copymode_then_corrupt
+        try:
+            try:
+                _do_copy(t + '.selftest-backup', t)
+                blocked = False
+            except DataError:
+                blocked = True
+        finally:
+            shutil.copymode = real_cm
+        left = sorted(n for n in os.listdir(d) if n.startswith('.r5'))
+        check('餌:還原寫出來的那一份跟備份對不上 → 不換上去,正本原封不動,暫存檔清掉',
+              blocked and snap(t) == before and not left, '留下=%r' % (left,))
+
+        # ── 26. 餌:還原的最後一步(換名)失敗 → 正本原封不動、登記收回來 ──
+        reset()
+
+        def replace_boom_r5(a, b):
+            if os.path.basename(os.fspath(b)) == 'r5.big':
+                raise OSError(28, '假裝磁碟滿了(這是 --selftest 故意製造的)')
+            return real_replace(a, b)
+
+        os.replace = replace_boom_r5
+        try:
+            try:
+                _do_copy(t + '.selftest-backup', t)
+                blew = False
+            except OSError:
+                blew = True
+        finally:
+            os.replace = real_replace
+        left = sorted(n for n in os.listdir(d) if n.startswith('.r5'))
+        check('餌:還原換名那一步失敗 → 正本原封不動、暫存檔清掉、登記收回「沒動過」',
+              blew and snap(t) == before and not left and _REPLACED['phase'] == 'idle',
+              '登記=%r' % (_REPLACED['phase'],))
+        reset()
+
+        # ── 27. 餌:要還原的目標是符號連結 → 拒絕 ──
+        link_t = os.path.join(d, 'r6.big')
+        if can_symlink(link_t, victim):
+            try:
+                _do_copy(t + '.selftest-backup', link_t)
+                blocked = False
+            except DataError:
+                blocked = True
+            check('餌:要還原的目標是符號連結 → 拒絕,連結指到的檔沒被動到',
+                  blocked and open(victim, 'rb').read() == keep)
+        else:
+            skip('餌:要還原的目標是符號連結', '這台做不出符號連結')
+
+        # ── 28. 餌:--restore 拿到壞的備份 → 結束碼 2(不是 1),正本不動 ──
+        # 半截備份那一道丟的是 SystemExit,不接住的話結束碼會是 1、訊息跑到別處。
+        with open(big + BACKUP_SUFFIX, 'wb') as f:
+            f.write(raw[:len(raw) // 2])
+        before = snap(big)
+        rc_t, out_t = run_main([big, '--restore'])
+        with open(big + BACKUP_SUFFIX, 'wb') as f:
+            f.write(b'NOPE' * 100)
+        rc_n, out_n = run_main([big, '--restore'])
+        os.remove(big + BACKUP_SUFFIX)
+        rc_m, out_m = run_main([big, '--restore'])
+        check('餌:--restore 碰到半截備份 / 不是封裝檔的備份 / 沒有備份 → 三種都結束碼 2,正本不動',
+              rc_t == 2 and rc_n == 2 and rc_m == 2 and snap(big) == before
+              and '備份是壞的' in out_t and '開頭不是 BIGF' in out_n and '找不到備份' in out_m,
+              '結束碼 %r / %r / %r' % (rc_t, rc_n, rc_m))
+
+        # ── 29 到 32:2026-09-24 補上原本沒有餌的幾道(一樣跑真正的 main())──
+        # 從同一個起點出發:正本是「清之前」那一份,旁邊沒有備份。
+        raw = _st_big(big, fat)
+        bak = big + BACKUP_SUFFIX
+        if os.path.lexists(bak):
+            os.remove(bak)
+        reset()
+
+        # ── 29. 預設唯讀:不加參數只量、只加 --shrink 只預覽 → 一個位元組都不寫 ──
+        # 把預覽那條路改成會寫檔的話,正本會被換掉(inode 會變)、旁邊會多一份備份 —— 這一項就會紅。
+        before = snap(big)
+        rc_c, out_c = run_main([big])
+        rc_s, out_s = run_main([big, '--shrink'])
+        left = sorted(n for n in os.listdir(d) if n.startswith('.'))
+        check('預設唯讀:不加參數只量、只加 --shrink 只預覽 → 正本還是同一個檔、同樣的位元組,'
+              '不做備份、不留暫存檔',
+              rc_c == 0 and rc_s == 0 and '以上是預覽' in out_s and snap(big) == before
+              and not os.path.lexists(bak) and not left,
+              'rc=%r / %r 備份在不在=%s 留下=%r' % (rc_c, rc_s, os.path.lexists(bak), left))
+        reset()
+
+        # ── 30. 餌:旁邊已經有備份 → 保留最早那一份,不可以拿現在的正本蓋掉它 ──
+        # 先在備份的位置放一份「更早的」封裝檔(完整合法,但跟現在的正本不一樣)。
+        # 改成每次都重做備份的話,那一份會被蓋成現在的正本 —— 這一項就會紅。
+        older = _st_big(os.path.join(d, 'older.big'),
+                        [('entry', 'a.fsh', b'A' * 400), ('junk', b'\xDD' * 1234),
+                         ('entry', 'b.fsh', b'B' * 400)])
+        with open(bak, 'wb') as f:
+            f.write(older)
+        rc, out = run_main([big, '--apply'])
+        check('餌:旁邊已經有備份 → 照樣清得掉,但那份最早的備份一個位元組都沒被蓋掉',
+              rc == 0 and '保留最早那一份' in out and open(bak, 'rb').read() == older
+              and os.path.getsize(big) < len(raw),
+              'rc=%r 備份%s' % (rc, '沒變' if open(bak, 'rb').read() == older else '被蓋掉了'))
+        with open(big, 'wb') as f:                  # 回到起點(不走 --restore:備份是 older 那一份)
+            f.write(raw)
+        os.remove(bak)
+        reset()
+
+        # ── 31. 餌:換名之後的複驗沒過,而且**自動還原也失敗** → 照實說,並印出 --restore 那一行 ──
+        # 這是讀者的球場檔已經被換掉、又救不回來時唯一會看到的一句話。
+        # 把「自動還原失敗」講成「已自動還原」、或把那一行 --restore 拿掉,這一項都會紅。
+        calls31 = []
+
+        def vp_second_bad31(check_path, items, raw_):
+            calls31.append(os.path.basename(check_path))
+            if len(calls31) >= 2:
+                return ['  ❌ 假的問題(這是 --selftest 故意製造的)']
+            return real_vp(check_path, items, raw_)
+
+        real_rfb = globals()['_restore_from_backup']
+
+        def restore_fails(bak_, dst_):
+            raise SystemExit('假的還原失敗(這是 --selftest 故意製造的)')
+
+        globals()['_verify_pack'] = vp_second_bad31
+        globals()['_restore_from_backup'] = restore_fails
+        try:
+            rc, out = run_main([big, '--apply'])
+        finally:
+            globals()['_verify_pack'] = real_vp
+            globals()['_restore_from_backup'] = real_rfb
+        check('餌:換名之後複驗沒過、自動還原也失敗 → 結束碼 2,說「自動還原沒有成功」、'
+              '印出 --restore 那一行,不說「已自動還原」',
+              len(calls31) == 2 and rc == 2 and '自動還原沒有成功' in out
+              and ('"%s" --restore' % big) in out and '已自動還原' not in out,
+              'rc=%r 驗了=%r' % (rc, calls31))
+        reset()
+        rc_back, _o = run_main([big, '--restore'])  # 照它印的那一行做,回到起點
+        check('  陰性對照:照畫面印的那一行 --restore 跑一次 → 逐位元組回到清之前',
+              rc_back == 0 and open(big, 'rb').read() == raw, 'rc=%r' % (rc_back,))
+        reset()
+
+        # ── 32. 餌:--restore 蓋完之後,內容跟備份差一個位元組 → 不可以說還原成功 ──
+        # 讓還原「做完」但寫出來的東西跟備份差最後一個位元組(模擬磁碟寫錯了)。
+        # 拿掉 --restore 最後那道逐位元組比對的話,結束碼會是 0 —— 這一項就會紅。
+        def restore_off_by_one(bak_, dst_):
+            data_ = bytearray(open(bak_, 'rb').read())
+            data_[-1] ^= 0xFF
+            with open(dst_, 'wb') as f:
+                f.write(bytes(data_))
+
+        globals()['_restore_from_backup'] = restore_off_by_one
+        try:
+            rc, out = run_main([big, '--restore'])
+        finally:
+            globals()['_restore_from_backup'] = real_rfb
+        check('餌:--restore 蓋完之後內容跟備份差一個位元組 → 結束碼 2,說「還原後內容跟備份不一樣」',
+              rc == 2 and '還原後內容跟備份不一樣' in out and '相同 ✅' not in out,
+              'rc=%r' % (rc,))
+
+        # ── 33 到 39:2026-09-24 再補的(一樣跑真正的 main())──
+        # 這一輪補上的:換名之後讀不到檔(DataError 與 OSError 兩條路)、「正在換名」那一格保險、
+        # 自動還原的換名也失敗、--restore 時備份是符號連結、換名之前按 Ctrl-C、
+        # 還原做完之後才讀不到備份。拆掉對應的那一行,這幾項各自會紅(實測過)。
+        # 從同一個起點出發:正本是「清之前」那一份,旁邊沒有備份。
+        with open(big, 'wb') as f:
+            f.write(raw)
+        if os.path.lexists(bak):
+            os.remove(bak)
+        reset()
+
+        # ── 33. 餌:換名之後的複驗讀不到檔(外接碟被拔掉那一種)──
+        # 第二次複驗(讀正本那一次)開檔之前,先把正本搬走 —— 等於外接碟被拔掉。
+        # big_entries 會把開不了檔的 OSError 包成 DataError('讀不到 …'),走的是 main()
+        # 的 DataError 那一條;那一條以前只印「停下來了:讀不到 …」,一個字都沒提
+        # 檔案已經換成清過的那一版,也沒給 --restore。那一條不照登記說話,這一項就會紅。
+        away = os.path.join(d, 'pulled_out.big')
+        calls33 = []
+
+        def vp_file_gone(check_path, items, raw_):
+            calls33.append(os.path.basename(check_path))
+            if len(calls33) >= 2:
+                os.rename(check_path, away)          # 正本「不見了」
+            return real_vp(check_path, items, raw_)
+
+        globals()['_verify_pack'] = vp_file_gone
+        try:
+            rc, out = run_main([big, '--apply'])
+        finally:
+            globals()['_verify_pack'] = real_vp
+        check('餌:換名之後複驗讀不到檔(外接碟被拔掉)→ 結束碼 2,說已經換成清過的那一版、'
+              '印出 --restore 那一行,不說「一個位元組都沒動」',
+              len(calls33) == 2 and rc == 2 and '讀不到' in out and '已經' in out
+              and ('"%s" --restore' % big) in out and '一個位元組都沒動' not in out,
+              'rc=%r 驗了=%r' % (rc, calls33))
+        if os.path.exists(away):
+            os.rename(away, big)                     # 外接碟插回去
+        reset()
+        rc_back, _o = run_main([big, '--restore'])
+        check('  陰性對照:檔案放回去、照畫面印的那一行 --restore 跑一次 → 逐位元組回到清之前',
+              rc_back == 0 and open(big, 'rb').read() == raw, 'rc=%r' % (rc_back,))
+        if os.path.lexists(bak):
+            os.remove(bak)
+        reset()
+
+        # ── 34. 餌:換名之後的複驗丟出作業系統的錯(沒被 big_entries 包起來的那一種)──
+        # 走的是 main() 的 OSError 那一條。把那一條的「已經換成清過的那一版」
+        # 改成「一個位元組都沒動」,這一項就會紅。
+        calls34 = []
+
+        def vp_oserror(check_path, items, raw_):
+            calls34.append(os.path.basename(check_path))
+            if len(calls34) >= 2:
+                raise OSError(5, '假裝讀檔失敗(這是 --selftest 故意製造的)')
+            return real_vp(check_path, items, raw_)
+
+        globals()['_verify_pack'] = vp_oserror
+        try:
+            rc, out = run_main([big, '--apply'])
+        finally:
+            globals()['_verify_pack'] = real_vp
+        check('餌:換名之後複驗丟出作業系統的錯 → 結束碼 2,說已經換成清過的那一版、'
+              '印出 --restore 那一行,不說「一個位元組都沒動」',
+              len(calls34) == 2 and rc == 2 and '作業系統不讓我讀寫' in out and '已經' in out
+              and ('"%s" --restore' % big) in out and '一個位元組都沒動' not in out,
+              'rc=%r 驗了=%r' % (rc, calls34))
+        reset()
+        run_main([big, '--restore'])
+        if os.path.lexists(bak):
+            os.remove(bak)
+        reset()
+        if open(big, 'rb').read() != raw:
+            check('  (餌 34 之後沒能還原回起點,下面的項目不可信)', False)
+
+        # ── 35. 保險那一格:出事的時候登記是「正在換名」→ 兩條「停下來了」都要說不確定 ──
+        # 換名包在不可中斷的區塊裡,正常跑不到這一格,所以這裡直接擺好登記、
+        # 讓清檔那一步丟出錯誤,驗的是 main() 收尾照登記說話的那一段。
+        real_cs = globals()['cmd_shrink']
+        outs35 = []
+        for exc35 in (DataError('假的問題(這是 --selftest 故意製造的)'),
+                      OSError(5, '假的讀寫錯誤(這是 --selftest 故意製造的)')):
+            def cs_mid_replace(path_, apply_it, _exc=exc35):
+                _REPLACED.update(what='shrink', path=path_, phase='replacing')
+                raise _exc
+
+            globals()['cmd_shrink'] = cs_mid_replace
+            try:
+                outs35.append(run_main([big, '--apply']))
+            finally:
+                globals()['cmd_shrink'] = real_cs
+            reset()
+        check('保險:出事的時候登記是「正在換名」→ 兩條「停下來了」都說沒辦法確定、'
+              '印出 --restore 那一行,不說「一個位元組都沒動」',
+              len(outs35) == 2
+              and all(r_ == 2 and '沒辦法確定' in o_ and ('"%s" --restore' % big) in o_
+                      and '一個位元組都沒動' not in o_ for r_, o_ in outs35),
+              '結束碼 %r' % ([r_ for r_, _o_ in outs35],))
+
+        # ── 36. 餌:換名之後複驗沒過,自動還原走到最後換名那一步也失敗 ──
+        # 這時候正本還是清過的那一版。還原那一支(_do_copy)沒換成時,登記要收回
+        # 「進來之前的樣子」;收成「還沒動」的話,接下來按一下 Ctrl-C,
+        # 收尾就會說「你的遊戲檔一個位元組都沒有動到」。
+        # 一起驗:訊息自己已經帶著 --restore,整個畫面只印一次。
+        calls36, hits36 = [], []
+
+        def vp_second_bad36(check_path, items, raw_):
+            calls36.append(os.path.basename(check_path))
+            if len(calls36) >= 2:
+                return ['  ❌ 假的問題(這是 --selftest 故意製造的)']
+            return real_vp(check_path, items, raw_)
+
+        def replace_second_boom(a, b):
+            if os.path.basename(os.fspath(b)) == 'stadium.big':
+                hits36.append(os.path.basename(os.fspath(a)))
+                if len(hits36) >= 2:               # 第一次是清完換上去,第二次是自動還原
+                    raise OSError(28, '假裝磁碟滿了(這是 --selftest 故意製造的)')
+            return real_replace(a, b)
+
+        globals()['_verify_pack'] = vp_second_bad36
+        os.replace = replace_second_boom
+        try:
+            rc, out = run_main([big, '--apply'])
+        finally:
+            globals()['_verify_pack'] = real_vp
+            os.replace = real_replace
+        left = sorted(n for n in os.listdir(d) if n.startswith('.'))
+        check('餌:自動還原的換名也失敗 → 結束碼 2,登記還是「已經換成清過的那一版」,'
+              '--restore 那一行只印一次,不留暫存檔',
+              len(hits36) == 2 and rc == 2 and '自動還原沒有成功' in out
+              and _REPLACED['what'] == 'shrink' and _REPLACED['phase'] == 'replaced'
+              and out.count('--restore') == 1 and ('"%s" --restore' % big) in out
+              and '一個位元組都沒動' not in out and not left,
+              'rc=%r 登記=%r/%r --restore 出現 %d 次 留下=%r'
+              % (rc, _REPLACED['what'], _REPLACED['phase'], out.count('--restore'), left))
+        reset()
+        run_main([big, '--restore'])
+        if os.path.lexists(bak):
+            os.remove(bak)
+        reset()
+        if open(big, 'rb').read() != raw:
+            check('  (餌 36 之後沒能還原回起點,下面的項目不可信)', False)
+
+        # ── 37. 餌:--restore 時 .shrinkbak 是符號連結,指到外面一份完整合法的封裝檔 ──
+        # 這條路上只有 _do_copy 那一行擋得住它:備份在、開頭是 BIGF、長度也對得上,
+        # 前面幾道把關全過。拿掉那一行,外面那一份就會被拿來蓋掉正本。
+        other = os.path.join(outside, '別人的球場.big')
+        other_raw = _st_big(other, [('entry', 'z.fsh', b'Z' * 300), ('junk', b'\xCC' * 1500),
+                                    ('entry', 'y.fsh', b'Y' * 300)])
+        other_sha = hashlib.sha256(other_raw).hexdigest()
+        if can_symlink(bak, other):
+            before = snap(big)
+            rc, out = run_main([big, '--restore'])
+            left = sorted(n for n in os.listdir(d) if '.restore-' in n)
+            check('餌:--restore 時備份是符號連結(指到外面一份完整的封裝檔)→ 結束碼 2,'
+                  '正本與外面那個檔都沒被動到,不留暫存檔',
+                  rc == 2 and '備份 是一個符號連結' in out and snap(big) == before
+                  and hashlib.sha256(open(other, 'rb').read()).hexdigest() == other_sha
+                  and not left, 'rc=%r 留下=%r' % (rc, left))
+            os.remove(bak)
+        else:
+            skip('餌:--restore 時備份是符號連結', '這台做不出符號連結')
+
+        # ── 38. 餌:Ctrl-C 落在換名之前(驗暫存檔的時候)→ 照實說一個位元組都沒動 ──
+        # 餌 7 驗的是換名之後的那一句;這一項驗的是最常見的那一種:還沒換上去就按了 Ctrl-C。
+        # 收尾把這一句講成「已經換成清過的那一版」、或留下暫存檔沒收,這一項都會紅。
+        def vp_ctrl_c(check_path, items, raw_):
+            raise KeyboardInterrupt
+
+        before = snap(big)
+        globals()['_verify_pack'] = vp_ctrl_c
+        try:
+            rc, out = run_main([big, '--apply'])
+        finally:
+            globals()['_verify_pack'] = real_vp
+        left = sorted(n for n in os.listdir(d) if n.startswith('.'))
+        check('餌:Ctrl-C 落在換名之前 → 結束碼 130,說一個位元組都沒有動到、不叫人 --restore,'
+              '正本還是同一個檔、同樣的位元組,暫存檔清掉',
+              rc == 130 and '一個位元組都沒有動到' in out and '--restore' not in out
+              and '換成清過的那一版' not in out and snap(big) == before and not left
+              and _REPLACED['phase'] == 'idle',
+              'rc=%r 留下=%r 登記=%r' % (rc, left, _REPLACED['phase']))
+        reset()
+
+        # ── 39. 餌:--restore 已經換上去了,最後那一次比對讀不到備份 → 照實說還原已經做完 ──
+        # 還原本身做完之後,cmd_restore 會把備份與正本整份讀出來再比一次;那時候讀不到
+        # (外接碟被拔掉)走的是 main() 的 OSError 那一條。把「還原那一步已經做完了」
+        # 講成「一個位元組都沒動」的話,這一項就會紅 —— 那時候正本其實已經換回備份那一份了。
+        with open(big, 'wb') as f:                  # 讓正本跟備份不一樣,還原才有事可做
+            f.write(raw + b'\x00' * 8)
+        with open(bak, 'wb') as f:
+            f.write(raw)
+        real_rfb39 = globals()['_restore_from_backup']
+        gone39 = bak + '.pulled_out'
+
+        def restore_then_backup_gone(bak_, dst_):
+            r_ = real_rfb39(bak_, dst_)             # 真的還原(登記會變成「還原已經做完」)
+            os.rename(bak_, gone39)                 # 接著備份「不見了」
+            return r_
+
+        globals()['_restore_from_backup'] = restore_then_backup_gone
+        try:
+            rc, out = run_main([big, '--restore'])
+        finally:
+            globals()['_restore_from_backup'] = real_rfb39
+        if os.path.exists(gone39):
+            os.rename(gone39, bak)
+        check('餌:--restore 換上去之後、最後比對讀不到備份 → 結束碼 2,說還原那一步已經做完,'
+              '不說「一個位元組都沒動」;正本確實已經是備份那一份',
+              rc == 2 and '還原那一步' in out and '已經' in out and '一個位元組都沒動' not in out
+              and open(big, 'rb').read() == raw,
+              'rc=%r 登記=%r/%r' % (rc, _REPLACED['what'], _REPLACED['phase']))
+        os.remove(bak)
+        reset()
+
+    finally:
+        shutil.rmtree(tmp_root, ignore_errors=True)
+        _REPLACED.update(what=None, path=None, phase='idle')
+
+    # ── 40. 餌:「-O 拒跑」這道守門自己 ──
+    # sys.flags 是唯讀的,同一個行程裡切不了 -O,所以換掉的是 _optimize_level。
+    if not _SELFTEST_NESTED:                        # 裡面那一次不要再套一層(見 _SELFTEST_NESTED)
+        real_opt = globals()['_optimize_level']
+        buf = _io.StringIO()
+        globals()['_optimize_level'] = lambda: 1
+        _SELFTEST_NESTED.append(1)
+        try:
+            with _contextlib.redirect_stdout(buf):
+                rc = selftest()
+        finally:
+            globals()['_optimize_level'] = real_opt
+            _SELFTEST_NESTED.pop()
+        check('餌:假裝在 python -O 底下 → --selftest 拒跑(回 2),而且說得出為什麼',
+              rc == 2 and '-O' in buf.getvalue(), 'rc=%r' % (rc,))
+
+    # ── 41. 跑完之後,暫存資料夾真的刪掉了(頁面上寫著「跑完整個刪掉」)──
+    check('跑完之後那個暫存資料夾已經整個刪掉', not os.path.exists(tmp_root),
+          ('還在:' + tmp_root) if os.path.exists(tmp_root) else '')
+
+    print()
+    if fails:
+        print('  ❌ %d 項沒過:%s' % (len(fails), ' / '.join(fails)))
+        return 1
+    if skipped:
+        print('  ✅ 跑到的全部通過。另外 %d 項因為這台機器做不到而跳過(上面標 ⏭ 的那幾行),'
+              '那幾項等於沒驗到。' % len(skipped))
+    else:
+        print('  ✅ 全部通過。')
     return 0
 
 

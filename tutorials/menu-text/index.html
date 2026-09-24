@@ -19,7 +19,7 @@
 <title>改主選單的文字 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="選單上的字不在版面檔裡，版面檔只放「字串編號」。所以改選單文字不必動版面檔，改字串表就好——這比動版面檔安全得多，而且改完檔案長度一個位元組都不變。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="../../assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="../../assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -57,10 +57,9 @@
   <div class="quickfix" id="quick">
     <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快改幾個字？照這四步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
-      <li>下載 <a href="mvp_menu_text.py" download>mvp_menu_text.py</a> 放到桌面，
-          開命令提示字元切到桌面<br>
-  <pre><code>cd %USERPROFILE%\Desktop</code></pre>
-  <pre><code>cd ~/Desktop</code></pre></li>
+      <li>下載 <a href="mvp_menu_text.py" download>mvp_menu_text.py</a>（瀏覽器會把它放進「下載」資料夾），
+          在「下載」資料夾開命令視窗：Windows 打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打；Mac 開終端機打這一行<br>
+  <pre><code>cd ~/Downloads</code></pre></li>
       <li>看主選單有哪些字可以改，以及<strong>每一條最多能放幾個字</strong><br>
   <pre><code>python mvp_menu_text.py "〔遊戲資料夾〕" --list</code></pre></li>
       <li>預覽。<u>新的字不能比原本長</u>，程式會先幫你算<br>
@@ -187,17 +186,15 @@
     <p>下面範例照 Mac 寫法用 <code>python3</code>；Windows 使用者把每行開頭改成 <code>python</code>。</p>
   </div>
 
-  <p><strong>步驟 1</strong>：下載 <a href="mvp_menu_text.py" download>mvp_menu_text.py</a>，放到桌面，切到桌面。</p>
-<pre><code>cd %USERPROFILE%\Desktop</code></pre>
-<pre><code>cd ~/Desktop</code></pre>
+  <p><strong>步驟 1</strong>：下載 <a href="mvp_menu_text.py" download>mvp_menu_text.py</a>，在「下載」資料夾開命令視窗。</p>
+  <p class="small">Windows：這一步不用打指令。打開檔案總管，左邊點「<u>下載</u>」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter。開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。</p>
+  <p class="small">Mac：打開終端機，打這一行：</p>
+<pre><code>cd ~/Downloads</code></pre>
   <div class="ifnot"><b>按了下載之後，檔案跑到哪裡去了？</b>
-      <p><strong>瀏覽器多半不會問你要存哪裡</strong>，它會直接放進「下載」資料夾。
-         所以按完之後還有一步：</p>
-      <p><span class="sk">1</span>打開檔案總管（Mac 用 Finder），左邊點「<u>下載</u>」<br>
-         <span class="sk">2</span>找到那個 <code>.py</code> 檔<br>
-         <span class="sk">3</span><strong>把它拖到桌面</strong></p>
-      <p class="small">沒做這一步的話，後面 <code>cd</code> 到桌面再執行，
-         畫面會出現 <code>can't open file</code> —— 那不是你打錯，是檔案還在「下載」裡。</p>
+      <p><strong>瀏覽器多半不會問你要存哪裡</strong>，它會直接放進「下載」資料夾，
+         所以命令視窗就在「下載」裡開（上面那一段），<u>不用把檔案搬到別處</u>。</p>
+      <p class="small">命令視窗跟檔案不在同一個資料夾的話，
+         畫面會出現 <code>can't open file</code> —— 那不是你打錯。</p>
   </div>
 
   <p><strong>步驟 2</strong>：看有哪些字可以改。唯讀。</p>
@@ -251,8 +248,9 @@
     <thead><tr><th>看到什麼</th><th>怎麼辦</th></tr></thead>
     <tbody>
       <tr class="hi"><td><code>can't open file '…\mvp_menu_text.py'</code></td>
-          <td><strong>檔案還在「下載」資料夾，不在桌面。</strong>
-              開檔案總管左邊點「下載」，把那個 <code>.py</code> 拖到桌面，再跑一次。
+          <td><strong>命令視窗跟腳本不在同一個資料夾。</strong>
+              打開放著那個 <code>.py</code> 的資料夾（剛下載的話就是「下載」），在網址列打 <code>cmd</code> 按 Enter，用新開的視窗再跑一次（Mac 用 <code>cd</code> 切過去，例如 <code>cd ~/Downloads</code>）。
+              還是一樣的話，是檔名對不上：瀏覽器可能在檔名後面加了 <code>(1)</code>，把它改成跟指令裡一模一樣。
               <u>這是本站最常見的第一個卡點。</u></td></tr>
       <tr><td>「有 N 條放不下」</td>
           <td>新文字太長。看預覽表的「字數 用掉/預算」欄，改短一點</td></tr>
@@ -409,9 +407,10 @@
           <td data-label="為什麼要有它">不必有遊戲也驗得動。
               道數是程式<u>自己算出來</u>的，跑完會印在最後一行 ——
               寫死的數字改了程式就會過期。本站這台跑出來是
-              <strong>29 道檢查，其中 20 道是反向餌</strong>；
+              <strong>33 道檢查，其中 23 道是反向餌</strong>；
               建不了符號連結的機器（Windows 沒開開發者模式）會
-              <u>跳過 7 道並印出來說跳過了</u>，那種機器上是 22 道、15 道反向餌。
+              <u>跳過 9 道並印出來說跳過了</u>，那種機器上是 24 道、16 道反向餌
+              （這組數字是把建連結的那一步換成一定失敗的版本模擬出來的，Windows 上還沒實測）。
               餌咬的是：太長要被擋、長度對不上的備份要被 <code>--restore</code> 擋下來、
               暫存檔的名字被人先用符號連結佔住、備份檔或字串表本身是符號連結、
               複驗四件事裡「沒點名的字串被寫壞了」要當場停下來、
@@ -433,13 +432,13 @@
      <a href="../fel-toolkit/index.html">介面萬用工具</a>。
      跑 <code>--selftest</code> 會<u>自己造一個最小的字串表</u>來測，
      不碰任何遊戲檔。道數是程式自己算的，會印在最後一行：
-     本站這台是 <strong>29 道（20 道反向餌）</strong>，
-     建不了符號連結的機器跳過 7 道之後是 22 道（15 道反向餌）。
+     本站這台是 <strong>33 道（23 道反向餌）</strong>，
+     建不了符號連結的機器跳過 9 道之後是 24 道（16 道反向餌，模擬出來的，Windows 上還沒實測）。
      「沒點名的不能被動到」在<u>正向</u>那一段，不是餌。</p>
 <pre><code>python3 mvp_menu_text.py --selftest</code></pre>
 
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1763 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1836 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -536,7 +535,7 @@ data/ 底下的 .LOC 字串表(UTF-16LE)。所以改選單文字**不必動版�
 無外部相依,Python 3.7 以上即可。
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-23'  # 這一版工具的日期
+TOOL_DATE = '2026-09-24'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -1944,6 +1943,9 @@ def selftest():
         不然「長度必須相同」那一道會先攔下來,餌就咬不到連結那一道
       · python -O 會把 assert 全部拿掉,這一段的正向檢查幾乎都是 assert ——
         真的跑下去會一路印到「全部通過」。所以 -O 直接拒絕,離開碼 2
+    2026-09-24 再加一組(兩道):上面那道 -O 守門自己的餌 ——
+      · 把 _optimize_level 換成「回傳 1」(假裝開了 -O),自我測試必須拒跑,
+        這一道算反向餌;換回原本那一支之後守門要照樣放行,這一道是它的陰性對照
 
     符號連結那幾道在建不了連結的系統(Windows 沒開開發者模式)上會跳過,
     而且**會印出來說跳過了**,不會默默當成通過。所以總道數是算出來的,
@@ -1955,12 +1957,18 @@ def selftest():
     # ⚠️ python -O 會把整支程式裡的 assert **全部拿掉**。這一段的正向檢查
     #    幾乎都是 assert,拿掉之後測試會一路跑到最後印「全部通過」——
     #    綠燈是假的。所以 -O 直接拒絕跑,不留這個假綠的窗口。
-    if sys.flags.optimize:
+    if _optimize_level():
         print('--selftest 不能在 python -O 下跑:-O 會把 assert 全部拿掉,測試會假綠')
         return 2
+    # 這一行要緊接在守門後面:_optimize_bait() 的陰性對照靠它收工(見那個函式)。
+    _opt = _optimize_bait(selftest)
     import io
     import contextlib
     total, baits = 17, 10          # 上面 docstring 說的那一段,下面才開始加
+    # 最上面那道 -O 守門自己的餌(開頭那一行 _optimize_bait() 已經量好了,這裡只記帳)
+    assert _opt[0], '假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試竟然沒有拒跑'
+    assert _opt[1], '陰性對照:沒開 -O 守門也擋,或是換回原本那一支沒換成功'
+    total += 2; baits += 1
     pairs = [(12, 'Play Now'), (627, 'Quit'), (13, 'Game Modes')]
     blob = _fake_loc(pairs)
     d = tempfile.mkdtemp()
@@ -2176,6 +2184,70 @@ def selftest():
     return 0
 
 
+# ─────────────────────────────────────────────────────────
+#  「-O 拒跑」那道守門的餌(2026-09-24 加)
+#
+#  自我測試一開頭有一道守門:在 python -O 底下拒跑(-O 會把 assert 整段拿掉,
+#  測試會變成一片假的綠燈)。那一行以前直接問 sys.flags.optimize,
+#  而 sys.flags 是唯讀的,同一個程序裡沒辦法把 -O 打開又關掉 ——
+#  所以那道守門一直沒有餌:哪天被拆掉,自我測試照樣全綠,沒有人會發現。
+#  現在守門改問 _optimize_level(),自我測試就能暫時把它換掉來下餌。
+# ─────────────────────────────────────────────────────────
+def _optimize_level():
+    """python 的 -O 等級:沒加 -O 是 0,加 -O 是 1,加 -OO 是 2。"""
+    return sys.flags.optimize
+
+
+class _OptGuardPassed(Exception):
+    """_optimize_bait() 用的記號:再叫一次自我測試時,守門放行、走到了下一行。"""
+
+
+def _optimize_bait(selftest_fn):
+    """-O 守門的餌與陰性對照。回傳 (餌被擋下來了, 陰性對照被放行了)。
+
+    自我測試在守門的下一行就叫這一支,這一支再叫兩次 selftest_fn(輸出收起來不印):
+      · 餌:先把 _optimize_level 換成「回傳 1」(假裝開了 -O)。那一次必須在守門
+        那裡就停下來 —— 結束碼 2,而且印出來的那句話提到 -O。
+      · 陰性對照:換回原本那一支之後再叫一次,守門必須放行。放行之後的下一行
+        就是這裡,所以那一次會丟出 _OptGuardPassed 立刻收工 ——
+        不會把整套自我測試再跑一遍,也不會在磁碟上留下任何東西。
+    守門被拆掉的話,餌那一次也會一路走到這裡、丟出 _OptGuardPassed,就算沒擋下來。
+    """
+    if getattr(_optimize_bait, 'busy', False):
+        raise _OptGuardPassed()
+    import contextlib
+    import io
+    global _optimize_level
+    real = _optimize_level
+
+    def once():
+        buf = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                rc = selftest_fn()
+        except SystemExit as e:
+            rc = e.code
+        except _OptGuardPassed:
+            rc = '放行'
+        except Exception as e:
+            rc = '例外 %r' % (e,)
+        return rc, buf.getvalue()
+
+    _optimize_bait.busy = True
+    try:
+        _optimize_level = lambda: 1
+        try:
+            rc, said = once()
+        finally:
+            _optimize_level = real
+        rc2, _said2 = once()
+    finally:
+        _optimize_bait.busy = False
+    bait = rc == 2 and '-O' in said
+    neg = rc2 == '放行' and _optimize_level is real and _optimize_level() == 0
+    return bait, neg
+
+
 if __name__ == '__main__':
     sys.exit(main())
 
@@ -2244,7 +2316,7 @@ if __name__ == '__main__':
         本站沒有逐一追過每條字串被誰用到。</li>
   </ul>
 
-  <!-- course-strip:begin · 這一塊由 .tools/gen_course_strip.py 從 plan.html 產生，不要手改 -->
+  <!-- course-strip:begin · 這一塊由產生器從 plan.html 產生，不要手改 -->
   <nav class="card course-strip" aria-label="這一課在課表的位置">
     <p class="card-h">📚 照課表上課的話</p>
     <p>這一課沒有排進任何一班。課表上寫的適合時機：「你想把主選單上的英文換成中文」</p>
@@ -2266,6 +2338,6 @@ if __name__ == '__main__':
        <a href="../../changelog.html">更新紀錄</a> · <a href="../../index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="../../assets/site.js?v=12835e693d" defer></script>
+<script src="../../assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>

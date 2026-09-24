@@ -20,7 +20,7 @@
 <title>本站做不到的事 — MVP Baseball 2005 教學 · toni的MVP模組補習班</title>
 <meta name="description" content="這一頁收攏站上每一課自己寫的「本站沒驗的」與未解標記。收進來的句子一個字都不是新寫的，全部是各課原本就有的，由程式收集，所以清單不會漏收哪一頁；只把邊界寫在「這一課到哪裡為止」卡片的頁，這裡放連結。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚾</text></svg>">
-<link rel="stylesheet" href="assets/site.css?v=d7b627940d">
+<link rel="stylesheet" href="assets/site.css?v=d4f94954c1">
 </head>
 <body>
 <a class="skip sr-only" href="#main">跳到主要內容</a>
@@ -47,8 +47,8 @@
   <div class="card clay">
     <p class="card-h">📊 現在的數字</p>
     <ul>
-      <li><strong>95 頁</strong>帶著明確的留白</li>
-      <li><strong>95 條</strong>「本站沒驗的」</li>
+      <li><strong>96 頁</strong>帶著明確的留白</li>
+      <li><strong>96 條</strong>「本站沒驗的」</li>
       <li><strong>199 個</strong>未解 / 未驗 / 推測的標記</li>
     </ul>
     <p class="small">這三個數字是程式數出來的，不是手寫的。每次發布都會重新數一次。</p>
@@ -60,7 +60,7 @@
     <p>所以有這一頁。<u>它不是新的內容，是同一批句子的另一種排法</u>：你想知道某一課有多可靠，就看它在這裡有沒有留白、留了什麼。</p>
   </div>
 
-  <h2>教學（39 頁）</h2>
+  <h2>教學（40 頁）</h2>
   <div class="card">
     <p class="card-h"><a href="tutorials/auto-install/index.html">一整包模組自動歸位</a></p>
     <ul>
@@ -232,7 +232,7 @@
   <div class="card">
     <p class="card-h"><a href="tutorials/shrink-big/index.html">球場超過 10MB 就當機</a> <span class="badge wip">1 個未解標記</span></p>
     <ul>
-      <li>「為什麼檔案大會害到遊戲」在這一課只是推論，這一課沒有量遊戲執行時的記憶體，只能確定清完檔案變回 5.20 MB。（中文版配大球場就跳出那一課後來量了：跳出的原因是一塊寫死的 64 MB 記憶體池，跟球場檔大小沒有關係 —— 把球場縮小並不會讓中文版不跳出。）實機測試是一個人、一台機器、一包球場，證明的是「這件事做得到」，不是「你那包一定沒問題」。</li>
+      <li>「為什麼檔案大會害到遊戲」在這一課只是推論，這一課沒有量遊戲執行時的記憶體，只能確定清完檔案變回 5.20 MB。（中文版配大球場就跳出那一課後來量了：卡住的是一塊寫死的 64 MB 記憶體池，不是「球場檔不能超過 10MB」那條線 —— 本站把一顆球場清到 8.51 MB，中文版照樣跳出。）實機測試是一個人、一台機器、一包球場，證明的是「這件事做得到」，不是「你那包一定沒問題」。</li>
     </ul>
   </div>
   <div class="card">
@@ -257,6 +257,12 @@
     <p class="card-h"><a href="tutorials/swap-face/index.html">幫球員換一張臉</a></p>
     <ul>
       <li>有球員指向不存在的臉皮時，這一頁寫的是遊戲「通常」會退回顯示通用臉，用的就是「通常」兩個字，沒有附任何實機數字；「臉沒變」時列的三個原因（改到二刀流的另一列、存檔快取、那張臉根本不存在）也是排查清單，同樣沒有數字。至於做一張遊戲裡本來沒有的新臉，那要動 models.big，不在這一頁的量測範圍，做法見〈做一張新的球員臉皮〉那一課。</li>
+    </ul>
+  </div>
+  <div class="card">
+    <p class="card-h"><a href="tutorials/swap-portrait/index.html">換球員大頭照</a></p>
+    <ul>
+      <li>這支腳本只處理 DXT3（代號 0x61）的大頭照，碰到別的格式會停下來不做 —— 而剛安裝好的原版 2,391 張圖全部是 ARGB32（代號 0x7D）128×128（本站在英文版、中文版、PK 版三份上各量一次，DXT3 都是 0 張），所以原版目前一張都換不了，ARGB32 的寫回還沒做。格式表裡的 0x7E（ARGB16_1555）是外部文件寫的，本站至今找不到樣本，無從實測。另外 FSHTOOL 說明書那條「代號加 0x80 代表這張圖本身是壓縮過的」，本站也沒有用到。</li>
     </ul>
   </div>
   <div class="card">
@@ -682,6 +688,6 @@
     <p>非營利個人教學網站 · 與 Electronic Arts、中華職棒無任何官方關聯 · <a href="legal.html">法律與版權說明</a> · <a href="changelog.html">更新紀錄</a> · <a href="index.html">回首頁</a></p>
   </footer>
 </div>
-<script src="assets/site.js?v=12835e693d" defer></script>
+<script src="assets/site.js?v=9291582c18" defer></script>
 </body>
 </html>
