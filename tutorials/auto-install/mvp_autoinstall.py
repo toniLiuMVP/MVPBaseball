@@ -122,7 +122,7 @@ qfs_compress_literal / fsh_first_image / fsh_replace_pixels 與 FSH_FORMATS
 #    各管道要不要帳號寫在那一頁。管道有變動只會改那一頁。
 # ─────────────────────────────────────────────────────────
 """
-TOOL_DATE = '2026-09-24'  # 這一版工具的日期
+TOOL_DATE = '2026-09-26'  # 這一版工具的日期
 
 import os
 import sys
@@ -1827,11 +1827,29 @@ def selftest():
       7 還原到一半 os.replace 失敗 —— 正本必須原封不動,而且不留暫存檔
       8 散裝檔寫到一半 os.replace 失敗 —— 同上
       9 封裝檔的複驗餵一段對不上的內容 —— 一定要抓出來
-     10 模組裡有讀不到的檔 —— 整批中止,一個檔都不可以被裝
+     10 模組裡有讀不到的檔 —— 整批中止,一個檔都不可以被裝,
+        而且停下來的理由要是「那個檔讀不到」。
+        權限擋不住讀取的機器這一塊做不出來 —— 例如 Windows(Python 官方文件:
+        chmod 在 Windows 上只能設唯讀屬性,其他位元一律忽略)、或是用 root 在跑;
+        會印一行「⏭ 餌 10 …略過」,最後的總結也照實說跑了幾塊(2026-09-26 改)。
+        Windows 要走得到這一塊,前面的符號連結得做得出來(見下面「還沒處理」那段)
      11 還原的目的地是符號連結 —— 要拒絕,資料夾外面那個檔不可以被動到
      12 收據的位置是符號連結 —— 要拒絕,而且不可以留下一份沒有收據的備份
      13 假裝開了 -O(把 _optimize_level 換成回傳 1)—— 自我測試必須拒跑;
         換回來之後守門要照樣放行(陰性對照,2026-09-24 加)
+
+    最後那一行的數字是**跑的當下數出來的**,不是寫死的(2026-09-26 改)。
+    上面 13 塊,每一塊要嘛有一道訊息開頭是「餌 N:」的檢查真的跑到、
+    要嘛印出「略過」;兩樣都沒有的話(有一塊安靜地沒跑)自我測試直接判失敗。
+    這個對帳只看「那一塊至少有一道本體檢查跑到」:同一塊裡某一道沒跑、
+    別道有跑,它抓不到(2026-09-26 註明)。
+
+    ⚠️ 還沒處理(2026-09-26 記):餌 1、1b、2、4、11、12 要先做出符號連結。
+    Python 官方文件寫明,Windows 沒開開發人員模式、也不是系統管理員時,
+    os.symlink 會丟 OSError(靠開發人員模式做,要 Python 3.8 以後)。這支自我測試沒有接住它,
+    會在餌 1 第一次做符號連結的地方直接印出錯誤停下來,走不到餌 10,
+    最後的總結也不會印(在 Mac 上把 os.symlink 換成會丟 OSError 的版本模擬過,
+    還沒在 Windows 上實跑)。
     """
     # -O 會把 assert 整個拿掉。本檔的 ck() 是自己 raise AssertionError,
     # 所以不吃這一刀;守門加在這裡是為了跟本站其他腳本口徑一致 ——
@@ -1847,9 +1865,31 @@ def selftest():
     import contextlib
 
     tally = [0]
+    # ── 餌有沒有真的跑到(2026-09-26 加)──────────────────────────
+    # 以前最後一行寫死「其中 13 塊是反向餌」。餌 10 在權限擋不住讀取的機器上
+    # 會整塊跳過、一個字都不印,結果那一行照樣說 13 塊 —— 實際只跑了 12 塊,
+    # 而讀者沒有任何辦法知道少了哪一塊。
+    # 現在改成數:ck() 的訊息開頭是「餌 N:」(數字後面緊接半形冒號)的,
+    # 就記下 N 這一塊跑到了;略過的那一塊由它自己登記進 skipped 並印出原因。
+    ran = set()
+    skipped = []      # [(餌的編號, 原因)]
+    # 上面說明文字列的 13 塊。只拿來對帳(每一塊要嘛跑到、要嘛說了略過),
+    # 印出來的數字一律用數到的。
+    declared = set(range(1, 14))
 
     def ck(cond, msg):
         tally[0] += 1
+        if msg.startswith('餌 '):
+            num = ''
+            for ch in msg[2:]:
+                if not ch.isdigit():
+                    break
+                num += ch
+            # 2026-09-26 收緊:數字後面要緊接「:」才算。以前只看開頭是不是「餌 N」,
+            # 「餌 11 的前置:」「餌 13 陰性對照:」「餌 1b:」這種前置、陰性對照、分支
+            # 也會把整塊記成跑到 —— 拿掉餌 11 的本體實測,照樣印「全部通過」、結束碼 0。
+            if num and msg[2 + len(num):3 + len(num)] == ':':
+                ran.add(int(num))
         if not cond:
             raise AssertionError(msg)
 
@@ -2080,11 +2120,36 @@ def selftest():
         locked = os.path.join(mod2, 'b.txt')
         open(locked, 'wb').write(b'x')
         os.chmod(locked, 0)
-        if not os.access(locked, os.R_OK):   # 用 root 跑的話 chmod 擋不住,跳過
+        # 2026-09-26:先真的打開一次,看權限擋不擋得住讀取。
+        #   以前問的是 os.access(),而安裝那一條路判斷「讀不到」靠的是 open() 失敗;
+        #   用同一個動作來量,量到的才是安裝時會遇到的那件事。
+        #   擋不住這一塊就做不出來 —— 那就明講略過,
+        #   不可以什麼都不印,讓最後那一行把沒跑的也算進去。
+        #   擋不住的機器,頭一個要想到的是 Windows:這一課的步驟以 Windows 為主,
+        #   而 Python 官方文件寫明 os.chmod 在 Windows 上只能設唯讀屬性、其他位元一律忽略,
+        #   chmod 0 只會讓檔變唯讀,照樣讀得到(依文件推論,還沒在 Windows 上實跑)。
+        #   所以印給讀者看的原因先講 Windows,root 放第二 —— 只講 root 的話,
+        #   Windows 讀者會以為自己的電腦哪裡不對勁(2026-09-26 改)。
+        try:
+            with open(locked, 'rb') as fh:
+                fh.read(1)
+            blocked = False
+        except OSError:
+            blocked = True
+        if blocked:
             before = open(notesp, 'rb').read()
             rc, out = quiet(cmd_install, game, mod2, True)
             ck(rc != 0, '餌 10:模組裡有讀不到的檔竟然照裝')
             ck(open(notesp, 'rb').read() == before, '餌 10:中止了卻還是寫了東西')
+            # 停下來的理由要是那個讀不到的檔,不是別的原因剛好也讓它失敗。
+            ck('模組資料夾裡有檔案讀不到' in out and 'b.txt' in out,
+               '餌 10:有停下來,但理由不是那個讀不到的檔:\n%s' % out)
+        else:
+            skipped.append((10, '這台機器上把權限設成 0 還是讀得到那個檔'))
+            print('  ⏭ 餌 10:這台機器上把權限設成 0 還是讀得到那個檔,'
+                  '略過 —— 這一塊沒驗到')
+            print('       常見原因:在 Windows 上跑(chmod 在 Windows 上只能設唯讀屬性,'
+                  '擋不住讀取),或是用 root 在跑。')
         os.chmod(locked, 0o600)
 
         # 正向收尾:完整的備份 + 對得上的收據,要真的還原得動,而且逐位元組回去
@@ -2095,7 +2160,23 @@ def selftest():
     finally:
         shutil.rmtree(root, ignore_errors=True)
 
-    print('自我測試:全部通過(%d 道檢查,其中 13 塊是反向餌)' % tally[0])
+    # 對帳(2026-09-26 加):說明裡列的每一塊,要嘛真的跑到、要嘛說了略過。
+    # 兩樣都沒有 = 有一塊安靜地沒跑,那正是這一段要抓的事,直接判失敗。
+    skipped_ids = set(n for n, _why in skipped)
+    silent = sorted(declared - ran - skipped_ids)
+    ck(not silent, '這幾塊餌沒有跑、也沒有說略過:%r' % (silent,))
+    extra = sorted((ran | skipped_ids) - declared)
+    ck(not extra, '跑到了說明裡沒有列的餌:%r —— 說明跟程式對不上' % (extra,))
+
+    if skipped:
+        # 略過的不算通過,所以這一行不可以寫「全部通過」。
+        print('自我測試:跑到的 %d 道檢查都通過,但反向餌 %d 塊只跑了 %d 塊'
+              '(略過的是%s,原因印在上面)'
+              % (tally[0], len(ran | skipped_ids), len(ran - skipped_ids),
+                 '、'.join('餌 %d' % n for n in sorted(skipped_ids))))
+    else:
+        print('自我測試:全部通過(%d 道檢查,其中 %d 塊是反向餌)'
+              % (tally[0], len(ran)))
     return 0
 
 

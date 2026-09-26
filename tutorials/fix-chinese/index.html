@@ -550,7 +550,10 @@ Enable Stadium Memory Quota</pre>
         2009 台灣模組那 2 份英文的少 52.8%，因為後者還會一起丟掉目錄指不到的那一大段）。<br>
         想先確認這一支在你的機器上是好的，跑 <code>python3 mvp_font_swap.py --selftest</code> ——
         它<u>不需要遊戲資料夾，也不碰任何遊戲檔</u>，自己造一份最小的封裝檔替把關正反各測一次
-        （不是每一道把關都有餌：本站把條件成立就讓它停下來的 20 道逐一拆掉再跑自我測試，會變紅的是 5 道）</li>
+        （不是每一道把關都有餌：本站把條件成立就讓它停下來的 20 道逐一拆掉再跑自我測試，會變紅的是 5 道）。
+        最後一行會寫出反向餌跑了幾組、略過幾組。會略過的情況有兩種：唯讀的資料夾擋不住寫入
+        （例如用系統管理員身分跑），或這台機器送不出 Ctrl-C 的訊號。遇到時它會當場印一行 <code>⏭</code> 說略過了哪幾組，
+        最後一行也改成「跑到的都通過」，不會把沒跑的算成跑過</li>
     <li><a href="mvp_fix_loc.py" download>mvp_fix_loc.py</a> ——
         修中文語系檔裡格式符數量對不上的字串（168 條）。
         實測：修完 0 條殘留、中文字元<u>一個都沒被改動</u>。<br>
@@ -716,7 +719,7 @@ Enable Stadium Memory Quota</pre>
      下面附的是本課自己的字型工具 <code>mvp_font_swap.py</code>，
      <strong>跟你剛才下載的那一支一個字都沒有不同</strong>（本站有自動檢查在守這件事）。</p>
   <details data-src="mvp_font_swap.py">
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（2081 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（2116 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
@@ -882,7 +885,7 @@ mvp_font_swap.py —— 一個一個換字型,找出到底是哪一個把記憶�
 
 MIT License · Copyright (c) 2026 toni · 無外部相依,Python 3.7 以上
 """
-TOOL_DATE = '2026-09-24'  # 這一版工具的日期
+TOOL_DATE = '2026-09-26'  # 這一版工具的日期
 
 import argparse
 import hashlib
@@ -2269,7 +2272,9 @@ def selftest():
          而且訊息裡要有還原指令
      12. --dedupe --apply 同上
      13. 資料夾唯讀 → 寫不進去要停,正本不可以被動、不可以留下暫存檔
-         (用 root 跑的話 chmod 擋不住,那種情況會跳過這一道而不是假裝測過)
+         (用 root 跑的話 chmod 擋不住,那種情況會印「⏭ 餌 13 …略過」,
+          最後那一行把它算成「略過」而不是「跑了」。2026-09-26 之前這裡什麼都不印,
+          最後照樣報「涵蓋 17 組」,「不是假裝測過」那半句當時不成立)
      14. 在 _NoInterrupt 區塊裡送一個真的 SIGINT → 區塊裡不可以被打斷,
          離開區塊之後才可以丟出 KeyboardInterrupt
      15. 真的跑一次 --swap --apply,SIGINT 在 os.replace 做完之後才打進來 →
@@ -2277,9 +2282,12 @@ def selftest():
      16. 同一條路,SIGINT 打在還沒開始換名的時候 → exit code 130、輸出說
          「還沒有換過任何檔案」、正本逐位元組不變、不留「正在換」的登記
          (14/15/16 在送不出 SIGINT 的環境會跳過,而且會印出來說跳過,
-          不會默默當成通過;所以最後那一行的餌數是算出來的,不是寫死的)
+          不會默默當成通過;所以最後那一行的餌數是算出來的,不是寫死的 ——
+          2026-09-26 之前起算點寫死成 13,等於不管餌 13 跑了沒都算它一份)
      17. 假裝開了 -O(把 _optimize_level 換成回傳 1)→ 自我測試必須拒跑、結束碼 2;
          換回原本那一支之後守門要照樣放行(陰性對照,2026-09-24 加)
+      ⚠️ 最後會對帳:跑了的組數 + 略過的組數,要等於這張清單有編號的組數,
+         對不上就變紅(2026-09-26 加)。所以加餌時要順手加進這張清單。
 
     ⚠️ 這一段在 python3 -O 底下**直接拒絕跑**:-O 會把 assert 全部拿掉,
        而下面的檢查幾乎都是 assert,跑下去會一路印到「全部通過」——
@@ -2302,9 +2310,14 @@ def selftest():
     _opt = _optimize_bait(selftest)
     import contextlib
     import io
+    import re
     import shutil as _shutil
 
     n_checks = 0
+    # 略過的餌記在這裡,最後一行照實報出來(2026-09-26 加)。每一筆是
+    # ([餌編號…], 為什麼略過)。會略過的餌,略過的當下印一行 ⏭,也記進這張表 ——
+    # 「注入沒成立」不可以安靜跳過:沒跑的餌被算成跑過,比沒有這一道還糟。
+    skipped = []
 
     def ck(cond, why):
         nonlocal n_checks
@@ -2445,7 +2458,10 @@ def selftest():
         # ── 餌 13:資料夾唯讀 → 正本不可以被動,也不可以留下暫存檔 ────
         # 用 root 跑的話 chmod 擋不住,所以先確認「這台機器上它真的擋得住」;
         # 擋不住就跳過,不要假裝測過。
+        # 推論(還沒實測):Windows 上 chmod 只會設「唯讀」屬性,擋不住在資料夾裡建檔,
+        # 所以在 Windows 上這一道應該也是走略過那一條。
         os.chmod(fonts, 0o500)
+        ran13 = False
         try:
             can_write = True
             try:
@@ -2468,6 +2484,11 @@ def selftest():
                 ck(open(live, 'rb').read() == before,
                    '餌 13 沒咬到:唯讀資料夾裡正本竟然被動了')
                 ck(_junk(fonts) == [], '餌 13:不該留下暫存檔:%s' % _junk(fonts))
+                ran13 = True
+            else:
+                # 2026-09-26 加:以前這裡沒有 else,擋不住時一個字都不印。
+                print('  ⏭ 餌 13:這台機器上權限擋不住(唯讀的資料夾照樣寫得進去),略過')
+                skipped.append(([13], '這台機器上唯讀的資料夾擋不住寫入'))
         finally:
             os.chmod(fonts, 0o700)
 
@@ -2588,7 +2609,9 @@ def selftest():
         # 陰性對照:把 _replace_and_register 改回「os.replace 完才登記、
         # 中間不擋訊號」,餌 15 就會變紅 —— 它會印「還沒有換過任何檔案」,
         # 而正本的 SHA-256 已經變了。
-        baits = 13
+        # 餌 1-12 沒有「略過」的分支:沒咬到就是 AssertionError,走到這一行就代表 12 組都跑過了。
+        # 餌 13 會因為權限擋不住而略過,所以看它實際有沒有跑(2026-09-26;以前這裡寫死 13)。
+        baits = 12 + (1 if ran13 else 0)
         fire = None
         if hasattr(signal, 'raise_signal'):          # Python 3.8 起才有
             fire = lambda: signal.raise_signal(signal.SIGINT)
@@ -2607,7 +2630,8 @@ def selftest():
             except (ValueError, OSError):
                 fire = None
         if fire is None:
-            print('  (這台機器送不出 SIGINT,餌 14/15/16 跳過,不當成通過)')
+            print('  ⏭ 餌 14/15/16:這台機器送不出 SIGINT,略過(不當成通過)')
+            skipped.append(([14, 15, 16], '這台機器送不出 SIGINT'))
         else:
             # ── 餌 14:區塊裡不可以被打斷,離開才可以丟 ──────────
             seq = []
@@ -2693,7 +2717,21 @@ def selftest():
         ck(_opt[1], '餌 17 的陰性對照:沒開 -O 守門也擋,或是換回原本那一支沒換成功')
         baits += 1
 
-        print('自我測試:全部通過(%d 道檢查,涵蓋 %d 組反向餌)' % (n_checks, baits))
+        # 最後一行的數字全部是算出來的:跑了幾組是 baits、略過幾組看 skipped,
+        # 兩者相加才是這支設計的餌數。有略過就不說「全部通過」(2026-09-26)。
+        n_skip = sum(len(ns) for ns, _why in skipped)
+        total = baits + n_skip
+        # 每一組餌不是跑了、就是記成略過 —— 兩者相加要等於上面說明文字列出來的組數。
+        # 對不上代表有哪一條路安靜跳過了(或加了餌卻沒記帳),那就不可以報通過。
+        listed = len(re.findall(r'^\s*\d+\.\s', selftest.__doc__ or '', re.M))
+        ck(total == listed, '餌的帳對不上:跑了 %d 組 + 略過 %d 組,說明文字列了 %d 組'
+                            % (baits, n_skip, listed))
+        head = '跑到的都通過' if n_skip else '全部通過'
+        if skipped:   # 先印略過清單,總結才真的是最後一行(2026-09-26;以前順序相反)
+            print('  略過的:%s' % '、'.join(
+                '餌 %s(%s)' % ('/'.join(str(n) for n in ns), why) for ns, why in skipped))
+        print('自我測試:%s(%d 道檢查;反向餌跑了 %d/%d 組,略過 %d 組)'
+              % (head, n_checks, baits, total, n_skip))
         return 0
     finally:
         _shutil.rmtree(root, ignore_errors=True)

@@ -146,8 +146,35 @@
   <p class="small">另外還有一個 <code>--selftest</code>，它<strong>不算在上面十四個模式裡</strong> ——
      它在最前面就被攔下來，連遊戲資料夾都不用給（所以 <code>--help</code> 的清單裡也看不到它）。
      它<u>不碰任何遊戲檔</u>，只在暫存資料夾裡自己造假資料驗自己，跑完會印
-     「自我測試:14 組全部通過」。想確認手上這一份沒被改壞，跑這一行：</p>
+     「自我測試:28 組全部通過」。想確認手上這一份沒被改壞，跑這一行：</p>
 <pre><code>python mvp_fel_toolkit.py --selftest</code></pre>
+  <p class="small">第 15 到 28 組是 2026-09-26 補的。第 15、16 組是陰性對照，證明同一份假資料上正常的指令照常跑得完、寫得進去、還原得回來
+     （第 16 組每一條會寫檔的路都<u>連改兩次</u>，證明第二次不會重做備份、<code>--restore</code> 回得到第一次動手之前）；
+     第 17 到 28 組是餌，跑的時候每組後面會印「(N 個餌)」，十二組加起來 <strong>89 個</strong>。
+     一個餌只放一個讀者常撞到的毛病
+     （路徑給錯、檔名打錯、封裝檔被截斷、字串表被截斷、備份只剩半截、寫回去之後讀出來對不上、封裝檔沒有讀取權限、資料夾不能寫、按了 Ctrl-C……），
+     要被<u>對的那一道</u>守門擋下來、印出那一道自己的那句話。這 89 個驗的嚴格程度不一樣：
+     <strong>65 個</strong>照讀者打指令的樣子跑、在寫入之前就擋下來（或是還沒動手就按了 Ctrl-C），還要證明指令裡那個資料夾每一個檔一個位元組都沒變、也沒多出檔案；
+     <strong>14 個</strong>是寫進去之後才驗得出來的（例如讀回來跟預期不一樣，或是檔案換過之後才按 Ctrl-C），要證明腳本會停下來叫你還原，
+     而且照著還原真的回到動手之前；<strong>5 個</strong>驗只讀不寫的指令遇到壞掉的資料照樣跑完、不噴一整片英文、檔案一個位元組都沒變 ——
+     <code>--entries</code> 遇到解不開的項目照樣列完、把它標出來（2 個），
+     <code>--strings</code> 遇到字串表被截斷或沒有讀取權限時照樣跑完、說它讀不到字串表，
+     <code>--where</code> 遇到座標那幾欄不是數字的行就跳過那一行、照樣列完（第 28 組的 3 個）；
+     剩下 <strong>5 個</strong>比較鬆 ——
+     命令列走不到的三道（改攝影機的行數那一道、還原最底層的兩道）直接餵那個函式、驗那一句話，
+     還原那兩道另外驗要還原的目標沒被動到；「還原之後跟備份對不上」那兩個只驗結束碼與那一句話。
+     第 27 組的 4 個另開一個 Python 從命令列真的跑，驗你真的會看到的那一層：出錯只印一句「❌ …」、不會噴一整片英文，
+     資料夾不能寫時講人話，按了 Ctrl-C 照實說有沒有動到檔案（Ctrl-C 不是真的按，是讓 Python 在那一刻丟出按下 Ctrl-C 時會丟的同一個例外）。
+     沒有讀取權限（封裝檔兩個、字串表一個）、資料夾不能寫（一個）那 4 個，在 Windows、用系統管理員身分跑、或是檔案系統不記權限時會跳過，那一組後面會照實印「跳過 N 個」和原因。
+     前 14 組是之前就有的測試，裡面也有餌（例如符號連結、還原到一半斷掉），<u>沒有算進這 89 個</u>。
+     量法（2026-09-26）：把腳本裡條件成立就讓它停下來的守門逐一拆掉再跑自我測試，
+     這個量法數得到的 64 道裡，拆掉會變紅的是 64 道（2026-09-24 量的時候是 2 道，那時還沒補這些餌）；
+     <code>try</code>／<code>except</code> 寫法的守門另外量（接到錯誤之後丟出新的錯誤、結束程式，
+     或是直接回傳一個值的那一種，例如字串表讀不到就當成沒有字串表），15 道裡拆掉會變紅的是 12 道
+     （字串表讀不到、字串表被截斷、座標那幾欄不是數字這 3 道，是補了第 28 組才會紅的）。
+     <u>這不等於每一道守門都有餌</u>：還原時驗語系檔、執行檔備份的那幾道，這支工具的兩個還原指令根本走不進去，沒有放餌，
+     拆掉照樣全綠的 6 道加 2 道都在這裡；另外 1 道要備份在讀的途中被別的程式改掉才走得到（推論，沒有實測），也沒有放餌。
+     「本身不停下來、只決定要不要做某件事」的守門這兩個量法都數不到，只挑了讀者會踩到的幾道補餌（例如「備份已經有了就不再備份」），其餘沒有逐一量。</p>
 
   <h2>前置</h2>
   <ul class="tick">
@@ -539,7 +566,7 @@ Python 版本：(python --version 印出來的那行)
   <h2 id="source">完整原始碼</h2>
   <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。不必下載也能先看過一遍。</p>
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（2523 行，零相依）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（3256 行，零相依）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -643,7 +670,7 @@ mvp_fel_toolkit.py — MVP Baseball 2005 介面版面檔萬用工具
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-24'  # 這一版工具的日期
+TOOL_DATE = '2026-09-26'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -2559,11 +2586,40 @@ def cmd_restore(bigpath):
 #  全部在一個丟得掉的暫存資料夾裡做。
 #
 #  守門要下餌 —— 只驗「正常流程會過」的測試,分不出
-#  「擋住了」跟「這段程式根本沒跑到」。下面每一組都是一正一反。
-#  ⚠️ 但這一支還不是每一道守門都有餌。2026-09-24 把自我測試以外、條件成立就讓它
-#     停下來的 64 道守門逐一拆掉(那一個 if 改成永遠不成立)再跑 --selftest,
-#     會變紅的只有 2 道(寫檔對象是符號連結、還原時暫存檔跟備份對不起來);
-#     其餘 62 道拆掉照樣全綠,例如改攝影機、切換開關寫回之後那幾道複驗。
+#  「擋住了」跟「這段程式根本沒跑到」。所以擋東西的餌旁邊都配了陰性對照
+#  (同一份假資料,正常的指令要照常跑完)。
+#  ⚠️ 2026-09-24 量過一次:把自我測試以外、條件成立就讓它停下來的 64 道守門
+#     逐一拆掉(那一個 if 改成永遠不成立)再跑 --selftest,會變紅的只有 2 道。
+#     2026-09-26 補了餌(見 _selftest_reader_baits)之後,用同一個量法再量:
+#     64 道裡拆掉會紅的是 64 道,而且紅在那一道自己的餌上(逐一看過輸出)。
+#  ⚠️ 還是不能讀成「每一道守門都有餌」。那個量法只數「if 的本體直接 raise、
+#     sys.exit 或 return 非 0」的守門,數不到下面幾種(2026-09-26 各自另外量過):
+#     · _restore_from_backup 裡呼叫 _stop(...) 停下來的 12 道。同樣逐一拆掉再跑,
+#       會紅的是 6 道(封裝檔那一段與最後的「不到一半」);另外 6 道(語系檔 LOCH、
+#       執行檔 MZ 那兩段)拆掉照樣全綠 —— 這支工具的兩個還原指令都先要求備份開頭是
+#       BIGF 或像 datafile.txt,走不進那兩段,所以沒有下餌。
+#     · try/except 的寫法:接到錯誤之後丟出新的錯誤(raise …)、sys.exit、呼叫 _stop,
+#       或是直接 return 的 —— return 什麼都算,例如字串表讀不到就回一個空的、
+#       座標欄不是數字就回 None、--entries 回一句「解不開」的說明。共 15 道
+#       (把接的錯誤換成永遠不會發生的那一種再跑):會紅的是 12 道 —— --set 的值不是數字、
+#       改攝影機時那一格本來就不是數字的護欄、--extract 的輸出資料夾不存在、封裝檔讀不到、
+#       字串表讀不到或被截斷(兩道)、版面檔某一行的座標欄不是數字、--entries 遇到壓縮資料
+#       解不開與內層封裝檔的目錄讀不出來(兩道),以及檔尾 __main__ 的三道(錯誤印成一句
+#       「❌ …」、沒有權限寫入、Ctrl-C 的收尾)。字串表那兩道與座標那一道是第 28 組的餌,
+#       補之前拆掉照樣全綠。拆掉照樣全綠的 3 道:
+#       兩道在上面說的語系檔、執行檔那兩段;一道在封裝檔那一段,前面的邊界檢查已經先擋掉,
+#       推論要備份在那一段讀的途中被別的程式改掉才會走到(沒有實測),沒有下餌。
+#       接到錯誤之後只是略過、印一行或記下來,再接著往下做的(例如 --list 把解不開的項目
+#       標成「解不開」),以及先收拾(刪暫存檔、改登記)再把同一個錯誤原樣丟出去、
+#       或讓 _stop 的結束直接穿過去的,不算在這 15 道裡。
+#     · 本身不停下來、只決定要不要做某件事的那種,量法數不到。挑了讀者會踩到的幾道
+#       另外補餌,各自單獨拆掉都會紅:「備份已經有了就不再備份」(開關、改攝影機各一道,
+#       第 16 組每條路連改兩次)、開關與改攝影機動手之前的四道符號連結檢查(第 25 組)、
+#       Ctrl-C 收尾時「已經換過了」與「沒動到」兩段(第 27 組)。這一類其餘的沒有逐一量。
+#     · Ctrl-C 收尾裡「中斷的那一刻正在替換」那一段沒有餌:換名跟登記被 _NoInterrupt
+#       包在一起,正常情況走不到那裡(見那一段的註解)。
+#     · 沒有讀取權限(封裝檔兩個、字串表一個)、資料夾不能寫(一個)那 4 個餌,在 Windows、
+#       系統管理員身分、或不記權限的檔案系統上會跳過,那一組後面照實印「跳過 N 個」和原因。
 # ─────────────────────────────────────────────────────────
 def selftest():
     """回傳 0 = 全過。任何一條不成立就丟 AssertionError,結束碼非 0。
@@ -2775,10 +2831,714 @@ def selftest():
     finally:
         shutil.rmtree(d, ignore_errors=True)
 
+    # ── 三、讀者最容易撞到的那些守門,一道一道下餌(2026-09-26 加)──────
+    # 內容太長,放在下一個函式裡;見那裡的說明。
+    _selftest_reader_baits(ok)
+
     print('自我測試:%d 組全部通過' % len(passed))
     for i, w in enumerate(passed, 1):
         print('  %d. %s' % (i, w))
     return 0
+
+
+def _selftest_reader_baits(ok):
+    """讀者最容易撞到的那些守門,一道一道下餌(2026-09-26 加)。
+
+    為什麼要有這一段:2026-09-24 把這支腳本自我測試以外的 64 道守門逐一拆掉
+    (條件改成永遠不成立)再跑 --selftest,會變紅的只有 2 道。路徑給錯、檔名打錯、
+    封裝檔被截斷、備份是半截的、寫回去之後複驗對不上……這些讀者真的會撞到的情況,
+    守門都在,但沒有任何一條測試證明它們擋得住 —— 哪天被改壞了也不會有人知道。
+
+    做法:在暫存資料夾裡造一個假的遊戲資料夾(一個封裝檔裝一個版面檔、一份總設定檔、
+    一份字串表),然後**照讀者打指令的樣子**跑 main(),一次只放一個毛病進去。
+    (命令列走不到的兩處 —— 最底層的還原檢查、改攝影機的行數那一道 —— 直接餵那個函式。
+     解壓函式那幾道走得到:版面檔那幾條路會把解不開的項目跳過(--list 標成「解不開」),
+     總設定檔那條路不會,所以那一組從 --cameras 下餌。
+     2026-09-26 訂正:原本這裡把解壓函式也算成走不到。
+     檔尾 __main__ 那幾道 —— 錯誤印成一句「❌ …」、沒有權限寫入、Ctrl-C 的收尾 ——
+     run() 也走不到,那幾個餌另開一個 python 從命令列真的跑,見 cli。2026-09-26 加。)
+    擋在寫入之前的餌(refuse)同時驗三件事:
+      (a) 印出來的是**那一道**守門自己的那句話 —— 只看「有擋下來」不夠:
+          後面常常還有別道守門,拆掉這一道之後換別道擋下來,只看結束碼照樣是綠的,
+          等於沒有替這一道下到餌;
+      (b) 結束碼是預期的那一個(多數是 1;參數寫錯的那幾種是 2);
+      (c) 遊戲資料夾裡每一個檔一個位元組都沒變,也沒有多出任何檔(備份、暫存檔)。
+    只驗 (b)(c) 會把「程式一啟動就死、檔案當然沒被動」讀成「擋下來了」,
+    所以一開頭先跑陰性對照:同一個假資料夾,正常的指令要照常跑完、寫得進去、還原得回來。
+
+    「寫進去之後的複驗」那幾道比較特別:正常情況下它們不會亮,要亮得先讓寫入出錯。
+    那幾個餌暫時把寫檔的函式換成「寫歪一點」的版本(多一個位元組、目錄少一項、
+    內容差一個字……),驗的是複驗抓得到、訊息叫你還原、照著還原真的回得去。
+
+    ⚠️ 不是每一道守門都有餌,拿不到的寫在 selftest() 上方那段說明裡。
+    """
+    import contextlib
+    import io
+    import subprocess
+
+    # 假的版面檔:兩個畫面、一個可開關的 TX、一個已經關掉的 RT、一個沒有開關欄的 VR。
+    FEL = ('SC:HUD,1,0,0,0,640,480\r\n'
+           '  GR:BOX,1,0,0,0,640,480\r\n'
+           '    TX:SPEED,1,0,10,20,30,40,font.ffn,5,0\r\n'
+           '    RT:BAR,0,0,1,2,3,4\r\n'
+           '  VR:78\r\n'
+           'SC:MENU,1,0,0,0,640,480\r\n'
+           '  TX:TITLE,1,0,5,5,100,20,font.ffn,6,0\r\n'
+           'END:\r\n').encode('latin-1')
+    # 假的總設定檔:兩張欄位名稱表(打擊、守備),照真的那樣各管它後面那一段。
+    # BattingView3 到 6 各自帶一個毛病,給攝影機那一組餌用:
+    #   3 = X 那一格裝的是字串 · 4 = 少了 FOV 那一欄 · 5 = FOV 後面多一個空白
+    #   6 = FOV 那一欄出現兩次
+    DF = ('0x1 3&lt;Settings&gt;;1 a;2 b;3 c\n'
+          '0x10 7 0;1 X;2 Y;3 Z;4 Label;5 FOV;6 Pitch;7 Heading\n'
+          '0x11 7&lt;BattingView1&gt;;1 1.0;2 2.0;3 3.0;4 X#Y#Z;5 30.0;6 0.0;7 0.0\n'
+          '0x12 7&lt;BattingView2&gt;;1 4.0;2 5.0;3 6.0;4 X#Y#Z;5 35.0;6 0.0;7 0.0\n'
+          '0x13 7&lt;BattingView3&gt;;1 X#Y#Z;2 5.0;3 6.0;4 X#Y#Z;5 35.0;6 0.0;7 0.0\n'
+          '0x14 6&lt;BattingView4&gt;;1 4.0;2 5.0;3 6.0;4 X#Y#Z;6 0.0;7 0.0\n'
+          '0x15 7&lt;BattingView5&gt;;1 4.0;2 5.0;3 6.0;4 X#Y#Z;5 30.0 ;6 0.0;7 0.0\n'
+          '0x16 8&lt;BattingView6&gt;;1 4.0;2 5.0;3 6.0;4 X#Y#Z;5 30.0;5 30.0;6 0.0;7 0.0\n'
+          '0x20 6 0;1 OffsetX;2 OffsetY;3 OffsetZ;4 Label;5 FOV;6 Roll\n'
+          '0x21 6&lt;FieldingView1&gt;;1 0.00;2 3.00;3 0.00;4 OffsetX#OffsetY#OffsetZ;5 40.0;6 0.0\n'
+          '0x30 2&lt;Other&gt;;1 MARK;2 z\n').encode('latin-1')
+    IG = os.path.join('data', 'frontend', 'ingame.big')
+    DFB = os.path.join('data', 'datafile', 'datafile.big')
+    DFT = os.path.join('data', 'datafile', 'datafile.txt')
+    TOGGLE = ['--toggle', 'fes_test.fel', 'SPEED', 'off', '--apply']
+
+    def cam(where, name, sets):
+        return ['--big', where, '--camera', name, '--set', sets, '--apply']
+
+    def big(entries, order='&lt;'):
+        """造一個格式合法的封裝檔:16 位元組檔頭、目錄(位移與長度都是大端)、資料。"""
+        toc_len = sum(8 + len(n) + 1 for n, _ in entries)
+        off, toc, body = 16 + toc_len, b'', b''
+        for n, p in entries:
+            toc += struct.pack('&gt;II', off, len(p)) + n.encode('latin-1') + b'\x00'
+            body += p
+            off += len(p)
+        return (b'BIGF' + struct.pack(order + 'I', off)
+                + struct.pack('&gt;II', len(entries), 16 + toc_len) + toc + body)
+
+    def loc(strings):
+        """造一個最小的字串表(LOCH → LOCI 索引 → LOCL 文字),給 --strings 用。"""
+        sids = sorted(strings)
+        texts = [strings[s].encode('utf-16-le') + b'\x00\x00' for s in sids]
+        loci = (b'LOCI' + struct.pack('&lt;II', 12 + 4 * len(sids), len(sids))
+                + b''.join(struct.pack('&lt;I', (i &lt;&lt; 16) | s) for i, s in enumerate(sids)))
+        offs, pos = [], 16 + 4 * len(sids)
+        for t in texts:
+            offs.append(pos)
+            pos += len(t)
+        locl = (b'LOCL' + struct.pack('&lt;I', pos) + b'\x00' * 4 + struct.pack('&lt;I', len(sids))
+                + b''.join(struct.pack('&lt;I', o) for o in offs) + b''.join(texts))
+        return b'LOCH' + b'\x00' * 16 + loci + locl
+
+    def put(path, data):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, 'wb') as f:
+            f.write(data)
+
+    def size(root, rel):
+        return os.path.getsize(os.path.join(root, rel))
+
+    d = tempfile.mkdtemp(prefix='fel_selftest_')
+    made = [0]
+
+    def game(datafile='big', order='&lt;', ingame=None):
+        """一個假的遊戲資料夾。datafile:'big' 放 datafile.big、'loose' 放散裝的 datafile.txt。"""
+        made[0] += 1
+        root = os.path.join(d, 'game%02d' % made[0])
+        put(os.path.join(root, IG), ingame if ingame is not None else big(
+            [('other.bin', b'NOTAFEL!' * 4), ('fes_test.fel', qfs_compress_literal(FEL))], order))
+        put(os.path.join(root, 'data', 'FEENG.LOC'), loc({5: 'SPEED!', 6: 'TITLE!'}))
+        os.makedirs(os.path.join(root, 'data', 'datafile'))
+        if datafile == 'big':
+            put(os.path.join(root, DFB),
+                big([('other.bin', b'x' * 8), ('datafile.txt', qfs_compress_literal(DF))]))
+        elif datafile == 'loose':
+            put(os.path.join(root, DFT), DF)
+        return root
+
+    def run(*argv):
+        """照讀者在命令列打的樣子跑一次 main()。回傳 (結束碼, 印出來的全部文字)。
+
+        結束碼照檔尾 __main__ 那一段對應:DataError 印「❌ 訊息」、結束碼 1;
+        SystemExit('訊息')(_restore_from_backup 走這個出口)結束碼 1;argparse 是 2。
+        其他例外不接 —— 那代表程式當掉,就讓自我測試跟著紅。
+        """
+        old, buf = sys.argv, io.StringIO()
+        sys.argv = ['mvp_fel_toolkit.py'] + list(argv)
+        try:
+            with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
+                try:
+                    rc = main()
+                except DataError as e:
+                    print('\n❌ %s' % e)
+                    rc = 1
+                except SystemExit as e:
+                    rc = 0 if e.code is None else (e.code if isinstance(e.code, int) else 1)
+                    print('' if isinstance(e.code, int) or e.code is None else e.code)
+        finally:
+            sys.argv = old
+        return rc, buf.getvalue()
+
+    def snap(root):
+        """資料夾底下每一個檔(含隱藏的暫存檔)的內容。拿來證明沒動到、也沒多出東西。"""
+        out = {}
+        for dp, _dn, fns in os.walk(root):
+            for fn in fns:
+                with open(os.path.join(dp, fn), 'rb') as f:
+                    out[os.path.relpath(os.path.join(dp, fn), root)] = f.read()
+        return out
+
+    def accept(root, argv, says):
+        """陰性對照:這一條要照常跑完。"""
+        rc, out = run(root, *argv)
+        assert rc == 0 and says in out, \
+            '陰性對照「%s」沒有照常跑完(結束碼 %r),後面的餌都不算數:\n%s' % (' '.join(argv), rc, out)
+        return out
+
+    def cli(*argv, head=None):
+        """從命令列真的跑一次(另開一個 python 跑這支腳本)。回傳 (結束碼, 印出來的全部文字)。
+
+        2026-09-26 加。run() 是直接叫 main(),例外由 run() 自己接 —— 檔尾 __main__
+        那一段(DataError 印成一句「❌ …」、PermissionError 講人話、Ctrl-C 的收尾)它走不到,
+        拆掉那幾道 run() 也不會知道。這一支才是讀者真的看到的那一層。
+        head:放在參數前面、取代「這支腳本的路徑」的那幾個(Ctrl-C 那組用 -c 包一層)。
+        """
+        env = dict(os.environ, PYTHONIOENCODING='utf-8')       # 輸出一律 UTF-8,不看這台的語系
+        r = subprocess.run([sys.executable, '-B'] + (head or [os.path.abspath(__file__)]) + list(argv),
+                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                           stdin=subprocess.DEVNULL, env=env, timeout=120)
+        return r.returncode, r.stdout.decode('utf-8', 'replace')
+
+    @contextlib.contextmanager
+    def chmodded(path, mode):
+        """暫時把 path 的權限改成 mode,離開時一定改回來(不改回來,暫存資料夾會刪不掉)。"""
+        keep = os.stat(path).st_mode &amp; 0o7777
+        os.chmod(path, mode)
+        try:
+            yield
+        finally:
+            os.chmod(path, keep)
+
+    def refuse(root, argv, says, rc_want=1, lock=None, runner=None):
+        """餌:要被那一道守門擋下來 —— 那一句話、那個結束碼、而且一個位元組都沒動。
+
+        lock=(路徑, 權限):跑的那一段時間把那個檔或資料夾的權限改掉(2026-09-26 加)。
+        runner=cli:從命令列真的跑,不是直接叫 main()。
+        """
+        before = snap(root)
+        with chmodded(*lock) if lock else contextlib.nullcontext():
+            rc, out = (runner or run)(root, *argv)
+        assert rc == rc_want, '「%s」結束碼應該是 %d,實際是 %r:\n%s' % (' '.join(argv), rc_want, rc, out)
+        assert says in out, '「%s」應該印出「%s」,實際印的是:\n%s' % (' '.join(argv), says, out)
+        assert 'Traceback' not in out, '「%s」噴出了一整片英文的錯誤訊息:\n%s' % (' '.join(argv), out)
+        assert snap(root) == before, '「%s」擋下來了,卻動到了遊戲資料夾裡的檔(或多留了檔)' % ' '.join(argv)
+
+    def lists(root, argv, says, lock=None):
+        """餌(不該停的):遇到壞掉的項目照樣做完、把它標出來,一個位元組都沒動(2026-09-26 加)。
+
+        lock=(路徑, 權限):跟 refuse() 一樣,只在跑的那一段改權限;前後兩次拍照都在外面,
+        不然權限設成 0 的那個檔,拍照的時候自己就讀不到了。
+        """
+        before = snap(root)
+        with chmodded(*lock) if lock else contextlib.nullcontext():
+            out = accept(root, argv, says)
+        assert 'Traceback' not in out, '「%s」噴出了一整片英文的錯誤訊息:\n%s' % (' '.join(argv), out)
+        assert snap(root) == before, '「%s」是唯讀的,卻動到了遊戲資料夾裡的檔' % ' '.join(argv)
+        return out
+
+    def perms_bite(kind):
+        """這台機器上權限擋不擋得住(2026-09-26 加)。kind='read':權限設成 0 的檔還打不打得開;
+        'write':設成唯讀的資料夾裡還能不能開新檔。
+
+        Windows 的 chmod 只管唯讀旗標、系統管理員(root)什麼都打得開、有些檔案系統不記權限
+        (推論:例如 exFAT 格式的隨身碟)—— 這些情況下權限的餌放不下去,
+        硬放的話它會「照常跑完」,那是這台機器的性質,不是守門壞了。所以先試,擋不住就跳過並照實印出來。
+        """
+        if os.name == 'nt':
+            return False
+        p = os.path.join(d, 'perm_probe_' + kind)
+        if kind == 'read':
+            put(p, b'x')
+            with chmodded(p, 0):
+                try:
+                    open(p, 'rb').close()
+                except OSError:
+                    return True
+            return False
+        os.mkdir(p)
+        with chmodded(p, 0o555):
+            try:
+                open(os.path.join(p, 'x'), 'wb').close()
+            except OSError:
+                return True
+        return False
+
+    def caught(root, argv, says, undo):
+        """餌(寫入之後的複驗):寫歪了要被抓到、叫你還原,而且照著還原真的回得去。"""
+        before = snap(root)
+        rc, out = run(root, *argv)
+        assert rc == 1 and says in out, \
+            '「%s」寫歪了,複驗應該印「%s」並以結束碼 1 停下來,實際(%r):\n%s' % (' '.join(argv), says, rc, out)
+        assert undo[-1] in out, '「%s」抓到了,卻沒有叫你跑 %s' % (' '.join(argv), undo[-1])
+        rc2, out2 = run(root, *undo)
+        after = snap(root)
+        assert rc2 == 0 and all(after.get(k) == v for k, v in before.items()), \
+            '照著訊息跑 %s 之後,沒有回到動手之前(結束碼 %r):\n%s' % (undo[-1], rc2, out2)
+        extra = sorted(set(after) - set(before))
+        assert len(extra) == 1 and extra[0].endswith('bak'), '還原之後除了備份檔還多了:%s' % extra
+
+    @contextlib.contextmanager
+    def swapped(name, fake):
+        """暫時把這支腳本裡的某個函式換掉(寫歪、算錯),離開時一定換回來。"""
+        g = globals()
+        real = g[name]
+        g[name] = fake
+        try:
+            yield real
+        finally:
+            g[name] = real
+
+    def writer(mangle):
+        """一個「寫歪一點」的寫檔函式:把要寫的內容先經過 mangle 再真的寫下去。"""
+        real = _atomic_write_bytes
+        return lambda path, data: real(path, mangle(bytes(data)))
+
+    def repack(b, name, blob):
+        """把 blob 接到檔尾、讓目錄裡 name 那一項指過去,檔頭的總大小照原本的位元組順序改。"""
+        field = [x[1] for x in list_entries(b) if x[0] == name][0]
+        out = bytearray(b + blob)
+        struct.pack_into('&gt;II', out, field, len(b), len(blob))
+        struct.pack_into(size_field_order(b) + 'I', out, 4, len(out))
+        return bytes(out)
+
+    def rewrite(name, old, new):
+        """寫歪的一種:name 那一項的內容被換掉一小段,其餘(目錄、檔頭)都一致。"""
+        def mangle(b):
+            _n, _f, off, n = [x for x in list_entries(b) if x[0] == name][0]
+            text = qfs_decompress(b[off:off + n])
+            assert old in text, '餌沒有布置成功:%s 裡找不到 %r' % (name, old)
+            return repack(b, name, qfs_compress_literal(text.replace(old, new, 1)))
+        return mangle
+
+    def also(edit):
+        """算錯的一種:改攝影機時順手多改了別的地方(換掉 _apply_sets 用)。"""
+        real = _apply_sets
+        return lambda text, name, sets: (lambda r: (edit(r[0]), r[1]))(real(text, name, sets))
+
+    count = [0]
+
+    def group(what, skipped=None):
+        """一組餌跑完:記下這一組實際跑了幾個,歸零再開下一組。
+
+        skipped=(個數, 原因):這台機器放不下去而跳過的餌(2026-09-26 加)。
+        跳過的不算進「N 個餌」,而且照實印出來 —— 不可以讓它看起來像通過。
+        """
+        note = ['%d 個餌' % count[0]] if count[0] else []
+        if skipped and skipped[0]:
+            note.append('跳過 %d 個:%s' % skipped)
+        ok('%s(%s)' % (what, '、'.join(note)) if note else what)
+        count[0] = 0
+
+    def bait(fn, *a, **k):
+        r = fn(*a, **k)
+        count[0] += 1
+        return r
+
+    try:
+        # ── 陰性對照一:不動遊戲檔的模式都跑得起來,遊戲資料夾一個位元組都沒變 ──
+        # 沒有這一條,下面每一個「擋下來、沒動到」都可能只是這個假資料夾根本讀不動。
+        g0 = game()
+        before = snap(g0)
+        outp = os.path.join(d, 'extracted.txt')
+        for argv, says in (
+                (['--list'], 'fes_test.fel'),
+                (['--entries'], '封裝檔內共 2 個項目'),
+                (['--bigs'], '合計 1 個封裝檔'),
+                (['--find', 'SPEED'], '找到 1 個元素'),
+                (['--show', 'fes_test.fel', '--screen', 'HUD'], '畫面 HUD'),
+                (['--strings', 'fes_test.fel'], 'SPEED!'),
+                (['--where', 'fes_test.fel'], '共 2 個'),
+                (['--extract', 'fes_test.fel', outp], '已存成'),
+                (['--big', DFB, '--cameras'], '這個檔裡有 7 個攝影機'),
+                (['--big', DFB, '--camera', 'BattingView1'], '可改的欄位'),
+                (['--big', DFB, '--camera', 'BattingView1', '--set', 'FOV=31.5'], '以上只是預覽'),
+                (TOGGLE[:-1], '以上只是預覽')):
+            accept(g0, argv, says)
+        assert snap(g0) == before, '唯讀模式或沒加 --apply 的預覽動到了遊戲資料夾'
+        assert open(outp, 'rb').read() == FEL, '--extract 存出來的不是那個版面檔'
+        group('陰性對照:假遊戲資料夾上十二條不動遊戲檔的指令照常跑完,遊戲資料夾一個位元組都沒變')
+
+        # ── 陰性對照二:會寫檔的三條路都走得通,還原也回得去 ───────────────
+        # 2026-09-26 改:每一條路都連改兩次。檔頭說「之後再改幾次都保留最早那一份,
+        # 所以 --restore 永遠回到你動手之前」—— 只改一次的話,拆掉「備份已存在就不再備份」
+        # 那一道,這一組照樣是綠的(實測開關那一條就是這樣):第二次 --apply 會拿
+        # 「改過一次」的檔去蓋掉備份,--restore 只回得到改過一次的樣子,而且還原時照樣印
+        # 「位元組完全一致:✅ 是」—— 它比的是備份,不是動手之前。所以第二次之後直接驗備份。
+        for order in ('&lt;', '&gt;'):                    # 檔頭大小欄小端、大端各一次
+            g1 = game(order=order)
+            orig = snap(g1)
+            accept(g1, TOGGLE, '✅ 複驗通過')
+            assert snap(g1)[IG] != orig[IG], '說寫入成功,檔案卻沒變'
+            accept(g1, ['--toggle', 'fes_test.fel', 'TITLE', 'off', '--apply'], '保留最早那一份')
+            assert snap(g1)[IG + '.feltoolbak'] == orig[IG], '開關改第二次之後,備份已經不是動手之前那一份'
+            accept(g1, ['--restore'], '位元組完全一致:✅ 是')
+            assert snap(g1)[IG] == orig[IG], '還原之後跟動手之前不一樣'
+        g2 = game()
+        orig = snap(g2)
+        accept(g2, cam(DFB, 'BattingView1', 'FOV=31.5'), '✅ 複驗通過')
+        accept(g2, cam(DFB, 'BattingView2', 'FOV=36.5'), '保留最早那一份')
+        assert snap(g2)[DFB + '.datafilebak'] == orig[DFB], '總設定檔(封裝版)改第二次之後,備份已經不是動手之前那一份'
+        accept(g2, ['--big', DFB, '--restore-datafile'], '相同 ✅')
+        assert snap(g2)[DFB] == orig[DFB], '總設定檔(封裝版)還原之後跟動手之前不一樣'
+        g3 = game('loose')
+        orig = snap(g3)
+        accept(g3, cam(DFT, 'BattingView1', 'FOV=31.5'), '讀回來的內容與預期相同 ✅')
+        accept(g3, cam(DFT, 'FieldingView1', 'OffsetX=1.5'), '保留最早那一份')
+        assert snap(g3)[DFT + '.datafilebak'] == orig[DFT], '總設定檔(散裝版)改第二次之後,備份已經不是動手之前那一份'
+        accept(g3, ['--big', DFT, '--restore-datafile'], '相同 ✅')
+        assert snap(g3)[DFT] == orig[DFT], '總設定檔(散裝版)還原之後跟動手之前不一樣'
+        group('陰性對照:開關(小端、大端)、改攝影機(封裝版、散裝版)各連改兩次,'
+              '第二次不重做備份,還原回得到第一次動手之前')
+
+        # ── 路徑給錯:第一個參數不是遊戲資料夾 ──────────────────────────
+        notgame = os.path.join(d, 'not_a_game')
+        os.mkdir(notgame)
+        bait(refuse, notgame, ['--list'], '請確認第一個參數是遊戲資料夾', 2)
+        bait(refuse, notgame, ['--bigs'], '第一個參數是不是給錯資料夾了')
+        group('路徑給錯:不是遊戲資料夾就停下來講清楚')
+
+        # ── 封裝檔本身壞掉或被截斷。開關那幾個加了 --apply,證明連寫都不會寫 ──
+        bait(refuse, game(ingame=b'SHPI' + b'\x00' * 60), TOGGLE, '這不是 EA 封裝檔')
+        bait(refuse, game(ingame=b'BIGF' + struct.pack('&lt;I', 16) + struct.pack('&gt;II', 0, 16)),
+             TOGGLE, '目錄項目數異常')
+        bait(refuse, game(ingame=big([('other.bin', b'NOTAFEL!' * 4)])), ['--list'], '裡沒有任何版面檔')
+        # 目錄說有 2 項,檔案在第 1 項之後就結束了
+        stub = struct.pack('&gt;II', 2, 30) + struct.pack('&gt;II', 0, 16) + b'a.fel\x00'
+        bait(refuse, game(ingame=b'BIGF' + struct.pack('&lt;I', 30) + stub), ['--list'], '目錄在第 2 項處被截斷')
+        # 第 1 項的名字沒有結束符
+        stub = struct.pack('&gt;II', 1, 29) + struct.pack('&gt;II', 0, 16) + b'a.fel'
+        bait(refuse, game(ingame=b'BIGF' + struct.pack('&lt;I', 29) + stub), ['--list'], '的名稱沒有結束符')
+        # 資料區被截掉最後 10 個位元組(版面檔那一項正好在最後面)
+        whole = big([('other.bin', b'NOTAFEL!' * 4), ('fes_test.fel', qfs_compress_literal(FEL))])
+        bait(refuse, game(ingame=whole[:-10]), TOGGLE, '第 2 項的資料範圍超出檔案結尾')
+        group('封裝檔不是 BIGF、目錄壞掉、被截斷、裡面沒有版面檔:都停下來,加了 --apply 的也不寫')
+
+        # ── 壓縮資料壞掉(總設定檔裡那一項)────────────────────────────
+        # 2026-09-26 改:原本直接餵解壓函式,說明寫「命令列走不到」—— 那句不成立。
+        # 版面檔那條路(fel_texts)會把解不開的項目跳過,那幾道在那裡不出聲;
+        # 總設定檔那條路(datafile_text)沒有接住,讀者照樣撞得到。所以照讀者的打法跑:
+        # datafile.big 裡 datafile.txt 那一項放壞掉的壓縮資料,打 --cameras。
+        for blob, says in (
+                (b'\x11\xfb\x00\x00', 'QFS 檔頭不完整'),             # 旗標最低位 1:檔頭要 10 個位元組
+                (b'\x10\xfb\x00', 'QFS 檔頭不完整'),                 # 旗標最低位 0:檔頭要 5 個位元組
+                (b'\x11\xfb' + b'\x00' * 4 + struct.pack('&gt;I', MAX_UNCOMPRESSED + 1), '宣稱解壓尺寸異常'),
+                (bytes([0x10, 0xfb, 0, 0, 3, 0x01, 0x00, 0x41, 0xfc]), '超過檔頭宣稱'),   # 宣稱 3 個,吐出 4 個
+                (bytes([0x10, 0xfb, 0, 0, 5, 0x02, 0x02, 0x41, 0x42, 0xfc]), '反向參照越界')):  # 往回 3 格,只有 2 格
+            gq = game(None)
+            put(os.path.join(gq, DFB), big([('other.bin', b'x' * 8), ('datafile.txt', blob)]))
+            bait(refuse, gq, ['--big', DFB, '--cameras'], says)
+        # 2026-09-26 加:--entries 是「先看看裡面有什麼」,遇到解不開的項目不可以整個停掉,
+        # 要照樣列完、把那一項標出來。兩種壞法各一個:壓縮資料本身壞掉、
+        # 解得開但裡面那一層封裝檔的目錄壞掉。拆掉接住它們的那兩道,--entries 會在那一項當場中止。
+        inner = b'BIGF' + struct.pack('&lt;I', 30) + struct.pack('&gt;II', 2, 30) + struct.pack('&gt;II', 0, 16) + b'a.fel\x00'
+        for name, blob, says in (('broken.qfs', b'\x10\xfb\x00\x00', 'QFS(解不開:QFS 檔頭不完整'),
+                                 ('inner.big', qfs_compress_literal(inner), 'QFS → BIGF(目錄讀不出來)')):
+            bait(lists, game(ingame=big([('other.bin', b'NOTAFEL!' * 4), (name, blob)])), ['--entries'], says)
+        group('壓縮資料壞掉:總設定檔裡那一項解不開就停下來(檔頭不完整、宣稱太大、吐得比宣稱多、往回抄越界);'
+              '--entries 遇到解不開的項目照樣列完,把它標出來')
+
+        # ── 名字打錯(版面檔、畫面、元素、on/off)─────────────────────────
+        g = game()
+        keep = os.path.join(g, 'keep.txt')
+        put(keep, b'mine')
+        for argv, says in (
+                (['--show', 'fes_nosuch.fel'], '封裝檔裡沒有 fes_nosuch.fel'),
+                (['--show', 'fes_test.fel', '--screen', 'NOPE'], '裡沒有畫面「NOPE」'),
+                (['--where', 'fes_nosuch.fel'], '封裝檔裡沒有 fes_nosuch.fel'),
+                (['--strings', 'fes_nosuch.fel'], '封裝檔裡沒有 fes_nosuch.fel'),
+                (['--extract', 'fes_nosuch.fel', os.path.join(g, 'out.txt')], '封裝檔裡沒有 fes_nosuch.fel'),
+                (['--extract', 'fes_test.fel', keep], '已經存在,換一個檔名'),
+                (['--extract', 'fes_test.fel', os.path.join(g, 'no_such_dir', 'out.txt')], '寫不出'),
+                (['--toggle', 'fes_nosuch.fel', 'SPEED', 'off', '--apply'], '封裝檔裡沒有 fes_nosuch.fel'),
+                (['--toggle', 'fes_test.fel', 'SPEEDO', 'off', '--apply'], '找不到可開關的元素「SPEEDO」'),
+                (['--toggle', 'fes_test.fel', 'HUD', 'off', '--apply'], '找不到可開關的元素「HUD」')):
+            bait(refuse, g, argv, says)
+        bait(refuse, g, ['--toggle', 'fes_test.fel', 'SPEED', 'of', '--apply'], '第三個參數要是 on 或 off', 2)
+        group('名字打錯:版面檔、畫面、元素、on/off,輸出檔已存在或資料夾不存在,都停下來而且不寫')
+
+        # ── 改攝影機:名字、欄位、值不對 ─────────────────────────────────
+        bait(refuse, g, ['--cameras'], '這個封裝檔裡沒有 datafile.txt')        # 忘了加 --big
+        bait(refuse, g, cam(DFB, 'BattingVeiw1', 'FOV=31'), '找不到攝影機「BattingVeiw1」。先用 --cameras')
+        bait(refuse, g, ['--big', DFB, '--camera', 'View1'], '找不到攝影機「View1」。你是不是要找')
+        gl = game('loose')
+        for sets in ('FOV=nan', 'FOV=inf', 'FOV=1e400', 'FOV=1_0'):
+            bait(refuse, gl, cam(DFT, 'BattingView1', sets), '不能是 nan / inf')
+        bait(refuse, gl, cam(DFT, 'BattingView1', 'FOV=abc'), '的值要是數字')
+        for name, sets, says in (
+                ('BattingView1', 'Label=1', '不在可改清單裡'),
+                ('FieldingView1', 'X=5', '沒有「X」這一欄'),                    # 守備視角沒有絕對座標
+                ('BattingView4', 'FOV=31', '這個攝影機沒有 FOV 這一欄'),
+                ('BattingView3', 'X=5', '不是數字 —— 不動它'),
+                ('BattingView6', 'FOV=31', '出現 2 次'),
+                ('BattingView5', 'FOV=31', '跟先前讀到的「30.0」不一致')):
+            bait(refuse, gl, cam(DFT, name, sets), says)
+        bait(refuse, gl, cam(DFT, 'BattingView1', 'FOV31'), '要寫成「欄位=值」', 2)
+        # 行數守門從命令列走不到(參數會先被去掉頭尾空白),直接餵:值的尾巴帶一個換行
+        try:
+            _apply_sets(DF.decode('latin-1'), 'BattingView1', [('FOV', '31\n')])
+        except DataError as e:
+            assert '行數改變了' in str(e), '值裡夾了換行,擋是擋了,說的卻是「%s」' % e
+        else:
+            raise AssertionError('值裡夾了換行,改完行數變了卻沒有被擋下來')
+        count[0] += 1
+        gc = game(None)
+        put(os.path.join(gc, DFT), b'0x11 3&lt;BattingView1&gt;;1 1.0;2 2.0;3 3.0\n0x10 3 0;1 X;2 Y;3 Z\n')
+        bait(refuse, gc, ['--big', DFT, '--cameras'], '前面找不到任何欄位名稱表')
+        gc = game(None)
+        put(os.path.join(gc, DFT), b'0x1 3&lt;Settings&gt;;1 a;2 b;3 c\n0x30 2&lt;Other&gt;;1 MARK;2 z\n')
+        bait(refuse, gc, ['--big', DFT, '--cameras'], '這個檔裡找不到任何攝影機')
+        group('改攝影機:名字打錯、欄位不能改、值不是數字或是 nan/inf、格子本來不是數字,都不寫')
+
+        # ── 寫進去之後的複驗(開關):讓寫入出錯,看它抓不抓得到 ──────────
+        with swapped('_atomic_write_bytes', writer(lambda b: b + b'\x00')):
+            bait(caught, game(), TOGGLE, '兩種位元組順序都對不上', ['--restore'])
+        with swapped('_atomic_write_bytes', writer(lambda b: b[:4] + struct.pack('&lt;I', len(b)) + b[8:])):
+            bait(caught, game(order='&gt;'), TOGGLE, '寫成了 little-endian,原檔是 big-endian', ['--restore'])
+        with swapped('_atomic_write_bytes',
+                     writer(lambda b: b[:8] + struct.pack('&gt;I', struct.unpack('&gt;I', b[8:12])[0] - 1) + b[12:])):
+            bait(caught, game(), TOGGLE, '寫入後項目數變了', ['--restore'])
+        with swapped('_atomic_write_bytes', writer(lambda b: repack(b, 'fes_test.fel', b'\x10\xfb\x00'))):
+            bait(caught, game(), TOGGLE, '寫入後讀不回 fes_test.fel', ['--restore'])
+        with swapped('_atomic_write_bytes', writer(rewrite('fes_test.fel', b'BAR,0', b'BAR,1'))):
+            bait(caught, game(), TOGGLE, '寫回的內容與預期不符', ['--restore'])
+        with swapped('set_visibility', lambda raw_line, parts, value: raw_line):   # 算錯:其實沒改
+            bait(caught, game(), TOGGLE, '行沒套用成功', ['--restore'])
+        with swapped('set_visibility', lambda raw_line, parts, value: raw_line + '\r\n  XX:EXTRA,1'):
+            bait(refuse, game(), TOGGLE, '行數改變了')                           # 這一道在備份之前
+        group('開關寫進去之後的複驗:大小、位元組順序、項目數、讀不回、內容、沒套用、行數')
+
+        # ── 寫進去之後的複驗(改攝影機)─────────────────────────────────
+        undo_b = ['--big', DFB, '--restore-datafile']
+        set_b = cam(DFB, 'BattingView1', 'FOV=31.5')
+        with swapped('_atomic_write_bytes', writer(lambda b: b + b'\x00')):
+            bait(caught, game(), set_b, '對不上,請立刻 --restore-datafile', undo_b)
+        with swapped('_atomic_write_bytes',
+                     writer(lambda b: b[:8] + struct.pack('&gt;I', struct.unpack('&gt;I', b[8:12])[0] - 1) + b[12:])):
+            bait(caught, game(), set_b, '寫入後項目數變了', undo_b)
+        with swapped('_atomic_write_bytes', writer(rewrite('datafile.txt', b';1 MARK', b';1 MARX'))):
+            bait(caught, game(), set_b, '讀回來的內容跟預期不符', undo_b)
+        with swapped('_apply_sets', also(lambda t: t.replace('&lt;BattingView2&gt;', '&lt;BattingView9&gt;'))):
+            bait(caught, game(), set_b, '寫入後攝影機數量變了', undo_b)
+        with swapped('_apply_sets', also(lambda t: t.replace('&lt;BattingView2&gt;;1 4.0', '&lt;BattingView2&gt;;1 4.5'))):
+            bait(caught, game(), set_b, '動到的攝影機不是只有', undo_b)
+        with swapped('_apply_sets', also(lambda t: t.replace('&lt;BattingView1&gt;;1 1.0', '&lt;BattingView1&gt;;1 1.5'))):
+            bait(caught, game(), set_b, '改動的欄位數不對', undo_b)
+        with swapped('_atomic_write_bytes', writer(lambda b: b + b'0x31 2&lt;Extra&gt;;1 1;2 2\n')):
+            bait(caught, game('loose'), cam(DFT, 'BattingView1', 'FOV=31.5'), '讀回來的內容跟預期不符',
+                 ['--big', DFT, '--restore-datafile'])
+        group('改攝影機寫進去之後的複驗:大小、項目數、內容、攝影機數量、多改了別台或別格,加上散裝版的讀回比對')
+
+        # ── 還原:備份不存在、不對、半截 ─────────────────────────────────
+        bait(refuse, game(), ['--restore'], '找不到備份 ingame.big.feltoolbak')
+        g = game()
+        put(os.path.join(g, IG + '.feltoolbak'), b'J' * size(g, IG))       # 一樣大、但不是封裝檔
+        bait(refuse, g, ['--restore'], '這個備份不是本工具建立的')
+        g = game()
+        accept(g, TOGGLE, '✅ 複驗通過')
+        put(os.path.join(g, IG), b'J' * size(g, IG))                        # 遊戲檔本身已經不是封裝檔
+        bait(refuse, g, ['--restore'], '要還原的目標開頭不是 BIGF')
+        g = game()
+        accept(g, TOGGLE, '✅ 複驗通過')
+        with open(os.path.join(g, IG + '.feltoolbak'), 'r+b') as f:
+            f.truncate(size(g, IG + '.feltoolbak') - 20)                    # 備份被截掉最後 20 個位元組
+        bait(refuse, g, ['--restore'], '檔頭說它應該是')
+        # 檔頭的總大小寫得比實際小(打包器沒更新那一欄)的備份,改走目錄那一條驗。
+        # 先證明完整的這種備份還原得回去 —— 一律拒絕的話就是「改得進去、還原不回來」。
+        stale = bytearray(big([('other.bin', b'NOTAFEL!' * 4), ('fes_test.fel', qfs_compress_literal(FEL))]))
+        struct.pack_into('&lt;I', stale, 4, 16)
+        g = game()
+        put(os.path.join(g, IG + '.feltoolbak'), bytes(stale))
+        accept(g, ['--restore'], '位元組完全一致:✅ 是')
+        head16 = b'BIGF' + struct.pack('&lt;I', 16)
+        for bak, says in (
+                (bytes(stale[:-10]), '的資料指到'),                                  # 資料區被截掉
+                (head16 + struct.pack('&gt;II', 0, 16) + b'\x00' * 16, '目錄說有 0 個項目'),
+                (head16 + struct.pack('&gt;II', 2, 30) + struct.pack('&gt;II', 0, 16) + b'a.fel\x00',
+                 '封裝檔的目錄在第 2 項處被截斷'),
+                (head16 + struct.pack('&gt;II', 1, 29) + struct.pack('&gt;II', 0, 16) + b'a.fel',
+                 '封裝檔第 1 項的名稱沒有結束符')):
+            g = game()
+            put(os.path.join(g, IG + '.feltoolbak'), bak)
+            bait(refuse, g, ['--restore'], says)
+        g = game()
+        accept(g, TOGGLE, '✅ 複驗通過')
+        with swapped('_restore_from_backup', lambda bak, dst: None):         # 還原「做了」卻沒寫進去
+            rc, out = run(g, '--restore')
+        assert rc == 1 and '還原後的內容跟備份不一樣' in out, \
+            '還原之後內容跟備份不一樣,卻沒有以結束碼 1 停下來(%r):\n%s' % (rc, out)
+        count[0] += 1
+        bait(refuse, game(), ['--big', DFB, '--restore-datafile'], '找不到備份 datafile.big.datafilebak')
+        g = game()
+        put(os.path.join(g, DFB + '.datafilebak'), b'J' * size(g, DFB))
+        bait(refuse, g, ['--big', DFB, '--restore-datafile'], '備份檔開頭不是 BIGF')
+        for bak, says in (
+                (b'PK\x03\x04 not a datafile\n', '看起來不像 datafile.txt'),
+                (DF[:-5], '結尾不是換行'),                                   # 截在最後一行的中間
+                (DF + b'garbage\n', '最後一行不是一筆完整的記錄'),
+                (b'\n'.join(DF.split(b'\n', 2)[:2]) + b'\n', '不到一半')):      # 只剩前兩行
+            g = game('loose')
+            put(os.path.join(g, DFT + '.datafilebak'), bak)
+            bait(refuse, g, ['--big', DFT, '--restore-datafile'], says)
+        g = game('loose')
+        accept(g, cam(DFT, 'BattingView1', 'FOV=31.5'), '讀回來的內容與預期相同 ✅')
+        with swapped('_restore_from_backup', lambda bak, dst: None):
+            rc, out = run(g, '--big', DFT, '--restore-datafile')
+        assert rc == 1 and '還原後內容跟備份不一樣' in out, \
+            '總設定檔還原之後跟備份不一樣,卻沒有以結束碼 1 停下來(%r):\n%s' % (rc, out)
+        count[0] += 1
+        # 最底層的兩道(找不到備份、0 bytes)命令列走不到 —— 前面那幾道會先擋 —— 直接餵
+        tgt = os.path.join(d, 'restore_target.bin')
+        put(tgt, b'keep me')
+        empty = os.path.join(d, 'empty.bak')
+        put(empty, b'')
+        # (「備份是 0 bytes」要整句比:拆掉這一道,下面那道「不到一半」也會擋,
+        #   而它的訊息寫的是「備份只有 0 bytes」—— 只比「0 bytes」會把它當成這一道。)
+        for bak, says in ((os.path.join(d, 'missing.bak'), '找不到備份'), (empty, '備份是 0 bytes')):
+            try:
+                _restore_from_backup(bak, tgt)
+            except SystemExit as e:
+                assert says in str(e.code), '壞備份被擋了,但說的是「%s」' % e.code
+            else:
+                raise AssertionError('%s 應該被擋下來' % bak)
+            assert open(tgt, 'rb').read() == b'keep me', '擋下來了卻動到了要還原的目標'
+            count[0] += 1
+        group('還原:備份不存在、不是本工具做的、半截、目標不是封裝檔、還原後對不上')
+
+        # ── 以下三組是 2026-09-26 加的 ─────────────────────────────────────
+        # ── 遊戲檔或備份檔是符號連結:開關、改攝影機兩條路各自那兩道 ─────────
+        # 底下的寫檔函式自己也會擋連結,所以拆掉這兩條路上的那幾道,多半換成別道擋下來
+        # (印的是「要備份的來源檔是一個符號連結」)—— 只看結束碼會是綠的,要比那一句話。
+        # 備份檔那一道更要緊:拆掉的話,連結指到的東西會被當成「已經有的備份」,
+        # 遊戲檔照寫,而那份「備份」根本不是動手之前的樣子。
+        far = os.path.join(d, 'far_away')          # 連結指過去的地方,在遊戲資料夾外面
+        os.mkdir(far)
+        for target, argv in ((IG, TOGGLE), (DFB, cam(DFB, 'BattingView1', 'FOV=31.5'))):
+            g = game()
+            real = os.path.join(far, 'real_%d' % made[0])
+            os.rename(os.path.join(g, target), real)
+            os.symlink(real, os.path.join(g, target))
+            before_far = snap(far)
+            bait(refuse, g, argv, '要修改的遊戲檔是一個符號連結')
+            assert snap(far) == before_far, '擋下來了,卻動到了連結指過去的那個檔'
+        for target, bak, argv in ((IG, '.feltoolbak', TOGGLE),
+                                  (DFT, '.datafilebak', cam(DFT, 'BattingView1', 'FOV=31.5'))):
+            g = game('loose' if target == DFT else 'big')
+            decoy = os.path.join(far, 'decoy_%d' % made[0])
+            put(decoy, b'this is not a backup')
+            os.symlink(decoy, os.path.join(g, target + bak))
+            before_far = snap(far)
+            bait(refuse, g, argv, '備份檔是一個符號連結')
+            assert snap(far) == before_far, '擋下來了,卻動到了連結指過去的那個檔'
+        group('遊戲檔或備份檔是符號連結:開關、改攝影機都在動手之前停下來,連結指到的檔一個位元組都沒動')
+
+        # ── 封裝檔讀不到(沒有讀取權限)───────────────────────────────────
+        # 讀檔那一道把「讀不到」接成一句中文;拆掉它,run() 會接不住那個例外,
+        # 這一組就紅在那裡。權限擋不住的機器上跳過(見 perms_bite)。
+        if perms_bite('read'):
+            for argv in (['--list'], TOGGLE):
+                g = game()
+                bait(refuse, g, argv, '讀不到', lock=(os.path.join(g, IG), 0))
+            skip = None
+        else:
+            skip = (2, '在 Windows、用系統管理員身分跑、或檔案系統不記權限時,讀取權限的餌放不下去')
+        group('封裝檔讀不到(沒有讀取權限):停下來講清楚,加了 --apply 的也不寫', skip)
+
+        # ── 從命令列真的跑一次:檔尾 __main__ 那三道(DataError、PermissionError、Ctrl-C)──
+        # 讀者看到的是這一層。DataError 那一道拆掉的話,錯誤會變成一整片英文(Traceback);
+        # PermissionError 那一道是「資料夾不能寫」時講人話 —— 遊戲裝在 C:\Program Files
+        # 這種受保護的資料夾時,--apply 做備份就會撞上(Windows 那一面本站還沒實測,
+        # 這裡在 macOS/Linux 用「資料夾設成唯讀」讓同一個例外出現)。
+        skips = []
+        bait(refuse, game(ingame=b'SHPI' + b'\x00' * 60), ['--list'], '\n❌ 檔頭前四碼不是 BIGF,這不是 EA 封裝檔',
+             runner=cli)
+        if perms_bite('write'):
+            g = game()
+            bait(refuse, g, TOGGLE, '❌ 沒有權限寫入', runner=cli,
+                 lock=(os.path.join(g, 'data', 'frontend'), 0o555))
+        else:
+            skips.append('在 Windows、用系統管理員身分跑、或檔案系統不記權限時,寫入權限的餌放不下去')
+        # 按 Ctrl-C:收尾那一道要照實說動到了沒有,結束碼 130。
+        # 不送真的訊號 —— Windows 不能這樣送,而且時機抓不準(2026-09-26 試過用具名管道卡住再送,
+        # 連跑 150 次有 14 次訊號沒生效,那種餌自己就是假的紅燈)。Ctrl-C 在 Python 裡就是
+        # 「跑到哪,就在哪丟出 KeyboardInterrupt」,所以另開一個 python,讓它在指定的那一刻
+        # 丟出來,其他照讀者的打法跑到底。兩個時間點各一個:
+        #   · 還沒動手(第一次讀封裝檔)→ 要說「遊戲檔一個位元組都沒有被動到」
+        #   · 已經換過了(寫完之後、複驗要重讀的那一刻)→ 要說換過了、叫你 --restore,
+        #     絕對不可以說沒動到;照著 --restore 要回得到動手之前
+        ctrl_c = ('import builtins, os, runpy, sys\n'
+                  'when, real_open, real_replace, done = sys.argv[1], builtins.open, os.replace, []\n'
+                  'def fake_open(p, *a, **k):\n'
+                  '    if os.path.basename(str(p)) == "ingame.big" and (when == "first" or done):\n'
+                  '        raise KeyboardInterrupt\n'
+                  '    return real_open(p, *a, **k)\n'
+                  'def fake_replace(src, dst, *a, **k):\n'
+                  '    real_replace(src, dst, *a, **k)\n'
+                  '    if os.path.basename(str(dst)) == "ingame.big":\n'
+                  '        done.append(dst)\n'
+                  'builtins.open, os.replace = fake_open, fake_replace\n'
+                  'sys.argv = sys.argv[2:]\n'
+                  'runpy.run_path(sys.argv[0], run_name="__main__")\n')
+        for when, argv in (('first', ['--list']), ('replaced', TOGGLE)):
+            g = game()
+            before = snap(g)
+            rc, out = cli(g, *argv, head=['-c', ctrl_c, when, os.path.abspath(__file__)])
+            assert rc == 130 and '已中斷' in out and 'Traceback' not in out, \
+                'Ctrl-C(%s):應該印「已中斷」、以結束碼 130 停下來,實際(%r):\n%s' % (when, rc, out)
+            if when == 'first':
+                assert '遊戲檔一個位元組都沒有被動到' in out and '已經換過了' not in out, \
+                    '還沒動手就按 Ctrl-C,卻沒有照實說「沒動到」:\n%s' % out
+                assert snap(g) == before, '還沒動手就按 Ctrl-C,卻動到了遊戲資料夾裡的檔'
+            else:
+                assert '已經換過了' in out and 'ingame.big' in out and '--restore' in out, \
+                    '換過之後才按 Ctrl-C,應該說「已經換過了」並叫你 --restore:\n%s' % out
+                assert '一個位元組都沒有被動到' not in out, '檔案已經換過了,Ctrl-C 的收尾卻說沒動到:\n%s' % out
+                assert snap(g)[IG] != before[IG], '餌沒有布置成功:說換過了,檔案卻沒變'
+                accept(g, ['--restore'], '位元組完全一致:✅ 是')
+                assert snap(g)[IG] == before[IG], '照著 Ctrl-C 的訊息 --restore 之後,沒有回到動手之前'
+            count[0] += 1
+        group('從命令列真的跑一次:出錯只印一句「❌ …」、資料夾不能寫時講人話、按 Ctrl-C 照實說動到了沒有',
+              (len(skips), ';'.join(skips)))
+
+        # ── 唯讀的指令遇到壞掉的資料:照樣跑完、不噴錯誤(2026-09-26 加)──────────
+        # 這三道都是「接住錯誤、回一個預設值、接著往下做」的寫法:字串表讀不到或被截斷,
+        # 就當成沒有字串表;版面檔某一行的座標欄不是數字,就跳過那一行。
+        # 拆掉任何一道,那個錯誤會一路冒出來,--strings / --where 在讀者面前噴一整片英文;
+        # run() 不接那種錯誤,這一組就紅在那裡。
+        # (1) 字串表被截斷:LOCL 那一區的位移表只剩第一條(第 2 條的位移被截掉)
+        whole_loc = loc({5: 'SPEED!', 6: 'TITLE!'})
+        g = game()
+        put(os.path.join(g, 'data', 'FEENG.LOC'), whole_loc[:whole_loc.index(b'LOCL') + 20])
+        bait(lists, g, ['--strings', 'fes_test.fel'], '讀不到字串表')
+        # (2) 版面檔裡多一行看得見的文字,座標那四欄不是數字:--where 跳過那一行,另外兩個照列
+        odd = FEL.replace(b'END:', b'  TX:ODD,1,0,a,b,c,d,font.ffn,5,0\r\nEND:', 1)
+        g = game(ingame=big([('other.bin', b'NOTAFEL!' * 4), ('fes_test.fel', qfs_compress_literal(odd))]))
+        out = bait(lists, g, ['--where', 'fes_test.fel'], '共 2 個')
+        assert 'TX:ODD' not in out, '座標欄不是數字的那一行不該被列出來:\n%s' % out
+        # (3) 字串表沒有讀取權限。權限擋不住的機器上跳過(見 perms_bite)。
+        if perms_bite('read'):
+            g = game()
+            bait(lists, g, ['--strings', 'fes_test.fel'], '讀不到字串表',
+                 lock=(os.path.join(g, 'data', 'FEENG.LOC'), 0))
+            skip = None
+        else:
+            skip = (1, '在 Windows、用系統管理員身分跑、或檔案系統不記權限時,讀取權限的餌放不下去')
+        group('唯讀的指令遇到壞掉的資料:字串表被截斷或沒有讀取權限時 --strings 照樣跑完、說讀不到字串表;'
+              '版面檔某一行的座標不是數字時 --where 跳過那一行、照樣列完', skip)
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
 
 
 # ─────────────────────────────────────────────────────────

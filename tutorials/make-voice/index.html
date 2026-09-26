@@ -550,7 +550,7 @@
   <p>這支<strong>會改你的檔案</strong>。會動你檔案的東西，你要能在跑之前先讀完它。</p>
   <p><a href="mvp_audio.py" download>下載 mvp_audio.py</a></p>
   <details data-src="mvp_audio.py">
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1731 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（2067 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -667,7 +667,7 @@ SCHl → SCCl → 一連串 SCDl → SCEl 這種「一段接一段」的容器�
     而且寫的內容正確」。⚠️ 2026-09-04 訂正:這句話以前只在 PT 容器上成立,
     GSTR 容器根本沒寫進去,見 cmd_import 上面那段。
 """
-TOOL_DATE = '2026-09-24'  # 這一版工具的日期
+TOOL_DATE = '2026-09-26'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -1905,10 +1905,28 @@ def _interrupt_note():
 # ─────────────────────────────────────────────────────────
 #  自我測試(--selftest):不碰任何遊戲檔,全部在系統暫存資料夾裡做
 #  守門要下餌 —— 沒有反向測試的檢查,分不出「沒問題」跟「根本沒跑」。
-#  ⚠️ 但這一支還不是每一道守門都有餌。2026-09-24 把自我測試以外、條件成立就讓它
-#     停下來的 27 道守門逐一拆掉(那一個 if 改成永遠不成立)再跑 --selftest,
-#     會變紅的只有 2 道(符號連結、輸出檔名上已經有一個不是 WAV 的檔);其餘 25 道
-#     拆掉照樣全綠,例如 WAV 的聲道數、取樣率跟那一段對不上就拒絕寫入的那兩道。
+#  ⚠️ 但這一支還不是每一道守門都有餌。怎麼量:把自我測試以外的守門一次拆一道
+#     (那一個 if 改成永遠不成立,或把那一個 raise 改成不丟出去)再跑 --selftest,
+#     看會不會變紅。2026-09-24 第一次量是 27 道只有 2 道會紅(那次怎麼數到 27
+#     沒有留下紀錄;下面兩種數法重數同一份程式碼,分別數到 24 與 29)。
+#  ── 2026-09-26 補餌 ──────────────────────────────────────
+#     第十二段拼一個假的 EA 聲音檔,用讀者打的指令逐一撞上讀者最常碰到的那幾道
+#     (路徑打錯、不是聲音檔、段號打錯、輸出檔名不對、WAV 規格不對、沒加 --apply、
+#     沒有備份、備份被截斷……)。同一天重量,補餌之前 → 之後:
+#       · 拆 if(下一行就是 raise 的 if,23 道;另外一個是「有沒有打 --selftest」
+#         那個分岔,不算守門):會紅的 1 道 → 23 道
+#       · 拆 raise(29 個):會紅的 5 個 → 29 個
+#       · 上面兩種數法都數不到的(印一句話就收工、或交給輔助函式喊停的),
+#         本輪另外挑了 16 道逐一拆:會紅的 1 道 → 10 道(新紅的是路徑打錯、
+#         不是聲音檔、沒有備份、沒加 --apply、備份只做一次、封裝檔備份截斷、
+#         備份區塊接龍走不出去、備份尾巴被切掉、還原前比大小的那個條件)
+#     ⚠️ 還沒有餌的:那 16 道裡剩下的 6 道,是還原函式裡檢查語系檔(LOCH)
+#        與執行檔(MZ)的那幾道。
+#        那個函式是幾支工具共用的;照課文走,這支工具的備份是聲音檔或封裝檔,
+#        碰不到那兩種(這是推論,沒有量過)—— 所以這一輪沒補,不是補過了。
+#     ⚠️ 這個量法只量得到「拆掉會不會紅」,量不到「該有卻沒寫的守門」:
+#        例如遊戲資料夾是唯讀的,--import --apply 現在會噴一串英文(本站在 Mac 上
+#        實測過:遊戲檔一個位元組都沒動、結束碼 1),還不是一句中文。
 # ─────────────────────────────────────────────────────────
 def selftest():
     global _LIVE_REPLACED
@@ -1937,10 +1955,16 @@ def selftest():
         with open(path, 'rb') as f:
             return f.read()
 
-    def _expect(exc, fn, what):
+    # want(2026-09-26 加):那句話裡一定要有的字。只看「有沒有被擋」不夠 ——
+    # 好幾道守門是前後相連的,拆掉一道,後面那一道常常剛好也擋得下來,
+    # 餌就照樣綠,量不出被拆的是哪一道。要求「是它自己那一句」才分得出來。
+    def _expect(exc, fn, what, want=None):
         try:
             fn()
-        except exc:
+        except exc as err:
+            if want is not None and want not in str(err):
+                raise AssertionError('%s:有擋下來,但不是那一道守門的話(印的是 %r)'
+                                     % (what, str(err)))
             return
         except Exception as err:
             raise AssertionError('%s:丟出來的是 %r,不是 %s'
@@ -2016,11 +2040,27 @@ def selftest():
         real_cfo = shutil.copyfileobj
         shutil.copyfileobj = _short
         try:
-            _expect(DataError, lambda: _do_copy(bak2, live2), '還原的內容對不起來')
+            _expect(DataError, lambda: _do_copy(bak2, live2), '還原的內容對不起來',
+                    want='不一樣長')
         finally:
             shutil.copyfileobj = real_cfo
         baits += 1
         assert _get(live2) == b'NEW' * 100, '比對沒過,正本卻已經被換掉了'
+
+        # 餌(2026-09-26 加):長度一樣、內容壞掉。上面那個餌長度就不對,
+        # 「比長度」那一道先擋掉了,「逐位元組比內容」那一道從來沒被單獨驗過。
+        def _garbled(fin, fout, length=0):
+            data = fin.read()
+            fout.write(data[::-1])
+
+        shutil.copyfileobj = _garbled
+        try:
+            _expect(DataError, lambda: _do_copy(bak2, live2), '還原的內容長度對、位元組錯',
+                    want='對不起來')
+        finally:
+            shutil.copyfileobj = real_cfo
+        baits += 1
+        assert _get(live2) == b'NEW' * 100, '內容比對沒過,正本卻已經被換掉了'
 
         # 陰性對照:上面兩個餌拿掉之後,還原本身要真的會動作
         _LIVE_REPLACED = False
@@ -2043,14 +2083,38 @@ def selftest():
         d4 = _new_dir()
         live4 = _put(os.path.join(d4, 'g.dat'), b'x' * 1000)
         bak4 = _put(os.path.join(d4, 'g.dat' + BACKUP_SUFFIX), b'')
+        # 2026-09-26:要求是「0 bytes」那一道自己的話。以前只看有沒有擋,
+        # 拆掉這一道,後面「不到一半」那一道照樣擋得下 0 bytes,餌就照樣綠。
         _expect(SystemExit,
-                lambda: _restore_from_backup(bak4, live4), '0 bytes 的備份')
+                lambda: _restore_from_backup(bak4, live4), '0 bytes 的備份',
+                want='備份是 0 bytes')
         baits += 1
         _put(bak4, b'x' * 100)                          # 不到正本的一半
         _expect(SystemExit,
-                lambda: _restore_from_backup(bak4, live4), '只有正本一成的備份')
+                lambda: _restore_from_backup(bak4, live4), '只有正本一成的備份',
+                want='不到一半')
         baits += 1
         assert _get(live4) == b'x' * 1000, '壞掉的備份還是把正本蓋掉了'
+        # 餌(2026-09-26 加):備份根本不存在。會走到這裡的是寫完複驗對不起來、要自動還原
+        # 的那一條(--restore 在呼叫之前已經先擋過「沒有備份」)。2026-09-26 實測拆掉這一道:
+        # 不會噴 traceback(_verify_written 把例外接住了),但「自動還原也失敗了」括號裡
+        # 會變成英文的 [Errno 2] No such file or directory,要讀得懂英文才知道是備份不見了。
+        _expect(SystemExit,
+                lambda: _restore_from_backup(os.path.join(d4, 'nope' + BACKUP_SUFFIX), live4),
+                '備份不存在', want='找不到備份')
+        baits += 1
+        # 餌(2026-09-26 加):封裝檔(BIGF)的備份被截斷。這支工具也吃 .big
+        # (球員名字的播報語音就裝在 pnamedat.big 裡)。在 _restore_from_backup 裡
+        # (寫完複驗對不起來、自動還原走的那一條),BIGF 不套「不到一半」那條地板,
+        # 擋截斷的只有「檔頭宣告的總長度」這一道。讀者自己跑 --restore 時前面還有
+        # _audio_container_error:截斷切在聲音段裡的話,拆掉這一道也照樣擋得下(2026-09-26 實測)。
+        liveb = _put(os.path.join(d4, 'p.big'), b'L' * 100)
+        bakb = _put(os.path.join(d4, 'p.big' + BACKUP_SUFFIX),
+                    b'BIGF' + struct.pack('&lt;I', 5000) + b'\x00' * 92)
+        _expect(SystemExit, lambda: _restore_from_backup(bakb, liveb),
+                '檔頭宣告 5,000 bytes、實際只有 100 的 BIGF 備份', want='檔頭說它應該是')
+        baits += 1
+        assert _get(liveb) == b'L' * 100, '截斷的 BIGF 備份還是把正本蓋掉了'
 
         # ── 七、--export 的輸出檔名守門 ──────────────────────
         d5 = _new_dir()
@@ -2172,6 +2236,278 @@ def selftest():
         assert _get(live7) == b'NEW' * 100, '換名失敗,檔案卻被動過了'
         os.remove(tmp8)
         _LIVE_REPLACED = False
+
+        # ── 十二、讀者最常撞到的那幾道(2026-09-26 補餌)──────────
+        # 2026-09-24 量到:把守門一道一道拆掉再跑自我測試,大多數照樣全綠 ——
+        # 而沒有餌的,正好是讀者最常撞到的那幾道:路徑打錯、段號打錯、
+        # WAV 規格不對、沒加 --apply、備份被截斷。
+        # 這裡拼一個假的 EA 聲音檔(不需要遊戲檔),用讀者打的那一行指令
+        # (走 main(),跟命令列一模一樣)逐一撞上去。會被擋的那些(_refuses)都要:
+        #   · 印出**那一道守門自己**的那句中文(不是後面別道剛好也擋下來)
+        #   · 以非 0 結束
+        #   · 遊戲檔一個位元組都沒變,資料夾裡也沒有多出任何檔
+        import contextlib
+        import io
+        import random
+
+        def _groups(smp, prev, cur):
+            out = bytearray()
+            for i in range(0, len(smp), GROUP_SAMPLES):
+                h, pay, prev, cur, _e = encode_group(smp[i:i + GROUP_SAMPLES], prev, cur)
+                out.append(h)
+                out += pay
+            return bytes(out), prev, cur
+
+        def _fake_audio(blocks, nch=1, rate=None, seed=1):
+            """拼一段假的 EA 聲音(PT 容器,數字是小端)。
+            blocks 是每一塊 SCDl 各有幾組(一組 28 個取樣):
+            0 = 這一塊沒有取樣;None = 這一塊每個位置都切不出相位。"""
+            rnd = random.Random(seed)
+            state = [(0, 0)] * nch
+            total, body = 0, b''
+            for ng in blocks:
+                n = GROUP_SAMPLES if ng is None else ng * GROUP_SAMPLES
+                parts = []
+                for c in range(nch):
+                    if ng is None:                    # 每個位置的表頭都是 0xF,超出 0-3
+                        parts.append(b'\xff' * (4 + GROUP_BYTES))
+                        continue
+                    smp = [rnd.randint(-6000, 6000) for _ in range(n)]
+                    if nch == 2:                      # 立體聲:每塊開頭 4 bytes 是自己的起始狀態
+                        g = _groups(smp, 0, 0)[0]
+                    else:                             # 單聲道:狀態跨塊延續
+                        g, p0, c0 = _groups(smp, state[c][0], state[c][1])
+                        state[c] = (p0, c0)
+                    parts.append(b'\x00' * 4 + g)
+                total += n
+                if nch == 2:
+                    blk = struct.pack('&lt;III', n, 0, len(parts[0])) + parts[0] + parts[1]
+                else:
+                    blk = struct.pack('&lt;I', n) + parts[0]
+                body += b'SCDl' + struct.pack('&lt;I', 8 + len(blk)) + blk
+            tags = bytes([0x80, 1, 2, 0x82, 1, nch])
+            if rate:
+                tags += bytes([0x84, 2]) + struct.pack('&gt;H', rate)
+            tags += bytes([0x85, 4]) + struct.pack('&gt;I', total) + b'\xff'
+            hdr = b'PT\x00\x00' + tags
+            hdr += b'\x00' * (-len(hdr) % 4)
+            return (b'SCHl' + struct.pack('&lt;I', 8 + len(hdr)) + hdr
+                    + b'SCCl' + struct.pack('&lt;II', 12, len(blocks))
+                    + body + b'SCEl' + struct.pack('&lt;I', 8))
+
+        def _wav(path, chans, rate=22050, width=2):
+            # 直接用內建的 wave 寫,不經過本工具的 write_wav(那一支自己也是被測的對象)
+            with wave.open(path, 'wb') as w:
+                w.setnchannels(len(chans))
+                w.setsampwidth(width)
+                w.setframerate(rate)
+                if width == 2:
+                    w.writeframes(b''.join(struct.pack('&lt;%dh' % len(chans), *fr)
+                                           for fr in zip(*chans)))
+                else:
+                    w.writeframes(bytes(len(chans[0]) * len(chans)))
+            return path
+
+        def _main(*argv):
+            """照讀者打指令的方式跑一次 main(),回傳 (結束碼, 畫面上的字)。
+            帶一句話的 SystemExit 跟直譯器的做法一樣:那句話印出來、結束碼算 1。"""
+            buf = io.StringIO()
+            old_argv = sys.argv
+            sys.argv = ['mvp_audio.py'] + list(argv)
+            try:
+                with contextlib.redirect_stdout(buf):
+                    try:
+                        rc = main()
+                    except SystemExit as e:
+                        if isinstance(e.code, str):
+                            print(e.code)
+                            rc = 1
+                        else:
+                            rc = 0 if e.code is None else e.code
+                    except Exception as e:            # 噴 traceback 本身就是這個餌沒過
+                        rc = '例外 %r' % (e,)
+            finally:
+                sys.argv = old_argv
+            return rc, buf.getvalue()
+
+        def _refuses(what, want, argv, watch, extra_ok=()):
+            """讀者打了 argv → 必須被擋下來:畫面上有 want、結束碼非 0、
+            watch 裡每個檔一個位元組都沒變、那個資料夾沒有多出檔(extra_ok 列的除外)。"""
+            folder = os.path.dirname(watch[0])
+            before = [(p, _get(p)) for p in watch]
+            listing = sorted(os.listdir(folder))
+            rc, said = _main(*argv)
+            assert isinstance(rc, int) and rc != 0, \
+                '%s:應該以非 0 結束,結果是 %r,畫面:%r' % (what, rc, said)
+            assert want in said, '%s:畫面上沒有「%s」,印的是 %r' % (what, want, said)
+            for p, b in before:
+                assert _get(p) == b, '%s:%s 被動到了' % (what, os.path.basename(p))
+            now = sorted(x for x in os.listdir(folder) if x not in extra_ok)
+            assert now == listing, '%s:資料夾裡多了東西:%s' % (
+                what, sorted(set(now) - set(listing)))
+
+        d9 = _new_dir()
+        game = _put(os.path.join(d9, 'g.dat'), _fake_audio([2, 2]))
+        original = _get(game)
+        nsmp = 4 * GROUP_SAMPLES
+        mono = _wav(os.path.join(d9, 'mono.wav'),
+                    [[(i * 37) % 4000 - 2000 for i in range(nsmp)]])
+        mono2 = _wav(os.path.join(d9, 'mono2.wav'),
+                     [[(i * 53) % 3000 - 1500 for i in range(nsmp)]])
+        stereo = _wav(os.path.join(d9, 'stereo.wav'), [[0] * nsmp, [0] * nsmp])
+        w8k = _wav(os.path.join(d9, 'w8k.wav'), [[0] * nsmp], rate=8000)
+        w8bit = _wav(os.path.join(d9, 'w8bit.wav'), [[0] * 8], width=1)
+        notwav = _put(os.path.join(d9, 'notwav.wav'), b'this is not a WAV file at all')
+        notaudio = _put(os.path.join(d9, 'readme.txt'), b'hello, not EA audio')
+        os.mkdir(os.path.join(d9, 'folder.wav'))
+        out = os.path.join(d9, 'out.wav')
+
+        # 陰性對照先做:這個假檔要真的解得開,不然下面的餌擋下來也不算數
+        info0, ch0 = decode_segment(original, 0)
+        assert info0['skipped_blocks'] == 0 and len(ch0) == 1 and len(ch0[0]) == nsmp, \
+            '拼出來的假聲音檔解不開(陰性對照沒過,下面的餌不算數)'
+        assert _audio_container_error(game) == '', '拼出來的假聲音檔自己的結構就不完整'
+
+        # 沒加 --apply:只能預覽(規格全對的 WAV,所以擋下寫入的只有 --apply 這一關)
+        listing9 = sorted(os.listdir(d9))
+        rc, said = _main(game, '--import', '0', mono)
+        assert rc == 0 and '這是預覽' in said, '沒加 --apply 卻沒有說這是預覽:%r' % said
+        assert _get(game) == original, '沒加 --apply,遊戲檔卻被動到了'
+        assert sorted(os.listdir(d9)) == listing9, '沒加 --apply,資料夾卻多了檔(例如備份)'
+        baits += 1
+
+        # 路徑打錯、不是 EA 的聲音檔
+        _refuses('遊戲檔路徑打錯', '找不到',
+                 [os.path.join(d9, 'nope.dat'), '--info'], [game])
+        baits += 1
+        _refuses('丟了一個不是 EA 聲音的檔', '這不是 EA 的聲音檔',
+                 [notaudio, '--info'], [notaudio, game])
+        baits += 1
+        # 段號打錯
+        _refuses('段號打成字', '段號要填數字', [game, '--export', 'abc', out], [game])
+        baits += 1
+        _refuses('段號是負的', '段號不能是負數', [game, '--export', '-1', out], [game])
+        baits += 1
+        _refuses('匯出:沒有那一段', '只有 1 段,沒有第 5 段',
+                 [game, '--export', '5', out], [game])
+        baits += 1
+        _refuses('匯入:沒有那一段', '只有 1 段,沒有第 3 段',
+                 [game, '--import', '3', mono, '--apply'], [game])
+        baits += 1
+        # 匯出的輸出檔名
+        _refuses('匯出:輸出的資料夾不存在', '輸出的資料夾不存在',
+                 [game, '--export', '0', os.path.join(d9, 'no_such_dir', 'out.wav')], [game])
+        baits += 1
+        _refuses('匯出:輸出檔名換個寫法指回遊戲檔本身', '就是那個遊戲檔本身',
+                 [game, '--export', '0', os.path.join(d9, '.', 'g.dat')], [game])
+        baits += 1
+        _refuses('匯出:輸出檔名是一個資料夾', '不是一般檔案',
+                 [game, '--export', '0', os.path.join(d9, 'folder.wav')], [game])
+        baits += 1
+        empty = _put(os.path.join(d9, 'empty.dat'), _fake_audio([0]))
+        _refuses('匯出:這一段一個取樣都沒有', '這一段解不出取樣',
+                 [empty, '--export', '0', out], [empty, game])
+        baits += 1
+        # WAV 規格不對(全部加了 --apply:擋下來之前一個位元組都不可以寫)
+        _refuses('匯入:WAV 檔名打錯', '找不到這個 WAV 檔',
+                 [game, '--import', '0', os.path.join(d9, 'nope.wav'), '--apply'], [game])
+        baits += 1
+        _refuses('匯入:丟了一個不是 WAV 的檔', '讀不出',
+                 [game, '--import', '0', notwav, '--apply'], [game])
+        baits += 1
+        _refuses('匯入:8 位元的 WAV', '只吃 16 位元',
+                 [game, '--import', '0', w8bit, '--apply'], [game])
+        baits += 1
+        _refuses('匯入:聲道數不對', '這一段是 1 聲道,你的 WAV 是 2 聲道',
+                 [game, '--import', '0', stereo, '--apply'], [game])
+        baits += 1
+        game_r = _put(os.path.join(d9, 'r.dat'), _fake_audio([2, 2], rate=22050, seed=2))
+        _refuses('匯入:取樣率不對(那一段的檔頭有寫)', '這一段是 22050 Hz,你的 WAV 是 8000 Hz',
+                 [game_r, '--import', '0', w8k, '--apply'], [game_r])
+        baits += 1
+        rc, said = _main(game_r, '--import', '0', mono)       # 陰性對照:取樣率對就放行
+        assert rc == 0 and '這是預覽' in said, '取樣率相符卻被擋(陰性對照沒過):%r' % said
+        game_p = _put(os.path.join(d9, 'p.dat'), _fake_audio([2, None], seed=3))
+        _refuses('匯入:有一塊切不出相位', '切不出相位',
+                 [game_p, '--import', '0', mono, '--apply'], [game_p])
+        baits += 1
+        # 一組都沒寫進去:備份照規矩先做了(那是舊內容,無害),但遊戲檔不可以被動到
+        game_z = _put(os.path.join(d9, 'z.dat'), _fake_audio([0, 0], seed=4))
+        _refuses('匯入:一組都沒有寫進去', '一個位元組都沒有被寫進去',
+                 [game_z, '--import', '0', mono, '--apply'], [game_z],
+                 extra_ok=('z.dat' + BACKUP_SUFFIX,))
+        baits += 1
+        assert os.path.isfile(game_z + BACKUP_SUFFIX) and \
+            _get(game_z + BACKUP_SUFFIX) == _get(game_z), '寫入之前沒有先備份,或備份不是舊內容'
+
+        # 陰性對照:規格全對又加了 --apply,要真的寫進去、長度不變、留下舊內容的備份
+        rc, said = _main(game, '--import', '0', mono, '--apply')
+        assert rc == 0 and '寫好了' in said, '正常的匯入沒有成功:%r' % said
+        after1 = _get(game)
+        assert after1 != original and len(after1) == len(original), \
+            '正常的匯入沒有改到位元組,或是改了長度'
+        assert _get(game + BACKUP_SUFFIX) == original, '備份不是寫入前的內容'
+        # 餌:再匯入一次,備份必須還是**最早那一份**,不可以被第一次改過的內容蓋掉
+        rc, said = _main(game, '--import', '0', mono2, '--apply')
+        assert rc == 0 and _get(game) != after1, '第二次匯入沒有成功'
+        assert _get(game + BACKUP_SUFFIX) == original, \
+            '第二次匯入把備份換成了改過的內容 —— --restore 再也回不到原樣'
+        baits += 1
+        rc, said = _main(game, '--export', '0', out)             # 寫回去的要解得開
+        assert rc == 0, '寫回去之後匯出失敗:%r' % said
+        with wave.open(out, 'rb') as w:
+            assert (w.getnchannels(), w.getnframes()) == (1, nsmp), '寫回去之後匯出的長度不對'
+        os.remove(out)
+        rc, said = _main(game, '--restore')                     # 還原要回到原樣
+        assert rc == 0 and _get(game) == original, '--restore 沒有回到寫入前的內容:%r' % said
+
+        # 還原
+        game_n = _put(os.path.join(d9, 'n.dat'), original)
+        _refuses('還原:從來沒有備份過', '沒有找到本工具做的備份',
+                 [game_n, '--restore'], [game_n])
+        baits += 1
+        live_t = _put(os.path.join(d9, 't.dat'), _fake_audio([2, 2, 2, 2], seed=5))
+        whole = _get(live_t)
+        _put(live_t + BACKUP_SUFFIX, whole[:len(whole) * 7 // 10])   # 截成七成,過得了「一半」那條地板
+        _refuses('還原:備份的尾巴被切掉', '尾巴被切掉',
+                 [live_t, '--restore'], [live_t, live_t + BACKUP_SUFFIX])
+        baits += 1
+        live_s = _put(os.path.join(d9, 's.dat'), _fake_audio([2, 2], seed=6))
+        _put(live_s + BACKUP_SUFFIX, _fake_audio([2, 2, 2], seed=7))  # 兩邊結構都完整、卻不一樣大
+        _refuses('還原:備份與正本都完整卻不一樣大', '卻不一樣大',
+                 [live_s, '--restore'], [live_s, live_s + BACKUP_SUFFIX])
+        baits += 1
+        # 備份第一個區塊的長度欄位壞掉:檔頭讀得出來,區塊接龍卻一步都走不出去
+        bad_head = bytearray(_get(live_s))
+        bad_head[4:8] = struct.pack('&lt;I', 0x00FFFFFF)
+        _put(live_s + BACKUP_SUFFIX, bytes(bad_head))
+        _refuses('還原:備份的區塊接龍走不出去', '區塊接龍讀不出來',
+                 [live_s, '--restore'], [live_s, live_s + BACKUP_SUFFIX])
+        baits += 1
+        # 還原完的複驗:假裝還原那一步「成功了卻什麼都沒做」,一定要被抓出來
+        live_v = _put(os.path.join(d9, 'v.dat'), _fake_audio([2, 2], seed=8))
+        want_v = _put(live_v + BACKUP_SUFFIX, _fake_audio([2, 2], seed=9))
+        g = globals()
+        real_restore = g['_restore_from_backup']
+        g['_restore_from_backup'] = lambda b, d: None
+        try:
+            _refuses('還原:換完之後跟備份對不起來', '跟備份對不起來',
+                     [live_v, '--restore'], [live_v, want_v])
+        finally:
+            g['_restore_from_backup'] = real_restore
+        baits += 1
+        rc, said = _main(live_v, '--restore')                   # 陰性對照:真的還原要成功
+        assert rc == 0 and _get(live_v) == _get(want_v), '正常的還原沒有成功:%r' % said
+
+        # 兩道內部守門:讀者走正常的路碰不到(前面已經先擋了),直接叫
+        _expect(DataError, lambda: decode_group(0x40, bytes(14), 0, 0),
+                '表頭高半位元組超出 0-3', want='相位切錯了')
+        baits += 1
+        _expect(DataError, lambda: parse_header(b'RIFF' + bytes(28)),
+                '開頭不是 SCHl', want='開頭不是 SCHl')
+        baits += 1
+        _LIVE_REPLACED = False
+        _note_replacing(None)
     finally:
         for d in dirs:
             shutil.rmtree(d, ignore_errors=True)

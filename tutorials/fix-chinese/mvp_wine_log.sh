@@ -1,5 +1,5 @@
 #!/bin/bash
-# TOOL_DATE = '2026-09-24'
+# TOOL_DATE = '2026-09-26'
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -463,6 +463,9 @@ has_unmasked_user_dir() {
 # (2026-09-24 之前主流程只下 rm、不看結果,刪不掉也照樣印「已經刪掉」。)
 # 刪不掉時只印檔名,不印完整路徑:完整路徑裡就有帳號名稱,而這一段常被整段貼出去問人。
 # rm 自己的錯誤訊息也會帶著完整路徑,所以丟掉不印。
+# 主流程緊接在後面的那兩行也不印完整路徑,只提原始 log 的檔名(2026-09-26 修:以前下一行就印 $LOG
+# 的完整路徑,等於把同一個資料夾、連帶帳號名稱補回這一段)。要找檔案的話,原始 log 的完整路徑印在
+# 開頭「記錄到」與最後「log 檔(原始,含本機路徑,自己留)」那兩行;兩行裡標明要自己留的是最後那一行,開頭那一行沒有標。
 # 回傳 0 = 刪掉了(SHARE 清空、SHARE_STATE=none);
 # 回傳 1 = 刪不掉(SHARE 留著、SHARE_STATE=kept_failed)。
 # 刪不掉時不可以沿用 unverified:那一態的收尾說的是「還沒跑完複驗就被中斷了」,
@@ -537,7 +540,7 @@ run_selftest() {
     local sb marker out rc real_wine n state why
     local fakehome_real whisky_bin
     local self_abs game_real rec_ok rec_bad want mvp_wine_ok _ld
-    local ln_guard ln_run ln_start ln_done ln_share ln_create ln_ok1 ln_resid ln_created ln_discard
+    local ln_guard ln_run ln_start ln_done ln_share ln_create ln_ok1 ln_resid ln_created ln_discard ln_concl
     sb=$(mktemp -d "${TMPDIR:-/tmp}/mvp_wine_log_selftest.XXXXXX") || return 1
     echo ""
     echo "  ═══ mvp_wine_log.sh 自我測試 ═══"
@@ -1384,6 +1387,19 @@ EOF
         else
             st_ok "主流程:沒通過複驗的遮蔽版交給 discard_share 刪(第 $ln_discard 行)"
         fi
+        # discard_share 之後、「結論」之前,不可以再印原始 log 的完整路徑(2026-09-26 加):
+        # discard_share 只印檔名,下一行若又印 $LOG,帳號名稱就回到常被整段貼出去的這一段裡。
+        # 這一段 --selftest 走不到(要真的跑完遊戲),所以跟上面一樣比原始碼。
+        # 抓的是 $LOG 後面不接變數名字元、或 ${LOG 後面不接 # 的寫法;${LOG##*/}(只取檔名)不算。
+        ln_concl=$(src_line_no 'echo "  ═══ 結論 ═══"')
+        if [ -z "$ln_discard" ] || [ -z "$ln_concl" ] || [ "$ln_concl" -le "$ln_discard" ]; then
+            st_bad "主流程:找不到唯一一行 discard_share 或「結論」(或順序反了),沒辦法檢查中間有沒有印完整路徑"
+        elif sed -n "${ln_discard},${ln_concl}p" "$0" | grep -v '^[[:space:]]*#' \
+                | grep -qE '[$](LOG([^A-Za-z0-9_]|$)|[{]LOG([^#A-Za-z0-9_]|$))'; then
+            st_bad "主流程:discard_share 之後、結論之前還有一行印原始 log 的完整路徑(只該印檔名)"
+        else
+            st_ok "主流程:遮蔽版沒過的那一段只印原始 log 的檔名(第 $ln_discard 到 $ln_concl 行)"
+        fi
     fi
 
     rm -rf "$sb"
@@ -1723,8 +1739,8 @@ else
         # 刪掉、登記、照實說刪掉了沒有,都在 discard_share 裡(--selftest 的餌 18 測它)。
         discard_share
     fi
-    echo "     log 本身沒事(在 $LOG),但裡面有你的家目錄與帳號名稱,"
-    echo "     要貼出去請自己先把那些換掉。"
+    echo "     log 本身沒事(檔名 ${LOG##*/},在哪個資料夾看最下面「log 檔」那一行),"
+    echo "     但裡面有你的家目錄與帳號名稱,要貼出去請自己先把那些換掉。"
     echo ""
 fi
 

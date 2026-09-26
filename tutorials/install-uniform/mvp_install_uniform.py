@@ -94,7 +94,7 @@ mvp_install_uniform.py — 把一套球衣裝進 MVP Baseball 2005
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-24'  # 這一版工具的日期
+TOOL_DATE = '2026-09-26'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -1587,15 +1587,45 @@ def main():
 # ─────────────────────────────────────────────────────────
 #  自我測試(--selftest)
 #
-#  ⚠️ 這一段一個遊戲檔都不碰。它在系統暫存資料夾裡自己造一個最小的封裝檔,
-#     然後**故意去踩**下面那 17 個反向餌寫著的情況,看它有沒有真的擋下來。
-#  ⚠️ 這不等於每一道守門都有餌。2026-09-24 把自我測試以外、條件成立就讓這支
-#     停下來的 29 道守門逐一拆掉(那一個 if 改成永遠不成立)再跑 --selftest,
-#     單拆一道就會紅的只有 1 道(目的檔是符號連結)。其餘 28 道裡,12 道在這一課
-#     根本不會呼叫的共用函式裡(qfs_decompress、read_entry、fsh_ 開頭那兩支);
-#     有的是背後還站著另一道 —— 例如對半截的檔,_verify_same 的「長度不同」與
-#     「內容不同」單拆哪一道都不紅,兩道一起拆,反向餌 4 就紅了;但長度相同、內容不同的檔
-#     只有「內容不同」擋得到,這種情況還沒有餌。其餘幾道沒有逐一分辨是哪一種。
+#  ⚠️ 這一段一個遊戲檔都不碰。它在系統暫存資料夾裡自己造幾個最小的封裝檔,
+#     然後**故意去踩**下面那 70 個反向餌寫著的情況,看它有沒有真的擋下來。
+#  ⚠️ 量法與結果(2026-09-26 重量):把自我測試以外、「下一行是 raise」的 if
+#     逐一改成永遠不成立(一次只拆一道)再跑 --selftest,看它會不會變紅。
+#     這樣數到 28 道,28 道單拆都會紅,而且逐一看過是對準它的那個餌紅的。
+#     2026-09-24 用同一個量法時只有 1 道會紅(那時候還沒有餌 18 到 70;
+#     當時記的是 29 道,2026-09-26 在當時那個版本上重數是 28 道,差的那 1 道沒查出來)。
+#  ⚠️ 上面那個量法只數一種形狀。2026-09-26 另外用一套更寬的拆法再量一次,
+#     多數六種:下一行是 _stop(...) 的 if(還原前檢查那 9 道)、下一行印 ❌ 的 if
+#     (複驗那 3 層)、接住錯誤再改用讀者看得懂的話說出來的 except(8 處,拆法是讓它接不到)、
+#     沒有 if 包著的 raise(2 處:size_field_order 最後那一行、寫入迴圈 else 後面那一行)、
+#     呼叫 _refuse_symlink / _verify_same / 只驗不蓋的 _restore_from_backup 的那一行(9 處,
+#     拆法是拿掉那次呼叫)、_NoInterrupt 離開時補丟的 Ctrl-C(1 處)。兩套合計 60 處。
+#     補餌 47 到 67 之前,單拆還是全綠的有 22 處;補完之後剩 1 處:
+#     _stage_copy 開頭那次 _refuse_symlink。cmd_install 在備份之前已經對同一個路徑叫過
+#     一次,只有封裝檔在那兩次中間被換成連結才輪得到它,沒有替它下餌。
+#  ⚠️ 兩套量法都只數「會停下來或報失敗」的那幾種形狀。不停下來、只是換一條路走的
+#     保護(「備份已經在就不再備份」底下是 continue、「沒加 --apply 就只預覽」底下是
+#     return)兩套都數不到。所以 2026-09-26 又量了第三次:自我測試以外、if 底下那一層
+#     直接有 return / continue / break 的(return 1、2 那種已經算在第一套裡)共 16 處,
+#     一樣一次拆一處。補餌 68 之前單拆全綠 6 處,其中一處就是「沒加 --apply 就只預覽」——
+#     拆掉它,沒加 --apply 的 --install 會真的備份、改寫封裝檔、印「完成」,當時的自我測試照樣全綠。
+#     補完剩 5 處,逐一看過:qfs_decompress 開頭「不是 QFS 就原樣回傳」、size_field_order
+#     認大端序的那一行、big_entries 讀目錄讀到資料盡頭就停的兩行 —— 這 4 處是分辨格式
+#     與讀檔的分支,不是擋東西的守門;剩下 1 處是 _rename_in_message 開頭的型別檢查,
+#     它自己的註解寫著目前的程式走不到它,沒有替它下餌。
+#     其他寫法的保護(例如迴圈條件、三元運算式)沒有逐一找過,所以這不等於每一道守門都有餌。
+#  ⚠️ 叫讀者還原的那幾句話也不在任何一套量法裡(它們是 print 與訊息字串,不是 if)。
+#     2026-09-26 另外逐一拆過:換上去之後複驗沒過、換名到一半失敗的逐檔說明、
+#     main() 接住 OSError 與 Ctrl-C 之後那幾段,各自把還原指令改成「不必 --restore」
+#     或整行拿掉,餌 27、28、52 分別會紅;換名之前複驗沒過那一句多印一行還原指令,餌 26 會紅。
+#     main() 接 Ctrl-C 時「中斷時正在替換、不確定換好了沒有」那一句沒有替它下餌
+#     (那一段的註解說只有裝不上訊號處理器的機器才走得到它,這一點本站沒有另外驗)。
+#  ⚠️ 反過來,叫讀者「不必 --restore」的那幾句也逐一拆過(2026-09-26,補餌 69、70 那一次)。
+#     共拆 8 種:換名之前複驗沒過、換名到一半失敗但全部換回來了的逐檔說明、main() 接住
+#     OSError 時照登記說的那一句,各自整行拿掉或改成叫人還原;另外把 main() 照登記分兩路的
+#     那個 if 改成永遠走「封裝檔已經換過了」、把逐檔說明那個 if 改成永遠給還原指令。
+#     補餌 69、70 之前 8 種裡 6 種單拆全綠(只有換名之前複驗那一句有餌 26 守著);
+#     補完 8 種都會紅,逐一看過紅的是餌 26、69、70 裡對準它的那一個。
 # ─────────────────────────────────────────────────────────
 class _Mute(object):
     """把一段程式的 print 吃掉,只給 --selftest 用。
@@ -1645,12 +1675,135 @@ def _fake_big(items):
     return bytes(out)
 
 
+# ── 反向餌 18 到 59 與 68 到 70 共用的小工具(2026-09-26 加)─────────────
+# 為什麼要有它們:2026-09-24 把自我測試以外的守門逐一拆掉(那一個 if 改成永遠
+# 不成立)再跑 --selftest,單拆一道就會紅的只有 1 道。讀者最常撞到的那幾道
+# (路徑給錯、球衣包沒解壓、封裝檔壞了、沒有備份就按 --restore…)拆掉了也照樣全綠。
+# 下面這幾支讓餌能照「讀者在命令列打的樣子」跑一次,再驗三件事:
+# 畫面上那句中文、結束碼、檔案有沒有被動到。
+def _selftest_snap(root):
+    """把 root 底下每一個檔讀成 {相對路徑: 位元組},只給 --selftest 用。
+
+    前後各拍一次、兩份要完全相等,才算「一個位元組都沒變,也沒有多出任何檔」——
+    多出一份 .unibak 備份或留下一個 .part- 暫存檔,兩份就不相等。
+    """
+    out = {}
+    for base, dirs, files in os.walk(root):
+        dirs.sort()
+        for fn in sorted(files):
+            p = os.path.join(base, fn)
+            with open(p, 'rb') as f:
+                out[os.path.relpath(p, root)] = f.read()
+    return out
+
+
+def _selftest_game(parent, name):
+    """組一個假的遊戲資料夾(三個封裝檔各一項),回傳 (資料夾, {鍵: 封裝檔路徑})。
+
+    內容跟反向餌 12 用的那一份一樣:models.big 有 u001.fsh、uniforms.big 有 001.fsh、
+    logos.big 有 l001.fsh。只給 --selftest 用。
+    """
+    g = os.path.join(parent, name)
+    os.makedirs(os.path.join(g, 'data', 'frontend'))
+    slots = {'models': os.path.join(g, 'data', 'models.big'),
+             'uniforms': os.path.join(g, 'data', 'frontend', 'uniforms.big'),
+             'logos': os.path.join(g, 'data', 'frontend', 'logos.big')}
+    for key, item, ch in (('models', 'u001.fsh', b'M'),
+                          ('uniforms', '001.fsh', b'U'),
+                          ('logos', 'l001.fsh', b'L')):
+        with open(slots[key], 'wb') as f:
+            f.write(_fake_big([(item, b'\x10\xfb' + ch * 30)]))
+    return g, slots
+
+
+def _selftest_pack(parent, name, files):
+    """組一個假的球衣包資料夾。files 是 [(檔名, 位元組)]。只給 --selftest 用。"""
+    m = os.path.join(parent, name)
+    os.makedirs(m)
+    for fn, blob in files:
+        with open(os.path.join(m, fn), 'wb') as f:
+            f.write(blob)
+    return m
+
+
+def _selftest_run_main(argv):
+    """照讀者在命令列打的樣子跑一次 main(),回傳 (結束碼, 畫面上印的字)。只給 --selftest 用。
+
+    不直接呼叫 cmd_install 那幾支,是因為讀者看到的是 main() 印的那句
+    「停下來了:…」跟結束碼 —— 反向餌要驗的正是這兩樣。
+    main() 沒接住的例外(在讀者那裡會變成一整片 traceback)回傳成「例外 …」字串,
+    呼叫端 assert 結束碼是 2 的那一行就會紅。
+    """
+    import contextlib
+    import io
+    buf = io.StringIO()
+    old_argv = sys.argv
+    sys.argv = ['mvp_install_uniform.py'] + list(argv)
+    try:
+        with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
+            try:
+                rc = main()
+            except SystemExit as e:
+                rc = e.code
+            except Exception as e:
+                rc = '例外 %r' % (e,)
+    finally:
+        sys.argv = old_argv
+    return rc, buf.getvalue()
+
+
+def _selftest_shpi(code=0x7D, width=2, height=2, num=1, magic=b'SHPI', img_off=24):
+    """組一個只有一張圖的最小 SHPI,只給 --selftest 用。
+
+    照上面 FSH 那張格式表:'SHPI' + 總長 + 圖數(little-endian)+ 4 個字的目錄代號,
+    目錄第 0 項(4 個字的標籤 + 圖片記錄的位移)從 16 開始,圖片記錄從 24 開始,
+    像素從 24 + 16 = 40 開始。像素一律照 4 bytes/像素 填(ARGB32 的大小)。
+    """
+    rec = (bytes([code, 0, 0, 0]) + struct.pack('<HH', width, height) + b'\x00' * 8
+           + b'\x11' * (width * height * 4))
+    out = (magic + b'\x00' * 4 + struct.pack('<I', num) + b'GIMX'
+           + b'0000' + struct.pack('<I', img_off) + rec)
+    return out[:4] + struct.pack('<I', len(out)) + out[8:]
+
+
+def _selftest_loch(locl=b'LOCL', count=2):
+    """組一個最小的假語系檔(LOCH),只給 --selftest 用(反向餌 60 到 63,2026-09-26 加)。
+
+    只放還原前檢查會讀的那幾格:檔頭 +16 是字串區的位移(這裡是 32);
+    字串區開頭是 'LOCL',+12 是字串條數,+16 起每條 4 個位元組的位移
+    (相對於字串區開頭)。兩條字串,最後一條從字串區 +30 開始,整個檔 68 個位元組。
+    """
+    out = bytearray(b'LOCH' + b'\x00' * 28)
+    out[16:20] = struct.pack('<I', 32)
+    out += locl + b'\x00' * 8 + struct.pack('<I', count)
+    out += struct.pack('<II', 24, 30)
+    out += b'ABCDE\x00' + b'FGHIJ\x00'
+    return bytes(out)
+
+
+def _selftest_mz(pe=b'PE\x00\x00', nsec=1, raw_size=0x100):
+    """組一個最小的假執行檔(MZ),只給 --selftest 用(反向餌 64 到 67,2026-09-26 加)。
+
+    只放還原前檢查會讀的那幾格:DOS 檔頭 +0x3C 指到 PE 檔頭(這裡是 0x40);
+    PE 檔頭 +6 是節區數、+20 是選用檔頭長度(這裡是 0,所以節區表從 0x58 開始);
+    節區表每項 40 個位元組,+16 是資料長度、+20 是資料位移。
+    整個檔 0x200 個位元組,唯一那個節區從 0x100 開始、長 raw_size。
+    """
+    out = bytearray(0x200)
+    out[0:2] = b'MZ'
+    out[0x3C:0x40] = struct.pack('<I', 0x40)
+    out[0x40:0x44] = pe
+    out[0x46:0x48] = struct.pack('<H', nsec)
+    out[0x58 + 16:0x58 + 24] = struct.pack('<II', raw_size, 0x100)
+    return bytes(out)
+
+
 # ── 反向餌的記帳簿(2026-09-11 第四輪加)──────────────────────────
 # 為什麼要有它:課程頁面叫讀者拿畫面上那個數字去對照,對不上就「不要拿它去
-# 動遊戲檔,直接回報」。而餌 1、2、8 需要這台機器做得出符號連結,餌 10、13
-# 需要裝得上 Ctrl-C 的訊號處理器 —— 兩件事都有機器做不到:
+# 動遊戲檔,直接回報」。而餌 1、2、8(2026-09-26 起再加 56 到 59)需要這台機器
+# 做得出符號連結,餌 10、13 需要裝得上 Ctrl-C 的訊號處理器 —— 兩件事都有機器做不到:
 #   · Windows 沒開開發人員模式(也不是系統管理員)就做不出符號連結,
-#     那三個餌會整段跳過;
+#     那幾個餌會整段跳過;
 #   · 不在主執行緒時 signal.signal 裝不上,那兩個餌會整段跳過。
 # 舊版不管實際跑了幾個,結尾都印同一個寫死的數字。實測模擬這兩種機器:
 # 做不出連結時只有 10 個餌真的踩過、非主執行緒時 11 個,畫面上都還是印 13。
@@ -1698,16 +1851,18 @@ _WHY_NO_SIGNAL = '這台裝不上 Ctrl-C 的訊號處理器(要在主執行緒�
 def selftest():
     """不碰任何遊戲檔的自我測試,全部在系統暫存資料夾裡做(跑完不刪,方便自己進去看)。
 
-    重點不是「有沒有通過」,是裡面有 **17 個反向餌**:先證明「答案錯的時候它
+    重點不是「有沒有通過」,是裡面有 **70 個反向餌**:先證明「答案錯的時候它
     真的會叫」。只驗正向的測試會一路綠燈,卻在功能整個壞掉時照樣綠燈,
     那種測試比沒有更危險(這是本站 2026-08-29 那一輪的教訓)。
 
-    ⚠️ 其中 5 個有機器做不到:餌 1、2、8 要做得出符號連結(Windows 沒開
-       開發人員模式就做不出來),餌 10、13 要裝得上 Ctrl-C 的訊號處理器
+    ⚠️ 其中 9 個有機器做不到:餌 1、2、8、56、57、58、59 要做得出符號連結
+       (Windows 沒開開發人員模式就做不出來),餌 10、13 要裝得上 Ctrl-C 的訊號處理器
        (要在主執行緒)。做不到就整段跳過,**而且畫面上會講出來**——
-       所以最後那一行的數字在有些機器上會小於 17,那不是壞掉。
+       所以最後那一行的數字在有些機器上會小於 70,那不是壞掉。
+       (2026-09-26 補完餌 70 之後模擬過這兩種機器:做不出符號連結時印 63、
+        非主執行緒時印 68,底下各多一行說明跳過了哪幾個。)
 
-    17 個反向餌:
+    70 個反向餌:
       1. 目的檔是符號連結 → 要拒絕,而且連結指到的那個檔不可以被動到
       2. 固定暫存名被先佔(事先放一個 <目的檔>.part 連結指到資料夾外面)
          → 正常備份照樣要成功,而外面那個檔要原封不動
@@ -1734,6 +1889,77 @@ def selftest():
          (暫存檔還在不在),不可以問旗標而說出「還沒有動到任何檔案」
      17. 假裝開了 -O(把 _optimize_level 換成回傳 1)→ 自我測試必須拒跑、結束碼 2;
          換回原本那一支之後守門要照樣放行(陰性對照)。2026-09-24 補的
+    18 到 46 是 2026-09-26 補的,每一個只對準一道守門。18 到 28、45、46 照讀者在
+    命令列打的樣子跑 main(),驗畫面上那句中文、結束碼 2,以及遊戲檔有沒有被動到:
+    停在動手之前的那些,整個假遊戲資料夾要一個位元組都沒變(沒有多出備份或暫存檔);
+    26 只驗三個封裝檔沒變(那時候備份已經做了);27、28 是換上去之後才出事,
+    驗的是照它教的 --restore 跑一次會回到原樣。其餘的直接呼叫那一支函式,驗那句話。
+     18. 給的資料夾不是遊戲資料夾 → 要說「請確認你給的是遊戲資料夾」
+     19. 球衣包資料夾的路徑不存在 → 要說「找不到資料夾」
+     20. 球衣包裡一個 .fsh 都沒有(多半是還沒解壓縮)→ 不可以印「找到 0 個」就結束
+     21. 球衣包裡沒有一個檔裝得進去 → 不可以一路印到「完成」
+     22. 球衣包裡混了一個不是遊戲圖檔的 .fsh → 整批停下,**連備份都還沒做**
+     23. 封裝檔開頭不是 BIGF(開頭被改掉,或只剩 8 個位元組)→ 不可以照樣裝進去
+     24. 封裝檔目錄說它有 0 項 → 不可以把它當成空的而跳過,其他照裝
+     25. 從來沒裝過(沒有任何備份)就 --restore → 不可以印「已還原 0 個」
+     26. 換名之前那一輪複驗沒過 → 整批不換,並且告訴讀者不必 --restore
+         (也不可以同時印出還原指令)
+     27. 換上去之後那一輪複驗沒過 → 要印出那一整行還原指令,不可以印「完成」,
+         也不可以說「不必 --restore」;照它教的 --restore 跑一次,
+         三個封裝檔要回到動手之前(陰性對照)
+     28. 做不出硬連結的磁碟(exFAT / FAT32)上換名到一半失敗 → 逐檔說「已改 / 沒改」、
+         逐檔說明那一段與最後「封裝檔已經換過了」那一段都要給那一整行還原指令、
+         結束碼 2,不可以變成一整片 traceback,也不可以說「不必 --restore」
+         (27、28 在 2026-09-26 第三次補的時候收緊過:原本只驗畫面上有「--restore」
+          這個字,而「不必 --restore」裡也有這個字)
+     29. 備份途中少寫了 → 訊息要說出兩邊不一樣大,而不只是「內容不同」
+     30. 寫出來的長度一樣、內容不一樣 → 不可以被當成相同而換上去
+     31. 還原前檢查拿到不存在的備份 → 要說「找不到備份」(直接呼叫,--restore 碰不到)
+     32. 封裝檔不到 8 個位元組 → 要說「太小」(直接呼叫,--install 會先被餌 23 那道擋下)
+     33 到 44. 這一課不會呼叫的共用函式(給想自己改圖的人接手用的):
+         QFS 長檔頭不完整、短檔頭不完整、宣稱的解壓大小超過上限、反向參照越界、
+         解出來超過宣稱的大小;read_entry 讀不滿;不是 SHPI、SHPI 裡 0 張圖、
+         圖片記錄指到檔案外面、沒見過的格式代號、圖片寬度 0;換像素長度不同。
+         每一個都要停下來、而且說的是對的那句話。
+     45. 0 bytes 的備份 → --restore 要說「備份是 0 bytes」,不可以只被後面那道地板接住
+     46. 開頭被蓋掉(不是 BIGF)又只剩不到一半的備份 → --restore 不可以拿它蓋遊戲檔
+    47 到 67 也是 2026-09-26 補的(第二次),補的是另一套更寬的拆法才數得到的那幾處
+    (見「自我測試(--selftest)」那個分隔註解)。47 到 59 照命令列跑 main();60 到 67 直接呼叫。
+     47. 封裝檔尾巴被截掉 → --install --apply 要停在「檔頭大小欄位跟實際檔案大小對不上」,
+         而且訊息裡是 uniforms.big,不是工作複本的臨時名字
+     48. 接上去之後目錄那一項的長度不對 → 換名前複驗第一層要說「目錄說 N,應該是 M」
+     49. 接上去之後檔頭的總大小沒寫進去 → 換名前複驗第三層要擋下來,不可以印「完成」
+     50. 兩次開頭檢查中間,球衣檔被換成 PNG → 寫入迴圈裡那第二道要擋下來
+     51. 封裝檔讀不到(作業系統不讓讀)→ 要說「讀不到 <哪一個檔>」
+     52. 動手途中按 Ctrl-C → 結束碼 130;換名之前要說「還沒有動到任何檔案」,
+         換名之後要說「已經動過了」並給那一整行還原指令(照它教的還原一次要回到原樣)
+     53. 工作複本複製得不對而且沒有報錯 → 不可以在它上面動手
+     54. --restore 時一份備份好、一份壞 → 一份都不可以先還原
+     55. 連裝兩套球衣 → 第一次動手之前的備份不可以被蓋掉(--restore 要回到兩套都沒裝)
+     56 到 59. 遊戲資料夾裡有符號連結:--install 時封裝檔或備份那個名字是連結、
+         --restore 時備份或封裝檔是連結 → 都要在動任何一個檔之前停下來
+     60 到 67. 還原前檢查裡給語系檔(LOCH)與執行檔(MZ)用的 8 道:這一課的備份都是
+         封裝檔,走 --restore 碰不到,所以直接呼叫,先做格式完整的陰性對照
+    68 是 2026-09-26 第三次補的,照命令列跑 main():
+     68. 沒加 --apply 的 --install → 只印預覽、結束碼 0,整個假遊戲資料夾一個位元組都不變
+         (沒有備份、沒有暫存檔);同一行加上 --apply 要真的裝進去(陰性對照)。
+         那道守門底下是 return 不是 raise,前兩套量法都數不到,而這之前自我測試裡
+         每一次 --install 都帶著 --apply —— 補這個餌之前把它拆掉,自我測試照樣全綠。
+    69、70 是 2026-09-26 第四次補的,照命令列跑 main(),驗的是叫讀者「不必 --restore」的那幾句:
+     69. 接到工作複本時作業系統不讓寫(封裝檔唯讀最常見的樣子)→ 結束碼 2,畫面上要說
+         「你的遊戲檔一個位元組都沒有動,不必 --restore」,不可以印還原指令或
+         「封裝檔已經換過了」;三個封裝檔一個位元組都不變、不留工作複本
+     70. 換上去換到一半被拒絕(第二個封裝檔被別的程式開著)、回頭路做得出來 → 逐檔說明
+         兩行都說「沒改」並說不必還原,main() 最後那一段也照登記說不必還原,結束碼 2,
+         不可以印還原指令;三個封裝檔都回到動手之前的樣子
+         餌 15、12 走的是同一條路,但它們直接呼叫 cmd_install 而且把畫面吃掉,
+         看不到讀者拿來決定要不要還原的那幾句 —— 補這兩個餌之前,把那幾句拿掉或改成
+         叫人還原,自我測試照樣全綠。
+    ⚠️ 第 18 到 46 個為什麼要補:2026-09-24 把守門逐一拆掉再跑自我測試,
+       單拆一道就會紅的只有 1 道 —— 讀者最常撞到的那幾道拆掉了照樣全綠。
+       而且只驗「有沒有停下來」不夠:拆掉一道,後面常常還有別道接住,
+       只是說的話不對(例如餌 18,拆掉之後印的是英文的 No such file),
+       所以每一個餌都驗那句話。
     ⚠️ 第 9 個是 2026-09-05 補的,補的理由值得寫下來:前 8 個餌都在的時候,
        我把「逐位元組比對」搬到 os.replace **後面**去,自我測試照樣全綠 ——
        一個測不到「驗在換之前」的測試,等於沒有在測這件事。
@@ -2192,10 +2418,899 @@ def selftest():
     _bait_ran(15)
     _STATE.update(phase='idle', target=None, replaced=[])
 
+    # ═══ 反向餌 18 到 46(2026-09-26 補;45、46 寫在餌 31 後面)═══════════
+    # 2026-09-24 把自我測試以外、下一行是 raise 的 if 逐一改成永遠不成立再跑
+    # --selftest,單拆一道就會紅的只有 1 道。讀者最常撞到的那些 —— 路徑給錯、
+    # 球衣包還沒解壓、封裝檔壞了、沒有備份就按 --restore —— 拆掉了照樣全綠。
+    # 下面每一個餌只對準一道守門。一定驗那句中文(不是只驗「有停下來」:
+    # 拆掉一道,後面常常還有別道接住,只是說的話不對);照命令列跑的那幾個
+    # 另外驗結束碼 2 與遊戲檔有沒有被動到(各餌上面寫著驗到什麼程度)。
+    # 一律用自己造的假檔,不需要遊戲。
+    _q = b'\x10\xfb'                         # 球衣檔開頭(QFS 壓縮過的那一種)
+    _pack_ok = [('001.fsh', _q + b'X' * 90), ('l001.fsh', _q + b'Y' * 90)]
+
+    def _must_stop(what, must_say, fn, *args):
+        # 呼叫 fn(*args),它一定要丟 DataError,而且那句話裡要有 must_say。
+        # 丟別種例外(IndexError、struct.error…)就讓它直接往上冒,自我測試會紅 ——
+        # 那在讀者那裡就是一整片 traceback。
+        try:
+            fn(*args)
+        except DataError as e:
+            said = str(e)
+        else:
+            raise AssertionError('%s:竟然沒有停下來' % what)
+        assert must_say in said, '%s:停是停了,但說的不是「%s」,而是:%s' % (what, must_say, said)
+
+    def _must_exit2(what, must_say, argv):
+        # 照讀者打的指令跑一次 main():結束碼一定要是 2,畫面上一定要有 must_say。
+        rc, out = _selftest_run_main(argv)
+        assert rc == 2, '%s:結束碼應該是 2,實際是 %r。畫面上印的是:\n%s' % (what, rc, out)
+        assert must_say in out, '%s:畫面上沒有「%s」。印的是:\n%s' % (what, must_say, out)
+        return out
+
+    def _restore_cmd(g):
+        # 畫面上教讀者還原的那一整行(開頭的 python3 不算在內)。2026-09-26 加:
+        # 餌 27、28 原本只驗畫面上有沒有「--restore」這個字,而相反的指示
+        # 「不必 --restore」裡也有這個字 —— 把還原指令換成「不必 --restore」,
+        # 那兩個餌照樣過。改成驗那一整行,另外驗畫面上沒有叫人不必還原。
+        return 'mvp_install_uniform.py "%s" --restore' % g
+
+    # ── 反向餌 18:給的資料夾不是遊戲資料夾 ──
+    # 讀者最常犯的第一個錯。拆掉這道,後面讀封裝檔那一關會接住,
+    # 但印的是「讀不到 …/data/models.big:[Errno 2] No such file or directory」
+    # (2026-09-26 拆掉實測)—— 沒有告訴他「你給錯資料夾了」。
+    _notgame = os.path.join(d, 'b18_notgame')
+    os.makedirs(_notgame)
+    _pk = _selftest_pack(d, 'b18_pack', _pack_ok)
+    _must_exit2('餌 18 不是遊戲資料夾', '請確認你給的是遊戲資料夾',
+                [_notgame, '--install', _pk, '--apply'])
+    assert _selftest_snap(_notgame) == {}, '餌 18:給錯資料夾,卻在那個資料夾裡留下了東西'
+    _bait_ran(18)
+
+    # ── 反向餌 19:球衣包資料夾的路徑給錯(不存在)──
+    _g, _slots = _selftest_game(d, 'b19_game')
+    _before = _selftest_snap(_g)
+    _must_exit2('餌 19 球衣包路徑不存在', '找不到資料夾',
+                [_g, '--scan', os.path.join(d, 'b19_沒有這個資料夾')])
+    assert _selftest_snap(_g) == _before, '餌 19:遊戲資料夾被動到了'
+    _bait_ran(19)
+
+    # ── 反向餌 20:球衣包還沒解壓縮(資料夾裡一個 .fsh 都沒有)──
+    # 拆掉這道,--scan 會印「找到 0 個 .fsh」然後結束碼 0,讀者以為沒事。
+    _pk = _selftest_pack(d, 'b20_pack', [('readme.txt', b'read me'), ('jersey.png', b'\x89PNG')])
+    _must_exit2('餌 20 沒有 .fsh', '一個 .fsh 都沒有', [_g, '--scan', _pk])
+    assert _selftest_snap(_g) == _before, '餌 20:遊戲資料夾被動到了'
+    _bait_ran(20)
+
+    # ── 反向餌 21:球衣包裡沒有一個檔裝得進去 ──
+    # 拆掉這道,--install --apply 會一路走到「複驗:0 個檔全部逐位元組相符」
+    # 「完成。進遊戲看看那支球隊。」、結束碼 0 —— 什麼都沒裝卻說完成了。
+    _pk = _selftest_pack(d, 'b21_pack', [('999.fsh', _q + b'Z' * 90), ('l999.fsh', _q + b'Z' * 90),
+                                         ('shirt.fsh', _q + b'Z' * 90)])
+    _out = _must_exit2('餌 21 一個都裝不進去', '沒有一個檔裝得進去',
+                       [_g, '--install', _pk, '--apply'])
+    assert '進遊戲看看' not in _out, '餌 21:什麼都沒裝,卻印了「完成」'
+    assert _selftest_snap(_g) == _before, '餌 21:一個都裝不進去,遊戲資料夾卻被動到了(或多了備份檔)'
+    _bait_ran(21)
+
+    # ── 反向餌 22:球衣包裡混了一個不是遊戲圖檔的 .fsh ──
+    # 拆掉這道,後面寫入迴圈裡的第二道還是會擋下來,遊戲檔也還是沒動 ——
+    # 但那時候已經先做了備份,資料夾裡多出兩份 .unibak;訊息也變成「改動都還在工作複本上」。
+    # 這一道的承諾是「有一個不是就整批停下來,那時候一個位元組都還沒寫」。
+    _pk = _selftest_pack(d, 'b22_pack', [('001.fsh', _q + b'X' * 90),
+                                         ('l001.fsh', b'\x89PNG\r\n\x1a\n' + b'Y' * 90)])
+    _out = _must_exit2('餌 22 混了一個不是圖檔的', '還沒有動到任何檔案',
+                       [_g, '--install', _pk, '--apply'])
+    # ⚠️ 2026-09-26 訂正:這一行原本只驗 'l001.fsh' 有沒有出現在畫面上 —— 而停下來之前
+    #    預覽那一段已經印過「l001.fsh → logos.big」,所以錯誤訊息就算不提檔名它也照樣過
+    #    (拿掉訊息裡的檔名實測,自我測試照樣全綠)。改成只有那句錯誤訊息才會有的字串。
+    assert 'l001.fsh 的開頭既不是' in _out, '餌 22:停下來的那句話沒說出是哪一個檔不對'
+    assert _selftest_snap(_g) == _before, \
+        '餌 22:來源檔有一個不像圖檔,卻已經寫了東西(多半是先做了備份)'
+    _bait_ran(22)
+
+    # ── 反向餌 23:封裝檔的開頭不是 BIGF(被別的工具存壞,或只剩半截)──
+    # 拆掉這道,開頭改過的檔照樣被當成封裝檔讀,球衣會被接進一個不是封裝檔的檔裡。
+    _pk = _selftest_pack(d, 'b23_pack', _pack_ok)
+    for _i, (_tag, _mangle) in enumerate((('開頭被改成 BIG4', lambda b: b'BIG4' + b[4:]),
+                                          ('只剩 8 個位元組', lambda b: b[:8]))):
+        _g, _slots = _selftest_game(d, 'b23_game_%d' % _i)
+        with open(_slots['uniforms'], 'rb') as f:
+            _raw = f.read()
+        with open(_slots['uniforms'], 'wb') as f:
+            f.write(_mangle(_raw))
+        _before = _selftest_snap(_g)
+        _must_exit2('餌 23 %s' % _tag, '開頭不是 BIGF', [_g, '--install', _pk, '--apply'])
+        assert _selftest_snap(_g) == _before, '餌 23 %s:遊戲資料夾被動到了' % _tag
+    _bait_ran(23)
+
+    # ── 反向餌 24:封裝檔目錄說它有 0 項 ──
+    # 拆掉這道,那個封裝檔會被讀成「空的」,球衣包裡要進它的檔全部變成
+    # 「沒有同名項目」而被跳過,其他封裝檔照樣裝 —— 結束碼 0,讀者不會知道檔壞了。
+    _g, _slots = _selftest_game(d, 'b24_game')
+    _pk = _selftest_pack(d, 'b24_pack', _pack_ok)
+    with open(_slots['uniforms'], 'r+b') as f:
+        f.seek(8)
+        f.write(b'\x00\x00\x00\x00')
+    _before = _selftest_snap(_g)
+    _must_exit2('餌 24 目錄 0 項', '目錄項目數異常', [_g, '--install', _pk, '--apply'])
+    assert _selftest_snap(_g) == _before, '餌 24:遊戲資料夾被動到了'
+    _bait_ran(24)
+
+    # ── 反向餌 25:從來沒裝過(沒有任何備份)就按 --restore ──
+    # 拆掉這道,畫面上會印「已還原 0 個封裝檔」、結束碼 0 —— 讀者以為救回來了。
+    _g, _slots = _selftest_game(d, 'b25_game')
+    _before = _selftest_snap(_g)
+    _out = _must_exit2('餌 25 沒有備份', '都找不到備份', [_g, '--restore'])
+    assert '已還原' not in _out, '餌 25:一份備份都沒有,卻印了「已還原」'
+    assert _selftest_snap(_g) == _before, '餌 25:遊戲資料夾被動到了'
+    _bait_ran(25)
+
+    # 下面三個餌要真的走到「寫」那一步,所以各自用一份新的假遊戲資料夾。
+    def _archives(slots):
+        got = {}
+        for k, v in slots.items():
+            with open(v, 'rb') as f:
+                got[k] = f.read()
+        return got
+
+    def _no_parts(g):
+        return not [n for n in _selftest_snap(g) if '.part-' in n]
+
+    # ── 反向餌 26:換名之前那一輪複驗沒過 → 整批不換 ──
+    # 下餌:讓 append_entry 接上去之後,把工作複本最後一個位元組翻掉
+    # (模擬「寫進去了、但寫的不對、而且沒有報錯」)。
+    # 拆掉這道,壞掉的工作複本會照樣被換上去,換上去之後那一輪才抓到 ——
+    # 那時候遊戲檔已經變了,讀者得自己 --restore。
+    _g, _slots = _selftest_game(d, 'b26_game')
+    _pk = _selftest_pack(d, 'b26_pack', _pack_ok)
+    _arch0 = _archives(_slots)
+    _real_append26 = append_entry
+    _hit26 = {'n': 0}
+
+    def _append_then_rot(path, field_pos, blob):
+        r = _real_append26(path, field_pos, blob)
+        with open(path, 'r+b') as f:
+            f.seek(-1, os.SEEK_END)
+            last = f.read(1)
+            f.seek(-1, os.SEEK_END)
+            f.write(bytes([last[0] ^ 0xFF]))
+        _hit26['n'] += 1
+        return r
+
+    globals()['append_entry'] = _append_then_rot
+    try:
+        _out = _must_exit2('餌 26 換名前複驗沒過', '工作複本複驗', [_g, '--install', _pk, '--apply'])
+    finally:
+        globals()['append_entry'] = _real_append26
+    assert _hit26['n'] >= 1, '餌 26 根本沒被踩到 —— 這一輪什麼都沒測到'
+    assert '不必 --restore' in _out, '餌 26:遊戲檔沒動,卻沒有告訴讀者不必還原'
+    # 反過來也要成立:遊戲檔沒動,就不可以同時印出還原指令(2026-09-26 加)。
+    # 照著跑的話,他先前裝好的別套球衣會被一起退掉。
+    assert _restore_cmd(_g) not in _out, '餌 26:遊戲檔沒動,畫面上卻印了還原指令'
+    assert _archives(_slots) == _arch0, '餌 26:換名前就驗出壞了,遊戲檔卻已經被換掉'
+    assert _no_parts(_g), '餌 26:留下了工作複本'
+    assert _STATE['phase'] == 'idle', '餌 26:什麼都沒換,登記卻說動過遊戲檔'
+    _bait_ran(26)
+
+    # ── 反向餌 27:換上去之後那一輪複驗沒過 → 一定要叫讀者 --restore,不可以說「完成」──
+    # 下餌:os.replace 換到遊戲檔身上之後,把那個遊戲檔最後一個位元組翻掉
+    # (模擬「換上去之後才壞掉」)。拆掉這道,畫面上會印「複驗:… 全部逐位元組相符」
+    # 「完成」、結束碼 0,而遊戲檔裡的球衣是壞的。
+    # 陰性對照在後面:照畫面上教的 --restore 跑一次,三個封裝檔要全部回到動手之前。
+    _g, _slots = _selftest_game(d, 'b27_game')
+    _pk = _selftest_pack(d, 'b27_pack', _pack_ok)
+    _arch0 = _archives(_slots)
+    _live27 = set(_slots.values())
+    _real_replace27 = os.replace
+    _hit27 = {'n': 0}
+
+    def _replace_then_rot(a, b):
+        r = _real_replace27(a, b)
+        if os.fspath(b) in _live27:
+            with open(b, 'r+b') as f:
+                f.seek(-1, os.SEEK_END)
+                last = f.read(1)
+                f.seek(-1, os.SEEK_END)
+                f.write(bytes([last[0] ^ 0xFF]))
+            _hit27['n'] += 1
+        return r
+
+    os.replace = _replace_then_rot
+    try:
+        # 驗的是還原指令那一整行,不是「--restore」這個字(見 _restore_cmd)
+        _out = _must_exit2('餌 27 換名後複驗沒過', _restore_cmd(_g), [_g, '--install', _pk, '--apply'])
+    finally:
+        os.replace = _real_replace27
+    assert _hit27['n'] >= 1, '餌 27 根本沒被踩到 —— 這一輪什麼都沒測到'
+    assert '複驗有' in _out and '進遊戲看看' not in _out, \
+        '餌 27:換上去的遊戲檔跟來源不一樣,畫面上卻沒有說複驗沒過(或說了完成)'
+    assert '不必 --restore' not in _out and '一個位元組都沒有動' not in _out, \
+        '餌 27:遊戲檔已經換上去了,畫面上卻說沒動到、不必還原:\n%s' % _out
+    _STATE.update(phase='idle', target=None, replaced=[])
+    _rc, _out = _selftest_run_main([_g, '--restore'])
+    assert _rc == 0, '餌 27 陰性對照:照畫面上教的 --restore 跑,結束碼是 %r:\n%s' % (_rc, _out)
+    assert _archives(_slots) == _arch0, '餌 27 陰性對照:--restore 之後沒有回到動手之前的樣子'
+    _STATE.update(phase='idle', target=None, replaced=[])
+    _bait_ran(27)
+
+    # ── 反向餌 28:做不出硬連結的磁碟(exFAT / FAT32 隨身碟)上,換名到一半失敗 ──
+    # 下餌:os.link 一律失敗(那種磁碟就是這樣),再讓第二次換到遊戲檔身上的
+    # os.replace 失敗。那時候第一個封裝檔已經換上去了,而沒有回頭路。
+    # 腳本要誠實逐檔說「哪個已改、哪個沒改」並給還原指令,結束碼 2。
+    # 拆掉這道,回頭路那一段會拿 None 去換名,丟出 TypeError —— 真正的原因被蓋掉,
+    # 讀者看到一整片 traceback,也不知道哪個檔已經改了。
+    _g, _slots = _selftest_game(d, 'b28_game')
+    _pk = _selftest_pack(d, 'b28_pack', _pack_ok)
+    _arch0 = _archives(_slots)
+    _live28 = set(_slots.values())
+    _real_replace28, _real_link28 = os.replace, getattr(os, 'link', None)
+    _trip28 = {'hits': 0, 'done': False, 'links': 0}
+
+    def _no_link(a, b):
+        _trip28['links'] += 1
+        raise OSError(1, '這個磁碟做不出硬連結(這是 --selftest 故意製造的)')
+
+    def _boom_second28(a, b):
+        if not _trip28['done'] and os.fspath(b) in _live28:
+            _trip28['hits'] += 1
+            if _trip28['hits'] >= 2:
+                _trip28['done'] = True
+                raise OSError(28, '磁碟沒有空間了(這是 --selftest 故意製造的)')
+        return _real_replace28(a, b)
+
+    os.link, os.replace = _no_link, _boom_second28
+    try:
+        _out = _must_exit2('餌 28 沒有回頭路', _restore_cmd(_g), [_g, '--install', _pk, '--apply'])
+    finally:
+        os.replace = _real_replace28
+        if _real_link28 is None:
+            del os.link
+        else:
+            os.link = _real_link28
+    assert _trip28['done'] and _trip28['links'] >= 1, '餌 28 根本沒被踩到 —— 這一輪什麼都沒測到'
+    _lines28 = _out.splitlines()
+    assert [ln for ln in _lines28 if 'logos.big' in ln and '已改' in ln], \
+        '餌 28:logos.big 已經換上去了,畫面上卻沒有說「已改」:\n%s' % _out
+    assert [ln for ln in _lines28 if 'uniforms.big' in ln and '沒改' in ln], \
+        '餌 28:uniforms.big 沒換成,畫面上卻沒有說「沒改」:\n%s' % _out
+    # 畫面上有兩段話各自要給還原指令(2026-09-26 加):逐檔說明那一段,
+    # 以及 main() 接住 OSError 之後照登記說的那一段(從「停下來了:作業系統…」開始)。
+    # 只驗整個畫面上有沒有那一行,其中一段改成「不必 --restore」或整行拿掉都驗不出來。
+    # (分段要用後面那半句:逐檔說明的標題「換名中途停下來了」裡也有「停下來了」四個字。)
+    _pre28, _sep28, _post28 = _out.partition('停下來了:作業系統不讓我讀寫這個檔')
+    assert _sep28, '餌 28:畫面上沒有「停下來了:作業系統不讓我讀寫這個檔」那一段:\n%s' % _out
+    assert _restore_cmd(_g) in _pre28, '餌 28:逐檔說明那一段沒有給還原指令:\n%s' % _out
+    assert '封裝檔已經換過了' in _post28 and _restore_cmd(_g) in _post28, \
+        '餌 28:最後那一段沒有照登記說「封裝檔已經換過了」並給還原指令:\n%s' % _out
+    assert '不必 --restore' not in _out and '一個位元組都沒有動' not in _out, \
+        '餌 28:logos.big 已經換上去了,畫面上卻說沒動到、不必還原:\n%s' % _out
+    _now28 = _archives(_slots)
+    assert _now28['logos'] != _arch0['logos'], '餌 28:logos.big 應該已經換上去了(不然這一輪沒測到東西)'
+    assert _now28['uniforms'] == _arch0['uniforms'] and _now28['models'] == _arch0['models'], \
+        '餌 28:沒換成的封裝檔被動到了'
+    assert _no_parts(_g), '餌 28:留下了工作複本'
+    _STATE.update(phase='idle', target=None, replaced=[])
+    _rc, _out = _selftest_run_main([_g, '--restore'])
+    assert _rc == 0 and _archives(_slots) == _arch0, \
+        '餌 28 陰性對照:照畫面上教的 --restore 跑,沒有回到動手之前的樣子:\n%s' % _out
+    _STATE.update(phase='idle', target=None, replaced=[])
+    _bait_ran(28)
+
+    # ── 反向餌 29:備份途中少寫了(沒有報錯的短寫)→ 訊息要講出兩邊各幾個位元組 ──
+    # 反向餌 9 驗的是「正本沒被換掉」;這一個驗讀者看到的那句話。
+    # 拆掉「長度不同」那道,後面「內容不同」還是會擋 —— 但讀者只看到「內容不同」,
+    # 看不出是少寫了(磁碟滿、外接碟拔掉最常見的樣子)。
+    _v29 = os.path.join(d, 'b29_victim.big')
+    with open(_v29, 'wb') as f:
+        f.write(b'KEEP29' * 50)
+    _b29 = open(_v29, 'rb').read()
+    _real_copy29 = shutil.copyfileobj
+
+    def _short29(fin, fout, length=0):
+        fout.write(fin.read()[:-1])        # 少寫一個位元組,而且不丟例外
+
+    shutil.copyfileobj = _short29
+    try:
+        _must_stop('餌 29 短寫', '兩邊不一樣大', _atomic_copy, big, _v29)
+    finally:
+        shutil.copyfileobj = _real_copy29
+    assert open(_v29, 'rb').read() == _b29, '餌 29:正本被換掉了'
+    assert not [n for n in os.listdir(d) if '.part-' in n], '餌 29:留下了暫存檔'
+    _bait_ran(29)
+
+    # ── 反向餌 30:寫出來的長度一樣、內容不一樣 → 不可以換上去 ──
+    # 2026-09-24 那一輪記下的缺口:「長度相同、內容不同的檔只有『內容不同』那一道
+    # 擋得到,這種情況還沒有餌」。拆掉那一道,這種檔會被當成「相同」換上去。
+    _v30 = os.path.join(d, 'b30_victim.big')
+    with open(_v30, 'wb') as f:
+        f.write(b'KEEP30' * 50)
+    _b30 = open(_v30, 'rb').read()
+    _real_copy30 = shutil.copyfileobj
+
+    def _flip30(fin, fout, length=0):
+        data = bytearray(fin.read())
+        data[len(data) // 2] ^= 0xFF      # 長度一樣,中間一個位元組不一樣
+        fout.write(bytes(data))
+
+    shutil.copyfileobj = _flip30
+    try:
+        _must_stop('餌 30 長度同內容不同', '內容跟來源不同', _atomic_copy, big, _v30, True)
+    finally:
+        shutil.copyfileobj = _real_copy30
+    assert open(_v30, 'rb').read() == _b30, '餌 30:內容不同的檔被換上去了'
+    assert not [n for n in os.listdir(d) if '.part-' in n], '餌 30:留下了暫存檔'
+    assert _STATE['phase'] == 'idle', '餌 30:沒換成,登記卻沒有收回來'
+    _bait_ran(30)
+
+    # ── 反向餌 31:還原前檢查拿到一個不存在的備份 ──
+    # 走正常的 --restore 碰不到這一道(前面先用 lexists 篩過),所以直接呼叫。
+    # 拆掉它,下一行量檔案大小會丟作業系統的錯,訊息變成英文的 No such file。
+    _must_stop('餌 31 備份不存在', '找不到備份', _restore_from_backup,
+               os.path.join(d, 'b31_沒有這份備份' + BACKUP_SUFFIX), big, True)
+    _bait_ran(31)
+
+    # ── 反向餌 45、46:還原前檢查備份的另外兩道(寫成 _stop(...) 的那幾道)──
+    # 上面那套量法只數「下一行是 raise」的 if,數不到 _stop(...)。2026-09-26 用同樣的
+    # 拆法去拆它們:拆掉「0 bytes」那一道,反向餌 5 照樣綠 —— 後面的「不到一半」
+    # 地板會接住,只是讀者看到的是「差太多了」而不是「備份是 0 bytes」;
+    # 拆掉那道地板,開頭被蓋掉(不是 BIGF)的半截備份會被拿去蓋遊戲檔。
+    # 兩個餌都照讀者打的 --restore 跑,驗那句話、結束碼 2、遊戲資料夾沒被動到。
+    for _n, _tag, _junk, _say in ((45, '0 bytes 的備份', b'', '備份是 0 bytes'),
+                                  (46, '開頭被蓋掉又只剩半截的備份', b'\x00' * 10, '不到一半')):
+        _g, _slots = _selftest_game(d, 'b%d_game' % _n)
+        with open(_slots['uniforms'] + BACKUP_SUFFIX, 'wb') as f:
+            f.write(_junk)
+        _before = _selftest_snap(_g)
+        _out = _must_exit2('餌 %d %s' % (_n, _tag), _say, [_g, '--restore'])
+        assert '已還原' not in _out, '餌 %d:備份是壞的,卻印了「已還原」' % _n
+        assert _selftest_snap(_g) == _before, '餌 %d:拿壞掉的備份動到了遊戲資料夾' % _n
+        _bait_ran(_n)
+
+    # ══ 反向餌 47 到 59(2026-09-26 第二次補)══════════════════════════
+    # 為什麼還要補:18 到 46 補完之後再檢查一次,發現上面那套量法(只數「if 的下一行
+    # 是 raise」)數不到的不只 _stop(...) 那幾道。另外用一套更寬的拆法再量(數哪些形狀
+    # 見「自我測試(--selftest)」那個分隔註解),單拆還是全綠的有 22 處。
+    # 這一段補讀者照課程走會碰到的那幾處;語系檔、執行檔那 8 處在反向餌 60 到 67。
+    # 47 到 59 都照命令列跑 main();其中 56 到 59 要這台機器做得出符號連結。
+
+    # ── 反向餌 47:封裝檔尾巴被截掉一段(複製或下載到一半中斷最常見的樣子)──
+    # 開頭與目錄都還完整,--scan 看不出來,餌 23、24 那兩道也不會攔;要到接上去之前
+    # 量檔頭大小欄位(size_field_order 最後那個 raise)才擋得下來。那個 raise 不在
+    # if 底下,上面那套量法數不到它。拆掉它實測:截掉 5 個位元組的 uniforms.big 照樣
+    # 被接上去、檔頭改成新的總長度,兩輪複驗全過,印「完成」、結束碼 0。
+    # 它量的是工作複本,所以另外驗訊息裡寫的是 uniforms.big,不是工作複本的臨時名字。
+    # 備份在這之前已經做了,所以跟餌 26 一樣只驗三個封裝檔沒變、沒留下工作複本。
+    _g, _slots = _selftest_game(d, 'b47_game')
+    _pk = _selftest_pack(d, 'b47_pack', _pack_ok)
+    with open(_slots['uniforms'], 'rb') as f:
+        _raw = f.read()
+    with open(_slots['uniforms'], 'wb') as f:
+        f.write(_raw[:-5])
+    _arch0 = _archives(_slots)
+    _out = _must_exit2('餌 47 封裝檔尾巴被截掉', 'uniforms.big 的檔頭大小欄位跟實際檔案大小對不上',
+                       [_g, '--install', _pk, '--apply'])
+    assert '.part-' not in _out, '餌 47:訊息裡留著工作複本的臨時名字 —— 讀者手上沒有那個檔'
+    assert '進遊戲看看' not in _out, '餌 47:封裝檔是壞的,卻印了「完成」'
+    assert _archives(_slots) == _arch0, '餌 47:封裝檔是壞的,遊戲檔卻被換掉了'
+    assert _no_parts(_g), '餌 47:留下了工作複本'
+    assert _STATE['phase'] == 'idle', '餌 47:什麼都沒換,登記卻說動過遊戲檔'
+    _bait_ran(47)
+
+    # ── 反向餌 48、49:換名前那一輪複驗的第一層與第三層 ──
+    # 餌 26 對準的是第二層(撈出來的位元組跟來源不同);另外兩層單拆,自我測試原本照樣全綠。
+    # 下餌跟餌 26 同一個做法:append_entry 照常接上去之後,再把工作複本改壞一處 ——
+    #   48:目錄裡那一項的長度少寫 1(模擬「目錄寫錯了,沒有報錯」)。拆掉第一層,
+    #       第二層還是會擋,只是說成「讀回來的位元組跟來源不同」,所以驗第一層那句話。
+    #   49:檔頭 +4 的總大小改回接之前的值(模擬「檔頭那 4 個位元組沒寫進去」)。
+    #       拆掉第三層,兩輪複驗都會過,印「完成」、結束碼 0。
+    _real_append4849 = append_entry
+    for _n, _tag, _spoil, _say in (
+            (48, '目錄說的長度不對',
+             lambda f, pos, blob, head: (f.seek(pos + 4), f.write(struct.pack('>I', len(blob) - 1))),
+             '❌ 001.fsh 複驗失敗(目錄說 91,應該是 92 bytes)'),
+            (49, '檔頭的總大小沒寫進去',
+             lambda f, pos, blob, head: (f.seek(4), f.write(head[4:8])),
+             '❌ uniforms.big 的檔頭大小欄位跟實際大小對不上')):
+        _g, _slots = _selftest_game(d, 'b%d_game' % _n)
+        _pk = _selftest_pack(d, 'b%d_pack' % _n, _pack_ok)
+        _arch0 = _archives(_slots)
+        _hit = {'n': 0}
+
+        def _append_then_spoil(path, field_pos, blob, _spoil=_spoil, _hit=_hit):
+            with open(path, 'rb') as f:
+                head = f.read(8)
+            r = _real_append4849(path, field_pos, blob)
+            with open(path, 'r+b') as f:
+                _spoil(f, field_pos, blob, head)
+            _hit['n'] += 1
+            return r
+
+        globals()['append_entry'] = _append_then_spoil
+        try:
+            _out = _must_exit2('餌 %d %s' % (_n, _tag), _say, [_g, '--install', _pk, '--apply'])
+        finally:
+            globals()['append_entry'] = _real_append4849
+        assert _hit['n'] >= 1, '餌 %d 根本沒被踩到 —— 這一輪什麼都沒測到' % _n
+        assert '工作複本複驗' in _out and '不必 --restore' in _out, \
+            '餌 %d:換名前就驗出壞了,卻沒有告訴讀者遊戲檔沒動、不必還原' % _n
+        assert _archives(_slots) == _arch0, '餌 %d:換名前就驗出壞了,遊戲檔卻已經被換掉' % _n
+        assert _no_parts(_g), '餌 %d:留下了工作複本' % _n
+        assert _STATE['phase'] == 'idle', '餌 %d:什麼都沒換,登記卻說動過遊戲檔' % _n
+        _bait_ran(_n)
+
+    # ── 反向餌 50:兩次開頭檢查中間,球衣檔被換成別的東西 ──
+    # 寫入迴圈裡還有第二道開頭檢查(else 後面那個 raise,不在 if 底下,量法數不到)。
+    # 第一道在備份之前已經認過每一個檔,所以只有檔案在兩次檢查中間被換掉才輪得到它。
+    # 下餌:「準備工作複本」那一步做完之後,把球衣包裡的 001.fsh 換成一張 PNG。
+    # 拆掉這道,那張 PNG 會原封不動接進封裝檔;複驗拿的是換過之後的來源去比,
+    # 當然相符 —— 印「完成」、結束碼 0。
+    _g, _slots = _selftest_game(d, 'b50_game')
+    _pk = _selftest_pack(d, 'b50_pack', _pack_ok)
+    _arch0 = _archives(_slots)
+    _real_stage50 = _stage_copy
+    _hit50 = {'n': 0}
+
+    def _stage_then_swap(live):
+        r = _real_stage50(live)
+        if not _hit50['n']:
+            with open(os.path.join(_pk, '001.fsh'), 'wb') as f:
+                f.write(b'\x89PNG\r\n\x1a\n' + b'X' * 84)
+        _hit50['n'] += 1
+        return r
+
+    globals()['_stage_copy'] = _stage_then_swap
+    try:
+        _out = _must_exit2('餌 50 兩次檢查中間被換掉', '改動都還在工作複本上',
+                           [_g, '--install', _pk, '--apply'])
+    finally:
+        globals()['_stage_copy'] = _real_stage50
+    assert _hit50['n'] >= 1, '餌 50 根本沒被踩到 —— 這一輪什麼都沒測到'
+    assert '001.fsh 的開頭既不是' in _out, '餌 50:停下來的那句話沒說出是哪一個檔不對'
+    assert _archives(_slots) == _arch0, '餌 50:不是圖檔的東西被換進遊戲檔了'
+    assert _no_parts(_g), '餌 50:留下了工作複本'
+    assert _STATE['phase'] == 'idle', '餌 50:什麼都沒換,登記卻說動過遊戲檔'
+    _bait_ran(50)
+
+    # ── 反向餌 51:封裝檔讀不到(作業系統不讓讀)──
+    # big_entries 把「打不開」翻成「讀不到 <哪一個檔>」。拆掉那個 except 實測,錯誤會一路
+    # 冒到 main() 接作業系統錯誤的那個出口,改印「作業系統不讓我讀寫這個檔」那一段 ——
+    # 一樣停得下來、結束碼一樣是 2,差別只在說法。所以這個餌守的是那句話,不是停不停得下來。
+    # 下餌:讓打開 uniforms.big 丟 PermissionError
+    # (不用 chmod:系統管理員身分與 Windows 上,chmod 擋不住讀)。
+    import builtins
+    _g, _slots = _selftest_game(d, 'b51_game')
+    _pk = _selftest_pack(d, 'b51_pack', _pack_ok)
+    _before = _selftest_snap(_g)
+    _deny51 = os.path.abspath(_slots['uniforms'])
+    _hit51 = {'n': 0}
+
+    def _open_denied(file, *a, **k):
+        if isinstance(file, str) and os.path.abspath(file) == _deny51:
+            _hit51['n'] += 1
+            raise PermissionError(13, '拒絕存取(這是 --selftest 故意製造的)', file)
+        return builtins.open(file, *a, **k)
+
+    assert 'open' not in globals(), '餌 51:這支腳本自己定義了 open,下面換回去的那一行會弄壞它'
+    globals()['open'] = _open_denied
+    try:
+        _must_exit2('餌 51 封裝檔讀不到', '讀不到 %s' % _slots['uniforms'], [_g, '--scan', _pk])
+    finally:
+        del globals()['open']
+    assert _hit51['n'] >= 1, '餌 51 根本沒被踩到 —— 這一輪什麼都沒測到'
+    assert _selftest_snap(_g) == _before, '餌 51:遊戲資料夾被動到了'
+    _bait_ran(51)
+
+    # ── 反向餌 52:動手途中按 Ctrl-C → main() 要接住、照登記說話、結束碼 130 ──
+    # 餌 7、13、16 驗的是登記本身;這一個驗讀者最後看到的那句話與結束碼。
+    # 拆掉 main() 接 Ctrl-C 的那一段,讀者看到的是一整片 traceback,不知道遊戲檔動了沒有。
+    #   (a) 落在換名之前(準備工作複本時)→ 要說「還沒有動到任何檔案」,不可以叫人 --restore
+    #   (b) 落在換名之後(最後那一輪複驗時)→ 要說「封裝檔已經動過了」並給 --restore;
+    #       照它教的 --restore 跑一次,三個封裝檔要回到動手之前(陰性對照)
+    # Ctrl-C 是直接丟出 KeyboardInterrupt,不靠訊號處理器,所以哪一種機器都跑得到。
+    _g, _slots = _selftest_game(d, 'b52_game')
+    _pk = _selftest_pack(d, 'b52_pack', _pack_ok)
+    _arch0 = _archives(_slots)
+    _real_recheck52 = _recheck_archive
+    _live52 = set(os.path.abspath(p) for p in _slots.values())
+
+    def _stage_ctrl_c(live):
+        raise KeyboardInterrupt
+
+    def _recheck_ctrl_c(archive, rows, shown):
+        if os.path.abspath(archive) in _live52:
+            raise KeyboardInterrupt
+        return _real_recheck52(archive, rows, shown)
+
+    for _part, _name, _fake, _say, _not_say in (
+            ('a', '_stage_copy', _stage_ctrl_c, '還沒有動到任何檔案', '--restore'),
+            ('b', '_recheck_archive', _recheck_ctrl_c, '封裝檔已經動過了', '還沒有動到任何檔案')):
+        _real = globals()[_name]
+        globals()[_name] = _fake
+        try:
+            try:
+                _rc, _out = _selftest_run_main([_g, '--install', _pk, '--apply'])
+            except KeyboardInterrupt:
+                raise AssertionError('餌 52(%s):Ctrl-C 沒有被 main() 接住 —— '
+                                     '讀者會看到一整片 traceback' % _part)
+        finally:
+            globals()[_name] = _real
+        assert _rc == 130, '餌 52(%s):結束碼應該是 130,實際是 %r:\n%s' % (_part, _rc, _out)
+        assert _say in _out and _not_say not in _out, \
+            '餌 52(%s):畫面上的話跟遊戲檔實際的狀態對不上:\n%s' % (_part, _out)
+        assert _no_parts(_g), '餌 52(%s):留下了工作複本' % _part
+        if _part == 'b':
+            # 2026-09-26 加:只驗「封裝檔已經動過了」不夠,後面那一整行還原指令拿掉了照樣過。
+            # 下面陰性對照跑的 --restore 就是這一行。
+            assert _restore_cmd(_g) in _out and '不必 --restore' not in _out, \
+                '餌 52(b):封裝檔已經換上去了,畫面上卻沒有給還原指令(或說了不必還原):\n%s' % _out
+        if _part == 'a':
+            assert _archives(_slots) == _arch0, '餌 52(a):說還沒動,遊戲檔卻變了'
+            assert _STATE['phase'] == 'idle', '餌 52(a):什麼都沒換,登記卻說動過遊戲檔'
+    assert _archives(_slots) != _arch0, '餌 52(b):遊戲檔應該已經換上去了(不然這一輪沒測到東西)'
+    _STATE.update(phase='idle', target=None, replaced=[])
+    _rc, _out = _selftest_run_main([_g, '--restore'])
+    assert _rc == 0 and _archives(_slots) == _arch0, \
+        '餌 52 陰性對照:照畫面上教的 --restore 跑,沒有回到動手之前的樣子:\n%s' % _out
+    _STATE.update(phase='idle', target=None, replaced=[])
+    _bait_ran(52)
+
+    # ── 反向餌 53:工作複本複製得不對(而且沒有報錯)→ 不可以在它上面動手 ──
+    # _stage_copy 複製完會先跟正本逐位元組比對。拆掉這一道,換名前後兩輪複驗都看不出來 ——
+    # 它們只驗新接上去的那一項與檔頭,工作複本別的地方錯了會原封不動換到遊戲檔上,
+    # 印「完成」、結束碼 0。
+    # 下餌:先把兩份 .unibak 備份放好(這一次就跳過備份,只剩「準備工作複本」會複製),
+    # 再讓複製的時候把最後一個位元組翻掉。
+    _g, _slots = _selftest_game(d, 'b53_game')
+    _pk = _selftest_pack(d, 'b53_pack', _pack_ok)
+    for _k in ('uniforms', 'logos'):
+        with open(_slots[_k], 'rb') as f:
+            _raw = f.read()
+        with open(_slots[_k] + BACKUP_SUFFIX, 'wb') as f:
+            f.write(_raw)
+    _before = _selftest_snap(_g)
+    _real_copy53 = shutil.copyfileobj
+    _hit53 = {'n': 0}
+
+    def _copy_flip_last(fin, fout, length=0):
+        data = bytearray(fin.read())
+        data[-1] ^= 0xFF
+        fout.write(bytes(data))
+        _hit53['n'] += 1
+
+    shutil.copyfileobj = _copy_flip_last
+    try:
+        _must_exit2('餌 53 工作複本複製得不對', '寫出來的內容跟來源不同',
+                    [_g, '--install', _pk, '--apply'])
+    finally:
+        shutil.copyfileobj = _real_copy53
+    assert _hit53['n'] >= 1, '餌 53 根本沒被踩到 —— 這一輪什麼都沒測到'
+    assert _selftest_snap(_g) == _before, '餌 53:工作複本是壞的,遊戲資料夾卻被動到了(或留下了暫存檔)'
+    assert _STATE['phase'] == 'idle', '餌 53:什麼都沒換,登記卻說動過遊戲檔'
+    _bait_ran(53)
+
+    # ── 反向餌 54:--restore 時一份備份好、一份壞 → 一份都不可以先還原 ──
+    # cmd_restore 先把每一份備份都驗過(verify_only=True 那一輪)才開始蓋。拆掉那一輪,
+    # 好的那一份會先被還原,輪到壞的那一份才停 —— 讀者拿到「一半還原、一半沒還原」的
+    # 遊戲資料夾(2026-09-05 修掉的就是這個)。下餌:uniforms.big 的備份是好的、但跟現在
+    # 的檔不一樣;logos.big 的備份是 0 bytes(uniforms 排在 logos 前面,拆掉那一輪時它會先被蓋)。
+    _g, _slots = _selftest_game(d, 'b54_game')
+    with open(_slots['uniforms'] + BACKUP_SUFFIX, 'wb') as f:
+        f.write(_fake_big([('001.fsh', _q + b'V' * 30)]))
+    with open(_slots['logos'] + BACKUP_SUFFIX, 'wb') as f:
+        f.write(b'')
+    _before = _selftest_snap(_g)
+    _out = _must_exit2('餌 54 一好一壞的備份', '備份是 0 bytes', [_g, '--restore'])
+    assert '已還原' not in _out, '餌 54:有一份備份是壞的,卻印了「已還原」'
+    assert _selftest_snap(_g) == _before, '餌 54:有一份備份是壞的,另一份卻已經先還原了'
+    _bait_ran(54)
+
+    # ── 反向餌 55:裝第二套球衣,不可以把第一次動手之前的備份蓋掉 ──
+    # 看到備份已經在就不再備份 —— 那一份才是「你第一次動手之前的樣子」。那個 if 底下
+    # 不是 raise 而是 continue,兩套量法都數不到;拆掉它,自我測試原本照樣全綠,
+    # 而裝第二套時備份會被換成「裝了第一套之後」的樣子,--restore 只退得回第一套。
+    # 下餌:同一個遊戲資料夾連裝兩套不一樣的球衣,再 --restore,要回到兩套都還沒裝的樣子。
+    _g, _slots = _selftest_game(d, 'b55_game')
+    _arch0 = _archives(_slots)
+    for _i, _pkx in enumerate((_selftest_pack(d, 'b55_packA', _pack_ok),
+                               _selftest_pack(d, 'b55_packB', [('001.fsh', _q + b'P' * 90),
+                                                               ('l001.fsh', _q + b'Q' * 90)]))):
+        _rc, _out = _selftest_run_main([_g, '--install', _pkx, '--apply'])
+        assert _rc == 0 and '進遊戲看看' in _out, \
+            '餌 55:第 %d 套正常的球衣沒裝成功(這一輪什麼都沒測到):\n%s' % (_i + 1, _out)
+        _STATE.update(phase='idle', target=None, replaced=[])
+    assert '備份已存在,保留最早那一份' in _out, '餌 55:裝第二套時沒有說保留了最早那一份備份'
+    _rc, _out = _selftest_run_main([_g, '--restore'])
+    assert _rc == 0 and _archives(_slots) == _arch0, \
+        '餌 55:連裝兩套之後 --restore,沒有回到兩套都還沒裝的樣子(第一次的備份被蓋掉了):\n%s' % _out
+    _STATE.update(phase='idle', target=None, replaced=[])
+    _bait_ran(55)
+
+    # ── 反向餌 56 到 59:遊戲資料夾裡有符號連結(照命令列跑)──
+    # 餌 1、8 驗的是 _refuse_symlink 這支函式本身;這四個驗 --install 與 --restore 在動手
+    # 之前有沒有真的去叫它。單拆其中一處呼叫,自我測試原本照樣全綠:
+    #   56 --install,封裝檔本身是連結 → 要在備份之前就停。拆掉的話,後面準備工作複本
+    #      那一步還是會擋,說的話也一樣 —— 但那時候已經隔著連結做了兩份備份。
+    #   57 --install,備份那個名字是連結、指到資料夾外面一個存在的檔 → 要停。拆掉的話,
+    #      它被當成「備份已存在」,整批照裝,而退路是一個指到別處的連結。
+    #   58 --restore,備份是連結 → 要停。拆掉的話,會照著連結把外面那個檔還原進來。
+    #   59 --restore,封裝檔是連結 → 要在還原任何一份之前就停。拆掉的話,排在前面的
+    #      uniforms.big 先被還原,輪到 logos.big 才被另一道擋下,變成一半還原。
+    # 連結都指到遊戲資料夾外面同一個檔,另外驗那個檔一個位元組都沒變。
+    # 做不出符號連結的機器整段跳過,並寫在畫面上(同餌 1、2、8)。
+    _outside56 = os.path.join(d, 'b56_outside.big')
+    with open(_outside56, 'wb') as f:
+        f.write(_fake_big([('001.fsh', _q + b'O' * 30), ('l001.fsh', _q + b'O' * 30)]))
+    with open(_outside56, 'rb') as f:
+        _outside56_0 = f.read()
+    try:
+        os.symlink(_outside56, os.path.join(d, 'b56_probe_link'))
+        _can_link = True
+    except (OSError, NotImplementedError, AttributeError):
+        _can_link = False
+    if _can_link:
+        # 56
+        _g, _slots = _selftest_game(d, 'b56_game')
+        _pk = _selftest_pack(d, 'b56_pack', _pack_ok)
+        os.remove(_slots['logos'])
+        os.symlink(_outside56, _slots['logos'])
+        _before = _selftest_snap(_g)
+        _must_exit2('餌 56 封裝檔是連結', '封裝檔 logos.big 是一個符號連結',
+                    [_g, '--install', _pk, '--apply'])
+        assert _selftest_snap(_g) == _before, '餌 56:封裝檔是連結,卻先隔著它做了備份(或動到了別的檔)'
+        _bait_ran(56)
+        # 57
+        _g, _slots = _selftest_game(d, 'b57_game')
+        _pk = _selftest_pack(d, 'b57_pack', _pack_ok)
+        os.symlink(_outside56, _slots['logos'] + BACKUP_SUFFIX)
+        _before = _selftest_snap(_g)
+        _out = _must_exit2('餌 57 備份那個名字是連結', '備份檔 logos.big.unibak 是一個符號連結',
+                           [_g, '--install', _pk, '--apply'])
+        assert '進遊戲看看' not in _out, '餌 57:退路是一個連結,卻照樣裝完了'
+        assert _selftest_snap(_g) == _before, '餌 57:備份是連結,遊戲資料夾卻被動到了'
+        _bait_ran(57)
+        # 58
+        _g, _slots = _selftest_game(d, 'b58_game')
+        os.symlink(_outside56, _slots['uniforms'] + BACKUP_SUFFIX)
+        _before = _selftest_snap(_g)
+        _out = _must_exit2('餌 58 還原時備份是連結', '備份檔 uniforms.big.unibak 是一個符號連結',
+                           [_g, '--restore'])
+        assert '已還原' not in _out, '餌 58:備份是連結,卻印了「已還原」'
+        assert _selftest_snap(_g) == _before, '餌 58:照著連結把外面的檔還原進來了'
+        _bait_ran(58)
+        # 59
+        _g, _slots = _selftest_game(d, 'b59_game')
+        with open(_slots['uniforms'] + BACKUP_SUFFIX, 'wb') as f:
+            f.write(_fake_big([('001.fsh', _q + b'V' * 30)]))
+        with open(_slots['logos'], 'rb') as f:
+            _raw = f.read()
+        with open(_slots['logos'] + BACKUP_SUFFIX, 'wb') as f:
+            f.write(_raw)
+        os.remove(_slots['logos'])
+        os.symlink(_outside56, _slots['logos'])
+        _before = _selftest_snap(_g)
+        _out = _must_exit2('餌 59 還原時封裝檔是連結', '封裝檔 logos.big 是一個符號連結',
+                           [_g, '--restore'])
+        assert '已還原' not in _out, '餌 59:有一個封裝檔是連結,卻印了「已還原」'
+        assert _selftest_snap(_g) == _before, '餌 59:有一個封裝檔是連結,另一個卻已經先還原了'
+        _bait_ran(59)
+        with open(_outside56, 'rb') as f:
+            assert f.read() == _outside56_0, '餌 56 到 59:連結指到的、遊戲資料夾外面的那個檔被動到了'
+    else:
+        for _n in (56, 57, 58, 59):
+            _bait_skipped(_n, _WHY_NO_SYMLINK)
+
+    # ── 反向餌 32:封裝檔小到連檔頭都裝不下(不到 8 個位元組)──
+    # 走 --install 會先被「開頭不是 BIGF」那一道擋下(餌 23),所以直接呼叫。
+    # 拆掉它,下一行會丟 struct.error —— 不是本腳本認得的錯,讀者會看到 traceback。
+    _tiny = os.path.join(d, 'b32_tiny.big')
+    with open(_tiny, 'wb') as f:
+        f.write(b'BIGF')
+    _must_stop('餌 32 封裝檔不到 8 bytes', '太小', size_field_order, _tiny)
+    _bait_ran(32)
+
+    # ── 反向餌 33 到 44:這一課不會呼叫的共用函式 ──
+    # qfs_decompress、read_entry、fsh_first_image、fsh_replace_pixels 這四支,
+    # 裝球衣的流程一支都沒用到(球衣檔是原封不動接進去的)。留著是給想自己
+    # 改圖的人接手用的 —— 他拿去用的時候,守門要是真的會擋的。
+    # 先做陰性對照:正常的資料要解得開、讀得出、換得了,不然下面的「擋下來了」
+    # 可能只是因為那支函式本來就整個壞掉。
+    assert qfs_decompress(qfs_compress_literal(b'MVP2005 uniform')) == b'MVP2005 uniform', \
+        '陰性對照:純照抄的 QFS 解不回原樣'
+    assert qfs_decompress(b'\x10\xfb\x00\x00\x04' + b'\x01\x00' + b'A') == b'AAAA', \
+        '陰性對照:帶反向參照的 QFS 解不回 AAAA'
+    _must_stop('餌 33 QFS 長檔頭不完整', 'QFS 檔頭不完整', qfs_decompress, b'\x11\xfb\x00\x00\x00')
+    _bait_ran(33)
+    _must_stop('餌 34 QFS 短檔頭不完整', 'QFS 檔頭不完整', qfs_decompress, b'\x10\xfb\x00')
+    _bait_ran(34)
+    _must_stop('餌 35 QFS 宣稱的解壓大小超過上限', '解壓尺寸異常', qfs_decompress,
+               b'\x11\xfb\x00\x00\x00\x00' + (MAX_UNCOMPRESSED + 1).to_bytes(4, 'big'))
+    _bait_ran(35)
+    # 照抄 1 個 A 之後往回 10 個位元組抄 —— 可是手上只有 1 個位元組。
+    _must_stop('餌 36 QFS 反向參照越界', '反向參照越界', qfs_decompress,
+               b'\x10\xfb\x00\x00\x10' + b'\x01\x09' + b'A')
+    _bait_ran(36)
+    # 檔頭說解開是 2 個位元組,控制碼卻吐出 4 個。
+    _must_stop('餌 37 QFS 解出來超過宣稱的大小', '超過檔頭宣稱', qfs_decompress,
+               b'\x10\xfb\x00\x00\x02' + b'\x01\x00' + b'A')
+    _bait_ran(37)
+    _p38 = os.path.join(d, 'b38.big')
+    with open(_p38, 'wb') as f:
+        f.write(_fake_big([('a.fsh', b'xyz')]))
+    _it38 = big_entries(_p38)[0]
+    assert read_entry(_p38, _it38[2], _it38[3]) == b'xyz', '陰性對照:read_entry 讀不出 xyz'
+    _must_stop('餌 38 目錄說的長度比檔案剩下的多', '實際只讀到', read_entry,
+               _p38, _it38[2], _it38[3] + 5)
+    _bait_ran(38)
+    _shpi = _selftest_shpi()
+    assert fsh_first_image(_shpi) == (0x7D, 2, 2, 40, len(_shpi)), \
+        '陰性對照:自造的 SHPI 讀不出來:%r' % (fsh_first_image(_shpi),)
+    _must_stop('餌 39 不是 SHPI', '不是 SHPI', fsh_first_image, _selftest_shpi(magic=b'SHPX'))
+    _bait_ran(39)
+    _must_stop('餌 40 SHPI 裡 0 張圖', '一張圖都沒有', fsh_first_image, _selftest_shpi(num=0))
+    _bait_ran(40)
+    _must_stop('餌 41 圖片記錄的位移指到檔案外面', '檔頭不完整', fsh_first_image,
+               _selftest_shpi(img_off=1000))
+    _bait_ran(41)
+    _must_stop('餌 42 沒見過的格式代號', '沒見過的格式代號', fsh_first_image, _selftest_shpi(code=0x55))
+    _bait_ran(42)
+    _must_stop('餌 43 圖片寬度是 0', '圖片尺寸異常', fsh_first_image, _selftest_shpi(width=0))
+    _bait_ran(43)
+    assert fsh_replace_pixels(_shpi, 40, 56, b'\x22' * 16) == _shpi[:40] + b'\x22' * 16, \
+        '陰性對照:長度相同的像素換不進去'
+    _must_stop('餌 44 新像素長度不同', '拒絕寫入', fsh_replace_pixels, _shpi, 40, 56, b'\x22' * 15)
+    _bait_ran(44)
+
+    # ── 反向餌 60 到 67:還原前檢查裡給語系檔(LOCH)與執行檔(MZ)用的那 8 道(2026-09-26 加)──
+    # 這一課的備份都是封裝檔(BIGF),走 --restore 碰不到它們;留著是因為這段檢查是本站
+    # 幾支腳本共用的(2026-08-30 那次是六支腳本一起中招),哪天有人拿去接手用,守門要是真的會擋。
+    # 所以直接呼叫 _restore_from_backup(只驗不蓋),而目標檔故意不存在 ——
+    # 不讓最後那道「不到一半」的地板插手,量到的才是對準的那一道。
+    # 每一格各一個:6 道 if,加上 2 道「讀不出結構」的 except(檔案短到連該讀的那幾格都沒有)。
+    # 先做陰性對照:格式完整的假語系檔與假執行檔要過得了,不然下面的「擋下來了」
+    # 可能只是那段檢查本來就什麼都擋。
+    _nodst = os.path.join(d, 'b60_沒有這個檔')
+
+    def _loc_bak(tag, blob):
+        p = os.path.join(d, 'b%s%s' % (tag, BACKUP_SUFFIX))
+        with open(p, 'wb') as f:
+            f.write(blob)
+        return p
+
+    assert _restore_from_backup(_loc_bak('60ok', _selftest_loch()), _nodst, True) is None, \
+        '陰性對照:格式完整的假語系檔過不了還原前檢查'
+    assert _restore_from_backup(_loc_bak('64ok', _selftest_mz()), _nodst, True) is None, \
+        '陰性對照:格式完整的假執行檔過不了還原前檢查'
+    for _n, _tag, _blob, _say in (
+            (60, '語系檔的 LOCL 不在該在的地方', _selftest_loch(locl=b'XXXX'), '那裡不是 LOCL'),
+            (61, '語系檔的位移表被截斷', _selftest_loch(count=1000), '位移表被截斷了'),
+            (62, '語系檔最後一條字串超出檔尾', _selftest_loch()[:62], '超出檔案結尾'),
+            (63, '語系檔短到讀不出結構', b'LOCH' + b'\x00' * 12, '讀不出語系檔的結構'),
+            (64, '執行檔的 PE 檔頭不對', _selftest_mz(pe=b'PX\x00\x00'), 'PE 檔頭不在它該在的地方'),
+            (65, '執行檔的節區表被截斷', _selftest_mz(nsec=100), '節區表被截斷了'),
+            (66, '執行檔的節區指到檔尾外面', _selftest_mz(raw_size=0x200), '節區指到'),
+            (67, '執行檔短到讀不出結構', b'MZ' + b'\x00' * 30, '讀不出執行檔的結構')):
+        _must_stop('餌 %d %s' % (_n, _tag), _say, _restore_from_backup, _loc_bak(_n, _blob), _nodst, True)
+        _bait_ran(_n)
+
+    # ── 反向餌 68:沒加 --apply 的 --install 只能預覽,一個位元組都不可以寫(2026-09-26 加)──
+    # 這是整支工具「預設不寫」的根本,也是課程頁面「預覽」那一步讀者一定會跑的那一行。
+    # 守門是 cmd_install 裡的 `if not apply_it:`,底下是 return 而不是 raise,前兩套量法都數不到
+    # (第三套才數得到,見「自我測試(--selftest)」那個分隔註解);
+    # 而這之前自我測試裡每一次 --install 都帶著 --apply。把那一行拆掉(或讓 main() 把
+    # args.apply 換成 True),當時的自我測試照樣全綠,而沒加 --apply 的 --install 會真的做備份、
+    # 改寫兩個封裝檔、印「完成」、結束碼 0(2026-09-26 在假遊戲資料夾上實測)。
+    # 下餌:照讀者打的樣子跑一次不加 --apply 的 --install。球衣包用裝得進去的那一種,
+    # 不然它會先被餌 21 那一道擋下來,測不到這一道。
+    # 陰性對照在後面:同一行加上 --apply 再跑一次,遊戲資料夾要真的變了 ——
+    # 不然「沒變」可能只是這個球衣包本來就裝不進去。
+    _g, _slots = _selftest_game(d, 'b68_game')
+    _pk = _selftest_pack(d, 'b68_pack', _pack_ok)
+    _before = _selftest_snap(_g)
+    _rc, _out = _selftest_run_main([_g, '--install', _pk])
+    assert _rc == 0, '餌 68:沒加 --apply 的預覽,結束碼應該是 0,實際是 %r:\n%s' % (_rc, _out)
+    assert '以上是預覽,還沒有動到任何檔案' in _out, \
+        '餌 68:沒加 --apply,畫面上卻沒有說這只是預覽:\n%s' % _out
+    assert '已備份' not in _out and '進遊戲看看' not in _out, \
+        '餌 68:沒加 --apply,卻做了備份或印了「完成」:\n%s' % _out
+    assert _selftest_snap(_g) == _before, \
+        '餌 68:沒加 --apply,遊戲資料夾卻被動到了(或多了備份檔、暫存檔)'
+    assert _STATE['phase'] == 'idle', '餌 68:什麼都沒寫,登記卻說動過遊戲檔'
+    _rc, _out = _selftest_run_main([_g, '--install', _pk, '--apply'])
+    assert _rc == 0 and '進遊戲看看' in _out and _selftest_snap(_g) != _before, \
+        '餌 68 陰性對照:同一行加上 --apply 卻沒有裝進去(這一輪什麼都沒測到):\n%s' % _out
+    _STATE.update(phase='idle', target=None, replaced=[])
+    _bait_ran(68)
+
+    # ── 反向餌 69:接到工作複本時作業系統不讓寫(封裝檔被設成唯讀最常見的樣子)(2026-09-26 加)──
+    # 為什麼要有它:這時候遊戲檔一個位元組都還沒動,main() 接住作業系統錯誤之後要照登記說
+    # 「不必 --restore」—— 課程頁面「停下來了:作業系統不讓我讀寫這個檔」那一列,教讀者看的
+    # 正是這一句。餌 15 走的是同一條路,但它直接呼叫 cmd_install 而且把畫面吃掉,看不到 main()
+    # 最後印的那一段。補這個餌之前實測:把 main() 裡照登記分兩路的那個 if 改成永遠不成立
+    # (永遠印「封裝檔已經換過了」加還原指令),或把「不必 --restore」那一行拿掉,自我測試照樣全綠。
+    # 讀者照著那行指令還原,會把他先前裝好的別套球衣一起退掉。
+    # 下餌:跟餌 15 一樣讓 append_entry 丟一個帶著工作複本路徑的 PermissionError
+    # (不用 chmod:系統管理員身分與 Windows 上,chmod 擋不住寫)。
+    _g, _slots = _selftest_game(d, 'b69_game')
+    _pk = _selftest_pack(d, 'b69_pack', _pack_ok)
+    _arch0 = _archives(_slots)
+    _real_append69 = append_entry
+    _hit69 = {'tmp': ''}
+
+    def _append_denied(path, field_pos, blob):
+        _hit69['tmp'] = os.path.basename(path)
+        raise PermissionError(13, '拒絕存取(這是 --selftest 故意製造的)', path)
+
+    globals()['append_entry'] = _append_denied
+    try:
+        _out = _must_exit2('餌 69 接到工作複本時被拒絕', '停下來了:作業系統不讓我讀寫這個檔',
+                           [_g, '--install', _pk, '--apply'])
+    finally:
+        globals()['append_entry'] = _real_append69
+    assert '.part-' in _hit69['tmp'], '餌 69 根本沒被踩到 —— 這一輪什麼都沒測到'
+    assert '你的遊戲檔一個位元組都沒有動,不必 --restore' in _out, \
+        '餌 69:遊戲檔沒動,畫面上卻沒有告訴讀者不必還原:\n%s' % _out
+    assert _restore_cmd(_g) not in _out and '封裝檔已經換過了' not in _out, \
+        '餌 69:遊戲檔沒動,畫面上卻叫讀者還原:\n%s' % _out
+    assert _hit69['tmp'] not in _out, '餌 69:畫面上留著工作複本那個臨時名字(讀者手上沒有那個檔)'
+    assert _archives(_slots) == _arch0, '餌 69:接到工作複本那一步就失敗了,遊戲檔卻被動到了'
+    assert _no_parts(_g), '餌 69:留下了工作複本'
+    assert _STATE['phase'] == 'idle', '餌 69:什麼都沒換,登記卻說動過遊戲檔'
+    _bait_ran(69)
+
+    # ── 反向餌 70:換上去換到一半被拒絕,而回頭路做得出來(2026-09-26 加)──
+    # 例如第二個封裝檔正被別的程式開著(Windows 上遊戲沒關就是這樣)。已經換上去的那一個
+    # 會靠回頭路換回來,所以遊戲檔一個位元組都沒動,畫面上兩段話都要說不必還原:
+    # 逐檔說明那一段(「換名中途停下來了」底下)與 main() 接住作業系統錯誤之後那一段。
+    # 餌 12 走的是同一條路,但它直接呼叫 cmd_install 而且把畫面吃掉,只驗三個封裝檔換回來了;
+    # 補這個餌之前實測:把逐檔說明那一段的「不必 --restore」換成還原指令,自我測試照樣全綠。
+    # 下餌:os.link 照常(回頭路做得出來),讓換到第二個封裝檔身上的 os.replace 丟 PermissionError。
+    # 跟餌 12 一樣,要系統暫存資料夾做得出硬連結(2026-09-26 模擬過做不出來的機器:兩個都會紅)。
+    # 反過來那一面是餌 28:同一條路做不出回頭路時,兩段都要改口給還原指令。
+    _g, _slots = _selftest_game(d, 'b70_game')
+    _pk = _selftest_pack(d, 'b70_pack', _pack_ok)
+    _arch0 = _archives(_slots)
+    _live70 = set(_slots.values())
+    _real_replace70 = os.replace
+    _trip70 = {'hits': 0, 'done': False}
+
+    def _locked_second(a, b):
+        if not _trip70['done'] and os.fspath(b) in _live70:
+            _trip70['hits'] += 1
+            if _trip70['hits'] >= 2:
+                _trip70['done'] = True
+                raise PermissionError(13, '檔案正被別的程式使用(這是 --selftest 故意製造的)', b)
+        return _real_replace70(a, b)
+
+    os.replace = _locked_second
+    try:
+        _out = _must_exit2('餌 70 換到一半被拒絕', '停下來了:作業系統不讓我讀寫這個檔',
+                           [_g, '--install', _pk, '--apply'])
+    finally:
+        os.replace = _real_replace70
+    assert _trip70['done'], '餌 70 根本沒被踩到 —— 這一輪什麼都沒測到'
+    # 分段跟餌 28 一樣用後面那半句(逐檔說明的標題「換名中途停下來了」裡也有「停下來了」)。
+    _pre70, _sep70, _post70 = _out.partition('停下來了:作業系統不讓我讀寫這個檔')
+    _rows70 = [ln.strip() for ln in _pre70.splitlines()
+               if ln.strip().endswith('已改') or ln.strip().endswith('沒改')]
+    assert '換名中途停下來了' in _pre70 and len(_rows70) == 2 \
+        and all(ln.endswith('沒改') for ln in _rows70), \
+        '餌 70:兩個封裝檔都換回來了,逐檔說明卻沒有兩行都說「沒改」:\n%s' % _out
+    assert '不必 --restore' in _pre70, \
+        '餌 70:逐檔說明那一段沒有告訴讀者不必還原:\n%s' % _out
+    assert '你的遊戲檔一個位元組都沒有動,不必 --restore' in _post70, \
+        '餌 70:最後那一段沒有照登記說不必還原:\n%s' % _out
+    assert _restore_cmd(_g) not in _out and '封裝檔已經換過了' not in _out, \
+        '餌 70:遊戲檔都換回來了,畫面上卻叫讀者還原:\n%s' % _out
+    assert _archives(_slots) == _arch0, '餌 70:換到一半被拒絕,封裝檔卻沒有全部回到動手之前的樣子'
+    assert _no_parts(_g), '餌 70:留下了工作複本或回頭路'
+    assert _STATE['phase'] == 'idle', '餌 70:全部換回來了,登記卻說動過遊戲檔'
+    _bait_ran(70)
+
     # ── 反向餌 14:印出來的餌數必須是「真的踩過的那些」,不可以寫死 ──
-    # 這一個踩的是記帳簿自己。上面那 13 個餌裡有 5 個會因為機器做不到而整段
-    # 跳過(餌 1、2、8 要做得出符號連結,餌 10、13 要裝得上訊號處理器),
-    # 而舊版不管跑了幾個都印同一個數字。實測模擬那兩種機器:只有 10 個 / 11 個
+    # 這一個踩的是記帳簿自己。上面那些餌裡有 9 個會因為機器做不到而整段
+    # 跳過(餌 1、2、8、56 到 59 要做得出符號連結,餌 10、13 要裝得上訊號處理器),
+    # 而舊版(那時候一共 13 個餌)不管跑了幾個都印同一個數字。實測模擬那兩種機器:只有 10 個 / 11 個
     # 餌真的踩過,畫面上還是印 13 —— 頁面卻叫讀者拿那個數字決定要不要動遊戲檔。
     # 下餌的方式有兩面:
     #   (a) 從記錄簿裡拿掉一個跑過的餌,那一行字一定要跟著變(數字寫死就不會變);

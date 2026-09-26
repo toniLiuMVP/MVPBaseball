@@ -82,6 +82,12 @@ EA 錄了 57 組球員專屬應援曲。這支腳本可以把其中一首指給�
 · 「你的檔動了沒」這句話不是只有 Ctrl-C 會講。換名之後才失敗的那些
   (作業系統擋下來、寫完複驗時讀不回來)也照實講,並且把還原指令印出來;
   換名之前就停手的照舊只說停手的理由,那一句一個字都沒有變。
+· 換名那一步自己失敗時(2026-09-26 加),先把正本讀回來比:跟這一次動手之前
+  一模一樣,就說一個位元組都沒有動到、排除原因後重跑同一行,不叫你 --restore
+  (備份是最早那一份,改過第二次的人照做會連第一次一起退掉);讀回來是新的
+  那一份就說已經換過了;讀不回來或兩份都不像,才說「可能已經換過了」並給還原指令。
+  (名字上不是一般的檔,例如具名管道,它不去開、算讀不回來 —— 開了會卡住。
+  2026-09-26 同一天第二次改。)
 · 備份已經存在就保留最早那一份,不會被第二次執行覆蓋掉 ——
   但動手之前會先確認那一份還能用(不是 0 bytes、也不是一個資料夾),
   不能用就停手不寫,不會讓你在「沒有還原點」的狀態下改遊戲檔。
@@ -113,9 +119,9 @@ EA 錄了 57 組球員專屬應援曲。這支腳本可以把其中一首指給�
  「不需要安裝任何套件」那半句是對的:本檔開頭 import 的
  argparse / os / re / shutil / signal / struct / sys / tempfile / zlib
  全是 Python 自己就附的模組(--selftest 與它的 -O 守門在函式裡另外 import 了
- contextlib / io / threading,也都是 Python 自己附的)。
- 其中 zlib 在本檔一次都沒有用到(用語法樹數本檔的模組用法:zlib 0 次、os 112 次、
- sys 12 次、signal 12 次、struct 11 次、shutil 6 次、re 2 次、argparse 2 次、tempfile 2 次),
+ contextlib / io / stat / threading,也都是 Python 自己附的;stat 是 2026-09-26 加的)。
+ 其中 zlib 在本檔一次都沒有用到(用語法樹數本檔的模組用法:zlib 0 次、os 150 次、
+ sys 14 次、signal 12 次、struct 11 次、shutil 6 次、re 2 次、argparse 2 次、tempfile 2 次),
  留著只是為了讓本站每一支腳本的檔頭長得一樣。
  (2026-09-05 訂正這幾個數字:那一輪把備份與還原改成原子的,os 從 35 次變 50 次、
   shutil 2→4、sys 4→6,還多了一個 tempfile。數字寫在說明裡就會過期,
@@ -123,14 +129,19 @@ EA 錄了 57 組球員專屬應援曲。這支腳本可以把其中一首指給�
   2026-09-06 那一輪把換名包成不可中斷的一段,多了 signal 4 次,其餘沒變;
   2026-09-10 那一輪只改說明文字與 main() 裡一個判斷,九個數字重數一次全部沒變;
   2026-09-24 加了 --selftest,os 50→112、sys 6→12、signal 4→12、shutil 4→6、
-  tempfile 1→2,其餘四個沒變。)
+  tempfile 1→2,其餘四個沒變;
+  2026-09-26 換名失敗時改成讀回來比、備份的暫存檔不再抄鎖定旗標,os 112→131
+  (自我測試裡多 17 次、外面多 2 次),shutil 一進一出還是 6,其餘七個沒變;
+  同一天第二次改:讀回來比之前先看名字上是不是一般的檔、自我測試加具名管道那兩道,
+  os 131→150(自我測試裡多 16 次、外面多 3 次)、sys 12→14(都在自我測試裡),
+  其餘七個沒變。)
  真的自己讀寫 PNG 的是「換球員大頭照」「做一張新的球員臉皮」「換掉開機畫面」
  「換球隊隊徽」這四課:site/tutorials/ 底下的 29 支腳本裡,找得到 png_read 與
  png_write 的就只有那四個檔。)
 
 授權:MIT(見檔尾完整條款)。本站教學文字另採 CC BY 4.0。
 """
-TOOL_DATE = '2026-09-24'  # 這一版工具的日期
+TOOL_DATE = '2026-09-26'  # 這一版工具的日期
 #
 # ─────────────────────────────────────────────────────────
 #  法律與免責(每一支本站腳本都帶著這一段)
@@ -178,6 +189,8 @@ import argparse
 #   0 = 還沒碰過正本(這時才可以說「一個位元組都沒有動到」)
 #   1 = 換檔那一步已經下去了,結果不明
 #   2 = 換檔確定完成
+#   3 = 換檔那一步自己回報失敗,而且讀回來確認正本跟動手之前一模一樣(2026-09-26 加,
+#       見 _settle_failed_replace())
 #
 # 2026-09-06 再加一層:換檔那一段用 _NoInterrupt 包起來(見下面那個類別),
 # 所以「1」這一格幾乎不會被看到了 —— 但它留著,因為 _NoInterrupt 在
@@ -227,11 +240,66 @@ def _state_note(gamedir):
     """
     if _REPLACE_STAGE == 0:
         return '遊戲檔一個位元組都沒有動到。'
+    if _REPLACE_STAGE == 3:
+        # 不寫「不用還原」:--restore 自己換檔失敗也會走到這裡,那時候你要的正是還原。
+        return ('換檔那一步沒有成功,但讀回來確認過:spch_cht.txt 跟這一次動手之前一模一樣,\n'
+                '  一個位元組都沒有動到。排除上面的原因之後,重跑同一行指令就好。')
+    # 1 這一格原本寫「中斷點就落在換檔那一步」。2026-09-26 起換檔自己回報失敗、
+    # 讀回來又比不出來的時候也會停在 1,那時沒有人按 Ctrl-C,所以改成兩種都說得通的話。
     return ('⚠️ 遊戲檔%s。想回到原本的樣子:\n'
             '    python3 %s "%s" --restore'
             % ('已經換過了' if _REPLACE_STAGE == 2
-               else '可能已經換過了(中斷點就落在換檔那一步)',
+               else '可能已經換過了(停在換檔那一步,程式分不出換了沒有)',
                os.path.basename(sys.argv[0]), gamedir))
+
+
+def _peek(path):
+    """讀出 path 現在的內容,給 _settle_failed_replace() 比對用(2026-09-26 加)。
+
+    不存在回 None;讀不到(沒有權限、名字上是資料夾之類)回 False。
+
+    ⚠️ 名字上不是一般的檔就不開它,直接回 False(2026-09-26 同一天第二次改)。
+       第一版無條件 open():那個名字上是具名管道(FIFO,不需要任何特權就建得出來)時,
+       open 會一直等一個永遠不會來的寫入端 —— 本站實測 --restore 就卡在這一行不動,
+       而舊版(不讀回來比)會直接把它換掉、還原成功。還原本來就不要求索引檔還是
+       正常的檔(見 cmd_restore()),所以這裡不可以讓它卡住。
+       回 False 就是「讀不回來」,收尾照舊說分不出來、給還原指令。
+    """
+    if not os.path.lexists(path):
+        return None
+    if os.path.islink(path) or not os.path.isfile(path):
+        return False
+    try:
+        with open(path, 'rb') as f:
+            return f.read()
+    except FileNotFoundError:
+        return None
+    except OSError:
+        return False
+
+
+def _settle_failed_replace(path, before, after):
+    """換檔那一步(os.replace)自己丟了 OSError 之後,讀回來看正本現在是哪一份(2026-09-26 加)。
+
+    在這之前,換名本身失敗時登記停在 1(結果不明),收尾一律說「可能已經換過了
+    (中斷點就落在換檔那一步)」並叫你 --restore。把 os.replace 換成丟 PermissionError
+    的替身實測三種情況:第一次改指派、已經改過一次之後再改第二次、--restore 本身 ——
+    三種正本都原封不動、暫存檔也清掉了,沒有遺失資料,只是那句話不對:
+    沒有人按 Ctrl-C,而且第二種照著跑 --restore 會連第一次那個成功的改動一起退掉
+    (備份保留的是最早那一份)。所以這裡不猜,讀回來比:
+      · 跟動手之前那一份(before)逐位元組相同 → 3:確定沒換成,重跑同一行就好
+      · 跟要換上去的那一份(after)相同         → 2:其實換成了,照「已經換過了」講
+      · 讀不回來、或兩份都不像                 → 維持 1,照舊給還原指令
+    before 是 None 代表動手之前那個名字上沒有檔(還原時索引檔已經被刪掉)。
+    """
+    global _REPLACE_STAGE
+    now = _peek(path)
+    if now is False:
+        return
+    if now == before:
+        _REPLACE_STAGE = 3
+    elif now == after:
+        _REPLACE_STAGE = 2
 
 
 def _no_symlink(path, what):
@@ -333,7 +401,14 @@ def _atomic_copy(src, dst):
                 shutil.copyfileobj(fi, fo)
             fo.flush()
             os.fsync(fo.fileno())   # 真的落到碟上,不是還躺在快取裡
-        shutil.copystat(src, part)  # 權限與時間戳照原檔,不要留下 mkstemp 的 0600
+        # 權限與時間戳照原檔,不要留下 mkstemp 的 0600。
+        # ⚠️ 2026-09-26 起不用 shutil.copystat:它在 macOS 上連「已鎖定」旗標(Finder
+        #    資訊視窗那一格,uchg)一起抄。原檔被鎖定時暫存檔一抄完也被鎖住,換名被擋、
+        #    _drop() 也刪不掉,遊戲資料夾裡留下一個刪不掉的 .part 檔(本站實測)。
+        #    時間戳先抄、權限後抄,跟 copystat 自己的順序一樣。
+        st = os.stat(src)
+        os.utime(part, ns=(st.st_atime_ns, st.st_mtime_ns))
+        shutil.copymode(src, part)
         os.replace(part, dst)       # os.replace 是原子的
     # 攔 BaseException 不是攔 Exception:Ctrl-C(KeyboardInterrupt)
     # 跟 SystemExit 都不是 Exception 的子類,而那正是最容易中斷備份的兩種情況。
@@ -498,6 +573,7 @@ def _do_copy(bak, dst):
     _no_symlink(bak, '備份檔')
     with open(bak, 'rb') as f:
         want = f.read()
+    before = _peek(dst)     # 換檔失敗時拿來比「正本到底動了沒」(2026-09-26 加)
     fd, tmp = _mkstemp_beside(dst, 'restore')
     try:
         with os.fdopen(fd, 'wb') as fo:
@@ -522,8 +598,11 @@ def _do_copy(bak, dst):
         with _NoInterrupt():
             os.replace(tmp, dst)
             _REPLACE_STAGE = 2
-    except BaseException:
+    except BaseException as e:
         _drop(tmp)
+        # 換檔那一步自己丟 OSError:不要停在「結果不明」,讀回來比(2026-09-26 加)
+        if _REPLACE_STAGE == 1 and isinstance(e, OSError):
+            _settle_failed_replace(dst, before, want)
         raise
 
 
@@ -905,11 +984,16 @@ def cmd_give(gamedir, who, source_num, apply_it):
         with _NoInterrupt():
             os.replace(tmp, idx)
             _REPLACE_STAGE = 2
-    except BaseException:
+    except BaseException as e:
         # 寫到一半被中斷(磁碟滿、按 Ctrl-C)時,把那個半截的暫存檔清掉,
         # 跟 _atomic_copy() 是同一個道理:不要在遊戲資料夾裡留垃圾。
         # 遊戲檔本身這時候還是原本那一份完整的,因為改名還沒發生。
         _drop(tmp)
+        # 改名那一步自己丟 OSError 時(2026-09-26 加),登記停在 1 的話收尾會叫你
+        # --restore —— 而備份是最早那一份,改過第二次的人照做會連第一次一起退掉。
+        # 所以讀回來跟這一次動手之前的 raw 比,見 _settle_failed_replace()。
+        if _REPLACE_STAGE == 1 and isinstance(e, OSError):
+            _settle_failed_replace(idx, raw, out)
         raise
 
     # 複驗:重新讀一次
@@ -1072,8 +1156,9 @@ def main():
         # 所以改名發生之前出的錯,遊戲檔一個位元組都沒被動到 ——
         # 但改名之後才出的錯(例如複驗時讀不到檔)不算。所以這句話交給
         # _state_note() 照 _REPLACE_STAGE 據實講,不打包票說「一定安全」。
+        # 改名那一步自己失敗的,在丟到這裡之前已經讀回來比過了(2026-09-26 加)。
         print('\n  停下來了:作業系統擋下這個動作 —— %s\n'
-              '  常見原因:磁碟滿了、檔案被設成唯讀、或那個路徑被別的東西佔住。\n'
+              '  常見原因:磁碟滿了、檔案被設成唯讀或被鎖定、或那個路徑被別的東西佔住。\n'
               '  %s\n' % (e, _state_note(args.gamedir)))
         return 2
     return 0
@@ -1108,14 +1193,22 @@ def selftest():
       五、已經有一份不能用的備份(0 bytes、或是一個資料夾)→ 停下來,不在沒有還原點時動手
       六、換檔那一步失敗(把 os.replace 換成一定丟例外的):索引檔換不上去、
           連備份都換不上去 → 索引檔原封不動、不留暫存檔;索引檔還沒碰過的時候,
-          收尾那句話照實說「一個位元組都沒有動到」;寫完讀回來複驗沒過 → 回 2 並給還原指令
+          收尾那句話照實說「一個位元組都沒有動到」;寫完讀回來複驗沒過 → 回 2 並給還原指令。
+          2026-09-26 加:換名自己失敗時收尾要照讀回來的樣子講 —— 跟動手之前一樣
+          (第一次改、改過一次之後再改第二次)→ 說沒動到、不叫你 --restore;
+          其實已經換上去了 → 說已經換過了;兩份都不像、或讀不回來 → 說分不出來、給還原指令;
+          不用替身、索引檔被鎖定(macOS 的 uchg,做不出來的系統跳過)→ 備份照樣做好、
+          不留刪不掉的暫存檔、照實說沒動到
       七、Ctrl-C:換檔之前按 → 說沒動到;換檔之後按 → 不可以說沒動到,要給還原指令;
           換名那一段裡收到真的 SIGINT → 那一段跑完才丟出來;接到改指派與還原的
           真流程上,換名做完才收到 → 要說「已經換過了」
       八、還原:備份被截短(少一組)、結尾不是完整的一行、有重複群組名、找不到備份、
           備份不到正本的一半、給的資料夾不對 → 停下來;還原換檔失敗、還原的暫存檔
-          讀回來跟備份對不起來 → 正本原封不動;換好之後讀回來跟備份不一樣 → 不印成功;
-          正常還原逐位元組回去;索引檔被刪掉也還原得回來
+          讀回來跟備份對不起來 → 正本原封不動(還原換檔失敗時收尾照讀回來的樣子說沒動到,
+          索引檔本來就被刪掉的也一樣,2026-09-26 加);換好之後讀回來跟備份不一樣 → 不印成功;
+          正常還原逐位元組回去;索引檔被刪掉也還原得回來;索引檔的名字上是具名管道(FIFO)
+          → 不卡住、照樣還原,換名又失敗時說分不出來、給還原指令(2026-09-26 加,
+          做不出 FIFO 的系統跳過)
       九、符號連結:索引檔、備份檔是指到資料夾外面的連結 → 改指派與還原都停下來,
           外面那個檔不被動到(這台機器做不出符號連結就跳過,而且會印出來說跳過了)
       十、命令列:給錯資料夾(DataError)印一句話回 2、--list 回 0
@@ -1207,11 +1300,14 @@ def selftest():
             """每一塊測試都從同一個乾淨狀態開始:原本的索引、原本的名冊、沒有備份。"""
             global _REPLACE_STAGE
             _REPLACE_STAGE = 0
+            # 資料夾(不是指到資料夾的連結)整個刪;其餘只要名字在就刪 ——
+            # 2026-09-26 改:原本只刪「連結或一般檔」,具名管道(FIFO)會被留下來,
+            # 下面的 put() 就卡住等一個不會來的讀取端。
             for p in (idx, bak):
-                if os.path.islink(p) or os.path.isfile(p):
-                    os.remove(p)
-                elif os.path.isdir(p):
+                if os.path.isdir(p) and not os.path.islink(p):
                     shutil.rmtree(p)
+                elif os.path.lexists(p):
+                    os.remove(p)
             put(idx, index)
             if not os.path.isfile(roster_p):
                 put(roster_p, roster)
@@ -1355,6 +1451,76 @@ def selftest():
             os.replace = real_replace
         check(rc == 2 and get(idx) == index and not junk(chants),
               '索引檔換上去那一步失敗 → 回 2、索引檔原封不動、不留暫存檔', True)
+        # 2026-09-26 加以下六道:換名那一步自己失敗時,收尾那句話要照讀回來的樣子講。
+        check('讀回來確認過' in out and '一個位元組都沒有動到' in out and '--restore' not in out,
+              '同一種失敗:讀回來確認索引檔沒變 → 照實說沒動到、重跑就好,不叫你 --restore', True)
+        # 改過一次之後再改第二次:備份是最早那一份,這時叫你 --restore 會連第一次一起退掉。
+        # 比的必須是「這一次動手之前」那一份,不是備份。
+        fresh()
+        quiet(cmd_give, game, 'Chin-Feng', '0010', True)     # 第一次:0010 → 1234,成功
+        _REPLACE_STAGE = 0
+        os.replace = boom_on_index
+        try:
+            rc, out = run_main(game, '--give', '2001', '0004', '--apply')
+        finally:
+            os.replace = real_replace
+        check(rc == 2 and get(idx) == want and get(bak) == index
+              and '讀回來確認過' in out and '--restore' not in out,
+              '改過一次之後再改第二次、換名失敗 → 停在第一次改完的樣子,照實說沒動到、不叫你 --restore',
+              True)
+
+        def replace_then_fail(src, dst):
+            real_replace(src, dst)
+            if dst == idx:
+                raise OSError(5, '(自我測試的替身)其實換上去了,卻回報失敗')
+
+        def scramble_then_fail(src, dst):
+            if dst == idx:
+                put(idx, b'selftest: neither before nor after\r\n')
+                raise OSError(5, '(自我測試的替身)換檔失敗')
+            return real_replace(src, dst)
+
+        for fake, label, ok in (
+                (replace_then_fail, '換名回報失敗、讀回來其實已經換上去了 → 照實說已經換過了、給還原指令',
+                 lambda o: '已經換過了' in o and '可能已經換過了' not in o),
+                (scramble_then_fail, '換名回報失敗、讀回來跟改之前改之後都不像 → 說分不出來、給還原指令',
+                 lambda o: '可能已經換過了' in o)):
+            fresh()
+            os.replace = fake
+            try:
+                rc, out = run_main(game, '--give', 'Chin-Feng', '0010', '--apply')
+            finally:
+                os.replace = real_replace
+            check(rc == 2 and ok(out) and '一個位元組都沒有動到' not in out and '--restore' in out,
+                  label, True)
+        _REPLACE_STAGE = 1
+        _settle_failed_replace(chants, False, index)     # chants 是資料夾:兩次都讀不回來
+        check(_REPLACE_STAGE == 1, '換名失敗之後正本讀不回來 → 維持「分不出來」,不說成沒動到', True)
+        # 不用替身、讓作業系統自己擋下換名:把索引檔設成 macOS 的「已鎖定」(uchg)。
+        # 備份要照樣做得出來(不可以把鎖定旗標抄到暫存檔上,留下刪不掉的 .part),
+        # 索引檔換不上去,收尾要讀回來說沒動到。做不出這個旗標的系統就跳過。
+        import stat
+        fresh()
+        try:
+            os.chflags(idx, stat.UF_IMMUTABLE)
+            locked = bool(os.stat(idx).st_flags & stat.UF_IMMUTABLE)
+        except (AttributeError, OSError):
+            locked = False
+        if locked:
+            try:
+                rc, out = run_main(game, '--give', 'Chin-Feng', '0010', '--apply')
+                left = junk(chants)
+            finally:
+                for x in [idx] + [os.path.join(chants, j) for j in junk(chants)]:
+                    os.chflags(x, 0)                     # 先解鎖,後面才刪得掉
+            check(rc == 2 and get(idx) == index and os.path.isfile(bak) and get(bak) == index
+                  and not left and '讀回來確認過' in out,
+                  '索引檔被鎖定(作業系統自己擋下換名)→ 備份照樣做好、不留刪不掉的暫存檔、照實說沒動到',
+                  True)
+            for j in left:                               # 這一道紅了才會有,清掉免得連累後面幾道
+                os.remove(os.path.join(chants, j))
+        else:
+            skipped.append('「已鎖定」的索引檔那 1 道(這台機器或這種磁碟做不出 macOS 的鎖定旗標)')
         fresh()
         os.replace = boom
         try:
@@ -1486,6 +1652,90 @@ def selftest():
             os.replace = real_replace
         check(isinstance(r, OSError) and get(idx) == changed and not junk(chants),
               '還原換檔失敗 → 正本原封不動、不留暫存檔', True)
+        fresh()                                           # 2026-09-26 加:同一種失敗,看收尾那句話
+        put(idx, changed)
+        put(bak, index)
+        os.replace = boom
+        try:
+            rc, out = run_main(game, '--restore')
+        finally:
+            os.replace = real_replace
+        check(rc == 2 and get(idx) == changed and '讀回來確認過' in out
+              and '可能已經換過了' not in out,
+              '同一種失敗從命令列跑:讀回來確認正本還是還原之前那一份 → 照實說、重跑同一行就好', True)
+        fresh()
+        os.remove(idx)                                    # 索引檔被刪掉了,正是最需要還原的時候
+        put(bak, index)
+        os.replace = boom
+        try:
+            rc, out = run_main(game, '--restore')
+        finally:
+            os.replace = real_replace
+        check(rc == 2 and not os.path.lexists(idx) and '讀回來確認過' in out,
+              '索引檔被刪掉時還原、換名失敗 → 讀回來還是不存在,一樣照實說沒動到', True)
+
+        # 2026-09-26 同一天第二次加:索引檔的名字上是一個具名管道(FIFO)。
+        # 換名失敗時拿來比的 _peek() 第一版會去 open 它,一直等一個不會來的寫入端 ——
+        # --restore 就卡在那裡(本站實測),而更早的版本是直接換掉、還原成功。
+        # 在另一條執行緒裡跑,5 秒沒結束就算紅,再從這邊打開寫入端把它放出來,
+        # 不讓整個自我測試跟著卡住。做不出 FIFO 的系統(例如 Windows)就跳過。
+        import threading
+
+        def fifo_restore(fake=None):
+            """索引檔換成 FIFO、備份照放,跑一次 --restore。回傳 (卡住了沒, 結束碼, 畫面)。"""
+            fresh()
+            os.remove(idx)
+            os.mkfifo(idx)
+            put(bak, index)
+            box = {}
+            screen = sys.stdout
+
+            def go():
+                box['r'] = run_main(game, '--restore')
+
+            if fake:
+                os.replace = fake
+            try:
+                t = threading.Thread(target=go)
+                t.daemon = True
+                t.start()
+                t.join(5)
+                hung = t.is_alive()
+                for _ in range(3):              # 卡住了才會進來:打開寫入端再關掉,放它出來
+                    if not t.is_alive():
+                        break
+                    try:
+                        os.close(os.open(idx, os.O_WRONLY | os.O_NONBLOCK))
+                    except OSError:
+                        pass
+                    t.join(2)
+            finally:
+                os.replace = real_replace
+                sys.stdout = screen             # 萬一它還卡著,別讓後面的輸出被收進它的緩衝區
+            rc, out = box.get('r', (None, ''))
+            return hung, rc, out
+
+        can_fifo = hasattr(os, 'mkfifo')
+        if can_fifo:
+            try:
+                os.mkfifo(os.path.join(root, 'probe-fifo'))
+                os.remove(os.path.join(root, 'probe-fifo'))
+            except OSError:
+                can_fifo = False
+        if can_fifo:
+            hung, rc, out = fifo_restore()
+            check(not hung and rc == 0 and os.path.isfile(idx) and not os.path.islink(idx)
+                  and get(idx) == index and '已還原' in out,
+                  '索引檔的名字上是具名管道(FIFO)→ --restore 不卡住、照樣還原成一般的檔', True)
+            hung, rc, out = fifo_restore(boom)
+            check(not hung and rc == 2
+                  and os.path.lexists(idx) and stat.S_ISFIFO(os.lstat(idx).st_mode)
+                  and '可能已經換過了' in out and '讀回來確認過' not in out
+                  and '--restore' in out and not junk(chants),
+                  '同樣是 FIFO、換名又失敗 → 不卡住,讀不回來就說分不出來、給還原指令', True)
+            fresh()
+        else:
+            skipped.append('具名管道(FIFO)那 2 道(這台機器做不出 FIFO)')
 
         real_fsync = os.fsync
 

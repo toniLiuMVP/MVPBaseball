@@ -66,7 +66,7 @@
   <div class="quickfix" id="quick">
     <p class="card-h" role="heading" aria-level="2">⚡ 只想趕快做完？照這四步（要先裝好 Python，沒裝的看<a href="../../start.html#python">第 0 課操作五</a>）</p>
     <ol>
-      <li>把腳本存到你的電腦：<a href="mvp_read_voice.py" download>mvp_read_voice.py</a>（1,079 行，零相依，只讀不寫）。下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打（Mac 開終端機先打 <code>cd ~/Downloads</code>）。</li>
+      <li>把腳本存到你的電腦：<a href="mvp_read_voice.py" download>mvp_read_voice.py</a>（1,165 行，零相依，只讀不寫）。下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列，把字刪掉改打 <code>cmd</code> 按 Enter，後面的指令都在開出來的這個視窗打（Mac 開終端機先打 <code>cd ~/Downloads</code>）。</li>
       <li>看看你的遊戲裡有哪些語音封裝檔。把引號裡換成你的遊戲資料夾，要指到<strong>下一層就是 <code>data</code> 的那一層</strong>。
   <p class="small">Windows:</p>
   <pre><code>python mvp_read_voice.py "你的遊戲資料夾" --list</code></pre>
@@ -359,7 +359,7 @@
 
   <h2>👉 自己跑一次</h2>
   <p><strong>步驟 1</strong>：把腳本存到你的電腦。</p>
-  <p><a href="mvp_read_voice.py" download>mvp_read_voice.py</a>（1,079 行，零相依，只讀不寫）</p>
+  <p><a href="mvp_read_voice.py" download>mvp_read_voice.py</a>（1,165 行，零相依，只讀不寫）</p>
   <p class="small"><strong>指令要在放腳本的那個資料夾打。</strong>瀏覽器下載的檔會在「下載」資料夾：打開檔案總管左邊的「下載」，點一下最上面的網址列（整條會反白），把字刪掉改打 <code>cmd</code> 按 Enter —— 開出來的命令提示字元<strong>已經停在「下載」裡</strong>，後面的指令都在這個視窗打（<a href="../../start.html">第 0 課</a>操作一的「資料夾法」）。Mac：打開終端機，先打 <code>cd ~/Downloads</code> 按 Enter。</p>
   <p><strong>步驟 2</strong>：看看你的遊戲裡有哪些語音封裝檔。把引號裡換成你的遊戲資料夾。</p>
   <p class="small">Windows:</p>
@@ -490,18 +490,28 @@
     <tbody>
       <tr><td data-label="哪一段"><code>main()</code></td>
           <td data-label="做什麼">收指令列參數，決定要跑 <code>--list</code>
-              還是看單一檔案，並把「讀不懂」與「找不到檔案」兩種狀況
-              各印成一句人話。</td>
+              還是看單一檔案；看單一檔案時，把「讀不懂」「找不到檔案」「給了資料夾卻沒加 <code>--list</code>」
+              「沒有權限讀」這四種狀況各印成一句人話。</td>
           <td data-label="為什麼要有它">這支只有三種用法，判斷集中在一個地方就講得完。
               會拿它來看自己遊戲的人不需要一整片 traceback，
-              所以預期得到的兩種失敗都收成一句話，回傳 2。</td></tr>
+              所以預期得到的這四種失敗都收成一句話，回傳 2。
+              ⚠️ <strong>2026-09-26 補</strong>：「給了資料夾」原本只接得住 Mac / Linux 的那一種錯誤。
+              Windows 上打開一個資料夾，Python 丟的是「沒有權限」那一種，
+              原本會變成一整片 traceback（這一句是推論，本站還沒在 Windows 上實測）。
+              現在開檔之前就先問「這是不是資料夾」，兩邊印的是同一句話；
+              真的沒有權限讀的檔，印的是另一句，不會被說成資料夾。
+              <code>--list</code> 不走這四句：這四句講的都是「你給的那一個檔」，
+              資料夾裡哪一個 <code>.big</code> 讀不到，交給下面的 <code>cmd_list()</code> 點名。</td></tr>
 
       <tr><td data-label="哪一段"><code>cmd_list()</code></td>
           <td data-label="做什麼">掃資料夾底下的 <code>.big</code>，逐項認出哪些是語音，
               統計每種編碼各有幾個。</td>
           <td data-label="為什麼要有它">找不到 <code>data/audio</code> 就直接掃你給的那一層，
               所以給錯一層、或給一個已經拆開的散裝資料夾，都不用重打指令。
-              個別項目讀不懂就跳過：一份概觀不該被一個壞項目卡住。</td></tr>
+              個別項目讀不懂就跳過：一份概觀不該被一個壞項目卡住。
+              整個 <code>.big</code> 讀不到（例如這個帳號沒有讀取權限）也一樣：
+              點名是哪一個、跳過，最後再說一次這份清單不完整，結束碼照樣是 <code>0</code>
+              （<strong>2026-09-26 補</strong>：在這之前，一個讀不到的 <code>.big</code> 會讓整份清單停在半路）。</td></tr>
 
       <tr class="hi"><td data-label="哪一段"><code>big_entries()</code></td>
           <td data-label="做什麼">讀 <code>BIGF</code> 封裝檔的目錄，回「名稱、位移、大小」。
@@ -603,7 +613,7 @@
   <p>下面就是你剛才下載的那一支，<strong>一個字都沒有不同</strong>（本站有自動檢查在守這件事）。
      它<u>完全不會寫入任何檔案</u> —— 沒有任何寫檔呼叫，你可以自己搜一次確認。</p>
   <details>
-    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1079 行）</summary>
+    <summary class="card-h" style="cursor:pointer">展開 / 收合完整原始碼（1165 行）</summary>
 <pre style="margin:10px 0 0">#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
@@ -657,8 +667,9 @@ mvp_read_voice.py —— 讀懂 MVP Baseball 2005 的語音檔（唯讀，不會
 吐什麼（輸出）
   · 只有畫面上的文字。它不寫檔、不建資料夾、不產生 WAV。
     整支腳本開檔一律是 'rb'，沒有任何 open(..., 'w')，你可以自己搜一次確認。
-  · 回傳值：讀得懂是 0；讀不懂、找不到檔案、或路徑給的是資料夾卻沒加 --list，
-    這三種都印一句人話然後回 2（不丟 traceback）。
+  · 回傳值：讀得懂是 0；看單一檔案時，讀不懂、找不到檔案、路徑給的是資料夾卻沒加
+    --list、或沒有權限讀那個檔，這四種都印一句人話然後回 2（不丟 traceback）。
+    --list 遇到讀不到的 .big 則是點名跳過，清單照樣列完、回 0（2026-09-26 加）。
   · --selftest（2026-09-24 加）：在記憶體裡拿自己拼的假語音檔，把每一道守門驗一次，
     一樣只印字、不開你的任何檔案。全過回 0，有一道沒過回 1，在 python3 -O 底下拒跑回 2。
 
@@ -666,7 +677,8 @@ mvp_read_voice.py —— 讀懂 MVP Baseball 2005 的語音檔（唯讀，不會
   · 唯讀是它的預設，也是它唯一的模式：沒有 --apply、沒有備份、也沒有還原功能，
     因為它從頭到尾沒有任何東西可以被改壞。
   · 讀不懂就停下來（丟 DataError），不硬解：開頭不是 SCHl、區塊長度不合理，
-    這兩種會印一句人話然後結束（回傳 2）。--list 掃整包時則是跳過讀不懂的那一項，
+    這兩種會印一句人話然後結束（回傳 2）。--list 掃整包時則是跳過讀不懂的那一項
+    （整個 .big 讀不到的話，點名那一個再跳過），
     --blocks 遇到某一段切不開也只會說那一段切不開，其餘照樣走完。
   · 印出來的東西分「量到的」與「推論」：取樣率 48,000 Hz 是推論，
     而且只涵蓋 GSTR 容器的編碼 3（社群做的那批裡的一種）。EA 原版、以及
@@ -719,7 +731,7 @@ mvp_read_voice.py —— 讀懂 MVP Baseball 2005 的語音檔（唯讀，不會
         —— 它比較像「PT 容器的記號」，不是「EA 原版的記號」。
 
 驗證方式很硬：**標籤解析消耗的長度必須等於檔頭宣告的長度** ——
-原版 6,995 個檔全部落在檔頭宣告長度的 1 個位元組容差內（程式第 463 行就是這樣判的：2,556 個剛好相等、4,439 個差 1）。
+原版 6,995 個檔全部落在檔頭宣告長度的 1 個位元組容差內（程式第 465 行就是這樣判的：2,556 個剛好相等、4,439 個差 1）。
 
 ─────────────────────────────────────────────────────────
  二、聲音資料怎麼擺（完全解開）
@@ -807,7 +819,7 @@ mvp_audio.py（--export / --import）。
 
 MIT License · Copyright (c) 2026 toni · 無外部相依，Python 3.7 以上
 """
-TOOL_DATE = '2026-09-24'  # 這一版工具的日期
+TOOL_DATE = '2026-09-26'  # 這一版工具的日期
 
 import argparse
 import os
@@ -1200,6 +1212,7 @@ def cmd_list(root):
     if not os.path.isdir(base):
         base = root
     found = 0
+    unreadable = 0
     for r, _, fs in os.walk(base):
         for f in sorted(fs):
             if not f.lower().endswith('.big'):
@@ -1208,8 +1221,21 @@ def cmd_list(root):
             # 一次把整個封裝檔讀進記憶體:後面每一項就能拿目錄裡的位移直接切,
             # 不必為了成千上萬項反覆 seek(本站量到一個封裝檔裡有 12,527 段語音)。
             # 開檔是 'rb',全程唯讀。
-            with open(p, 'rb') as fh:
-                raw = fh.read()
+            # 讀不到的封裝檔點名跳過(2026-09-26 加)。原本這裡一丟例外整份清單就停掉:
+            # 舊版噴一整片 traceback;09-26 第一版改成在 main() 接住,結果印的是
+            # 「沒有權限讀這個檔：&lt;你給的資料夾&gt;」—— 把資料夾說成那個檔,也不說是哪一個。
+            # 本站在 Mac 上把一個 .big 設成 chmod 000 重現過。跟下面「個別項目讀不懂
+            # 不要讓整份清單停下來」同一個道理,路徑照這裡的習慣印相對路徑。
+            try:
+                with open(p, 'rb') as fh:
+                    raw = fh.read()
+            except OSError as e:
+                unreadable += 1
+                print('  %-40s 讀不到，跳過（%s）'
+                      % (os.path.relpath(p, root),
+                         '沒有讀取權限，或別的程式正鎖著它'
+                         if isinstance(e, PermissionError) else '作業系統打不開它'))
+                continue
             items = big_entries(raw)
             if not items:
                 continue
@@ -1233,7 +1259,12 @@ def cmd_list(root):
             print('  %-40s %5d 個語音 · 編碼 %s'
                   % (os.path.relpath(p, root), n,
                      ', '.join('%s×%d' % (k, x) for k, x in sorted(codecs.items()))))
-    if not found:
+    # 有封裝檔讀不到時,清單就不完整 —— 最後再講一次,而且不接著說「請確認資料夾給對了」:
+    # 資料夾是對的,問題在那幾個檔(2026-09-26 加)。
+    if unreadable:
+        print('\n  ⚠️ 有 %d 個 .big 讀不到，上面已經點名跳過，所以這份清單不完整。' % unreadable)
+        print('  先確認這個帳號讀得到上面點名的檔（或關掉正在用它的程式），再跑一次。')
+    elif not found:
         print('  在這個資料夾底下沒有找到語音封裝檔。')
         print('  請確認你指的是**遊戲安裝資料夾**（它的下一層才是 data）。')
 
@@ -1261,18 +1292,31 @@ def main():
     ap.add_argument('--blocks', action='store_true', help='顯示聲音資料的內部切法')
     args = ap.parse_args()
 
+    # --list 放在下面那個 try 外面(2026-09-26 改)。下面每一句話講的都是「你給的
+    # 那一個檔」(找不到檔案：X、這是一個資料夾、沒有權限讀這個檔：X);--list 給的是
+    # 資料夾,放在 try 裡面的話,裡頭某一個 .big 讀不到時就會把資料夾說成那個檔
+    # (09-26 第一版就這樣錯過)。讀不到的封裝檔由 cmd_list() 自己點名跳過。
+    if args.list:
+        cmd_list(args.path)
+        return 0
     try:
-        if args.list:
-            cmd_list(args.path)
-            return 0
+        # 給的是資料夾就在開檔之前先認出來(2026-09-26 加)。原本只靠下面接
+        # IsADirectoryError,但那是 Mac / Linux 的反應;Windows 上 open() 一個資料夾
+        # 丟的是 PermissionError(Errno 13),Windows 的讀者會拿到一整片 traceback
+        # (這一句是推論:本站還沒在 Windows 上實測)。os.path.isdir 兩邊都認得資料夾,
+        # 所以先問它,再丟 IsADirectoryError 交給同一段印同一句話。
+        if os.path.isdir(args.path):
+            raise IsADirectoryError(21, '這是一個資料夾', args.path)
         with open(args.path, 'rb') as f:
             b = f.read()
         v = describe(b, os.path.basename(args.path))
         if args.blocks:
             show_blocks(v)
         return 0
-    # 兩種預期得到的失敗各印一句人話就好:一整片 traceback 對「只是想看看自己
-    # 遊戲檔」的人沒有任何用處。回傳 2 代表沒讀成功,別的錯誤仍然照常拋出來。
+    # 預期得到的失敗(讀不懂、找不到、給了資料夾、沒有權限讀)各印一句人話就好:
+    # 一整片 traceback 對「只是想看看自己遊戲檔」的人沒有任何用處。
+    # 回傳 2 代表沒讀成功,別的錯誤仍然照常拋出來。(2026-09-26 從「兩種」改寫:
+    # 資料夾那一種 09-24 就在了,這句話沒跟上;這一輪又多了沒有權限那一種。)
     except DataError as e:
         print('\n  停下來了：%s\n' % e)
         return 2
@@ -1285,6 +1329,13 @@ def main():
         print('\n  這是一個資料夾，不是單一語音檔。要列出整包語音請加 --list：')
         print('      python3 mvp_read_voice.py "%s" --list\n' % args.path)
         return 2
+    # 不是資料夾、作業系統卻不讓讀(2026-09-26 加)。資料夾在上面已經先認出來了,
+    # --list 也不走這個 try,走到這裡的是你給的那一個檔真的讀不到,所以不說成
+    # 「這是資料夾」。跟「找不到檔案」一樣只印你自己給的那個路徑,不印作業系統那串錯誤。
+    except PermissionError:
+        print('\n  沒有權限讀這個檔：%s' % args.path)
+        print('  作業系統不讓這支腳本讀它（這個帳號沒有讀取權限，或別的程式正鎖著它）。\n')
+        return 2
 
 
 # ─────────────────────────────────────────────────────────
@@ -1295,8 +1346,8 @@ def selftest():
     """--selftest:拿程式裡拼出來的假語音檔,把這支的每一道守門各驗一次。全過回 0。
 
     ⚠️ 全程在記憶體裡。假資料是下面拼出來的位元組;要「開檔」的那兩條路
-       (--list 走資料夾、單一檔案讀進來)是暫時把 os.walk 與這支腳本用的 open
-       換成讀這些位元組的替身,跑完就換回去 —— 所以它跟這支腳本平常一樣:
+       (--list 走資料夾、單一檔案讀進來)是暫時把 os.walk、os.path.isdir 與這支
+       腳本用的 open 換成讀這些位元組的替身,跑完就換回去 —— 所以它跟這支腳本平常一樣:
        不寫檔、不建資料夾,也不讀你電腦上的任何檔案。
 
     每一道守門都有「餌」(故意餵它該擋的東西,沒擋就紅)與「陰性對照」
@@ -1314,9 +1365,13 @@ def selftest():
       九、「若是 48000 Hz」那句推論只對 GSTR 容器的編碼 3 印
       十、區塊鏈之後的尾巴:裡面還有 SCHl 就要說「後面還有語音」,不可以說成補齊
       十一、--list:讀不懂的那一項跳過、不是 BIGF 的 .big 與一段語音都沒有的
-          封裝檔都不列,清單照樣列完;一個封裝檔都沒有時要說找不到
-      十二、命令列:讀不懂、找不到、給了資料夾卻沒加 --list(用替身丟出那個例外)
-          —— 三種都印一句話、回 2、不噴 traceback
+          封裝檔都不列,清單照樣列完;一個封裝檔都沒有時要說找不到。
+          2026-09-26 加:整個 .big 讀不到(沒有權限、斷掉的連結)→ 點名跳過、
+          其餘照樣列完、回 0,不可以把你給的資料夾說成那個檔;唯一的 .big 讀不到時
+          不可以說成「沒有找到語音封裝檔」
+      十二、命令列:讀不懂、找不到、給了資料夾卻沒加 --list(Mac / Linux 與 Windows
+          兩種 open 的反應各用替身丟一次)、不是資料夾卻沒有權限讀
+          —— 都印一句話、回 2、不噴 traceback;兩種資料夾印的是同一句
       十三、最上面那道「-O 拒跑」守門自己的餌
     在 python3 -O 底下拒跑,回 2。
     """
@@ -1504,10 +1559,16 @@ def selftest():
 
     # 下面兩道要「開檔」,所以暫時換上替身:os.walk 只回報下面這張表裡的名字,
     # 這支腳本用的 open 只從這張表拿位元組。finally 一定換回去。
+    # 2026-09-26 加:os.path.isdir 也換成替身,只有 folders 裡的名字算資料夾 ——
+    # main() 在開檔之前會先問它,不換的話就只能靠「剛好沒有同名的真資料夾」。
     table = {}
+    folders = set()
 
     def fake_walk(top, *a, **k):
         yield top, [], sorted(table)
+
+    def fake_isdir(path):
+        return os.path.basename(path) in folders
 
     def fake_open(path, mode='r', *a, **k):
         name = os.path.basename(path)
@@ -1519,13 +1580,13 @@ def selftest():
 
     def with_fakes(fn, *a):
         g = globals()
-        real_walk = os.walk
-        os.walk = fake_walk
+        real_walk, real_isdir = os.walk, os.path.isdir
+        os.walk, os.path.isdir = fake_walk, fake_isdir
         g['open'] = fake_open
         try:
             return quiet(fn, *a)
         finally:
-            os.walk = real_walk
+            os.walk, os.path.isdir = real_walk, real_isdir
             del g['open']
 
     def run_main(*argv):
@@ -1555,11 +1616,38 @@ def selftest():
     table.update({'notes.txt': b'x'})
     _, out = with_fakes(cmd_list, fake_dir)
     check('沒有找到語音封裝檔' in out, '陰性對照:一個封裝檔都沒有時,說找不到')
+    # 2026-09-26 加:整個 .big 讀不到。走 main() 那條路,連「--list 不可以被下面
+    # 單一檔案那幾句話接走」一起驗 —— 09-26 第一版就是被那幾句接走,
+    # 印成「沒有權限讀這個檔：&lt;你給的資料夾&gt;」,清單也停在半路。
+    # 斷掉的連結在 os.walk 眼裡也是一個檔,open 它丟的是 FileNotFoundError,一起放進來。
+    table.clear()
+    table.update({'voice.big': bigf([(b'a.dat', good), (b'b.dat', good)]),
+                  'locked.big': PermissionError(13, '(自我測試的替身)Permission denied'),
+                  'gone.big': FileNotFoundError(2, '(自我測試的替身)斷掉的連結')})
+    rc, out = run_main(fake_dir, '--list')
+    check(rc == 0 and '3×2' in line_of(out, 'voice.big')
+          and '讀不到' in line_of(out, 'locked.big') and '讀不到' in line_of(out, 'gone.big')
+          and '有 2 個 .big 讀不到' in out
+          and '沒有權限讀這個檔' not in out and '找不到檔案' not in out,
+          '有 .big 讀不到(沒有權限、斷掉的連結)→ 點名跳過、其餘照樣列完、回 0,'
+          '不把資料夾說成那個檔', True)
+    table.clear()
+    table.update({'locked.big': PermissionError(13, '(自我測試的替身)Permission denied')})
+    rc, out = run_main(fake_dir, '--list')
+    check(rc == 0 and '讀不到' in line_of(out, 'locked.big') and '沒有找到語音封裝檔' not in out,
+          '唯一的 .big 讀不到 → 說讀不到,不說成「沒有找到語音封裝檔、請確認資料夾」', True)
 
     print('\n十二、命令列')
     table.clear()
+    # 資料夾要兩個替身一起下(2026-09-26 改):folders 讓 isdir 說「是資料夾」,
+    # 表裡放的是真的去 open 時會丟的例外 —— Mac / Linux 是 IsADirectoryError,
+    # Windows 是 PermissionError(後者是推論,本站還沒在 Windows 上實測)。
+    # 「鎖住的檔」不在 folders 裡:isdir 說不是資料夾,open 卻丟 PermissionError。
+    folders.update({'Mac的資料夾', 'Windows的資料夾'})
     table.update({'good.dat': good, 'bad.dat': b'RIFF' + b'\x00' * 20,
-                  '一個資料夾': IsADirectoryError(21, '(自我測試的替身)這是資料夾')})
+                  'Mac的資料夾': IsADirectoryError(21, '(自我測試的替身)這是資料夾'),
+                  'Windows的資料夾': PermissionError(13, '(自我測試的替身)Permission denied'),
+                  '鎖住的檔.dat': PermissionError(13, '(自我測試的替身)Permission denied')})
     rc, out = run_main('good.dat')
     check(rc == 0 and '✅' in line_of(out, '標籤解析到'), '陰性對照:讀得懂的檔回 0')
     rc, out = run_main('bad.dat')
@@ -1567,9 +1655,17 @@ def selftest():
           '讀不懂的檔印一句話、回 2、不噴 traceback', True)
     rc, out = run_main('沒有這個檔.dat')
     check(rc == 2 and '找不到檔案' in out, '找不到檔案時印一句話、回 2', True)
-    rc, out = run_main('一個資料夾')
-    check(rc == 2 and '--list' in out, '給了資料夾卻沒加 --list,提示要加 --list、回 2', True)
+    said = '這是一個資料夾，不是單一語音檔'
+    for name, how in (('Mac的資料夾', 'Mac / Linux 的 open 丟 IsADirectoryError'),
+                      ('Windows的資料夾', 'Windows 的 open 丟 PermissionError')):
+        rc, out = run_main(name)
+        check(rc == 2 and said in out and '--list' in out and 'Traceback' not in out,
+              '給了資料夾卻沒加 --list(%s)→ 同一句話、提示加 --list、回 2' % how, True)
+    rc, out = run_main('鎖住的檔.dat')
+    check(rc == 2 and '沒有權限讀這個檔' in out and said not in out and 'Traceback' not in out,
+          '不是資料夾、open 卻丟 PermissionError → 說沒有權限讀、不說成資料夾、回 2', True)
     table.clear()
+    folders.clear()
 
     print('\n十三、-O 守門')
     check(_opt[0], '假裝開了 -O(把 _optimize_level 換成回傳 1),自我測試拒跑、結束碼 2', True)
